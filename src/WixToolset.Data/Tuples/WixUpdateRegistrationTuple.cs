@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixUpdateRegistration = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixUpdateRegistration,
+        public static readonly IntermediateSymbolDefinition WixUpdateRegistration = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixUpdateRegistration,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationTupleFields.Manufacturer), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationTupleFields.Department), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationTupleFields.ProductFamily), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationTupleFields.Classification), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationSymbolFields.Manufacturer), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationSymbolFields.Department), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationSymbolFields.ProductFamily), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixUpdateRegistrationSymbolFields.Classification), IntermediateFieldType.String),
             },
-            typeof(WixUpdateRegistrationTuple));
+            typeof(WixUpdateRegistrationSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixUpdateRegistrationTupleFields
+    public enum WixUpdateRegistrationSymbolFields
     {
         Manufacturer,
         Department,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         Classification,
     }
 
-    public class WixUpdateRegistrationTuple : IntermediateTuple
+    public class WixUpdateRegistrationSymbol : IntermediateSymbol
     {
-        public WixUpdateRegistrationTuple() : base(TupleDefinitions.WixUpdateRegistration, null, null)
+        public WixUpdateRegistrationSymbol() : base(SymbolDefinitions.WixUpdateRegistration, null, null)
         {
         }
 
-        public WixUpdateRegistrationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixUpdateRegistration, sourceLineNumber, id)
+        public WixUpdateRegistrationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixUpdateRegistration, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixUpdateRegistrationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixUpdateRegistrationSymbolFields index] => this.Fields[(int)index];
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Manufacturer];
-            set => this.Set((int)WixUpdateRegistrationTupleFields.Manufacturer, value);
+            get => (string)this.Fields[(int)WixUpdateRegistrationSymbolFields.Manufacturer];
+            set => this.Set((int)WixUpdateRegistrationSymbolFields.Manufacturer, value);
         }
 
         public string Department
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Department];
-            set => this.Set((int)WixUpdateRegistrationTupleFields.Department, value);
+            get => (string)this.Fields[(int)WixUpdateRegistrationSymbolFields.Department];
+            set => this.Set((int)WixUpdateRegistrationSymbolFields.Department, value);
         }
 
         public string ProductFamily
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.ProductFamily];
-            set => this.Set((int)WixUpdateRegistrationTupleFields.ProductFamily, value);
+            get => (string)this.Fields[(int)WixUpdateRegistrationSymbolFields.ProductFamily];
+            set => this.Set((int)WixUpdateRegistrationSymbolFields.ProductFamily, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Name];
-            set => this.Set((int)WixUpdateRegistrationTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixUpdateRegistrationSymbolFields.Name];
+            set => this.Set((int)WixUpdateRegistrationSymbolFields.Name, value);
         }
 
         public string Classification
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Classification];
-            set => this.Set((int)WixUpdateRegistrationTupleFields.Classification, value);
+            get => (string)this.Fields[(int)WixUpdateRegistrationSymbolFields.Classification];
+            set => this.Set((int)WixUpdateRegistrationSymbolFields.Classification, value);
         }
     }
 }

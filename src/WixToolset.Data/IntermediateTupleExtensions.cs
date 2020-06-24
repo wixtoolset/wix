@@ -2,118 +2,118 @@
 
 namespace WixToolset.Data
 {
-    public static class IntermediateTupleExtensions
+    public static class IntermediateSymbolExtensions
     {
-        public static bool AsBool(this IntermediateTuple tuple, int index) => tuple?.Fields[index].AsBool() ?? false;
+        public static bool AsBool(this IntermediateSymbol symbol, int index) => symbol?.Fields[index].AsBool() ?? false;
 
-        public static bool? AsNullableBool(this IntermediateTuple tuple, int index) => tuple?.Fields[index].AsNullableBool();
+        public static bool? AsNullableBool(this IntermediateSymbol symbol, int index) => symbol?.Fields[index].AsNullableBool();
 
-        public static int AsNumber(this IntermediateTuple tuple, int index) => tuple?.Fields[index].AsNumber() ?? 0;
+        public static int AsNumber(this IntermediateSymbol symbol, int index) => symbol?.Fields[index].AsNumber() ?? 0;
 
-        public static int? AsNullableNumber(this IntermediateTuple tuple, int index) => tuple?.Fields[index].AsNullableNumber();
+        public static int? AsNullableNumber(this IntermediateSymbol symbol, int index) => symbol?.Fields[index].AsNullableNumber();
 
-        public static string AsString(this IntermediateTuple tuple, int index) => tuple?.Fields[index].AsString();
+        public static string AsString(this IntermediateSymbol symbol, int index) => symbol?.Fields[index].AsString();
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, bool value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, bool value)
         {
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, bool? value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, bool? value)
         {
-            if (value == null && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(symbol, index))
             {
-                return tuple.Fields[index] = null;
+                return symbol.Fields[index] = null;
             }
 
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, long value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, long value)
         {
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, long? value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, long? value)
         {
-            if (value == null && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(symbol, index))
             {
-                return tuple.Fields[index] = null;
+                return symbol.Fields[index] = null;
             }
 
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, int value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, int value)
         {
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, int? value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, int? value)
         {
-            if (value == null && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(symbol, index))
             {
-                return tuple.Fields[index] = null;
+                return symbol.Fields[index] = null;
             }
 
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, IntermediateFieldPathValue value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, IntermediateFieldPathValue value)
         {
-            if (value?.Path == null && value?.BaseUri == null && NoFieldMetadata(tuple, index))
+            if (value?.Path == null && value?.BaseUri == null && NoFieldMetadata(symbol, index))
             {
-                return tuple.Fields[index] = null;
+                return symbol.Fields[index] = null;
             }
 
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, string value)
+        public static IntermediateField Set(this IntermediateSymbol symbol, int index, string value)
         {
-            if (value == null && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(symbol, index))
             {
-                return tuple.Fields[index] = null;
+                return symbol.Fields[index] = null;
             }
 
-            var definition = tuple.Definition.FieldDefinitions[index];
+            var definition = symbol.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value);
+            var field = symbol.Fields[index].Set(definition, value);
 
-            return tuple.Fields[index] = field;
+            return symbol.Fields[index] = field;
         }
 
-        private static bool NoFieldMetadata(IntermediateTuple tuple, int index)
+        private static bool NoFieldMetadata(IntermediateSymbol symbol, int index)
         {
-            var field = tuple?.Fields[index];
+            var field = symbol?.Fields[index];
 
             return field?.Context == null && field?.PreviousValue == null;
         }

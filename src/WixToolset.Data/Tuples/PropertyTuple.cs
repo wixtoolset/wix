@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Property = new IntermediateTupleDefinition(
-            TupleDefinitionType.Property,
+        public static readonly IntermediateSymbolDefinition Property = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Property,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PropertyTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PropertySymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(PropertyTuple));
+            typeof(PropertySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PropertyTupleFields
+    public enum PropertySymbolFields
     {
         Value,
     }
 
-    public class PropertyTuple : IntermediateTuple
+    public class PropertySymbol : IntermediateSymbol
     {
-        public PropertyTuple() : base(TupleDefinitions.Property, null, null)
+        public PropertySymbol() : base(SymbolDefinitions.Property, null, null)
         {
         }
 
-        public PropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Property, sourceLineNumber, id)
+        public PropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Property, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PropertySymbolFields index] => this.Fields[(int)index];
 
         public string Value
         {
-            get => (string)this.Fields[(int)PropertyTupleFields.Value];
-            set => this.Set((int)PropertyTupleFields.Value, value);
+            get => (string)this.Fields[(int)PropertySymbolFields.Value];
+            set => this.Set((int)PropertySymbolFields.Value, value);
         }
     }
 }

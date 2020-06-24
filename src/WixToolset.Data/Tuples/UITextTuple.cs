@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition UIText = new IntermediateTupleDefinition(
-            TupleDefinitionType.UIText,
+        public static readonly IntermediateSymbolDefinition UIText = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.UIText,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UITextTupleFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UITextSymbolFields.Text), IntermediateFieldType.String),
             },
-            typeof(UITextTuple));
+            typeof(UITextSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum UITextTupleFields
+    public enum UITextSymbolFields
     {
         Text,
     }
 
-    public class UITextTuple : IntermediateTuple
+    public class UITextSymbol : IntermediateSymbol
     {
-        public UITextTuple() : base(TupleDefinitions.UIText, null, null)
+        public UITextSymbol() : base(SymbolDefinitions.UIText, null, null)
         {
         }
 
-        public UITextTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.UIText, sourceLineNumber, id)
+        public UITextSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.UIText, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UITextTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UITextSymbolFields index] => this.Fields[(int)index];
 
         public string Text
         {
-            get => (string)this.Fields[(int)UITextTupleFields.Text];
-            set => this.Set((int)UITextTupleFields.Text, value);
+            get => (string)this.Fields[(int)UITextSymbolFields.Text];
+            set => this.Set((int)UITextSymbolFields.Text, value);
         }
     }
 }

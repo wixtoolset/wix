@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixSearchRelation = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixSearchRelation,
+        public static readonly IntermediateSymbolDefinition WixSearchRelation = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixSearchRelation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.ParentSearchRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixSearchRelationSymbolFields.ParentSearchRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSearchRelationSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixSearchRelationTuple));
+            typeof(WixSearchRelationSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixSearchRelationTupleFields
+    public enum WixSearchRelationSymbolFields
     {
         ParentSearchRef,
         Attributes,
     }
 
-    public class WixSearchRelationTuple : IntermediateTuple
+    public class WixSearchRelationSymbol : IntermediateSymbol
     {
-        public WixSearchRelationTuple() : base(TupleDefinitions.WixSearchRelation, null, null)
+        public WixSearchRelationSymbol() : base(SymbolDefinitions.WixSearchRelation, null, null)
         {
         }
 
-        public WixSearchRelationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixSearchRelation, sourceLineNumber, id)
+        public WixSearchRelationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixSearchRelation, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixSearchRelationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixSearchRelationSymbolFields index] => this.Fields[(int)index];
 
         public string ParentSearchRef
         {
-            get => (string)this.Fields[(int)WixSearchRelationTupleFields.ParentSearchRef];
-            set => this.Set((int)WixSearchRelationTupleFields.ParentSearchRef, value);
+            get => (string)this.Fields[(int)WixSearchRelationSymbolFields.ParentSearchRef];
+            set => this.Set((int)WixSearchRelationSymbolFields.ParentSearchRef, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixSearchRelationTupleFields.Attributes];
-            set => this.Set((int)WixSearchRelationTupleFields.Attributes, value);
+            get => (int)this.Fields[(int)WixSearchRelationSymbolFields.Attributes];
+            set => this.Set((int)WixSearchRelationSymbolFields.Attributes, value);
         }
     }
 }

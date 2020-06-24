@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundlePackageCommandLine = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundlePackageCommandLine,
+        public static readonly IntermediateSymbolDefinition WixBundlePackageCommandLine = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundlePackageCommandLine,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.InstallArgument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.UninstallArgument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.RepairArgument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineSymbolFields.WixBundlePackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineSymbolFields.InstallArgument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineSymbolFields.UninstallArgument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineSymbolFields.RepairArgument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineSymbolFields.Condition), IntermediateFieldType.String),
             },
-            typeof(WixBundlePackageCommandLineTuple));
+            typeof(WixBundlePackageCommandLineSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundlePackageCommandLineTupleFields
+    public enum WixBundlePackageCommandLineSymbolFields
     {
         WixBundlePackageRef,
         InstallArgument,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         Condition,
     }
 
-    public class WixBundlePackageCommandLineTuple : IntermediateTuple
+    public class WixBundlePackageCommandLineSymbol : IntermediateSymbol
     {
-        public WixBundlePackageCommandLineTuple() : base(TupleDefinitions.WixBundlePackageCommandLine, null, null)
+        public WixBundlePackageCommandLineSymbol() : base(SymbolDefinitions.WixBundlePackageCommandLine, null, null)
         {
         }
 
-        public WixBundlePackageCommandLineTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundlePackageCommandLine, sourceLineNumber, id)
+        public WixBundlePackageCommandLineSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundlePackageCommandLine, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundlePackageCommandLineTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundlePackageCommandLineSymbolFields index] => this.Fields[(int)index];
 
         public string WixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.WixBundlePackageRef];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.WixBundlePackageRef, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineSymbolFields.WixBundlePackageRef];
+            set => this.Set((int)WixBundlePackageCommandLineSymbolFields.WixBundlePackageRef, value);
         }
 
         public string InstallArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.InstallArgument];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.InstallArgument, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineSymbolFields.InstallArgument];
+            set => this.Set((int)WixBundlePackageCommandLineSymbolFields.InstallArgument, value);
         }
 
         public string UninstallArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.UninstallArgument];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.UninstallArgument, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineSymbolFields.UninstallArgument];
+            set => this.Set((int)WixBundlePackageCommandLineSymbolFields.UninstallArgument, value);
         }
 
         public string RepairArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.RepairArgument];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.RepairArgument, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineSymbolFields.RepairArgument];
+            set => this.Set((int)WixBundlePackageCommandLineSymbolFields.RepairArgument, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.Condition];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.Condition, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineSymbolFields.Condition];
+            set => this.Set((int)WixBundlePackageCommandLineSymbolFields.Condition, value);
         }
     }
 }

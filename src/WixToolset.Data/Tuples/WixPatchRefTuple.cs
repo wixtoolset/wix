@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixPatchRef = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixPatchRef,
+        public static readonly IntermediateSymbolDefinition WixPatchRef = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixPatchRef,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchRefTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixPatchRefTupleFields.PrimaryKeys), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPatchRefSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPatchRefSymbolFields.PrimaryKeys), IntermediateFieldType.String),
             },
-            typeof(WixPatchRefTuple));
+            typeof(WixPatchRefSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPatchRefTupleFields
+    public enum WixPatchRefSymbolFields
     {
         Table,
         PrimaryKeys,
     }
 
-    public class WixPatchRefTuple : IntermediateTuple
+    public class WixPatchRefSymbol : IntermediateSymbol
     {
-        public WixPatchRefTuple() : base(TupleDefinitions.WixPatchRef, null, null)
+        public WixPatchRefSymbol() : base(SymbolDefinitions.WixPatchRef, null, null)
         {
         }
 
-        public WixPatchRefTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixPatchRef, sourceLineNumber, id)
+        public WixPatchRefSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixPatchRef, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPatchRefTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPatchRefSymbolFields index] => this.Fields[(int)index];
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixPatchRefTupleFields.Table];
-            set => this.Set((int)WixPatchRefTupleFields.Table, value);
+            get => (string)this.Fields[(int)WixPatchRefSymbolFields.Table];
+            set => this.Set((int)WixPatchRefSymbolFields.Table, value);
         }
 
         public string PrimaryKeys
         {
-            get => (string)this.Fields[(int)WixPatchRefTupleFields.PrimaryKeys];
-            set => this.Set((int)WixPatchRefTupleFields.PrimaryKeys, value);
+            get => (string)this.Fields[(int)WixPatchRefSymbolFields.PrimaryKeys];
+            set => this.Set((int)WixPatchRefSymbolFields.PrimaryKeys, value);
         }
     }
 }

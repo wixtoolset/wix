@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ListBox = new IntermediateTupleDefinition(
-            TupleDefinitionType.ListBox,
+        public static readonly IntermediateSymbolDefinition ListBox = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ListBox,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ListBoxTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListBoxTupleFields.Order), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ListBoxTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListBoxTupleFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListBoxSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListBoxSymbolFields.Order), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ListBoxSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListBoxSymbolFields.Text), IntermediateFieldType.String),
             },
-            typeof(ListBoxTuple));
+            typeof(ListBoxSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ListBoxTupleFields
+    public enum ListBoxSymbolFields
     {
         Property,
         Order,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Text,
     }
 
-    public class ListBoxTuple : IntermediateTuple
+    public class ListBoxSymbol : IntermediateSymbol
     {
-        public ListBoxTuple() : base(TupleDefinitions.ListBox, null, null)
+        public ListBoxSymbol() : base(SymbolDefinitions.ListBox, null, null)
         {
         }
 
-        public ListBoxTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ListBox, sourceLineNumber, id)
+        public ListBoxSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ListBox, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ListBoxTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ListBoxSymbolFields index] => this.Fields[(int)index];
 
         public string Property
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Property];
-            set => this.Set((int)ListBoxTupleFields.Property, value);
+            get => (string)this.Fields[(int)ListBoxSymbolFields.Property];
+            set => this.Set((int)ListBoxSymbolFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ListBoxTupleFields.Order];
-            set => this.Set((int)ListBoxTupleFields.Order, value);
+            get => (int)this.Fields[(int)ListBoxSymbolFields.Order];
+            set => this.Set((int)ListBoxSymbolFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Value];
-            set => this.Set((int)ListBoxTupleFields.Value, value);
+            get => (string)this.Fields[(int)ListBoxSymbolFields.Value];
+            set => this.Set((int)ListBoxSymbolFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Text];
-            set => this.Set((int)ListBoxTupleFields.Text, value);
+            get => (string)this.Fields[(int)ListBoxSymbolFields.Text];
+            set => this.Set((int)ListBoxSymbolFields.Text, value);
         }
     }
 }

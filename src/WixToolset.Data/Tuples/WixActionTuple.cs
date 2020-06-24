@@ -2,29 +2,29 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixAction = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixAction,
+        public static readonly IntermediateSymbolDefinition WixAction = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixAction,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.SequenceTable), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.Action), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.Sequence), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.Before), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.After), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.Overridable), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.SequenceTable), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.Before), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.After), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixActionSymbolFields.Overridable), IntermediateFieldType.Bool),
             },
-            typeof(WixActionTuple));
+            typeof(WixActionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixActionTupleFields
+    public enum WixActionSymbolFields
     {
         SequenceTable,
         Action,
@@ -44,58 +44,58 @@ namespace WixToolset.Data.Tuples
         InstallExecuteSequence
     }
 
-    public class WixActionTuple : IntermediateTuple
+    public class WixActionSymbol : IntermediateSymbol
     {
-        public WixActionTuple() : base(TupleDefinitions.WixAction, null, null)
+        public WixActionSymbol() : base(SymbolDefinitions.WixAction, null, null)
         {
         }
 
-        public WixActionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixAction, sourceLineNumber, id)
+        public WixActionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixAction, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixActionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixActionSymbolFields index] => this.Fields[(int)index];
 
         public SequenceTable SequenceTable
         {
-            get => (SequenceTable)this.Fields[(int)WixActionTupleFields.SequenceTable].AsNumber();
-            set => this.Set((int)WixActionTupleFields.SequenceTable, (int)value);
+            get => (SequenceTable)this.Fields[(int)WixActionSymbolFields.SequenceTable].AsNumber();
+            set => this.Set((int)WixActionSymbolFields.SequenceTable, (int)value);
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Action];
-            set => this.Set((int)WixActionTupleFields.Action, value);
+            get => (string)this.Fields[(int)WixActionSymbolFields.Action];
+            set => this.Set((int)WixActionSymbolFields.Action, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Condition];
-            set => this.Set((int)WixActionTupleFields.Condition, value);
+            get => (string)this.Fields[(int)WixActionSymbolFields.Condition];
+            set => this.Set((int)WixActionSymbolFields.Condition, value);
         }
 
         public int? Sequence
         {
-            get => (int?)this.Fields[(int)WixActionTupleFields.Sequence];
-            set => this.Set((int)WixActionTupleFields.Sequence, value);
+            get => (int?)this.Fields[(int)WixActionSymbolFields.Sequence];
+            set => this.Set((int)WixActionSymbolFields.Sequence, value);
         }
 
         public string Before
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Before];
-            set => this.Set((int)WixActionTupleFields.Before, value);
+            get => (string)this.Fields[(int)WixActionSymbolFields.Before];
+            set => this.Set((int)WixActionSymbolFields.Before, value);
         }
 
         public string After
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.After];
-            set => this.Set((int)WixActionTupleFields.After, value);
+            get => (string)this.Fields[(int)WixActionSymbolFields.After];
+            set => this.Set((int)WixActionSymbolFields.After, value);
         }
 
         public bool Overridable
         {
-            get => this.Fields[(int)WixActionTupleFields.Overridable].AsBool();
-            set => this.Set((int)WixActionTupleFields.Overridable, value);
+            get => this.Fields[(int)WixActionSymbolFields.Overridable].AsBool();
+            set => this.Set((int)WixActionSymbolFields.Overridable, value);
         }
     }
 }

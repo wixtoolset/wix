@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixProperty = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixProperty,
+        public static readonly IntermediateSymbolDefinition WixProperty = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixProperty,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.PropertyRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Admin), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Secure), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixPropertySymbolFields.PropertyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPropertySymbolFields.Admin), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixPropertySymbolFields.Hidden), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixPropertySymbolFields.Secure), IntermediateFieldType.Bool),
             },
-            typeof(WixPropertyTuple));
+            typeof(WixPropertySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPropertyTupleFields
+    public enum WixPropertySymbolFields
     {
         PropertyRef,
         Admin,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Secure,
     }
 
-    public class WixPropertyTuple : IntermediateTuple
+    public class WixPropertySymbol : IntermediateSymbol
     {
-        public WixPropertyTuple() : base(TupleDefinitions.WixProperty, null, null)
+        public WixPropertySymbol() : base(SymbolDefinitions.WixProperty, null, null)
         {
         }
 
-        public WixPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixProperty, sourceLineNumber, id)
+        public WixPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPropertySymbolFields index] => this.Fields[(int)index];
 
         public string PropertyRef
         {
-            get => (string)this.Fields[(int)WixPropertyTupleFields.PropertyRef];
-            set => this.Set((int)WixPropertyTupleFields.PropertyRef, value);
+            get => (string)this.Fields[(int)WixPropertySymbolFields.PropertyRef];
+            set => this.Set((int)WixPropertySymbolFields.PropertyRef, value);
         }
 
         public bool Admin
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Admin];
-            set => this.Set((int)WixPropertyTupleFields.Admin, value);
+            get => (bool)this.Fields[(int)WixPropertySymbolFields.Admin];
+            set => this.Set((int)WixPropertySymbolFields.Admin, value);
         }
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Hidden];
-            set => this.Set((int)WixPropertyTupleFields.Hidden, value);
+            get => (bool)this.Fields[(int)WixPropertySymbolFields.Hidden];
+            set => this.Set((int)WixPropertySymbolFields.Hidden, value);
         }
 
         public bool Secure
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Secure];
-            set => this.Set((int)WixPropertyTupleFields.Secure, value);
+            get => (bool)this.Fields[(int)WixPropertySymbolFields.Secure];
+            set => this.Set((int)WixPropertySymbolFields.Secure, value);
         }
     }
 }

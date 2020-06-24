@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleUpdate = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleUpdate,
+        public static readonly IntermediateSymbolDefinition WixBundleUpdate = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleUpdate,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleUpdateTupleFields.Location), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleUpdateTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleUpdateSymbolFields.Location), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleUpdateSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixBundleUpdateTuple));
+            typeof(WixBundleUpdateSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleUpdateTupleFields
+    public enum WixBundleUpdateSymbolFields
     {
         Location,
         Attributes,
     }
 
-    public class WixBundleUpdateTuple : IntermediateTuple
+    public class WixBundleUpdateSymbol : IntermediateSymbol
     {
-        public WixBundleUpdateTuple() : base(TupleDefinitions.WixBundleUpdate, null, null)
+        public WixBundleUpdateSymbol() : base(SymbolDefinitions.WixBundleUpdate, null, null)
         {
         }
 
-        public WixBundleUpdateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleUpdate, sourceLineNumber, id)
+        public WixBundleUpdateSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleUpdate, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleUpdateTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleUpdateSymbolFields index] => this.Fields[(int)index];
 
         public string Location
         {
-            get => (string)this.Fields[(int)WixBundleUpdateTupleFields.Location];
-            set => this.Set((int)WixBundleUpdateTupleFields.Location, value);
+            get => (string)this.Fields[(int)WixBundleUpdateSymbolFields.Location];
+            set => this.Set((int)WixBundleUpdateSymbolFields.Location, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixBundleUpdateTupleFields.Attributes];
-            set => this.Set((int)WixBundleUpdateTupleFields.Attributes, value);
+            get => (int)this.Fields[(int)WixBundleUpdateSymbolFields.Attributes];
+            set => this.Set((int)WixBundleUpdateSymbolFields.Attributes, value);
         }
     }
 }

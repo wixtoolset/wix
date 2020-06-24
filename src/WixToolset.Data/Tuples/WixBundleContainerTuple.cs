@@ -2,31 +2,31 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleContainer = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleContainer,
+        public static readonly IntermediateSymbolDefinition WixBundleContainer = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleContainer,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Type), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.DownloadUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Size), IntermediateFieldType.LargeNumber),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Hash), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.AttachedContainerIndex), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.WorkingPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.DownloadUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.Size), IntermediateFieldType.LargeNumber),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.Hash), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.AttachedContainerIndex), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.WorkingPath), IntermediateFieldType.String),
             },
-            typeof(WixBundleContainerTuple));
+            typeof(WixBundleContainerSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundleContainerTupleFields
+    public enum WixBundleContainerSymbolFields
     {
         Name,
         Type,
@@ -46,58 +46,58 @@ namespace WixToolset.Data.Tuples
         Detached,
     }
 
-    public class WixBundleContainerTuple : IntermediateTuple
+    public class WixBundleContainerSymbol : IntermediateSymbol
     {
-        public WixBundleContainerTuple() : base(TupleDefinitions.WixBundleContainer, null, null)
+        public WixBundleContainerSymbol() : base(SymbolDefinitions.WixBundleContainer, null, null)
         {
         }
 
-        public WixBundleContainerTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleContainer, sourceLineNumber, id)
+        public WixBundleContainerSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleContainer, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleContainerTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleContainerSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Name];
-            set => this.Set((int)WixBundleContainerTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixBundleContainerSymbolFields.Name];
+            set => this.Set((int)WixBundleContainerSymbolFields.Name, value);
         }
 
         public ContainerType Type
         {
-            get => (ContainerType)this.Fields[(int)WixBundleContainerTupleFields.Type].AsNumber();
-            set => this.Set((int)WixBundleContainerTupleFields.Type, (int)value);
+            get => (ContainerType)this.Fields[(int)WixBundleContainerSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixBundleContainerSymbolFields.Type, (int)value);
         }
 
         public string DownloadUrl
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.DownloadUrl];
-            set => this.Set((int)WixBundleContainerTupleFields.DownloadUrl, value);
+            get => (string)this.Fields[(int)WixBundleContainerSymbolFields.DownloadUrl];
+            set => this.Set((int)WixBundleContainerSymbolFields.DownloadUrl, value);
         }
 
         public long? Size
         {
-            get => (long?)this.Fields[(int)WixBundleContainerTupleFields.Size];
-            set => this.Set((int)WixBundleContainerTupleFields.Size, value);
+            get => (long?)this.Fields[(int)WixBundleContainerSymbolFields.Size];
+            set => this.Set((int)WixBundleContainerSymbolFields.Size, value);
         }
 
         public string Hash
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Hash];
-            set => this.Set((int)WixBundleContainerTupleFields.Hash, value);
+            get => (string)this.Fields[(int)WixBundleContainerSymbolFields.Hash];
+            set => this.Set((int)WixBundleContainerSymbolFields.Hash, value);
         }
 
         public int? AttachedContainerIndex
         {
-            get => (int?)this.Fields[(int)WixBundleContainerTupleFields.AttachedContainerIndex];
-            set => this.Set((int)WixBundleContainerTupleFields.AttachedContainerIndex, value);
+            get => (int?)this.Fields[(int)WixBundleContainerSymbolFields.AttachedContainerIndex];
+            set => this.Set((int)WixBundleContainerSymbolFields.AttachedContainerIndex, value);
         }
 
         public string WorkingPath
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WorkingPath];
-            set => this.Set((int)WixBundleContainerTupleFields.WorkingPath, value);
+            get => (string)this.Fields[(int)WixBundleContainerSymbolFields.WorkingPath];
+            set => this.Set((int)WixBundleContainerSymbolFields.WorkingPath, value);
         }
     }
 }

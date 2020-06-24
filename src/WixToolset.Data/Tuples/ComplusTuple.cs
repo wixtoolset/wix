@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Complus = new IntermediateTupleDefinition(
-            TupleDefinitionType.Complus,
+        public static readonly IntermediateSymbolDefinition Complus = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Complus,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComplusTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComplusTupleFields.ExpType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComplusSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComplusSymbolFields.ExpType), IntermediateFieldType.Number),
             },
-            typeof(ComplusTuple));
+            typeof(ComplusSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ComplusTupleFields
+    public enum ComplusSymbolFields
     {
         ComponentRef,
         ExpType,
     }
 
-    public class ComplusTuple : IntermediateTuple
+    public class ComplusSymbol : IntermediateSymbol
     {
-        public ComplusTuple() : base(TupleDefinitions.Complus, null, null)
+        public ComplusSymbol() : base(SymbolDefinitions.Complus, null, null)
         {
         }
 
-        public ComplusTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Complus, sourceLineNumber, id)
+        public ComplusSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Complus, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComplusTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComplusSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ComplusTupleFields.ComponentRef];
-            set => this.Set((int)ComplusTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ComplusSymbolFields.ComponentRef];
+            set => this.Set((int)ComplusSymbolFields.ComponentRef, value);
         }
 
         public int? ExpType
         {
-            get => (int?)this.Fields[(int)ComplusTupleFields.ExpType];
-            set => this.Set((int)ComplusTupleFields.ExpType, value);
+            get => (int?)this.Fields[(int)ComplusSymbolFields.ExpType];
+            set => this.Set((int)ComplusSymbolFields.ExpType, value);
         }
     }
 }

@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition AppSearch = new IntermediateTupleDefinition(
-            TupleDefinitionType.AppSearch,
+        public static readonly IntermediateSymbolDefinition AppSearch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.AppSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(AppSearchTupleFields.PropertyRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AppSearchTupleFields.SignatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AppSearchSymbolFields.PropertyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AppSearchSymbolFields.SignatureRef), IntermediateFieldType.String),
             },
-            typeof(AppSearchTuple));
+            typeof(AppSearchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum AppSearchTupleFields
+    public enum AppSearchSymbolFields
     {
         PropertyRef,
         SignatureRef,
     }
 
-    public class AppSearchTuple : IntermediateTuple
+    public class AppSearchSymbol : IntermediateSymbol
     {
-        public AppSearchTuple() : base(TupleDefinitions.AppSearch, null, null)
+        public AppSearchSymbol() : base(SymbolDefinitions.AppSearch, null, null)
         {
         }
 
-        public AppSearchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.AppSearch, sourceLineNumber, id)
+        public AppSearchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.AppSearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[AppSearchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[AppSearchSymbolFields index] => this.Fields[(int)index];
 
         public string PropertyRef
         {
-            get => (string)this.Fields[(int)AppSearchTupleFields.PropertyRef];
-            set => this.Set((int)AppSearchTupleFields.PropertyRef, value);
+            get => (string)this.Fields[(int)AppSearchSymbolFields.PropertyRef];
+            set => this.Set((int)AppSearchSymbolFields.PropertyRef, value);
         }
 
         public string SignatureRef
         {
-            get => (string)this.Fields[(int)AppSearchTupleFields.SignatureRef];
-            set => this.Set((int)AppSearchTupleFields.SignatureRef, value);
+            get => (string)this.Fields[(int)AppSearchSymbolFields.SignatureRef];
+            set => this.Set((int)AppSearchSymbolFields.SignatureRef, value);
         }
     }
 }

@@ -2,32 +2,32 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Feature = new IntermediateTupleDefinition(
-            TupleDefinitionType.Feature,
+        public static readonly IntermediateSymbolDefinition Feature = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Feature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.ParentFeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Title), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Display), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Level), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAbsent), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAdvertise), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.InstallDefault), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.TypicalDefault), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.ParentFeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.Title), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.Display), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.Level), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.DisallowAbsent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.DisallowAdvertise), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.InstallDefault), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureSymbolFields.TypicalDefault), IntermediateFieldType.Number),
             },
-            typeof(FeatureTuple));
+            typeof(FeatureSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum FeatureTupleFields
+    public enum FeatureSymbolFields
     {
         ParentFeatureRef,
         Title,
@@ -54,76 +54,76 @@ namespace WixToolset.Data.Tuples
         Advertise
     }
 
-    public class FeatureTuple : IntermediateTuple
+    public class FeatureSymbol : IntermediateSymbol
     {
-        public FeatureTuple() : base(TupleDefinitions.Feature, null, null)
+        public FeatureSymbol() : base(SymbolDefinitions.Feature, null, null)
         {
         }
 
-        public FeatureTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Feature, sourceLineNumber, id)
+        public FeatureSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Feature, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FeatureTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FeatureSymbolFields index] => this.Fields[(int)index];
 
         public string ParentFeatureRef
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.ParentFeatureRef];
-            set => this.Set((int)FeatureTupleFields.ParentFeatureRef, value);
+            get => (string)this.Fields[(int)FeatureSymbolFields.ParentFeatureRef];
+            set => this.Set((int)FeatureSymbolFields.ParentFeatureRef, value);
         }
 
         public string Title
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Title];
-            set => this.Set((int)FeatureTupleFields.Title, value);
+            get => (string)this.Fields[(int)FeatureSymbolFields.Title];
+            set => this.Set((int)FeatureSymbolFields.Title, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Description];
-            set => this.Set((int)FeatureTupleFields.Description, value);
+            get => (string)this.Fields[(int)FeatureSymbolFields.Description];
+            set => this.Set((int)FeatureSymbolFields.Description, value);
         }
 
         public int Display
         {
-            get => (int)this.Fields[(int)FeatureTupleFields.Display];
-            set => this.Set((int)FeatureTupleFields.Display, value);
+            get => (int)this.Fields[(int)FeatureSymbolFields.Display];
+            set => this.Set((int)FeatureSymbolFields.Display, value);
         }
 
         public int Level
         {
-            get => (int)this.Fields[(int)FeatureTupleFields.Level];
-            set => this.Set((int)FeatureTupleFields.Level, value);
+            get => (int)this.Fields[(int)FeatureSymbolFields.Level];
+            set => this.Set((int)FeatureSymbolFields.Level, value);
         }
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.DirectoryRef];
-            set => this.Set((int)FeatureTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)FeatureSymbolFields.DirectoryRef];
+            set => this.Set((int)FeatureSymbolFields.DirectoryRef, value);
         }
 
         public bool DisallowAbsent
         {
-            get => this.Fields[(int)FeatureTupleFields.DisallowAbsent].AsBool();
-            set => this.Set((int)FeatureTupleFields.DisallowAbsent, value);
+            get => this.Fields[(int)FeatureSymbolFields.DisallowAbsent].AsBool();
+            set => this.Set((int)FeatureSymbolFields.DisallowAbsent, value);
         }
 
         public bool DisallowAdvertise
         {
-            get => this.Fields[(int)FeatureTupleFields.DisallowAdvertise].AsBool();
-            set => this.Set((int)FeatureTupleFields.DisallowAdvertise, value);
+            get => this.Fields[(int)FeatureSymbolFields.DisallowAdvertise].AsBool();
+            set => this.Set((int)FeatureSymbolFields.DisallowAdvertise, value);
         }
 
         public FeatureInstallDefault InstallDefault
         {
-            get => (FeatureInstallDefault)this.Fields[(int)FeatureTupleFields.InstallDefault].AsNumber();
-            set => this.Set((int)FeatureTupleFields.InstallDefault, (int)value);
+            get => (FeatureInstallDefault)this.Fields[(int)FeatureSymbolFields.InstallDefault].AsNumber();
+            set => this.Set((int)FeatureSymbolFields.InstallDefault, (int)value);
         }
 
         public FeatureTypicalDefault TypicalDefault
         {
-            get => (FeatureTypicalDefault)this.Fields[(int)FeatureTupleFields.TypicalDefault].AsNumber();
-            set => this.Set((int)FeatureTupleFields.TypicalDefault, (int)value);
+            get => (FeatureTypicalDefault)this.Fields[(int)FeatureSymbolFields.TypicalDefault].AsNumber();
+            set => this.Set((int)FeatureSymbolFields.TypicalDefault, (int)value);
         }
     }
 }

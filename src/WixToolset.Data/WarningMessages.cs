@@ -567,10 +567,10 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.TooManyProgIds, "Class '{0}' tried to use ProgId '{1}' which has already been associated with class '{2}'. This information will be left out of the decompiled output.", clsId, progId, otherClsId);
         }
 
-        public static Message TupleNotTranslatedToOutput(IntermediateTuple tuple)
+        public static Message SymbolNotTranslatedToOutput(IntermediateSymbol symbol)
         {
-            var tupleString = $"TupleName: '{tuple.Definition.Name}', Id: '{tuple.Id?.Id}'";
-            return Message(tuple.SourceLineNumbers, Ids.TupleNotTranslatedToOutput, "The binder doesn't know how to place the following tuple into the output: {0}", tupleString);
+            var symbolString = $"SymbolName: '{symbol.Definition.Name}', Id: '{symbol.Id?.Id}'";
+            return Message(symbol.SourceLineNumbers, Ids.SymbolNotTranslatedToOutput, "The binder doesn't know how to place the following symbol into the output: {0}", symbolString);
         }
 
         public static Message UnableToFindFileFromCabOrImage(SourceLineNumber sourceLineNumbers, string existingFileSpec, string srcFileSpec)
@@ -779,7 +779,7 @@ namespace WixToolset.Data
             BackslashTerminateInlineDirectorySyntax = 1147,
             VersionTruncated = 1148,
             ServiceConfigFamilyNotSupported = 1149,
-            TupleNotTranslatedToOutput = 1150,
+            SymbolNotTranslatedToOutput = 1150,
         }
     }
 }

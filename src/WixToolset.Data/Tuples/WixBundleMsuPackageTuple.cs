@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleMsuPackage = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleMsuPackage,
+        public static readonly IntermediateSymbolDefinition WixBundleMsuPackage = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleMsuPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.DetectCondition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.MsuKB), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageSymbolFields.DetectCondition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageSymbolFields.MsuKB), IntermediateFieldType.String),
             },
-            typeof(WixBundleMsuPackageTuple));
+            typeof(WixBundleMsuPackageSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleMsuPackageTupleFields
+    public enum WixBundleMsuPackageSymbolFields
     {
         DetectCondition,
         MsuKB,
     }
 
-    public class WixBundleMsuPackageTuple : IntermediateTuple
+    public class WixBundleMsuPackageSymbol : IntermediateSymbol
     {
-        public WixBundleMsuPackageTuple() : base(TupleDefinitions.WixBundleMsuPackage, null, null)
+        public WixBundleMsuPackageSymbol() : base(SymbolDefinitions.WixBundleMsuPackage, null, null)
         {
         }
 
-        public WixBundleMsuPackageTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleMsuPackage, sourceLineNumber, id)
+        public WixBundleMsuPackageSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleMsuPackage, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleMsuPackageTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleMsuPackageSymbolFields index] => this.Fields[(int)index];
 
         public string DetectCondition
         {
-            get => (string)this.Fields[(int)WixBundleMsuPackageTupleFields.DetectCondition];
-            set => this.Set((int)WixBundleMsuPackageTupleFields.DetectCondition, value);
+            get => (string)this.Fields[(int)WixBundleMsuPackageSymbolFields.DetectCondition];
+            set => this.Set((int)WixBundleMsuPackageSymbolFields.DetectCondition, value);
         }
 
         public string MsuKB
         {
-            get => (string)this.Fields[(int)WixBundleMsuPackageTupleFields.MsuKB];
-            set => this.Set((int)WixBundleMsuPackageTupleFields.MsuKB, value);
+            get => (string)this.Fields[(int)WixBundleMsuPackageSymbolFields.MsuKB];
+            set => this.Set((int)WixBundleMsuPackageSymbolFields.MsuKB, value);
         }
     }
 }

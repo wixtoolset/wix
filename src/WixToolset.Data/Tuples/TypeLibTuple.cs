@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition TypeLib = new IntermediateTupleDefinition(
-            TupleDefinitionType.TypeLib,
+        public static readonly IntermediateSymbolDefinition TypeLib = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.TypeLib,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.LibId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Language), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Version), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Cost), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.LibId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.Language), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.Version), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibSymbolFields.Cost), IntermediateFieldType.Number),
             },
-            typeof(TypeLibTuple));
+            typeof(TypeLibSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum TypeLibTupleFields
+    public enum TypeLibSymbolFields
     {
         LibId,
         Language,
@@ -37,64 +37,64 @@ namespace WixToolset.Data.Tuples
         Cost,
     }
 
-    public class TypeLibTuple : IntermediateTuple
+    public class TypeLibSymbol : IntermediateSymbol
     {
-        public TypeLibTuple() : base(TupleDefinitions.TypeLib, null, null)
+        public TypeLibSymbol() : base(SymbolDefinitions.TypeLib, null, null)
         {
         }
 
-        public TypeLibTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.TypeLib, sourceLineNumber, id)
+        public TypeLibSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.TypeLib, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[TypeLibTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[TypeLibSymbolFields index] => this.Fields[(int)index];
 
         public string LibId
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.LibId];
-            set => this.Set((int)TypeLibTupleFields.LibId, value);
+            get => (string)this.Fields[(int)TypeLibSymbolFields.LibId];
+            set => this.Set((int)TypeLibSymbolFields.LibId, value);
         }
 
         public int Language
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Language];
-            set => this.Set((int)TypeLibTupleFields.Language, value);
+            get => (int)this.Fields[(int)TypeLibSymbolFields.Language];
+            set => this.Set((int)TypeLibSymbolFields.Language, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.ComponentRef];
-            set => this.Set((int)TypeLibTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)TypeLibSymbolFields.ComponentRef];
+            set => this.Set((int)TypeLibSymbolFields.ComponentRef, value);
         }
 
         public int? Version
         {
-            get => (int?)this.Fields[(int)TypeLibTupleFields.Version];
-            set => this.Set((int)TypeLibTupleFields.Version, value);
+            get => (int?)this.Fields[(int)TypeLibSymbolFields.Version];
+            set => this.Set((int)TypeLibSymbolFields.Version, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Description];
-            set => this.Set((int)TypeLibTupleFields.Description, value);
+            get => (string)this.Fields[(int)TypeLibSymbolFields.Description];
+            set => this.Set((int)TypeLibSymbolFields.Description, value);
         }
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.DirectoryRef];
-            set => this.Set((int)TypeLibTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)TypeLibSymbolFields.DirectoryRef];
+            set => this.Set((int)TypeLibSymbolFields.DirectoryRef, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.FeatureRef];
-            set => this.Set((int)TypeLibTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)TypeLibSymbolFields.FeatureRef];
+            set => this.Set((int)TypeLibSymbolFields.FeatureRef, value);
         }
 
         public int? Cost
         {
-            get => (int?)this.Fields[(int)TypeLibTupleFields.Cost];
-            set => this.Set((int)TypeLibTupleFields.Cost, value);
+            get => (int?)this.Fields[(int)TypeLibSymbolFields.Cost];
+            set => this.Set((int)TypeLibSymbolFields.Cost, value);
         }
     }
 }

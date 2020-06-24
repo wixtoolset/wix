@@ -2,24 +2,24 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixRelatedBundle = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixRelatedBundle,
+        public static readonly IntermediateSymbolDefinition WixRelatedBundle = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixRelatedBundle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRelatedBundleTupleFields.BundleId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRelatedBundleTupleFields.Action), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRelatedBundleSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRelatedBundleSymbolFields.Action), IntermediateFieldType.Number),
             },
-            typeof(WixRelatedBundleTuple));
+            typeof(WixRelatedBundleSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixRelatedBundleTupleFields
+    public enum WixRelatedBundleSymbolFields
     {
         BundleId,
         Action,
@@ -33,28 +33,28 @@ namespace WixToolset.Data.Tuples
         Patch
     }
 
-    public class WixRelatedBundleTuple : IntermediateTuple
+    public class WixRelatedBundleSymbol : IntermediateSymbol
     {
-        public WixRelatedBundleTuple() : base(TupleDefinitions.WixRelatedBundle, null, null)
+        public WixRelatedBundleSymbol() : base(SymbolDefinitions.WixRelatedBundle, null, null)
         {
         }
 
-        public WixRelatedBundleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixRelatedBundle, sourceLineNumber, id)
+        public WixRelatedBundleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixRelatedBundle, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixRelatedBundleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixRelatedBundleSymbolFields index] => this.Fields[(int)index];
 
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixRelatedBundleTupleFields.BundleId];
-            set => this.Set((int)WixRelatedBundleTupleFields.BundleId, value);
+            get => (string)this.Fields[(int)WixRelatedBundleSymbolFields.BundleId];
+            set => this.Set((int)WixRelatedBundleSymbolFields.BundleId, value);
         }
 
         public RelatedBundleActionType Action
         {
-            get => (RelatedBundleActionType)this.Fields[(int)WixRelatedBundleTupleFields.Action].AsNumber();
-            set => this.Set((int)WixRelatedBundleTupleFields.Action, (int)value);
+            get => (RelatedBundleActionType)this.Fields[(int)WixRelatedBundleSymbolFields.Action].AsNumber();
+            set => this.Set((int)WixRelatedBundleSymbolFields.Action, (int)value);
         }
     }
 }

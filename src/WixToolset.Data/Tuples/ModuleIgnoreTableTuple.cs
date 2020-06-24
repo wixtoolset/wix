@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleIgnoreTable = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleIgnoreTable,
+        public static readonly IntermediateSymbolDefinition ModuleIgnoreTable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleIgnoreTable,
             new IntermediateFieldDefinition[]
             {
             },
-            typeof(ModuleIgnoreTableTuple));
+            typeof(ModuleIgnoreTableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleIgnoreTableTupleFields
+    public enum ModuleIgnoreTableSymbolFields
     {
     }
 
-    public class ModuleIgnoreTableTuple : IntermediateTuple
+    public class ModuleIgnoreTableSymbol : IntermediateSymbol
     {
-        public ModuleIgnoreTableTuple() : base(TupleDefinitions.ModuleIgnoreTable, null, null)
+        public ModuleIgnoreTableSymbol() : base(SymbolDefinitions.ModuleIgnoreTable, null, null)
         {
         }
 
-        public ModuleIgnoreTableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleIgnoreTable, sourceLineNumber, id)
+        public ModuleIgnoreTableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleIgnoreTable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleIgnoreTableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleIgnoreTableSymbolFields index] => this.Fields[(int)index];
     }
 }

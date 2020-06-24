@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Properties = new IntermediateTupleDefinition(
-            TupleDefinitionType.Properties,
+        public static readonly IntermediateSymbolDefinition Properties = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Properties,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PropertiesTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PropertiesTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PropertiesSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PropertiesSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(PropertiesTuple));
+            typeof(PropertiesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PropertiesTupleFields
+    public enum PropertiesSymbolFields
     {
         Name,
         Value,
     }
 
-    public class PropertiesTuple : IntermediateTuple
+    public class PropertiesSymbol : IntermediateSymbol
     {
-        public PropertiesTuple() : base(TupleDefinitions.Properties, null, null)
+        public PropertiesSymbol() : base(SymbolDefinitions.Properties, null, null)
         {
         }
 
-        public PropertiesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Properties, sourceLineNumber, id)
+        public PropertiesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Properties, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PropertiesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PropertiesSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)PropertiesTupleFields.Name];
-            set => this.Set((int)PropertiesTupleFields.Name, value);
+            get => (string)this.Fields[(int)PropertiesSymbolFields.Name];
+            set => this.Set((int)PropertiesSymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)PropertiesTupleFields.Value];
-            set => this.Set((int)PropertiesTupleFields.Value, value);
+            get => (string)this.Fields[(int)PropertiesSymbolFields.Value];
+            set => this.Set((int)PropertiesSymbolFields.Value, value);
         }
     }
 }

@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiPatchOldAssemblyFile = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiPatchOldAssemblyFile,
+        public static readonly IntermediateSymbolDefinition MsiPatchOldAssemblyFile = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiPatchOldAssemblyFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.AssemblyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileSymbolFields.AssemblyRef), IntermediateFieldType.String),
             },
-            typeof(MsiPatchOldAssemblyFileTuple));
+            typeof(MsiPatchOldAssemblyFileSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiPatchOldAssemblyFileTupleFields
+    public enum MsiPatchOldAssemblyFileSymbolFields
     {
         FileRef,
         AssemblyRef,
     }
 
-    public class MsiPatchOldAssemblyFileTuple : IntermediateTuple
+    public class MsiPatchOldAssemblyFileSymbol : IntermediateSymbol
     {
-        public MsiPatchOldAssemblyFileTuple() : base(TupleDefinitions.MsiPatchOldAssemblyFile, null, null)
+        public MsiPatchOldAssemblyFileSymbol() : base(SymbolDefinitions.MsiPatchOldAssemblyFile, null, null)
         {
         }
 
-        public MsiPatchOldAssemblyFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiPatchOldAssemblyFile, sourceLineNumber, id)
+        public MsiPatchOldAssemblyFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiPatchOldAssemblyFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiPatchOldAssemblyFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiPatchOldAssemblyFileSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.FileRef];
-            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileSymbolFields.FileRef];
+            set => this.Set((int)MsiPatchOldAssemblyFileSymbolFields.FileRef, value);
         }
 
         public string AssemblyRef
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.AssemblyRef];
-            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.AssemblyRef, value);
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileSymbolFields.AssemblyRef];
+            set => this.Set((int)MsiPatchOldAssemblyFileSymbolFields.AssemblyRef, value);
         }
     }
 }

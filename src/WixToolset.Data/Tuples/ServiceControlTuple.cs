@@ -2,32 +2,32 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ServiceControl = new IntermediateTupleDefinition(
-            TupleDefinitionType.ServiceControl,
+        public static readonly IntermediateSymbolDefinition ServiceControl = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ServiceControl,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallRemove), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallRemove), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallStart), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallStart), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallStop), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallStop), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Arguments), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Wait), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.InstallRemove), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.UninstallRemove), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.InstallStart), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.UninstallStart), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.InstallStop), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.UninstallStop), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.Arguments), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.Wait), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(ServiceControlTuple));
+            typeof(ServiceControlSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ServiceControlTupleFields
+    public enum ServiceControlSymbolFields
     {
         Name,
         InstallRemove,
@@ -41,76 +41,76 @@ namespace WixToolset.Data.Tuples
         ComponentRef,
     }
 
-    public class ServiceControlTuple : IntermediateTuple
+    public class ServiceControlSymbol : IntermediateSymbol
     {
-        public ServiceControlTuple() : base(TupleDefinitions.ServiceControl, null, null)
+        public ServiceControlSymbol() : base(SymbolDefinitions.ServiceControl, null, null)
         {
         }
 
-        public ServiceControlTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ServiceControl, sourceLineNumber, id)
+        public ServiceControlSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ServiceControl, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ServiceControlTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ServiceControlSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Name];
-            set => this.Set((int)ServiceControlTupleFields.Name, value);
+            get => (string)this.Fields[(int)ServiceControlSymbolFields.Name];
+            set => this.Set((int)ServiceControlSymbolFields.Name, value);
         }
 
         public bool InstallRemove
         {
-            get => this.Fields[(int)ServiceControlTupleFields.InstallRemove].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.InstallRemove, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.InstallRemove].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.InstallRemove, value);
         }
 
         public bool UninstallRemove
         {
-            get => this.Fields[(int)ServiceControlTupleFields.UninstallRemove].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.UninstallRemove, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.UninstallRemove].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.UninstallRemove, value);
         }
 
         public bool InstallStart
         {
-            get => this.Fields[(int)ServiceControlTupleFields.InstallStart].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.InstallStart, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.InstallStart].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.InstallStart, value);
         }
 
         public bool UninstallStart
         {
-            get => this.Fields[(int)ServiceControlTupleFields.UninstallStart].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.UninstallStart, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.UninstallStart].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.UninstallStart, value);
         }
 
         public bool InstallStop
         {
-            get => this.Fields[(int)ServiceControlTupleFields.InstallStop].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.InstallStop, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.InstallStop].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.InstallStop, value);
         }
 
         public bool UninstallStop
         {
-            get => this.Fields[(int)ServiceControlTupleFields.UninstallStop].AsBool();
-            set => this.Set((int)ServiceControlTupleFields.UninstallStop, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.UninstallStop].AsBool();
+            set => this.Set((int)ServiceControlSymbolFields.UninstallStop, value);
         }
 
         public string Arguments
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Arguments];
-            set => this.Set((int)ServiceControlTupleFields.Arguments, value);
+            get => (string)this.Fields[(int)ServiceControlSymbolFields.Arguments];
+            set => this.Set((int)ServiceControlSymbolFields.Arguments, value);
         }
 
         public bool? Wait
         {
-            get => this.Fields[(int)ServiceControlTupleFields.Wait].AsNullableBool();
-            set => this.Set((int)ServiceControlTupleFields.Wait, value);
+            get => this.Fields[(int)ServiceControlSymbolFields.Wait].AsNullableBool();
+            set => this.Set((int)ServiceControlSymbolFields.Wait, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.ComponentRef];
-            set => this.Set((int)ServiceControlTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ServiceControlSymbolFields.ComponentRef];
+            set => this.Set((int)ServiceControlSymbolFields.ComponentRef, value);
         }
     }
 }

@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MoveFile = new IntermediateTupleDefinition(
-            TupleDefinitionType.MoveFile,
+        public static readonly IntermediateSymbolDefinition MoveFile = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MoveFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.DestName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceFolder), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.DestFolder), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.Delete), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.SourceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.SourceFolder), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestFolder), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.Delete), IntermediateFieldType.Bool),
             },
-            typeof(MoveFileTuple));
+            typeof(MoveFileSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MoveFileTupleFields
+    public enum MoveFileSymbolFields
     {
         ComponentRef,
         SourceName,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         Delete,
     }
 
-    public class MoveFileTuple : IntermediateTuple
+    public class MoveFileSymbol : IntermediateSymbol
     {
-        public MoveFileTuple() : base(TupleDefinitions.MoveFile, null, null)
+        public MoveFileSymbol() : base(SymbolDefinitions.MoveFile, null, null)
         {
         }
 
-        public MoveFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MoveFile, sourceLineNumber, id)
+        public MoveFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MoveFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MoveFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MoveFileSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.ComponentRef];
-            set => this.Set((int)MoveFileTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.ComponentRef];
+            set => this.Set((int)MoveFileSymbolFields.ComponentRef, value);
         }
 
         public string SourceName
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.SourceName];
-            set => this.Set((int)MoveFileTupleFields.SourceName, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.SourceName];
+            set => this.Set((int)MoveFileSymbolFields.SourceName, value);
         }
 
         public string DestName
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.DestName];
-            set => this.Set((int)MoveFileTupleFields.DestName, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.DestName];
+            set => this.Set((int)MoveFileSymbolFields.DestName, value);
         }
 
         public string SourceFolder
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.SourceFolder];
-            set => this.Set((int)MoveFileTupleFields.SourceFolder, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.SourceFolder];
+            set => this.Set((int)MoveFileSymbolFields.SourceFolder, value);
         }
 
         public string DestFolder
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.DestFolder];
-            set => this.Set((int)MoveFileTupleFields.DestFolder, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.DestFolder];
+            set => this.Set((int)MoveFileSymbolFields.DestFolder, value);
         }
 
         public bool Delete
         {
-            get => (bool)this.Fields[(int)MoveFileTupleFields.Delete];
-            set => this.Set((int)MoveFileTupleFields.Delete, value);
+            get => (bool)this.Fields[(int)MoveFileSymbolFields.Delete];
+            set => this.Set((int)MoveFileSymbolFields.Delete, value);
         }
     }
 }

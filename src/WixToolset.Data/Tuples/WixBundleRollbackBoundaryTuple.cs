@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleRollbackBoundary = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleRollbackBoundary,
+        public static readonly IntermediateSymbolDefinition WixBundleRollbackBoundary = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleRollbackBoundary,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.Vital), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.Transaction), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundarySymbolFields.Vital), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundarySymbolFields.Transaction), IntermediateFieldType.Number),
             },
-            typeof(WixBundleRollbackBoundaryTuple));
+            typeof(WixBundleRollbackBoundarySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleRollbackBoundaryTupleFields
+    public enum WixBundleRollbackBoundarySymbolFields
     {
         Vital,
         Transaction,
     }
 
-    public class WixBundleRollbackBoundaryTuple : IntermediateTuple
+    public class WixBundleRollbackBoundarySymbol : IntermediateSymbol
     {
-        public WixBundleRollbackBoundaryTuple() : base(TupleDefinitions.WixBundleRollbackBoundary, null, null)
+        public WixBundleRollbackBoundarySymbol() : base(SymbolDefinitions.WixBundleRollbackBoundary, null, null)
         {
         }
 
-        public WixBundleRollbackBoundaryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleRollbackBoundary, sourceLineNumber, id)
+        public WixBundleRollbackBoundarySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleRollbackBoundary, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleRollbackBoundaryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleRollbackBoundarySymbolFields index] => this.Fields[(int)index];
 
         public bool? Vital
         {
-            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Vital];
-            set => this.Set((int)WixBundleRollbackBoundaryTupleFields.Vital, value);
+            get => (bool?)this.Fields[(int)WixBundleRollbackBoundarySymbolFields.Vital];
+            set => this.Set((int)WixBundleRollbackBoundarySymbolFields.Vital, value);
         }
 
         public bool? Transaction
         {
-            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Transaction];
-            set => this.Set((int)WixBundleRollbackBoundaryTupleFields.Transaction, value);
+            get => (bool?)this.Fields[(int)WixBundleRollbackBoundarySymbolFields.Transaction];
+            set => this.Set((int)WixBundleRollbackBoundarySymbolFields.Transaction, value);
         }
     }
 }

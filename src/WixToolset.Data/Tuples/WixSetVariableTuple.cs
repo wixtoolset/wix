@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixSetVariable = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixSetVariable,
+        public static readonly IntermediateSymbolDefinition WixSetVariable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixSetVariable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSetVariableTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSetVariableTupleFields.Type), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSetVariableSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSetVariableSymbolFields.Type), IntermediateFieldType.String),
             },
-            typeof(WixSetVariableTuple));
+            typeof(WixSetVariableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixSetVariableTupleFields
+    public enum WixSetVariableSymbolFields
     {
         Value,
         Type,
     }
 
-    public class WixSetVariableTuple : IntermediateTuple
+    public class WixSetVariableSymbol : IntermediateSymbol
     {
-        public WixSetVariableTuple() : base(TupleDefinitions.WixSetVariable, null, null)
+        public WixSetVariableSymbol() : base(SymbolDefinitions.WixSetVariable, null, null)
         {
         }
 
-        public WixSetVariableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixSetVariable, sourceLineNumber, id)
+        public WixSetVariableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixSetVariable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixSetVariableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixSetVariableSymbolFields index] => this.Fields[(int)index];
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixSetVariableTupleFields.Value];
-            set => this.Set((int)WixSetVariableTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixSetVariableSymbolFields.Value];
+            set => this.Set((int)WixSetVariableSymbolFields.Value, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)WixSetVariableTupleFields.Type];
-            set => this.Set((int)WixSetVariableTupleFields.Type, value);
+            get => (string)this.Fields[(int)WixSetVariableSymbolFields.Type];
+            set => this.Set((int)WixSetVariableSymbolFields.Type, value);
         }
     }
 }

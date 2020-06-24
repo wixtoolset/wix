@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Error = new IntermediateTupleDefinition(
-            TupleDefinitionType.Error,
+        public static readonly IntermediateSymbolDefinition Error = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Error,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ErrorTupleFields.Message), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ErrorSymbolFields.Message), IntermediateFieldType.String),
             },
-            typeof(ErrorTuple));
+            typeof(ErrorSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ErrorTupleFields
+    public enum ErrorSymbolFields
     {
         Message,
     }
 
-    public class ErrorTuple : IntermediateTuple
+    public class ErrorSymbol : IntermediateSymbol
     {
-        public ErrorTuple() : base(TupleDefinitions.Error, null, null)
+        public ErrorSymbol() : base(SymbolDefinitions.Error, null, null)
         {
         }
 
-        public ErrorTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Error, sourceLineNumber, id)
+        public ErrorSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Error, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ErrorTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ErrorSymbolFields index] => this.Fields[(int)index];
 
         public string Message
         {
-            get => (string)this.Fields[(int)ErrorTupleFields.Message];
-            set => this.Set((int)ErrorTupleFields.Message, value);
+            get => (string)this.Fields[(int)ErrorSymbolFields.Message];
+            set => this.Set((int)ErrorSymbolFields.Message, value);
         }
     }
 }

@@ -2,24 +2,24 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SummaryInformation = new IntermediateTupleDefinition(
-            TupleDefinitionType.SummaryInformation,
+        public static readonly IntermediateSymbolDefinition SummaryInformation = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.SummaryInformation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SummaryInformationTupleFields.PropertyId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SummaryInformationTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SummaryInformationSymbolFields.PropertyId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SummaryInformationSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(SummaryInformationTuple));
+            typeof(SummaryInformationSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum SummaryInformationTupleFields
+    public enum SummaryInformationSymbolFields
     {
         PropertyId,
         Value,
@@ -75,28 +75,28 @@ namespace WixToolset.Data.Tuples
         Version31 = 5,
     }
 
-    public class SummaryInformationTuple : IntermediateTuple
+    public class SummaryInformationSymbol : IntermediateSymbol
     {
-        public SummaryInformationTuple() : base(TupleDefinitions.SummaryInformation, null, null)
+        public SummaryInformationSymbol() : base(SymbolDefinitions.SummaryInformation, null, null)
         {
         }
 
-        public SummaryInformationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.SummaryInformation, sourceLineNumber, id)
+        public SummaryInformationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.SummaryInformation, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SummaryInformationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SummaryInformationSymbolFields index] => this.Fields[(int)index];
 
         public SummaryInformationType PropertyId
         {
-            get => (SummaryInformationType)this.Fields[(int)SummaryInformationTupleFields.PropertyId].AsNumber();
-            set => this.Set((int)SummaryInformationTupleFields.PropertyId, (int)value);
+            get => (SummaryInformationType)this.Fields[(int)SummaryInformationSymbolFields.PropertyId].AsNumber();
+            set => this.Set((int)SummaryInformationSymbolFields.PropertyId, (int)value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)SummaryInformationTupleFields.Value];
-            set => this.Set((int)SummaryInformationTupleFields.Value, value);
+            get => (string)this.Fields[(int)SummaryInformationSymbolFields.Value];
+            set => this.Set((int)SummaryInformationSymbolFields.Value, value);
         }
     }
 }

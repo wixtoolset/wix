@@ -4,11 +4,11 @@ namespace WixToolset.Data
 {
     using System.Collections.Generic;
 
-    internal class SimpleTupleDefinitionCreator : ITupleDefinitionCreator
+    internal class SimpleSymbolDefinitionCreator : ISymbolDefinitionCreator
     {
-        private Dictionary<string, IntermediateTupleDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateTupleDefinition>();
+        private Dictionary<string, IntermediateSymbolDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateSymbolDefinition>();
 
-        public void AddCustomTupleDefinition(IntermediateTupleDefinition definition)
+        public void AddCustomSymbolDefinition(IntermediateSymbolDefinition definition)
         {
             if (!this.CustomDefinitionByName.TryGetValue(definition.Name, out var existing) || definition.Revision > existing.Revision)
             {
@@ -16,16 +16,16 @@ namespace WixToolset.Data
             }
         }
 
-        public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = TupleDefinitions.ByName(name);
+            symbolDefinition = SymbolDefinitions.ByName(name);
 
-            if (tupleDefinition == null)
+            if (symbolDefinition == null)
             {
-                tupleDefinition = this.CustomDefinitionByName.GetValueOrDefault(name);
+                symbolDefinition = this.CustomDefinitionByName.GetValueOrDefault(name);
             }
 
-            return tupleDefinition != null;
+            return symbolDefinition != null;
         }
     }
 }

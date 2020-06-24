@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CreateFolder = new IntermediateTupleDefinition(
-            TupleDefinitionType.CreateFolder,
+        public static readonly IntermediateSymbolDefinition CreateFolder = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.CreateFolder,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CreateFolderSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CreateFolderSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(CreateFolderTuple));
+            typeof(CreateFolderSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum CreateFolderTupleFields
+    public enum CreateFolderSymbolFields
     {
         DirectoryRef,
         ComponentRef,
     }
 
-    public class CreateFolderTuple : IntermediateTuple
+    public class CreateFolderSymbol : IntermediateSymbol
     {
-        public CreateFolderTuple() : base(TupleDefinitions.CreateFolder, null, null)
+        public CreateFolderSymbol() : base(SymbolDefinitions.CreateFolder, null, null)
         {
         }
 
-        public CreateFolderTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.CreateFolder, sourceLineNumber, id)
+        public CreateFolderSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.CreateFolder, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CreateFolderTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CreateFolderSymbolFields index] => this.Fields[(int)index];
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.DirectoryRef];
-            set => this.Set((int)CreateFolderTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)CreateFolderSymbolFields.DirectoryRef];
+            set => this.Set((int)CreateFolderSymbolFields.DirectoryRef, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.ComponentRef];
-            set => this.Set((int)CreateFolderTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)CreateFolderSymbolFields.ComponentRef];
+            set => this.Set((int)CreateFolderSymbolFields.ComponentRef, value);
         }
     }
 }

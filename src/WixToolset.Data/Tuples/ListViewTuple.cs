@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ListView = new IntermediateTupleDefinition(
-            TupleDefinitionType.ListView,
+        public static readonly IntermediateSymbolDefinition ListView = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ListView,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.Order), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.Text), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.BinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListViewSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListViewSymbolFields.Order), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ListViewSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListViewSymbolFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListViewSymbolFields.BinaryRef), IntermediateFieldType.String),
             },
-            typeof(ListViewTuple));
+            typeof(ListViewSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ListViewTupleFields
+    public enum ListViewSymbolFields
     {
         Property,
         Order,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         BinaryRef,
     }
 
-    public class ListViewTuple : IntermediateTuple
+    public class ListViewSymbol : IntermediateSymbol
     {
-        public ListViewTuple() : base(TupleDefinitions.ListView, null, null)
+        public ListViewSymbol() : base(SymbolDefinitions.ListView, null, null)
         {
         }
 
-        public ListViewTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ListView, sourceLineNumber, id)
+        public ListViewSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ListView, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ListViewTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ListViewSymbolFields index] => this.Fields[(int)index];
 
         public string Property
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Property];
-            set => this.Set((int)ListViewTupleFields.Property, value);
+            get => (string)this.Fields[(int)ListViewSymbolFields.Property];
+            set => this.Set((int)ListViewSymbolFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ListViewTupleFields.Order];
-            set => this.Set((int)ListViewTupleFields.Order, value);
+            get => (int)this.Fields[(int)ListViewSymbolFields.Order];
+            set => this.Set((int)ListViewSymbolFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Value];
-            set => this.Set((int)ListViewTupleFields.Value, value);
+            get => (string)this.Fields[(int)ListViewSymbolFields.Value];
+            set => this.Set((int)ListViewSymbolFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Text];
-            set => this.Set((int)ListViewTupleFields.Text, value);
+            get => (string)this.Fields[(int)ListViewSymbolFields.Text];
+            set => this.Set((int)ListViewSymbolFields.Text, value);
         }
 
         public string BinaryRef
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.BinaryRef];
-            set => this.Set((int)ListViewTupleFields.BinaryRef, value);
+            get => (string)this.Fields[(int)ListViewSymbolFields.BinaryRef];
+            set => this.Set((int)ListViewSymbolFields.BinaryRef, value);
         }
     }
 }

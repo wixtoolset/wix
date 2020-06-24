@@ -22,7 +22,7 @@ namespace WixToolset.Data
             this.Id = id;
             this.Type = type;
             this.Codepage = codepage;
-            this.Tuples = new List<IntermediateTuple>();
+            this.Symbols = new List<IntermediateSymbol>();
         }
 
         /// <summary>
@@ -54,14 +54,14 @@ namespace WixToolset.Data
         public string LibraryId { get; set; }
 
         /// <summary>
-        /// Tuples in the section.
+        /// Symbols in the section.
         /// </summary>
-        public IList<IntermediateTuple> Tuples { get; }
+        public IList<IntermediateSymbol> Symbols { get; }
 
         /// <summary>
         /// Parse a section from the JSON data.
         /// </summary>
-        internal static IntermediateSection Deserialize(ITupleDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
+        internal static IntermediateSection Deserialize(ISymbolDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
             var codepage = jsonObject.GetValueOrDefault("codepage", 0);
             var id = jsonObject.GetValueOrDefault<string>("id");
@@ -74,12 +74,12 @@ namespace WixToolset.Data
 
             var section = new IntermediateSection(id, type, codepage);
 
-            var tuplesJson = jsonObject.GetValueOrDefault<JsonArray>("tuples");
+            var symbolsJson = jsonObject.GetValueOrDefault<JsonArray>("symbols");
 
-            foreach (JsonObject tupleJson in tuplesJson)
+            foreach (JsonObject symbolJson in symbolsJson)
             {
-                var tuple = IntermediateTuple.Deserialize(creator, baseUri, tupleJson);
-                section.Tuples.Add(tuple);
+                var symbol = IntermediateSymbol.Deserialize(creator, baseUri, symbolJson);
+                section.Symbols.Add(symbol);
             }
 
             return section;
@@ -98,15 +98,15 @@ namespace WixToolset.Data
                 jsonObject.Add("id", this.Id);
             }
 
-            var tuplesJson = new JsonArray(this.Tuples.Count);
+            var symbolsJson = new JsonArray(this.Symbols.Count);
 
-            foreach (var tuple in this.Tuples)
+            foreach (var symbol in this.Symbols)
             {
-                var tupleJson = tuple.Serialize();
-                tuplesJson.Add(tupleJson);
+                var symbolJson = symbol.Serialize();
+                symbolsJson.Add(symbolJson);
             }
 
-            jsonObject.Add("tuples", tuplesJson);
+            jsonObject.Add("symbols", symbolsJson);
 
             return jsonObject;
         }

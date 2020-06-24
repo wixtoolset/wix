@@ -7,7 +7,7 @@ namespace WixToolsetTest.Data
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller.Rows;
     using Xunit;
 
@@ -22,7 +22,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -45,12 +45,12 @@ namespace WixToolsetTest.Data
                 Assert.True(loaded.HasLevel(IntermediateLevels.Linked));
                 Assert.True(loaded.HasLevel(IntermediateLevels.Resolved));
 
-                var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
+                var symbol = (ComponentSymbol)loaded.Sections.Single().Symbols.Single();
 
-                Assert.Equal("TestComponent", tuple.Id.Id);
-                Assert.Equal(AccessModifier.Public, tuple.Id.Access);
-                Assert.Equal("TestFolder", tuple.DirectoryRef);
-                Assert.Equal(ComponentLocation.Either, tuple.Location);
+                Assert.Equal("TestComponent", symbol.Id.Id);
+                Assert.Equal(AccessModifier.Public, symbol.Id.Access);
+                Assert.Equal("TestFolder", symbol.DirectoryRef);
+                Assert.Equal(ComponentLocation.Either, symbol.Location);
             }
             finally
             {
@@ -64,7 +64,7 @@ namespace WixToolsetTest.Data
             var sln = new SourceLineNumber("test.wxs", 1);
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -84,14 +84,14 @@ namespace WixToolsetTest.Data
                 using (var wixout = WixOutput.Read(uri, stream))
                 {
                     var loaded = Intermediate.Load(wixout);
-                    var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
+                    var symbol = (ComponentSymbol)loaded.Sections.Single().Symbols.Single();
 
-                    Assert.Equal("TestComponent", tuple.Id.Id);
-                    Assert.Equal(AccessModifier.Public, tuple.Id.Access);
+                    Assert.Equal("TestComponent", symbol.Id.Id);
+                    Assert.Equal(AccessModifier.Public, symbol.Id.Access);
 
                     wixout.Reopen(writable: true);
 
-                    section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "NewComponent"))
+                    section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "NewComponent"))
                     {
                         ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                     });
@@ -99,13 +99,13 @@ namespace WixToolsetTest.Data
                     intermediate.Save(wixout);
                     loaded = Intermediate.Load(wixout);
 
-                    var newTuple = loaded.Sections.Single().Tuples.Where(t => t.Id.Id == "NewComponent");
-                    Assert.Single(newTuple);
+                    var newSymbol = loaded.Sections.Single().Symbols.Where(t => t.Id.Id == "NewComponent");
+                    Assert.Single(newSymbol);
                 }
 
                 var loadedAfterDispose = Intermediate.Load(path);
-                var newTupleStillThere = loadedAfterDispose.Sections.Single().Tuples.Where(t => t.Id.Id == "NewComponent");
-                Assert.Single(newTupleStillThere);
+                var newSymbolStillThere = loadedAfterDispose.Sections.Single().Symbols.Where(t => t.Id.Id == "NewComponent");
+                Assert.Single(newSymbolStillThere);
 
             }
             finally
@@ -128,14 +128,14 @@ namespace WixToolsetTest.Data
                 new IntermediateFieldDefinition("C", IntermediateFieldType.Bool),
             };
 
-            var tupleDef = new IntermediateTupleDefinition("CustomDef2", fieldDefs, null);
+            var symbolDef = new IntermediateSymbolDefinition("CustomDef2", fieldDefs, null);
 
-            var tuple = tupleDef.CreateTuple(sln, new Identifier(AccessModifier.Public, "customT"));
-            tuple.Set(0, "foo");
-            tuple.Set(1, 2);
-            tuple.Set(2, true);
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            symbol.Set(0, "foo");
+            symbol.Set(1, 2);
+            symbol.Set(2, true);
 
-            section.Tuples.Add(tuple);
+            section.Symbols.Add(symbol);
 
             var intermediate = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -146,11 +146,11 @@ namespace WixToolsetTest.Data
 
                 var loaded = Intermediate.Load(path);
                 var loadedSection = loaded.Sections.Single();
-                var loadedTuple = loadedSection.Tuples.Single();
+                var loadedSymbol = loadedSection.Symbols.Single();
 
-                Assert.Equal("foo", loadedTuple.AsString(0));
-                Assert.Equal(2, loadedTuple[1].AsNumber());
-                Assert.True(loadedTuple[2].AsBool());
+                Assert.Equal("foo", loadedSymbol.AsString(0));
+                Assert.Equal(2, loadedSymbol[1].AsNumber());
+                Assert.True(loadedSymbol[2].AsBool());
             }
             finally
             {
@@ -171,15 +171,15 @@ namespace WixToolsetTest.Data
                 new IntermediateFieldDefinition("C", IntermediateFieldType.Bool),
             };
 
-            var tupleDef = new IntermediateTupleDefinition("CustomDef", fieldDefs, null);
+            var symbolDef = new IntermediateSymbolDefinition("CustomDef", fieldDefs, null);
 
-            var tuple = tupleDef.CreateTuple(sln, new Identifier(AccessModifier.Public, "customT"));
-            tuple.Set(0, "foo");
-            tuple.Set(1, 2);
-            tuple.Set(2, true);
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            symbol.Set(0, "foo");
+            symbol.Set(1, 2);
+            symbol.Set(2, true);
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
-            section.Tuples.Add(tuple);
+            section.Symbols.Add(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -192,16 +192,16 @@ namespace WixToolsetTest.Data
                 new IntermediateFieldDefinition("D", IntermediateFieldType.String),
             };
 
-            var tupleDef2 = new IntermediateTupleDefinition("CustomDef2", 1, fieldDefs2, null);
+            var symbolDef2 = new IntermediateSymbolDefinition("CustomDef2", 1, fieldDefs2, null);
 
-            var tuple2 = tupleDef2.CreateTuple(sln, new Identifier(AccessModifier.Public, "customT2"));
-            tuple2.Set(0, "bar");
-            tuple2.Set(1, 3);
-            tuple2.Set(2, false);
-            tuple2.Set(3, "baz");
+            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT2"));
+            symbol2.Set(0, "bar");
+            symbol2.Set(1, 3);
+            symbol2.Set(2, false);
+            symbol2.Set(3, "baz");
 
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
-            section2.Tuples.Add(tuple2);
+            section2.Symbols.Add(symbol2);
 
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
@@ -218,17 +218,17 @@ namespace WixToolsetTest.Data
                 var loaded1 = loaded.First();
                 var loaded2 = loaded.Skip(1).Single();
 
-                var loadedTuple1 = loaded1.Sections.Single().Tuples.Single();
-                var loadedTuple2 = loaded2.Sections.Single().Tuples.Single();
+                var loadedSymbol1 = loaded1.Sections.Single().Symbols.Single();
+                var loadedSymbol2 = loaded2.Sections.Single().Symbols.Single();
 
-                Assert.Equal("foo", loadedTuple1.AsString(0));
-                Assert.Equal(2, loadedTuple1[1].AsNumber());
-                Assert.True(loadedTuple1[2].AsBool());
+                Assert.Equal("foo", loadedSymbol1.AsString(0));
+                Assert.Equal(2, loadedSymbol1[1].AsNumber());
+                Assert.True(loadedSymbol1[2].AsBool());
 
-                Assert.Equal("bar", loadedTuple2.AsString(0));
-                Assert.Equal(3, loadedTuple2[1].AsNumber());
-                Assert.False(loadedTuple2[2].AsBool());
-                Assert.Equal("baz", loadedTuple2.AsString(3));
+                Assert.Equal("bar", loadedSymbol2.AsString(0));
+                Assert.Equal(3, loadedSymbol2[1].AsNumber());
+                Assert.False(loadedSymbol2[2].AsBool());
+                Assert.Equal("baz", loadedSymbol2.AsString(3));
             }
             finally
             {
@@ -250,19 +250,19 @@ namespace WixToolsetTest.Data
                 new IntermediateFieldDefinition("C", IntermediateFieldType.Bool),
             };
 
-            var tupleDef = new IntermediateTupleDefinition("CustomDef", fieldDefs, null);
+            var symbolDef = new IntermediateSymbolDefinition("CustomDef", fieldDefs, null);
 
-            tupleDef.AddTag("customDef");
+            symbolDef.AddTag("customDef");
 
-            var tuple = tupleDef.CreateTuple(sln, new Identifier(AccessModifier.Public, "customT"));
-            tuple.Set(0, "foo");
-            tuple.Set(1, 2);
-            tuple.Set(2, true);
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            symbol.Set(0, "foo");
+            symbol.Set(1, 2);
+            symbol.Set(2, true);
 
-            tuple.AddTag("tuple1tag");
+            symbol.AddTag("symbol1tag");
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
-            section.Tuples.Add(tuple);
+            section.Symbols.Add(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -275,22 +275,22 @@ namespace WixToolsetTest.Data
                 new IntermediateFieldDefinition("D", IntermediateFieldType.String),
             };
 
-            var tupleDef2 = new IntermediateTupleDefinition("CustomDef2", 1, fieldDefs2, null);
+            var symbolDef2 = new IntermediateSymbolDefinition("CustomDef2", 1, fieldDefs2, null);
 
-            tupleDef2.AddTag("customDef2");
-            tupleDef2.AddTag("customDef2 tag2");
+            symbolDef2.AddTag("customDef2");
+            symbolDef2.AddTag("customDef2 tag2");
 
-            var tuple2 = tupleDef2.CreateTuple(sln, new Identifier(AccessModifier.Public, "customT2"));
-            tuple2.Set(0, "bar");
-            tuple2.Set(1, 3);
-            tuple2.Set(2, false);
-            tuple2.Set(3, "baz");
+            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT2"));
+            symbol2.Set(0, "bar");
+            symbol2.Set(1, 3);
+            symbol2.Set(2, false);
+            symbol2.Set(3, "baz");
 
-            tuple2.AddTag("tuple2tag1");
-            tuple2.AddTag("tuple2tag2");
+            symbol2.AddTag("symbol2tag1");
+            symbol2.AddTag("symbol2tag2");
 
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
-            section2.Tuples.Add(tuple2);
+            section2.Symbols.Add(symbol2);
 
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
@@ -307,23 +307,23 @@ namespace WixToolsetTest.Data
                 var loaded1 = loaded.First();
                 var loaded2 = loaded.Skip(1).Single();
 
-                var loadedTuple1 = loaded1.Sections.Single().Tuples.Single();
-                var loadedTuple2 = loaded2.Sections.Single().Tuples.Single();
+                var loadedSymbol1 = loaded1.Sections.Single().Symbols.Single();
+                var loadedSymbol2 = loaded2.Sections.Single().Symbols.Single();
 
-                Assert.True(loadedTuple1.Definition.HasTag("customDef"));
-                Assert.Equal("foo", loadedTuple1.AsString(0));
-                Assert.Equal(2, loadedTuple1[1].AsNumber());
-                Assert.True(loadedTuple1[2].AsBool());
-                Assert.True(loadedTuple1.HasTag("tuple1tag"));
+                Assert.True(loadedSymbol1.Definition.HasTag("customDef"));
+                Assert.Equal("foo", loadedSymbol1.AsString(0));
+                Assert.Equal(2, loadedSymbol1[1].AsNumber());
+                Assert.True(loadedSymbol1[2].AsBool());
+                Assert.True(loadedSymbol1.HasTag("symbol1tag"));
 
-                Assert.True(loadedTuple2.Definition.HasTag("customDef2"));
-                Assert.True(loadedTuple2.Definition.HasTag("customDef2 tag2"));
-                Assert.Equal("bar", loadedTuple2.AsString(0));
-                Assert.Equal(3, loadedTuple2[1].AsNumber());
-                Assert.False(loadedTuple2[2].AsBool());
-                Assert.Equal("baz", loadedTuple2.AsString(3));
-                Assert.True(loadedTuple2.HasTag("tuple2tag1"));
-                Assert.True(loadedTuple2.HasTag("tuple2tag2"));
+                Assert.True(loadedSymbol2.Definition.HasTag("customDef2"));
+                Assert.True(loadedSymbol2.Definition.HasTag("customDef2 tag2"));
+                Assert.Equal("bar", loadedSymbol2.AsString(0));
+                Assert.Equal(3, loadedSymbol2[1].AsNumber());
+                Assert.False(loadedSymbol2[2].AsBool());
+                Assert.Equal("baz", loadedSymbol2.AsString(3));
+                Assert.True(loadedSymbol2.HasTag("symbol2tag1"));
+                Assert.True(loadedSymbol2.HasTag("symbol2tag2"));
             }
             finally
             {
@@ -356,7 +356,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",

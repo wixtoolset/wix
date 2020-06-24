@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ProvidesDependency = new IntermediateTupleDefinition(
-            TupleDefinitionType.ProvidesDependency,
+        public static readonly IntermediateSymbolDefinition ProvidesDependency = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ProvidesDependency,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.PackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.DisplayName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ProvidesDependencyTupleFields.Imported), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.Key), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.DisplayName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ProvidesDependencySymbolFields.Imported), IntermediateFieldType.Bool),
             },
-            typeof(ProvidesDependencyTuple));
+            typeof(ProvidesDependencySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ProvidesDependencyTupleFields
+    public enum ProvidesDependencySymbolFields
     {
         PackageRef,
         Key,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         Imported,
     }
 
-    public class ProvidesDependencyTuple : IntermediateTuple
+    public class ProvidesDependencySymbol : IntermediateSymbol
     {
-        public ProvidesDependencyTuple() : base(TupleDefinitions.ProvidesDependency, null, null)
+        public ProvidesDependencySymbol() : base(SymbolDefinitions.ProvidesDependency, null, null)
         {
         }
 
-        public ProvidesDependencyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ProvidesDependency, sourceLineNumber, id)
+        public ProvidesDependencySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ProvidesDependency, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ProvidesDependencyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ProvidesDependencySymbolFields index] => this.Fields[(int)index];
 
         public string PackageRef
         {
-            get => (string)this.Fields[(int)ProvidesDependencyTupleFields.PackageRef];
-            set => this.Set((int)ProvidesDependencyTupleFields.PackageRef, value);
+            get => (string)this.Fields[(int)ProvidesDependencySymbolFields.PackageRef];
+            set => this.Set((int)ProvidesDependencySymbolFields.PackageRef, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)ProvidesDependencyTupleFields.Key];
-            set => this.Set((int)ProvidesDependencyTupleFields.Key, value);
+            get => (string)this.Fields[(int)ProvidesDependencySymbolFields.Key];
+            set => this.Set((int)ProvidesDependencySymbolFields.Key, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)ProvidesDependencyTupleFields.Version];
-            set => this.Set((int)ProvidesDependencyTupleFields.Version, value);
+            get => (string)this.Fields[(int)ProvidesDependencySymbolFields.Version];
+            set => this.Set((int)ProvidesDependencySymbolFields.Version, value);
         }
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)ProvidesDependencyTupleFields.DisplayName];
-            set => this.Set((int)ProvidesDependencyTupleFields.DisplayName, value);
+            get => (string)this.Fields[(int)ProvidesDependencySymbolFields.DisplayName];
+            set => this.Set((int)ProvidesDependencySymbolFields.DisplayName, value);
         }
 
         public int? Attributes
         {
-            get => (int?)this.Fields[(int)ProvidesDependencyTupleFields.Attributes];
-            set => this.Set((int)ProvidesDependencyTupleFields.Attributes, value);
+            get => (int?)this.Fields[(int)ProvidesDependencySymbolFields.Attributes];
+            set => this.Set((int)ProvidesDependencySymbolFields.Attributes, value);
         }
 
         public bool Imported
         {
-            get => (bool)this.Fields[(int)ProvidesDependencyTupleFields.Imported];
-            set => this.Set((int)ProvidesDependencyTupleFields.Imported, value);
+            get => (bool)this.Fields[(int)ProvidesDependencySymbolFields.Imported];
+            set => this.Set((int)ProvidesDependencySymbolFields.Imported, value);
         }
     }
 }

@@ -2,53 +2,53 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixSuppressAction = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixSuppressAction,
+        public static readonly IntermediateSymbolDefinition WixSuppressAction = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixSuppressAction,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSuppressActionTupleFields.SequenceTable), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSuppressActionTupleFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSuppressActionSymbolFields.SequenceTable), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSuppressActionSymbolFields.Action), IntermediateFieldType.String),
             },
-            typeof(WixSuppressActionTuple));
+            typeof(WixSuppressActionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixSuppressActionTupleFields
+    public enum WixSuppressActionSymbolFields
     {
         SequenceTable,
         Action,
     }
 
-    public class WixSuppressActionTuple : IntermediateTuple
+    public class WixSuppressActionSymbol : IntermediateSymbol
     {
-        public WixSuppressActionTuple() : base(TupleDefinitions.WixSuppressAction, null, null)
+        public WixSuppressActionSymbol() : base(SymbolDefinitions.WixSuppressAction, null, null)
         {
         }
 
-        public WixSuppressActionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixSuppressAction, sourceLineNumber, id)
+        public WixSuppressActionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixSuppressAction, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixSuppressActionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixSuppressActionSymbolFields index] => this.Fields[(int)index];
 
         public SequenceTable SequenceTable
         {
-            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixSuppressActionTupleFields.SequenceTable]);
-            set => this.Set((int)WixSuppressActionTupleFields.SequenceTable, value.ToString());
+            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixSuppressActionSymbolFields.SequenceTable]);
+            set => this.Set((int)WixSuppressActionSymbolFields.SequenceTable, value.ToString());
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)WixSuppressActionTupleFields.Action];
-            set => this.Set((int)WixSuppressActionTupleFields.Action, value);
+            get => (string)this.Fields[(int)WixSuppressActionSymbolFields.Action];
+            set => this.Set((int)WixSuppressActionSymbolFields.Action, value);
         }
     }
 }

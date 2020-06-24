@@ -2,34 +2,34 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Upgrade = new IntermediateTupleDefinition(
-            TupleDefinitionType.Upgrade,
+        public static readonly IntermediateSymbolDefinition Upgrade = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Upgrade,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.UpgradeCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMin), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMax), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.Language), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.ExcludeLanguages), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.IgnoreRemoveFailures), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.MigrateFeatures), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.OnlyDetect), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMaxInclusive), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMinInclusive), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.Remove), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.ActionProperty), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.UpgradeCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.VersionMin), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.VersionMax), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.Language), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.ExcludeLanguages), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.IgnoreRemoveFailures), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.MigrateFeatures), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.OnlyDetect), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.VersionMaxInclusive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.VersionMinInclusive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.Remove), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradeSymbolFields.ActionProperty), IntermediateFieldType.String),
             },
-            typeof(UpgradeTuple));
+            typeof(UpgradeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum UpgradeTupleFields
+    public enum UpgradeSymbolFields
     {
         UpgradeCode,
         VersionMin,
@@ -45,88 +45,88 @@ namespace WixToolset.Data.Tuples
         ActionProperty,
     }
 
-    public class UpgradeTuple : IntermediateTuple
+    public class UpgradeSymbol : IntermediateSymbol
     {
-        public UpgradeTuple() : base(TupleDefinitions.Upgrade, null, null)
+        public UpgradeSymbol() : base(SymbolDefinitions.Upgrade, null, null)
         {
         }
 
-        public UpgradeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Upgrade, sourceLineNumber, id)
+        public UpgradeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Upgrade, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UpgradeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UpgradeSymbolFields index] => this.Fields[(int)index];
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.UpgradeCode];
-            set => this.Set((int)UpgradeTupleFields.UpgradeCode, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.UpgradeCode];
+            set => this.Set((int)UpgradeSymbolFields.UpgradeCode, value);
         }
 
         public string VersionMin
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMin];
-            set => this.Set((int)UpgradeTupleFields.VersionMin, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.VersionMin];
+            set => this.Set((int)UpgradeSymbolFields.VersionMin, value);
         }
 
         public string VersionMax
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMax];
-            set => this.Set((int)UpgradeTupleFields.VersionMax, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.VersionMax];
+            set => this.Set((int)UpgradeSymbolFields.VersionMax, value);
         }
 
         public string Language
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.Language];
-            set => this.Set((int)UpgradeTupleFields.Language, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.Language];
+            set => this.Set((int)UpgradeSymbolFields.Language, value);
         }
 
         public bool ExcludeLanguages
         {
-            get => this.Fields[(int)UpgradeTupleFields.ExcludeLanguages].AsBool();
-            set => this.Set((int)UpgradeTupleFields.ExcludeLanguages, value);
+            get => this.Fields[(int)UpgradeSymbolFields.ExcludeLanguages].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.ExcludeLanguages, value);
         }
 
         public bool IgnoreRemoveFailures
         {
-            get => this.Fields[(int)UpgradeTupleFields.IgnoreRemoveFailures].AsBool();
-            set => this.Set((int)UpgradeTupleFields.IgnoreRemoveFailures, value);
+            get => this.Fields[(int)UpgradeSymbolFields.IgnoreRemoveFailures].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.IgnoreRemoveFailures, value);
         }
 
         public bool MigrateFeatures
         {
-            get => this.Fields[(int)UpgradeTupleFields.MigrateFeatures].AsBool();
-            set => this.Set((int)UpgradeTupleFields.MigrateFeatures, value);
+            get => this.Fields[(int)UpgradeSymbolFields.MigrateFeatures].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.MigrateFeatures, value);
         }
 
         public bool OnlyDetect
         {
-            get => this.Fields[(int)UpgradeTupleFields.OnlyDetect].AsBool();
-            set => this.Set((int)UpgradeTupleFields.OnlyDetect, value);
+            get => this.Fields[(int)UpgradeSymbolFields.OnlyDetect].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.OnlyDetect, value);
         }
 
         public bool VersionMaxInclusive
         {
-            get => this.Fields[(int)UpgradeTupleFields.VersionMaxInclusive].AsBool();
-            set => this.Set((int)UpgradeTupleFields.VersionMaxInclusive, value);
+            get => this.Fields[(int)UpgradeSymbolFields.VersionMaxInclusive].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.VersionMaxInclusive, value);
         }
 
         public bool VersionMinInclusive
         {
-            get => this.Fields[(int)UpgradeTupleFields.VersionMinInclusive].AsBool();
-            set => this.Set((int)UpgradeTupleFields.VersionMinInclusive, value);
+            get => this.Fields[(int)UpgradeSymbolFields.VersionMinInclusive].AsBool();
+            set => this.Set((int)UpgradeSymbolFields.VersionMinInclusive, value);
         }
 
         public string Remove
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.Remove];
-            set => this.Set((int)UpgradeTupleFields.Remove, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.Remove];
+            set => this.Set((int)UpgradeSymbolFields.Remove, value);
         }
 
         public string ActionProperty
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.ActionProperty];
-            set => this.Set((int)UpgradeTupleFields.ActionProperty, value);
+            get => (string)this.Fields[(int)UpgradeSymbolFields.ActionProperty];
+            set => this.Set((int)UpgradeSymbolFields.ActionProperty, value);
         }
     }
 }

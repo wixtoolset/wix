@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ODBCAttribute = new IntermediateTupleDefinition(
-            TupleDefinitionType.ODBCAttribute,
+        public static readonly IntermediateSymbolDefinition ODBCAttribute = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ODBCAttribute,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.DriverRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.Attribute), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCAttributeSymbolFields.DriverRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCAttributeSymbolFields.Attribute), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCAttributeSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ODBCAttributeTuple));
+            typeof(ODBCAttributeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ODBCAttributeTupleFields
+    public enum ODBCAttributeSymbolFields
     {
         DriverRef,
         Attribute,
         Value,
     }
 
-    public class ODBCAttributeTuple : IntermediateTuple
+    public class ODBCAttributeSymbol : IntermediateSymbol
     {
-        public ODBCAttributeTuple() : base(TupleDefinitions.ODBCAttribute, null, null)
+        public ODBCAttributeSymbol() : base(SymbolDefinitions.ODBCAttribute, null, null)
         {
         }
 
-        public ODBCAttributeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ODBCAttribute, sourceLineNumber, id)
+        public ODBCAttributeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ODBCAttribute, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ODBCAttributeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ODBCAttributeSymbolFields index] => this.Fields[(int)index];
 
         public string DriverRef
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.DriverRef];
-            set => this.Set((int)ODBCAttributeTupleFields.DriverRef, value);
+            get => (string)this.Fields[(int)ODBCAttributeSymbolFields.DriverRef];
+            set => this.Set((int)ODBCAttributeSymbolFields.DriverRef, value);
         }
 
         public string Attribute
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Attribute];
-            set => this.Set((int)ODBCAttributeTupleFields.Attribute, value);
+            get => (string)this.Fields[(int)ODBCAttributeSymbolFields.Attribute];
+            set => this.Set((int)ODBCAttributeSymbolFields.Attribute, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Value];
-            set => this.Set((int)ODBCAttributeTupleFields.Value, value);
+            get => (string)this.Fields[(int)ODBCAttributeSymbolFields.Value];
+            set => this.Set((int)ODBCAttributeSymbolFields.Value, value);
         }
     }
 }

@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition DuplicateFile = new IntermediateTupleDefinition(
-            TupleDefinitionType.DuplicateFile,
+        public static readonly IntermediateSymbolDefinition DuplicateFile = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.DuplicateFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestinationName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestinationFolder), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.DestinationName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.DestinationFolder), IntermediateFieldType.String),
             },
-            typeof(DuplicateFileTuple));
+            typeof(DuplicateFileSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum DuplicateFileTupleFields
+    public enum DuplicateFileSymbolFields
     {
         ComponentRef,
         FileRef,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         DestinationFolder,
     }
 
-    public class DuplicateFileTuple : IntermediateTuple
+    public class DuplicateFileSymbol : IntermediateSymbol
     {
-        public DuplicateFileTuple() : base(TupleDefinitions.DuplicateFile, null, null)
+        public DuplicateFileSymbol() : base(SymbolDefinitions.DuplicateFile, null, null)
         {
         }
 
-        public DuplicateFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.DuplicateFile, sourceLineNumber, id)
+        public DuplicateFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.DuplicateFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[DuplicateFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[DuplicateFileSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.ComponentRef];
-            set => this.Set((int)DuplicateFileTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)DuplicateFileSymbolFields.ComponentRef];
+            set => this.Set((int)DuplicateFileSymbolFields.ComponentRef, value);
         }
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.FileRef];
-            set => this.Set((int)DuplicateFileTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)DuplicateFileSymbolFields.FileRef];
+            set => this.Set((int)DuplicateFileSymbolFields.FileRef, value);
         }
 
         public string DestinationName
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestinationName];
-            set => this.Set((int)DuplicateFileTupleFields.DestinationName, value);
+            get => (string)this.Fields[(int)DuplicateFileSymbolFields.DestinationName];
+            set => this.Set((int)DuplicateFileSymbolFields.DestinationName, value);
         }
 
         public string DestinationFolder
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestinationFolder];
-            set => this.Set((int)DuplicateFileTupleFields.DestinationFolder, value);
+            get => (string)this.Fields[(int)DuplicateFileSymbolFields.DestinationFolder];
+            set => this.Set((int)DuplicateFileSymbolFields.DestinationFolder, value);
         }
     }
 }

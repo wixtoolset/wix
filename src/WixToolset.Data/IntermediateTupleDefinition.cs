@@ -5,50 +5,50 @@ namespace WixToolset.Data
     using System;
     using SimpleJson;
 
-    public class IntermediateTupleDefinition
+    public class IntermediateSymbolDefinition
     {
         private object tags;
 
-        public IntermediateTupleDefinition(string name, IntermediateFieldDefinition[] fieldDefinitions, Type strongTupleType)
-            : this(TupleDefinitionType.MustBeFromAnExtension, name, 0, fieldDefinitions, strongTupleType)
+        public IntermediateSymbolDefinition(string name, IntermediateFieldDefinition[] fieldDefinitions, Type strongSymbolType)
+            : this(SymbolDefinitionType.MustBeFromAnExtension, name, 0, fieldDefinitions, strongSymbolType)
         {
         }
 
-        public IntermediateTupleDefinition(string name, int revision, IntermediateFieldDefinition[] fieldDefinitions, Type strongTupleType)
-            : this(TupleDefinitionType.MustBeFromAnExtension, name, revision, fieldDefinitions, strongTupleType)
+        public IntermediateSymbolDefinition(string name, int revision, IntermediateFieldDefinition[] fieldDefinitions, Type strongSymbolType)
+            : this(SymbolDefinitionType.MustBeFromAnExtension, name, revision, fieldDefinitions, strongSymbolType)
         {
         }
 
-        internal IntermediateTupleDefinition(TupleDefinitionType type, IntermediateFieldDefinition[] fieldDefinitions, Type strongTupleType)
-            : this(type, type.ToString(), 0, fieldDefinitions, strongTupleType)
+        internal IntermediateSymbolDefinition(SymbolDefinitionType type, IntermediateFieldDefinition[] fieldDefinitions, Type strongSymbolType)
+            : this(type, type.ToString(), 0, fieldDefinitions, strongSymbolType)
         {
         }
 
-        private IntermediateTupleDefinition(TupleDefinitionType type, string name, int revision, IntermediateFieldDefinition[] fieldDefinitions, Type strongTupleType)
+        private IntermediateSymbolDefinition(SymbolDefinitionType type, string name, int revision, IntermediateFieldDefinition[] fieldDefinitions, Type strongSymbolType)
         {
             this.Type = type;
             this.Name = name;
             this.Revision = revision;
             this.FieldDefinitions = fieldDefinitions;
-            this.StrongTupleType = strongTupleType ?? typeof(IntermediateTuple);
+            this.StrongSymbolType = strongSymbolType ?? typeof(IntermediateSymbol);
 #if DEBUG
-            if (this.StrongTupleType != typeof(IntermediateTuple) && !this.StrongTupleType.IsSubclassOf(typeof(IntermediateTuple))) { throw new ArgumentException(nameof(strongTupleType)); }
+            if (this.StrongSymbolType != typeof(IntermediateSymbol) && !this.StrongSymbolType.IsSubclassOf(typeof(IntermediateSymbol))) { throw new ArgumentException(nameof(strongSymbolType)); }
 #endif
         }
 
         public int Revision { get; }
 
-        public TupleDefinitionType Type { get; }
+        public SymbolDefinitionType Type { get; }
 
         public string Name { get; }
 
         public IntermediateFieldDefinition[] FieldDefinitions { get; }
 
-        private Type StrongTupleType { get; }
+        private Type StrongSymbolType { get; }
 
-        public IntermediateTuple CreateTuple(SourceLineNumber sourceLineNumber = null, Identifier id = null)
+        public IntermediateSymbol CreateSymbol(SourceLineNumber sourceLineNumber = null, Identifier id = null)
         {
-            var result = (this.StrongTupleType == typeof(IntermediateTuple)) ? (IntermediateTuple)Activator.CreateInstance(this.StrongTupleType, this) : (IntermediateTuple)Activator.CreateInstance(this.StrongTupleType);
+            var result = (this.StrongSymbolType == typeof(IntermediateSymbol)) ? (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType, this) : (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType);
             result.SourceLineNumbers = sourceLineNumber;
             result.Id = id;
 
@@ -174,7 +174,7 @@ namespace WixToolset.Data
             return false;
         }
 
-        internal static IntermediateTupleDefinition Deserialize(JsonObject jsonObject)
+        internal static IntermediateSymbolDefinition Deserialize(JsonObject jsonObject)
         {
             var name = jsonObject.GetValueOrDefault<string>("name");
             var revision = jsonObject.GetValueOrDefault("rev", 0);
@@ -191,7 +191,7 @@ namespace WixToolset.Data
                 fieldDefinitions[i] = new IntermediateFieldDefinition(fieldName, fieldType);
             }
 
-            var definition = new IntermediateTupleDefinition(name, revision, fieldDefinitions, null);
+            var definition = new IntermediateSymbolDefinition(name, revision, fieldDefinitions, null);
 
             if (tagsJson == null || tagsJson.Count == 0)
             {

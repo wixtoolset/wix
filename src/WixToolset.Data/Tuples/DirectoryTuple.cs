@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Directory = new IntermediateTupleDefinition(
-            TupleDefinitionType.Directory,
+        public static readonly IntermediateSymbolDefinition Directory = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Directory,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ParentDirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ShortName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.SourceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.SourceShortName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ComponentGuidGenerationSeed), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.ParentDirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.ShortName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.SourceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.SourceShortName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectorySymbolFields.ComponentGuidGenerationSeed), IntermediateFieldType.String),
             },
-            typeof(DirectoryTuple));
+            typeof(DirectorySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum DirectoryTupleFields
+    public enum DirectorySymbolFields
     {
         ParentDirectoryRef,
         Name,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         ComponentGuidGenerationSeed,
     }
 
-    public class DirectoryTuple : IntermediateTuple
+    public class DirectorySymbol : IntermediateSymbol
     {
-        public DirectoryTuple() : base(TupleDefinitions.Directory, null, null)
+        public DirectorySymbol() : base(SymbolDefinitions.Directory, null, null)
         {
         }
 
-        public DirectoryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Directory, sourceLineNumber, id)
+        public DirectorySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Directory, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[DirectoryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[DirectorySymbolFields index] => this.Fields[(int)index];
 
         public string ParentDirectoryRef
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.ParentDirectoryRef];
-            set => this.Set((int)DirectoryTupleFields.ParentDirectoryRef, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.ParentDirectoryRef];
+            set => this.Set((int)DirectorySymbolFields.ParentDirectoryRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.Name];
-            set => this.Set((int)DirectoryTupleFields.Name, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.Name];
+            set => this.Set((int)DirectorySymbolFields.Name, value);
         }
 
         public string ShortName
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.ShortName];
-            set => this.Set((int)DirectoryTupleFields.ShortName, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.ShortName];
+            set => this.Set((int)DirectorySymbolFields.ShortName, value);
         }
 
         public string SourceName
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.SourceName];
-            set => this.Set((int)DirectoryTupleFields.SourceName, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.SourceName];
+            set => this.Set((int)DirectorySymbolFields.SourceName, value);
         }
 
         public string SourceShortName
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.SourceShortName];
-            set => this.Set((int)DirectoryTupleFields.SourceShortName, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.SourceShortName];
+            set => this.Set((int)DirectorySymbolFields.SourceShortName, value);
         }
 
         public string ComponentGuidGenerationSeed
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.ComponentGuidGenerationSeed];
-            set => this.Set((int)DirectoryTupleFields.ComponentGuidGenerationSeed, value);
+            get => (string)this.Fields[(int)DirectorySymbolFields.ComponentGuidGenerationSeed];
+            set => this.Set((int)DirectorySymbolFields.ComponentGuidGenerationSeed, value);
         }
     }
 }

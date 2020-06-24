@@ -2,32 +2,32 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleConfiguration = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleConfiguration,
+        public static readonly IntermediateSymbolDefinition ModuleConfiguration = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleConfiguration,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Format), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Type), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.ContextData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.DefaultValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.KeyNoOrphan), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.NonNullable), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.DisplayName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.HelpLocation), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.HelpKeyword), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.Format), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.Type), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.ContextData), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.DefaultValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.KeyNoOrphan), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.NonNullable), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.DisplayName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.HelpLocation), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationSymbolFields.HelpKeyword), IntermediateFieldType.String),
             },
-            typeof(ModuleConfigurationTuple));
+            typeof(ModuleConfigurationSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleConfigurationTupleFields
+    public enum ModuleConfigurationSymbolFields
     {
         Format,
         Type,
@@ -41,76 +41,76 @@ namespace WixToolset.Data.Tuples
         HelpKeyword,
     }
 
-    public class ModuleConfigurationTuple : IntermediateTuple
+    public class ModuleConfigurationSymbol : IntermediateSymbol
     {
-        public ModuleConfigurationTuple() : base(TupleDefinitions.ModuleConfiguration, null, null)
+        public ModuleConfigurationSymbol() : base(SymbolDefinitions.ModuleConfiguration, null, null)
         {
         }
 
-        public ModuleConfigurationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleConfiguration, sourceLineNumber, id)
+        public ModuleConfigurationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleConfiguration, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleConfigurationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleConfigurationSymbolFields index] => this.Fields[(int)index];
 
         public int Format
         {
-            get => (int)this.Fields[(int)ModuleConfigurationTupleFields.Format];
-            set => this.Set((int)ModuleConfigurationTupleFields.Format, value);
+            get => (int)this.Fields[(int)ModuleConfigurationSymbolFields.Format];
+            set => this.Set((int)ModuleConfigurationSymbolFields.Format, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Type];
-            set => this.Set((int)ModuleConfigurationTupleFields.Type, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.Type];
+            set => this.Set((int)ModuleConfigurationSymbolFields.Type, value);
         }
 
         public string ContextData
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.ContextData];
-            set => this.Set((int)ModuleConfigurationTupleFields.ContextData, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.ContextData];
+            set => this.Set((int)ModuleConfigurationSymbolFields.ContextData, value);
         }
 
         public string DefaultValue
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DefaultValue];
-            set => this.Set((int)ModuleConfigurationTupleFields.DefaultValue, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.DefaultValue];
+            set => this.Set((int)ModuleConfigurationSymbolFields.DefaultValue, value);
         }
 
         public bool KeyNoOrphan
         {
-            get => this.Fields[(int)ModuleConfigurationTupleFields.KeyNoOrphan].AsBool();
-            set => this.Set((int)ModuleConfigurationTupleFields.KeyNoOrphan, value);
+            get => this.Fields[(int)ModuleConfigurationSymbolFields.KeyNoOrphan].AsBool();
+            set => this.Set((int)ModuleConfigurationSymbolFields.KeyNoOrphan, value);
         }
 
         public bool NonNullable
         {
-            get => this.Fields[(int)ModuleConfigurationTupleFields.NonNullable].AsBool();
-            set => this.Set((int)ModuleConfigurationTupleFields.NonNullable, value);
+            get => this.Fields[(int)ModuleConfigurationSymbolFields.NonNullable].AsBool();
+            set => this.Set((int)ModuleConfigurationSymbolFields.NonNullable, value);
         }
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DisplayName];
-            set => this.Set((int)ModuleConfigurationTupleFields.DisplayName, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.DisplayName];
+            set => this.Set((int)ModuleConfigurationSymbolFields.DisplayName, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Description];
-            set => this.Set((int)ModuleConfigurationTupleFields.Description, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.Description];
+            set => this.Set((int)ModuleConfigurationSymbolFields.Description, value);
         }
 
         public string HelpLocation
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpLocation];
-            set => this.Set((int)ModuleConfigurationTupleFields.HelpLocation, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.HelpLocation];
+            set => this.Set((int)ModuleConfigurationSymbolFields.HelpLocation, value);
         }
 
         public string HelpKeyword
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpKeyword];
-            set => this.Set((int)ModuleConfigurationTupleFields.HelpKeyword, value);
+            get => (string)this.Fields[(int)ModuleConfigurationSymbolFields.HelpKeyword];
+            set => this.Set((int)ModuleConfigurationSymbolFields.HelpKeyword, value);
         }
     }
 }

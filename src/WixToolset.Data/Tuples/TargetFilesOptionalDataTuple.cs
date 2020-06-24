@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition TargetFilesOptionalData = new IntermediateTupleDefinition(
-            TupleDefinitionType.TargetFilesOptionalData,
+        public static readonly IntermediateSymbolDefinition TargetFilesOptionalData = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.TargetFilesOptionalData,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.Target), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.FTK), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.SymbolPaths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.IgnoreOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.IgnoreLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataTupleFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.Target), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.FTK), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.IgnoreOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.IgnoreLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TargetFilesOptionalDataSymbolFields.RetainOffsets), IntermediateFieldType.String),
             },
-            typeof(TargetFilesOptionalDataTuple));
+            typeof(TargetFilesOptionalDataSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum TargetFilesOptionalDataTupleFields
+    public enum TargetFilesOptionalDataSymbolFields
     {
         Target,
         FTK,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         RetainOffsets,
     }
 
-    public class TargetFilesOptionalDataTuple : IntermediateTuple
+    public class TargetFilesOptionalDataSymbol : IntermediateSymbol
     {
-        public TargetFilesOptionalDataTuple() : base(TupleDefinitions.TargetFilesOptionalData, null, null)
+        public TargetFilesOptionalDataSymbol() : base(SymbolDefinitions.TargetFilesOptionalData, null, null)
         {
         }
 
-        public TargetFilesOptionalDataTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.TargetFilesOptionalData, sourceLineNumber, id)
+        public TargetFilesOptionalDataSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.TargetFilesOptionalData, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[TargetFilesOptionalDataTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[TargetFilesOptionalDataSymbolFields index] => this.Fields[(int)index];
 
         public string Target
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.Target];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.Target, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.Target];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.Target, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.FTK];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.FTK, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.FTK];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.FTK, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.SymbolPaths];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.SymbolPaths];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.SymbolPaths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.IgnoreOffsets];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.IgnoreOffsets, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.IgnoreOffsets];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.IgnoreLengths];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.IgnoreLengths, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.IgnoreLengths];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)TargetFilesOptionalDataTupleFields.RetainOffsets];
-            set => this.Set((int)TargetFilesOptionalDataTupleFields.RetainOffsets, value);
+            get => (string)this.Fields[(int)TargetFilesOptionalDataSymbolFields.RetainOffsets];
+            set => this.Set((int)TargetFilesOptionalDataSymbolFields.RetainOffsets, value);
         }
     }
 }

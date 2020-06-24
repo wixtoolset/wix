@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Class = new IntermediateTupleDefinition(
-            TupleDefinitionType.Class,
+        public static readonly IntermediateSymbolDefinition Class = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Class,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.CLSID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Context), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.DefaultProgIdRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.AppIdRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.FileTypeMask), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.IconRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.IconIndex), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.DefInprocHandler), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Argument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.RelativePath), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.CLSID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.Context), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.DefaultProgIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.AppIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.FileTypeMask), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.IconRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.IconIndex), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.DefInprocHandler), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.Argument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassSymbolFields.RelativePath), IntermediateFieldType.Bool),
             },
-            typeof(ClassTuple));
+            typeof(ClassSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ClassTupleFields
+    public enum ClassSymbolFields
     {
         CLSID,
         Context,
@@ -47,94 +47,94 @@ namespace WixToolset.Data.Tuples
         RelativePath,
     }
 
-    public class ClassTuple : IntermediateTuple
+    public class ClassSymbol : IntermediateSymbol
     {
-        public ClassTuple() : base(TupleDefinitions.Class, null, null)
+        public ClassSymbol() : base(SymbolDefinitions.Class, null, null)
         {
         }
 
-        public ClassTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Class, sourceLineNumber, id)
+        public ClassSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Class, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ClassTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ClassSymbolFields index] => this.Fields[(int)index];
 
         public string CLSID
         {
-            get => (string)this.Fields[(int)ClassTupleFields.CLSID];
-            set => this.Set((int)ClassTupleFields.CLSID, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.CLSID];
+            set => this.Set((int)ClassSymbolFields.CLSID, value);
         }
 
         public string Context
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Context];
-            set => this.Set((int)ClassTupleFields.Context, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.Context];
+            set => this.Set((int)ClassSymbolFields.Context, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.ComponentRef];
-            set => this.Set((int)ClassTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.ComponentRef];
+            set => this.Set((int)ClassSymbolFields.ComponentRef, value);
         }
 
         public string DefaultProgIdRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.DefaultProgIdRef];
-            set => this.Set((int)ClassTupleFields.DefaultProgIdRef, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.DefaultProgIdRef];
+            set => this.Set((int)ClassSymbolFields.DefaultProgIdRef, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Description];
-            set => this.Set((int)ClassTupleFields.Description, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.Description];
+            set => this.Set((int)ClassSymbolFields.Description, value);
         }
 
         public string AppIdRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.AppIdRef];
-            set => this.Set((int)ClassTupleFields.AppIdRef, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.AppIdRef];
+            set => this.Set((int)ClassSymbolFields.AppIdRef, value);
         }
 
         public string FileTypeMask
         {
-            get => (string)this.Fields[(int)ClassTupleFields.FileTypeMask];
-            set => this.Set((int)ClassTupleFields.FileTypeMask, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.FileTypeMask];
+            set => this.Set((int)ClassSymbolFields.FileTypeMask, value);
         }
 
         public string IconRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.IconRef];
-            set => this.Set((int)ClassTupleFields.IconRef, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.IconRef];
+            set => this.Set((int)ClassSymbolFields.IconRef, value);
         }
 
         public int? IconIndex
         {
-            get => (int?)this.Fields[(int)ClassTupleFields.IconIndex];
-            set => this.Set((int)ClassTupleFields.IconIndex, value);
+            get => (int?)this.Fields[(int)ClassSymbolFields.IconIndex];
+            set => this.Set((int)ClassSymbolFields.IconIndex, value);
         }
 
         public string DefInprocHandler
         {
-            get => (string)this.Fields[(int)ClassTupleFields.DefInprocHandler];
-            set => this.Set((int)ClassTupleFields.DefInprocHandler, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.DefInprocHandler];
+            set => this.Set((int)ClassSymbolFields.DefInprocHandler, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Argument];
-            set => this.Set((int)ClassTupleFields.Argument, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.Argument];
+            set => this.Set((int)ClassSymbolFields.Argument, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.FeatureRef];
-            set => this.Set((int)ClassTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)ClassSymbolFields.FeatureRef];
+            set => this.Set((int)ClassSymbolFields.FeatureRef, value);
         }
 
         public bool RelativePath
         {
-            get => this.Fields[(int)ClassTupleFields.RelativePath].AsBool();
-            set => this.Set((int)ClassTupleFields.RelativePath, value);
+            get => this.Fields[(int)ClassSymbolFields.RelativePath].AsBool();
+            set => this.Set((int)ClassSymbolFields.RelativePath, value);
         }
     }
 }

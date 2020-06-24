@@ -3,59 +3,59 @@
 namespace WixToolsetTest.Data
 {
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
-    public class TupleDefinitionFixture
+    public class SymbolDefinitionFixture
     {
         [Fact]
-        public void CanCreateFileTuple()
+        public void CanCreateFileSymbol()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.IsType<FileTuple>(tuple);
-            Assert.Same(TupleDefinitions.File, tuple.Definition);
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.IsType<FileSymbol>(symbol);
+            Assert.Same(SymbolDefinitions.File, symbol.Definition);
         }
 
         [Fact]
-        public void CanCreateFileTupleByName()
+        public void CanCreateFileSymbolByName()
         {
-            var tuple = TupleDefinitions.ByName("File").CreateTuple();
-            Assert.IsType<FileTuple>(tuple);
-            Assert.Same(TupleDefinitions.File, tuple.Definition);
+            var symbol = SymbolDefinitions.ByName("File").CreateSymbol();
+            Assert.IsType<FileSymbol>(symbol);
+            Assert.Same(SymbolDefinitions.File, symbol.Definition);
         }
 
         //[Fact]
-        //public void CanCreateFileTupleByType()
+        //public void CanCreateFileSymbolByType()
         //{
-        //    var tuple = TupleDefinitions.CreateTuple<FileTuple>();
-        //    Assert.Same(TupleDefinitions.File, tuple.Definition);
+        //    var symbol = SymbolDefinitions.CreateSymbol<FileSymbol>();
+        //    Assert.Same(SymbolDefinitions.File, symbol.Definition);
         //}
 
         [Fact]
-        public void CanSetComponentFieldInFileTupleByCasting()
+        public void CanSetComponentFieldInFileSymbolByCasting()
         {
-            var fileTuple = (FileTuple)TupleDefinitions.File.CreateTuple();
-            fileTuple.ComponentRef = "Foo";
-            Assert.Equal("Foo", fileTuple.ComponentRef);
+            var fileSymbol = (FileSymbol)SymbolDefinitions.File.CreateSymbol();
+            fileSymbol.ComponentRef = "Foo";
+            Assert.Equal("Foo", fileSymbol.ComponentRef);
         }
 
         [Fact]
         public void CanCheckNameofField()
         {
-            var fileTuple = new FileTuple();
-            Assert.Equal("ComponentRef", fileTuple.Definition.FieldDefinitions[0].Name);
-            Assert.Null(fileTuple.Fields[0]);
-            fileTuple.ComponentRef = "Foo";
-            Assert.Equal("ComponentRef", fileTuple.Fields[0].Name);
-            Assert.Same(fileTuple.Definition.FieldDefinitions[0].Name, fileTuple.Fields[0].Name);
+            var fileSymbol = new FileSymbol();
+            Assert.Equal("ComponentRef", fileSymbol.Definition.FieldDefinitions[0].Name);
+            Assert.Null(fileSymbol.Fields[0]);
+            fileSymbol.ComponentRef = "Foo";
+            Assert.Equal("ComponentRef", fileSymbol.Fields[0].Name);
+            Assert.Same(fileSymbol.Definition.FieldDefinitions[0].Name, fileSymbol.Fields[0].Name);
         }
 
         [Fact]
-        public void CanSetComponentFieldInFileTupleByNew()
+        public void CanSetComponentFieldInFileSymbolByNew()
         {
-            var fileTuple = new FileTuple();
-            fileTuple.ComponentRef = "Foo";
-            Assert.Equal("Foo", fileTuple.ComponentRef);
+            var fileSymbol = new FileSymbol();
+            fileSymbol.ComponentRef = "Foo";
+            Assert.Equal("Foo", fileSymbol.ComponentRef);
         }
 
         [Fact]
@@ -63,10 +63,10 @@ namespace WixToolsetTest.Data
         {
             using (new IntermediateFieldContext("bar"))
             {
-                var fileTuple = new FileTuple();
-                fileTuple.ComponentRef = "Foo";
+                var fileSymbol = new FileSymbol();
+                fileSymbol.ComponentRef = "Foo";
 
-                var field = fileTuple[FileTupleFields.ComponentRef];
+                var field = fileSymbol[FileSymbolFields.ComponentRef];
                 Assert.Equal("Foo", field.AsString());
                 Assert.Equal("bar", field.Context);
             }
@@ -75,21 +75,21 @@ namespace WixToolsetTest.Data
         [Fact]
         public void CanSetInNestedContext()
         {
-            var fileTuple = new FileTuple();
+            var fileSymbol = new FileSymbol();
 
             using (new IntermediateFieldContext("bar"))
             {
-                fileTuple.ComponentRef = "Foo";
+                fileSymbol.ComponentRef = "Foo";
 
-                var field = fileTuple[FileTupleFields.ComponentRef];
+                var field = fileSymbol[FileSymbolFields.ComponentRef];
                 Assert.Equal("Foo", field.AsString());
                 Assert.Equal("bar", field.Context);
 
                 using (new IntermediateFieldContext("baz"))
                 {
-                    fileTuple.ComponentRef = "Foo2";
+                    fileSymbol.ComponentRef = "Foo2";
 
-                    field = fileTuple[FileTupleFields.ComponentRef];
+                    field = fileSymbol[FileSymbolFields.ComponentRef];
                     Assert.Equal("Foo2", field.AsString());
                     Assert.Equal("baz", field.Context);
 
@@ -97,9 +97,9 @@ namespace WixToolsetTest.Data
                     Assert.Equal("bar", field.PreviousValue.Context);
                 }
 
-                fileTuple.ComponentRef = "Foo3";
+                fileSymbol.ComponentRef = "Foo3";
 
-                field = fileTuple[FileTupleFields.ComponentRef];
+                field = fileSymbol[FileSymbolFields.ComponentRef];
                 Assert.Equal("Foo3", field.AsString());
                 Assert.Equal("bar", field.Context);
 
@@ -110,26 +110,26 @@ namespace WixToolsetTest.Data
                 Assert.Equal("bar", field.PreviousValue.PreviousValue.Context);
             }
 
-            fileTuple.ComponentRef = "Foo4";
+            fileSymbol.ComponentRef = "Foo4";
 
-            var fieldOutside = fileTuple[FileTupleFields.ComponentRef];
+            var fieldOutside = fileSymbol[FileSymbolFields.ComponentRef];
             Assert.Equal("Foo4", fieldOutside.AsString());
             Assert.Null(fieldOutside.Context);
         }
 
         //[Fact]
-        //public void CanSetComponentFieldInFileTuple()
+        //public void CanSetComponentFieldInFileSymbol()
         //{
-        //    var fileTuple = TupleDefinitions.File.CreateTuple<FileTuple>();
-        //    fileTuple.Component_ = "Foo";
-        //    Assert.Equal("Foo", fileTuple.Component_);
+        //    var fileSymbol = SymbolDefinitions.File.CreateSymbol<FileSymbol>();
+        //    fileSymbol.Component_ = "Foo";
+        //    Assert.Equal("Foo", fileSymbol.Component_);
         //}
 
         //[Fact]
-        //public void CanThrowOnMismatchTupleType()
+        //public void CanThrowOnMismatchSymbolType()
         //{
-        //    var e = Assert.Throws<InvalidCastException>(() => TupleDefinitions.File.CreateTuple<ComponentTuple>());
-        //    Assert.Equal("Requested wrong type WixToolset.Data.Tuples.ComponentTuple, actual type WixToolset.Data.Tuples.FileTuple", e.Message);
+        //    var e = Assert.Throws<InvalidCastException>(() => SymbolDefinitions.File.CreateSymbol<ComponentSymbol>());
+        //    Assert.Equal("Requested wrong type WixToolset.Data.Symbols.ComponentSymbol, actual type WixToolset.Data.Symbols.FileSymbol", e.Message);
         //}
     }
 }

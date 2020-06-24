@@ -2,29 +2,29 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiServiceConfig = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiServiceConfig,
+        public static readonly IntermediateSymbolDefinition MsiServiceConfig = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiServiceConfig,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnInstall), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnReinstall), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnUninstall), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.ConfigType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Argument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsSymbolFields.OnInstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsSymbolFields.OnReinstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsSymbolFields.OnUninstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigSymbolFields.ConfigType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigSymbolFields.Argument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(MsiServiceConfigTuple));
+            typeof(MsiServiceConfigSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiServiceConfigTupleFields
+    public enum MsiServiceConfigSymbolFields
     {
         Name,
         OnInstall,
@@ -44,58 +44,58 @@ namespace WixToolset.Data.Tuples
         PreshutdownInfo,
     }
 
-    public class MsiServiceConfigTuple : IntermediateTuple
+    public class MsiServiceConfigSymbol : IntermediateSymbol
     {
-        public MsiServiceConfigTuple() : base(TupleDefinitions.MsiServiceConfig, null, null)
+        public MsiServiceConfigSymbol() : base(SymbolDefinitions.MsiServiceConfig, null, null)
         {
         }
 
-        public MsiServiceConfigTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiServiceConfig, sourceLineNumber, id)
+        public MsiServiceConfigSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiServiceConfig, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiServiceConfigTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiServiceConfigSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Name];
-            set => this.Set((int)MsiServiceConfigTupleFields.Name, value);
+            get => (string)this.Fields[(int)MsiServiceConfigSymbolFields.Name];
+            set => this.Set((int)MsiServiceConfigSymbolFields.Name, value);
         }
 
         public bool OnInstall
         {
-            get => this.Fields[(int)MsiServiceConfigTupleFields.OnInstall].AsBool();
-            set => this.Set((int)MsiServiceConfigTupleFields.OnInstall, value);
+            get => this.Fields[(int)MsiServiceConfigSymbolFields.OnInstall].AsBool();
+            set => this.Set((int)MsiServiceConfigSymbolFields.OnInstall, value);
         }
 
         public bool OnReinstall
         {
-            get => this.Fields[(int)MsiServiceConfigTupleFields.OnReinstall].AsBool();
-            set => this.Set((int)MsiServiceConfigTupleFields.OnReinstall, value);
+            get => this.Fields[(int)MsiServiceConfigSymbolFields.OnReinstall].AsBool();
+            set => this.Set((int)MsiServiceConfigSymbolFields.OnReinstall, value);
         }
 
         public bool OnUninstall
         {
-            get => this.Fields[(int)MsiServiceConfigTupleFields.OnUninstall].AsBool();
-            set => this.Set((int)MsiServiceConfigTupleFields.OnUninstall, value);
+            get => this.Fields[(int)MsiServiceConfigSymbolFields.OnUninstall].AsBool();
+            set => this.Set((int)MsiServiceConfigSymbolFields.OnUninstall, value);
         }
 
         public MsiServiceConfigType ConfigType
         {
-            get => (MsiServiceConfigType)this.Fields[(int)MsiServiceConfigTupleFields.ConfigType].AsNumber();
-            set => this.Set((int)MsiServiceConfigTupleFields.ConfigType, (int)value);
+            get => (MsiServiceConfigType)this.Fields[(int)MsiServiceConfigSymbolFields.ConfigType].AsNumber();
+            set => this.Set((int)MsiServiceConfigSymbolFields.ConfigType, (int)value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Argument];
-            set => this.Set((int)MsiServiceConfigTupleFields.Argument, value);
+            get => (string)this.Fields[(int)MsiServiceConfigSymbolFields.Argument];
+            set => this.Set((int)MsiServiceConfigSymbolFields.Argument, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.ComponentRef];
-            set => this.Set((int)MsiServiceConfigTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)MsiServiceConfigSymbolFields.ComponentRef];
+            set => this.Set((int)MsiServiceConfigSymbolFields.ComponentRef, value);
         }
     }
 }

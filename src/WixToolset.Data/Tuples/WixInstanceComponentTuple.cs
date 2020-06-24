@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixInstanceComponent = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixInstanceComponent,
+        public static readonly IntermediateSymbolDefinition WixInstanceComponent = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixInstanceComponent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInstanceComponentTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceComponentSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(WixInstanceComponentTuple));
+            typeof(WixInstanceComponentSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixInstanceComponentTupleFields
+    public enum WixInstanceComponentSymbolFields
     {
         ComponentRef,
     }
 
-    public class WixInstanceComponentTuple : IntermediateTuple
+    public class WixInstanceComponentSymbol : IntermediateSymbol
     {
-        public WixInstanceComponentTuple() : base(TupleDefinitions.WixInstanceComponent, null, null)
+        public WixInstanceComponentSymbol() : base(SymbolDefinitions.WixInstanceComponent, null, null)
         {
         }
 
-        public WixInstanceComponentTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixInstanceComponent, sourceLineNumber, id)
+        public WixInstanceComponentSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixInstanceComponent, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixInstanceComponentTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixInstanceComponentSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)WixInstanceComponentTupleFields.ComponentRef];
-            set => this.Set((int)WixInstanceComponentTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)WixInstanceComponentSymbolFields.ComponentRef];
+            set => this.Set((int)WixInstanceComponentSymbolFields.ComponentRef, value);
         }
     }
 }

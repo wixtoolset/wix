@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixCustomTableCell = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixCustomTableCell,
+        public static readonly IntermediateSymbolDefinition WixCustomTableCell = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixCustomTableCell,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixCustomTableCellTupleFields.TableRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableCellTupleFields.ColumnRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableCellTupleFields.RowId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableCellTupleFields.Data), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableCellSymbolFields.TableRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableCellSymbolFields.ColumnRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableCellSymbolFields.RowId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableCellSymbolFields.Data), IntermediateFieldType.String),
             },
-            typeof(WixCustomTableCellTuple));
+            typeof(WixCustomTableCellSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixCustomTableCellTupleFields
+    public enum WixCustomTableCellSymbolFields
     {
         TableRef,
         ColumnRef,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Data,
     }
 
-    public class WixCustomTableCellTuple : IntermediateTuple
+    public class WixCustomTableCellSymbol : IntermediateSymbol
     {
-        public WixCustomTableCellTuple() : base(TupleDefinitions.WixCustomTableCell, null, null)
+        public WixCustomTableCellSymbol() : base(SymbolDefinitions.WixCustomTableCell, null, null)
         {
         }
 
-        public WixCustomTableCellTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixCustomTableCell, sourceLineNumber, id)
+        public WixCustomTableCellSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixCustomTableCell, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixCustomTableCellTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixCustomTableCellSymbolFields index] => this.Fields[(int)index];
 
         public string TableRef
         {
-            get => (string)this.Fields[(int)WixCustomTableCellTupleFields.TableRef];
-            set => this.Set((int)WixCustomTableCellTupleFields.TableRef, value);
+            get => (string)this.Fields[(int)WixCustomTableCellSymbolFields.TableRef];
+            set => this.Set((int)WixCustomTableCellSymbolFields.TableRef, value);
         }
 
         public string ColumnRef
         {
-            get => (string)this.Fields[(int)WixCustomTableCellTupleFields.ColumnRef];
-            set => this.Set((int)WixCustomTableCellTupleFields.ColumnRef, value);
+            get => (string)this.Fields[(int)WixCustomTableCellSymbolFields.ColumnRef];
+            set => this.Set((int)WixCustomTableCellSymbolFields.ColumnRef, value);
         }
 
         public string RowId
         {
-            get => (string)this.Fields[(int)WixCustomTableCellTupleFields.RowId];
-            set => this.Set((int)WixCustomTableCellTupleFields.RowId, value);
+            get => (string)this.Fields[(int)WixCustomTableCellSymbolFields.RowId];
+            set => this.Set((int)WixCustomTableCellSymbolFields.RowId, value);
         }
 
         public string Data
         {
-            get => (string)this.Fields[(int)WixCustomTableCellTupleFields.Data];
-            set => this.Set((int)WixCustomTableCellTupleFields.Data, value);
+            get => (string)this.Fields[(int)WixCustomTableCellSymbolFields.Data];
+            set => this.Set((int)WixCustomTableCellSymbolFields.Data, value);
         }
     }
 }

@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleCustomDataAttribute = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleCustomDataAttribute,
+        public static readonly IntermediateSymbolDefinition WixBundleCustomDataAttribute = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleCustomDataAttribute,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataAttributeTupleFields.CustomDataRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataAttributeTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataAttributeSymbolFields.CustomDataRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataAttributeSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(WixBundleCustomDataAttributeTuple));
+            typeof(WixBundleCustomDataAttributeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleCustomDataAttributeTupleFields
+    public enum WixBundleCustomDataAttributeSymbolFields
     {
         CustomDataRef,
         Name,
     }
 
-    public class WixBundleCustomDataAttributeTuple : IntermediateTuple
+    public class WixBundleCustomDataAttributeSymbol : IntermediateSymbol
     {
-        public WixBundleCustomDataAttributeTuple() : base(TupleDefinitions.WixBundleCustomDataAttribute, null, null)
+        public WixBundleCustomDataAttributeSymbol() : base(SymbolDefinitions.WixBundleCustomDataAttribute, null, null)
         {
         }
 
-        public WixBundleCustomDataAttributeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleCustomDataAttribute, sourceLineNumber, id)
+        public WixBundleCustomDataAttributeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleCustomDataAttribute, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleCustomDataAttributeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleCustomDataAttributeSymbolFields index] => this.Fields[(int)index];
 
         public string CustomDataRef
         {
-            get => (string)this.Fields[(int)WixBundleCustomDataAttributeTupleFields.CustomDataRef];
-            set => this.Set((int)WixBundleCustomDataAttributeTupleFields.CustomDataRef, value);
+            get => (string)this.Fields[(int)WixBundleCustomDataAttributeSymbolFields.CustomDataRef];
+            set => this.Set((int)WixBundleCustomDataAttributeSymbolFields.CustomDataRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleCustomDataAttributeTupleFields.Name];
-            set => this.Set((int)WixBundleCustomDataAttributeTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixBundleCustomDataAttributeSymbolFields.Name];
+            set => this.Set((int)WixBundleCustomDataAttributeSymbolFields.Name, value);
         }
     }
 }

@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBuildInfo = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBuildInfo,
+        public static readonly IntermediateSymbolDefinition WixBuildInfo = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBuildInfo,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBuildInfoTupleFields.WixVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBuildInfoTupleFields.WixOutputFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBuildInfoTupleFields.WixProjectFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBuildInfoTupleFields.WixPdbFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBuildInfoSymbolFields.WixVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBuildInfoSymbolFields.WixOutputFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBuildInfoSymbolFields.WixProjectFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBuildInfoSymbolFields.WixPdbFile), IntermediateFieldType.String),
             },
-            typeof(WixBuildInfoTuple));
+            typeof(WixBuildInfoSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBuildInfoTupleFields
+    public enum WixBuildInfoSymbolFields
     {
         WixVersion,
         WixOutputFile,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         WixPdbFile,
     }
 
-    public class WixBuildInfoTuple : IntermediateTuple
+    public class WixBuildInfoSymbol : IntermediateSymbol
     {
-        public WixBuildInfoTuple() : base(TupleDefinitions.WixBuildInfo, null, null)
+        public WixBuildInfoSymbol() : base(SymbolDefinitions.WixBuildInfo, null, null)
         {
         }
 
-        public WixBuildInfoTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBuildInfo, sourceLineNumber, id)
+        public WixBuildInfoSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBuildInfo, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBuildInfoTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBuildInfoSymbolFields index] => this.Fields[(int)index];
 
         public string WixVersion
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixVersion];
-            set => this.Set((int)WixBuildInfoTupleFields.WixVersion, value);
+            get => (string)this.Fields[(int)WixBuildInfoSymbolFields.WixVersion];
+            set => this.Set((int)WixBuildInfoSymbolFields.WixVersion, value);
         }
 
         public string WixOutputFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixOutputFile];
-            set => this.Set((int)WixBuildInfoTupleFields.WixOutputFile, value);
+            get => (string)this.Fields[(int)WixBuildInfoSymbolFields.WixOutputFile];
+            set => this.Set((int)WixBuildInfoSymbolFields.WixOutputFile, value);
         }
 
         public string WixProjectFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixProjectFile];
-            set => this.Set((int)WixBuildInfoTupleFields.WixProjectFile, value);
+            get => (string)this.Fields[(int)WixBuildInfoSymbolFields.WixProjectFile];
+            set => this.Set((int)WixBuildInfoSymbolFields.WixProjectFile, value);
         }
 
         public string WixPdbFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixPdbFile];
-            set => this.Set((int)WixBuildInfoTupleFields.WixPdbFile, value);
+            get => (string)this.Fields[(int)WixBuildInfoSymbolFields.WixPdbFile];
+            set => this.Set((int)WixBuildInfoSymbolFields.WixPdbFile, value);
         }
     }
 }

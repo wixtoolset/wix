@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixFeatureModules = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixFeatureModules,
+        public static readonly IntermediateSymbolDefinition WixFeatureModules = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixFeatureModules,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.WixMergeRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFeatureModulesSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFeatureModulesSymbolFields.WixMergeRef), IntermediateFieldType.String),
             },
-            typeof(WixFeatureModulesTuple));
+            typeof(WixFeatureModulesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixFeatureModulesTupleFields
+    public enum WixFeatureModulesSymbolFields
     {
         FeatureRef,
         WixMergeRef,
     }
 
-    public class WixFeatureModulesTuple : IntermediateTuple
+    public class WixFeatureModulesSymbol : IntermediateSymbol
     {
-        public WixFeatureModulesTuple() : base(TupleDefinitions.WixFeatureModules, null, null)
+        public WixFeatureModulesSymbol() : base(SymbolDefinitions.WixFeatureModules, null, null)
         {
         }
 
-        public WixFeatureModulesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixFeatureModules, sourceLineNumber, id)
+        public WixFeatureModulesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixFeatureModules, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixFeatureModulesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixFeatureModulesSymbolFields index] => this.Fields[(int)index];
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.FeatureRef];
-            set => this.Set((int)WixFeatureModulesTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)WixFeatureModulesSymbolFields.FeatureRef];
+            set => this.Set((int)WixFeatureModulesSymbolFields.FeatureRef, value);
         }
 
         public string WixMergeRef
         {
-            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.WixMergeRef];
-            set => this.Set((int)WixFeatureModulesTupleFields.WixMergeRef, value);
+            get => (string)this.Fields[(int)WixFeatureModulesSymbolFields.WixMergeRef];
+            set => this.Set((int)WixFeatureModulesSymbolFields.WixMergeRef, value);
         }
     }
 }

@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleCatalog = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleCatalog,
+        public static readonly IntermediateSymbolDefinition WixBundleCatalog = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleCatalog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleCatalogTupleFields.PayloadRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCatalogSymbolFields.PayloadRef), IntermediateFieldType.String),
             },
-            typeof(WixBundleCatalogTuple));
+            typeof(WixBundleCatalogSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleCatalogTupleFields
+    public enum WixBundleCatalogSymbolFields
     {
         PayloadRef,
     }
 
-    public class WixBundleCatalogTuple : IntermediateTuple
+    public class WixBundleCatalogSymbol : IntermediateSymbol
     {
-        public WixBundleCatalogTuple() : base(TupleDefinitions.WixBundleCatalog, null, null)
+        public WixBundleCatalogSymbol() : base(SymbolDefinitions.WixBundleCatalog, null, null)
         {
         }
 
-        public WixBundleCatalogTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleCatalog, sourceLineNumber, id)
+        public WixBundleCatalogSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleCatalog, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleCatalogTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleCatalogSymbolFields index] => this.Fields[(int)index];
 
         public string PayloadRef
         {
-            get => (string)this.Fields[(int)WixBundleCatalogTupleFields.PayloadRef];
-            set => this.Set((int)WixBundleCatalogTupleFields.PayloadRef, value);
+            get => (string)this.Fields[(int)WixBundleCatalogSymbolFields.PayloadRef];
+            set => this.Set((int)WixBundleCatalogSymbolFields.PayloadRef, value);
         }
     }
 }

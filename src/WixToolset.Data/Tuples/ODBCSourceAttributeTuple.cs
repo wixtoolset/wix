@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ODBCSourceAttribute = new IntermediateTupleDefinition(
-            TupleDefinitionType.ODBCSourceAttribute,
+        public static readonly IntermediateSymbolDefinition ODBCSourceAttribute = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ODBCSourceAttribute,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.DataSourceRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.Attribute), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeSymbolFields.DataSourceRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeSymbolFields.Attribute), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ODBCSourceAttributeTuple));
+            typeof(ODBCSourceAttributeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ODBCSourceAttributeTupleFields
+    public enum ODBCSourceAttributeSymbolFields
     {
         DataSourceRef,
         Attribute,
         Value,
     }
 
-    public class ODBCSourceAttributeTuple : IntermediateTuple
+    public class ODBCSourceAttributeSymbol : IntermediateSymbol
     {
-        public ODBCSourceAttributeTuple() : base(TupleDefinitions.ODBCSourceAttribute, null, null)
+        public ODBCSourceAttributeSymbol() : base(SymbolDefinitions.ODBCSourceAttribute, null, null)
         {
         }
 
-        public ODBCSourceAttributeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ODBCSourceAttribute, sourceLineNumber, id)
+        public ODBCSourceAttributeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ODBCSourceAttribute, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ODBCSourceAttributeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ODBCSourceAttributeSymbolFields index] => this.Fields[(int)index];
 
         public string DataSourceRef
         {
-            get => (string)this.Fields[(int)ODBCSourceAttributeTupleFields.DataSourceRef];
-            set => this.Set((int)ODBCSourceAttributeTupleFields.DataSourceRef, value);
+            get => (string)this.Fields[(int)ODBCSourceAttributeSymbolFields.DataSourceRef];
+            set => this.Set((int)ODBCSourceAttributeSymbolFields.DataSourceRef, value);
         }
 
         public string Attribute
         {
-            get => (string)this.Fields[(int)ODBCSourceAttributeTupleFields.Attribute];
-            set => this.Set((int)ODBCSourceAttributeTupleFields.Attribute, value);
+            get => (string)this.Fields[(int)ODBCSourceAttributeSymbolFields.Attribute];
+            set => this.Set((int)ODBCSourceAttributeSymbolFields.Attribute, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ODBCSourceAttributeTupleFields.Value];
-            set => this.Set((int)ODBCSourceAttributeTupleFields.Value, value);
+            get => (string)this.Fields[(int)ODBCSourceAttributeSymbolFields.Value];
+            set => this.Set((int)ODBCSourceAttributeSymbolFields.Value, value);
         }
     }
 }

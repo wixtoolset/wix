@@ -212,7 +212,7 @@ namespace WixToolset.Data
         {
             return Message(null, Ids.CouldNotDetermineProductCodeFromTransformSummaryInfo, "Could not determine ProductCode from transform summary information.");
         }
-        
+
         public static Message CreateCabAddFileFailed()
         {
             return Message(null, Ids.CreateCabAddFileFailed, "An error (E_FAIL) was returned while adding files to a CAB file. This most commonly happens when creating a CAB file 2 GB or larger. Either reduce the size of your installation package, raise Media/@CompressionLevel to a higher compression level, or split your installation package's files into more than one CAB file.");
@@ -1486,7 +1486,7 @@ namespace WixToolset.Data
 
         public static Message MissingBundleSearch(SourceLineNumber sourceLineNumbers, string searchId)
         {
-            return Message(sourceLineNumbers, Ids.MissingBundleSearch, "Bundle Search with id '{0}' has no corresponding implementation tuple.", searchId);
+            return Message(sourceLineNumbers, Ids.MissingBundleSearch, "Bundle Search with id '{0}' has no corresponding implementation symbol.", searchId);
         }
 
         public static Message MissingDependencyVersion(string packageId)
@@ -1981,7 +1981,7 @@ namespace WixToolset.Data
 
         public static Message UnableToConvertFieldToNumber(string value)
         {
-            return Message(null, Ids.UnableToConvertFieldToNumber, "Unable to convert intermediate tuple field value '{0}' to a number. This means the intermediate is corrupt or of an unsupported version.", value);
+            return Message(null, Ids.UnableToConvertFieldToNumber, "Unable to convert intermediate symbol field value '{0}' to a number. This means the intermediate is corrupt or of an unsupported version.", value);
         }
 
         public static Message UnableToOpenModule(SourceLineNumber sourceLineNumbers, string modulePath, string message)

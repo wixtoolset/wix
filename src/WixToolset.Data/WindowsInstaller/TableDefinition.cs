@@ -22,15 +22,15 @@ namespace WixToolset.Data.WindowsInstaller
         /// Creates a table definition.
         /// </summary>
         /// <param name="name">Name of table to create.</param>
-        /// <param name="tupleDefinition">Optional tuple definition for this table.</param>
+        /// <param name="symbolDefinition">Optional symbol definition for this table.</param>
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
-        /// <param name="tupleIdIsPrimaryKey">Whether the primary key is the id of the tuple definition associated with this table.</param>
-        public TableDefinition(string name, IntermediateTupleDefinition tupleDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool tupleIdIsPrimaryKey = false, Type strongRowType = null)
+        /// <param name="symbolIdIsPrimaryKey">Whether the primary key is the id of the symbol definition associated with this table.</param>
+        public TableDefinition(string name, IntermediateSymbolDefinition symbolDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool symbolIdIsPrimaryKey = false, Type strongRowType = null)
         {
             this.Name = name;
-            this.TupleDefinition = tupleDefinition;
-            this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey;
+            this.SymbolDefinition = symbolDefinition;
+            this.SymbolIdIsPrimaryKey = symbolIdIsPrimaryKey;
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
             this.StrongRowType = strongRowType ?? typeof(Row);
@@ -51,10 +51,10 @@ namespace WixToolset.Data.WindowsInstaller
         public string Name { get; }
 
         /// <summary>
-        /// Gets the tuple definition associated with this table.
+        /// Gets the symbol definition associated with this table.
         /// </summary>
-        /// <value>The tuple definition.</value>
-        public IntermediateTupleDefinition TupleDefinition { get; }
+        /// <value>The symbol definition.</value>
+        public IntermediateSymbolDefinition SymbolDefinition { get; }
 
         /// <summary>
         /// Gets if the table is unreal.
@@ -69,10 +69,10 @@ namespace WixToolset.Data.WindowsInstaller
         public ColumnDefinition[] Columns { get; }
 
         /// <summary>
-        /// Gets if the primary key is the id of the tuple definition associated with this table.
+        /// Gets if the primary key is the id of the symbol definition associated with this table.
         /// </summary>
         /// <value>Flag if table is unreal.</value>
-        public bool TupleIdIsPrimaryKey { get; }
+        public bool SymbolIdIsPrimaryKey { get; }
 
         private Type StrongRowType { get; }
 
@@ -162,9 +162,9 @@ namespace WixToolset.Data.WindowsInstaller
         {
             var empty = reader.IsEmptyElement;
             string name = null;
-            IntermediateTupleDefinition tupleDefinition = null;
+            IntermediateSymbolDefinition symbolDefinition = null;
             var unreal = false;
-            var tupleIdIsPrimaryKey = false;
+            var symbolIdIsPrimaryKey = false;
             Type strongRowType = null;
 
             while (reader.MoveToNextAttribute())
@@ -187,8 +187,8 @@ namespace WixToolset.Data.WindowsInstaller
 
             if (tableDefinitions.TryGet(name, out var tableDefinition))
             {
-                tupleDefinition = tableDefinition.TupleDefinition;
-                tupleIdIsPrimaryKey = tableDefinition.TupleIdIsPrimaryKey;
+                symbolDefinition = tableDefinition.SymbolDefinition;
+                symbolIdIsPrimaryKey = tableDefinition.SymbolIdIsPrimaryKey;
                 strongRowType = tableDefinition.StrongRowType;
             }
 
@@ -237,7 +237,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, tupleDefinition, columns.ToArray(), unreal, tupleIdIsPrimaryKey, strongRowType);
+            return new TableDefinition(name, symbolDefinition, columns.ToArray(), unreal, symbolIdIsPrimaryKey, strongRowType);
         }
 
         /// <summary>

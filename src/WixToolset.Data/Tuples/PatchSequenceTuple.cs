@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PatchSequence = new IntermediateTupleDefinition(
-            TupleDefinitionType.PatchSequence,
+        public static readonly IntermediateSymbolDefinition PatchSequence = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.PatchSequence,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PatchSequenceTupleFields.PatchFamily), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchSequenceTupleFields.Target), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchSequenceTupleFields.Sequence), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchSequenceTupleFields.Supersede), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchSequenceSymbolFields.PatchFamily), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchSequenceSymbolFields.Target), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchSequenceSymbolFields.Sequence), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchSequenceSymbolFields.Supersede), IntermediateFieldType.Number),
             },
-            typeof(PatchSequenceTuple));
+            typeof(PatchSequenceSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PatchSequenceTupleFields
+    public enum PatchSequenceSymbolFields
     {
         PatchFamily,
         Target,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Supersede,
     }
 
-    public class PatchSequenceTuple : IntermediateTuple
+    public class PatchSequenceSymbol : IntermediateSymbol
     {
-        public PatchSequenceTuple() : base(TupleDefinitions.PatchSequence, null, null)
+        public PatchSequenceSymbol() : base(SymbolDefinitions.PatchSequence, null, null)
         {
         }
 
-        public PatchSequenceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.PatchSequence, sourceLineNumber, id)
+        public PatchSequenceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.PatchSequence, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PatchSequenceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PatchSequenceSymbolFields index] => this.Fields[(int)index];
 
         public string PatchFamily
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.PatchFamily];
-            set => this.Set((int)PatchSequenceTupleFields.PatchFamily, value);
+            get => (string)this.Fields[(int)PatchSequenceSymbolFields.PatchFamily];
+            set => this.Set((int)PatchSequenceSymbolFields.PatchFamily, value);
         }
 
         public string Target
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.Target];
-            set => this.Set((int)PatchSequenceTupleFields.Target, value);
+            get => (string)this.Fields[(int)PatchSequenceSymbolFields.Target];
+            set => this.Set((int)PatchSequenceSymbolFields.Target, value);
         }
 
         public string Sequence
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.Sequence];
-            set => this.Set((int)PatchSequenceTupleFields.Sequence, value);
+            get => (string)this.Fields[(int)PatchSequenceSymbolFields.Sequence];
+            set => this.Set((int)PatchSequenceSymbolFields.Sequence, value);
         }
 
         public int? Supersede
         {
-            get => (int?)this.Fields[(int)PatchSequenceTupleFields.Supersede];
-            set => this.Set((int)PatchSequenceTupleFields.Supersede, value);
+            get => (int?)this.Fields[(int)PatchSequenceSymbolFields.Supersede];
+            set => this.Set((int)PatchSequenceSymbolFields.Supersede, value);
         }
     }
 }

@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition LockPermissions = new IntermediateTupleDefinition(
-            TupleDefinitionType.LockPermissions,
+        public static readonly IntermediateSymbolDefinition LockPermissions = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.LockPermissions,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(LockPermissionsTupleFields.LockObject), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(LockPermissionsTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(LockPermissionsTupleFields.Domain), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(LockPermissionsTupleFields.User), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(LockPermissionsTupleFields.Permission), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(LockPermissionsSymbolFields.LockObject), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LockPermissionsSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LockPermissionsSymbolFields.Domain), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LockPermissionsSymbolFields.User), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LockPermissionsSymbolFields.Permission), IntermediateFieldType.Number),
             },
-            typeof(LockPermissionsTuple));
+            typeof(LockPermissionsSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum LockPermissionsTupleFields
+    public enum LockPermissionsSymbolFields
     {
         LockObject,
         Table,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         Permission,
     }
 
-    public class LockPermissionsTuple : IntermediateTuple
+    public class LockPermissionsSymbol : IntermediateSymbol
     {
-        public LockPermissionsTuple() : base(TupleDefinitions.LockPermissions, null, null)
+        public LockPermissionsSymbol() : base(SymbolDefinitions.LockPermissions, null, null)
         {
         }
 
-        public LockPermissionsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.LockPermissions, sourceLineNumber, id)
+        public LockPermissionsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.LockPermissions, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[LockPermissionsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[LockPermissionsSymbolFields index] => this.Fields[(int)index];
 
         public string LockObject
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.LockObject];
-            set => this.Set((int)LockPermissionsTupleFields.LockObject, value);
+            get => (string)this.Fields[(int)LockPermissionsSymbolFields.LockObject];
+            set => this.Set((int)LockPermissionsSymbolFields.LockObject, value);
         }
 
         public string Table
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.Table];
-            set => this.Set((int)LockPermissionsTupleFields.Table, value);
+            get => (string)this.Fields[(int)LockPermissionsSymbolFields.Table];
+            set => this.Set((int)LockPermissionsSymbolFields.Table, value);
         }
 
         public string Domain
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.Domain];
-            set => this.Set((int)LockPermissionsTupleFields.Domain, value);
+            get => (string)this.Fields[(int)LockPermissionsSymbolFields.Domain];
+            set => this.Set((int)LockPermissionsSymbolFields.Domain, value);
         }
 
         public string User
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.User];
-            set => this.Set((int)LockPermissionsTupleFields.User, value);
+            get => (string)this.Fields[(int)LockPermissionsSymbolFields.User];
+            set => this.Set((int)LockPermissionsSymbolFields.User, value);
         }
 
         public int? Permission
         {
-            get => (int?)this.Fields[(int)LockPermissionsTupleFields.Permission];
-            set => this.Set((int)LockPermissionsTupleFields.Permission, value);
+            get => (int?)this.Fields[(int)LockPermissionsSymbolFields.Permission];
+            set => this.Set((int)LockPermissionsSymbolFields.Permission, value);
         }
     }
 }

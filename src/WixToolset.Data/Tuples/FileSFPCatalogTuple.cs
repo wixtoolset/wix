@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition FileSFPCatalog = new IntermediateTupleDefinition(
-            TupleDefinitionType.FileSFPCatalog,
+        public static readonly IntermediateSymbolDefinition FileSFPCatalog = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.FileSFPCatalog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.SFPCatalogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSFPCatalogSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSFPCatalogSymbolFields.SFPCatalogRef), IntermediateFieldType.String),
             },
-            typeof(FileSFPCatalogTuple));
+            typeof(FileSFPCatalogSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum FileSFPCatalogTupleFields
+    public enum FileSFPCatalogSymbolFields
     {
         FileRef,
         SFPCatalogRef,
     }
 
-    public class FileSFPCatalogTuple : IntermediateTuple
+    public class FileSFPCatalogSymbol : IntermediateSymbol
     {
-        public FileSFPCatalogTuple() : base(TupleDefinitions.FileSFPCatalog, null, null)
+        public FileSFPCatalogSymbol() : base(SymbolDefinitions.FileSFPCatalog, null, null)
         {
         }
 
-        public FileSFPCatalogTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.FileSFPCatalog, sourceLineNumber, id)
+        public FileSFPCatalogSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.FileSFPCatalog, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FileSFPCatalogTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FileSFPCatalogSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.FileRef];
-            set => this.Set((int)FileSFPCatalogTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)FileSFPCatalogSymbolFields.FileRef];
+            set => this.Set((int)FileSFPCatalogSymbolFields.FileRef, value);
         }
 
         public string SFPCatalogRef
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.SFPCatalogRef];
-            set => this.Set((int)FileSFPCatalogTupleFields.SFPCatalogRef, value);
+            get => (string)this.Fields[(int)FileSFPCatalogSymbolFields.SFPCatalogRef];
+            set => this.Set((int)FileSFPCatalogSymbolFields.SFPCatalogRef, value);
         }
     }
 }

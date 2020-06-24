@@ -2,31 +2,31 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition RadioButton = new IntermediateTupleDefinition(
-            TupleDefinitionType.RadioButton,
+        public static readonly IntermediateSymbolDefinition RadioButton = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.RadioButton,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Order), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.X), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Y), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Width), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Height), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Text), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RadioButtonTupleFields.Help), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Order), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.X), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Y), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Width), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Height), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RadioButtonSymbolFields.Help), IntermediateFieldType.String),
             },
-            typeof(RadioButtonTuple));
+            typeof(RadioButtonSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum RadioButtonTupleFields
+    public enum RadioButtonSymbolFields
     {
         Property,
         Order,
@@ -39,70 +39,70 @@ namespace WixToolset.Data.Tuples
         Help,
     }
 
-    public class RadioButtonTuple : IntermediateTuple
+    public class RadioButtonSymbol : IntermediateSymbol
     {
-        public RadioButtonTuple() : base(TupleDefinitions.RadioButton, null, null)
+        public RadioButtonSymbol() : base(SymbolDefinitions.RadioButton, null, null)
         {
         }
 
-        public RadioButtonTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.RadioButton, sourceLineNumber, id)
+        public RadioButtonSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.RadioButton, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[RadioButtonTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[RadioButtonSymbolFields index] => this.Fields[(int)index];
 
         public string Property
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Property];
-            set => this.Set((int)RadioButtonTupleFields.Property, value);
+            get => (string)this.Fields[(int)RadioButtonSymbolFields.Property];
+            set => this.Set((int)RadioButtonSymbolFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Order];
-            set => this.Set((int)RadioButtonTupleFields.Order, value);
+            get => (int)this.Fields[(int)RadioButtonSymbolFields.Order];
+            set => this.Set((int)RadioButtonSymbolFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Value];
-            set => this.Set((int)RadioButtonTupleFields.Value, value);
+            get => (string)this.Fields[(int)RadioButtonSymbolFields.Value];
+            set => this.Set((int)RadioButtonSymbolFields.Value, value);
         }
 
         public int X
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.X];
-            set => this.Set((int)RadioButtonTupleFields.X, value);
+            get => (int)this.Fields[(int)RadioButtonSymbolFields.X];
+            set => this.Set((int)RadioButtonSymbolFields.X, value);
         }
 
         public int Y
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Y];
-            set => this.Set((int)RadioButtonTupleFields.Y, value);
+            get => (int)this.Fields[(int)RadioButtonSymbolFields.Y];
+            set => this.Set((int)RadioButtonSymbolFields.Y, value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Width];
-            set => this.Set((int)RadioButtonTupleFields.Width, value);
+            get => (int)this.Fields[(int)RadioButtonSymbolFields.Width];
+            set => this.Set((int)RadioButtonSymbolFields.Width, value);
         }
 
         public int Height
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Height];
-            set => this.Set((int)RadioButtonTupleFields.Height, value);
+            get => (int)this.Fields[(int)RadioButtonSymbolFields.Height];
+            set => this.Set((int)RadioButtonSymbolFields.Height, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Text];
-            set => this.Set((int)RadioButtonTupleFields.Text, value);
+            get => (string)this.Fields[(int)RadioButtonSymbolFields.Text];
+            set => this.Set((int)RadioButtonSymbolFields.Text, value);
         }
 
         public string Help
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Help];
-            set => this.Set((int)RadioButtonTupleFields.Help, value);
+            get => (string)this.Fields[(int)RadioButtonSymbolFields.Help];
+            set => this.Set((int)RadioButtonSymbolFields.Help, value);
         }
     }
 }

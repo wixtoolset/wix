@@ -2,55 +2,55 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixSimpleReference = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixSimpleReference,
+        public static readonly IntermediateSymbolDefinition WixSimpleReference = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixSimpleReference,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSimpleReferenceTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSimpleReferenceTupleFields.PrimaryKeys), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSimpleReferenceSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSimpleReferenceSymbolFields.PrimaryKeys), IntermediateFieldType.String),
             },
-            typeof(WixSimpleReferenceTuple));
+            typeof(WixSimpleReferenceSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
     using System.Diagnostics;
 
-    public enum WixSimpleReferenceTupleFields
+    public enum WixSimpleReferenceSymbolFields
     {
         Table,
         PrimaryKeys,
     }
 
     [DebuggerDisplay("{SymbolicName}")]
-    public class WixSimpleReferenceTuple : IntermediateTuple
+    public class WixSimpleReferenceSymbol : IntermediateSymbol
     {
-        public WixSimpleReferenceTuple() : base(TupleDefinitions.WixSimpleReference, null, null)
+        public WixSimpleReferenceSymbol() : base(SymbolDefinitions.WixSimpleReference, null, null)
         {
         }
 
-        public WixSimpleReferenceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixSimpleReference, sourceLineNumber, id)
+        public WixSimpleReferenceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixSimpleReference, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixSimpleReferenceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixSimpleReferenceSymbolFields index] => this.Fields[(int)index];
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.Table];
-            set => this.Set((int)WixSimpleReferenceTupleFields.Table, value);
+            get => (string)this.Fields[(int)WixSimpleReferenceSymbolFields.Table];
+            set => this.Set((int)WixSimpleReferenceSymbolFields.Table, value);
         }
 
         public string PrimaryKeys
         {
-            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.PrimaryKeys];
-            set => this.Set((int)WixSimpleReferenceTupleFields.PrimaryKeys, value);
+            get => (string)this.Fields[(int)WixSimpleReferenceSymbolFields.PrimaryKeys];
+            set => this.Set((int)WixSimpleReferenceSymbolFields.PrimaryKeys, value);
         }
 
         /// <summary>

@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiDigitalSignature = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiDigitalSignature,
+        public static readonly IntermediateSymbolDefinition MsiDigitalSignature = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiDigitalSignature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.SignObject), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.DigitalCertificateRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.Hash), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureSymbolFields.SignObject), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureSymbolFields.DigitalCertificateRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureSymbolFields.Hash), IntermediateFieldType.Path),
             },
-            typeof(MsiDigitalSignatureTuple));
+            typeof(MsiDigitalSignatureSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiDigitalSignatureTupleFields
+    public enum MsiDigitalSignatureSymbolFields
     {
         Table,
         SignObject,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Hash,
     }
 
-    public class MsiDigitalSignatureTuple : IntermediateTuple
+    public class MsiDigitalSignatureSymbol : IntermediateSymbol
     {
-        public MsiDigitalSignatureTuple() : base(TupleDefinitions.MsiDigitalSignature, null, null)
+        public MsiDigitalSignatureSymbol() : base(SymbolDefinitions.MsiDigitalSignature, null, null)
         {
         }
 
-        public MsiDigitalSignatureTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiDigitalSignature, sourceLineNumber, id)
+        public MsiDigitalSignatureSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiDigitalSignature, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiDigitalSignatureTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiDigitalSignatureSymbolFields index] => this.Fields[(int)index];
 
         public string Table
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Table];
-            set => this.Set((int)MsiDigitalSignatureTupleFields.Table, value);
+            get => (string)this.Fields[(int)MsiDigitalSignatureSymbolFields.Table];
+            set => this.Set((int)MsiDigitalSignatureSymbolFields.Table, value);
         }
 
         public string SignObject
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.SignObject];
-            set => this.Set((int)MsiDigitalSignatureTupleFields.SignObject, value);
+            get => (string)this.Fields[(int)MsiDigitalSignatureSymbolFields.SignObject];
+            set => this.Set((int)MsiDigitalSignatureSymbolFields.SignObject, value);
         }
 
         public string DigitalCertificateRef
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.DigitalCertificateRef];
-            set => this.Set((int)MsiDigitalSignatureTupleFields.DigitalCertificateRef, value);
+            get => (string)this.Fields[(int)MsiDigitalSignatureSymbolFields.DigitalCertificateRef];
+            set => this.Set((int)MsiDigitalSignatureSymbolFields.DigitalCertificateRef, value);
         }
 
         public string Hash
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Hash];
-            set => this.Set((int)MsiDigitalSignatureTupleFields.Hash, value);
+            get => (string)this.Fields[(int)MsiDigitalSignatureSymbolFields.Hash];
+            set => this.Set((int)MsiDigitalSignatureSymbolFields.Hash, value);
         }
     }
 }

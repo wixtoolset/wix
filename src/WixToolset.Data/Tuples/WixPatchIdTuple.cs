@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixPatchId = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixPatchId,
+        public static readonly IntermediateSymbolDefinition WixPatchId = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixPatchId,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ClientPatchId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ApiPatchingSymbolFlags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPatchIdSymbolFields.ClientPatchId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPatchIdSymbolFields.OptimizePatchSizeForLargeFiles), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixPatchIdSymbolFields.ApiPatchingSymbolFlags), IntermediateFieldType.Number),
             },
-            typeof(WixPatchIdTuple));
+            typeof(WixPatchIdSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPatchIdTupleFields
+    public enum WixPatchIdSymbolFields
     {
         ClientPatchId,
         OptimizePatchSizeForLargeFiles,
         ApiPatchingSymbolFlags,
     }
 
-    public class WixPatchIdTuple : IntermediateTuple
+    public class WixPatchIdSymbol : IntermediateSymbol
     {
-        public WixPatchIdTuple() : base(TupleDefinitions.WixPatchId, null, null)
+        public WixPatchIdSymbol() : base(SymbolDefinitions.WixPatchId, null, null)
         {
         }
 
-        public WixPatchIdTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixPatchId, sourceLineNumber, id)
+        public WixPatchIdSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixPatchId, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPatchIdTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPatchIdSymbolFields index] => this.Fields[(int)index];
 
         public string ClientPatchId
         {
-            get => (string)this.Fields[(int)WixPatchIdTupleFields.ClientPatchId];
-            set => this.Set((int)WixPatchIdTupleFields.ClientPatchId, value);
+            get => (string)this.Fields[(int)WixPatchIdSymbolFields.ClientPatchId];
+            set => this.Set((int)WixPatchIdSymbolFields.ClientPatchId, value);
         }
 
         public bool? OptimizePatchSizeForLargeFiles
         {
-            get => (bool?)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles];
-            set => this.Set((int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles, value);
+            get => (bool?)this.Fields[(int)WixPatchIdSymbolFields.OptimizePatchSizeForLargeFiles];
+            set => this.Set((int)WixPatchIdSymbolFields.OptimizePatchSizeForLargeFiles, value);
         }
 
         public int? ApiPatchingSymbolFlags
         {
-            get => (int?)this.Fields[(int)WixPatchIdTupleFields.ApiPatchingSymbolFlags];
-            set => this.Set((int)WixPatchIdTupleFields.ApiPatchingSymbolFlags, value);
+            get => (int?)this.Fields[(int)WixPatchIdSymbolFields.ApiPatchingSymbolFlags];
+            set => this.Set((int)WixPatchIdSymbolFields.ApiPatchingSymbolFlags, value);
         }
     }
 }

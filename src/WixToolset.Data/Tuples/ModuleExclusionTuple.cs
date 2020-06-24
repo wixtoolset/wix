@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleExclusion = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleExclusion,
+        public static readonly IntermediateSymbolDefinition ModuleExclusion = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleExclusion,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ModuleID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ModuleLanguage), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ExcludedID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ExcludedLanguage), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ExcludedMinVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleExclusionTupleFields.ExcludedMaxVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ModuleID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ModuleLanguage), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ExcludedID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ExcludedLanguage), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ExcludedMinVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleExclusionSymbolFields.ExcludedMaxVersion), IntermediateFieldType.String),
             },
-            typeof(ModuleExclusionTuple));
+            typeof(ModuleExclusionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleExclusionTupleFields
+    public enum ModuleExclusionSymbolFields
     {
         ModuleID,
         ModuleLanguage,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         ExcludedMaxVersion,
     }
 
-    public class ModuleExclusionTuple : IntermediateTuple
+    public class ModuleExclusionSymbol : IntermediateSymbol
     {
-        public ModuleExclusionTuple() : base(TupleDefinitions.ModuleExclusion, null, null)
+        public ModuleExclusionSymbol() : base(SymbolDefinitions.ModuleExclusion, null, null)
         {
         }
 
-        public ModuleExclusionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleExclusion, sourceLineNumber, id)
+        public ModuleExclusionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleExclusion, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleExclusionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleExclusionSymbolFields index] => this.Fields[(int)index];
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ModuleID];
-            set => this.Set((int)ModuleExclusionTupleFields.ModuleID, value);
+            get => (string)this.Fields[(int)ModuleExclusionSymbolFields.ModuleID];
+            set => this.Set((int)ModuleExclusionSymbolFields.ModuleID, value);
         }
 
         public int ModuleLanguage
         {
-            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ModuleLanguage];
-            set => this.Set((int)ModuleExclusionTupleFields.ModuleLanguage, value);
+            get => (int)this.Fields[(int)ModuleExclusionSymbolFields.ModuleLanguage];
+            set => this.Set((int)ModuleExclusionSymbolFields.ModuleLanguage, value);
         }
 
         public string ExcludedID
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedID];
-            set => this.Set((int)ModuleExclusionTupleFields.ExcludedID, value);
+            get => (string)this.Fields[(int)ModuleExclusionSymbolFields.ExcludedID];
+            set => this.Set((int)ModuleExclusionSymbolFields.ExcludedID, value);
         }
 
         public int ExcludedLanguage
         {
-            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ExcludedLanguage];
-            set => this.Set((int)ModuleExclusionTupleFields.ExcludedLanguage, value);
+            get => (int)this.Fields[(int)ModuleExclusionSymbolFields.ExcludedLanguage];
+            set => this.Set((int)ModuleExclusionSymbolFields.ExcludedLanguage, value);
         }
 
         public string ExcludedMinVersion
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMinVersion];
-            set => this.Set((int)ModuleExclusionTupleFields.ExcludedMinVersion, value);
+            get => (string)this.Fields[(int)ModuleExclusionSymbolFields.ExcludedMinVersion];
+            set => this.Set((int)ModuleExclusionSymbolFields.ExcludedMinVersion, value);
         }
 
         public string ExcludedMaxVersion
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMaxVersion];
-            set => this.Set((int)ModuleExclusionTupleFields.ExcludedMaxVersion, value);
+            get => (string)this.Fields[(int)ModuleExclusionSymbolFields.ExcludedMaxVersion];
+            set => this.Set((int)ModuleExclusionSymbolFields.ExcludedMaxVersion, value);
         }
     }
 }

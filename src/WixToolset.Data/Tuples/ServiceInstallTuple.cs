@@ -2,36 +2,36 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ServiceInstall = new IntermediateTupleDefinition(
-            TupleDefinitionType.ServiceInstall,
+        public static readonly IntermediateSymbolDefinition ServiceInstall = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ServiceInstall,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.DisplayName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.ServiceType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.StartType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.ErrorControl), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.LoadOrderGroup), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Dependencies), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.StartName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Password), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Arguments), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Interactive), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Vital), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.DisplayName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.ServiceType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.StartType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.ErrorControl), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.LoadOrderGroup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Dependencies), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.StartName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Password), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Arguments), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Interactive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceInstallSymbolFields.Vital), IntermediateFieldType.Bool),
             },
-            typeof(ServiceInstallTuple));
+            typeof(ServiceInstallSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ServiceInstallTupleFields
+    public enum ServiceInstallSymbolFields
     {
         Name,
         DisplayName,
@@ -74,100 +74,100 @@ namespace WixToolset.Data.Tuples
         Critical = 3,
     }
 
-    public class ServiceInstallTuple : IntermediateTuple
+    public class ServiceInstallSymbol : IntermediateSymbol
     {
-        public ServiceInstallTuple() : base(TupleDefinitions.ServiceInstall, null, null)
+        public ServiceInstallSymbol() : base(SymbolDefinitions.ServiceInstall, null, null)
         {
         }
 
-        public ServiceInstallTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ServiceInstall, sourceLineNumber, id)
+        public ServiceInstallSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ServiceInstall, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ServiceInstallTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ServiceInstallSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Name];
-            set => this.Set((int)ServiceInstallTupleFields.Name, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.Name];
+            set => this.Set((int)ServiceInstallSymbolFields.Name, value);
         }
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.DisplayName];
-            set => this.Set((int)ServiceInstallTupleFields.DisplayName, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.DisplayName];
+            set => this.Set((int)ServiceInstallSymbolFields.DisplayName, value);
         }
 
         public ServiceType ServiceType
         {
-            get => (ServiceType)this.Fields[(int)ServiceInstallTupleFields.ServiceType].AsNumber();
-            set => this.Set((int)ServiceInstallTupleFields.ServiceType, (int)value);
+            get => (ServiceType)this.Fields[(int)ServiceInstallSymbolFields.ServiceType].AsNumber();
+            set => this.Set((int)ServiceInstallSymbolFields.ServiceType, (int)value);
         }
 
         public ServiceStartType StartType
         {
-            get => (ServiceStartType)this.Fields[(int)ServiceInstallTupleFields.StartType].AsNumber();
-            set => this.Set((int)ServiceInstallTupleFields.StartType, (int)value);
+            get => (ServiceStartType)this.Fields[(int)ServiceInstallSymbolFields.StartType].AsNumber();
+            set => this.Set((int)ServiceInstallSymbolFields.StartType, (int)value);
         }
 
         public ServiceErrorControl ErrorControl
         {
-            get => (ServiceErrorControl)this.Fields[(int)ServiceInstallTupleFields.ErrorControl].AsNumber();
-            set => this.Set((int)ServiceInstallTupleFields.ErrorControl, (int)value);
+            get => (ServiceErrorControl)this.Fields[(int)ServiceInstallSymbolFields.ErrorControl].AsNumber();
+            set => this.Set((int)ServiceInstallSymbolFields.ErrorControl, (int)value);
         }
 
         public string LoadOrderGroup
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.LoadOrderGroup];
-            set => this.Set((int)ServiceInstallTupleFields.LoadOrderGroup, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.LoadOrderGroup];
+            set => this.Set((int)ServiceInstallSymbolFields.LoadOrderGroup, value);
         }
 
         public string Dependencies
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Dependencies];
-            set => this.Set((int)ServiceInstallTupleFields.Dependencies, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.Dependencies];
+            set => this.Set((int)ServiceInstallSymbolFields.Dependencies, value);
         }
 
         public string StartName
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.StartName];
-            set => this.Set((int)ServiceInstallTupleFields.StartName, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.StartName];
+            set => this.Set((int)ServiceInstallSymbolFields.StartName, value);
         }
 
         public string Password
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Password];
-            set => this.Set((int)ServiceInstallTupleFields.Password, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.Password];
+            set => this.Set((int)ServiceInstallSymbolFields.Password, value);
         }
 
         public string Arguments
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Arguments];
-            set => this.Set((int)ServiceInstallTupleFields.Arguments, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.Arguments];
+            set => this.Set((int)ServiceInstallSymbolFields.Arguments, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.ComponentRef];
-            set => this.Set((int)ServiceInstallTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.ComponentRef];
+            set => this.Set((int)ServiceInstallSymbolFields.ComponentRef, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Description];
-            set => this.Set((int)ServiceInstallTupleFields.Description, value);
+            get => (string)this.Fields[(int)ServiceInstallSymbolFields.Description];
+            set => this.Set((int)ServiceInstallSymbolFields.Description, value);
         }
 
         public bool Interactive
         {
-            get => this.Fields[(int)ServiceInstallTupleFields.Interactive].AsBool();
-            set => this.Set((int)ServiceInstallTupleFields.Interactive, value);
+            get => this.Fields[(int)ServiceInstallSymbolFields.Interactive].AsBool();
+            set => this.Set((int)ServiceInstallSymbolFields.Interactive, value);
         }
 
         public bool Vital
         {
-            get => this.Fields[(int)ServiceInstallTupleFields.Vital].AsBool();
-            set => this.Set((int)ServiceInstallTupleFields.Vital, value);
+            get => this.Fields[(int)ServiceInstallSymbolFields.Vital].AsBool();
+            set => this.Set((int)ServiceInstallSymbolFields.Vital, value);
         }
     }
 }

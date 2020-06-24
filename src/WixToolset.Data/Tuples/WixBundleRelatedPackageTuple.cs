@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleRelatedPackage = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleRelatedPackage,
+        public static readonly IntermediateSymbolDefinition WixBundleRelatedPackage = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleRelatedPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.PackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.RelatedId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MinVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MaxVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Languages), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.RelatedId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.MinVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.MaxVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.Languages), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixBundleRelatedPackageTuple));
+            typeof(WixBundleRelatedPackageSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundleRelatedPackageTupleFields
+    public enum WixBundleRelatedPackageSymbolFields
     {
         PackageRef,
         RelatedId,
@@ -45,52 +45,52 @@ namespace WixToolset.Data.Tuples
         LangInclusive = 0x8,
     }
 
-    public class WixBundleRelatedPackageTuple : IntermediateTuple
+    public class WixBundleRelatedPackageSymbol : IntermediateSymbol
     {
-        public WixBundleRelatedPackageTuple() : base(TupleDefinitions.WixBundleRelatedPackage, null, null)
+        public WixBundleRelatedPackageSymbol() : base(SymbolDefinitions.WixBundleRelatedPackage, null, null)
         {
         }
 
-        public WixBundleRelatedPackageTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleRelatedPackage, sourceLineNumber, id)
+        public WixBundleRelatedPackageSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleRelatedPackage, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleRelatedPackageTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleRelatedPackageSymbolFields index] => this.Fields[(int)index];
 
         public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.PackageRef];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.PackageRef];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.PackageRef, value);
         }
 
         public string RelatedId
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.RelatedId];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.RelatedId, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.RelatedId];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.RelatedId, value);
         }
 
         public string MinVersion
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinVersion];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.MinVersion, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.MinVersion];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxVersion];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.MaxVersion, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.MaxVersion];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.MaxVersion, value);
         }
 
         public string Languages
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Languages];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.Languages, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageSymbolFields.Languages];
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.Languages, value);
         }
 
         public WixBundleRelatedPackageAttributes Attributes
         {
-            get => (WixBundleRelatedPackageAttributes)this.Fields[(int)WixBundleRelatedPackageTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.Attributes, (int)value);
+            get => (WixBundleRelatedPackageAttributes)this.Fields[(int)WixBundleRelatedPackageSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleRelatedPackageSymbolFields.Attributes, (int)value);
         }
 
         public bool MinInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.MinInclusive) == WixBundleRelatedPackageAttributes.MinInclusive;

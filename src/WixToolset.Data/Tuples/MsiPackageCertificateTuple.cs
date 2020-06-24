@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiPackageCertificate = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiPackageCertificate,
+        public static readonly IntermediateSymbolDefinition MsiPackageCertificate = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiPackageCertificate,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiPackageCertificateTupleFields.PackageCertificate), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPackageCertificateTupleFields.DigitalCertificateRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPackageCertificateSymbolFields.PackageCertificate), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPackageCertificateSymbolFields.DigitalCertificateRef), IntermediateFieldType.String),
             },
-            typeof(MsiPackageCertificateTuple));
+            typeof(MsiPackageCertificateSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiPackageCertificateTupleFields
+    public enum MsiPackageCertificateSymbolFields
     {
         PackageCertificate,
         DigitalCertificateRef,
     }
 
-    public class MsiPackageCertificateTuple : IntermediateTuple
+    public class MsiPackageCertificateSymbol : IntermediateSymbol
     {
-        public MsiPackageCertificateTuple() : base(TupleDefinitions.MsiPackageCertificate, null, null)
+        public MsiPackageCertificateSymbol() : base(SymbolDefinitions.MsiPackageCertificate, null, null)
         {
         }
 
-        public MsiPackageCertificateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiPackageCertificate, sourceLineNumber, id)
+        public MsiPackageCertificateSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiPackageCertificate, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiPackageCertificateTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiPackageCertificateSymbolFields index] => this.Fields[(int)index];
 
         public string PackageCertificate
         {
-            get => (string)this.Fields[(int)MsiPackageCertificateTupleFields.PackageCertificate];
-            set => this.Set((int)MsiPackageCertificateTupleFields.PackageCertificate, value);
+            get => (string)this.Fields[(int)MsiPackageCertificateSymbolFields.PackageCertificate];
+            set => this.Set((int)MsiPackageCertificateSymbolFields.PackageCertificate, value);
         }
 
         public string DigitalCertificateRef
         {
-            get => (string)this.Fields[(int)MsiPackageCertificateTupleFields.DigitalCertificateRef];
-            set => this.Set((int)MsiPackageCertificateTupleFields.DigitalCertificateRef, value);
+            get => (string)this.Fields[(int)MsiPackageCertificateSymbolFields.DigitalCertificateRef];
+            set => this.Set((int)MsiPackageCertificateSymbolFields.DigitalCertificateRef, value);
         }
     }
 }

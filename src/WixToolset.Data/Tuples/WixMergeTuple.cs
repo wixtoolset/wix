@@ -2,29 +2,29 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixMerge = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixMerge,
+        public static readonly IntermediateSymbolDefinition WixMerge = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixMerge,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Language), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.SourceFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.DiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FileAttributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.ConfigurationData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.Language), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.SourceFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.DiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.FileAttributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.ConfigurationData), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMergeSymbolFields.FeatureRef), IntermediateFieldType.String),
             },
-            typeof(WixMergeTuple));
+            typeof(WixMergeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixMergeTupleFields
+    public enum WixMergeSymbolFields
     {
         Language,
         DirectoryRef,
@@ -35,58 +35,58 @@ namespace WixToolset.Data.Tuples
         FeatureRef,
     }
 
-    public class WixMergeTuple : IntermediateTuple
+    public class WixMergeSymbol : IntermediateSymbol
     {
-        public WixMergeTuple() : base(TupleDefinitions.WixMerge, null, null)
+        public WixMergeSymbol() : base(SymbolDefinitions.WixMerge, null, null)
         {
         }
 
-        public WixMergeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixMerge, sourceLineNumber, id)
+        public WixMergeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixMerge, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixMergeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixMergeSymbolFields index] => this.Fields[(int)index];
 
         public int Language
         {
-            get => (int)this.Fields[(int)WixMergeTupleFields.Language];
-            set => this.Set((int)WixMergeTupleFields.Language, value);
+            get => (int)this.Fields[(int)WixMergeSymbolFields.Language];
+            set => this.Set((int)WixMergeSymbolFields.Language, value);
         }
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.DirectoryRef];
-            set => this.Set((int)WixMergeTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)WixMergeSymbolFields.DirectoryRef];
+            set => this.Set((int)WixMergeSymbolFields.DirectoryRef, value);
         }
 
         public string SourceFile
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.SourceFile];
-            set => this.Set((int)WixMergeTupleFields.SourceFile, value);
+            get => (string)this.Fields[(int)WixMergeSymbolFields.SourceFile];
+            set => this.Set((int)WixMergeSymbolFields.SourceFile, value);
         }
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)WixMergeTupleFields.DiskId];
-            set => this.Set((int)WixMergeTupleFields.DiskId, value);
+            get => (int)this.Fields[(int)WixMergeSymbolFields.DiskId];
+            set => this.Set((int)WixMergeSymbolFields.DiskId, value);
         }
 
-        public FileTupleAttributes FileAttributes
+        public FileSymbolAttributes FileAttributes
         {
-            get => (FileTupleAttributes)this.Fields[(int)WixMergeTupleFields.FileAttributes].AsNumber();
-            set => this.Set((int)WixMergeTupleFields.FileAttributes, (int)value);
+            get => (FileSymbolAttributes)this.Fields[(int)WixMergeSymbolFields.FileAttributes].AsNumber();
+            set => this.Set((int)WixMergeSymbolFields.FileAttributes, (int)value);
         }
 
         public string ConfigurationData
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.ConfigurationData];
-            set => this.Set((int)WixMergeTupleFields.ConfigurationData, value);
+            get => (string)this.Fields[(int)WixMergeSymbolFields.ConfigurationData];
+            set => this.Set((int)WixMergeSymbolFields.ConfigurationData, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.FeatureRef];
-            set => this.Set((int)WixMergeTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)WixMergeSymbolFields.FeatureRef];
+            set => this.Set((int)WixMergeSymbolFields.FeatureRef, value);
         }
     }
 }

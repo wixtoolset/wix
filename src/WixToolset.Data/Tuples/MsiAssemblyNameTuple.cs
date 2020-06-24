@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiAssemblyName = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiAssemblyName,
+        public static readonly IntermediateSymbolDefinition MsiAssemblyName = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiAssemblyName,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyNameSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyNameSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyNameSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(MsiAssemblyNameTuple));
+            typeof(MsiAssemblyNameSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiAssemblyNameTupleFields
+    public enum MsiAssemblyNameSymbolFields
     {
         ComponentRef,
         Name,
         Value,
     }
 
-    public class MsiAssemblyNameTuple : IntermediateTuple
+    public class MsiAssemblyNameSymbol : IntermediateSymbol
     {
-        public MsiAssemblyNameTuple() : base(TupleDefinitions.MsiAssemblyName, null, null)
+        public MsiAssemblyNameSymbol() : base(SymbolDefinitions.MsiAssemblyName, null, null)
         {
         }
 
-        public MsiAssemblyNameTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiAssemblyName, sourceLineNumber, id)
+        public MsiAssemblyNameSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiAssemblyName, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiAssemblyNameTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiAssemblyNameSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyNameTupleFields.ComponentRef];
-            set => this.Set((int)MsiAssemblyNameTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)MsiAssemblyNameSymbolFields.ComponentRef];
+            set => this.Set((int)MsiAssemblyNameSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)MsiAssemblyNameTupleFields.Name];
-            set => this.Set((int)MsiAssemblyNameTupleFields.Name, value);
+            get => (string)this.Fields[(int)MsiAssemblyNameSymbolFields.Name];
+            set => this.Set((int)MsiAssemblyNameSymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)MsiAssemblyNameTupleFields.Value];
-            set => this.Set((int)MsiAssemblyNameTupleFields.Value, value);
+            get => (string)this.Fields[(int)MsiAssemblyNameSymbolFields.Value];
+            set => this.Set((int)MsiAssemblyNameSymbolFields.Value, value);
         }
     }
 }

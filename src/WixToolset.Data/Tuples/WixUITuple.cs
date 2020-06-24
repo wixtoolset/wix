@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixUI = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixUI,
+        public static readonly IntermediateSymbolDefinition WixUI = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixUI,
             new IntermediateFieldDefinition[]
             {
             },
-            typeof(WixUITuple));
+            typeof(WixUISymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixUITupleFields
+    public enum WixUISymbolFields
     {
     }
 
-    public class WixUITuple : IntermediateTuple
+    public class WixUISymbol : IntermediateSymbol
     {
-        public WixUITuple() : base(TupleDefinitions.WixUI, null, null)
+        public WixUISymbol() : base(SymbolDefinitions.WixUI, null, null)
         {
         }
 
-        public WixUITuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixUI, sourceLineNumber, id)
+        public WixUISymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixUI, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixUITupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixUISymbolFields index] => this.Fields[(int)index];
     }
 }

@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MIME = new IntermediateTupleDefinition(
-            TupleDefinitionType.MIME,
+        public static readonly IntermediateSymbolDefinition MIME = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MIME,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MIMETupleFields.ContentType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MIMETupleFields.ExtensionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MIMETupleFields.CLSID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MIMESymbolFields.ContentType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MIMESymbolFields.ExtensionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MIMESymbolFields.CLSID), IntermediateFieldType.String),
             },
-            typeof(MIMETuple));
+            typeof(MIMESymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MIMETupleFields
+    public enum MIMESymbolFields
     {
         ContentType,
         ExtensionRef,
         CLSID,
     }
 
-    public class MIMETuple : IntermediateTuple
+    public class MIMESymbol : IntermediateSymbol
     {
-        public MIMETuple() : base(TupleDefinitions.MIME, null, null)
+        public MIMESymbol() : base(SymbolDefinitions.MIME, null, null)
         {
         }
 
-        public MIMETuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MIME, sourceLineNumber, id)
+        public MIMESymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MIME, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MIMETupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MIMESymbolFields index] => this.Fields[(int)index];
 
         public string ContentType
         {
-            get => (string)this.Fields[(int)MIMETupleFields.ContentType];
-            set => this.Set((int)MIMETupleFields.ContentType, value);
+            get => (string)this.Fields[(int)MIMESymbolFields.ContentType];
+            set => this.Set((int)MIMESymbolFields.ContentType, value);
         }
 
         public string ExtensionRef
         {
-            get => (string)this.Fields[(int)MIMETupleFields.ExtensionRef];
-            set => this.Set((int)MIMETupleFields.ExtensionRef, value);
+            get => (string)this.Fields[(int)MIMESymbolFields.ExtensionRef];
+            set => this.Set((int)MIMESymbolFields.ExtensionRef, value);
         }
 
         public string CLSID
         {
-            get => (string)this.Fields[(int)MIMETupleFields.CLSID];
-            set => this.Set((int)MIMETupleFields.CLSID, value);
+            get => (string)this.Fields[(int)MIMESymbolFields.CLSID];
+            set => this.Set((int)MIMESymbolFields.CLSID, value);
         }
     }
 }

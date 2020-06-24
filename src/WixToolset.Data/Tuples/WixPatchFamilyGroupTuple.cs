@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixPatchFamilyGroup = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixPatchFamilyGroup,
+        public static readonly IntermediateSymbolDefinition WixPatchFamilyGroup = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixPatchFamilyGroup,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPatchFamilyGroupSymbolFields.WixPatchFamilyGroup), IntermediateFieldType.String),
             },
-            typeof(WixPatchFamilyGroupTuple));
+            typeof(WixPatchFamilyGroupSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPatchFamilyGroupTupleFields
+    public enum WixPatchFamilyGroupSymbolFields
     {
         WixPatchFamilyGroup,
     }
 
-    public class WixPatchFamilyGroupTuple : IntermediateTuple
+    public class WixPatchFamilyGroupSymbol : IntermediateSymbol
     {
-        public WixPatchFamilyGroupTuple() : base(TupleDefinitions.WixPatchFamilyGroup, null, null)
+        public WixPatchFamilyGroupSymbol() : base(SymbolDefinitions.WixPatchFamilyGroup, null, null)
         {
         }
 
-        public WixPatchFamilyGroupTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixPatchFamilyGroup, sourceLineNumber, id)
+        public WixPatchFamilyGroupSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixPatchFamilyGroup, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPatchFamilyGroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPatchFamilyGroupSymbolFields index] => this.Fields[(int)index];
 
         public string WixPatchFamilyGroup
         {
-            get => (string)this.Fields[(int)WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup];
-            set => this.Set((int)WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup, value);
+            get => (string)this.Fields[(int)WixPatchFamilyGroupSymbolFields.WixPatchFamilyGroup];
+            set => this.Set((int)WixPatchFamilyGroupSymbolFields.WixPatchFamilyGroup, value);
         }
     }
 }

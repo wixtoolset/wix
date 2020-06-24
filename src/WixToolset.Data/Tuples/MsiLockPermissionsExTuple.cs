@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiLockPermissionsEx = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiLockPermissionsEx,
+        public static readonly IntermediateSymbolDefinition MsiLockPermissionsEx = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiLockPermissionsEx,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.LockObject), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.SDDLText), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExSymbolFields.LockObject), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExSymbolFields.SDDLText), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExSymbolFields.Condition), IntermediateFieldType.String),
             },
-            typeof(MsiLockPermissionsExTuple));
+            typeof(MsiLockPermissionsExSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiLockPermissionsExTupleFields
+    public enum MsiLockPermissionsExSymbolFields
     {
         LockObject,
         Table,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Condition,
     }
 
-    public class MsiLockPermissionsExTuple : IntermediateTuple
+    public class MsiLockPermissionsExSymbol : IntermediateSymbol
     {
-        public MsiLockPermissionsExTuple() : base(TupleDefinitions.MsiLockPermissionsEx, null, null)
+        public MsiLockPermissionsExSymbol() : base(SymbolDefinitions.MsiLockPermissionsEx, null, null)
         {
         }
 
-        public MsiLockPermissionsExTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiLockPermissionsEx, sourceLineNumber, id)
+        public MsiLockPermissionsExSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiLockPermissionsEx, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiLockPermissionsExTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiLockPermissionsExSymbolFields index] => this.Fields[(int)index];
 
         public string LockObject
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.LockObject];
-            set => this.Set((int)MsiLockPermissionsExTupleFields.LockObject, value);
+            get => (string)this.Fields[(int)MsiLockPermissionsExSymbolFields.LockObject];
+            set => this.Set((int)MsiLockPermissionsExSymbolFields.LockObject, value);
         }
 
         public string Table
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Table];
-            set => this.Set((int)MsiLockPermissionsExTupleFields.Table, value);
+            get => (string)this.Fields[(int)MsiLockPermissionsExSymbolFields.Table];
+            set => this.Set((int)MsiLockPermissionsExSymbolFields.Table, value);
         }
 
         public string SDDLText
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.SDDLText];
-            set => this.Set((int)MsiLockPermissionsExTupleFields.SDDLText, value);
+            get => (string)this.Fields[(int)MsiLockPermissionsExSymbolFields.SDDLText];
+            set => this.Set((int)MsiLockPermissionsExSymbolFields.SDDLText, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Condition];
-            set => this.Set((int)MsiLockPermissionsExTupleFields.Condition, value);
+            get => (string)this.Fields[(int)MsiLockPermissionsExSymbolFields.Condition];
+            set => this.Set((int)MsiLockPermissionsExSymbolFields.Condition, value);
         }
     }
 }

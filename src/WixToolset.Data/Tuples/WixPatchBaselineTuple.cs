@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixPatchBaseline = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixPatchBaseline,
+        public static readonly IntermediateSymbolDefinition WixPatchBaseline = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixPatchBaseline,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.DiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.ValidationFlags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.BaselineFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.UpdateFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.TransformFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.DiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.ValidationFlags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.BaselineFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.UpdateFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineSymbolFields.TransformFile), IntermediateFieldType.Path),
             },
-            typeof(WixPatchBaselineTuple));
+            typeof(WixPatchBaselineSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPatchBaselineTupleFields
+    public enum WixPatchBaselineSymbolFields
     {
         DiskId,
         ValidationFlags,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         TransformFile,
     }
 
-    public class WixPatchBaselineTuple : IntermediateTuple
+    public class WixPatchBaselineSymbol : IntermediateSymbol
     {
-        public WixPatchBaselineTuple() : base(TupleDefinitions.WixPatchBaseline, null, null)
+        public WixPatchBaselineSymbol() : base(SymbolDefinitions.WixPatchBaseline, null, null)
         {
         }
 
-        public WixPatchBaselineTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixPatchBaseline, sourceLineNumber, id)
+        public WixPatchBaselineSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixPatchBaseline, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPatchBaselineTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPatchBaselineSymbolFields index] => this.Fields[(int)index];
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.DiskId];
-            set => this.Set((int)WixPatchBaselineTupleFields.DiskId, value);
+            get => (int)this.Fields[(int)WixPatchBaselineSymbolFields.DiskId];
+            set => this.Set((int)WixPatchBaselineSymbolFields.DiskId, value);
         }
 
         public TransformFlags ValidationFlags
         {
-            get => (TransformFlags)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags].AsNumber();
-            set => this.Set((int)WixPatchBaselineTupleFields.ValidationFlags, (int)value);
+            get => (TransformFlags)this.Fields[(int)WixPatchBaselineSymbolFields.ValidationFlags].AsNumber();
+            set => this.Set((int)WixPatchBaselineSymbolFields.ValidationFlags, (int)value);
         }
 
         public IntermediateFieldPathValue BaselineFile
         {
-            get => this.Fields[(int)WixPatchBaselineTupleFields.BaselineFile].AsPath();
-            set => this.Set((int)WixPatchBaselineTupleFields.BaselineFile, value);
+            get => this.Fields[(int)WixPatchBaselineSymbolFields.BaselineFile].AsPath();
+            set => this.Set((int)WixPatchBaselineSymbolFields.BaselineFile, value);
         }
 
         public IntermediateFieldPathValue UpdateFile
         {
-            get => this.Fields[(int)WixPatchBaselineTupleFields.UpdateFile].AsPath();
-            set => this.Set((int)WixPatchBaselineTupleFields.UpdateFile, value);
+            get => this.Fields[(int)WixPatchBaselineSymbolFields.UpdateFile].AsPath();
+            set => this.Set((int)WixPatchBaselineSymbolFields.UpdateFile, value);
         }
 
         public IntermediateFieldPathValue TransformFile
         {
-            get => this.Fields[(int)WixPatchBaselineTupleFields.TransformFile].AsPath();
-            set => this.Set((int)WixPatchBaselineTupleFields.TransformFile, value);
+            get => this.Fields[(int)WixPatchBaselineSymbolFields.TransformFile].AsPath();
+            set => this.Set((int)WixPatchBaselineSymbolFields.TransformFile, value);
         }
     }
 }

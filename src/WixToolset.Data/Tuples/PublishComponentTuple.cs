@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PublishComponent = new IntermediateTupleDefinition(
-            TupleDefinitionType.PublishComponent,
+        public static readonly IntermediateSymbolDefinition PublishComponent = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.PublishComponent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.ComponentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.Qualifier), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.AppData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentSymbolFields.ComponentId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentSymbolFields.Qualifier), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentSymbolFields.AppData), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentSymbolFields.FeatureRef), IntermediateFieldType.String),
             },
-            typeof(PublishComponentTuple));
+            typeof(PublishComponentSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PublishComponentTupleFields
+    public enum PublishComponentSymbolFields
     {
         ComponentId,
         Qualifier,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         FeatureRef,
     }
 
-    public class PublishComponentTuple : IntermediateTuple
+    public class PublishComponentSymbol : IntermediateSymbol
     {
-        public PublishComponentTuple() : base(TupleDefinitions.PublishComponent, null, null)
+        public PublishComponentSymbol() : base(SymbolDefinitions.PublishComponent, null, null)
         {
         }
 
-        public PublishComponentTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.PublishComponent, sourceLineNumber, id)
+        public PublishComponentSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.PublishComponent, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PublishComponentTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PublishComponentSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.ComponentId];
-            set => this.Set((int)PublishComponentTupleFields.ComponentId, value);
+            get => (string)this.Fields[(int)PublishComponentSymbolFields.ComponentId];
+            set => this.Set((int)PublishComponentSymbolFields.ComponentId, value);
         }
 
         public string Qualifier
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Qualifier];
-            set => this.Set((int)PublishComponentTupleFields.Qualifier, value);
+            get => (string)this.Fields[(int)PublishComponentSymbolFields.Qualifier];
+            set => this.Set((int)PublishComponentSymbolFields.Qualifier, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.ComponentRef];
-            set => this.Set((int)PublishComponentTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)PublishComponentSymbolFields.ComponentRef];
+            set => this.Set((int)PublishComponentSymbolFields.ComponentRef, value);
         }
 
         public string AppData
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.AppData];
-            set => this.Set((int)PublishComponentTupleFields.AppData, value);
+            get => (string)this.Fields[(int)PublishComponentSymbolFields.AppData];
+            set => this.Set((int)PublishComponentSymbolFields.AppData, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.FeatureRef];
-            set => this.Set((int)PublishComponentTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)PublishComponentSymbolFields.FeatureRef];
+            set => this.Set((int)PublishComponentSymbolFields.FeatureRef, value);
         }
     }
 }

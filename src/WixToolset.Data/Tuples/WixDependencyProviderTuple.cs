@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDependencyProvider = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixDependencyProvider.ToString(),
+        public static readonly IntermediateSymbolDefinition WixDependencyProvider = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixDependencyProvider.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderTupleFields.ProviderKey), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderTupleFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderTupleFields.DisplayName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ProviderKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.DisplayName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixDependencyProviderTuple));
+            typeof(WixDependencyProviderSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
     using WixToolset.Data;
 
-    public enum WixDependencyProviderTupleFields
+    public enum WixDependencyProviderSymbolFields
     {
         ComponentRef,
         ProviderKey,
@@ -40,46 +40,46 @@ namespace WixToolset.Data.Tuples
         ProvidesAttributesBundle = 0x10000
     }
 
-    public class WixDependencyProviderTuple : IntermediateTuple
+    public class WixDependencyProviderSymbol : IntermediateSymbol
     {
-        public WixDependencyProviderTuple() : base(TupleDefinitions.WixDependencyProvider, null, null)
+        public WixDependencyProviderSymbol() : base(SymbolDefinitions.WixDependencyProvider, null, null)
         {
         }
 
-        public WixDependencyProviderTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDependencyProvider, sourceLineNumber, id)
+        public WixDependencyProviderSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixDependencyProvider, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDependencyProviderTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDependencyProviderSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixDependencyProviderTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixDependencyProviderTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixDependencyProviderSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixDependencyProviderSymbolFields.ComponentRef, value);
         }
 
         public string ProviderKey
         {
-            get => this.Fields[(int)WixDependencyProviderTupleFields.ProviderKey].AsString();
-            set => this.Set((int)WixDependencyProviderTupleFields.ProviderKey, value);
+            get => this.Fields[(int)WixDependencyProviderSymbolFields.ProviderKey].AsString();
+            set => this.Set((int)WixDependencyProviderSymbolFields.ProviderKey, value);
         }
 
         public string Version
         {
-            get => this.Fields[(int)WixDependencyProviderTupleFields.Version].AsString();
-            set => this.Set((int)WixDependencyProviderTupleFields.Version, value);
+            get => this.Fields[(int)WixDependencyProviderSymbolFields.Version].AsString();
+            set => this.Set((int)WixDependencyProviderSymbolFields.Version, value);
         }
 
         public string DisplayName
         {
-            get => this.Fields[(int)WixDependencyProviderTupleFields.DisplayName].AsString();
-            set => this.Set((int)WixDependencyProviderTupleFields.DisplayName, value);
+            get => this.Fields[(int)WixDependencyProviderSymbolFields.DisplayName].AsString();
+            set => this.Set((int)WixDependencyProviderSymbolFields.DisplayName, value);
         }
 
         public WixDependencyProviderAttributes Attributes
         {
-            get => (WixDependencyProviderAttributes)(int)this.Fields[(int)WixDependencyProviderTupleFields.Attributes];
-            set => this.Set((int)WixDependencyProviderTupleFields.Attributes, (int)value);
+            get => (WixDependencyProviderAttributes)(int)this.Fields[(int)WixDependencyProviderSymbolFields.Attributes];
+            set => this.Set((int)WixDependencyProviderSymbolFields.Attributes, (int)value);
         }
 
         public bool Bundle => (this.Attributes & WixDependencyProviderAttributes.ProvidesAttributesBundle) == WixDependencyProviderAttributes.ProvidesAttributesBundle;

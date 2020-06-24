@@ -2,36 +2,36 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Component = new IntermediateTupleDefinition(
-            TupleDefinitionType.Component,
+        public static readonly IntermediateSymbolDefinition Component = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Component,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.ComponentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Location), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.DisableRegistryReflection), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.NeverOverwrite), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Permanent), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.SharedDllRefCount), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Shared), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Transitive), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.UninstallWhenSuperseded), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Win64), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.KeyPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.KeyPathType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.ComponentId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Location), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.DisableRegistryReflection), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.NeverOverwrite), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Permanent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.SharedDllRefCount), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Shared), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Transitive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.UninstallWhenSuperseded), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Win64), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.KeyPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.KeyPathType), IntermediateFieldType.Number),
             },
-            typeof(ComponentTuple));
+            typeof(ComponentSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ComponentTupleFields
+    public enum ComponentSymbolFields
     {
         ComponentId,
         DirectoryRef,
@@ -56,100 +56,100 @@ namespace WixToolset.Data.Tuples
         Either
     }
 
-    public class ComponentTuple : IntermediateTuple
+    public class ComponentSymbol : IntermediateSymbol
     {
-        public ComponentTuple() : base(TupleDefinitions.Component, null, null)
+        public ComponentSymbol() : base(SymbolDefinitions.Component, null, null)
         {
         }
 
-        public ComponentTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Component, sourceLineNumber, id)
+        public ComponentSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Component, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComponentTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComponentSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.ComponentId];
-            set => this.Set((int)ComponentTupleFields.ComponentId, value);
+            get => (string)this.Fields[(int)ComponentSymbolFields.ComponentId];
+            set => this.Set((int)ComponentSymbolFields.ComponentId, value);
         }
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.DirectoryRef];
-            set => this.Set((int)ComponentTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)ComponentSymbolFields.DirectoryRef];
+            set => this.Set((int)ComponentSymbolFields.DirectoryRef, value);
         }
 
         public ComponentLocation Location
         {
-            get => (ComponentLocation)this.Fields[(int)ComponentTupleFields.Location].AsNumber();
-            set => this.Set((int)ComponentTupleFields.Location, (int)value);
+            get => (ComponentLocation)this.Fields[(int)ComponentSymbolFields.Location].AsNumber();
+            set => this.Set((int)ComponentSymbolFields.Location, (int)value);
         }
 
         public bool DisableRegistryReflection
         {
-            get => this.Fields[(int)ComponentTupleFields.DisableRegistryReflection].AsBool();
-            set => this.Set((int)ComponentTupleFields.DisableRegistryReflection, value);
+            get => this.Fields[(int)ComponentSymbolFields.DisableRegistryReflection].AsBool();
+            set => this.Set((int)ComponentSymbolFields.DisableRegistryReflection, value);
         }
 
         public bool NeverOverwrite
         {
-            get => this.Fields[(int)ComponentTupleFields.NeverOverwrite].AsBool();
-            set => this.Set((int)ComponentTupleFields.NeverOverwrite, value);
+            get => this.Fields[(int)ComponentSymbolFields.NeverOverwrite].AsBool();
+            set => this.Set((int)ComponentSymbolFields.NeverOverwrite, value);
         }
 
         public bool Permanent
         {
-            get => this.Fields[(int)ComponentTupleFields.Permanent].AsBool();
-            set => this.Set((int)ComponentTupleFields.Permanent, value);
+            get => this.Fields[(int)ComponentSymbolFields.Permanent].AsBool();
+            set => this.Set((int)ComponentSymbolFields.Permanent, value);
         }
 
         public bool SharedDllRefCount
         {
-            get => this.Fields[(int)ComponentTupleFields.SharedDllRefCount].AsBool();
-            set => this.Set((int)ComponentTupleFields.SharedDllRefCount, value);
+            get => this.Fields[(int)ComponentSymbolFields.SharedDllRefCount].AsBool();
+            set => this.Set((int)ComponentSymbolFields.SharedDllRefCount, value);
         }
 
         public bool Shared
         {
-            get => this.Fields[(int)ComponentTupleFields.Shared].AsBool();
-            set => this.Set((int)ComponentTupleFields.Shared, value);
+            get => this.Fields[(int)ComponentSymbolFields.Shared].AsBool();
+            set => this.Set((int)ComponentSymbolFields.Shared, value);
         }
 
         public bool Transitive
         {
-            get => this.Fields[(int)ComponentTupleFields.Transitive].AsBool();
-            set => this.Set((int)ComponentTupleFields.Transitive, value);
+            get => this.Fields[(int)ComponentSymbolFields.Transitive].AsBool();
+            set => this.Set((int)ComponentSymbolFields.Transitive, value);
         }
 
         public bool UninstallWhenSuperseded
         {
-            get => this.Fields[(int)ComponentTupleFields.UninstallWhenSuperseded].AsBool();
-            set => this.Set((int)ComponentTupleFields.UninstallWhenSuperseded, value);
+            get => this.Fields[(int)ComponentSymbolFields.UninstallWhenSuperseded].AsBool();
+            set => this.Set((int)ComponentSymbolFields.UninstallWhenSuperseded, value);
         }
 
         public bool Win64
         {
-            get => this.Fields[(int)ComponentTupleFields.Win64].AsBool();
-            set => this.Set((int)ComponentTupleFields.Win64, value);
+            get => this.Fields[(int)ComponentSymbolFields.Win64].AsBool();
+            set => this.Set((int)ComponentSymbolFields.Win64, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.Condition];
-            set => this.Set((int)ComponentTupleFields.Condition, value);
+            get => (string)this.Fields[(int)ComponentSymbolFields.Condition];
+            set => this.Set((int)ComponentSymbolFields.Condition, value);
         }
 
         public string KeyPath
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.KeyPath];
-            set => this.Set((int)ComponentTupleFields.KeyPath, value);
+            get => (string)this.Fields[(int)ComponentSymbolFields.KeyPath];
+            set => this.Set((int)ComponentSymbolFields.KeyPath, value);
         }
 
         public ComponentKeyPathType KeyPathType
         {
-            get => (ComponentKeyPathType)this.Fields[(int)ComponentTupleFields.KeyPathType].AsNumber();
-            set => this.Set((int)ComponentTupleFields.KeyPathType, (int)value);
+            get => (ComponentKeyPathType)this.Fields[(int)ComponentSymbolFields.KeyPathType].AsNumber();
+            set => this.Set((int)ComponentSymbolFields.KeyPathType, (int)value);
         }
     }
 }

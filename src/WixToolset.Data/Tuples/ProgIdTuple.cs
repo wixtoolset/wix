@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ProgId = new IntermediateTupleDefinition(
-            TupleDefinitionType.ProgId,
+        public static readonly IntermediateSymbolDefinition ProgId = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ProgId,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ProgId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ParentProgIdRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ClassRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.IconRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.IconIndex), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.ProgId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.ParentProgIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.ClassRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.IconRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdSymbolFields.IconIndex), IntermediateFieldType.Number),
             },
-            typeof(ProgIdTuple));
+            typeof(ProgIdSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ProgIdTupleFields
+    public enum ProgIdSymbolFields
     {
         ProgId,
         ParentProgIdRef,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         IconIndex,
     }
 
-    public class ProgIdTuple : IntermediateTuple
+    public class ProgIdSymbol : IntermediateSymbol
     {
-        public ProgIdTuple() : base(TupleDefinitions.ProgId, null, null)
+        public ProgIdSymbol() : base(SymbolDefinitions.ProgId, null, null)
         {
         }
 
-        public ProgIdTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ProgId, sourceLineNumber, id)
+        public ProgIdSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ProgId, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ProgIdTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ProgIdSymbolFields index] => this.Fields[(int)index];
 
         public string ProgId
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId];
-            set => this.Set((int)ProgIdTupleFields.ProgId, value);
+            get => (string)this.Fields[(int)ProgIdSymbolFields.ProgId];
+            set => this.Set((int)ProgIdSymbolFields.ProgId, value);
         }
 
         public string ParentProgIdRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ParentProgIdRef];
-            set => this.Set((int)ProgIdTupleFields.ParentProgIdRef, value);
+            get => (string)this.Fields[(int)ProgIdSymbolFields.ParentProgIdRef];
+            set => this.Set((int)ProgIdSymbolFields.ParentProgIdRef, value);
         }
 
         public string ClassRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ClassRef];
-            set => this.Set((int)ProgIdTupleFields.ClassRef, value);
+            get => (string)this.Fields[(int)ProgIdSymbolFields.ClassRef];
+            set => this.Set((int)ProgIdSymbolFields.ClassRef, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Description];
-            set => this.Set((int)ProgIdTupleFields.Description, value);
+            get => (string)this.Fields[(int)ProgIdSymbolFields.Description];
+            set => this.Set((int)ProgIdSymbolFields.Description, value);
         }
 
         public string IconRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.IconRef];
-            set => this.Set((int)ProgIdTupleFields.IconRef, value);
+            get => (string)this.Fields[(int)ProgIdSymbolFields.IconRef];
+            set => this.Set((int)ProgIdSymbolFields.IconRef, value);
         }
 
         public int? IconIndex
         {
-            get => (int?)this.Fields[(int)ProgIdTupleFields.IconIndex];
-            set => this.Set((int)ProgIdTupleFields.IconIndex, value);
+            get => (int?)this.Fields[(int)ProgIdSymbolFields.IconIndex];
+            set => this.Set((int)ProgIdSymbolFields.IconIndex, value);
         }
     }
 }

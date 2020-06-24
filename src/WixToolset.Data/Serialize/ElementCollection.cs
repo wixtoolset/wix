@@ -429,13 +429,13 @@ namespace WixToolset.Data.Serialize
                 {
                     if (this.collectionStack != null && this.collectionStack.Count > 0)
                     {
-                        CollectionTuple tuple = (CollectionTuple)this.collectionStack.Peek();
-                        object container = tuple.Collection.items[tuple.ContainerIndex];
+                        CollectionSymbol symbol = (CollectionSymbol)this.collectionStack.Peek();
+                        object container = symbol.Collection.items[symbol.ContainerIndex];
 
                         CollectionItem collectionItem = container as CollectionItem;
                         if (collectionItem != null)
                         {
-                            return collectionItem.Elements[tuple.ItemIndex];
+                            return collectionItem.Elements[symbol.ItemIndex];
                         }
 
                         throw new InvalidOperationException(String.Format(
@@ -474,12 +474,12 @@ namespace WixToolset.Data.Serialize
                     }
 
                     this.collectionStack = new Stack();
-                    this.collectionStack.Push(new CollectionTuple(this.collection));
+                    this.collectionStack.Push(new CollectionSymbol(this.collection));
                 }
 
-                CollectionTuple tuple = (CollectionTuple)this.collectionStack.Peek();
+                CollectionSymbol symbol = (CollectionSymbol)this.collectionStack.Peek();
 
-                if (this.FindNext(tuple))
+                if (this.FindNext(symbol))
                 {
                     return true;
                 }
@@ -507,50 +507,50 @@ namespace WixToolset.Data.Serialize
                         elementCollection.Count));
                 }
 
-                CollectionTuple tuple = new CollectionTuple(elementCollection);
-                this.collectionStack.Push(tuple);
-                this.FindNext(tuple);
+                CollectionSymbol symbol = new CollectionSymbol(elementCollection);
+                this.collectionStack.Push(symbol);
+                this.FindNext(symbol);
             }
 
             /// <summary>
-            /// Finds the next item from a given tuple.
+            /// Finds the next item from a given symbol.
             /// </summary>
-            /// <param name="tuple">The tuple to start looking from.</param>
+            /// <param name="symbol">The symbol to start looking from.</param>
             /// <returns>True if a next element is found, false otherwise.</returns>
-            private bool FindNext(CollectionTuple tuple)
+            private bool FindNext(CollectionSymbol symbol)
             {
-                object container = tuple.Collection.items[tuple.ContainerIndex];
+                object container = symbol.Collection.items[symbol.ContainerIndex];
 
                 CollectionItem collectionItem = container as CollectionItem;
                 if (collectionItem != null)
                 {
-                    if (tuple.ItemIndex + 1 < collectionItem.Elements.Count)
+                    if (symbol.ItemIndex + 1 < collectionItem.Elements.Count)
                     {
-                        tuple.ItemIndex++;
+                        symbol.ItemIndex++;
                         return true;
                     }
                 }
 
                 ElementCollection elementCollection = container as ElementCollection;
-                if (elementCollection != null && elementCollection.Count > 0 && tuple.ItemIndex == -1)
+                if (elementCollection != null && elementCollection.Count > 0 && symbol.ItemIndex == -1)
                 {
-                    tuple.ItemIndex++;
+                    symbol.ItemIndex++;
                     this.PushCollection(elementCollection);
                     return true;
                 }
 
-                tuple.ItemIndex = 0;
+                symbol.ItemIndex = 0;
 
-                for (int i = tuple.ContainerIndex + 1; i < tuple.Collection.items.Count; ++i)
+                for (int i = symbol.ContainerIndex + 1; i < symbol.Collection.items.Count; ++i)
                 {
-                    object nestedContainer = tuple.Collection.items[i];
+                    object nestedContainer = symbol.Collection.items[i];
 
                     CollectionItem nestedCollectionItem = nestedContainer as CollectionItem;
                     if (nestedCollectionItem != null)
                     {
                         if (nestedCollectionItem.Elements.Count > 0)
                         {
-                            tuple.ContainerIndex = i;
+                            symbol.ContainerIndex = i;
                             return true;
                         }
                     }
@@ -558,7 +558,7 @@ namespace WixToolset.Data.Serialize
                     ElementCollection nestedElementCollection = nestedContainer as ElementCollection;
                     if (nestedElementCollection != null && nestedElementCollection.Count > 0)
                     {
-                        tuple.ContainerIndex = i;
+                        symbol.ContainerIndex = i;
                         this.PushCollection(nestedElementCollection);
                         return true;
                     }
@@ -571,23 +571,23 @@ namespace WixToolset.Data.Serialize
             /// Class representing a single point in the collection. Consists of an ElementCollection,
             /// a container index, and an index into the container.
             /// </summary>
-            private class CollectionTuple
+            private class CollectionSymbol
             {
                 private ElementCollection collection;
                 private int containerIndex;
                 private int itemIndex = -1;
 
                 /// <summary>
-                /// Creates a new CollectionTuple.
+                /// Creates a new CollectionSymbol.
                 /// </summary>
-                /// <param name="collection">The collection for the tuple.</param>
-                public CollectionTuple(ElementCollection collection)
+                /// <param name="collection">The collection for the symbol.</param>
+                public CollectionSymbol(ElementCollection collection)
                 {
                     this.collection = collection;
                 }
 
                 /// <summary>
-                /// Gets the collection for the tuple.
+                /// Gets the collection for the symbol.
                 /// </summary>
                 public ElementCollection Collection
                 {

@@ -4,11 +4,11 @@ namespace WixToolset.Data
 {
     public static class IntermediateSectionExtensions
     {
-        public static T AddTuple<T>(this IntermediateSection section, T tuple)
-            where T : IntermediateTuple
+        public static T AddSymbol<T>(this IntermediateSection section, T symbol)
+            where T : IntermediateSymbol
         {
-            section.Tuples.Add(tuple);
-            return tuple;
+            section.Symbols.Add(symbol);
+            return symbol;
         }
     }
 }

@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ImageFamilies = new IntermediateTupleDefinition(
-            TupleDefinitionType.ImageFamilies,
+        public static readonly IntermediateSymbolDefinition ImageFamilies = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ImageFamilies,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.Family), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.MediaSrcPropName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.MediaDiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.FileSequenceStart), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.DiskPrompt), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ImageFamiliesTupleFields.VolumeLabel), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.Family), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.MediaSrcPropName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.MediaDiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.FileSequenceStart), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.DiskPrompt), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ImageFamiliesSymbolFields.VolumeLabel), IntermediateFieldType.String),
             },
-            typeof(ImageFamiliesTuple));
+            typeof(ImageFamiliesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ImageFamiliesTupleFields
+    public enum ImageFamiliesSymbolFields
     {
         Family,
         MediaSrcPropName,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         VolumeLabel,
     }
 
-    public class ImageFamiliesTuple : IntermediateTuple
+    public class ImageFamiliesSymbol : IntermediateSymbol
     {
-        public ImageFamiliesTuple() : base(TupleDefinitions.ImageFamilies, null, null)
+        public ImageFamiliesSymbol() : base(SymbolDefinitions.ImageFamilies, null, null)
         {
         }
 
-        public ImageFamiliesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ImageFamilies, sourceLineNumber, id)
+        public ImageFamiliesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ImageFamilies, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ImageFamiliesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ImageFamiliesSymbolFields index] => this.Fields[(int)index];
 
         public string Family
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.Family];
-            set => this.Set((int)ImageFamiliesTupleFields.Family, value);
+            get => (string)this.Fields[(int)ImageFamiliesSymbolFields.Family];
+            set => this.Set((int)ImageFamiliesSymbolFields.Family, value);
         }
 
         public string MediaSrcPropName
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.MediaSrcPropName];
-            set => this.Set((int)ImageFamiliesTupleFields.MediaSrcPropName, value);
+            get => (string)this.Fields[(int)ImageFamiliesSymbolFields.MediaSrcPropName];
+            set => this.Set((int)ImageFamiliesSymbolFields.MediaSrcPropName, value);
         }
 
         public int? MediaDiskId
         {
-            get => (int?)this.Fields[(int)ImageFamiliesTupleFields.MediaDiskId];
-            set => this.Set((int)ImageFamiliesTupleFields.MediaDiskId, value);
+            get => (int?)this.Fields[(int)ImageFamiliesSymbolFields.MediaDiskId];
+            set => this.Set((int)ImageFamiliesSymbolFields.MediaDiskId, value);
         }
 
         public int? FileSequenceStart
         {
-            get => (int?)this.Fields[(int)ImageFamiliesTupleFields.FileSequenceStart];
-            set => this.Set((int)ImageFamiliesTupleFields.FileSequenceStart, value);
+            get => (int?)this.Fields[(int)ImageFamiliesSymbolFields.FileSequenceStart];
+            set => this.Set((int)ImageFamiliesSymbolFields.FileSequenceStart, value);
         }
 
         public string DiskPrompt
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.DiskPrompt];
-            set => this.Set((int)ImageFamiliesTupleFields.DiskPrompt, value);
+            get => (string)this.Fields[(int)ImageFamiliesSymbolFields.DiskPrompt];
+            set => this.Set((int)ImageFamiliesSymbolFields.DiskPrompt, value);
         }
 
         public string VolumeLabel
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.VolumeLabel];
-            set => this.Set((int)ImageFamiliesTupleFields.VolumeLabel, value);
+            get => (string)this.Fields[(int)ImageFamiliesSymbolFields.VolumeLabel];
+            set => this.Set((int)ImageFamiliesSymbolFields.VolumeLabel, value);
         }
     }
 }

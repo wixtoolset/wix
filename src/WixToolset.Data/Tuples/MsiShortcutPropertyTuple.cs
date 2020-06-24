@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiShortcutProperty = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiShortcutProperty,
+        public static readonly IntermediateSymbolDefinition MsiShortcutProperty = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiShortcutProperty,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.ShortcutRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.PropertyKey), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.PropVariantValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiShortcutPropertySymbolFields.ShortcutRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiShortcutPropertySymbolFields.PropertyKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiShortcutPropertySymbolFields.PropVariantValue), IntermediateFieldType.String),
             },
-            typeof(MsiShortcutPropertyTuple));
+            typeof(MsiShortcutPropertySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiShortcutPropertyTupleFields
+    public enum MsiShortcutPropertySymbolFields
     {
         ShortcutRef,
         PropertyKey,
         PropVariantValue,
     }
 
-    public class MsiShortcutPropertyTuple : IntermediateTuple
+    public class MsiShortcutPropertySymbol : IntermediateSymbol
     {
-        public MsiShortcutPropertyTuple() : base(TupleDefinitions.MsiShortcutProperty, null, null)
+        public MsiShortcutPropertySymbol() : base(SymbolDefinitions.MsiShortcutProperty, null, null)
         {
         }
 
-        public MsiShortcutPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiShortcutProperty, sourceLineNumber, id)
+        public MsiShortcutPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiShortcutProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiShortcutPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiShortcutPropertySymbolFields index] => this.Fields[(int)index];
 
         public string ShortcutRef
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.ShortcutRef];
-            set => this.Set((int)MsiShortcutPropertyTupleFields.ShortcutRef, value);
+            get => (string)this.Fields[(int)MsiShortcutPropertySymbolFields.ShortcutRef];
+            set => this.Set((int)MsiShortcutPropertySymbolFields.ShortcutRef, value);
         }
 
         public string PropertyKey
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropertyKey];
-            set => this.Set((int)MsiShortcutPropertyTupleFields.PropertyKey, value);
+            get => (string)this.Fields[(int)MsiShortcutPropertySymbolFields.PropertyKey];
+            set => this.Set((int)MsiShortcutPropertySymbolFields.PropertyKey, value);
         }
 
         public string PropVariantValue
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropVariantValue];
-            set => this.Set((int)MsiShortcutPropertyTupleFields.PropVariantValue, value);
+            get => (string)this.Fields[(int)MsiShortcutPropertySymbolFields.PropVariantValue];
+            set => this.Set((int)MsiShortcutPropertySymbolFields.PropVariantValue, value);
         }
     }
 }

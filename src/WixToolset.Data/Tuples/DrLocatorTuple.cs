@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition DrLocator = new IntermediateTupleDefinition(
-            TupleDefinitionType.DrLocator,
+        public static readonly IntermediateSymbolDefinition DrLocator = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.DrLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.SignatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Parent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Depth), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DrLocatorSymbolFields.SignatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DrLocatorSymbolFields.Parent), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DrLocatorSymbolFields.Path), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DrLocatorSymbolFields.Depth), IntermediateFieldType.Number),
             },
-            typeof(DrLocatorTuple));
+            typeof(DrLocatorSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum DrLocatorTupleFields
+    public enum DrLocatorSymbolFields
     {
         SignatureRef,
         Parent,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Depth,
     }
 
-    public class DrLocatorTuple : IntermediateTuple
+    public class DrLocatorSymbol : IntermediateSymbol
     {
-        public DrLocatorTuple() : base(TupleDefinitions.DrLocator, null, null)
+        public DrLocatorSymbol() : base(SymbolDefinitions.DrLocator, null, null)
         {
         }
 
-        public DrLocatorTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.DrLocator, sourceLineNumber, id)
+        public DrLocatorSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.DrLocator, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[DrLocatorTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[DrLocatorSymbolFields index] => this.Fields[(int)index];
 
         public string SignatureRef
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.SignatureRef];
-            set => this.Set((int)DrLocatorTupleFields.SignatureRef, value);
+            get => (string)this.Fields[(int)DrLocatorSymbolFields.SignatureRef];
+            set => this.Set((int)DrLocatorSymbolFields.SignatureRef, value);
         }
 
         public string Parent
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Parent];
-            set => this.Set((int)DrLocatorTupleFields.Parent, value);
+            get => (string)this.Fields[(int)DrLocatorSymbolFields.Parent];
+            set => this.Set((int)DrLocatorSymbolFields.Parent, value);
         }
 
         public string Path
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Path];
-            set => this.Set((int)DrLocatorTupleFields.Path, value);
+            get => (string)this.Fields[(int)DrLocatorSymbolFields.Path];
+            set => this.Set((int)DrLocatorSymbolFields.Path, value);
         }
 
         public int? Depth
         {
-            get => (int?)this.Fields[(int)DrLocatorTupleFields.Depth];
-            set => this.Set((int)DrLocatorTupleFields.Depth, value);
+            get => (int?)this.Fields[(int)DrLocatorSymbolFields.Depth];
+            set => this.Set((int)DrLocatorSymbolFields.Depth, value);
         }
     }
 }

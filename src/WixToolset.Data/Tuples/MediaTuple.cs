@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Media = new IntermediateTupleDefinition(
-            TupleDefinitionType.Media,
+        public static readonly IntermediateSymbolDefinition Media = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Media,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.DiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.LastSequence), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.DiskPrompt), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.Cabinet), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.VolumeLabel), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.Source), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.CompressionLevel), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MediaTupleFields.Layout), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.DiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.LastSequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.DiskPrompt), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.Cabinet), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.VolumeLabel), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.Source), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.CompressionLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MediaSymbolFields.Layout), IntermediateFieldType.String),
             },
-            typeof(MediaTuple));
+            typeof(MediaSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MediaTupleFields
+    public enum MediaSymbolFields
     {
         DiskId,
         LastSequence,
@@ -37,64 +37,64 @@ namespace WixToolset.Data.Tuples
         Layout,
     }
 
-    public class MediaTuple : IntermediateTuple
+    public class MediaSymbol : IntermediateSymbol
     {
-        public MediaTuple() : base(TupleDefinitions.Media, null, null)
+        public MediaSymbol() : base(SymbolDefinitions.Media, null, null)
         {
         }
 
-        public MediaTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Media, sourceLineNumber, id)
+        public MediaSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Media, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MediaTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MediaSymbolFields index] => this.Fields[(int)index];
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)MediaTupleFields.DiskId];
-            set => this.Set((int)MediaTupleFields.DiskId, value);
+            get => (int)this.Fields[(int)MediaSymbolFields.DiskId];
+            set => this.Set((int)MediaSymbolFields.DiskId, value);
         }
 
         public int? LastSequence
         {
-            get => (int?)this.Fields[(int)MediaTupleFields.LastSequence];
-            set => this.Set((int)MediaTupleFields.LastSequence, value);
+            get => (int?)this.Fields[(int)MediaSymbolFields.LastSequence];
+            set => this.Set((int)MediaSymbolFields.LastSequence, value);
         }
 
         public string DiskPrompt
         {
-            get => (string)this.Fields[(int)MediaTupleFields.DiskPrompt];
-            set => this.Set((int)MediaTupleFields.DiskPrompt, value);
+            get => (string)this.Fields[(int)MediaSymbolFields.DiskPrompt];
+            set => this.Set((int)MediaSymbolFields.DiskPrompt, value);
         }
 
         public string Cabinet
         {
-            get => (string)this.Fields[(int)MediaTupleFields.Cabinet];
-            set => this.Set((int)MediaTupleFields.Cabinet, value);
+            get => (string)this.Fields[(int)MediaSymbolFields.Cabinet];
+            set => this.Set((int)MediaSymbolFields.Cabinet, value);
         }
 
         public string VolumeLabel
         {
-            get => (string)this.Fields[(int)MediaTupleFields.VolumeLabel];
-            set => this.Set((int)MediaTupleFields.VolumeLabel, value);
+            get => (string)this.Fields[(int)MediaSymbolFields.VolumeLabel];
+            set => this.Set((int)MediaSymbolFields.VolumeLabel, value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)MediaTupleFields.Source];
-            set => this.Set((int)MediaTupleFields.Source, value);
+            get => (string)this.Fields[(int)MediaSymbolFields.Source];
+            set => this.Set((int)MediaSymbolFields.Source, value);
         }
 
         public CompressionLevel? CompressionLevel
         {
-            get => (CompressionLevel?)this.Fields[(int)MediaTupleFields.CompressionLevel].AsNullableNumber();
-            set => this.Set((int)MediaTupleFields.CompressionLevel, (int?)value);
+            get => (CompressionLevel?)this.Fields[(int)MediaSymbolFields.CompressionLevel].AsNullableNumber();
+            set => this.Set((int)MediaSymbolFields.CompressionLevel, (int?)value);
         }
 
         public string Layout
         {
-            get => (string)this.Fields[(int)MediaTupleFields.Layout];
-            set => this.Set((int)MediaTupleFields.Layout, value);
+            get => (string)this.Fields[(int)MediaSymbolFields.Layout];
+            set => this.Set((int)MediaSymbolFields.Layout, value);
         }
     }
 }

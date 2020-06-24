@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundlePatchTargetCode = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundlePatchTargetCode,
+        public static readonly IntermediateSymbolDefinition WixBundlePatchTargetCode = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundlePatchTargetCode,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.PackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.TargetCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.TargetCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixBundlePatchTargetCodeTuple));
+            typeof(WixBundlePatchTargetCodeSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundlePatchTargetCodeTupleFields
+    public enum WixBundlePatchTargetCodeSymbolFields
     {
         PackageRef,
         TargetCode,
@@ -45,34 +45,34 @@ namespace WixToolset.Data.Tuples
         TargetsUpgradeCode = 2,
     }
 
-    public class WixBundlePatchTargetCodeTuple : IntermediateTuple
+    public class WixBundlePatchTargetCodeSymbol : IntermediateSymbol
     {
-        public WixBundlePatchTargetCodeTuple() : base(TupleDefinitions.WixBundlePatchTargetCode, null, null)
+        public WixBundlePatchTargetCodeSymbol() : base(SymbolDefinitions.WixBundlePatchTargetCode, null, null)
         {
         }
 
-        public WixBundlePatchTargetCodeTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundlePatchTargetCode, sourceLineNumber, id)
+        public WixBundlePatchTargetCodeSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundlePatchTargetCode, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundlePatchTargetCodeTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundlePatchTargetCodeSymbolFields index] => this.Fields[(int)index];
 
         public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.PackageRef];
-            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.PackageRef];
+            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.PackageRef, value);
         }
 
         public string TargetCode
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.TargetCode];
-            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.TargetCode, value);
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.TargetCode];
+            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.TargetCode, value);
         }
 
         public WixBundlePatchTargetCodeAttributes Attributes
         {
-            get => (WixBundlePatchTargetCodeAttributes)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.Attributes, (int)value);
+            get => (WixBundlePatchTargetCodeAttributes)this.Fields[(int)WixBundlePatchTargetCodeSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundlePatchTargetCodeSymbolFields.Attributes, (int)value);
         }
 
         public bool TargetsProductCode => (this.Attributes & WixBundlePatchTargetCodeAttributes.TargetsProductCode) == WixBundlePatchTargetCodeAttributes.TargetsProductCode;

@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PatchPackage = new IntermediateTupleDefinition(
-            TupleDefinitionType.PatchPackage,
+        public static readonly IntermediateSymbolDefinition PatchPackage = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.PatchPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PatchPackageTupleFields.PatchId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchPackageTupleFields.MediaDiskIdRef), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchPackageSymbolFields.PatchId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchPackageSymbolFields.MediaDiskIdRef), IntermediateFieldType.Number),
             },
-            typeof(PatchPackageTuple));
+            typeof(PatchPackageSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PatchPackageTupleFields
+    public enum PatchPackageSymbolFields
     {
         PatchId,
         MediaDiskIdRef,
     }
 
-    public class PatchPackageTuple : IntermediateTuple
+    public class PatchPackageSymbol : IntermediateSymbol
     {
-        public PatchPackageTuple() : base(TupleDefinitions.PatchPackage, null, null)
+        public PatchPackageSymbol() : base(SymbolDefinitions.PatchPackage, null, null)
         {
         }
 
-        public PatchPackageTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.PatchPackage, sourceLineNumber, id)
+        public PatchPackageSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.PatchPackage, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PatchPackageTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PatchPackageSymbolFields index] => this.Fields[(int)index];
 
         public string PatchId
         {
-            get => (string)this.Fields[(int)PatchPackageTupleFields.PatchId];
-            set => this.Set((int)PatchPackageTupleFields.PatchId, value);
+            get => (string)this.Fields[(int)PatchPackageSymbolFields.PatchId];
+            set => this.Set((int)PatchPackageSymbolFields.PatchId, value);
         }
 
         public int MediaDiskIdRef
         {
-            get => (int)this.Fields[(int)PatchPackageTupleFields.MediaDiskIdRef];
-            set => this.Set((int)PatchPackageTupleFields.MediaDiskIdRef, value);
+            get => (int)this.Fields[(int)PatchPackageSymbolFields.MediaDiskIdRef];
+            set => this.Set((int)PatchPackageSymbolFields.MediaDiskIdRef, value);
         }
     }
 }

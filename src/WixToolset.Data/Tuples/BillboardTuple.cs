@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Billboard = new IntermediateTupleDefinition(
-            TupleDefinitionType.Billboard,
+        public static readonly IntermediateSymbolDefinition Billboard = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Billboard,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(BillboardTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(BillboardTupleFields.Action), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(BillboardTupleFields.Ordering), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(BillboardSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(BillboardSymbolFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(BillboardSymbolFields.Ordering), IntermediateFieldType.Number),
             },
-            typeof(BillboardTuple));
+            typeof(BillboardSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum BillboardTupleFields
+    public enum BillboardSymbolFields
     {
         FeatureRef,
         Action,
         Ordering,
     }
 
-    public class BillboardTuple : IntermediateTuple
+    public class BillboardSymbol : IntermediateSymbol
     {
-        public BillboardTuple() : base(TupleDefinitions.Billboard, null, null)
+        public BillboardSymbol() : base(SymbolDefinitions.Billboard, null, null)
         {
         }
 
-        public BillboardTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Billboard, sourceLineNumber, id)
+        public BillboardSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Billboard, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[BillboardTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[BillboardSymbolFields index] => this.Fields[(int)index];
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.FeatureRef];
-            set => this.Set((int)BillboardTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)BillboardSymbolFields.FeatureRef];
+            set => this.Set((int)BillboardSymbolFields.FeatureRef, value);
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.Action];
-            set => this.Set((int)BillboardTupleFields.Action, value);
+            get => (string)this.Fields[(int)BillboardSymbolFields.Action];
+            set => this.Set((int)BillboardSymbolFields.Action, value);
         }
 
         public int? Ordering
         {
-            get => (int?)this.Fields[(int)BillboardTupleFields.Ordering];
-            set => this.Set((int)BillboardTupleFields.Ordering, value);
+            get => (int?)this.Fields[(int)BillboardSymbolFields.Ordering];
+            set => this.Set((int)BillboardSymbolFields.Ordering, value);
         }
     }
 }

@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDeltaPatchFile = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixDeltaPatchFile,
+        public static readonly IntermediateSymbolDefinition WixDeltaPatchFile = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixDeltaPatchFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.RetainLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.IgnoreOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.IgnoreLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.RetainOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.RetainLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.IgnoreOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.IgnoreLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileSymbolFields.SymbolPaths), IntermediateFieldType.String),
             },
-            typeof(WixDeltaPatchFileTuple));
+            typeof(WixDeltaPatchFileSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixDeltaPatchFileTupleFields
+    public enum WixDeltaPatchFileSymbolFields
     {
         FileRef,
         RetainLengths,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         SymbolPaths,
     }
 
-    public class WixDeltaPatchFileTuple : IntermediateTuple
+    public class WixDeltaPatchFileSymbol : IntermediateSymbol
     {
-        public WixDeltaPatchFileTuple() : base(TupleDefinitions.WixDeltaPatchFile, null, null)
+        public WixDeltaPatchFileSymbol() : base(SymbolDefinitions.WixDeltaPatchFile, null, null)
         {
         }
 
-        public WixDeltaPatchFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchFile, sourceLineNumber, id)
+        public WixDeltaPatchFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixDeltaPatchFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDeltaPatchFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDeltaPatchFileSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.FileRef];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.FileRef];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.FileRef, value);
         }
 
         public string RetainLengths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainLengths];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.RetainLengths, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.RetainLengths];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.RetainLengths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreOffsets];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.IgnoreOffsets, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.IgnoreOffsets];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreLengths];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.IgnoreLengths, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.IgnoreLengths];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainOffsets];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.RetainOffsets, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.RetainOffsets];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.RetainOffsets, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.SymbolPaths];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)WixDeltaPatchFileSymbolFields.SymbolPaths];
+            set => this.Set((int)WixDeltaPatchFileSymbolFields.SymbolPaths, value);
         }
     }
 }

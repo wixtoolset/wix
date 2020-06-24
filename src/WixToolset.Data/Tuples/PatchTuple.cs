@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Patch = new IntermediateTupleDefinition(
-            TupleDefinitionType.Patch,
+        public static readonly IntermediateSymbolDefinition Patch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Patch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.Sequence), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.PatchSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.Header), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.StreamRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.PatchSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.Header), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(PatchSymbolFields.StreamRef), IntermediateFieldType.String),
             },
-            typeof(PatchTuple));
+            typeof(PatchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PatchTupleFields
+    public enum PatchSymbolFields
     {
         FileRef,
         Sequence,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         StreamRef,
     }
 
-    public class PatchTuple : IntermediateTuple
+    public class PatchSymbol : IntermediateSymbol
     {
-        public PatchTuple() : base(TupleDefinitions.Patch, null, null)
+        public PatchSymbol() : base(SymbolDefinitions.Patch, null, null)
         {
         }
 
-        public PatchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Patch, sourceLineNumber, id)
+        public PatchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Patch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PatchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PatchSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)PatchTupleFields.FileRef];
-            set => this.Set((int)PatchTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)PatchSymbolFields.FileRef];
+            set => this.Set((int)PatchSymbolFields.FileRef, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)PatchTupleFields.Sequence];
-            set => this.Set((int)PatchTupleFields.Sequence, value);
+            get => (int)this.Fields[(int)PatchSymbolFields.Sequence];
+            set => this.Set((int)PatchSymbolFields.Sequence, value);
         }
 
         public int PatchSize
         {
-            get => (int)this.Fields[(int)PatchTupleFields.PatchSize];
-            set => this.Set((int)PatchTupleFields.PatchSize, value);
+            get => (int)this.Fields[(int)PatchSymbolFields.PatchSize];
+            set => this.Set((int)PatchSymbolFields.PatchSize, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)PatchTupleFields.Attributes];
-            set => this.Set((int)PatchTupleFields.Attributes, value);
+            get => (int)this.Fields[(int)PatchSymbolFields.Attributes];
+            set => this.Set((int)PatchSymbolFields.Attributes, value);
         }
 
         public string Header
         {
-            get => (string)this.Fields[(int)PatchTupleFields.Header];
-            set => this.Set((int)PatchTupleFields.Header, value);
+            get => (string)this.Fields[(int)PatchSymbolFields.Header];
+            set => this.Set((int)PatchSymbolFields.Header, value);
         }
 
         public string StreamRef
         {
-            get => (string)this.Fields[(int)PatchTupleFields.StreamRef];
-            set => this.Set((int)PatchTupleFields.StreamRef, value);
+            get => (string)this.Fields[(int)PatchSymbolFields.StreamRef];
+            set => this.Set((int)PatchSymbolFields.StreamRef, value);
         }
     }
 }

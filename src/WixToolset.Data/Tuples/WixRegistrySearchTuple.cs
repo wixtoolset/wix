@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixRegistrySearch = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixRegistrySearch,
+        public static readonly IntermediateSymbolDefinition WixRegistrySearch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixRegistrySearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Root), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Root), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Key), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixRegistrySearchTuple));
+            typeof(WixRegistrySearchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixRegistrySearchTupleFields
+    public enum WixRegistrySearchSymbolFields
     {
         Root,
         Key,
@@ -42,40 +42,40 @@ namespace WixToolset.Data.Tuples
         Win64 = 0x20,
     }
 
-    public class WixRegistrySearchTuple : IntermediateTuple
+    public class WixRegistrySearchSymbol : IntermediateSymbol
     {
-        public WixRegistrySearchTuple() : base(TupleDefinitions.WixRegistrySearch, null, null)
+        public WixRegistrySearchSymbol() : base(SymbolDefinitions.WixRegistrySearch, null, null)
         {
         }
 
-        public WixRegistrySearchTuple(SourceLineNumber sourceLineNumber , Identifier id = null) : base(TupleDefinitions.WixRegistrySearch, sourceLineNumber, id)
+        public WixRegistrySearchSymbol(SourceLineNumber sourceLineNumber , Identifier id = null) : base(SymbolDefinitions.WixRegistrySearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixRegistrySearchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixRegistrySearchSymbolFields index] => this.Fields[(int)index];
 
         public RegistryRootType Root
         {
-            get => (RegistryRootType)this.Fields[(int)WixRegistrySearchTupleFields.Root].AsNumber();
-            set => this.Set((int)WixRegistrySearchTupleFields.Root, (int)value);
+            get => (RegistryRootType)this.Fields[(int)WixRegistrySearchSymbolFields.Root].AsNumber();
+            set => this.Set((int)WixRegistrySearchSymbolFields.Root, (int)value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Key];
-            set => this.Set((int)WixRegistrySearchTupleFields.Key, value);
+            get => (string)this.Fields[(int)WixRegistrySearchSymbolFields.Key];
+            set => this.Set((int)WixRegistrySearchSymbolFields.Key, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Value];
-            set => this.Set((int)WixRegistrySearchTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixRegistrySearchSymbolFields.Value];
+            set => this.Set((int)WixRegistrySearchSymbolFields.Value, value);
         }
 
         public WixRegistrySearchAttributes Attributes
         {
-            get => (WixRegistrySearchAttributes)this.Fields[(int)WixRegistrySearchTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixRegistrySearchTupleFields.Attributes, (int)value);
+            get => (WixRegistrySearchAttributes)this.Fields[(int)WixRegistrySearchSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixRegistrySearchSymbolFields.Attributes, (int)value);
         }
     }
 }

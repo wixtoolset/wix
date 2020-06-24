@@ -2,37 +2,37 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixCustomTableColumn = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixCustomTableColumn,
+        public static readonly IntermediateSymbolDefinition WixCustomTableColumn = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixCustomTableColumn,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.TableRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Type), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Width), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.MinValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.MaxValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.KeyTable), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.KeyColumn), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Category), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Set), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableColumnTupleFields.Modularize), IntermediateFieldType.Number)
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.TableRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Type), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Width), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.MinValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.MaxValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.KeyTable), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.KeyColumn), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Category), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Set), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableColumnSymbolFields.Modularize), IntermediateFieldType.Number)
             },
-            typeof(WixCustomTableColumnTuple));
+            typeof(WixCustomTableColumnSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixCustomTableColumnTupleFields
+    public enum WixCustomTableColumnSymbolFields
     {
         TableRef,
         Name,
@@ -50,7 +50,7 @@ namespace WixToolset.Data.Tuples
     }
 
     [Flags]
-    public enum WixCustomTableColumnTupleAttributes
+    public enum WixCustomTableColumnSymbolAttributes
     {
         None = 0x0,
         PrimaryKey = 0x1,
@@ -102,102 +102,102 @@ namespace WixToolset.Data.Tuples
         SemicolonDelimited,
     }
 
-    public class WixCustomTableColumnTuple : IntermediateTuple
+    public class WixCustomTableColumnSymbol : IntermediateSymbol
     {
-        public WixCustomTableColumnTuple() : base(TupleDefinitions.WixCustomTableColumn, null, null)
+        public WixCustomTableColumnSymbol() : base(SymbolDefinitions.WixCustomTableColumn, null, null)
         {
         }
 
-        public WixCustomTableColumnTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixCustomTableColumn, sourceLineNumber, id)
+        public WixCustomTableColumnSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixCustomTableColumn, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixCustomTableColumnTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixCustomTableColumnSymbolFields index] => this.Fields[(int)index];
 
         public string TableRef
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.TableRef];
-            set => this.Set((int)WixCustomTableColumnTupleFields.TableRef, value);
+            get => (string)this.Fields[(int)WixCustomTableColumnSymbolFields.TableRef];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.TableRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.Name];
-            set => this.Set((int)WixCustomTableColumnTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixCustomTableColumnSymbolFields.Name];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Name, value);
         }
 
         public IntermediateFieldType Type
         {
-            get => (IntermediateFieldType)this.Fields[(int)WixCustomTableColumnTupleFields.Type].AsNumber();
-            set => this.Set((int)WixCustomTableColumnTupleFields.Type, (int)value);
+            get => (IntermediateFieldType)this.Fields[(int)WixCustomTableColumnSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Type, (int)value);
         }
 
-        public WixCustomTableColumnTupleAttributes Attributes
+        public WixCustomTableColumnSymbolAttributes Attributes
         {
-            get => (WixCustomTableColumnTupleAttributes)this.Fields[(int)WixCustomTableColumnTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixCustomTableColumnTupleFields.Attributes, (int)value);
+            get => (WixCustomTableColumnSymbolAttributes)this.Fields[(int)WixCustomTableColumnSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Attributes, (int)value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)WixCustomTableColumnTupleFields.Width];
-            set => this.Set((int)WixCustomTableColumnTupleFields.Width, value);
+            get => (int)this.Fields[(int)WixCustomTableColumnSymbolFields.Width];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Width, value);
         }
 
         public long? MinValue
         {
-            get => (long?)this.Fields[(int)WixCustomTableColumnTupleFields.MinValue];
-            set => this.Set((int)WixCustomTableColumnTupleFields.MinValue, value);
+            get => (long?)this.Fields[(int)WixCustomTableColumnSymbolFields.MinValue];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.MinValue, value);
         }
 
         public long? MaxValue
         {
-            get => (long?)this.Fields[(int)WixCustomTableColumnTupleFields.MaxValue];
-            set => this.Set((int)WixCustomTableColumnTupleFields.MaxValue, value);
+            get => (long?)this.Fields[(int)WixCustomTableColumnSymbolFields.MaxValue];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.MaxValue, value);
         }
 
         public string KeyTable
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.KeyTable];
-            set => this.Set((int)WixCustomTableColumnTupleFields.KeyTable, value);
+            get => (string)this.Fields[(int)WixCustomTableColumnSymbolFields.KeyTable];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.KeyTable, value);
         }
 
         public int? KeyColumn
         {
-            get => (int?)this.Fields[(int)WixCustomTableColumnTupleFields.KeyColumn];
-            set => this.Set((int)WixCustomTableColumnTupleFields.KeyColumn, value);
+            get => (int?)this.Fields[(int)WixCustomTableColumnSymbolFields.KeyColumn];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.KeyColumn, value);
         }
 
         public WixCustomTableColumnCategoryType? Category
         {
-            get => (WixCustomTableColumnCategoryType?)this.Fields[(int)WixCustomTableColumnTupleFields.Category].AsNullableNumber();
-            set => this.Set((int)WixCustomTableColumnTupleFields.Category, (int?)value);
+            get => (WixCustomTableColumnCategoryType?)this.Fields[(int)WixCustomTableColumnSymbolFields.Category].AsNullableNumber();
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Category, (int?)value);
         }
 
         public string Set
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.Set];
-            set => this.Set((int)WixCustomTableColumnTupleFields.Set, value);
+            get => (string)this.Fields[(int)WixCustomTableColumnSymbolFields.Set];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Set, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.Description];
-            set => this.Set((int)WixCustomTableColumnTupleFields.Description, value);
+            get => (string)this.Fields[(int)WixCustomTableColumnSymbolFields.Description];
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Description, value);
         }
 
         public WixCustomTableColumnModularizeType? Modularize
         {
-            get => (WixCustomTableColumnModularizeType?)this.Fields[(int)WixCustomTableColumnTupleFields.Modularize].AsNullableNumber();
-            set => this.Set((int)WixCustomTableColumnTupleFields.Modularize, (int?)value);
+            get => (WixCustomTableColumnModularizeType?)this.Fields[(int)WixCustomTableColumnSymbolFields.Modularize].AsNullableNumber();
+            set => this.Set((int)WixCustomTableColumnSymbolFields.Modularize, (int?)value);
         }
 
-        public bool PrimaryKey => (this.Attributes & WixCustomTableColumnTupleAttributes.PrimaryKey) == WixCustomTableColumnTupleAttributes.PrimaryKey;
+        public bool PrimaryKey => (this.Attributes & WixCustomTableColumnSymbolAttributes.PrimaryKey) == WixCustomTableColumnSymbolAttributes.PrimaryKey;
 
-        public bool Localizable => (this.Attributes & WixCustomTableColumnTupleAttributes.Localizable) == WixCustomTableColumnTupleAttributes.Localizable;
+        public bool Localizable => (this.Attributes & WixCustomTableColumnSymbolAttributes.Localizable) == WixCustomTableColumnSymbolAttributes.Localizable;
 
-        public bool Nullable => (this.Attributes & WixCustomTableColumnTupleAttributes.Nullable) == WixCustomTableColumnTupleAttributes.Nullable;
+        public bool Nullable => (this.Attributes & WixCustomTableColumnSymbolAttributes.Nullable) == WixCustomTableColumnSymbolAttributes.Nullable;
 
-        public bool Unreal => (this.Attributes & WixCustomTableColumnTupleAttributes.Unreal) == WixCustomTableColumnTupleAttributes.Unreal;
+        public bool Unreal => (this.Attributes & WixCustomTableColumnSymbolAttributes.Unreal) == WixCustomTableColumnSymbolAttributes.Unreal;
     }
 }

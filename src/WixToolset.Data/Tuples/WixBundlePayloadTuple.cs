@@ -2,45 +2,45 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundlePayload = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundlePayload,
+        public static readonly IntermediateSymbolDefinition WixBundlePayload = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundlePayload,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.SourceFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.DownloadUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Compressed), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.UnresolvedSourceFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.DisplayName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.EnableSignatureValidation), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.FileSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Hash), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.PublicKey), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Thumbprint), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.CatalogRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContainerRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.PackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContentFile), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.EmbeddedId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.LayoutOnly), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Packaging), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ParentPackagePayloadRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.SourceFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.DownloadUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Compressed), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.UnresolvedSourceFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.DisplayName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.EnableSignatureValidation), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.FileSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Hash), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.PublicKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Thumbprint), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.CatalogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContainerRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContentFile), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.EmbeddedId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.LayoutOnly), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Packaging), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ParentPackagePayloadRef), IntermediateFieldType.String),
             },
-            typeof(WixBundlePayloadTuple));
+            typeof(WixBundlePayloadSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundlePayloadTupleFields
+    public enum WixBundlePayloadSymbolFields
     {
         Name,
         SourceFile,
@@ -65,142 +65,142 @@ namespace WixToolset.Data.Tuples
         ParentPackagePayloadRef,
     }
 
-    public class WixBundlePayloadTuple : IntermediateTuple
+    public class WixBundlePayloadSymbol : IntermediateSymbol
     {
-        public WixBundlePayloadTuple() : base(TupleDefinitions.WixBundlePayload, null, null)
+        public WixBundlePayloadSymbol() : base(SymbolDefinitions.WixBundlePayload, null, null)
         {
         }
 
-        public WixBundlePayloadTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundlePayload, sourceLineNumber, id)
+        public WixBundlePayloadSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundlePayload, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundlePayloadTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundlePayloadSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Name];
-            set => this.Set((int)WixBundlePayloadTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Name];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Name, value);
         }
 
         public IntermediateFieldPathValue SourceFile
         {
-            get => this.Fields[(int)WixBundlePayloadTupleFields.SourceFile].AsPath();
-            set => this.Set((int)WixBundlePayloadTupleFields.SourceFile, value);
+            get => this.Fields[(int)WixBundlePayloadSymbolFields.SourceFile].AsPath();
+            set => this.Set((int)WixBundlePayloadSymbolFields.SourceFile, value);
         }
 
         public string DownloadUrl
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.DownloadUrl];
-            set => this.Set((int)WixBundlePayloadTupleFields.DownloadUrl, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.DownloadUrl];
+            set => this.Set((int)WixBundlePayloadSymbolFields.DownloadUrl, value);
         }
 
         public bool? Compressed
         {
-            get => (bool?)this.Fields[(int)WixBundlePayloadTupleFields.Compressed];
-            set => this.Set((int)WixBundlePayloadTupleFields.Compressed, value);
+            get => (bool?)this.Fields[(int)WixBundlePayloadSymbolFields.Compressed];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Compressed, value);
         }
 
         public string UnresolvedSourceFile
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.UnresolvedSourceFile];
-            set => this.Set((int)WixBundlePayloadTupleFields.UnresolvedSourceFile, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.UnresolvedSourceFile];
+            set => this.Set((int)WixBundlePayloadSymbolFields.UnresolvedSourceFile, value);
         }
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.DisplayName];
-            set => this.Set((int)WixBundlePayloadTupleFields.DisplayName, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.DisplayName];
+            set => this.Set((int)WixBundlePayloadSymbolFields.DisplayName, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Description];
-            set => this.Set((int)WixBundlePayloadTupleFields.Description, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Description];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Description, value);
         }
 
         public bool EnableSignatureValidation
         {
-            get => (bool)this.Fields[(int)WixBundlePayloadTupleFields.EnableSignatureValidation];
-            set => this.Set((int)WixBundlePayloadTupleFields.EnableSignatureValidation, value);
+            get => (bool)this.Fields[(int)WixBundlePayloadSymbolFields.EnableSignatureValidation];
+            set => this.Set((int)WixBundlePayloadSymbolFields.EnableSignatureValidation, value);
         }
 
         public int? FileSize
         {
-            get => (int?)this.Fields[(int)WixBundlePayloadTupleFields.FileSize];
-            set => this.Set((int)WixBundlePayloadTupleFields.FileSize, value);
+            get => (int?)this.Fields[(int)WixBundlePayloadSymbolFields.FileSize];
+            set => this.Set((int)WixBundlePayloadSymbolFields.FileSize, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Version];
-            set => this.Set((int)WixBundlePayloadTupleFields.Version, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Version];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Version, value);
         }
 
         public string Hash
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Hash];
-            set => this.Set((int)WixBundlePayloadTupleFields.Hash, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Hash];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Hash, value);
         }
 
         public string PublicKey
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.PublicKey];
-            set => this.Set((int)WixBundlePayloadTupleFields.PublicKey, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.PublicKey];
+            set => this.Set((int)WixBundlePayloadSymbolFields.PublicKey, value);
         }
 
         public string Thumbprint
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Thumbprint];
-            set => this.Set((int)WixBundlePayloadTupleFields.Thumbprint, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Thumbprint];
+            set => this.Set((int)WixBundlePayloadSymbolFields.Thumbprint, value);
         }
 
         public string CatalogRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.CatalogRef];
-            set => this.Set((int)WixBundlePayloadTupleFields.CatalogRef, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.CatalogRef];
+            set => this.Set((int)WixBundlePayloadSymbolFields.CatalogRef, value);
         }
 
         public string ContainerRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.ContainerRef];
-            set => this.Set((int)WixBundlePayloadTupleFields.ContainerRef, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.ContainerRef];
+            set => this.Set((int)WixBundlePayloadSymbolFields.ContainerRef, value);
         }
 
         public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.PackageRef];
-            set => this.Set((int)WixBundlePayloadTupleFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.PackageRef];
+            set => this.Set((int)WixBundlePayloadSymbolFields.PackageRef, value);
         }
 
         public bool ContentFile
         {
-            get => (bool)this.Fields[(int)WixBundlePayloadTupleFields.ContentFile];
-            set => this.Set((int)WixBundlePayloadTupleFields.ContentFile, value);
+            get => (bool)this.Fields[(int)WixBundlePayloadSymbolFields.ContentFile];
+            set => this.Set((int)WixBundlePayloadSymbolFields.ContentFile, value);
         }
 
         public string EmbeddedId
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.EmbeddedId];
-            set => this.Set((int)WixBundlePayloadTupleFields.EmbeddedId, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.EmbeddedId];
+            set => this.Set((int)WixBundlePayloadSymbolFields.EmbeddedId, value);
         }
 
         public bool LayoutOnly
         {
-            get => (bool)this.Fields[(int)WixBundlePayloadTupleFields.LayoutOnly];
-            set => this.Set((int)WixBundlePayloadTupleFields.LayoutOnly, value);
+            get => (bool)this.Fields[(int)WixBundlePayloadSymbolFields.LayoutOnly];
+            set => this.Set((int)WixBundlePayloadSymbolFields.LayoutOnly, value);
         }
 
         public PackagingType? Packaging
         {
-            get => (PackagingType?)this.Fields[(int)WixBundlePayloadTupleFields.Packaging].AsNumber();
-            set => this.Set((int)WixBundlePayloadTupleFields.Packaging, (int?)value);
+            get => (PackagingType?)this.Fields[(int)WixBundlePayloadSymbolFields.Packaging].AsNumber();
+            set => this.Set((int)WixBundlePayloadSymbolFields.Packaging, (int?)value);
         }
 
         public string ParentPackagePayloadRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.ParentPackagePayloadRef];
-            set => this.Set((int)WixBundlePayloadTupleFields.ParentPackagePayloadRef, value);
+            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.ParentPackagePayloadRef];
+            set => this.Set((int)WixBundlePayloadSymbolFields.ParentPackagePayloadRef, value);
         }
     }
 }

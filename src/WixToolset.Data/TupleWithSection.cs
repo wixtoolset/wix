@@ -7,29 +7,29 @@ namespace WixToolset.Data
     using System.Linq;
 
     /// <summary>
-    /// Tuple with section representing a single unique tuple.
+    /// Symbol with section representing a single unique symbol.
     /// </summary>
-    public sealed class TupleWithSection
+    public sealed class SymbolWithSection
     {
-        private HashSet<TupleWithSection> possibleConflicts;
-        private HashSet<TupleWithSection> redundants;
+        private HashSet<SymbolWithSection> possibleConflicts;
+        private HashSet<SymbolWithSection> redundants;
 
         /// <summary>
-        /// Creates a symbol for a tuple.
+        /// Creates a symbol for a symbol.
         /// </summary>
-        /// <param name="tuple">Tuple for the symbol</param>
-        public TupleWithSection(IntermediateSection section, IntermediateTuple tuple)
+        /// <param name="symbol">Symbol for the symbol</param>
+        public SymbolWithSection(IntermediateSection section, IntermediateSymbol symbol)
         {
-            this.Tuple = tuple;
+            this.Symbol = symbol;
             this.Section = section;
-            this.Name = String.Concat(this.Tuple.Definition.Name, ":", this.Tuple.Id.Id);
+            this.Name = String.Concat(this.Symbol.Definition.Name, ":", this.Symbol.Id.Id);
         }
 
         /// <summary>
         /// Gets the accessibility of the symbol which is a direct reflection of the accessibility of the row's accessibility.
         /// </summary>
         /// <value>Accessbility of the symbol.</value>
-        public AccessModifier Access => this.Tuple.Id.Access;
+        public AccessModifier Access => this.Symbol.Id.Access;
 
         /// <summary>
         /// Gets the name of the symbol.
@@ -38,10 +38,10 @@ namespace WixToolset.Data
         public string Name { get; }
 
         /// <summary>
-        /// Gets the tuple for this symbol.
+        /// Gets the symbol for this symbol.
         /// </summary>
-        /// <value>Tuple for this symbol.</value>
-        public IntermediateTuple Tuple { get; }
+        /// <value>Symbol for this symbol.</value>
+        public IntermediateSymbol Symbol { get; }
 
         /// <summary>
         /// Gets the section for the symbol.
@@ -50,41 +50,41 @@ namespace WixToolset.Data
         public IntermediateSection Section { get; }
 
         /// <summary>
-        /// Gets any duplicates of this tuple with sections that are possible conflicts.
+        /// Gets any duplicates of this symbol with sections that are possible conflicts.
         /// </summary>
-        public IEnumerable<TupleWithSection> PossiblyConflicts => this.possibleConflicts ?? Enumerable.Empty<TupleWithSection>();
+        public IEnumerable<SymbolWithSection> PossiblyConflicts => this.possibleConflicts ?? Enumerable.Empty<SymbolWithSection>();
 
         /// <summary>
-        /// Gets any duplicates of this tuple with sections that are redundant.
+        /// Gets any duplicates of this symbol with sections that are redundant.
         /// </summary>
-        public IEnumerable<TupleWithSection> Redundants => this.redundants ?? Enumerable.Empty<TupleWithSection>();
+        public IEnumerable<SymbolWithSection> Redundants => this.redundants ?? Enumerable.Empty<SymbolWithSection>();
 
         /// <summary>
-        /// Adds a duplicate tuple with sections that is a possible conflict.
+        /// Adds a duplicate symbol with sections that is a possible conflict.
         /// </summary>
-        /// <param name="tupleWithSection">Tuple with section that is a possible conflict of this symbol.</param>
-        public void AddPossibleConflict(TupleWithSection tupleWithSection)
+        /// <param name="symbolWithSection">Symbol with section that is a possible conflict of this symbol.</param>
+        public void AddPossibleConflict(SymbolWithSection symbolWithSection)
         {
             if (null == this.possibleConflicts)
             {
-                this.possibleConflicts = new HashSet<TupleWithSection>();
+                this.possibleConflicts = new HashSet<SymbolWithSection>();
             }
 
-            this.possibleConflicts.Add(tupleWithSection);
+            this.possibleConflicts.Add(symbolWithSection);
         }
 
         /// <summary>
-        /// Adds a duplicate tuple that is redundant.
+        /// Adds a duplicate symbol that is redundant.
         /// </summary>
-        /// <param name="tupleWithSection">Tuple with section that is redundant of this tuple.</param>
-        public void AddRedundant(TupleWithSection tupleWithSection)
+        /// <param name="symbolWithSection">Symbol with section that is redundant of this symbol.</param>
+        public void AddRedundant(SymbolWithSection symbolWithSection)
         {
             if (null == this.redundants)
             {
-                this.redundants = new HashSet<TupleWithSection>();
+                this.redundants = new HashSet<SymbolWithSection>();
             }
 
-            this.redundants.Add(tupleWithSection);
+            this.redundants.Add(symbolWithSection);
         }
     }
 }

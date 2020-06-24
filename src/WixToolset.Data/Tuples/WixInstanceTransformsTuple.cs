@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixInstanceTransforms = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixInstanceTransforms,
+        public static readonly IntermediateSymbolDefinition WixInstanceTransforms = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixInstanceTransforms,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.PropertyId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.ProductCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.ProductName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.UpgradeCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceTransformsSymbolFields.PropertyId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceTransformsSymbolFields.ProductCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceTransformsSymbolFields.ProductName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceTransformsSymbolFields.UpgradeCode), IntermediateFieldType.String),
             },
-            typeof(WixInstanceTransformsTuple));
+            typeof(WixInstanceTransformsSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixInstanceTransformsTupleFields
+    public enum WixInstanceTransformsSymbolFields
     {
         PropertyId,
         ProductCode,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         UpgradeCode,
     }
 
-    public class WixInstanceTransformsTuple : IntermediateTuple
+    public class WixInstanceTransformsSymbol : IntermediateSymbol
     {
-        public WixInstanceTransformsTuple() : base(TupleDefinitions.WixInstanceTransforms, null, null)
+        public WixInstanceTransformsSymbol() : base(SymbolDefinitions.WixInstanceTransforms, null, null)
         {
         }
 
-        public WixInstanceTransformsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixInstanceTransforms, sourceLineNumber, id)
+        public WixInstanceTransformsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixInstanceTransforms, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixInstanceTransformsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixInstanceTransformsSymbolFields index] => this.Fields[(int)index];
 
         public string PropertyId
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.PropertyId];
-            set => this.Set((int)WixInstanceTransformsTupleFields.PropertyId, value);
+            get => (string)this.Fields[(int)WixInstanceTransformsSymbolFields.PropertyId];
+            set => this.Set((int)WixInstanceTransformsSymbolFields.PropertyId, value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductCode];
-            set => this.Set((int)WixInstanceTransformsTupleFields.ProductCode, value);
+            get => (string)this.Fields[(int)WixInstanceTransformsSymbolFields.ProductCode];
+            set => this.Set((int)WixInstanceTransformsSymbolFields.ProductCode, value);
         }
 
         public string ProductName
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductName];
-            set => this.Set((int)WixInstanceTransformsTupleFields.ProductName, value);
+            get => (string)this.Fields[(int)WixInstanceTransformsSymbolFields.ProductName];
+            set => this.Set((int)WixInstanceTransformsSymbolFields.ProductName, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.UpgradeCode];
-            set => this.Set((int)WixInstanceTransformsTupleFields.UpgradeCode, value);
+            get => (string)this.Fields[(int)WixInstanceTransformsSymbolFields.UpgradeCode];
+            set => this.Set((int)WixInstanceTransformsSymbolFields.UpgradeCode, value);
         }
     }
 }

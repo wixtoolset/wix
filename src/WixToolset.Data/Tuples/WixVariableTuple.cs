@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixVariable = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixVariable,
+        public static readonly IntermediateSymbolDefinition WixVariable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixVariable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixVariableTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixVariableTupleFields.Overridable), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixVariableSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixVariableSymbolFields.Overridable), IntermediateFieldType.Bool),
             },
-            typeof(WixVariableTuple));
+            typeof(WixVariableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixVariableTupleFields
+    public enum WixVariableSymbolFields
     {
         Value,
         Overridable,
     }
 
-    public class WixVariableTuple : IntermediateTuple
+    public class WixVariableSymbol : IntermediateSymbol
     {
-        public WixVariableTuple() : base(TupleDefinitions.WixVariable, null, null)
+        public WixVariableSymbol() : base(SymbolDefinitions.WixVariable, null, null)
         {
         }
 
-        public WixVariableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixVariable, sourceLineNumber, id)
+        public WixVariableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixVariable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixVariableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixVariableSymbolFields index] => this.Fields[(int)index];
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixVariableTupleFields.Value];
-            set => this.Set((int)WixVariableTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixVariableSymbolFields.Value];
+            set => this.Set((int)WixVariableSymbolFields.Value, value);
         }
 
         public bool Overridable
         {
-            get => (bool)this.Fields[(int)WixVariableTupleFields.Overridable];
-            set => this.Set((int)WixVariableTupleFields.Overridable, value);
+            get => (bool)this.Fields[(int)WixVariableSymbolFields.Overridable];
+            set => this.Set((int)WixVariableSymbolFields.Overridable, value);
         }
     }
 }

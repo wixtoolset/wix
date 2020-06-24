@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBindUpdatedFiles = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBindUpdatedFiles,
+        public static readonly IntermediateSymbolDefinition WixBindUpdatedFiles = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBindUpdatedFiles,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBindUpdatedFilesTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBindUpdatedFilesSymbolFields.FileRef), IntermediateFieldType.String),
             },
-            typeof(WixBindUpdatedFilesTuple));
+            typeof(WixBindUpdatedFilesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBindUpdatedFilesTupleFields
+    public enum WixBindUpdatedFilesSymbolFields
     {
         FileRef,
     }
 
-    public class WixBindUpdatedFilesTuple : IntermediateTuple
+    public class WixBindUpdatedFilesSymbol : IntermediateSymbol
     {
-        public WixBindUpdatedFilesTuple() : base(TupleDefinitions.WixBindUpdatedFiles, null, null)
+        public WixBindUpdatedFilesSymbol() : base(SymbolDefinitions.WixBindUpdatedFiles, null, null)
         {
         }
 
-        public WixBindUpdatedFilesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBindUpdatedFiles, sourceLineNumber, id)
+        public WixBindUpdatedFilesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBindUpdatedFiles, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBindUpdatedFilesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBindUpdatedFilesSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)WixBindUpdatedFilesTupleFields.FileRef];
-            set => this.Set((int)WixBindUpdatedFilesTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)WixBindUpdatedFilesSymbolFields.FileRef];
+            set => this.Set((int)WixBindUpdatedFilesSymbolFields.FileRef, value);
         }
     }
 }

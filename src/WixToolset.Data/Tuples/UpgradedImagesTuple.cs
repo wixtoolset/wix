@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition UpgradedImages = new IntermediateTupleDefinition(
-            TupleDefinitionType.UpgradedImages,
+        public static readonly IntermediateSymbolDefinition UpgradedImages = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.UpgradedImages,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UpgradedImagesTupleFields.Upgraded), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedImagesTupleFields.MsiPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedImagesTupleFields.PatchMsiPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedImagesTupleFields.SymbolPaths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedImagesTupleFields.Family), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedImagesSymbolFields.Upgraded), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedImagesSymbolFields.MsiPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedImagesSymbolFields.PatchMsiPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedImagesSymbolFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedImagesSymbolFields.Family), IntermediateFieldType.String),
             },
-            typeof(UpgradedImagesTuple));
+            typeof(UpgradedImagesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum UpgradedImagesTupleFields
+    public enum UpgradedImagesSymbolFields
     {
         Upgraded,
         MsiPath,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         Family,
     }
 
-    public class UpgradedImagesTuple : IntermediateTuple
+    public class UpgradedImagesSymbol : IntermediateSymbol
     {
-        public UpgradedImagesTuple() : base(TupleDefinitions.UpgradedImages, null, null)
+        public UpgradedImagesSymbol() : base(SymbolDefinitions.UpgradedImages, null, null)
         {
         }
 
-        public UpgradedImagesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.UpgradedImages, sourceLineNumber, id)
+        public UpgradedImagesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.UpgradedImages, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UpgradedImagesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UpgradedImagesSymbolFields index] => this.Fields[(int)index];
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Upgraded];
-            set => this.Set((int)UpgradedImagesTupleFields.Upgraded, value);
+            get => (string)this.Fields[(int)UpgradedImagesSymbolFields.Upgraded];
+            set => this.Set((int)UpgradedImagesSymbolFields.Upgraded, value);
         }
 
         public string MsiPath
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.MsiPath];
-            set => this.Set((int)UpgradedImagesTupleFields.MsiPath, value);
+            get => (string)this.Fields[(int)UpgradedImagesSymbolFields.MsiPath];
+            set => this.Set((int)UpgradedImagesSymbolFields.MsiPath, value);
         }
 
         public string PatchMsiPath
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.PatchMsiPath];
-            set => this.Set((int)UpgradedImagesTupleFields.PatchMsiPath, value);
+            get => (string)this.Fields[(int)UpgradedImagesSymbolFields.PatchMsiPath];
+            set => this.Set((int)UpgradedImagesSymbolFields.PatchMsiPath, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.SymbolPaths];
-            set => this.Set((int)UpgradedImagesTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)UpgradedImagesSymbolFields.SymbolPaths];
+            set => this.Set((int)UpgradedImagesSymbolFields.SymbolPaths, value);
         }
 
         public string Family
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Family];
-            set => this.Set((int)UpgradedImagesTupleFields.Family, value);
+            get => (string)this.Fields[(int)UpgradedImagesSymbolFields.Family];
+            set => this.Set((int)UpgradedImagesSymbolFields.Family, value);
         }
     }
 }

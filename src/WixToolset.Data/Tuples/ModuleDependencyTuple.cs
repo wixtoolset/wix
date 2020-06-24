@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleDependency = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleDependency,
+        public static readonly IntermediateSymbolDefinition ModuleDependency = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleDependency,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleDependencyTupleFields.ModuleID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleDependencyTupleFields.ModuleLanguage), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ModuleDependencyTupleFields.RequiredID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleDependencyTupleFields.RequiredLanguage), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ModuleDependencyTupleFields.RequiredVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleDependencySymbolFields.ModuleID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleDependencySymbolFields.ModuleLanguage), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleDependencySymbolFields.RequiredID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleDependencySymbolFields.RequiredLanguage), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleDependencySymbolFields.RequiredVersion), IntermediateFieldType.String),
             },
-            typeof(ModuleDependencyTuple));
+            typeof(ModuleDependencySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleDependencyTupleFields
+    public enum ModuleDependencySymbolFields
     {
         ModuleID,
         ModuleLanguage,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         RequiredVersion,
     }
 
-    public class ModuleDependencyTuple : IntermediateTuple
+    public class ModuleDependencySymbol : IntermediateSymbol
     {
-        public ModuleDependencyTuple() : base(TupleDefinitions.ModuleDependency, null, null)
+        public ModuleDependencySymbol() : base(SymbolDefinitions.ModuleDependency, null, null)
         {
         }
 
-        public ModuleDependencyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleDependency, sourceLineNumber, id)
+        public ModuleDependencySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleDependency, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleDependencyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleDependencySymbolFields index] => this.Fields[(int)index];
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.ModuleID];
-            set => this.Set((int)ModuleDependencyTupleFields.ModuleID, value);
+            get => (string)this.Fields[(int)ModuleDependencySymbolFields.ModuleID];
+            set => this.Set((int)ModuleDependencySymbolFields.ModuleID, value);
         }
 
         public int ModuleLanguage
         {
-            get => (int)this.Fields[(int)ModuleDependencyTupleFields.ModuleLanguage];
-            set => this.Set((int)ModuleDependencyTupleFields.ModuleLanguage, value);
+            get => (int)this.Fields[(int)ModuleDependencySymbolFields.ModuleLanguage];
+            set => this.Set((int)ModuleDependencySymbolFields.ModuleLanguage, value);
         }
 
         public string RequiredID
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredID];
-            set => this.Set((int)ModuleDependencyTupleFields.RequiredID, value);
+            get => (string)this.Fields[(int)ModuleDependencySymbolFields.RequiredID];
+            set => this.Set((int)ModuleDependencySymbolFields.RequiredID, value);
         }
 
         public int RequiredLanguage
         {
-            get => (int)this.Fields[(int)ModuleDependencyTupleFields.RequiredLanguage];
-            set => this.Set((int)ModuleDependencyTupleFields.RequiredLanguage, value);
+            get => (int)this.Fields[(int)ModuleDependencySymbolFields.RequiredLanguage];
+            set => this.Set((int)ModuleDependencySymbolFields.RequiredLanguage, value);
         }
 
         public string RequiredVersion
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredVersion];
-            set => this.Set((int)ModuleDependencyTupleFields.RequiredVersion, value);
+            get => (string)this.Fields[(int)ModuleDependencySymbolFields.RequiredVersion];
+            set => this.Set((int)ModuleDependencySymbolFields.RequiredVersion, value);
         }
     }
 }

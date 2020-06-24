@@ -2,10 +2,10 @@
 
 namespace WixToolset.Data
 {
-    public interface ITupleDefinitionCreator
+    public interface ISymbolDefinitionCreator
     {
-        void AddCustomTupleDefinition(IntermediateTupleDefinition definition);
+        void AddCustomSymbolDefinition(IntermediateSymbolDefinition definition);
 
-        bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition);
+        bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition);
     }
 }

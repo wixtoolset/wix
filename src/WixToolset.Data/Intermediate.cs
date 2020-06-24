@@ -69,7 +69,7 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(string path, bool suppressVersionCheck = false)
         {
-            var creator = new SimpleTupleDefinitionCreator();
+            var creator = new SimpleSymbolDefinitionCreator();
             return Intermediate.Load(path, creator, suppressVersionCheck);
         }
 
@@ -82,7 +82,7 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(Assembly assembly, string resourceName, bool suppressVersionCheck = false)
         {
-            var creator = new SimpleTupleDefinitionCreator();
+            var creator = new SimpleSymbolDefinitionCreator();
             return Intermediate.Load(assembly, resourceName, creator, suppressVersionCheck);
         }
 
@@ -91,10 +91,10 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="assembly">Assembly with intermediate embedded in resource stream.</param>
         /// <param name="resourceName">Name of resource stream.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(Assembly assembly, string resourceName, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        public static Intermediate Load(Assembly assembly, string resourceName, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             using (var wixout = WixOutput.Read(assembly, resourceName))
             {
@@ -106,10 +106,10 @@ namespace WixToolset.Data
         /// Loads an intermediate from a path on disk.
         /// </summary>
         /// <param name="path">Path to intermediate file saved on disk.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(string path, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        public static Intermediate Load(string path, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             using (var wixout = WixOutput.Read(path))
             {
@@ -121,12 +121,12 @@ namespace WixToolset.Data
         /// Loads an intermediate from a WixOutput object.
         /// </summary>
         /// <param name="wixOutput">WixOutput object.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(WixOutput wixOutput, bool suppressVersionCheck = false)
         {
-            var creator = new SimpleTupleDefinitionCreator();
+            var creator = new SimpleSymbolDefinitionCreator();
             return Intermediate.LoadIntermediate(wixOutput, creator, suppressVersionCheck);
         }
 
@@ -134,10 +134,10 @@ namespace WixToolset.Data
         /// Loads an intermediate from a WixOutput object.
         /// </summary>
         /// <param name="wixOutput">WixOutput object.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(WixOutput wixOutput, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        public static Intermediate Load(WixOutput wixOutput, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             return Intermediate.LoadIntermediate(wixOutput, creator, suppressVersionCheck);
         }
@@ -150,7 +150,7 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediates</returns>
         public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles)
         {
-            var creator = new SimpleTupleDefinitionCreator();
+            var creator = new SimpleSymbolDefinitionCreator();
             return Intermediate.Load(intermediateFiles, creator);
         }
 
@@ -158,10 +158,10 @@ namespace WixToolset.Data
         /// Loads several intermediates from paths on disk using the same definitions.
         /// </summary>
         /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediates.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediates.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediates</returns>
-        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             var jsons = new Queue<JsonWithPath>();
             var intermediates = new List<Intermediate>();
@@ -240,10 +240,10 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="stream">Stream to intermediate file.</param>
         /// <param name="baseUri">Path name of intermediate file.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        private static Intermediate LoadIntermediate(WixOutput wixout, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        private static Intermediate LoadIntermediate(WixOutput wixout, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             var data = wixout.GetData(WixOutputStreamName);
             var json = Intermediate.LoadJson(data, wixout.Uri, suppressVersionCheck);
@@ -281,8 +281,8 @@ namespace WixToolset.Data
         /// Loads custom definitions in intermediate json into the creator.
         /// </summary>
         /// <param name="json">Json version of intermediate.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
-        private static void LoadDefinitions(JsonObject json, ITupleDefinitionCreator creator)
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
+        private static void LoadDefinitions(JsonObject json, ISymbolDefinitionCreator creator)
         {
             var definitionsJson = json.GetValueOrDefault<JsonArray>("definitions");
 
@@ -290,8 +290,8 @@ namespace WixToolset.Data
             {
                 foreach (JsonObject definitionJson in definitionsJson)
                 {
-                    var definition = IntermediateTupleDefinition.Deserialize(definitionJson);
-                    creator.AddCustomTupleDefinition(definition);
+                    var definition = IntermediateSymbolDefinition.Deserialize(definitionJson);
+                    creator.AddCustomSymbolDefinition(definition);
                 }
             }
         }
@@ -301,9 +301,9 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="json">Json version of intermediate.</param>
         /// <param name="baseUri">Path to the intermediate.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <returns>The finalized intermediate.</returns>
-        private static Intermediate FinalizeLoad(JsonObject json, Uri baseUri, ITupleDefinitionCreator creator)
+        private static Intermediate FinalizeLoad(JsonObject json, Uri baseUri, ISymbolDefinitionCreator creator)
         {
             var id = json.GetValueOrDefault<string>("id");
             var level = json.GetValueOrDefault<string>("level");
@@ -331,7 +331,7 @@ namespace WixToolset.Data
 
         private void SaveEmbedFiles(WixOutput wixout)
         {
-            var embeddedFields = this.Sections.SelectMany(s => s.Tuples)
+            var embeddedFields = this.Sections.SelectMany(s => s.Symbols)
                 .SelectMany(t => t.Fields)
                 .Where(f => f?.Type == IntermediateFieldType.Path)
                 .Select(f => f.AsPath())
@@ -440,15 +440,15 @@ namespace WixToolset.Data
             return entryName;
         }
 
-        private Dictionary<string, IntermediateTupleDefinition> GetCustomDefinitionsInSections()
+        private Dictionary<string, IntermediateSymbolDefinition> GetCustomDefinitionsInSections()
         {
-            var customDefinitions = new Dictionary<string, IntermediateTupleDefinition>();
+            var customDefinitions = new Dictionary<string, IntermediateSymbolDefinition>();
 
-            foreach (var tuple in this.Sections.SelectMany(s => s.Tuples).Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension))
+            foreach (var symbol in this.Sections.SelectMany(s => s.Symbols).Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension))
             {
-                if (!customDefinitions.ContainsKey(tuple.Definition.Name))
+                if (!customDefinitions.ContainsKey(symbol.Definition.Name))
                 {
-                    customDefinitions.Add(tuple.Definition.Name, tuple.Definition);
+                    customDefinitions.Add(symbol.Definition.Name, symbol.Definition);
                 }
             }
 

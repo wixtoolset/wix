@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleSlipstreamMsp = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleSlipstreamMsp,
+        public static readonly IntermediateSymbolDefinition WixBundleSlipstreamMsp = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleSlipstreamMsp,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.TargetPackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.MspPackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspSymbolFields.TargetPackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspSymbolFields.MspPackageRef), IntermediateFieldType.String),
             },
-            typeof(WixBundleSlipstreamMspTuple));
+            typeof(WixBundleSlipstreamMspSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleSlipstreamMspTupleFields
+    public enum WixBundleSlipstreamMspSymbolFields
     {
         TargetPackageRef,
         MspPackageRef,
     }
 
-    public class WixBundleSlipstreamMspTuple : IntermediateTuple
+    public class WixBundleSlipstreamMspSymbol : IntermediateSymbol
     {
-        public WixBundleSlipstreamMspTuple() : base(TupleDefinitions.WixBundleSlipstreamMsp, null, null)
+        public WixBundleSlipstreamMspSymbol() : base(SymbolDefinitions.WixBundleSlipstreamMsp, null, null)
         {
         }
 
-        public WixBundleSlipstreamMspTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleSlipstreamMsp, sourceLineNumber, id)
+        public WixBundleSlipstreamMspSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleSlipstreamMsp, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleSlipstreamMspTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleSlipstreamMspSymbolFields index] => this.Fields[(int)index];
 
         public string TargetPackageRef
         {
-            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.TargetPackageRef];
-            set => this.Set((int)WixBundleSlipstreamMspTupleFields.TargetPackageRef, value);
+            get => (string)this.Fields[(int)WixBundleSlipstreamMspSymbolFields.TargetPackageRef];
+            set => this.Set((int)WixBundleSlipstreamMspSymbolFields.TargetPackageRef, value);
         }
 
         public string MspPackageRef
         {
-            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.MspPackageRef];
-            set => this.Set((int)WixBundleSlipstreamMspTupleFields.MspPackageRef, value);
+            get => (string)this.Fields[(int)WixBundleSlipstreamMspSymbolFields.MspPackageRef];
+            set => this.Set((int)WixBundleSlipstreamMspSymbolFields.MspPackageRef, value);
         }
     }
 }

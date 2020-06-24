@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixApprovedExeForElevation = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixApprovedExeForElevation,
+        public static readonly IntermediateSymbolDefinition WixApprovedExeForElevation = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixApprovedExeForElevation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.ValueName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationSymbolFields.Key), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationSymbolFields.ValueName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixApprovedExeForElevationTuple));
+            typeof(WixApprovedExeForElevationSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixApprovedExeForElevationTupleFields
+    public enum WixApprovedExeForElevationSymbolFields
     {
         Key,
         ValueName,
@@ -36,34 +36,34 @@ namespace WixToolset.Data.Tuples
         Win64 = 0x1,
     }
 
-    public class WixApprovedExeForElevationTuple : IntermediateTuple
+    public class WixApprovedExeForElevationSymbol : IntermediateSymbol
     {
-        public WixApprovedExeForElevationTuple() : base(TupleDefinitions.WixApprovedExeForElevation, null, null)
+        public WixApprovedExeForElevationSymbol() : base(SymbolDefinitions.WixApprovedExeForElevation, null, null)
         {
         }
 
-        public WixApprovedExeForElevationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixApprovedExeForElevation, sourceLineNumber, id)
+        public WixApprovedExeForElevationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixApprovedExeForElevation, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixApprovedExeForElevationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixApprovedExeForElevationSymbolFields index] => this.Fields[(int)index];
 
         public string Key
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Key];
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.Key, value);
+            get => (string)this.Fields[(int)WixApprovedExeForElevationSymbolFields.Key];
+            set => this.Set((int)WixApprovedExeForElevationSymbolFields.Key, value);
         }
 
         public string ValueName
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.ValueName];
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.ValueName, value);
+            get => (string)this.Fields[(int)WixApprovedExeForElevationSymbolFields.ValueName];
+            set => this.Set((int)WixApprovedExeForElevationSymbolFields.ValueName, value);
         }
 
         public WixApprovedExeForElevationAttributes Attributes
         {
-            get => (WixApprovedExeForElevationAttributes)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.Attributes, (int)value);
+            get => (WixApprovedExeForElevationAttributes)this.Fields[(int)WixApprovedExeForElevationSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixApprovedExeForElevationSymbolFields.Attributes, (int)value);
         }
 
         public bool Win64 => (this.Attributes & WixApprovedExeForElevationAttributes.Win64) == WixApprovedExeForElevationAttributes.Win64;

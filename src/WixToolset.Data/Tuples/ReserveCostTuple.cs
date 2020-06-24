@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ReserveCost = new IntermediateTupleDefinition(
-            TupleDefinitionType.ReserveCost,
+        public static readonly IntermediateSymbolDefinition ReserveCost = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ReserveCost,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveFolder), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveLocal), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveSource), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ReserveCostSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ReserveCostSymbolFields.ReserveFolder), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ReserveCostSymbolFields.ReserveLocal), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ReserveCostSymbolFields.ReserveSource), IntermediateFieldType.Number),
             },
-            typeof(ReserveCostTuple));
+            typeof(ReserveCostSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ReserveCostTupleFields
+    public enum ReserveCostSymbolFields
     {
         ComponentRef,
         ReserveFolder,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         ReserveSource,
     }
 
-    public class ReserveCostTuple : IntermediateTuple
+    public class ReserveCostSymbol : IntermediateSymbol
     {
-        public ReserveCostTuple() : base(TupleDefinitions.ReserveCost, null, null)
+        public ReserveCostSymbol() : base(SymbolDefinitions.ReserveCost, null, null)
         {
         }
 
-        public ReserveCostTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ReserveCost, sourceLineNumber, id)
+        public ReserveCostSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ReserveCost, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ReserveCostTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ReserveCostSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.ComponentRef];
-            set => this.Set((int)ReserveCostTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ReserveCostSymbolFields.ComponentRef];
+            set => this.Set((int)ReserveCostSymbolFields.ComponentRef, value);
         }
 
         public string ReserveFolder
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.ReserveFolder];
-            set => this.Set((int)ReserveCostTupleFields.ReserveFolder, value);
+            get => (string)this.Fields[(int)ReserveCostSymbolFields.ReserveFolder];
+            set => this.Set((int)ReserveCostSymbolFields.ReserveFolder, value);
         }
 
         public int ReserveLocal
         {
-            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveLocal];
-            set => this.Set((int)ReserveCostTupleFields.ReserveLocal, value);
+            get => (int)this.Fields[(int)ReserveCostSymbolFields.ReserveLocal];
+            set => this.Set((int)ReserveCostSymbolFields.ReserveLocal, value);
         }
 
         public int ReserveSource
         {
-            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveSource];
-            set => this.Set((int)ReserveCostTupleFields.ReserveSource, value);
+            get => (int)this.Fields[(int)ReserveCostSymbolFields.ReserveSource];
+            set => this.Set((int)ReserveCostSymbolFields.ReserveSource, value);
         }
     }
 }

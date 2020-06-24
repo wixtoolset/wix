@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiPatchSequence = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiPatchSequence,
+        public static readonly IntermediateSymbolDefinition MsiPatchSequence = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiPatchSequence,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiPatchSequenceTupleFields.PatchFamily), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchSequenceTupleFields.ProductCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchSequenceTupleFields.Sequence), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchSequenceTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiPatchSequenceSymbolFields.PatchFamily), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchSequenceSymbolFields.ProductCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchSequenceSymbolFields.Sequence), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchSequenceSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(MsiPatchSequenceTuple));
+            typeof(MsiPatchSequenceSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiPatchSequenceTupleFields
+    public enum MsiPatchSequenceSymbolFields
     {
         PatchFamily,
         ProductCode,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Attributes,
     }
 
-    public class MsiPatchSequenceTuple : IntermediateTuple
+    public class MsiPatchSequenceSymbol : IntermediateSymbol
     {
-        public MsiPatchSequenceTuple() : base(TupleDefinitions.MsiPatchSequence, null, null)
+        public MsiPatchSequenceSymbol() : base(SymbolDefinitions.MsiPatchSequence, null, null)
         {
         }
 
-        public MsiPatchSequenceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiPatchSequence, sourceLineNumber, id)
+        public MsiPatchSequenceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiPatchSequence, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiPatchSequenceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiPatchSequenceSymbolFields index] => this.Fields[(int)index];
 
         public string PatchFamily
         {
-            get => (string)this.Fields[(int)MsiPatchSequenceTupleFields.PatchFamily];
-            set => this.Set((int)MsiPatchSequenceTupleFields.PatchFamily, value);
+            get => (string)this.Fields[(int)MsiPatchSequenceSymbolFields.PatchFamily];
+            set => this.Set((int)MsiPatchSequenceSymbolFields.PatchFamily, value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)MsiPatchSequenceTupleFields.ProductCode];
-            set => this.Set((int)MsiPatchSequenceTupleFields.ProductCode, value);
+            get => (string)this.Fields[(int)MsiPatchSequenceSymbolFields.ProductCode];
+            set => this.Set((int)MsiPatchSequenceSymbolFields.ProductCode, value);
         }
 
         public string Sequence
         {
-            get => (string)this.Fields[(int)MsiPatchSequenceTupleFields.Sequence];
-            set => this.Set((int)MsiPatchSequenceTupleFields.Sequence, value);
+            get => (string)this.Fields[(int)MsiPatchSequenceSymbolFields.Sequence];
+            set => this.Set((int)MsiPatchSequenceSymbolFields.Sequence, value);
         }
 
         public int? Attributes
         {
-            get => (int?)this.Fields[(int)MsiPatchSequenceTupleFields.Attributes];
-            set => this.Set((int)MsiPatchSequenceTupleFields.Attributes, value);
+            get => (int?)this.Fields[(int)MsiPatchSequenceSymbolFields.Attributes];
+            set => this.Set((int)MsiPatchSequenceSymbolFields.Attributes, value);
         }
     }
 }

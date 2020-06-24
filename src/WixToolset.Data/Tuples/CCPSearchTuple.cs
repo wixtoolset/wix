@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CCPSearch = new IntermediateTupleDefinition(
-            TupleDefinitionType.CCPSearch,
+        public static readonly IntermediateSymbolDefinition CCPSearch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.CCPSearch,
             new IntermediateFieldDefinition[]
             {
             },
-            typeof(CCPSearchTuple));
+            typeof(CCPSearchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum CCPSearchTupleFields
+    public enum CCPSearchSymbolFields
     {
     }
 
-    public class CCPSearchTuple : IntermediateTuple
+    public class CCPSearchSymbol : IntermediateSymbol
     {
-        public CCPSearchTuple() : base(TupleDefinitions.CCPSearch, null, null)
+        public CCPSearchSymbol() : base(SymbolDefinitions.CCPSearch, null, null)
         {
         }
 
-        public CCPSearchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.CCPSearch, sourceLineNumber, id)
+        public CCPSearchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.CCPSearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CCPSearchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CCPSearchSymbolFields index] => this.Fields[(int)index];
     }
 }

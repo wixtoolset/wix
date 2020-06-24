@@ -2,29 +2,29 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Registry = new IntermediateTupleDefinition(
-            TupleDefinitionType.Registry,
+        public static readonly IntermediateSymbolDefinition Registry = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Registry,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Root), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueAction), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.Root), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.Key), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.ValueType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.ValueAction), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RegistrySymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(RegistryTuple));
+            typeof(RegistrySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum RegistryTupleFields
+    public enum RegistrySymbolFields
     {
         Root,
         Key,
@@ -51,58 +51,58 @@ namespace WixToolset.Data.Tuples
         Prepend,
     }
 
-    public class RegistryTuple : IntermediateTuple
+    public class RegistrySymbol : IntermediateSymbol
     {
-        public RegistryTuple() : base(TupleDefinitions.Registry, null, null)
+        public RegistrySymbol() : base(SymbolDefinitions.Registry, null, null)
         {
         }
 
-        public RegistryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Registry, sourceLineNumber, id)
+        public RegistrySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Registry, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[RegistryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[RegistrySymbolFields index] => this.Fields[(int)index];
 
         public RegistryRootType Root
         {
-            get => (RegistryRootType)this.Fields[(int)RegistryTupleFields.Root].AsNumber();
-            set => this.Set((int)RegistryTupleFields.Root, (int)value);
+            get => (RegistryRootType)this.Fields[(int)RegistrySymbolFields.Root].AsNumber();
+            set => this.Set((int)RegistrySymbolFields.Root, (int)value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Key];
-            set => this.Set((int)RegistryTupleFields.Key, value);
+            get => (string)this.Fields[(int)RegistrySymbolFields.Key];
+            set => this.Set((int)RegistrySymbolFields.Key, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Name];
-            set => this.Set((int)RegistryTupleFields.Name, value);
+            get => (string)this.Fields[(int)RegistrySymbolFields.Name];
+            set => this.Set((int)RegistrySymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)RegistryTupleFields.Value].AsString();
-            set => this.Set((int)RegistryTupleFields.Value, value);
+            get => this.Fields[(int)RegistrySymbolFields.Value].AsString();
+            set => this.Set((int)RegistrySymbolFields.Value, value);
         }
 
         public RegistryValueType ValueType
         {
-            get => (RegistryValueType)this.Fields[(int)RegistryTupleFields.ValueType].AsNumber();
-            set => this.Set((int)RegistryTupleFields.ValueType, (int)value);
+            get => (RegistryValueType)this.Fields[(int)RegistrySymbolFields.ValueType].AsNumber();
+            set => this.Set((int)RegistrySymbolFields.ValueType, (int)value);
         }
 
         public RegistryValueActionType ValueAction
         {
-            get => (RegistryValueActionType)this.Fields[(int)RegistryTupleFields.ValueAction].AsNumber();
-            set => this.Set((int)RegistryTupleFields.ValueAction, (int)value);
+            get => (RegistryValueActionType)this.Fields[(int)RegistrySymbolFields.ValueAction].AsNumber();
+            set => this.Set((int)RegistrySymbolFields.ValueAction, (int)value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.ComponentRef];
-            set => this.Set((int)RegistryTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)RegistrySymbolFields.ComponentRef];
+            set => this.Set((int)RegistrySymbolFields.ComponentRef, value);
         }
     }
 }

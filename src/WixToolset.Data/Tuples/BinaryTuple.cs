@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Binary = new IntermediateTupleDefinition(
-            TupleDefinitionType.Binary,
+        public static readonly IntermediateSymbolDefinition Binary = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Binary,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(BinaryTupleFields.Data), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(BinarySymbolFields.Data), IntermediateFieldType.Path),
             },
-            typeof(BinaryTuple));
+            typeof(BinarySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum BinaryTupleFields
+    public enum BinarySymbolFields
     {
         Data,
     }
 
-    public class BinaryTuple : IntermediateTuple
+    public class BinarySymbol : IntermediateSymbol
     {
-        public BinaryTuple() : base(TupleDefinitions.Binary, null, null)
+        public BinarySymbol() : base(SymbolDefinitions.Binary, null, null)
         {
         }
 
-        public BinaryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Binary, sourceLineNumber, id)
+        public BinarySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Binary, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[BinaryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[BinarySymbolFields index] => this.Fields[(int)index];
 
         public IntermediateFieldPathValue Data
         {
-            get => this.Fields[(int)BinaryTupleFields.Data].AsPath();
-            set => this.Set((int)BinaryTupleFields.Data, value);
+            get => this.Fields[(int)BinarySymbolFields.Data].AsPath();
+            set => this.Set((int)BinarySymbolFields.Data, value);
         }
     }
 }

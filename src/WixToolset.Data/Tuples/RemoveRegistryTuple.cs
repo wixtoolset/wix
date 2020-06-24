@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition RemoveRegistry = new IntermediateTupleDefinition(
-            TupleDefinitionType.RemoveRegistry,
+        public static readonly IntermediateSymbolDefinition RemoveRegistry = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.RemoveRegistry,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Root), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Action), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveRegistrySymbolFields.Root), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RemoveRegistrySymbolFields.Key), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveRegistrySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveRegistrySymbolFields.Action), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RemoveRegistrySymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(RemoveRegistryTuple));
+            typeof(RemoveRegistrySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum RemoveRegistryTupleFields
+    public enum RemoveRegistrySymbolFields
     {
         Root,
         Key,
@@ -37,46 +37,46 @@ namespace WixToolset.Data.Tuples
         RemoveOnUninstall
     };
 
-    public class RemoveRegistryTuple : IntermediateTuple
+    public class RemoveRegistrySymbol : IntermediateSymbol
     {
-        public RemoveRegistryTuple() : base(TupleDefinitions.RemoveRegistry, null, null)
+        public RemoveRegistrySymbol() : base(SymbolDefinitions.RemoveRegistry, null, null)
         {
         }
 
-        public RemoveRegistryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.RemoveRegistry, sourceLineNumber, id)
+        public RemoveRegistrySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.RemoveRegistry, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[RemoveRegistryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[RemoveRegistrySymbolFields index] => this.Fields[(int)index];
 
         public RegistryRootType Root
         {
-            get => (RegistryRootType)this.Fields[(int)RemoveRegistryTupleFields.Root].AsNumber();
-            set => this.Set((int)RemoveRegistryTupleFields.Root, (int)value);
+            get => (RegistryRootType)this.Fields[(int)RemoveRegistrySymbolFields.Root].AsNumber();
+            set => this.Set((int)RemoveRegistrySymbolFields.Root, (int)value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)RemoveRegistryTupleFields.Key];
-            set => this.Set((int)RemoveRegistryTupleFields.Key, value);
+            get => (string)this.Fields[(int)RemoveRegistrySymbolFields.Key];
+            set => this.Set((int)RemoveRegistrySymbolFields.Key, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)RemoveRegistryTupleFields.Name];
-            set => this.Set((int)RemoveRegistryTupleFields.Name, value);
+            get => (string)this.Fields[(int)RemoveRegistrySymbolFields.Name];
+            set => this.Set((int)RemoveRegistrySymbolFields.Name, value);
         }
 
         public RemoveRegistryActionType Action
         {
-            get => (RemoveRegistryActionType)this.Fields[(int)RemoveRegistryTupleFields.Action].AsNumber();
-            set => this.Set((int)RemoveRegistryTupleFields.Action, (int)value);
+            get => (RemoveRegistryActionType)this.Fields[(int)RemoveRegistrySymbolFields.Action].AsNumber();
+            set => this.Set((int)RemoveRegistrySymbolFields.Action, (int)value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)RemoveRegistryTupleFields.ComponentRef];
-            set => this.Set((int)RemoveRegistryTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)RemoveRegistrySymbolFields.ComponentRef];
+            set => this.Set((int)RemoveRegistrySymbolFields.ComponentRef, value);
         }
     }
 }

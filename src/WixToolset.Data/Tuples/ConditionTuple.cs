@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Condition = new IntermediateTupleDefinition(
-            TupleDefinitionType.Condition,
+        public static readonly IntermediateSymbolDefinition Condition = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Condition,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ConditionTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ConditionTupleFields.Level), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ConditionTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ConditionSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ConditionSymbolFields.Level), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ConditionSymbolFields.Condition), IntermediateFieldType.String),
             },
-            typeof(ConditionTuple));
+            typeof(ConditionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ConditionTupleFields
+    public enum ConditionSymbolFields
     {
         FeatureRef,
         Level,
         Condition,
     }
 
-    public class ConditionTuple : IntermediateTuple
+    public class ConditionSymbol : IntermediateSymbol
     {
-        public ConditionTuple() : base(TupleDefinitions.Condition, null, null)
+        public ConditionSymbol() : base(SymbolDefinitions.Condition, null, null)
         {
         }
 
-        public ConditionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Condition, sourceLineNumber, id)
+        public ConditionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Condition, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ConditionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ConditionSymbolFields index] => this.Fields[(int)index];
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)ConditionTupleFields.FeatureRef];
-            set => this.Set((int)ConditionTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)ConditionSymbolFields.FeatureRef];
+            set => this.Set((int)ConditionSymbolFields.FeatureRef, value);
         }
 
         public int Level
         {
-            get => (int)this.Fields[(int)ConditionTupleFields.Level];
-            set => this.Set((int)ConditionTupleFields.Level, value);
+            get => (int)this.Fields[(int)ConditionSymbolFields.Level];
+            set => this.Set((int)ConditionSymbolFields.Level, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ConditionTupleFields.Condition];
-            set => this.Set((int)ConditionTupleFields.Condition, value);
+            get => (string)this.Fields[(int)ConditionSymbolFields.Condition];
+            set => this.Set((int)ConditionSymbolFields.Condition, value);
         }
     }
 }

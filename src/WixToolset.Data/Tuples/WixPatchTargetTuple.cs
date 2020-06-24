@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixPatchTarget = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixPatchTarget,
+        public static readonly IntermediateSymbolDefinition WixPatchTarget = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixPatchTarget,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchTargetTupleFields.ProductCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPatchTargetSymbolFields.ProductCode), IntermediateFieldType.String),
             },
-            typeof(WixPatchTargetTuple));
+            typeof(WixPatchTargetSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixPatchTargetTupleFields
+    public enum WixPatchTargetSymbolFields
     {
         ProductCode,
     }
 
-    public class WixPatchTargetTuple : IntermediateTuple
+    public class WixPatchTargetSymbol : IntermediateSymbol
     {
-        public WixPatchTargetTuple() : base(TupleDefinitions.WixPatchTarget, null, null)
+        public WixPatchTargetSymbol() : base(SymbolDefinitions.WixPatchTarget, null, null)
         {
         }
 
-        public WixPatchTargetTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixPatchTarget, sourceLineNumber, id)
+        public WixPatchTargetSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixPatchTarget, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixPatchTargetTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixPatchTargetSymbolFields index] => this.Fields[(int)index];
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixPatchTargetTupleFields.ProductCode];
-            set => this.Set((int)WixPatchTargetTupleFields.ProductCode, value);
+            get => (string)this.Fields[(int)WixPatchTargetSymbolFields.ProductCode];
+            set => this.Set((int)WixPatchTargetSymbolFields.ProductCode, value);
         }
     }
 }

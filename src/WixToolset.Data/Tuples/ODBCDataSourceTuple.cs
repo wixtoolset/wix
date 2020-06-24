@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ODBCDataSource = new IntermediateTupleDefinition(
-            TupleDefinitionType.ODBCDataSource,
+        public static readonly IntermediateSymbolDefinition ODBCDataSource = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ODBCDataSource,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.DriverDescription), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.Registration), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ODBCDataSourceSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDataSourceSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDataSourceSymbolFields.DriverDescription), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDataSourceSymbolFields.Registration), IntermediateFieldType.Number),
             },
-            typeof(ODBCDataSourceTuple));
+            typeof(ODBCDataSourceSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ODBCDataSourceTupleFields
+    public enum ODBCDataSourceSymbolFields
     {
         ComponentRef,
         Description,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Registration,
     }
 
-    public class ODBCDataSourceTuple : IntermediateTuple
+    public class ODBCDataSourceSymbol : IntermediateSymbol
     {
-        public ODBCDataSourceTuple() : base(TupleDefinitions.ODBCDataSource, null, null)
+        public ODBCDataSourceSymbol() : base(SymbolDefinitions.ODBCDataSource, null, null)
         {
         }
 
-        public ODBCDataSourceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ODBCDataSource, sourceLineNumber, id)
+        public ODBCDataSourceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ODBCDataSource, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ODBCDataSourceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ODBCDataSourceSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ODBCDataSourceTupleFields.ComponentRef];
-            set => this.Set((int)ODBCDataSourceTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ODBCDataSourceSymbolFields.ComponentRef];
+            set => this.Set((int)ODBCDataSourceSymbolFields.ComponentRef, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ODBCDataSourceTupleFields.Description];
-            set => this.Set((int)ODBCDataSourceTupleFields.Description, value);
+            get => (string)this.Fields[(int)ODBCDataSourceSymbolFields.Description];
+            set => this.Set((int)ODBCDataSourceSymbolFields.Description, value);
         }
 
         public string DriverDescription
         {
-            get => (string)this.Fields[(int)ODBCDataSourceTupleFields.DriverDescription];
-            set => this.Set((int)ODBCDataSourceTupleFields.DriverDescription, value);
+            get => (string)this.Fields[(int)ODBCDataSourceSymbolFields.DriverDescription];
+            set => this.Set((int)ODBCDataSourceSymbolFields.DriverDescription, value);
         }
 
         public int Registration
         {
-            get => (int)this.Fields[(int)ODBCDataSourceTupleFields.Registration];
-            set => this.Set((int)ODBCDataSourceTupleFields.Registration, value);
+            get => (int)this.Fields[(int)ODBCDataSourceSymbolFields.Registration];
+            set => this.Set((int)ODBCDataSourceSymbolFields.Registration, value);
         }
     }
 }

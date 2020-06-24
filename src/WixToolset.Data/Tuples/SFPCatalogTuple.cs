@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SFPCatalog = new IntermediateTupleDefinition(
-            TupleDefinitionType.SFPCatalog,
+        public static readonly IntermediateSymbolDefinition SFPCatalog = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.SFPCatalog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SFPCatalogTupleFields.SFPCatalog), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SFPCatalogTupleFields.Catalog), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(SFPCatalogTupleFields.Dependency), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SFPCatalogSymbolFields.SFPCatalog), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SFPCatalogSymbolFields.Catalog), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(SFPCatalogSymbolFields.Dependency), IntermediateFieldType.String),
             },
-            typeof(SFPCatalogTuple));
+            typeof(SFPCatalogSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum SFPCatalogTupleFields
+    public enum SFPCatalogSymbolFields
     {
         SFPCatalog,
         Catalog,
         Dependency,
     }
 
-    public class SFPCatalogTuple : IntermediateTuple
+    public class SFPCatalogSymbol : IntermediateSymbol
     {
-        public SFPCatalogTuple() : base(TupleDefinitions.SFPCatalog, null, null)
+        public SFPCatalogSymbol() : base(SymbolDefinitions.SFPCatalog, null, null)
         {
         }
 
-        public SFPCatalogTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.SFPCatalog, sourceLineNumber, id)
+        public SFPCatalogSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.SFPCatalog, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SFPCatalogTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SFPCatalogSymbolFields index] => this.Fields[(int)index];
 
         public string SFPCatalog
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.SFPCatalog];
-            set => this.Set((int)SFPCatalogTupleFields.SFPCatalog, value);
+            get => (string)this.Fields[(int)SFPCatalogSymbolFields.SFPCatalog];
+            set => this.Set((int)SFPCatalogSymbolFields.SFPCatalog, value);
         }
 
         public string Catalog
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.Catalog];
-            set => this.Set((int)SFPCatalogTupleFields.Catalog, value);
+            get => (string)this.Fields[(int)SFPCatalogSymbolFields.Catalog];
+            set => this.Set((int)SFPCatalogSymbolFields.Catalog, value);
         }
 
         public string Dependency
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.Dependency];
-            set => this.Set((int)SFPCatalogTupleFields.Dependency, value);
+            get => (string)this.Fields[(int)SFPCatalogSymbolFields.Dependency];
+            set => this.Set((int)SFPCatalogSymbolFields.Dependency, value);
         }
     }
 }

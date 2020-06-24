@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Signature = new IntermediateTupleDefinition(
-            TupleDefinitionType.Signature,
+        public static readonly IntermediateSymbolDefinition Signature = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Signature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.FileName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MinVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MaxVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MinSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MaxSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MinDate), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.MaxDate), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.Languages), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.FileName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MinVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MaxVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MinSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MaxSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MinDate), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.MaxDate), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SignatureSymbolFields.Languages), IntermediateFieldType.String),
             },
-            typeof(SignatureTuple));
+            typeof(SignatureSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum SignatureTupleFields
+    public enum SignatureSymbolFields
     {
         FileName,
         MinVersion,
@@ -37,64 +37,64 @@ namespace WixToolset.Data.Tuples
         Languages,
     }
 
-    public class SignatureTuple : IntermediateTuple
+    public class SignatureSymbol : IntermediateSymbol
     {
-        public SignatureTuple() : base(TupleDefinitions.Signature, null, null)
+        public SignatureSymbol() : base(SymbolDefinitions.Signature, null, null)
         {
         }
 
-        public SignatureTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Signature, sourceLineNumber, id)
+        public SignatureSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Signature, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SignatureTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SignatureSymbolFields index] => this.Fields[(int)index];
 
         public string FileName
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.FileName];
-            set => this.Set((int)SignatureTupleFields.FileName, value);
+            get => (string)this.Fields[(int)SignatureSymbolFields.FileName];
+            set => this.Set((int)SignatureSymbolFields.FileName, value);
         }
 
         public string MinVersion
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.MinVersion];
-            set => this.Set((int)SignatureTupleFields.MinVersion, value);
+            get => (string)this.Fields[(int)SignatureSymbolFields.MinVersion];
+            set => this.Set((int)SignatureSymbolFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.MaxVersion];
-            set => this.Set((int)SignatureTupleFields.MaxVersion, value);
+            get => (string)this.Fields[(int)SignatureSymbolFields.MaxVersion];
+            set => this.Set((int)SignatureSymbolFields.MaxVersion, value);
         }
 
         public int? MinSize
         {
-            get => (int?)this.Fields[(int)SignatureTupleFields.MinSize];
-            set => this.Set((int)SignatureTupleFields.MinSize, value);
+            get => (int?)this.Fields[(int)SignatureSymbolFields.MinSize];
+            set => this.Set((int)SignatureSymbolFields.MinSize, value);
         }
 
         public int? MaxSize
         {
-            get => (int?)this.Fields[(int)SignatureTupleFields.MaxSize];
-            set => this.Set((int)SignatureTupleFields.MaxSize, value);
+            get => (int?)this.Fields[(int)SignatureSymbolFields.MaxSize];
+            set => this.Set((int)SignatureSymbolFields.MaxSize, value);
         }
 
         public int? MinDate
         {
-            get => (int?)this.Fields[(int)SignatureTupleFields.MinDate];
-            set => this.Set((int)SignatureTupleFields.MinDate, value);
+            get => (int?)this.Fields[(int)SignatureSymbolFields.MinDate];
+            set => this.Set((int)SignatureSymbolFields.MinDate, value);
         }
 
         public int? MaxDate
         {
-            get => (int?)this.Fields[(int)SignatureTupleFields.MaxDate];
-            set => this.Set((int)SignatureTupleFields.MaxDate, value);
+            get => (int?)this.Fields[(int)SignatureSymbolFields.MaxDate];
+            set => this.Set((int)SignatureSymbolFields.MaxDate, value);
         }
 
         public string Languages
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.Languages];
-            set => this.Set((int)SignatureTupleFields.Languages, value);
+            get => (string)this.Fields[(int)SignatureSymbolFields.Languages];
+            set => this.Set((int)SignatureSymbolFields.Languages, value);
         }
     }
 }

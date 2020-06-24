@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComboBox = new IntermediateTupleDefinition(
-            TupleDefinitionType.ComboBox,
+        public static readonly IntermediateSymbolDefinition ComboBox = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ComboBox,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComboBoxTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComboBoxTupleFields.Order), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ComboBoxTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComboBoxTupleFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComboBoxSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComboBoxSymbolFields.Order), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComboBoxSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComboBoxSymbolFields.Text), IntermediateFieldType.String),
             },
-            typeof(ComboBoxTuple));
+            typeof(ComboBoxSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ComboBoxTupleFields
+    public enum ComboBoxSymbolFields
     {
         Property,
         Order,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Text,
     }
 
-    public class ComboBoxTuple : IntermediateTuple
+    public class ComboBoxSymbol : IntermediateSymbol
     {
-        public ComboBoxTuple() : base(TupleDefinitions.ComboBox, null, null)
+        public ComboBoxSymbol() : base(SymbolDefinitions.ComboBox, null, null)
         {
         }
 
-        public ComboBoxTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ComboBox, sourceLineNumber, id)
+        public ComboBoxSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ComboBox, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComboBoxTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComboBoxSymbolFields index] => this.Fields[(int)index];
 
         public string Property
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Property];
-            set => this.Set((int)ComboBoxTupleFields.Property, value);
+            get => (string)this.Fields[(int)ComboBoxSymbolFields.Property];
+            set => this.Set((int)ComboBoxSymbolFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ComboBoxTupleFields.Order];
-            set => this.Set((int)ComboBoxTupleFields.Order, value);
+            get => (int)this.Fields[(int)ComboBoxSymbolFields.Order];
+            set => this.Set((int)ComboBoxSymbolFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Value];
-            set => this.Set((int)ComboBoxTupleFields.Value, value);
+            get => (string)this.Fields[(int)ComboBoxSymbolFields.Value];
+            set => this.Set((int)ComboBoxSymbolFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Text];
-            set => this.Set((int)ComboBoxTupleFields.Text, value);
+            get => (string)this.Fields[(int)ComboBoxSymbolFields.Text];
+            set => this.Set((int)ComboBoxSymbolFields.Text, value);
         }
     }
 }

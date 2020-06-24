@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleSubstitution = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleSubstitution,
+        public static readonly IntermediateSymbolDefinition ModuleSubstitution = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleSubstitution,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleSubstitutionTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleSubstitutionTupleFields.Row), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleSubstitutionTupleFields.Column), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleSubstitutionTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleSubstitutionSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleSubstitutionSymbolFields.Row), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleSubstitutionSymbolFields.Column), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleSubstitutionSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ModuleSubstitutionTuple));
+            typeof(ModuleSubstitutionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleSubstitutionTupleFields
+    public enum ModuleSubstitutionSymbolFields
     {
         Table,
         Row,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Value,
     }
 
-    public class ModuleSubstitutionTuple : IntermediateTuple
+    public class ModuleSubstitutionSymbol : IntermediateSymbol
     {
-        public ModuleSubstitutionTuple() : base(TupleDefinitions.ModuleSubstitution, null, null)
+        public ModuleSubstitutionSymbol() : base(SymbolDefinitions.ModuleSubstitution, null, null)
         {
         }
 
-        public ModuleSubstitutionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleSubstitution, sourceLineNumber, id)
+        public ModuleSubstitutionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleSubstitution, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleSubstitutionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleSubstitutionSymbolFields index] => this.Fields[(int)index];
 
         public string Table
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Table];
-            set => this.Set((int)ModuleSubstitutionTupleFields.Table, value);
+            get => (string)this.Fields[(int)ModuleSubstitutionSymbolFields.Table];
+            set => this.Set((int)ModuleSubstitutionSymbolFields.Table, value);
         }
 
         public string Row
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Row];
-            set => this.Set((int)ModuleSubstitutionTupleFields.Row, value);
+            get => (string)this.Fields[(int)ModuleSubstitutionSymbolFields.Row];
+            set => this.Set((int)ModuleSubstitutionSymbolFields.Row, value);
         }
 
         public string Column
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Column];
-            set => this.Set((int)ModuleSubstitutionTupleFields.Column, value);
+            get => (string)this.Fields[(int)ModuleSubstitutionSymbolFields.Column];
+            set => this.Set((int)ModuleSubstitutionSymbolFields.Column, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Value];
-            set => this.Set((int)ModuleSubstitutionTupleFields.Value, value);
+            get => (string)this.Fields[(int)ModuleSubstitutionSymbolFields.Value];
+            set => this.Set((int)ModuleSubstitutionSymbolFields.Value, value);
         }
     }
 }

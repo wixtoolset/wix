@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CheckBox = new IntermediateTupleDefinition(
-            TupleDefinitionType.CheckBox,
+        public static readonly IntermediateSymbolDefinition CheckBox = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.CheckBox,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CheckBoxTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CheckBoxTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CheckBoxSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CheckBoxSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(CheckBoxTuple));
+            typeof(CheckBoxSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum CheckBoxTupleFields
+    public enum CheckBoxSymbolFields
     {
         Property,
         Value,
     }
 
-    public class CheckBoxTuple : IntermediateTuple
+    public class CheckBoxSymbol : IntermediateSymbol
     {
-        public CheckBoxTuple() : base(TupleDefinitions.CheckBox, null, null)
+        public CheckBoxSymbol() : base(SymbolDefinitions.CheckBox, null, null)
         {
         }
 
-        public CheckBoxTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.CheckBox, sourceLineNumber, id)
+        public CheckBoxSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.CheckBox, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CheckBoxTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CheckBoxSymbolFields index] => this.Fields[(int)index];
 
         public string Property
         {
-            get => (string)this.Fields[(int)CheckBoxTupleFields.Property];
-            set => this.Set((int)CheckBoxTupleFields.Property, value);
+            get => (string)this.Fields[(int)CheckBoxSymbolFields.Property];
+            set => this.Set((int)CheckBoxSymbolFields.Property, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)CheckBoxTupleFields.Value];
-            set => this.Set((int)CheckBoxTupleFields.Value, value);
+            get => (string)this.Fields[(int)CheckBoxSymbolFields.Value];
+            set => this.Set((int)CheckBoxSymbolFields.Value, value);
         }
     }
 }

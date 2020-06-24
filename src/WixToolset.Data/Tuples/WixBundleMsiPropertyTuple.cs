@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleMsiProperty = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleMsiProperty,
+        public static readonly IntermediateSymbolDefinition WixBundleMsiProperty = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleMsiProperty,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertyTupleFields.PackageRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertyTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertyTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertyTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertySymbolFields.PackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertySymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPropertySymbolFields.Condition), IntermediateFieldType.String),
             },
-            typeof(WixBundleMsiPropertyTuple));
+            typeof(WixBundleMsiPropertySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleMsiPropertyTupleFields
+    public enum WixBundleMsiPropertySymbolFields
     {
         PackageRef,
         Name,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Condition,
     }
 
-    public class WixBundleMsiPropertyTuple : IntermediateTuple
+    public class WixBundleMsiPropertySymbol : IntermediateSymbol
     {
-        public WixBundleMsiPropertyTuple() : base(TupleDefinitions.WixBundleMsiProperty, null, null)
+        public WixBundleMsiPropertySymbol() : base(SymbolDefinitions.WixBundleMsiProperty, null, null)
         {
         }
 
-        public WixBundleMsiPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleMsiProperty, sourceLineNumber, id)
+        public WixBundleMsiPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleMsiProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleMsiPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleMsiPropertySymbolFields index] => this.Fields[(int)index];
 
         public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.PackageRef];
-            set => this.Set((int)WixBundleMsiPropertyTupleFields.PackageRef, value);
+            get => (string)this.Fields[(int)WixBundleMsiPropertySymbolFields.PackageRef];
+            set => this.Set((int)WixBundleMsiPropertySymbolFields.PackageRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Name];
-            set => this.Set((int)WixBundleMsiPropertyTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixBundleMsiPropertySymbolFields.Name];
+            set => this.Set((int)WixBundleMsiPropertySymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Value];
-            set => this.Set((int)WixBundleMsiPropertyTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixBundleMsiPropertySymbolFields.Value];
+            set => this.Set((int)WixBundleMsiPropertySymbolFields.Value, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Condition];
-            set => this.Set((int)WixBundleMsiPropertyTupleFields.Condition, value);
+            get => (string)this.Fields[(int)WixBundleMsiPropertySymbolFields.Condition];
+            set => this.Set((int)WixBundleMsiPropertySymbolFields.Condition, value);
         }
     }
 }

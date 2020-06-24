@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ModuleComponents = new IntermediateTupleDefinition(
-            TupleDefinitionType.ModuleComponents,
+        public static readonly IntermediateSymbolDefinition ModuleComponents = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ModuleComponents,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleComponentsTupleFields.Component), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleComponentsTupleFields.ModuleID), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleComponentsTupleFields.Language), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleComponentsSymbolFields.Component), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleComponentsSymbolFields.ModuleID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ModuleComponentsSymbolFields.Language), IntermediateFieldType.Number),
             },
-            typeof(ModuleComponentsTuple));
+            typeof(ModuleComponentsSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ModuleComponentsTupleFields
+    public enum ModuleComponentsSymbolFields
     {
         Component,
         ModuleID,
         Language,
     }
 
-    public class ModuleComponentsTuple : IntermediateTuple
+    public class ModuleComponentsSymbol : IntermediateSymbol
     {
-        public ModuleComponentsTuple() : base(TupleDefinitions.ModuleComponents, null, null)
+        public ModuleComponentsSymbol() : base(SymbolDefinitions.ModuleComponents, null, null)
         {
         }
 
-        public ModuleComponentsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ModuleComponents, sourceLineNumber, id)
+        public ModuleComponentsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ModuleComponents, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ModuleComponentsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ModuleComponentsSymbolFields index] => this.Fields[(int)index];
 
         public string Component
         {
-            get => (string)this.Fields[(int)ModuleComponentsTupleFields.Component];
-            set => this.Set((int)ModuleComponentsTupleFields.Component, value);
+            get => (string)this.Fields[(int)ModuleComponentsSymbolFields.Component];
+            set => this.Set((int)ModuleComponentsSymbolFields.Component, value);
         }
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleComponentsTupleFields.ModuleID];
-            set => this.Set((int)ModuleComponentsTupleFields.ModuleID, value);
+            get => (string)this.Fields[(int)ModuleComponentsSymbolFields.ModuleID];
+            set => this.Set((int)ModuleComponentsSymbolFields.ModuleID, value);
         }
 
         public int Language
         {
-            get => (int)this.Fields[(int)ModuleComponentsTupleFields.Language];
-            set => this.Set((int)ModuleComponentsTupleFields.Language, value);
+            get => (int)this.Fields[(int)ModuleComponentsSymbolFields.Language];
+            set => this.Set((int)ModuleComponentsSymbolFields.Language, value);
         }
     }
 }

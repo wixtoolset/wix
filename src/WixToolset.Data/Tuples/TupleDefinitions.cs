@@ -4,7 +4,7 @@ namespace WixToolset.Data
 {
     using System;
 
-    public enum TupleDefinitionType
+    public enum SymbolDefinitionType
     {
         SummaryInformation,
         ActionText,
@@ -185,13 +185,13 @@ namespace WixToolset.Data
         MustBeFromAnExtension,
     }
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out TupleDefinitionType type) || type == TupleDefinitionType.MustBeFromAnExtension)
+            if (!Enum.TryParse(name, out SymbolDefinitionType type) || type == SymbolDefinitionType.MustBeFromAnExtension)
             {
                 return null;
             }
@@ -199,534 +199,534 @@ namespace WixToolset.Data
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(TupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(SymbolDefinitionType type)
         {
             switch (type)
             {
-                case TupleDefinitionType.SummaryInformation:
-                    return TupleDefinitions.SummaryInformation;
+                case SymbolDefinitionType.SummaryInformation:
+                    return SymbolDefinitions.SummaryInformation;
 
-                case TupleDefinitionType.ActionText:
-                    return TupleDefinitions.ActionText;
+                case SymbolDefinitionType.ActionText:
+                    return SymbolDefinitions.ActionText;
 
-                case TupleDefinitionType.AppId:
-                    return TupleDefinitions.AppId;
+                case SymbolDefinitionType.AppId:
+                    return SymbolDefinitions.AppId;
 
-                case TupleDefinitionType.AppSearch:
-                    return TupleDefinitions.AppSearch;
+                case SymbolDefinitionType.AppSearch:
+                    return SymbolDefinitions.AppSearch;
 
-                case TupleDefinitionType.BBControl:
-                    return TupleDefinitions.BBControl;
+                case SymbolDefinitionType.BBControl:
+                    return SymbolDefinitions.BBControl;
 
-                case TupleDefinitionType.Billboard:
-                    return TupleDefinitions.Billboard;
+                case SymbolDefinitionType.Billboard:
+                    return SymbolDefinitions.Billboard;
 
-                case TupleDefinitionType.Binary:
-                    return TupleDefinitions.Binary;
+                case SymbolDefinitionType.Binary:
+                    return SymbolDefinitions.Binary;
 
-                case TupleDefinitionType.CCPSearch:
-                    return TupleDefinitions.CCPSearch;
+                case SymbolDefinitionType.CCPSearch:
+                    return SymbolDefinitions.CCPSearch;
 
-                case TupleDefinitionType.CheckBox:
-                    return TupleDefinitions.CheckBox;
+                case SymbolDefinitionType.CheckBox:
+                    return SymbolDefinitions.CheckBox;
 
-                case TupleDefinitionType.Class:
-                    return TupleDefinitions.Class;
+                case SymbolDefinitionType.Class:
+                    return SymbolDefinitions.Class;
 
-                case TupleDefinitionType.ComboBox:
-                    return TupleDefinitions.ComboBox;
+                case SymbolDefinitionType.ComboBox:
+                    return SymbolDefinitions.ComboBox;
 
-                case TupleDefinitionType.CompLocator:
-                    return TupleDefinitions.CompLocator;
+                case SymbolDefinitionType.CompLocator:
+                    return SymbolDefinitions.CompLocator;
 
-                case TupleDefinitionType.Complus:
-                    return TupleDefinitions.Complus;
+                case SymbolDefinitionType.Complus:
+                    return SymbolDefinitions.Complus;
 
-                case TupleDefinitionType.Component:
-                    return TupleDefinitions.Component;
+                case SymbolDefinitionType.Component:
+                    return SymbolDefinitions.Component;
 
-                case TupleDefinitionType.Condition:
-                    return TupleDefinitions.Condition;
+                case SymbolDefinitionType.Condition:
+                    return SymbolDefinitions.Condition;
 
-                case TupleDefinitionType.Control:
-                    return TupleDefinitions.Control;
+                case SymbolDefinitionType.Control:
+                    return SymbolDefinitions.Control;
 
-                case TupleDefinitionType.ControlCondition:
-                    return TupleDefinitions.ControlCondition;
+                case SymbolDefinitionType.ControlCondition:
+                    return SymbolDefinitions.ControlCondition;
 
-                case TupleDefinitionType.ControlEvent:
-                    return TupleDefinitions.ControlEvent;
+                case SymbolDefinitionType.ControlEvent:
+                    return SymbolDefinitions.ControlEvent;
 
-                case TupleDefinitionType.CreateFolder:
-                    return TupleDefinitions.CreateFolder;
+                case SymbolDefinitionType.CreateFolder:
+                    return SymbolDefinitions.CreateFolder;
 
-                case TupleDefinitionType.CustomAction:
-                    return TupleDefinitions.CustomAction;
+                case SymbolDefinitionType.CustomAction:
+                    return SymbolDefinitions.CustomAction;
 
-                case TupleDefinitionType.Dialog:
-                    return TupleDefinitions.Dialog;
+                case SymbolDefinitionType.Dialog:
+                    return SymbolDefinitions.Dialog;
 
-                case TupleDefinitionType.Directory:
-                    return TupleDefinitions.Directory;
+                case SymbolDefinitionType.Directory:
+                    return SymbolDefinitions.Directory;
 
-                case TupleDefinitionType.DrLocator:
-                    return TupleDefinitions.DrLocator;
+                case SymbolDefinitionType.DrLocator:
+                    return SymbolDefinitions.DrLocator;
 
-                case TupleDefinitionType.DuplicateFile:
-                    return TupleDefinitions.DuplicateFile;
+                case SymbolDefinitionType.DuplicateFile:
+                    return SymbolDefinitions.DuplicateFile;
 
-                case TupleDefinitionType.Environment:
-                    return TupleDefinitions.Environment;
+                case SymbolDefinitionType.Environment:
+                    return SymbolDefinitions.Environment;
 
-                case TupleDefinitionType.Error:
-                    return TupleDefinitions.Error;
+                case SymbolDefinitionType.Error:
+                    return SymbolDefinitions.Error;
 
-                case TupleDefinitionType.EventMapping:
-                    return TupleDefinitions.EventMapping;
+                case SymbolDefinitionType.EventMapping:
+                    return SymbolDefinitions.EventMapping;
 
-                case TupleDefinitionType.Extension:
-                    return TupleDefinitions.Extension;
+                case SymbolDefinitionType.Extension:
+                    return SymbolDefinitions.Extension;
 
-                case TupleDefinitionType.ExternalFiles:
-                    return TupleDefinitions.ExternalFiles;
+                case SymbolDefinitionType.ExternalFiles:
+                    return SymbolDefinitions.ExternalFiles;
 
-                case TupleDefinitionType.FamilyFileRanges:
-                    return TupleDefinitions.FamilyFileRanges;
+                case SymbolDefinitionType.FamilyFileRanges:
+                    return SymbolDefinitions.FamilyFileRanges;
 
-                case TupleDefinitionType.Feature:
-                    return TupleDefinitions.Feature;
+                case SymbolDefinitionType.Feature:
+                    return SymbolDefinitions.Feature;
 
-                case TupleDefinitionType.FeatureComponents:
-                    return TupleDefinitions.FeatureComponents;
+                case SymbolDefinitionType.FeatureComponents:
+                    return SymbolDefinitions.FeatureComponents;
 
-                case TupleDefinitionType.File:
-                    return TupleDefinitions.File;
+                case SymbolDefinitionType.File:
+                    return SymbolDefinitions.File;
 
-                case TupleDefinitionType.FileSFPCatalog:
-                    return TupleDefinitions.FileSFPCatalog;
+                case SymbolDefinitionType.FileSFPCatalog:
+                    return SymbolDefinitions.FileSFPCatalog;
 
-                case TupleDefinitionType.Icon:
-                    return TupleDefinitions.Icon;
+                case SymbolDefinitionType.Icon:
+                    return SymbolDefinitions.Icon;
 
-                case TupleDefinitionType.ImageFamilies:
-                    return TupleDefinitions.ImageFamilies;
+                case SymbolDefinitionType.ImageFamilies:
+                    return SymbolDefinitions.ImageFamilies;
 
-                case TupleDefinitionType.IniFile:
-                    return TupleDefinitions.IniFile;
+                case SymbolDefinitionType.IniFile:
+                    return SymbolDefinitions.IniFile;
 
-                case TupleDefinitionType.IniLocator:
-                    return TupleDefinitions.IniLocator;
+                case SymbolDefinitionType.IniLocator:
+                    return SymbolDefinitions.IniLocator;
 
-                case TupleDefinitionType.IsolatedComponent:
-                    return TupleDefinitions.IsolatedComponent;
+                case SymbolDefinitionType.IsolatedComponent:
+                    return SymbolDefinitions.IsolatedComponent;
 
-                case TupleDefinitionType.LaunchCondition:
-                    return TupleDefinitions.LaunchCondition;
+                case SymbolDefinitionType.LaunchCondition:
+                    return SymbolDefinitions.LaunchCondition;
 
-                case TupleDefinitionType.ListBox:
-                    return TupleDefinitions.ListBox;
+                case SymbolDefinitionType.ListBox:
+                    return SymbolDefinitions.ListBox;
 
-                case TupleDefinitionType.ListView:
-                    return TupleDefinitions.ListView;
+                case SymbolDefinitionType.ListView:
+                    return SymbolDefinitions.ListView;
 
-                case TupleDefinitionType.LockPermissions:
-                    return TupleDefinitions.LockPermissions;
+                case SymbolDefinitionType.LockPermissions:
+                    return SymbolDefinitions.LockPermissions;
 
-                case TupleDefinitionType.Media:
-                    return TupleDefinitions.Media;
+                case SymbolDefinitionType.Media:
+                    return SymbolDefinitions.Media;
 
-                case TupleDefinitionType.MIME:
-                    return TupleDefinitions.MIME;
+                case SymbolDefinitionType.MIME:
+                    return SymbolDefinitions.MIME;
 
-                case TupleDefinitionType.ModuleComponents:
-                    return TupleDefinitions.ModuleComponents;
+                case SymbolDefinitionType.ModuleComponents:
+                    return SymbolDefinitions.ModuleComponents;
 
-                case TupleDefinitionType.ModuleConfiguration:
-                    return TupleDefinitions.ModuleConfiguration;
+                case SymbolDefinitionType.ModuleConfiguration:
+                    return SymbolDefinitions.ModuleConfiguration;
 
-                case TupleDefinitionType.ModuleDependency:
-                    return TupleDefinitions.ModuleDependency;
+                case SymbolDefinitionType.ModuleDependency:
+                    return SymbolDefinitions.ModuleDependency;
 
-                case TupleDefinitionType.ModuleExclusion:
-                    return TupleDefinitions.ModuleExclusion;
+                case SymbolDefinitionType.ModuleExclusion:
+                    return SymbolDefinitions.ModuleExclusion;
 
-                case TupleDefinitionType.ModuleIgnoreTable:
-                    return TupleDefinitions.ModuleIgnoreTable;
+                case SymbolDefinitionType.ModuleIgnoreTable:
+                    return SymbolDefinitions.ModuleIgnoreTable;
 
-                case TupleDefinitionType.ModuleSignature:
-                    return TupleDefinitions.ModuleSignature;
+                case SymbolDefinitionType.ModuleSignature:
+                    return SymbolDefinitions.ModuleSignature;
 
-                case TupleDefinitionType.ModuleSubstitution:
-                    return TupleDefinitions.ModuleSubstitution;
+                case SymbolDefinitionType.ModuleSubstitution:
+                    return SymbolDefinitions.ModuleSubstitution;
 
-                case TupleDefinitionType.MoveFile:
-                    return TupleDefinitions.MoveFile;
+                case SymbolDefinitionType.MoveFile:
+                    return SymbolDefinitions.MoveFile;
 
-                case TupleDefinitionType.Assembly:
-                    return TupleDefinitions.Assembly;
+                case SymbolDefinitionType.Assembly:
+                    return SymbolDefinitions.Assembly;
 
-                case TupleDefinitionType.MsiAssemblyName:
-                    return TupleDefinitions.MsiAssemblyName;
+                case SymbolDefinitionType.MsiAssemblyName:
+                    return SymbolDefinitions.MsiAssemblyName;
 
-                case TupleDefinitionType.MsiDigitalCertificate:
-                    return TupleDefinitions.MsiDigitalCertificate;
+                case SymbolDefinitionType.MsiDigitalCertificate:
+                    return SymbolDefinitions.MsiDigitalCertificate;
 
-                case TupleDefinitionType.MsiDigitalSignature:
-                    return TupleDefinitions.MsiDigitalSignature;
+                case SymbolDefinitionType.MsiDigitalSignature:
+                    return SymbolDefinitions.MsiDigitalSignature;
 
-                case TupleDefinitionType.MsiEmbeddedChainer:
-                    return TupleDefinitions.MsiEmbeddedChainer;
+                case SymbolDefinitionType.MsiEmbeddedChainer:
+                    return SymbolDefinitions.MsiEmbeddedChainer;
 
-                case TupleDefinitionType.MsiEmbeddedUI:
-                    return TupleDefinitions.MsiEmbeddedUI;
+                case SymbolDefinitionType.MsiEmbeddedUI:
+                    return SymbolDefinitions.MsiEmbeddedUI;
 
-                case TupleDefinitionType.MsiFileHash:
-                    return TupleDefinitions.MsiFileHash;
+                case SymbolDefinitionType.MsiFileHash:
+                    return SymbolDefinitions.MsiFileHash;
 
-                case TupleDefinitionType.MsiLockPermissionsEx:
-                    return TupleDefinitions.MsiLockPermissionsEx;
+                case SymbolDefinitionType.MsiLockPermissionsEx:
+                    return SymbolDefinitions.MsiLockPermissionsEx;
 
-                case TupleDefinitionType.MsiPackageCertificate:
-                    return TupleDefinitions.MsiPackageCertificate;
+                case SymbolDefinitionType.MsiPackageCertificate:
+                    return SymbolDefinitions.MsiPackageCertificate;
 
-                case TupleDefinitionType.MsiPatchCertificate:
-                    return TupleDefinitions.MsiPatchCertificate;
+                case SymbolDefinitionType.MsiPatchCertificate:
+                    return SymbolDefinitions.MsiPatchCertificate;
 
-                case TupleDefinitionType.MsiPatchHeaders:
-                    return TupleDefinitions.MsiPatchHeaders;
+                case SymbolDefinitionType.MsiPatchHeaders:
+                    return SymbolDefinitions.MsiPatchHeaders;
 
-                case TupleDefinitionType.MsiPatchMetadata:
-                    return TupleDefinitions.MsiPatchMetadata;
+                case SymbolDefinitionType.MsiPatchMetadata:
+                    return SymbolDefinitions.MsiPatchMetadata;
 
-                case TupleDefinitionType.MsiPatchOldAssemblyFile:
-                    return TupleDefinitions.MsiPatchOldAssemblyFile;
+                case SymbolDefinitionType.MsiPatchOldAssemblyFile:
+                    return SymbolDefinitions.MsiPatchOldAssemblyFile;
 
-                case TupleDefinitionType.MsiPatchOldAssemblyName:
-                    return TupleDefinitions.MsiPatchOldAssemblyName;
+                case SymbolDefinitionType.MsiPatchOldAssemblyName:
+                    return SymbolDefinitions.MsiPatchOldAssemblyName;
 
-                case TupleDefinitionType.MsiPatchSequence:
-                    return TupleDefinitions.MsiPatchSequence;
+                case SymbolDefinitionType.MsiPatchSequence:
+                    return SymbolDefinitions.MsiPatchSequence;
 
-                case TupleDefinitionType.MsiServiceConfig:
-                    return TupleDefinitions.MsiServiceConfig;
+                case SymbolDefinitionType.MsiServiceConfig:
+                    return SymbolDefinitions.MsiServiceConfig;
 
-                case TupleDefinitionType.MsiServiceConfigFailureActions:
-                    return TupleDefinitions.MsiServiceConfigFailureActions;
+                case SymbolDefinitionType.MsiServiceConfigFailureActions:
+                    return SymbolDefinitions.MsiServiceConfigFailureActions;
 
-                case TupleDefinitionType.MsiShortcutProperty:
-                    return TupleDefinitions.MsiShortcutProperty;
+                case SymbolDefinitionType.MsiShortcutProperty:
+                    return SymbolDefinitions.MsiShortcutProperty;
 
-                case TupleDefinitionType.ODBCAttribute:
-                    return TupleDefinitions.ODBCAttribute;
+                case SymbolDefinitionType.ODBCAttribute:
+                    return SymbolDefinitions.ODBCAttribute;
 
-                case TupleDefinitionType.ODBCDataSource:
-                    return TupleDefinitions.ODBCDataSource;
+                case SymbolDefinitionType.ODBCDataSource:
+                    return SymbolDefinitions.ODBCDataSource;
 
-                case TupleDefinitionType.ODBCDriver:
-                    return TupleDefinitions.ODBCDriver;
+                case SymbolDefinitionType.ODBCDriver:
+                    return SymbolDefinitions.ODBCDriver;
 
-                case TupleDefinitionType.ODBCSourceAttribute:
-                    return TupleDefinitions.ODBCSourceAttribute;
+                case SymbolDefinitionType.ODBCSourceAttribute:
+                    return SymbolDefinitions.ODBCSourceAttribute;
 
-                case TupleDefinitionType.ODBCTranslator:
-                    return TupleDefinitions.ODBCTranslator;
+                case SymbolDefinitionType.ODBCTranslator:
+                    return SymbolDefinitions.ODBCTranslator;
 
-                case TupleDefinitionType.Patch:
-                    return TupleDefinitions.Patch;
+                case SymbolDefinitionType.Patch:
+                    return SymbolDefinitions.Patch;
 
-                case TupleDefinitionType.PatchMetadata:
-                    return TupleDefinitions.PatchMetadata;
+                case SymbolDefinitionType.PatchMetadata:
+                    return SymbolDefinitions.PatchMetadata;
 
-                case TupleDefinitionType.PatchPackage:
-                    return TupleDefinitions.PatchPackage;
+                case SymbolDefinitionType.PatchPackage:
+                    return SymbolDefinitions.PatchPackage;
 
-                case TupleDefinitionType.PatchSequence:
-                    return TupleDefinitions.PatchSequence;
+                case SymbolDefinitionType.PatchSequence:
+                    return SymbolDefinitions.PatchSequence;
 
-                case TupleDefinitionType.ProgId:
-                    return TupleDefinitions.ProgId;
+                case SymbolDefinitionType.ProgId:
+                    return SymbolDefinitions.ProgId;
 
-                case TupleDefinitionType.Properties:
-                    return TupleDefinitions.Properties;
+                case SymbolDefinitionType.Properties:
+                    return SymbolDefinitions.Properties;
 
-                case TupleDefinitionType.Property:
-                    return TupleDefinitions.Property;
+                case SymbolDefinitionType.Property:
+                    return SymbolDefinitions.Property;
 
-                case TupleDefinitionType.PublishComponent:
-                    return TupleDefinitions.PublishComponent;
+                case SymbolDefinitionType.PublishComponent:
+                    return SymbolDefinitions.PublishComponent;
 
-                case TupleDefinitionType.ProvidesDependency:
-                    return TupleDefinitions.ProvidesDependency;
+                case SymbolDefinitionType.ProvidesDependency:
+                    return SymbolDefinitions.ProvidesDependency;
 
-                case TupleDefinitionType.RadioButton:
-                    return TupleDefinitions.RadioButton;
+                case SymbolDefinitionType.RadioButton:
+                    return SymbolDefinitions.RadioButton;
 
-                case TupleDefinitionType.Registry:
-                    return TupleDefinitions.Registry;
+                case SymbolDefinitionType.Registry:
+                    return SymbolDefinitions.Registry;
 
-                case TupleDefinitionType.RegLocator:
-                    return TupleDefinitions.RegLocator;
+                case SymbolDefinitionType.RegLocator:
+                    return SymbolDefinitions.RegLocator;
 
-                case TupleDefinitionType.RemoveFile:
-                    return TupleDefinitions.RemoveFile;
+                case SymbolDefinitionType.RemoveFile:
+                    return SymbolDefinitions.RemoveFile;
 
-                case TupleDefinitionType.RemoveRegistry:
-                    return TupleDefinitions.RemoveRegistry;
+                case SymbolDefinitionType.RemoveRegistry:
+                    return SymbolDefinitions.RemoveRegistry;
 
-                case TupleDefinitionType.ReserveCost:
-                    return TupleDefinitions.ReserveCost;
+                case SymbolDefinitionType.ReserveCost:
+                    return SymbolDefinitions.ReserveCost;
 
-                case TupleDefinitionType.ServiceControl:
-                    return TupleDefinitions.ServiceControl;
+                case SymbolDefinitionType.ServiceControl:
+                    return SymbolDefinitions.ServiceControl;
 
-                case TupleDefinitionType.ServiceInstall:
-                    return TupleDefinitions.ServiceInstall;
+                case SymbolDefinitionType.ServiceInstall:
+                    return SymbolDefinitions.ServiceInstall;
 
-                case TupleDefinitionType.SFPCatalog:
-                    return TupleDefinitions.SFPCatalog;
+                case SymbolDefinitionType.SFPCatalog:
+                    return SymbolDefinitions.SFPCatalog;
 
-                case TupleDefinitionType.Shortcut:
-                    return TupleDefinitions.Shortcut;
+                case SymbolDefinitionType.Shortcut:
+                    return SymbolDefinitions.Shortcut;
 
-                case TupleDefinitionType.Signature:
-                    return TupleDefinitions.Signature;
+                case SymbolDefinitionType.Signature:
+                    return SymbolDefinitions.Signature;
 
-                case TupleDefinitionType.TargetFilesOptionalData:
-                    return TupleDefinitions.TargetFilesOptionalData;
+                case SymbolDefinitionType.TargetFilesOptionalData:
+                    return SymbolDefinitions.TargetFilesOptionalData;
 
-                case TupleDefinitionType.TargetImages:
-                    return TupleDefinitions.TargetImages;
+                case SymbolDefinitionType.TargetImages:
+                    return SymbolDefinitions.TargetImages;
 
-                case TupleDefinitionType.TextStyle:
-                    return TupleDefinitions.TextStyle;
+                case SymbolDefinitionType.TextStyle:
+                    return SymbolDefinitions.TextStyle;
 
-                case TupleDefinitionType.TypeLib:
-                    return TupleDefinitions.TypeLib;
+                case SymbolDefinitionType.TypeLib:
+                    return SymbolDefinitions.TypeLib;
 
-                case TupleDefinitionType.UIText:
-                    return TupleDefinitions.UIText;
+                case SymbolDefinitionType.UIText:
+                    return SymbolDefinitions.UIText;
 
-                case TupleDefinitionType.Upgrade:
-                    return TupleDefinitions.Upgrade;
+                case SymbolDefinitionType.Upgrade:
+                    return SymbolDefinitions.Upgrade;
 
-                case TupleDefinitionType.UpgradedFilesOptionalData:
-                    return TupleDefinitions.UpgradedFilesOptionalData;
+                case SymbolDefinitionType.UpgradedFilesOptionalData:
+                    return SymbolDefinitions.UpgradedFilesOptionalData;
 
-                case TupleDefinitionType.UpgradedFilesToIgnore:
-                    return TupleDefinitions.UpgradedFilesToIgnore;
+                case SymbolDefinitionType.UpgradedFilesToIgnore:
+                    return SymbolDefinitions.UpgradedFilesToIgnore;
 
-                case TupleDefinitionType.UpgradedImages:
-                    return TupleDefinitions.UpgradedImages;
+                case SymbolDefinitionType.UpgradedImages:
+                    return SymbolDefinitions.UpgradedImages;
 
-                case TupleDefinitionType.Verb:
-                    return TupleDefinitions.Verb;
+                case SymbolDefinitionType.Verb:
+                    return SymbolDefinitions.Verb;
 
-                case TupleDefinitionType.WixAction:
-                    return TupleDefinitions.WixAction;
+                case SymbolDefinitionType.WixAction:
+                    return SymbolDefinitions.WixAction;
 
-                case TupleDefinitionType.WixApprovedExeForElevation:
-                    return TupleDefinitions.WixApprovedExeForElevation;
+                case SymbolDefinitionType.WixApprovedExeForElevation:
+                    return SymbolDefinitions.WixApprovedExeForElevation;
 
-                case TupleDefinitionType.WixBindUpdatedFiles:
-                    return TupleDefinitions.WixBindUpdatedFiles;
+                case SymbolDefinitionType.WixBindUpdatedFiles:
+                    return SymbolDefinitions.WixBindUpdatedFiles;
 
-                case TupleDefinitionType.WixBootstrapperApplication:
-                    return TupleDefinitions.WixBootstrapperApplication;
+                case SymbolDefinitionType.WixBootstrapperApplication:
+                    return SymbolDefinitions.WixBootstrapperApplication;
 
-                case TupleDefinitionType.WixBuildInfo:
-                    return TupleDefinitions.WixBuildInfo;
+                case SymbolDefinitionType.WixBuildInfo:
+                    return SymbolDefinitions.WixBuildInfo;
 
-                case TupleDefinitionType.WixBundle:
-                    return TupleDefinitions.WixBundle;
+                case SymbolDefinitionType.WixBundle:
+                    return SymbolDefinitions.WixBundle;
 
-                case TupleDefinitionType.WixBundleCatalog:
-                    return TupleDefinitions.WixBundleCatalog;
+                case SymbolDefinitionType.WixBundleCatalog:
+                    return SymbolDefinitions.WixBundleCatalog;
 
-                case TupleDefinitionType.WixBundleContainer:
-                    return TupleDefinitions.WixBundleContainer;
+                case SymbolDefinitionType.WixBundleContainer:
+                    return SymbolDefinitions.WixBundleContainer;
 
-                case TupleDefinitionType.WixBundleCustomData:
-                    return TupleDefinitions.WixBundleCustomData;
+                case SymbolDefinitionType.WixBundleCustomData:
+                    return SymbolDefinitions.WixBundleCustomData;
 
-                case TupleDefinitionType.WixBundleCustomDataAttribute:
-                    return TupleDefinitions.WixBundleCustomDataAttribute;
+                case SymbolDefinitionType.WixBundleCustomDataAttribute:
+                    return SymbolDefinitions.WixBundleCustomDataAttribute;
 
-                case TupleDefinitionType.WixBundleCustomDataCell:
-                    return TupleDefinitions.WixBundleCustomDataCell;
+                case SymbolDefinitionType.WixBundleCustomDataCell:
+                    return SymbolDefinitions.WixBundleCustomDataCell;
 
-                case TupleDefinitionType.WixBundleExtension:
-                    return TupleDefinitions.WixBundleExtension;
+                case SymbolDefinitionType.WixBundleExtension:
+                    return SymbolDefinitions.WixBundleExtension;
 
-                case TupleDefinitionType.WixBundleExePackage:
-                    return TupleDefinitions.WixBundleExePackage;
+                case SymbolDefinitionType.WixBundleExePackage:
+                    return SymbolDefinitions.WixBundleExePackage;
 
-                case TupleDefinitionType.WixBundleMsiFeature:
-                    return TupleDefinitions.WixBundleMsiFeature;
+                case SymbolDefinitionType.WixBundleMsiFeature:
+                    return SymbolDefinitions.WixBundleMsiFeature;
 
-                case TupleDefinitionType.WixBundleMsiPackage:
-                    return TupleDefinitions.WixBundleMsiPackage;
+                case SymbolDefinitionType.WixBundleMsiPackage:
+                    return SymbolDefinitions.WixBundleMsiPackage;
 
-                case TupleDefinitionType.WixBundleMsiProperty:
-                    return TupleDefinitions.WixBundleMsiProperty;
+                case SymbolDefinitionType.WixBundleMsiProperty:
+                    return SymbolDefinitions.WixBundleMsiProperty;
 
-                case TupleDefinitionType.WixBundleMspPackage:
-                    return TupleDefinitions.WixBundleMspPackage;
+                case SymbolDefinitionType.WixBundleMspPackage:
+                    return SymbolDefinitions.WixBundleMspPackage;
 
-                case TupleDefinitionType.WixBundleMsuPackage:
-                    return TupleDefinitions.WixBundleMsuPackage;
+                case SymbolDefinitionType.WixBundleMsuPackage:
+                    return SymbolDefinitions.WixBundleMsuPackage;
 
-                case TupleDefinitionType.WixBundlePackage:
-                    return TupleDefinitions.WixBundlePackage;
+                case SymbolDefinitionType.WixBundlePackage:
+                    return SymbolDefinitions.WixBundlePackage;
 
-                case TupleDefinitionType.WixBundlePackageCommandLine:
-                    return TupleDefinitions.WixBundlePackageCommandLine;
+                case SymbolDefinitionType.WixBundlePackageCommandLine:
+                    return SymbolDefinitions.WixBundlePackageCommandLine;
 
-                case TupleDefinitionType.WixBundlePackageExitCode:
-                    return TupleDefinitions.WixBundlePackageExitCode;
+                case SymbolDefinitionType.WixBundlePackageExitCode:
+                    return SymbolDefinitions.WixBundlePackageExitCode;
 
-                case TupleDefinitionType.WixBundlePackageGroup:
-                    return TupleDefinitions.WixBundlePackageGroup;
+                case SymbolDefinitionType.WixBundlePackageGroup:
+                    return SymbolDefinitions.WixBundlePackageGroup;
 
-                case TupleDefinitionType.WixBundlePatchTargetCode:
-                    return TupleDefinitions.WixBundlePatchTargetCode;
+                case SymbolDefinitionType.WixBundlePatchTargetCode:
+                    return SymbolDefinitions.WixBundlePatchTargetCode;
 
-                case TupleDefinitionType.WixBundlePayload:
-                    return TupleDefinitions.WixBundlePayload;
+                case SymbolDefinitionType.WixBundlePayload:
+                    return SymbolDefinitions.WixBundlePayload;
 
-                case TupleDefinitionType.WixBundlePayloadGroup:
-                    return TupleDefinitions.WixBundlePayloadGroup;
+                case SymbolDefinitionType.WixBundlePayloadGroup:
+                    return SymbolDefinitions.WixBundlePayloadGroup;
 
-                case TupleDefinitionType.WixBundleRelatedPackage:
-                    return TupleDefinitions.WixBundleRelatedPackage;
+                case SymbolDefinitionType.WixBundleRelatedPackage:
+                    return SymbolDefinitions.WixBundleRelatedPackage;
 
-                case TupleDefinitionType.WixBundleRollbackBoundary:
-                    return TupleDefinitions.WixBundleRollbackBoundary;
+                case SymbolDefinitionType.WixBundleRollbackBoundary:
+                    return SymbolDefinitions.WixBundleRollbackBoundary;
 
-                case TupleDefinitionType.WixBundleSlipstreamMsp:
-                    return TupleDefinitions.WixBundleSlipstreamMsp;
+                case SymbolDefinitionType.WixBundleSlipstreamMsp:
+                    return SymbolDefinitions.WixBundleSlipstreamMsp;
 
-                case TupleDefinitionType.WixBundleUpdate:
-                    return TupleDefinitions.WixBundleUpdate;
+                case SymbolDefinitionType.WixBundleUpdate:
+                    return SymbolDefinitions.WixBundleUpdate;
 
-                case TupleDefinitionType.WixBundleVariable:
-                    return TupleDefinitions.WixBundleVariable;
+                case SymbolDefinitionType.WixBundleVariable:
+                    return SymbolDefinitions.WixBundleVariable;
 
-                case TupleDefinitionType.WixChain:
-                    return TupleDefinitions.WixChain;
+                case SymbolDefinitionType.WixChain:
+                    return SymbolDefinitions.WixChain;
 
-                case TupleDefinitionType.WixChainItem:
-                    return TupleDefinitions.WixChainItem;
+                case SymbolDefinitionType.WixChainItem:
+                    return SymbolDefinitions.WixChainItem;
 
-                case TupleDefinitionType.WixComplexReference:
-                    return TupleDefinitions.WixComplexReference;
+                case SymbolDefinitionType.WixComplexReference:
+                    return SymbolDefinitions.WixComplexReference;
 
-                case TupleDefinitionType.WixComponentGroup:
-                    return TupleDefinitions.WixComponentGroup;
+                case SymbolDefinitionType.WixComponentGroup:
+                    return SymbolDefinitions.WixComponentGroup;
 
-                case TupleDefinitionType.WixComponentSearch:
-                    return TupleDefinitions.WixComponentSearch;
+                case SymbolDefinitionType.WixComponentSearch:
+                    return SymbolDefinitions.WixComponentSearch;
 
-                case TupleDefinitionType.WixCustomTable:
-                    return TupleDefinitions.WixCustomTable;
+                case SymbolDefinitionType.WixCustomTable:
+                    return SymbolDefinitions.WixCustomTable;
 
-                case TupleDefinitionType.WixCustomTableCell:
-                    return TupleDefinitions.WixCustomTableCell;
+                case SymbolDefinitionType.WixCustomTableCell:
+                    return SymbolDefinitions.WixCustomTableCell;
 
-                case TupleDefinitionType.WixCustomTableColumn:
-                    return TupleDefinitions.WixCustomTableColumn;
+                case SymbolDefinitionType.WixCustomTableColumn:
+                    return SymbolDefinitions.WixCustomTableColumn;
 
-                case TupleDefinitionType.WixDeltaPatchFile:
-                    return TupleDefinitions.WixDeltaPatchFile;
+                case SymbolDefinitionType.WixDeltaPatchFile:
+                    return SymbolDefinitions.WixDeltaPatchFile;
 
-                case TupleDefinitionType.WixDeltaPatchSymbolPaths:
-                    return TupleDefinitions.WixDeltaPatchSymbolPaths;
+                case SymbolDefinitionType.WixDeltaPatchSymbolPaths:
+                    return SymbolDefinitions.WixDeltaPatchSymbolPaths;
 
-                case TupleDefinitionType.WixEnsureTable:
-                    return TupleDefinitions.WixEnsureTable;
+                case SymbolDefinitionType.WixEnsureTable:
+                    return SymbolDefinitions.WixEnsureTable;
 
-                case TupleDefinitionType.WixFeatureGroup:
-                    return TupleDefinitions.WixFeatureGroup;
+                case SymbolDefinitionType.WixFeatureGroup:
+                    return SymbolDefinitions.WixFeatureGroup;
 
-                case TupleDefinitionType.WixFeatureModules:
-                    return TupleDefinitions.WixFeatureModules;
+                case SymbolDefinitionType.WixFeatureModules:
+                    return SymbolDefinitions.WixFeatureModules;
 
-                case TupleDefinitionType.WixFileSearch:
-                    return TupleDefinitions.WixFileSearch;
+                case SymbolDefinitionType.WixFileSearch:
+                    return SymbolDefinitions.WixFileSearch;
 
-                case TupleDefinitionType.WixFragment:
-                    return TupleDefinitions.WixFragment;
+                case SymbolDefinitionType.WixFragment:
+                    return SymbolDefinitions.WixFragment;
 
-                case TupleDefinitionType.WixGroup:
-                    return TupleDefinitions.WixGroup;
+                case SymbolDefinitionType.WixGroup:
+                    return SymbolDefinitions.WixGroup;
 
-                case TupleDefinitionType.WixInstanceComponent:
-                    return TupleDefinitions.WixInstanceComponent;
+                case SymbolDefinitionType.WixInstanceComponent:
+                    return SymbolDefinitions.WixInstanceComponent;
 
-                case TupleDefinitionType.WixInstanceTransforms:
-                    return TupleDefinitions.WixInstanceTransforms;
+                case SymbolDefinitionType.WixInstanceTransforms:
+                    return SymbolDefinitions.WixInstanceTransforms;
 
-                case TupleDefinitionType.WixMediaTemplate:
-                    return TupleDefinitions.WixMediaTemplate;
+                case SymbolDefinitionType.WixMediaTemplate:
+                    return SymbolDefinitions.WixMediaTemplate;
 
-                case TupleDefinitionType.WixMerge:
-                    return TupleDefinitions.WixMerge;
+                case SymbolDefinitionType.WixMerge:
+                    return SymbolDefinitions.WixMerge;
 
-                case TupleDefinitionType.WixOrdering:
-                    return TupleDefinitions.WixOrdering;
+                case SymbolDefinitionType.WixOrdering:
+                    return SymbolDefinitions.WixOrdering;
 
-                case TupleDefinitionType.WixPatchBaseline:
-                    return TupleDefinitions.WixPatchBaseline;
+                case SymbolDefinitionType.WixPatchBaseline:
+                    return SymbolDefinitions.WixPatchBaseline;
 
-                case TupleDefinitionType.WixPatchFamilyGroup:
-                    return TupleDefinitions.WixPatchFamilyGroup;
+                case SymbolDefinitionType.WixPatchFamilyGroup:
+                    return SymbolDefinitions.WixPatchFamilyGroup;
 
-                case TupleDefinitionType.WixPatchId:
-                    return TupleDefinitions.WixPatchId;
+                case SymbolDefinitionType.WixPatchId:
+                    return SymbolDefinitions.WixPatchId;
 
-                case TupleDefinitionType.WixPatchRef:
-                    return TupleDefinitions.WixPatchRef;
+                case SymbolDefinitionType.WixPatchRef:
+                    return SymbolDefinitions.WixPatchRef;
 
-                case TupleDefinitionType.WixPatchTarget:
-                    return TupleDefinitions.WixPatchTarget;
+                case SymbolDefinitionType.WixPatchTarget:
+                    return SymbolDefinitions.WixPatchTarget;
 
-                case TupleDefinitionType.WixProductSearch:
-                    return TupleDefinitions.WixProductSearch;
+                case SymbolDefinitionType.WixProductSearch:
+                    return SymbolDefinitions.WixProductSearch;
 
-                case TupleDefinitionType.WixProperty:
-                    return TupleDefinitions.WixProperty;
+                case SymbolDefinitionType.WixProperty:
+                    return SymbolDefinitions.WixProperty;
 
-                case TupleDefinitionType.WixRegistrySearch:
-                    return TupleDefinitions.WixRegistrySearch;
+                case SymbolDefinitionType.WixRegistrySearch:
+                    return SymbolDefinitions.WixRegistrySearch;
 
-                case TupleDefinitionType.WixRelatedBundle:
-                    return TupleDefinitions.WixRelatedBundle;
+                case SymbolDefinitionType.WixRelatedBundle:
+                    return SymbolDefinitions.WixRelatedBundle;
 
-                case TupleDefinitionType.WixSearch:
-                    return TupleDefinitions.WixSearch;
+                case SymbolDefinitionType.WixSearch:
+                    return SymbolDefinitions.WixSearch;
 
-                case TupleDefinitionType.WixSearchRelation:
-                    return TupleDefinitions.WixSearchRelation;
+                case SymbolDefinitionType.WixSearchRelation:
+                    return SymbolDefinitions.WixSearchRelation;
 
-                case TupleDefinitionType.WixSetVariable:
-                    return TupleDefinitions.WixSetVariable;
+                case SymbolDefinitionType.WixSetVariable:
+                    return SymbolDefinitions.WixSetVariable;
 
-                case TupleDefinitionType.WixSimpleReference:
-                    return TupleDefinitions.WixSimpleReference;
+                case SymbolDefinitionType.WixSimpleReference:
+                    return SymbolDefinitions.WixSimpleReference;
 
-                case TupleDefinitionType.WixSuppressAction:
-                    return TupleDefinitions.WixSuppressAction;
+                case SymbolDefinitionType.WixSuppressAction:
+                    return SymbolDefinitions.WixSuppressAction;
 
-                case TupleDefinitionType.WixSuppressModularization:
-                    return TupleDefinitions.WixSuppressModularization;
+                case SymbolDefinitionType.WixSuppressModularization:
+                    return SymbolDefinitions.WixSuppressModularization;
 
-                case TupleDefinitionType.WixUI:
-                    return TupleDefinitions.WixUI;
+                case SymbolDefinitionType.WixUI:
+                    return SymbolDefinitions.WixUI;
 
-                case TupleDefinitionType.WixUpdateRegistration:
-                    return TupleDefinitions.WixUpdateRegistration;
+                case SymbolDefinitionType.WixUpdateRegistration:
+                    return SymbolDefinitions.WixUpdateRegistration;
 
-                case TupleDefinitionType.WixVariable:
-                    return TupleDefinitions.WixVariable;
+                case SymbolDefinitionType.WixVariable:
+                    return SymbolDefinitions.WixVariable;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

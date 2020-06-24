@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ODBCDriver = new IntermediateTupleDefinition(
-            TupleDefinitionType.ODBCDriver,
+        public static readonly IntermediateSymbolDefinition ODBCDriver = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ODBCDriver,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.SetupFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverSymbolFields.SetupFileRef), IntermediateFieldType.String),
             },
-            typeof(ODBCDriverTuple));
+            typeof(ODBCDriverSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ODBCDriverTupleFields
+    public enum ODBCDriverSymbolFields
     {
         ComponentRef,
         Description,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         SetupFileRef,
     }
 
-    public class ODBCDriverTuple : IntermediateTuple
+    public class ODBCDriverSymbol : IntermediateSymbol
     {
-        public ODBCDriverTuple() : base(TupleDefinitions.ODBCDriver, null, null)
+        public ODBCDriverSymbol() : base(SymbolDefinitions.ODBCDriver, null, null)
         {
         }
 
-        public ODBCDriverTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ODBCDriver, sourceLineNumber, id)
+        public ODBCDriverSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ODBCDriver, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ODBCDriverTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ODBCDriverSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.ComponentRef];
-            set => this.Set((int)ODBCDriverTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ODBCDriverSymbolFields.ComponentRef];
+            set => this.Set((int)ODBCDriverSymbolFields.ComponentRef, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.Description];
-            set => this.Set((int)ODBCDriverTupleFields.Description, value);
+            get => (string)this.Fields[(int)ODBCDriverSymbolFields.Description];
+            set => this.Set((int)ODBCDriverSymbolFields.Description, value);
         }
 
         public string FileRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.FileRef];
-            set => this.Set((int)ODBCDriverTupleFields.FileRef, value);
+            get => (string)this.Fields[(int)ODBCDriverSymbolFields.FileRef];
+            set => this.Set((int)ODBCDriverSymbolFields.FileRef, value);
         }
 
         public string SetupFileRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.SetupFileRef];
-            set => this.Set((int)ODBCDriverTupleFields.SetupFileRef, value);
+            get => (string)this.Fields[(int)ODBCDriverSymbolFields.SetupFileRef];
+            set => this.Set((int)ODBCDriverSymbolFields.SetupFileRef, value);
         }
     }
 }

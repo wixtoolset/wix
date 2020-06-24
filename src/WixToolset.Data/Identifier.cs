@@ -7,7 +7,7 @@ namespace WixToolset.Data
     using SimpleJson;
 
     /// <summary>
-    /// Class to define the identifier and access for a tuple.
+    /// Class to define the identifier and access for a symbol.
     /// </summary>
     [DebuggerDisplay("{Access} {Id,nq}")]
     public class Identifier
@@ -46,12 +46,12 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Access modifier for a tuple.
+        /// Access modifier for a symbol.
         /// </summary>
         public AccessModifier Access { get; }
 
         /// <summary>
-        /// Identifier for the tuple.
+        /// Identifier for the symbol.
         /// </summary>
         public string Id { get; }
 

@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ControlEvent = new IntermediateTupleDefinition(
-            TupleDefinitionType.ControlEvent,
+        public static readonly IntermediateSymbolDefinition ControlEvent = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ControlEvent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.DialogRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.ControlRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Event), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Argument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Ordering), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.DialogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.ControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.Event), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.Argument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventSymbolFields.Ordering), IntermediateFieldType.Number),
             },
-            typeof(ControlEventTuple));
+            typeof(ControlEventSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ControlEventTupleFields
+    public enum ControlEventSymbolFields
     {
         DialogRef,
         ControlRef,
@@ -33,52 +33,52 @@ namespace WixToolset.Data.Tuples
         Ordering,
     }
 
-    public class ControlEventTuple : IntermediateTuple
+    public class ControlEventSymbol : IntermediateSymbol
     {
-        public ControlEventTuple() : base(TupleDefinitions.ControlEvent, null, null)
+        public ControlEventSymbol() : base(SymbolDefinitions.ControlEvent, null, null)
         {
         }
 
-        public ControlEventTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ControlEvent, sourceLineNumber, id)
+        public ControlEventSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ControlEvent, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ControlEventTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ControlEventSymbolFields index] => this.Fields[(int)index];
 
         public string DialogRef
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.DialogRef];
-            set => this.Set((int)ControlEventTupleFields.DialogRef, value);
+            get => (string)this.Fields[(int)ControlEventSymbolFields.DialogRef];
+            set => this.Set((int)ControlEventSymbolFields.DialogRef, value);
         }
 
         public string ControlRef
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.ControlRef];
-            set => this.Set((int)ControlEventTupleFields.ControlRef, value);
+            get => (string)this.Fields[(int)ControlEventSymbolFields.ControlRef];
+            set => this.Set((int)ControlEventSymbolFields.ControlRef, value);
         }
 
         public string Event
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Event];
-            set => this.Set((int)ControlEventTupleFields.Event, value);
+            get => (string)this.Fields[(int)ControlEventSymbolFields.Event];
+            set => this.Set((int)ControlEventSymbolFields.Event, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Argument];
-            set => this.Set((int)ControlEventTupleFields.Argument, value);
+            get => (string)this.Fields[(int)ControlEventSymbolFields.Argument];
+            set => this.Set((int)ControlEventSymbolFields.Argument, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Condition];
-            set => this.Set((int)ControlEventTupleFields.Condition, value);
+            get => (string)this.Fields[(int)ControlEventSymbolFields.Condition];
+            set => this.Set((int)ControlEventSymbolFields.Condition, value);
         }
 
         public int? Ordering
         {
-            get => (int?)this.Fields[(int)ControlEventTupleFields.Ordering];
-            set => this.Set((int)ControlEventTupleFields.Ordering, value);
+            get => (int?)this.Fields[(int)ControlEventSymbolFields.Ordering];
+            set => this.Set((int)ControlEventSymbolFields.Ordering, value);
         }
     }
 }

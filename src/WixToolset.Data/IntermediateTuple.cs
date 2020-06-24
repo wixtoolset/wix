@@ -7,15 +7,15 @@ namespace WixToolset.Data
     using SimpleJson;
 
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class IntermediateTuple
+    public class IntermediateSymbol
     {
         private object tags;
 
-        public IntermediateTuple(IntermediateTupleDefinition definition) : this(definition, null, null)
+        public IntermediateSymbol(IntermediateSymbolDefinition definition) : this(definition, null, null)
         {
         }
 
-        public IntermediateTuple(IntermediateTupleDefinition definition, SourceLineNumber sourceLineNumber, Identifier id = null)
+        public IntermediateSymbol(IntermediateSymbolDefinition definition, SourceLineNumber sourceLineNumber, Identifier id = null)
         {
             this.Definition = definition;
             this.Fields = new IntermediateField[definition.FieldDefinitions.Length];
@@ -23,7 +23,7 @@ namespace WixToolset.Data
             this.Id = id;
         }
 
-        public IntermediateTupleDefinition Definition { get; }
+        public IntermediateSymbolDefinition Definition { get; }
 
         public IntermediateField[] Fields { get; }
 
@@ -154,7 +154,7 @@ namespace WixToolset.Data
             return false;
         }
 
-        internal static IntermediateTuple Deserialize(ITupleDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
+        internal static IntermediateSymbol Deserialize(ISymbolDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
             var definitionName = jsonObject.GetValueOrDefault<string>("type");
             var idJson = jsonObject.GetValueOrDefault<JsonObject>("id");
@@ -166,18 +166,18 @@ namespace WixToolset.Data
             var sourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
 
             // TODO: this isn't sufficient.
-            if (!creator.TryGetTupleDefinitionByName(definitionName, out var definition))
+            if (!creator.TryGetSymbolDefinitionByName(definitionName, out var definition))
             {
                 throw new WixException(ErrorMessages.UnknownSymbolType(definitionName));
             }
 
-            var tuple = definition.CreateTuple(sourceLineNumbers, id);
+            var symbol = definition.CreateSymbol(sourceLineNumbers, id);
 
-            for (var i = 0; i < fieldsJson.Count && i < tuple.Fields.Length; ++i)
+            for (var i = 0; i < fieldsJson.Count && i < symbol.Fields.Length; ++i)
             {
                 if (fieldsJson[i] is JsonObject fieldJson)
                 {
-                    tuple.Fields[i] = IntermediateField.Deserialize(tuple.Definition.FieldDefinitions[i], baseUri, fieldJson);
+                    symbol.Fields[i] = IntermediateField.Deserialize(symbol.Definition.FieldDefinitions[i], baseUri, fieldJson);
                 }
             }
 
@@ -186,7 +186,7 @@ namespace WixToolset.Data
             }
             else if (tagsJson.Count == 1)
             {
-                tuple.tags = (string)tagsJson[0];
+                symbol.tags = (string)tagsJson[0];
             }
             else
             {
@@ -197,10 +197,10 @@ namespace WixToolset.Data
                     tags[i] = (string)tagsJson[i];
                 }
 
-                tuple.tags = tags;
+                symbol.tags = tags;
             }
 
-            return tuple;
+            return symbol;
         }
 
         internal JsonObject Serialize()

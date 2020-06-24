@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleVariable = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleVariable,
+        public static readonly IntermediateSymbolDefinition WixBundleVariable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleVariable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Type), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Persisted), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Type), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Hidden), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundleVariableSymbolFields.Persisted), IntermediateFieldType.Bool),
             },
-            typeof(WixBundleVariableTuple));
+            typeof(WixBundleVariableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleVariableTupleFields
+    public enum WixBundleVariableSymbolFields
     {
         Value,
         Type,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Persisted,
     }
 
-    public class WixBundleVariableTuple : IntermediateTuple
+    public class WixBundleVariableSymbol : IntermediateSymbol
     {
-        public WixBundleVariableTuple() : base(TupleDefinitions.WixBundleVariable, null, null)
+        public WixBundleVariableSymbol() : base(SymbolDefinitions.WixBundleVariable, null, null)
         {
         }
 
-        public WixBundleVariableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleVariable, sourceLineNumber, id)
+        public WixBundleVariableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleVariable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleVariableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleVariableSymbolFields index] => this.Fields[(int)index];
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Value];
-            set => this.Set((int)WixBundleVariableTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixBundleVariableSymbolFields.Value];
+            set => this.Set((int)WixBundleVariableSymbolFields.Value, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Type];
-            set => this.Set((int)WixBundleVariableTupleFields.Type, value);
+            get => (string)this.Fields[(int)WixBundleVariableSymbolFields.Type];
+            set => this.Set((int)WixBundleVariableSymbolFields.Type, value);
         }
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Hidden];
-            set => this.Set((int)WixBundleVariableTupleFields.Hidden, value);
+            get => (bool)this.Fields[(int)WixBundleVariableSymbolFields.Hidden];
+            set => this.Set((int)WixBundleVariableSymbolFields.Hidden, value);
         }
 
         public bool Persisted
         {
-            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Persisted];
-            set => this.Set((int)WixBundleVariableTupleFields.Persisted, value);
+            get => (bool)this.Fields[(int)WixBundleVariableSymbolFields.Persisted];
+            set => this.Set((int)WixBundleVariableSymbolFields.Persisted, value);
         }
     }
 }

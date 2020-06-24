@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IsolatedComponent = new IntermediateTupleDefinition(
-            TupleDefinitionType.IsolatedComponent,
+        public static readonly IntermediateSymbolDefinition IsolatedComponent = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.IsolatedComponent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.SharedComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.ApplicationComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IsolatedComponentSymbolFields.SharedComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IsolatedComponentSymbolFields.ApplicationComponentRef), IntermediateFieldType.String),
             },
-            typeof(IsolatedComponentTuple));
+            typeof(IsolatedComponentSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum IsolatedComponentTupleFields
+    public enum IsolatedComponentSymbolFields
     {
         SharedComponentRef,
         ApplicationComponentRef,
     }
 
-    public class IsolatedComponentTuple : IntermediateTuple
+    public class IsolatedComponentSymbol : IntermediateSymbol
     {
-        public IsolatedComponentTuple() : base(TupleDefinitions.IsolatedComponent, null, null)
+        public IsolatedComponentSymbol() : base(SymbolDefinitions.IsolatedComponent, null, null)
         {
         }
 
-        public IsolatedComponentTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.IsolatedComponent, sourceLineNumber, id)
+        public IsolatedComponentSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.IsolatedComponent, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IsolatedComponentTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IsolatedComponentSymbolFields index] => this.Fields[(int)index];
 
         public string SharedComponentRef
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.SharedComponentRef];
-            set => this.Set((int)IsolatedComponentTupleFields.SharedComponentRef, value);
+            get => (string)this.Fields[(int)IsolatedComponentSymbolFields.SharedComponentRef];
+            set => this.Set((int)IsolatedComponentSymbolFields.SharedComponentRef, value);
         }
 
         public string ApplicationComponentRef
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.ApplicationComponentRef];
-            set => this.Set((int)IsolatedComponentTupleFields.ApplicationComponentRef, value);
+            get => (string)this.Fields[(int)IsolatedComponentSymbolFields.ApplicationComponentRef];
+            set => this.Set((int)IsolatedComponentSymbolFields.ApplicationComponentRef, value);
         }
     }
 }

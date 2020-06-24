@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ControlCondition = new IntermediateTupleDefinition(
-            TupleDefinitionType.ControlCondition,
+        public static readonly IntermediateSymbolDefinition ControlCondition = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ControlCondition,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.DialogRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.ControlRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Action), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionSymbolFields.DialogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionSymbolFields.ControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionSymbolFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionSymbolFields.Condition), IntermediateFieldType.String),
             },
-            typeof(ControlConditionTuple));
+            typeof(ControlConditionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ControlConditionTupleFields
+    public enum ControlConditionSymbolFields
     {
         DialogRef,
         ControlRef,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Condition,
     }
 
-    public class ControlConditionTuple : IntermediateTuple
+    public class ControlConditionSymbol : IntermediateSymbol
     {
-        public ControlConditionTuple() : base(TupleDefinitions.ControlCondition, null, null)
+        public ControlConditionSymbol() : base(SymbolDefinitions.ControlCondition, null, null)
         {
         }
 
-        public ControlConditionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ControlCondition, sourceLineNumber, id)
+        public ControlConditionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ControlCondition, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ControlConditionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ControlConditionSymbolFields index] => this.Fields[(int)index];
 
         public string DialogRef
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.DialogRef];
-            set => this.Set((int)ControlConditionTupleFields.DialogRef, value);
+            get => (string)this.Fields[(int)ControlConditionSymbolFields.DialogRef];
+            set => this.Set((int)ControlConditionSymbolFields.DialogRef, value);
         }
 
         public string ControlRef
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.ControlRef];
-            set => this.Set((int)ControlConditionTupleFields.ControlRef, value);
+            get => (string)this.Fields[(int)ControlConditionSymbolFields.ControlRef];
+            set => this.Set((int)ControlConditionSymbolFields.ControlRef, value);
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Action];
-            set => this.Set((int)ControlConditionTupleFields.Action, value);
+            get => (string)this.Fields[(int)ControlConditionSymbolFields.Action];
+            set => this.Set((int)ControlConditionSymbolFields.Action, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Condition];
-            set => this.Set((int)ControlConditionTupleFields.Condition, value);
+            get => (string)this.Fields[(int)ControlConditionSymbolFields.Condition];
+            set => this.Set((int)ControlConditionSymbolFields.Condition, value);
         }
     }
 }

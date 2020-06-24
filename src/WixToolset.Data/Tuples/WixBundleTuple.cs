@@ -2,46 +2,46 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundle = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundle,
+        public static readonly IntermediateSymbolDefinition WixBundle = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.UpgradeCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Copyright), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Manufacturer), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.AboutUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.HelpUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.HelpTelephone), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.UpdateUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Compressed), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.LogPathVariable), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.LogPrefix), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.LogExtension), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.IconSourceFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.SplashScreenSourceFile), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Tag), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.Platform), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.ParentName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.BundleId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.ProviderKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.UpgradeCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Copyright), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Manufacturer), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.AboutUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.HelpUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.HelpTelephone), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.UpdateUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Compressed), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.LogPathVariable), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.LogPrefix), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.LogExtension), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.IconSourceFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.SplashScreenSourceFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Tag), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Platform), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ParentName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
             },
-            typeof(WixBundleTuple));
+            typeof(WixBundleSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundleTupleFields
+    public enum WixBundleSymbolFields
     {
         UpgradeCode,
         Version,
@@ -77,148 +77,148 @@ namespace WixToolset.Data.Tuples
         PerMachine = 0x8,
     }
 
-    public class WixBundleTuple : IntermediateTuple
+    public class WixBundleSymbol : IntermediateSymbol
     {
-        public WixBundleTuple() : base(TupleDefinitions.WixBundle, null, null)
+        public WixBundleSymbol() : base(SymbolDefinitions.WixBundle, null, null)
         {
         }
 
-        public WixBundleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundle, sourceLineNumber, id)
+        public WixBundleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundle, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleSymbolFields index] => this.Fields[(int)index];
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.UpgradeCode];
-            set => this.Set((int)WixBundleTupleFields.UpgradeCode, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.UpgradeCode];
+            set => this.Set((int)WixBundleSymbolFields.UpgradeCode, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Version];
-            set => this.Set((int)WixBundleTupleFields.Version, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Version];
+            set => this.Set((int)WixBundleSymbolFields.Version, value);
         }
 
         public string Copyright
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Copyright];
-            set => this.Set((int)WixBundleTupleFields.Copyright, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Copyright];
+            set => this.Set((int)WixBundleSymbolFields.Copyright, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Name];
-            set => this.Set((int)WixBundleTupleFields.Name, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Name];
+            set => this.Set((int)WixBundleSymbolFields.Name, value);
         }
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Manufacturer];
-            set => this.Set((int)WixBundleTupleFields.Manufacturer, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Manufacturer];
+            set => this.Set((int)WixBundleSymbolFields.Manufacturer, value);
         }
 
         public WixBundleAttributes Attributes
         {
-            get => (WixBundleAttributes)this.Fields[(int)WixBundleTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixBundleTupleFields.Attributes, (int)value);
+            get => (WixBundleAttributes)this.Fields[(int)WixBundleSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleSymbolFields.Attributes, (int)value);
         }
 
         public string AboutUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.AboutUrl];
-            set => this.Set((int)WixBundleTupleFields.AboutUrl, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.AboutUrl];
+            set => this.Set((int)WixBundleSymbolFields.AboutUrl, value);
         }
 
         public string HelpTelephone
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.HelpTelephone];
-            set => this.Set((int)WixBundleTupleFields.HelpTelephone, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.HelpTelephone];
+            set => this.Set((int)WixBundleSymbolFields.HelpTelephone, value);
         }
 
         public string HelpUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.HelpUrl];
-            set => this.Set((int)WixBundleTupleFields.HelpUrl, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.HelpUrl];
+            set => this.Set((int)WixBundleSymbolFields.HelpUrl, value);
         }
 
         public string UpdateUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.UpdateUrl];
-            set => this.Set((int)WixBundleTupleFields.UpdateUrl, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.UpdateUrl];
+            set => this.Set((int)WixBundleSymbolFields.UpdateUrl, value);
         }
 
         public bool? Compressed
         {
-            get => (bool?)this.Fields[(int)WixBundleTupleFields.Compressed];
-            set => this.Set((int)WixBundleTupleFields.Compressed, value);
+            get => (bool?)this.Fields[(int)WixBundleSymbolFields.Compressed];
+            set => this.Set((int)WixBundleSymbolFields.Compressed, value);
         }
 
         public string LogPathVariable
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.LogPathVariable];
-            set => this.Set((int)WixBundleTupleFields.LogPathVariable, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.LogPathVariable];
+            set => this.Set((int)WixBundleSymbolFields.LogPathVariable, value);
         }
 
         public string LogPrefix
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.LogPrefix];
-            set => this.Set((int)WixBundleTupleFields.LogPrefix, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.LogPrefix];
+            set => this.Set((int)WixBundleSymbolFields.LogPrefix, value);
         }
 
         public string LogExtension
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.LogExtension];
-            set => this.Set((int)WixBundleTupleFields.LogExtension, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.LogExtension];
+            set => this.Set((int)WixBundleSymbolFields.LogExtension, value);
         }
 
         public string IconSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.IconSourceFile];
-            set => this.Set((int)WixBundleTupleFields.IconSourceFile, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.IconSourceFile];
+            set => this.Set((int)WixBundleSymbolFields.IconSourceFile, value);
         }
 
         public string SplashScreenSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.SplashScreenSourceFile];
-            set => this.Set((int)WixBundleTupleFields.SplashScreenSourceFile, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.SplashScreenSourceFile];
+            set => this.Set((int)WixBundleSymbolFields.SplashScreenSourceFile, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Condition];
-            set => this.Set((int)WixBundleTupleFields.Condition, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Condition];
+            set => this.Set((int)WixBundleSymbolFields.Condition, value);
         }
 
         public string Tag
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Tag];
-            set => this.Set((int)WixBundleTupleFields.Tag, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.Tag];
+            set => this.Set((int)WixBundleSymbolFields.Tag, value);
         }
 
         public Platform Platform
         {
-            get => (Platform)this.Fields[(int)WixBundleTupleFields.Platform].AsNumber();
-            set => this.Set((int)WixBundleTupleFields.Platform, (int)value);
+            get => (Platform)this.Fields[(int)WixBundleSymbolFields.Platform].AsNumber();
+            set => this.Set((int)WixBundleSymbolFields.Platform, (int)value);
         }
 
         public string ParentName
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.ParentName];
-            set => this.Set((int)WixBundleTupleFields.ParentName, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.ParentName];
+            set => this.Set((int)WixBundleSymbolFields.ParentName, value);
         }
 
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.BundleId];
-            set => this.Set((int)WixBundleTupleFields.BundleId, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.BundleId];
+            set => this.Set((int)WixBundleSymbolFields.BundleId, value);
         }
 
         public string ProviderKey
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.ProviderKey];
-            set => this.Set((int)WixBundleTupleFields.ProviderKey, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.ProviderKey];
+            set => this.Set((int)WixBundleSymbolFields.ProviderKey, value);
         }
 
         public PackagingType DefaultPackagingType => (this.Compressed.HasValue && !this.Compressed.Value) ? PackagingType.External : PackagingType.Embedded;

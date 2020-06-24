@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundlePackageGroup = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundlePackageGroup,
+        public static readonly IntermediateSymbolDefinition WixBundlePackageGroup = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundlePackageGroup,
             new IntermediateFieldDefinition[]
             {
             },
-            typeof(WixBundlePackageGroupTuple));
+            typeof(WixBundlePackageGroupSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundlePackageGroupTupleFields
+    public enum WixBundlePackageGroupSymbolFields
     {
     }
 
-    public class WixBundlePackageGroupTuple : IntermediateTuple
+    public class WixBundlePackageGroupSymbol : IntermediateSymbol
     {
-        public WixBundlePackageGroupTuple() : base(TupleDefinitions.WixBundlePackageGroup, null, null)
+        public WixBundlePackageGroupSymbol() : base(SymbolDefinitions.WixBundlePackageGroup, null, null)
         {
         }
 
-        public WixBundlePackageGroupTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundlePackageGroup, sourceLineNumber, id)
+        public WixBundlePackageGroupSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundlePackageGroup, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundlePackageGroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundlePackageGroupSymbolFields index] => this.Fields[(int)index];
     }
 }

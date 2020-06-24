@@ -2,25 +2,25 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleCustomData = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleCustomData,
+        public static readonly IntermediateSymbolDefinition WixBundleCustomData = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleCustomData,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataTupleFields.AttributeNames), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataTupleFields.Type), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataTupleFields.BundleExtensionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.AttributeNames), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.BundleExtensionRef), IntermediateFieldType.String),
             },
-            typeof(WixBundleCustomDataTuple));
+            typeof(WixBundleCustomDataSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleCustomDataTupleFields
+    public enum WixBundleCustomDataSymbolFields
     {
         AttributeNames,
         Type,
@@ -34,36 +34,36 @@ namespace WixToolset.Data.Tuples
         BundleExtension,
     }
 
-    public class WixBundleCustomDataTuple : IntermediateTuple
+    public class WixBundleCustomDataSymbol : IntermediateSymbol
     {
         public const char AttributeNamesSeparator = '\x85';
 
-        public WixBundleCustomDataTuple() : base(TupleDefinitions.WixBundleCustomData, null, null)
+        public WixBundleCustomDataSymbol() : base(SymbolDefinitions.WixBundleCustomData, null, null)
         {
         }
 
-        public WixBundleCustomDataTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleCustomData, sourceLineNumber, id)
+        public WixBundleCustomDataSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleCustomData, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleCustomDataTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleCustomDataSymbolFields index] => this.Fields[(int)index];
 
         public string AttributeNames
         {
-            get => (string)this.Fields[(int)WixBundleCustomDataTupleFields.AttributeNames];
-            set => this.Set((int)WixBundleCustomDataTupleFields.AttributeNames, value);
+            get => (string)this.Fields[(int)WixBundleCustomDataSymbolFields.AttributeNames];
+            set => this.Set((int)WixBundleCustomDataSymbolFields.AttributeNames, value);
         }
 
         public WixBundleCustomDataType Type
         {
-            get => (WixBundleCustomDataType)this.Fields[(int)WixBundleCustomDataTupleFields.Type].AsNumber();
-            set => this.Set((int)WixBundleCustomDataTupleFields.Type, (int)value);
+            get => (WixBundleCustomDataType)this.Fields[(int)WixBundleCustomDataSymbolFields.Type].AsNumber();
+            set => this.Set((int)WixBundleCustomDataSymbolFields.Type, (int)value);
         }
 
         public string BundleExtensionRef
         {
-            get => (string)this.Fields[(int)WixBundleCustomDataTupleFields.BundleExtensionRef];
-            set => this.Set((int)WixBundleCustomDataTupleFields.BundleExtensionRef, value);
+            get => (string)this.Fields[(int)WixBundleCustomDataSymbolFields.BundleExtensionRef];
+            set => this.Set((int)WixBundleCustomDataSymbolFields.BundleExtensionRef, value);
         }
 
         public string[] AttributeNamesSeparated => this.AttributeNames.Split(AttributeNamesSeparator);

@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ExternalFiles = new IntermediateTupleDefinition(
-            TupleDefinitionType.ExternalFiles,
+        public static readonly IntermediateSymbolDefinition ExternalFiles = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ExternalFiles,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.Family), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.FTK), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.FilePath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.SymbolPaths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.IgnoreOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.IgnoreLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.RetainOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExternalFilesTupleFields.Order), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.Family), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.FTK), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.FilePath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.IgnoreOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.IgnoreLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExternalFilesSymbolFields.Order), IntermediateFieldType.Number),
             },
-            typeof(ExternalFilesTuple));
+            typeof(ExternalFilesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ExternalFilesTupleFields
+    public enum ExternalFilesSymbolFields
     {
         Family,
         FTK,
@@ -37,64 +37,64 @@ namespace WixToolset.Data.Tuples
         Order,
     }
 
-    public class ExternalFilesTuple : IntermediateTuple
+    public class ExternalFilesSymbol : IntermediateSymbol
     {
-        public ExternalFilesTuple() : base(TupleDefinitions.ExternalFiles, null, null)
+        public ExternalFilesSymbol() : base(SymbolDefinitions.ExternalFiles, null, null)
         {
         }
 
-        public ExternalFilesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ExternalFiles, sourceLineNumber, id)
+        public ExternalFilesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ExternalFiles, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ExternalFilesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ExternalFilesSymbolFields index] => this.Fields[(int)index];
 
         public string Family
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.Family];
-            set => this.Set((int)ExternalFilesTupleFields.Family, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.Family];
+            set => this.Set((int)ExternalFilesSymbolFields.Family, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.FTK];
-            set => this.Set((int)ExternalFilesTupleFields.FTK, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.FTK];
+            set => this.Set((int)ExternalFilesSymbolFields.FTK, value);
         }
 
         public string FilePath
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.FilePath];
-            set => this.Set((int)ExternalFilesTupleFields.FilePath, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.FilePath];
+            set => this.Set((int)ExternalFilesSymbolFields.FilePath, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.SymbolPaths];
-            set => this.Set((int)ExternalFilesTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.SymbolPaths];
+            set => this.Set((int)ExternalFilesSymbolFields.SymbolPaths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreOffsets];
-            set => this.Set((int)ExternalFilesTupleFields.IgnoreOffsets, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.IgnoreOffsets];
+            set => this.Set((int)ExternalFilesSymbolFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreLengths];
-            set => this.Set((int)ExternalFilesTupleFields.IgnoreLengths, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.IgnoreLengths];
+            set => this.Set((int)ExternalFilesSymbolFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.RetainOffsets];
-            set => this.Set((int)ExternalFilesTupleFields.RetainOffsets, value);
+            get => (string)this.Fields[(int)ExternalFilesSymbolFields.RetainOffsets];
+            set => this.Set((int)ExternalFilesSymbolFields.RetainOffsets, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ExternalFilesTupleFields.Order];
-            set => this.Set((int)ExternalFilesTupleFields.Order, value);
+            get => (int)this.Fields[(int)ExternalFilesSymbolFields.Order];
+            set => this.Set((int)ExternalFilesSymbolFields.Order, value);
         }
     }
 }

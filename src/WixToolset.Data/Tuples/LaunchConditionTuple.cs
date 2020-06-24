@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition LaunchCondition = new IntermediateTupleDefinition(
-            TupleDefinitionType.LaunchCondition,
+        public static readonly IntermediateSymbolDefinition LaunchCondition = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.LaunchCondition,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(LaunchConditionTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(LaunchConditionTupleFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LaunchConditionSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(LaunchConditionSymbolFields.Description), IntermediateFieldType.String),
             },
-            typeof(LaunchConditionTuple));
+            typeof(LaunchConditionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum LaunchConditionTupleFields
+    public enum LaunchConditionSymbolFields
     {
         Condition,
         Description,
     }
 
-    public class LaunchConditionTuple : IntermediateTuple
+    public class LaunchConditionSymbol : IntermediateSymbol
     {
-        public LaunchConditionTuple() : base(TupleDefinitions.LaunchCondition, null, null)
+        public LaunchConditionSymbol() : base(SymbolDefinitions.LaunchCondition, null, null)
         {
         }
 
-        public LaunchConditionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.LaunchCondition, sourceLineNumber, id)
+        public LaunchConditionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.LaunchCondition, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[LaunchConditionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[LaunchConditionSymbolFields index] => this.Fields[(int)index];
 
         public string Condition
         {
-            get => (string)this.Fields[(int)LaunchConditionTupleFields.Condition];
-            set => this.Set((int)LaunchConditionTupleFields.Condition, value);
+            get => (string)this.Fields[(int)LaunchConditionSymbolFields.Condition];
+            set => this.Set((int)LaunchConditionSymbolFields.Condition, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)LaunchConditionTupleFields.Description];
-            set => this.Set((int)LaunchConditionTupleFields.Description, value);
+            get => (string)this.Fields[(int)LaunchConditionSymbolFields.Description];
+            set => this.Set((int)LaunchConditionSymbolFields.Description, value);
         }
     }
 }

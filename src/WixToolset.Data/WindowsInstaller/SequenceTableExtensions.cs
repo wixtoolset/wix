@@ -2,7 +2,7 @@
 
 namespace WixToolset.Data.WindowsInstaller
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Enhancements to the SequenceTable enum.

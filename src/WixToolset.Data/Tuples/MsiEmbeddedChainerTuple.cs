@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiEmbeddedChainer = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiEmbeddedChainer,
+        public static readonly IntermediateSymbolDefinition MsiEmbeddedChainer = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiEmbeddedChainer,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.CommandLine), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.Source), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerSymbolFields.CommandLine), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerSymbolFields.Source), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerSymbolFields.Type), IntermediateFieldType.Number),
             },
-            typeof(MsiEmbeddedChainerTuple));
+            typeof(MsiEmbeddedChainerSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiEmbeddedChainerTupleFields
+    public enum MsiEmbeddedChainerSymbolFields
     {
         Condition,
         CommandLine,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         Type,
     }
 
-    public class MsiEmbeddedChainerTuple : IntermediateTuple
+    public class MsiEmbeddedChainerSymbol : IntermediateSymbol
     {
-        public MsiEmbeddedChainerTuple() : base(TupleDefinitions.MsiEmbeddedChainer, null, null)
+        public MsiEmbeddedChainerSymbol() : base(SymbolDefinitions.MsiEmbeddedChainer, null, null)
         {
         }
 
-        public MsiEmbeddedChainerTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiEmbeddedChainer, sourceLineNumber, id)
+        public MsiEmbeddedChainerSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiEmbeddedChainer, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiEmbeddedChainerTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiEmbeddedChainerSymbolFields index] => this.Fields[(int)index];
 
         public string Condition
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Condition];
-            set => this.Set((int)MsiEmbeddedChainerTupleFields.Condition, value);
+            get => (string)this.Fields[(int)MsiEmbeddedChainerSymbolFields.Condition];
+            set => this.Set((int)MsiEmbeddedChainerSymbolFields.Condition, value);
         }
 
         public string CommandLine
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.CommandLine];
-            set => this.Set((int)MsiEmbeddedChainerTupleFields.CommandLine, value);
+            get => (string)this.Fields[(int)MsiEmbeddedChainerSymbolFields.CommandLine];
+            set => this.Set((int)MsiEmbeddedChainerSymbolFields.CommandLine, value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Source];
-            set => this.Set((int)MsiEmbeddedChainerTupleFields.Source, value);
+            get => (string)this.Fields[(int)MsiEmbeddedChainerSymbolFields.Source];
+            set => this.Set((int)MsiEmbeddedChainerSymbolFields.Source, value);
         }
 
         public int Type
         {
-            get => (int)this.Fields[(int)MsiEmbeddedChainerTupleFields.Type];
-            set => this.Set((int)MsiEmbeddedChainerTupleFields.Type, value);
+            get => (int)this.Fields[(int)MsiEmbeddedChainerSymbolFields.Type];
+            set => this.Set((int)MsiEmbeddedChainerSymbolFields.Type, value);
         }
     }
 }

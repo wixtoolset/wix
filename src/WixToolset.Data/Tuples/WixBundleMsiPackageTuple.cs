@@ -2,31 +2,31 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleMsiPackage = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleMsiPackage,
+        public static readonly IntermediateSymbolDefinition WixBundleMsiPackage = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleMsiPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.UpgradeCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductLanguage), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.Manufacturer), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.UpgradeCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductLanguage), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.Manufacturer), IntermediateFieldType.String),
             },
-            typeof(WixBundleMsiPackageTuple));
+            typeof(WixBundleMsiPackageSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixBundleMsiPackageTupleFields
+    public enum WixBundleMsiPackageSymbolFields
     {
         Attributes,
         ProductCode,
@@ -44,58 +44,58 @@ namespace WixToolset.Data.Tuples
         ForcePerMachine = 0x2,
     }
 
-    public class WixBundleMsiPackageTuple : IntermediateTuple
+    public class WixBundleMsiPackageSymbol : IntermediateSymbol
     {
-        public WixBundleMsiPackageTuple() : base(TupleDefinitions.WixBundleMsiPackage, null, null)
+        public WixBundleMsiPackageSymbol() : base(SymbolDefinitions.WixBundleMsiPackage, null, null)
         {
         }
 
-        public WixBundleMsiPackageTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleMsiPackage, sourceLineNumber, id)
+        public WixBundleMsiPackageSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleMsiPackage, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleMsiPackageTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleMsiPackageSymbolFields index] => this.Fields[(int)index];
 
         public WixBundleMsiPackageAttributes Attributes
         {
-            get => (WixBundleMsiPackageAttributes)(int)this.Fields[(int)WixBundleMsiPackageTupleFields.Attributes];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.Attributes, (int)value);
+            get => (WixBundleMsiPackageAttributes)(int)this.Fields[(int)WixBundleMsiPackageSymbolFields.Attributes];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.Attributes, (int)value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductCode];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.ProductCode, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.ProductCode];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.ProductCode, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.UpgradeCode];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.UpgradeCode, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.UpgradeCode];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.UpgradeCode, value);
         }
 
         public string ProductVersion
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductVersion];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.ProductVersion, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.ProductVersion];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.ProductVersion, value);
         }
 
         public int ProductLanguage
         {
-            get => (int)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductLanguage];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.ProductLanguage, value);
+            get => (int)this.Fields[(int)WixBundleMsiPackageSymbolFields.ProductLanguage];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.ProductLanguage, value);
         }
 
         public string ProductName
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductName];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.ProductName, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.ProductName];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.ProductName, value);
         }
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.Manufacturer];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.Manufacturer, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.Manufacturer];
+            set => this.Set((int)WixBundleMsiPackageSymbolFields.Manufacturer, value);
         }
 
         public bool EnableFeatureSelection => (this.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection;

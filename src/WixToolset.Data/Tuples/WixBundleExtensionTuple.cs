@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBundleExtension = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixBundleExtension,
+        public static readonly IntermediateSymbolDefinition WixBundleExtension = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixBundleExtension,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleExtensionTupleFields.PayloadRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleExtensionSymbolFields.PayloadRef), IntermediateFieldType.String),
             },
-            typeof(WixBundleExtensionTuple));
+            typeof(WixBundleExtensionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixBundleExtensionTupleFields
+    public enum WixBundleExtensionSymbolFields
     {
         PayloadRef,
     }
 
-    public class WixBundleExtensionTuple : IntermediateTuple
+    public class WixBundleExtensionSymbol : IntermediateSymbol
     {
-        public WixBundleExtensionTuple() : base(TupleDefinitions.WixBundleExtension, null, null)
+        public WixBundleExtensionSymbol() : base(SymbolDefinitions.WixBundleExtension, null, null)
         {
         }
 
-        public WixBundleExtensionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleExtension, sourceLineNumber, id)
+        public WixBundleExtensionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixBundleExtension, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBundleExtensionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBundleExtensionSymbolFields index] => this.Fields[(int)index];
 
         public string PayloadRef
         {
-            get => (string)this.Fields[(int)WixBundleExtensionTupleFields.PayloadRef];
-            set => this.Set((int)WixBundleExtensionTupleFields.PayloadRef, value);
+            get => (string)this.Fields[(int)WixBundleExtensionSymbolFields.PayloadRef];
+            set => this.Set((int)WixBundleExtensionSymbolFields.PayloadRef, value);
         }
     }
 }

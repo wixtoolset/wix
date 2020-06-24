@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Extension = new IntermediateTupleDefinition(
-            TupleDefinitionType.Extension,
+        public static readonly IntermediateSymbolDefinition Extension = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Extension,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.Extension), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.ProgIdRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.MimeRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionSymbolFields.Extension), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionSymbolFields.ProgIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionSymbolFields.MimeRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionSymbolFields.FeatureRef), IntermediateFieldType.String),
             },
-            typeof(ExtensionTuple));
+            typeof(ExtensionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ExtensionTupleFields
+    public enum ExtensionSymbolFields
     {
         Extension,
         ComponentRef,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         FeatureRef,
     }
 
-    public class ExtensionTuple : IntermediateTuple
+    public class ExtensionSymbol : IntermediateSymbol
     {
-        public ExtensionTuple() : base(TupleDefinitions.Extension, null, null)
+        public ExtensionSymbol() : base(SymbolDefinitions.Extension, null, null)
         {
         }
 
-        public ExtensionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Extension, sourceLineNumber, id)
+        public ExtensionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Extension, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ExtensionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ExtensionSymbolFields index] => this.Fields[(int)index];
 
         public string Extension
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Extension];
-            set => this.Set((int)ExtensionTupleFields.Extension, value);
+            get => (string)this.Fields[(int)ExtensionSymbolFields.Extension];
+            set => this.Set((int)ExtensionSymbolFields.Extension, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.ComponentRef];
-            set => this.Set((int)ExtensionTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)ExtensionSymbolFields.ComponentRef];
+            set => this.Set((int)ExtensionSymbolFields.ComponentRef, value);
         }
 
         public string ProgIdRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.ProgIdRef];
-            set => this.Set((int)ExtensionTupleFields.ProgIdRef, value);
+            get => (string)this.Fields[(int)ExtensionSymbolFields.ProgIdRef];
+            set => this.Set((int)ExtensionSymbolFields.ProgIdRef, value);
         }
 
         public string MimeRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.MimeRef];
-            set => this.Set((int)ExtensionTupleFields.MimeRef, value);
+            get => (string)this.Fields[(int)ExtensionSymbolFields.MimeRef];
+            set => this.Set((int)ExtensionSymbolFields.MimeRef, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.FeatureRef];
-            set => this.Set((int)ExtensionTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)ExtensionSymbolFields.FeatureRef];
+            set => this.Set((int)ExtensionSymbolFields.FeatureRef, value);
         }
     }
 }

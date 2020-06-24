@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CompLocator = new IntermediateTupleDefinition(
-            TupleDefinitionType.CompLocator,
+        public static readonly IntermediateSymbolDefinition CompLocator = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.CompLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.SignatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.ComponentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CompLocatorSymbolFields.SignatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CompLocatorSymbolFields.ComponentId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CompLocatorSymbolFields.Type), IntermediateFieldType.Number),
             },
-            typeof(CompLocatorTuple));
+            typeof(CompLocatorSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum CompLocatorTupleFields
+    public enum CompLocatorSymbolFields
     {
         SignatureRef,
         ComponentId,
         Type,
     }
 
-    public class CompLocatorTuple : IntermediateTuple
+    public class CompLocatorSymbol : IntermediateSymbol
     {
-        public CompLocatorTuple() : base(TupleDefinitions.CompLocator, null, null)
+        public CompLocatorSymbol() : base(SymbolDefinitions.CompLocator, null, null)
         {
         }
 
-        public CompLocatorTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.CompLocator, sourceLineNumber, id)
+        public CompLocatorSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.CompLocator, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CompLocatorTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CompLocatorSymbolFields index] => this.Fields[(int)index];
 
         public string SignatureRef
         {
-            get => (string)this.Fields[(int)CompLocatorTupleFields.SignatureRef];
-            set => this.Set((int)CompLocatorTupleFields.SignatureRef, value);
+            get => (string)this.Fields[(int)CompLocatorSymbolFields.SignatureRef];
+            set => this.Set((int)CompLocatorSymbolFields.SignatureRef, value);
         }
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)CompLocatorTupleFields.ComponentId];
-            set => this.Set((int)CompLocatorTupleFields.ComponentId, value);
+            get => (string)this.Fields[(int)CompLocatorSymbolFields.ComponentId];
+            set => this.Set((int)CompLocatorSymbolFields.ComponentId, value);
         }
 
         public LocatorType Type
         {
-            get => (LocatorType)this.Fields[(int)CompLocatorTupleFields.Type].AsNumber();
-            set => this.Set((int)CompLocatorTupleFields.Type, (int)value);
+            get => (LocatorType)this.Fields[(int)CompLocatorSymbolFields.Type].AsNumber();
+            set => this.Set((int)CompLocatorSymbolFields.Type, (int)value);
         }
     }
 }

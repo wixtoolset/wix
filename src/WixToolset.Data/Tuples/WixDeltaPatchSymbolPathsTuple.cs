@@ -4,25 +4,25 @@ using System;
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDeltaPatchSymbolPaths = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixDeltaPatchSymbolPaths,
+        public static readonly IntermediateSymbolDefinition WixDeltaPatchSymbolPaths = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixDeltaPatchSymbolPaths,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsSymbolFields.SymbolType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsSymbolFields.SymbolId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsSymbolFields.SymbolPaths), IntermediateFieldType.String),
             },
-            typeof(WixDeltaPatchSymbolPathsTuple));
+            typeof(WixDeltaPatchSymbolPathsSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixDeltaPatchSymbolPathsTupleFields
+    public enum WixDeltaPatchSymbolPathsSymbolFields
     {
         SymbolType,
         SymbolId,
@@ -42,34 +42,34 @@ namespace WixToolset.Data.Tuples
         Product
     };
 
-    public class WixDeltaPatchSymbolPathsTuple : IntermediateTuple
+    public class WixDeltaPatchSymbolPathsSymbol : IntermediateSymbol
     {
-        public WixDeltaPatchSymbolPathsTuple() : base(TupleDefinitions.WixDeltaPatchSymbolPaths, null, null)
+        public WixDeltaPatchSymbolPathsSymbol() : base(SymbolDefinitions.WixDeltaPatchSymbolPaths, null, null)
         {
         }
 
-        public WixDeltaPatchSymbolPathsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, id)
+        public WixDeltaPatchSymbolPathsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDeltaPatchSymbolPathsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDeltaPatchSymbolPathsSymbolFields index] => this.Fields[(int)index];
 
         public SymbolPathType SymbolType
         {
-            get => (SymbolPathType)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolType].AsNumber();
-            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolType, (int)value);
+            get => (SymbolPathType)this.Fields[(int)WixDeltaPatchSymbolPathsSymbolFields.SymbolType].AsNumber();
+            set => this.Set((int)WixDeltaPatchSymbolPathsSymbolFields.SymbolType, (int)value);
         }
 
         public string SymbolId
         {
-            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolId];
-            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolId, value);
+            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsSymbolFields.SymbolId];
+            set => this.Set((int)WixDeltaPatchSymbolPathsSymbolFields.SymbolId, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolPaths];
-            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsSymbolFields.SymbolPaths];
+            set => this.Set((int)WixDeltaPatchSymbolPathsSymbolFields.SymbolPaths, value);
         }
     }
 }

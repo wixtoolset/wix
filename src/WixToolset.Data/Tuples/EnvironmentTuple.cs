@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Environment = new IntermediateTupleDefinition(
-            TupleDefinitionType.Environment,
+        public static readonly IntermediateSymbolDefinition Environment = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Environment,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Separator), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Action), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Part), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Permanent), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.System), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Separator), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Action), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Part), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.Permanent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.System), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(EnvironmentSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(EnvironmentTuple));
+            typeof(EnvironmentSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum EnvironmentTupleFields
+    public enum EnvironmentSymbolFields
     {
         Name,
         Value,
@@ -51,64 +51,64 @@ namespace WixToolset.Data.Tuples
         Last
     }
 
-    public class EnvironmentTuple : IntermediateTuple
+    public class EnvironmentSymbol : IntermediateSymbol
     {
-        public EnvironmentTuple() : base(TupleDefinitions.Environment, null, null)
+        public EnvironmentSymbol() : base(SymbolDefinitions.Environment, null, null)
         {
         }
 
-        public EnvironmentTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Environment, sourceLineNumber, id)
+        public EnvironmentSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Environment, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[EnvironmentTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[EnvironmentSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Name];
-            set => this.Set((int)EnvironmentTupleFields.Name, value);
+            get => (string)this.Fields[(int)EnvironmentSymbolFields.Name];
+            set => this.Set((int)EnvironmentSymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Value];
-            set => this.Set((int)EnvironmentTupleFields.Value, value);
+            get => (string)this.Fields[(int)EnvironmentSymbolFields.Value];
+            set => this.Set((int)EnvironmentSymbolFields.Value, value);
         }
 
         public string Separator
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Separator];
-            set => this.Set((int)EnvironmentTupleFields.Separator, value);
+            get => (string)this.Fields[(int)EnvironmentSymbolFields.Separator];
+            set => this.Set((int)EnvironmentSymbolFields.Separator, value);
         }
 
         public EnvironmentActionType? Action
         {
-            get => (EnvironmentActionType?)this.Fields[(int)EnvironmentTupleFields.Action].AsNullableNumber();
-            set => this.Set((int)EnvironmentTupleFields.Action, (int?)value);
+            get => (EnvironmentActionType?)this.Fields[(int)EnvironmentSymbolFields.Action].AsNullableNumber();
+            set => this.Set((int)EnvironmentSymbolFields.Action, (int?)value);
         }
 
         public EnvironmentPartType? Part
         {
-            get => (EnvironmentPartType?)this.Fields[(int)EnvironmentTupleFields.Part].AsNullableNumber();
-            set => this.Set((int)EnvironmentTupleFields.Part, (int?)value);
+            get => (EnvironmentPartType?)this.Fields[(int)EnvironmentSymbolFields.Part].AsNullableNumber();
+            set => this.Set((int)EnvironmentSymbolFields.Part, (int?)value);
         }
 
         public bool Permanent
         {
-            get => this.Fields[(int)EnvironmentTupleFields.Permanent].AsBool();
-            set => this.Set((int)EnvironmentTupleFields.Permanent, value);
+            get => this.Fields[(int)EnvironmentSymbolFields.Permanent].AsBool();
+            set => this.Set((int)EnvironmentSymbolFields.Permanent, value);
         }
 
         public bool System
         {
-            get => this.Fields[(int)EnvironmentTupleFields.System].AsBool();
-            set => this.Set((int)EnvironmentTupleFields.System, value);
+            get => this.Fields[(int)EnvironmentSymbolFields.System].AsBool();
+            set => this.Set((int)EnvironmentSymbolFields.System, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.ComponentRef];
-            set => this.Set((int)EnvironmentTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)EnvironmentSymbolFields.ComponentRef];
+            set => this.Set((int)EnvironmentSymbolFields.ComponentRef, value);
         }
     }
 }

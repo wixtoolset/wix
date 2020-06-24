@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixComponentGroup = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixComponentGroup,
+        public static readonly IntermediateSymbolDefinition WixComponentGroup = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixComponentGroup,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixComponentGroupTupleFields.WixComponentGroup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComponentGroupSymbolFields.WixComponentGroup), IntermediateFieldType.String),
             },
-            typeof(WixComponentGroupTuple));
+            typeof(WixComponentGroupSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixComponentGroupTupleFields
+    public enum WixComponentGroupSymbolFields
     {
         WixComponentGroup,
     }
 
-    public class WixComponentGroupTuple : IntermediateTuple
+    public class WixComponentGroupSymbol : IntermediateSymbol
     {
-        public WixComponentGroupTuple() : base(TupleDefinitions.WixComponentGroup, null, null)
+        public WixComponentGroupSymbol() : base(SymbolDefinitions.WixComponentGroup, null, null)
         {
         }
 
-        public WixComponentGroupTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixComponentGroup, sourceLineNumber, id)
+        public WixComponentGroupSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixComponentGroup, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixComponentGroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixComponentGroupSymbolFields index] => this.Fields[(int)index];
 
         public string WixComponentGroup
         {
-            get => (string)this.Fields[(int)WixComponentGroupTupleFields.WixComponentGroup];
-            set => this.Set((int)WixComponentGroupTupleFields.WixComponentGroup, value);
+            get => (string)this.Fields[(int)WixComponentGroupSymbolFields.WixComponentGroup];
+            set => this.Set((int)WixComponentGroupSymbolFields.WixComponentGroup, value);
         }
     }
 }

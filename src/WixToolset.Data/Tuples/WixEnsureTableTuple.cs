@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixEnsureTable = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixEnsureTable,
+        public static readonly IntermediateSymbolDefinition WixEnsureTable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixEnsureTable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixEnsureTableTupleFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixEnsureTableSymbolFields.Table), IntermediateFieldType.String),
             },
-            typeof(WixEnsureTableTuple));
+            typeof(WixEnsureTableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixEnsureTableTupleFields
+    public enum WixEnsureTableSymbolFields
     {
         Table,
     }
 
-    public class WixEnsureTableTuple : IntermediateTuple
+    public class WixEnsureTableSymbol : IntermediateSymbol
     {
-        public WixEnsureTableTuple() : base(TupleDefinitions.WixEnsureTable, null, null)
+        public WixEnsureTableSymbol() : base(SymbolDefinitions.WixEnsureTable, null, null)
         {
         }
 
-        public WixEnsureTableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixEnsureTable, sourceLineNumber, id)
+        public WixEnsureTableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixEnsureTable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixEnsureTableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixEnsureTableSymbolFields index] => this.Fields[(int)index];
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixEnsureTableTupleFields.Table];
-            set => this.Set((int)WixEnsureTableTupleFields.Table, value);
+            get => (string)this.Fields[(int)WixEnsureTableSymbolFields.Table];
+            set => this.Set((int)WixEnsureTableSymbolFields.Table, value);
         }
     }
 }

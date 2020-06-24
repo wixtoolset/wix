@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiDigitalCertificate = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiDigitalCertificate,
+        public static readonly IntermediateSymbolDefinition MsiDigitalCertificate = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiDigitalCertificate,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiDigitalCertificateTupleFields.CertData), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(MsiDigitalCertificateSymbolFields.CertData), IntermediateFieldType.Path),
             },
-            typeof(MsiDigitalCertificateTuple));
+            typeof(MsiDigitalCertificateSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiDigitalCertificateTupleFields
+    public enum MsiDigitalCertificateSymbolFields
     {
         CertData,
     }
 
-    public class MsiDigitalCertificateTuple : IntermediateTuple
+    public class MsiDigitalCertificateSymbol : IntermediateSymbol
     {
-        public MsiDigitalCertificateTuple() : base(TupleDefinitions.MsiDigitalCertificate, null, null)
+        public MsiDigitalCertificateSymbol() : base(SymbolDefinitions.MsiDigitalCertificate, null, null)
         {
         }
 
-        public MsiDigitalCertificateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiDigitalCertificate, sourceLineNumber, id)
+        public MsiDigitalCertificateSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiDigitalCertificate, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiDigitalCertificateTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiDigitalCertificateSymbolFields index] => this.Fields[(int)index];
 
         public string CertData
         {
-            get => (string)this.Fields[(int)MsiDigitalCertificateTupleFields.CertData];
-            set => this.Set((int)MsiDigitalCertificateTupleFields.CertData, value);
+            get => (string)this.Fields[(int)MsiDigitalCertificateSymbolFields.CertData];
+            set => this.Set((int)MsiDigitalCertificateSymbolFields.CertData, value);
         }
     }
 }

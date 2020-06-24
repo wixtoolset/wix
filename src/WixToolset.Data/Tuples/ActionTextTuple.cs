@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ActionText = new IntermediateTupleDefinition(
-            TupleDefinitionType.ActionText,
+        public static readonly IntermediateSymbolDefinition ActionText = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.ActionText,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ActionTextTupleFields.Action), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ActionTextTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ActionTextTupleFields.Template), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ActionTextSymbolFields.Action), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ActionTextSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ActionTextSymbolFields.Template), IntermediateFieldType.String),
             },
-            typeof(ActionTextTuple));
+            typeof(ActionTextSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum ActionTextTupleFields
+    public enum ActionTextSymbolFields
     {
         Action,
         Description,
         Template,
     }
 
-    public class ActionTextTuple : IntermediateTuple
+    public class ActionTextSymbol : IntermediateSymbol
     {
-        public ActionTextTuple() : base(TupleDefinitions.ActionText, null, null)
+        public ActionTextSymbol() : base(SymbolDefinitions.ActionText, null, null)
         {
         }
 
-        public ActionTextTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.ActionText, sourceLineNumber, id)
+        public ActionTextSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.ActionText, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ActionTextTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ActionTextSymbolFields index] => this.Fields[(int)index];
 
         public string Action
         {
-            get => (string)this.Fields[(int)ActionTextTupleFields.Action];
-            set => this.Set((int)ActionTextTupleFields.Action, value);
+            get => (string)this.Fields[(int)ActionTextSymbolFields.Action];
+            set => this.Set((int)ActionTextSymbolFields.Action, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ActionTextTupleFields.Description];
-            set => this.Set((int)ActionTextTupleFields.Description, value);
+            get => (string)this.Fields[(int)ActionTextSymbolFields.Description];
+            set => this.Set((int)ActionTextSymbolFields.Description, value);
         }
 
         public string Template
         {
-            get => (string)this.Fields[(int)ActionTextTupleFields.Template];
-            set => this.Set((int)ActionTextTupleFields.Template, value);
+            get => (string)this.Fields[(int)ActionTextSymbolFields.Template];
+            set => this.Set((int)ActionTextSymbolFields.Template, value);
         }
     }
 }

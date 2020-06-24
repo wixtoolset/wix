@@ -2,50 +2,50 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition File = new IntermediateTupleDefinition(
-            TupleDefinitionType.File,
+        public static readonly IntermediateSymbolDefinition File = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.File,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.ShortName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.FileSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Version), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Language), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.DiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Source), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.ShortName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.FileSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Version), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Language), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.DiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Source), IntermediateFieldType.Path),
 
-                new IntermediateFieldDefinition(nameof(FileTupleFields.FontTitle), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.SelfRegCost), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.BindPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.FontTitle), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.SelfRegCost), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.BindPath), IntermediateFieldType.String),
 
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.Sequence), IntermediateFieldType.Number),
 
-                new IntermediateFieldDefinition(nameof(FileTupleFields.PatchGroup), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.PatchAttributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.DeltaPatchHeaderSource), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.PatchGroup), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.PatchAttributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.DeltaPatchHeaderSource), IntermediateFieldType.String),
 
-                new IntermediateFieldDefinition(nameof(FileTupleFields.RetainLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.IgnoreOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.IgnoreLengths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.RetainOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.RetainLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.IgnoreOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.IgnoreLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSymbolFields.SymbolPaths), IntermediateFieldType.String),
             },
-            typeof(FileTuple));
+            typeof(FileSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum FileTupleFields
+    public enum FileSymbolFields
     {
         ComponentRef,
         Name,
@@ -76,7 +76,7 @@ namespace WixToolset.Data.Tuples
     }
 
     [Flags]
-    public enum FileTupleAttributes : int
+    public enum FileSymbolAttributes : int
     {
         None = 0x0,
         ReadOnly = 0x1,
@@ -110,148 +110,148 @@ namespace WixToolset.Data.Tuples
         Defined = Ignore | IncludeWholeFile | AllowIgnoreOnError
     }
 
-    public class FileTuple : IntermediateTuple
+    public class FileSymbol : IntermediateSymbol
     {
-        public FileTuple() : base(TupleDefinitions.File, null, null)
+        public FileSymbol() : base(SymbolDefinitions.File, null, null)
         {
         }
 
-        public FileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.File, sourceLineNumber, id)
+        public FileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.File, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FileSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)FileTupleFields.ComponentRef];
-            set => this.Set((int)FileTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)FileSymbolFields.ComponentRef];
+            set => this.Set((int)FileSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)FileTupleFields.Name];
-            set => this.Set((int)FileTupleFields.Name, value);
+            get => (string)this.Fields[(int)FileSymbolFields.Name];
+            set => this.Set((int)FileSymbolFields.Name, value);
         }
 
         public string ShortName
         {
-            get => (string)this.Fields[(int)FileTupleFields.ShortName];
-            set => this.Set((int)FileTupleFields.ShortName, value);
+            get => (string)this.Fields[(int)FileSymbolFields.ShortName];
+            set => this.Set((int)FileSymbolFields.ShortName, value);
         }
 
         public int FileSize
         {
-            get => (int)this.Fields[(int)FileTupleFields.FileSize];
-            set => this.Set((int)FileTupleFields.FileSize, value);
+            get => (int)this.Fields[(int)FileSymbolFields.FileSize];
+            set => this.Set((int)FileSymbolFields.FileSize, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)FileTupleFields.Version];
-            set => this.Set((int)FileTupleFields.Version, value);
+            get => (string)this.Fields[(int)FileSymbolFields.Version];
+            set => this.Set((int)FileSymbolFields.Version, value);
         }
 
         public string Language
         {
-            get => (string)this.Fields[(int)FileTupleFields.Language];
-            set => this.Set((int)FileTupleFields.Language, value);
+            get => (string)this.Fields[(int)FileSymbolFields.Language];
+            set => this.Set((int)FileSymbolFields.Language, value);
         }
 
-        public FileTupleAttributes Attributes
+        public FileSymbolAttributes Attributes
         {
-            get => (FileTupleAttributes)this.Fields[(int)FileTupleFields.Attributes].AsNumber();
-            set => this.Set((int)FileTupleFields.Attributes, (int)value);
+            get => (FileSymbolAttributes)this.Fields[(int)FileSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)FileSymbolFields.Attributes, (int)value);
         }
 
         public string DirectoryRef
         {
-            get => (string)this.Fields[(int)FileTupleFields.DirectoryRef];
-            set => this.Set((int)FileTupleFields.DirectoryRef, value);
+            get => (string)this.Fields[(int)FileSymbolFields.DirectoryRef];
+            set => this.Set((int)FileSymbolFields.DirectoryRef, value);
         }
 
         public int? DiskId
         {
-            get => (int?)this.Fields[(int)FileTupleFields.DiskId];
-            set => this.Set((int)FileTupleFields.DiskId, value);
+            get => (int?)this.Fields[(int)FileSymbolFields.DiskId];
+            set => this.Set((int)FileSymbolFields.DiskId, value);
         }
 
         public IntermediateFieldPathValue Source
         {
-            get => this.Fields[(int)FileTupleFields.Source].AsPath();
-            set => this.Set((int)FileTupleFields.Source, value);
+            get => this.Fields[(int)FileSymbolFields.Source].AsPath();
+            set => this.Set((int)FileSymbolFields.Source, value);
         }
 
         public string FontTitle
         {
-            get => (string)this.Fields[(int)FileTupleFields.FontTitle];
-            set => this.Set((int)FileTupleFields.FontTitle, value);
+            get => (string)this.Fields[(int)FileSymbolFields.FontTitle];
+            set => this.Set((int)FileSymbolFields.FontTitle, value);
         }
 
         public int? SelfRegCost
         {
-            get => (int?)this.Fields[(int)FileTupleFields.SelfRegCost];
-            set => this.Set((int)FileTupleFields.SelfRegCost, value);
+            get => (int?)this.Fields[(int)FileSymbolFields.SelfRegCost];
+            set => this.Set((int)FileSymbolFields.SelfRegCost, value);
         }
 
         public string BindPath
         {
-            get => (string)this.Fields[(int)FileTupleFields.BindPath];
-            set => this.Set((int)FileTupleFields.BindPath, value);
+            get => (string)this.Fields[(int)FileSymbolFields.BindPath];
+            set => this.Set((int)FileSymbolFields.BindPath, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)FileTupleFields.Sequence];
-            set => this.Set((int)FileTupleFields.Sequence, value);
+            get => (int)this.Fields[(int)FileSymbolFields.Sequence];
+            set => this.Set((int)FileSymbolFields.Sequence, value);
         }
 
         public int? PatchGroup
         {
-            get => (int?)this.Fields[(int)FileTupleFields.PatchGroup];
-            set => this.Set((int)FileTupleFields.PatchGroup, value);
+            get => (int?)this.Fields[(int)FileSymbolFields.PatchGroup];
+            set => this.Set((int)FileSymbolFields.PatchGroup, value);
         }
 
         public PatchAttributeType? PatchAttributes
         {
-            get => (PatchAttributeType?)this.Fields[(int)FileTupleFields.PatchAttributes].AsNullableNumber();
-            set => this.Set((int)FileTupleFields.PatchAttributes, (int?)value);
+            get => (PatchAttributeType?)this.Fields[(int)FileSymbolFields.PatchAttributes].AsNullableNumber();
+            set => this.Set((int)FileSymbolFields.PatchAttributes, (int?)value);
         }
 
         public string DeltaPatchHeaderSource
         {
-            get => (string)this.Fields[(int)FileTupleFields.DeltaPatchHeaderSource];
-            set => this.Set((int)FileTupleFields.DeltaPatchHeaderSource, value);
+            get => (string)this.Fields[(int)FileSymbolFields.DeltaPatchHeaderSource];
+            set => this.Set((int)FileSymbolFields.DeltaPatchHeaderSource, value);
         }
 
         public string RetainLengths
         {
-            get => (string)this.Fields[(int)FileTupleFields.RetainLengths];
-            set => this.Set((int)FileTupleFields.RetainLengths, value);
+            get => (string)this.Fields[(int)FileSymbolFields.RetainLengths];
+            set => this.Set((int)FileSymbolFields.RetainLengths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)FileTupleFields.IgnoreOffsets];
-            set => this.Set((int)FileTupleFields.IgnoreOffsets, value);
+            get => (string)this.Fields[(int)FileSymbolFields.IgnoreOffsets];
+            set => this.Set((int)FileSymbolFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)FileTupleFields.IgnoreLengths];
-            set => this.Set((int)FileTupleFields.IgnoreLengths, value);
+            get => (string)this.Fields[(int)FileSymbolFields.IgnoreLengths];
+            set => this.Set((int)FileSymbolFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)FileTupleFields.RetainOffsets];
-            set => this.Set((int)FileTupleFields.RetainOffsets, value);
+            get => (string)this.Fields[(int)FileSymbolFields.RetainOffsets];
+            set => this.Set((int)FileSymbolFields.RetainOffsets, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)FileTupleFields.SymbolPaths];
-            set => this.Set((int)FileTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)FileSymbolFields.SymbolPaths];
+            set => this.Set((int)FileSymbolFields.SymbolPaths, value);
         }
     }
 }

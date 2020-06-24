@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition UpgradedFilesToIgnore = new IntermediateTupleDefinition(
-            TupleDefinitionType.UpgradedFilesToIgnore,
+        public static readonly IntermediateSymbolDefinition UpgradedFilesToIgnore = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.UpgradedFilesToIgnore,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UpgradedFilesToIgnoreTupleFields.Upgraded), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedFilesToIgnoreTupleFields.FTK), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesToIgnoreSymbolFields.Upgraded), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesToIgnoreSymbolFields.FTK), IntermediateFieldType.String),
             },
-            typeof(UpgradedFilesToIgnoreTuple));
+            typeof(UpgradedFilesToIgnoreSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum UpgradedFilesToIgnoreTupleFields
+    public enum UpgradedFilesToIgnoreSymbolFields
     {
         Upgraded,
         FTK,
     }
 
-    public class UpgradedFilesToIgnoreTuple : IntermediateTuple
+    public class UpgradedFilesToIgnoreSymbol : IntermediateSymbol
     {
-        public UpgradedFilesToIgnoreTuple() : base(TupleDefinitions.UpgradedFilesToIgnore, null, null)
+        public UpgradedFilesToIgnoreSymbol() : base(SymbolDefinitions.UpgradedFilesToIgnore, null, null)
         {
         }
 
-        public UpgradedFilesToIgnoreTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.UpgradedFilesToIgnore, sourceLineNumber, id)
+        public UpgradedFilesToIgnoreSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.UpgradedFilesToIgnore, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UpgradedFilesToIgnoreTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UpgradedFilesToIgnoreSymbolFields index] => this.Fields[(int)index];
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.Upgraded];
-            set => this.Set((int)UpgradedFilesToIgnoreTupleFields.Upgraded, value);
+            get => (string)this.Fields[(int)UpgradedFilesToIgnoreSymbolFields.Upgraded];
+            set => this.Set((int)UpgradedFilesToIgnoreSymbolFields.Upgraded, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.FTK];
-            set => this.Set((int)UpgradedFilesToIgnoreTupleFields.FTK, value);
+            get => (string)this.Fields[(int)UpgradedFilesToIgnoreSymbolFields.FTK];
+            set => this.Set((int)UpgradedFilesToIgnoreSymbolFields.FTK, value);
         }
     }
 }

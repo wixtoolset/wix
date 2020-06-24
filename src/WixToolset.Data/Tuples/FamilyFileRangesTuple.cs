@@ -2,26 +2,26 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition FamilyFileRanges = new IntermediateTupleDefinition(
-            TupleDefinitionType.FamilyFileRanges,
+        public static readonly IntermediateSymbolDefinition FamilyFileRanges = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.FamilyFileRanges,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FamilyFileRangesTupleFields.Family), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FamilyFileRangesTupleFields.FTK), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FamilyFileRangesTupleFields.RetainOffsets), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FamilyFileRangesTupleFields.RetainLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FamilyFileRangesSymbolFields.Family), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FamilyFileRangesSymbolFields.FTK), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FamilyFileRangesSymbolFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FamilyFileRangesSymbolFields.RetainLengths), IntermediateFieldType.String),
             },
-            typeof(FamilyFileRangesTuple));
+            typeof(FamilyFileRangesSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum FamilyFileRangesTupleFields
+    public enum FamilyFileRangesSymbolFields
     {
         Family,
         FTK,
@@ -29,40 +29,40 @@ namespace WixToolset.Data.Tuples
         RetainLengths,
     }
 
-    public class FamilyFileRangesTuple : IntermediateTuple
+    public class FamilyFileRangesSymbol : IntermediateSymbol
     {
-        public FamilyFileRangesTuple() : base(TupleDefinitions.FamilyFileRanges, null, null)
+        public FamilyFileRangesSymbol() : base(SymbolDefinitions.FamilyFileRanges, null, null)
         {
         }
 
-        public FamilyFileRangesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.FamilyFileRanges, sourceLineNumber, id)
+        public FamilyFileRangesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.FamilyFileRanges, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FamilyFileRangesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FamilyFileRangesSymbolFields index] => this.Fields[(int)index];
 
         public string Family
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.Family];
-            set => this.Set((int)FamilyFileRangesTupleFields.Family, value);
+            get => (string)this.Fields[(int)FamilyFileRangesSymbolFields.Family];
+            set => this.Set((int)FamilyFileRangesSymbolFields.Family, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.FTK];
-            set => this.Set((int)FamilyFileRangesTupleFields.FTK, value);
+            get => (string)this.Fields[(int)FamilyFileRangesSymbolFields.FTK];
+            set => this.Set((int)FamilyFileRangesSymbolFields.FTK, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainOffsets];
-            set => this.Set((int)FamilyFileRangesTupleFields.RetainOffsets, value);
+            get => (string)this.Fields[(int)FamilyFileRangesSymbolFields.RetainOffsets];
+            set => this.Set((int)FamilyFileRangesSymbolFields.RetainOffsets, value);
         }
 
         public string RetainLengths
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainLengths];
-            set => this.Set((int)FamilyFileRangesTupleFields.RetainLengths, value);
+            get => (string)this.Fields[(int)FamilyFileRangesSymbolFields.RetainLengths];
+            set => this.Set((int)FamilyFileRangesSymbolFields.RetainLengths, value);
         }
     }
 }

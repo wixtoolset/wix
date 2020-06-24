@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PatchMetadata = new IntermediateTupleDefinition(
-            TupleDefinitionType.PatchMetadata,
+        public static readonly IntermediateSymbolDefinition PatchMetadata = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.PatchMetadata,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PatchMetadataTupleFields.Company), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchMetadataTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchMetadataTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchMetadataSymbolFields.Company), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchMetadataSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchMetadataSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(PatchMetadataTuple));
+            typeof(PatchMetadataSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum PatchMetadataTupleFields
+    public enum PatchMetadataSymbolFields
     {
         Company,
         Property,
         Value,
     }
 
-    public class PatchMetadataTuple : IntermediateTuple
+    public class PatchMetadataSymbol : IntermediateSymbol
     {
-        public PatchMetadataTuple() : base(TupleDefinitions.PatchMetadata, null, null)
+        public PatchMetadataSymbol() : base(SymbolDefinitions.PatchMetadata, null, null)
         {
         }
 
-        public PatchMetadataTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.PatchMetadata, sourceLineNumber, id)
+        public PatchMetadataSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.PatchMetadata, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PatchMetadataTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PatchMetadataSymbolFields index] => this.Fields[(int)index];
 
         public string Company
         {
-            get => (string)this.Fields[(int)PatchMetadataTupleFields.Company];
-            set => this.Set((int)PatchMetadataTupleFields.Company, value);
+            get => (string)this.Fields[(int)PatchMetadataSymbolFields.Company];
+            set => this.Set((int)PatchMetadataSymbolFields.Company, value);
         }
 
         public string Property
         {
-            get => (string)this.Fields[(int)PatchMetadataTupleFields.Property];
-            set => this.Set((int)PatchMetadataTupleFields.Property, value);
+            get => (string)this.Fields[(int)PatchMetadataSymbolFields.Property];
+            set => this.Set((int)PatchMetadataSymbolFields.Property, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)PatchMetadataTupleFields.Value];
-            set => this.Set((int)PatchMetadataTupleFields.Value, value);
+            get => (string)this.Fields[(int)PatchMetadataSymbolFields.Value];
+            set => this.Set((int)PatchMetadataSymbolFields.Value, value);
         }
     }
 }

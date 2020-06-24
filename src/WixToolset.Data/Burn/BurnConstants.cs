@@ -12,8 +12,8 @@ namespace WixToolset.Data.Burn
         public const string BundleExtensionDataWixOutputStreamName = "wix-bextdata";
         public const string BootstrapperApplicationDataWixOutputStreamName = "wix-badata.xml";
 
-        public const string BootstrapperApplicationDataTupleDefinitionTag = "WixBootstrapperApplicationData";
-        public const string BundleExtensionSearchTupleDefinitionTag = "WixBundleExtensionSearch";
+        public const string BootstrapperApplicationDataSymbolDefinitionTag = "WixBootstrapperApplicationData";
+        public const string BundleExtensionSearchSymbolDefinitionTag = "WixBundleExtensionSearch";
 
         // The following constants must stay in sync with src\burn\engine\core.h
         public const string BURN_BUNDLE_NAME = "WixBundleName";

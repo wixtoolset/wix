@@ -2,33 +2,33 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixFileSearch = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixFileSearch,
+        public static readonly IntermediateSymbolDefinition WixFileSearch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixFileSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MinVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MaxVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MinSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MaxSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MinDate), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MaxDate), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.Languages), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Path), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MinVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MaxVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MinSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MaxSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MinDate), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.MaxDate), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Languages), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileSearchSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixFileSearchTuple));
+            typeof(WixFileSearchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixFileSearchTupleFields
+    public enum WixFileSearchSymbolFields
     {
         Path,
         MinVersion,
@@ -56,70 +56,70 @@ namespace WixToolset.Data.Tuples
         IsDirectory = 0x200,
     }
 
-    public class WixFileSearchTuple : IntermediateTuple
+    public class WixFileSearchSymbol : IntermediateSymbol
     {
-        public WixFileSearchTuple() : base(TupleDefinitions.WixFileSearch, null, null)
+        public WixFileSearchSymbol() : base(SymbolDefinitions.WixFileSearch, null, null)
         {
         }
 
-        public WixFileSearchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixFileSearch, sourceLineNumber, id)
+        public WixFileSearchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixFileSearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixFileSearchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixFileSearchSymbolFields index] => this.Fields[(int)index];
 
         public string Path
         {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.Path];
-            set => this.Set((int)WixFileSearchTupleFields.Path, value);
+            get => (string)this.Fields[(int)WixFileSearchSymbolFields.Path];
+            set => this.Set((int)WixFileSearchSymbolFields.Path, value);
         }
 
         public string MinVersion
         {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.MinVersion];
-            set => this.Set((int)WixFileSearchTupleFields.MinVersion, value);
+            get => (string)this.Fields[(int)WixFileSearchSymbolFields.MinVersion];
+            set => this.Set((int)WixFileSearchSymbolFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.MaxVersion];
-            set => this.Set((int)WixFileSearchTupleFields.MaxVersion, value);
+            get => (string)this.Fields[(int)WixFileSearchSymbolFields.MaxVersion];
+            set => this.Set((int)WixFileSearchSymbolFields.MaxVersion, value);
         }
 
         public int? MinSize
         {
-            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MinSize];
-            set => this.Set((int)WixFileSearchTupleFields.MinSize, value);
+            get => (int?)this.Fields[(int)WixFileSearchSymbolFields.MinSize];
+            set => this.Set((int)WixFileSearchSymbolFields.MinSize, value);
         }
 
         public int? MaxSize
         {
-            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MaxSize];
-            set => this.Set((int)WixFileSearchTupleFields.MaxSize, value);
+            get => (int?)this.Fields[(int)WixFileSearchSymbolFields.MaxSize];
+            set => this.Set((int)WixFileSearchSymbolFields.MaxSize, value);
         }
 
         public int? MinDate
         {
-            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MinDate];
-            set => this.Set((int)WixFileSearchTupleFields.MinDate, value);
+            get => (int?)this.Fields[(int)WixFileSearchSymbolFields.MinDate];
+            set => this.Set((int)WixFileSearchSymbolFields.MinDate, value);
         }
 
         public int? MaxDate
         {
-            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MaxDate];
-            set => this.Set((int)WixFileSearchTupleFields.MaxDate, value);
+            get => (int?)this.Fields[(int)WixFileSearchSymbolFields.MaxDate];
+            set => this.Set((int)WixFileSearchSymbolFields.MaxDate, value);
         }
 
         public string Languages
         {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.Languages];
-            set => this.Set((int)WixFileSearchTupleFields.Languages, value);
+            get => (string)this.Fields[(int)WixFileSearchSymbolFields.Languages];
+            set => this.Set((int)WixFileSearchSymbolFields.Languages, value);
         }
 
         public WixFileSearchAttributes Attributes
         {
-            get => (WixFileSearchAttributes)this.Fields[(int)WixFileSearchTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixFileSearchTupleFields.Attributes, (int)value);
+            get => (WixFileSearchAttributes)this.Fields[(int)WixFileSearchSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixFileSearchSymbolFields.Attributes, (int)value);
         }
     }
 }

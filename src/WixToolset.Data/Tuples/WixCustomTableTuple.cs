@@ -2,53 +2,53 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixCustomTable = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixCustomTable,
+        public static readonly IntermediateSymbolDefinition WixCustomTable = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixCustomTable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.ColumnNames), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Unreal), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixCustomTableSymbolFields.ColumnNames), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixCustomTableSymbolFields.Unreal), IntermediateFieldType.Bool),
             },
-            typeof(WixCustomTableTuple));
+            typeof(WixCustomTableSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum WixCustomTableTupleFields
+    public enum WixCustomTableSymbolFields
     {
         ColumnNames,
         Unreal,
     }
 
-    public class WixCustomTableTuple : IntermediateTuple
+    public class WixCustomTableSymbol : IntermediateSymbol
     {
         public const char ColumnNamesSeparator = '\x85';
 
-        public WixCustomTableTuple() : base(TupleDefinitions.WixCustomTable, null, null)
+        public WixCustomTableSymbol() : base(SymbolDefinitions.WixCustomTable, null, null)
         {
         }
 
-        public WixCustomTableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixCustomTable, sourceLineNumber, id)
+        public WixCustomTableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixCustomTable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixCustomTableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixCustomTableSymbolFields index] => this.Fields[(int)index];
 
         public string ColumnNames
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnNames];
-            set => this.Set((int)WixCustomTableTupleFields.ColumnNames, value);
+            get => (string)this.Fields[(int)WixCustomTableSymbolFields.ColumnNames];
+            set => this.Set((int)WixCustomTableSymbolFields.ColumnNames, value);
         }
 
         public bool Unreal
         {
-            get => (bool)this.Fields[(int)WixCustomTableTupleFields.Unreal];
-            set => this.Set((int)WixCustomTableTupleFields.Unreal, value);
+            get => (bool)this.Fields[(int)WixCustomTableSymbolFields.Unreal];
+            set => this.Set((int)WixCustomTableSymbolFields.Unreal, value);
         }
 
         public string[] ColumnNamesSeparated => this.ColumnNames.Split(ColumnNamesSeparator);

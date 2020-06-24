@@ -2,51 +2,51 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition FeatureComponents = new IntermediateTupleDefinition(
-            TupleDefinitionType.FeatureComponents,
+        public static readonly IntermediateSymbolDefinition FeatureComponents = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.FeatureComponents,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureComponentsSymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureComponentsSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(FeatureComponentsTuple));
+            typeof(FeatureComponentsSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum FeatureComponentsTupleFields
+    public enum FeatureComponentsSymbolFields
     {
         FeatureRef,
         ComponentRef,
     }
 
-    public class FeatureComponentsTuple : IntermediateTuple
+    public class FeatureComponentsSymbol : IntermediateSymbol
     {
-        public FeatureComponentsTuple() : base(TupleDefinitions.FeatureComponents, null, null)
+        public FeatureComponentsSymbol() : base(SymbolDefinitions.FeatureComponents, null, null)
         {
         }
 
-        public FeatureComponentsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.FeatureComponents, sourceLineNumber, id)
+        public FeatureComponentsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.FeatureComponents, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FeatureComponentsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FeatureComponentsSymbolFields index] => this.Fields[(int)index];
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)FeatureComponentsTupleFields.FeatureRef];
-            set => this.Set((int)FeatureComponentsTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)FeatureComponentsSymbolFields.FeatureRef];
+            set => this.Set((int)FeatureComponentsSymbolFields.FeatureRef, value);
         }
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)FeatureComponentsTupleFields.ComponentRef];
-            set => this.Set((int)FeatureComponentsTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)FeatureComponentsSymbolFields.ComponentRef];
+            set => this.Set((int)FeatureComponentsSymbolFields.ComponentRef, value);
         }
     }
 }

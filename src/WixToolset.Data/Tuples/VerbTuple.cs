@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Verb = new IntermediateTupleDefinition(
-            TupleDefinitionType.Verb,
+        public static readonly IntermediateSymbolDefinition Verb = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Verb,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.ExtensionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.Verb), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.Sequence), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.Command), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.Argument), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(VerbSymbolFields.ExtensionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(VerbSymbolFields.Verb), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(VerbSymbolFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(VerbSymbolFields.Command), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(VerbSymbolFields.Argument), IntermediateFieldType.String),
             },
-            typeof(VerbTuple));
+            typeof(VerbSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum VerbTupleFields
+    public enum VerbSymbolFields
     {
         ExtensionRef,
         Verb,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         Argument,
     }
 
-    public class VerbTuple : IntermediateTuple
+    public class VerbSymbol : IntermediateSymbol
     {
-        public VerbTuple() : base(TupleDefinitions.Verb, null, null)
+        public VerbSymbol() : base(SymbolDefinitions.Verb, null, null)
         {
         }
 
-        public VerbTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Verb, sourceLineNumber, id)
+        public VerbSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Verb, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[VerbTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[VerbSymbolFields index] => this.Fields[(int)index];
 
         public string ExtensionRef
         {
-            get => (string)this.Fields[(int)VerbTupleFields.ExtensionRef];
-            set => this.Set((int)VerbTupleFields.ExtensionRef, value);
+            get => (string)this.Fields[(int)VerbSymbolFields.ExtensionRef];
+            set => this.Set((int)VerbSymbolFields.ExtensionRef, value);
         }
 
         public string Verb
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Verb];
-            set => this.Set((int)VerbTupleFields.Verb, value);
+            get => (string)this.Fields[(int)VerbSymbolFields.Verb];
+            set => this.Set((int)VerbSymbolFields.Verb, value);
         }
 
         public int? Sequence
         {
-            get => (int?)this.Fields[(int)VerbTupleFields.Sequence];
-            set => this.Set((int)VerbTupleFields.Sequence, value);
+            get => (int?)this.Fields[(int)VerbSymbolFields.Sequence];
+            set => this.Set((int)VerbSymbolFields.Sequence, value);
         }
 
         public string Command
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Command];
-            set => this.Set((int)VerbTupleFields.Command, value);
+            get => (string)this.Fields[(int)VerbSymbolFields.Command];
+            set => this.Set((int)VerbSymbolFields.Command, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Argument];
-            set => this.Set((int)VerbTupleFields.Argument, value);
+            get => (string)this.Fields[(int)VerbSymbolFields.Argument];
+            set => this.Set((int)VerbSymbolFields.Argument, value);
         }
     }
 }

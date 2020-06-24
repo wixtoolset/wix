@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixComplexReference = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixComplexReference,
+        public static readonly IntermediateSymbolDefinition WixComplexReference = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixComplexReference,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.Parent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.ParentAttributes), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.ParentLanguage), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.Child), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.ChildAttributes), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceTupleFields.Attributes), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Parent), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ParentAttributes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ParentLanguage), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Child), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ChildAttributes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Attributes), IntermediateFieldType.Bool),
             },
-            typeof(WixComplexReferenceTuple));
+            typeof(WixComplexReferenceSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixComplexReferenceTupleFields
+    public enum WixComplexReferenceSymbolFields
     {
         Parent,
         ParentAttributes,
@@ -35,52 +35,52 @@ namespace WixToolset.Data.Tuples
         Attributes,
     }
 
-    public class WixComplexReferenceTuple : IntermediateTuple
+    public class WixComplexReferenceSymbol : IntermediateSymbol
     {
-        public WixComplexReferenceTuple() : base(TupleDefinitions.WixComplexReference, null, null)
+        public WixComplexReferenceSymbol() : base(SymbolDefinitions.WixComplexReference, null, null)
         {
         }
 
-        public WixComplexReferenceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixComplexReference, sourceLineNumber, id)
+        public WixComplexReferenceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixComplexReference, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixComplexReferenceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixComplexReferenceSymbolFields index] => this.Fields[(int)index];
 
         public string Parent
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Parent];
-            set => this.Set((int)WixComplexReferenceTupleFields.Parent, value);
+            get => (string)this.Fields[(int)WixComplexReferenceSymbolFields.Parent];
+            set => this.Set((int)WixComplexReferenceSymbolFields.Parent, value);
         }
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentAttributes], true);
-            set => this.Set((int)WixComplexReferenceTupleFields.ParentAttributes, value.ToString());
+            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixComplexReferenceSymbolFields.ParentAttributes], true);
+            set => this.Set((int)WixComplexReferenceSymbolFields.ParentAttributes, value.ToString());
         }
 
         public string ParentLanguage
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentLanguage];
-            set => this.Set((int)WixComplexReferenceTupleFields.ParentLanguage, value);
+            get => (string)this.Fields[(int)WixComplexReferenceSymbolFields.ParentLanguage];
+            set => this.Set((int)WixComplexReferenceSymbolFields.ParentLanguage, value);
         }
 
         public string Child
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Child];
-            set => this.Set((int)WixComplexReferenceTupleFields.Child, value);
+            get => (string)this.Fields[(int)WixComplexReferenceSymbolFields.Child];
+            set => this.Set((int)WixComplexReferenceSymbolFields.Child, value);
         }
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ChildAttributes], true);
-            set => this.Set((int)WixComplexReferenceTupleFields.ChildAttributes, value.ToString());
+            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixComplexReferenceSymbolFields.ChildAttributes], true);
+            set => this.Set((int)WixComplexReferenceSymbolFields.ChildAttributes, value.ToString());
         }
 
         public bool IsPrimary
         {
-            get => (bool)this.Fields[(int)WixComplexReferenceTupleFields.Attributes];
-            set => this.Set((int)WixComplexReferenceTupleFields.Attributes, value);
+            get => (bool)this.Fields[(int)WixComplexReferenceSymbolFields.Attributes];
+            set => this.Set((int)WixComplexReferenceSymbolFields.Attributes, value);
         }
     }
 }

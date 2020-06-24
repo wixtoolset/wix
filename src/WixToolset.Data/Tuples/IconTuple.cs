@@ -2,43 +2,43 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Icon = new IntermediateTupleDefinition(
-            TupleDefinitionType.Icon,
+        public static readonly IntermediateSymbolDefinition Icon = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Icon,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IconTupleFields.Data), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(IconSymbolFields.Data), IntermediateFieldType.Path),
             },
-            typeof(IconTuple));
+            typeof(IconSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum IconTupleFields
+    public enum IconSymbolFields
     {
         Data,
     }
 
-    public class IconTuple : IntermediateTuple
+    public class IconSymbol : IntermediateSymbol
     {
-        public IconTuple() : base(TupleDefinitions.Icon, null, null)
+        public IconSymbol() : base(SymbolDefinitions.Icon, null, null)
         {
         }
 
-        public IconTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Icon, sourceLineNumber, id)
+        public IconSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Icon, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IconTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IconSymbolFields index] => this.Fields[(int)index];
 
         public IntermediateFieldPathValue Data
         {
-            get => this.Fields[(int)IconTupleFields.Data].AsPath();
-            set => this.Set((int)IconTupleFields.Data, value);
+            get => this.Fields[(int)IconSymbolFields.Data].AsPath();
+            set => this.Set((int)IconSymbolFields.Data, value);
         }
     }
 }

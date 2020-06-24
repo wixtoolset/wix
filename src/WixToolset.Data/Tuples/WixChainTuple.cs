@@ -2,25 +2,25 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixChain = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixChain,
+        public static readonly IntermediateSymbolDefinition WixChain = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixChain,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixChainTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixChainSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixChainTuple));
+            typeof(WixChainSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixChainTupleFields
+    public enum WixChainSymbolFields
     {
         Attributes,
     }
@@ -34,22 +34,22 @@ namespace WixToolset.Data.Tuples
         ParallelCache = 0x4,
     }
 
-    public class WixChainTuple : IntermediateTuple
+    public class WixChainSymbol : IntermediateSymbol
     {
-        public WixChainTuple() : base(TupleDefinitions.WixChain, null, null)
+        public WixChainSymbol() : base(SymbolDefinitions.WixChain, null, null)
         {
         }
 
-        public WixChainTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixChain, sourceLineNumber, id)
+        public WixChainSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixChain, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixChainTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixChainSymbolFields index] => this.Fields[(int)index];
 
         public WixChainAttributes Attributes
         {
-            get => (WixChainAttributes)(int)this.Fields[(int)WixChainTupleFields.Attributes];
-            set => this.Set((int)WixChainTupleFields.Attributes, (int)value);
+            get => (WixChainAttributes)(int)this.Fields[(int)WixChainSymbolFields.Attributes];
+            set => this.Set((int)WixChainSymbolFields.Attributes, (int)value);
         }
 
         public bool DisableRollback => (this.Attributes & WixChainAttributes.DisableRollback) == WixChainAttributes.DisableRollback;

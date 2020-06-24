@@ -2,59 +2,59 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MsiPatchMetadata = new IntermediateTupleDefinition(
-            TupleDefinitionType.MsiPatchMetadata,
+        public static readonly IntermediateSymbolDefinition MsiPatchMetadata = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.MsiPatchMetadata,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiPatchMetadataTupleFields.Company), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchMetadataTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchMetadataTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchMetadataSymbolFields.Company), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchMetadataSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchMetadataSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(MsiPatchMetadataTuple));
+            typeof(MsiPatchMetadataSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum MsiPatchMetadataTupleFields
+    public enum MsiPatchMetadataSymbolFields
     {
         Company,
         Property,
         Value,
     }
 
-    public class MsiPatchMetadataTuple : IntermediateTuple
+    public class MsiPatchMetadataSymbol : IntermediateSymbol
     {
-        public MsiPatchMetadataTuple() : base(TupleDefinitions.MsiPatchMetadata, null, null)
+        public MsiPatchMetadataSymbol() : base(SymbolDefinitions.MsiPatchMetadata, null, null)
         {
         }
 
-        public MsiPatchMetadataTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.MsiPatchMetadata, sourceLineNumber, id)
+        public MsiPatchMetadataSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.MsiPatchMetadata, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MsiPatchMetadataTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MsiPatchMetadataSymbolFields index] => this.Fields[(int)index];
 
         public string Company
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Company];
-            set => this.Set((int)MsiPatchMetadataTupleFields.Company, value);
+            get => (string)this.Fields[(int)MsiPatchMetadataSymbolFields.Company];
+            set => this.Set((int)MsiPatchMetadataSymbolFields.Company, value);
         }
 
         public string Property
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Property];
-            set => this.Set((int)MsiPatchMetadataTupleFields.Property, value);
+            get => (string)this.Fields[(int)MsiPatchMetadataSymbolFields.Property];
+            set => this.Set((int)MsiPatchMetadataSymbolFields.Property, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Value];
-            set => this.Set((int)MsiPatchMetadataTupleFields.Value, value);
+            get => (string)this.Fields[(int)MsiPatchMetadataSymbolFields.Value];
+            set => this.Set((int)MsiPatchMetadataSymbolFields.Value, value);
         }
     }
 }

@@ -2,35 +2,35 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CustomAction = new IntermediateTupleDefinition(
-            TupleDefinitionType.CustomAction,
+        public static readonly IntermediateSymbolDefinition CustomAction = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.CustomAction,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.ExecutionType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Source), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.SourceType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Target), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.TargetType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Async), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.IgnoreResult), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Impersonate), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.PatchUninstall), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.TSAware), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Win64), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.ScriptFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.ExecutionType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Source), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.SourceType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Target), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.TargetType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Async), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Hidden), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.IgnoreResult), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Impersonate), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.PatchUninstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.TSAware), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.Win64), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionSymbolFields.ScriptFile), IntermediateFieldType.Path),
             },
-            typeof(CustomActionTuple));
+            typeof(CustomActionSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum CustomActionTupleFields
+    public enum CustomActionSymbolFields
     {
         ExecutionType,
         Source,
@@ -75,94 +75,94 @@ namespace WixToolset.Data.Tuples
         VBScript = 6,
     }
 
-    public class CustomActionTuple : IntermediateTuple
+    public class CustomActionSymbol : IntermediateSymbol
     {
-        public CustomActionTuple() : base(TupleDefinitions.CustomAction, null, null)
+        public CustomActionSymbol() : base(SymbolDefinitions.CustomAction, null, null)
         {
         }
 
-        public CustomActionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.CustomAction, sourceLineNumber, id)
+        public CustomActionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.CustomAction, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CustomActionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CustomActionSymbolFields index] => this.Fields[(int)index];
 
         public CustomActionExecutionType ExecutionType
         {
-            get => (CustomActionExecutionType)this.Fields[(int)CustomActionTupleFields.ExecutionType].AsNumber();
-            set => this.Set((int)CustomActionTupleFields.ExecutionType, (int)value);
+            get => (CustomActionExecutionType)this.Fields[(int)CustomActionSymbolFields.ExecutionType].AsNumber();
+            set => this.Set((int)CustomActionSymbolFields.ExecutionType, (int)value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)CustomActionTupleFields.Source];
-            set => this.Set((int)CustomActionTupleFields.Source, value);
+            get => (string)this.Fields[(int)CustomActionSymbolFields.Source];
+            set => this.Set((int)CustomActionSymbolFields.Source, value);
         }
 
         public CustomActionSourceType SourceType
         {
-            get => (CustomActionSourceType)this.Fields[(int)CustomActionTupleFields.SourceType].AsNumber();
-            set => this.Set((int)CustomActionTupleFields.SourceType, (int)value);
+            get => (CustomActionSourceType)this.Fields[(int)CustomActionSymbolFields.SourceType].AsNumber();
+            set => this.Set((int)CustomActionSymbolFields.SourceType, (int)value);
         }
 
         public string Target
         {
-            get => (string)this.Fields[(int)CustomActionTupleFields.Target];
-            set => this.Set((int)CustomActionTupleFields.Target, value);
+            get => (string)this.Fields[(int)CustomActionSymbolFields.Target];
+            set => this.Set((int)CustomActionSymbolFields.Target, value);
         }
 
         public CustomActionTargetType TargetType
         {
-            get => (CustomActionTargetType)this.Fields[(int)CustomActionTupleFields.TargetType].AsNumber();
-            set => this.Set((int)CustomActionTupleFields.TargetType, (int)value);
+            get => (CustomActionTargetType)this.Fields[(int)CustomActionSymbolFields.TargetType].AsNumber();
+            set => this.Set((int)CustomActionSymbolFields.TargetType, (int)value);
         }
 
         public bool Async
         {
-            get => this.Fields[(int)CustomActionTupleFields.Async].AsBool();
-            set => this.Set((int)CustomActionTupleFields.Async, value);
+            get => this.Fields[(int)CustomActionSymbolFields.Async].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.Async, value);
         }
 
         public bool Hidden
         {
-            get => this.Fields[(int)CustomActionTupleFields.Hidden].AsBool();
-            set => this.Set((int)CustomActionTupleFields.Hidden, value);
+            get => this.Fields[(int)CustomActionSymbolFields.Hidden].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.Hidden, value);
         }
 
         public bool IgnoreResult
         {
-            get => this.Fields[(int)CustomActionTupleFields.IgnoreResult].AsBool();
-            set => this.Set((int)CustomActionTupleFields.IgnoreResult, value);
+            get => this.Fields[(int)CustomActionSymbolFields.IgnoreResult].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.IgnoreResult, value);
         }
 
         public bool Impersonate
         {
-            get => this.Fields[(int)CustomActionTupleFields.Impersonate].AsBool();
-            set => this.Set((int)CustomActionTupleFields.Impersonate, value);
+            get => this.Fields[(int)CustomActionSymbolFields.Impersonate].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.Impersonate, value);
         }
 
         public bool PatchUninstall
         {
-            get => this.Fields[(int)CustomActionTupleFields.PatchUninstall].AsBool();
-            set => this.Set((int)CustomActionTupleFields.PatchUninstall, value);
+            get => this.Fields[(int)CustomActionSymbolFields.PatchUninstall].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.PatchUninstall, value);
         }
 
         public bool TSAware
         {
-            get => this.Fields[(int)CustomActionTupleFields.TSAware].AsBool();
-            set => this.Set((int)CustomActionTupleFields.TSAware, value);
+            get => this.Fields[(int)CustomActionSymbolFields.TSAware].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.TSAware, value);
         }
 
         public bool Win64
         {
-            get => this.Fields[(int)CustomActionTupleFields.Win64].AsBool();
-            set => this.Set((int)CustomActionTupleFields.Win64, value);
+            get => this.Fields[(int)CustomActionSymbolFields.Win64].AsBool();
+            set => this.Set((int)CustomActionSymbolFields.Win64, value);
         }
 
         public IntermediateFieldPathValue ScriptFile
         {
-            get => this.Fields[(int)CustomActionTupleFields.ScriptFile].AsPath();
-            set => this.Set((int)CustomActionTupleFields.ScriptFile, value);
+            get => this.Fields[(int)CustomActionSymbolFields.ScriptFile].AsPath();
+            set => this.Set((int)CustomActionSymbolFields.ScriptFile, value);
         }
     }
 }

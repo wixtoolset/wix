@@ -10,92 +10,92 @@ namespace WixToolsetTest.Data
         [Fact]
         public void CanAddSingleTag()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test"));
-            Assert.True(tuple.HasTag("test"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test"));
+            Assert.True(symbol.HasTag("test"));
         }
 
         [Fact]
         public void CanAddDuplicateTag()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test"));
-            Assert.False(tuple.AddTag("test"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test"));
+            Assert.False(symbol.AddTag("test"));
         }
 
         [Fact]
         public void CanAddRemoveSingleTag()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test"));
-            Assert.True(tuple.RemoveTag("test"));
-            Assert.False(tuple.HasTag("test"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test"));
+            Assert.True(symbol.RemoveTag("test"));
+            Assert.False(symbol.HasTag("test"));
         }
 
         [Fact]
         public void CanAddMultipleTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.True(tuple.HasTag("test1"));
-            Assert.True(tuple.HasTag("test2"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.True(symbol.HasTag("test1"));
+            Assert.True(symbol.HasTag("test2"));
         }
 
         [Fact]
         public void CanAddRemoveMultipleTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.True(tuple.RemoveTag("test2"));
-            Assert.False(tuple.HasTag("test2"));
-            Assert.True(tuple.RemoveTag("test1"));
-            Assert.False(tuple.HasTag("test1"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.True(symbol.RemoveTag("test2"));
+            Assert.False(symbol.HasTag("test2"));
+            Assert.True(symbol.RemoveTag("test1"));
+            Assert.False(symbol.HasTag("test1"));
         }
 
         [Fact]
         public void CanAddRemoveMissingTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.False(tuple.RemoveTag("test3"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.False(symbol.RemoveTag("test3"));
         }
 
         [Fact]
         public void CanAdd2AndRemoveAllTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.True(tuple.RemoveTag("test1"));
-            Assert.True(tuple.RemoveTag("test2"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.True(symbol.RemoveTag("test1"));
+            Assert.True(symbol.RemoveTag("test2"));
         }
 
         [Fact]
         public void CanAdd3AndRemoveAllTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.True(tuple.AddTag("test3"));
-            Assert.True(tuple.RemoveTag("test1"));
-            Assert.True(tuple.RemoveTag("test3"));
-            Assert.True(tuple.RemoveTag("test2"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.True(symbol.AddTag("test3"));
+            Assert.True(symbol.RemoveTag("test1"));
+            Assert.True(symbol.RemoveTag("test3"));
+            Assert.True(symbol.RemoveTag("test2"));
         }
 
         [Fact]
         public void CanAdd3AndRemoveMissingTags()
         {
-            var tuple = TupleDefinitions.File.CreateTuple();
-            Assert.True(tuple.AddTag("test1"));
-            Assert.True(tuple.AddTag("test2"));
-            Assert.True(tuple.AddTag("test3"));
-            Assert.False(tuple.RemoveTag("test4"));
-            Assert.True(tuple.RemoveTag("test1"));
-            Assert.True(tuple.RemoveTag("test3"));
-            Assert.True(tuple.RemoveTag("test2"));
+            var symbol = SymbolDefinitions.File.CreateSymbol();
+            Assert.True(symbol.AddTag("test1"));
+            Assert.True(symbol.AddTag("test2"));
+            Assert.True(symbol.AddTag("test3"));
+            Assert.False(symbol.RemoveTag("test4"));
+            Assert.True(symbol.RemoveTag("test1"));
+            Assert.True(symbol.RemoveTag("test3"));
+            Assert.True(symbol.RemoveTag("test2"));
         }
     }
 }

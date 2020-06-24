@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Assembly = new IntermediateTupleDefinition(
-            TupleDefinitionType.Assembly,
+        public static readonly IntermediateSymbolDefinition Assembly = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Assembly,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.FeatureRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ManifestFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ApplicationFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.Type), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ProcessorArchitecture), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.ManifestFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.ApplicationFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(AssemblySymbolFields.ProcessorArchitecture), IntermediateFieldType.String),
             },
-            typeof(AssemblyTuple));
+            typeof(AssemblySymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum AssemblyTupleFields
+    public enum AssemblySymbolFields
     {
         ComponentRef,
         FeatureRef,
@@ -45,52 +45,52 @@ namespace WixToolset.Data.Tuples
         Win32Assembly,
     }
 
-    public class AssemblyTuple : IntermediateTuple
+    public class AssemblySymbol : IntermediateSymbol
     {
-        public AssemblyTuple() : base(TupleDefinitions.Assembly, null, null)
+        public AssemblySymbol() : base(SymbolDefinitions.Assembly, null, null)
         {
         }
 
-        public AssemblyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Assembly, sourceLineNumber, id)
+        public AssemblySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Assembly, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[AssemblyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[AssemblySymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => (string)this.Fields[(int)AssemblyTupleFields.ComponentRef];
-            set => this.Set((int)AssemblyTupleFields.ComponentRef, value);
+            get => (string)this.Fields[(int)AssemblySymbolFields.ComponentRef];
+            set => this.Set((int)AssemblySymbolFields.ComponentRef, value);
         }
 
         public string FeatureRef
         {
-            get => (string)this.Fields[(int)AssemblyTupleFields.FeatureRef];
-            set => this.Set((int)AssemblyTupleFields.FeatureRef, value);
+            get => (string)this.Fields[(int)AssemblySymbolFields.FeatureRef];
+            set => this.Set((int)AssemblySymbolFields.FeatureRef, value);
         }
 
         public string ManifestFileRef
         {
-            get => (string)this.Fields[(int)AssemblyTupleFields.ManifestFileRef];
-            set => this.Set((int)AssemblyTupleFields.ManifestFileRef, value);
+            get => (string)this.Fields[(int)AssemblySymbolFields.ManifestFileRef];
+            set => this.Set((int)AssemblySymbolFields.ManifestFileRef, value);
         }
 
         public string ApplicationFileRef
         {
-            get => (string)this.Fields[(int)AssemblyTupleFields.ApplicationFileRef];
-            set => this.Set((int)AssemblyTupleFields.ApplicationFileRef, value);
+            get => (string)this.Fields[(int)AssemblySymbolFields.ApplicationFileRef];
+            set => this.Set((int)AssemblySymbolFields.ApplicationFileRef, value);
         }
 
         public AssemblyType Type
         {
-            get => (AssemblyType)this.Fields[(int)AssemblyTupleFields.Type].AsNumber();
-            set => this.Set((int)AssemblyTupleFields.Type, (int)value);
+            get => (AssemblyType)this.Fields[(int)AssemblySymbolFields.Type].AsNumber();
+            set => this.Set((int)AssemblySymbolFields.Type, (int)value);
         }
 
         public string ProcessorArchitecture
         {
-            get => (string)this.Fields[(int)AssemblyTupleFields.ProcessorArchitecture];
-            set => this.Set((int)AssemblyTupleFields.ProcessorArchitecture, value);
+            get => (string)this.Fields[(int)AssemblySymbolFields.ProcessorArchitecture];
+            set => this.Set((int)AssemblySymbolFields.ProcessorArchitecture, value);
         }
     }
 }

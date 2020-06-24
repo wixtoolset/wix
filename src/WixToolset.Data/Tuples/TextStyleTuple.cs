@@ -2,31 +2,31 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition TextStyle = new IntermediateTupleDefinition(
-            TupleDefinitionType.TextStyle,
+        public static readonly IntermediateSymbolDefinition TextStyle = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.TextStyle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.FaceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Size), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Red), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Green), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Blue), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Bold), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Italic), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Strike), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Underline), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.FaceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Size), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Red), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Green), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Blue), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Bold), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Italic), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Strike), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Underline), IntermediateFieldType.Bool),
             },
-            typeof(TextStyleTuple));
+            typeof(TextStyleSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum TextStyleTupleFields
+    public enum TextStyleSymbolFields
     {
         FaceName,
         Size,
@@ -39,70 +39,70 @@ namespace WixToolset.Data.Tuples
         Underline,
     }
 
-    public class TextStyleTuple : IntermediateTuple
+    public class TextStyleSymbol : IntermediateSymbol
     {
-        public TextStyleTuple() : base(TupleDefinitions.TextStyle, null, null)
+        public TextStyleSymbol() : base(SymbolDefinitions.TextStyle, null, null)
         {
         }
 
-        public TextStyleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.TextStyle, sourceLineNumber, id)
+        public TextStyleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.TextStyle, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[TextStyleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[TextStyleSymbolFields index] => this.Fields[(int)index];
 
         public string FaceName
         {
-            get => (string)this.Fields[(int)TextStyleTupleFields.FaceName];
-            set => this.Set((int)TextStyleTupleFields.FaceName, value);
+            get => (string)this.Fields[(int)TextStyleSymbolFields.FaceName];
+            set => this.Set((int)TextStyleSymbolFields.FaceName, value);
         }
 
         public int Size
         {
-            get => (int)this.Fields[(int)TextStyleTupleFields.Size];
-            set => this.Set((int)TextStyleTupleFields.Size, value);
+            get => (int)this.Fields[(int)TextStyleSymbolFields.Size];
+            set => this.Set((int)TextStyleSymbolFields.Size, value);
         }
 
         public int? Red
         {
-            get => (int?)this.Fields[(int)TextStyleTupleFields.Red];
-            set => this.Set((int)TextStyleTupleFields.Red, value);
+            get => (int?)this.Fields[(int)TextStyleSymbolFields.Red];
+            set => this.Set((int)TextStyleSymbolFields.Red, value);
         }
 
         public int? Green
         {
-            get => (int?)this.Fields[(int)TextStyleTupleFields.Green];
-            set => this.Set((int)TextStyleTupleFields.Green, value);
+            get => (int?)this.Fields[(int)TextStyleSymbolFields.Green];
+            set => this.Set((int)TextStyleSymbolFields.Green, value);
         }
 
         public int? Blue
         {
-            get => (int?)this.Fields[(int)TextStyleTupleFields.Blue];
-            set => this.Set((int)TextStyleTupleFields.Blue, value);
+            get => (int?)this.Fields[(int)TextStyleSymbolFields.Blue];
+            set => this.Set((int)TextStyleSymbolFields.Blue, value);
         }
 
         public bool Bold
         {
-            get => (bool)this.Fields[(int)TextStyleTupleFields.Bold];
-            set => this.Set((int)TextStyleTupleFields.Bold, value);
+            get => (bool)this.Fields[(int)TextStyleSymbolFields.Bold];
+            set => this.Set((int)TextStyleSymbolFields.Bold, value);
         }
 
         public bool Italic
         {
-            get => (bool)this.Fields[(int)TextStyleTupleFields.Italic];
-            set => this.Set((int)TextStyleTupleFields.Italic, value);
+            get => (bool)this.Fields[(int)TextStyleSymbolFields.Italic];
+            set => this.Set((int)TextStyleSymbolFields.Italic, value);
         }
 
         public bool Strike
         {
-            get => (bool)this.Fields[(int)TextStyleTupleFields.Strike];
-            set => this.Set((int)TextStyleTupleFields.Strike, value);
+            get => (bool)this.Fields[(int)TextStyleSymbolFields.Strike];
+            set => this.Set((int)TextStyleSymbolFields.Strike, value);
         }
 
         public bool Underline
         {
-            get => (bool)this.Fields[(int)TextStyleTupleFields.Underline];
-            set => this.Set((int)TextStyleTupleFields.Underline, value);
+            get => (bool)this.Fields[(int)TextStyleSymbolFields.Underline];
+            set => this.Set((int)TextStyleSymbolFields.Underline, value);
         }
     }
 }

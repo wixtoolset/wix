@@ -8,14 +8,14 @@ namespace WixToolset.Data.WindowsInstaller
     {
         public static readonly TableDefinition ActionText = new TableDefinition(
             "ActionText",
-            TupleDefinitions.ActionText,
+            SymbolDefinitions.ActionText,
             new[]
             {
                 new ColumnDefinition("Action", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of action to be described.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Localized description displayed in progress dialog and log when action is executing."),
                 new ColumnDefinition("Template", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Template, description: "Optional localized format template used to format action data records for display during action execution.", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition AdminExecuteSequence = new TableDefinition(
@@ -27,19 +27,19 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Condition = new TableDefinition(
             "Condition",
-            TupleDefinitions.Condition,
+            SymbolDefinitions.Condition,
             new[]
             {
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Reference to a Feature entry in Feature table."),
                 new ColumnDefinition("Level", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "New selection Level to set in Feature table if Condition evaluates to TRUE."),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Expression evaluated to determine if Level in the Feature table is to change.", forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition AdminUISequence = new TableDefinition(
@@ -51,7 +51,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition AdvtExecuteSequence = new TableDefinition(
@@ -63,7 +63,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition AdvtUISequence = new TableDefinition(
@@ -75,12 +75,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition AppId = new TableDefinition(
             "AppId",
-            TupleDefinitions.AppId,
+            SymbolDefinitions.AppId,
             new[]
             {
                 new ColumnDefinition("AppId", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid),
@@ -91,35 +91,35 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ActivateAtStorage", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1),
                 new ColumnDefinition("RunAsInteractiveUser", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition AppSearch = new TableDefinition(
             "AppSearch",
-            TupleDefinitions.AppSearch,
+            SymbolDefinitions.AppSearch,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The property associated with a Signature", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Signature;RegLocator;IniLocator;DrLocator;CompLocator", keyColumn: 1, description: "The Signature_ represents a unique file signature and is also the foreign key in the Signature,  RegLocator, IniLocator, CompLocator and the DrLocator tables.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Property = new TableDefinition(
             "Property",
-            TupleDefinitions.Property,
+            SymbolDefinitions.Property,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of property, uppercase if settable by launcher or loader.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "String value for property.  Never null or empty."),
             },
             strongRowType: typeof(PropertyRow),
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition BBControl = new TableDefinition(
             "BBControl",
-            TupleDefinitions.BBControl,
+            SymbolDefinitions.BBControl,
             new[]
             {
                 new ColumnDefinition("Billboard_", ColumnType.String, 50, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Billboard", keyColumn: 1, description: "External key to the Billboard table, name of the billboard.", modularizeType: ColumnModularizeType.Column),
@@ -133,12 +133,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Text", ColumnType.Localized, 50, primaryKey: false, nullable: true, ColumnCategory.Text, description: "A string used to set the initial text contained within a control (if appropriate)."),
             },
             strongRowType: typeof(BBControlRow),
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Billboard = new TableDefinition(
             "Billboard",
-            TupleDefinitions.Billboard,
+            SymbolDefinitions.Billboard,
             new[]
             {
                 new ColumnDefinition("Billboard", ColumnType.String, 50, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of the billboard.", modularizeType: ColumnModularizeType.Column),
@@ -146,12 +146,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Action", ColumnType.String, 50, primaryKey: false, nullable: true, ColumnCategory.Identifier, description: "The name of an action. The billboard is displayed during the progress messages received from this action."),
                 new ColumnDefinition("Ordering", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "A positive integer. If there is more than one billboard corresponding to an action they will be shown in the order defined by this column."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Feature = new TableDefinition(
             "Feature",
-            TupleDefinitions.Feature,
+            SymbolDefinitions.Feature,
             new[]
             {
                 new ColumnDefinition("Feature", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key used to identify a particular feature record."),
@@ -163,18 +163,18 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.UpperCase, keyTable: "Directory", keyColumn: 1, description: "The name of the Directory that can be configured by the UI. A non-null value will enable the browse button.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "0;1;2;4;5;6;8;9;10;16;17;18;20;21;22;24;25;26;32;33;34;36;37;38;48;49;50;52;53;54", description: "Feature attributes"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Binary = new TableDefinition(
             "Binary",
-            TupleDefinitions.Binary,
+            SymbolDefinitions.Binary,
             new[]
             {
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique key identifying the binary data.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Data", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "The unformatted binary data."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition BindImage = new TableDefinition(
@@ -185,12 +185,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "The index into the File table. This must be an executable file.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Path", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Paths, description: "A list of ;  delimited paths that represent the paths to be searched for the import DLLS. The list is usually a list of properties each enclosed within square brackets [] .", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition File = new TableDefinition(
             "File",
-            TupleDefinitions.File,
+            SymbolDefinitions.File,
             new[]
             {
                 new ColumnDefinition("File", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token, must match identifier in cabinet.  For uncompressed files, this field is ignored.", modularizeType: ColumnModularizeType.Column),
@@ -205,33 +205,33 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Source", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "Path to source of file.", unreal: true),
             },
             strongRowType: typeof(FileRow),
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition CCPSearch = new TableDefinition(
             "CCPSearch",
-            TupleDefinitions.CCPSearch,
+            SymbolDefinitions.CCPSearch,
             new[]
             {
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Signature;RegLocator;IniLocator;DrLocator;CompLocator", keyColumn: 1, description: "The Signature_ represents a unique file signature and is also the foreign key in the Signature,  RegLocator, IniLocator, CompLocator and the DrLocator tables."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition CheckBox = new TableDefinition(
             "CheckBox",
-            TupleDefinitions.CheckBox,
+            SymbolDefinitions.CheckBox,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A named property to be tied to the item.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Value", ColumnType.String, 64, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The value string associated with the item.", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Class = new TableDefinition(
             "Class",
-            TupleDefinitions.Class,
+            SymbolDefinitions.Class,
             new[]
             {
                 new ColumnDefinition("CLSID", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid, description: "The CLSID of an OLE factory."),
@@ -248,12 +248,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Required foreign key into the Feature Table, specifying the feature to validate or install in order for the CLSID factory to be operational."),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, maxValue: 32767, description: "Class registration attributes."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Component = new TableDefinition(
             "Component",
-            TupleDefinitions.Component,
+            SymbolDefinitions.Component,
             new[]
             {
                 new ColumnDefinition("Component", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key used to identify a particular component record.", modularizeType: ColumnModularizeType.Column),
@@ -264,23 +264,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("KeyPath", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File;Registry;ODBCDataSource", keyColumn: 1, description: "Either the primary key into the File table, Registry table, or ODBCDataSource table. This extract path is stored when the component is installed, and is used to detect the presence of the component and to return the path to it.", modularizeType: ColumnModularizeType.Column),
             },
             strongRowType: typeof(ComponentRow),
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Icon = new TableDefinition(
             "Icon",
-            TupleDefinitions.Icon,
+            SymbolDefinitions.Icon,
             new[]
             {
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. Name of the icon file.", modularizeType: ColumnModularizeType.Icon),
                 new ColumnDefinition("Data", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "Binary stream. The binary icon data in PE (.DLL or .EXE) or icon (.ICO) format."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ProgId = new TableDefinition(
             "ProgId",
-            TupleDefinitions.ProgId,
+            SymbolDefinitions.ProgId,
             new[]
             {
                 new ColumnDefinition("ProgId", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, description: "The Program Identifier. Primary key."),
@@ -290,12 +290,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Icon_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Icon", keyColumn: 1, description: "Optional foreign key into the Icon Table, specifying the icon file associated with this ProgId. Will be written under the DefaultIcon key.", modularizeType: ColumnModularizeType.Icon),
                 new ColumnDefinition("IconIndex", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -32767, maxValue: 32767, description: "Optional icon index."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComboBox = new TableDefinition(
             "ComboBox",
-            TupleDefinitions.ComboBox,
+            SymbolDefinitions.ComboBox,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A named property to be tied to this item. All the items tied to the same property become part of the same combobox.", modularizeType: ColumnModularizeType.Column),
@@ -303,47 +303,47 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Value", ColumnType.String, 64, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The value string associated with this item. Selecting the line will set the associated property to this value.", modularizeType: ColumnModularizeType.Property, forceLocalizable: true),
                 new ColumnDefinition("Text", ColumnType.Localized, 64, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The visible text to be assigned to the item. Optional. If this entry or the entire column is missing, the text is the same as the value.", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition CompLocator = new TableDefinition(
             "CompLocator",
-            TupleDefinitions.CompLocator,
+            SymbolDefinitions.CompLocator,
             new[]
             {
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The table key. The Signature_ represents a unique file signature and is also the foreign key in the Signature table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ComponentId", ColumnType.String, 38, primaryKey: false, nullable: false, ColumnCategory.Guid, description: "A string GUID unique to this component, version, and language."),
                 new ColumnDefinition("Type", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "A boolean value that determines if the registry value is a filename or a directory location."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Complus = new TableDefinition(
             "Complus",
-            TupleDefinitions.Complus,
+            SymbolDefinitions.Complus,
             new[]
             {
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key referencing Component that controls the ComPlus component.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ExpType", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "ComPlus component attributes."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Directory = new TableDefinition(
             "Directory",
-            TupleDefinitions.Directory,
+            SymbolDefinitions.Directory,
             new[]
             {
                 new ColumnDefinition("Directory", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique identifier for directory entry, primary key. If a property by this name is defined, it contains the full path to the directory.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Directory_Parent", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Directory", keyColumn: 1, description: "Reference to the entry in this table specifying the default parent directory. A record parented to itself or with a Null parent represents a root of the install tree.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("DefaultDir", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.DefaultDir, description: "The default sub-path under parent's path."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Control = new TableDefinition(
             "Control",
-            TupleDefinitions.Control,
+            SymbolDefinitions.Control,
             new[]
             {
                 new ColumnDefinition("Dialog_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Dialog", keyColumn: 1, description: "External key to the Dialog table, name of the dialog.", modularizeType: ColumnModularizeType.Column),
@@ -360,12 +360,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Help", ColumnType.Localized, 50, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The help strings used with the button. The text is optional. "),
             },
             strongRowType: typeof(ControlRow),
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Dialog = new TableDefinition(
             "Dialog",
-            TupleDefinitions.Dialog,
+            SymbolDefinitions.Dialog,
             new[]
             {
                 new ColumnDefinition("Dialog", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of the dialog.", modularizeType: ColumnModularizeType.Column),
@@ -379,12 +379,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Control_Default", ColumnType.String, 50, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Control", keyColumn: 2, description: "Defines the default control. Hitting return is equivalent to pushing this button."),
                 new ColumnDefinition("Control_Cancel", ColumnType.String, 50, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Control", keyColumn: 2, description: "Defines the cancel control. Hitting escape or clicking on the close icon on the dialog is equivalent to pushing this button."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ControlCondition = new TableDefinition(
             "ControlCondition",
-            TupleDefinitions.ControlCondition,
+            SymbolDefinitions.ControlCondition,
             new[]
             {
                 new ColumnDefinition("Dialog_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Dialog", keyColumn: 1, description: "A foreign key to the Dialog table, name of the dialog.", modularizeType: ColumnModularizeType.Column),
@@ -392,12 +392,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Action", ColumnType.String, 50, primaryKey: true, nullable: false, ColumnCategory.Unknown, possibilities: "Default;Disable;Enable;Hide;Show", description: "The desired action to be taken on the specified control."),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Condition, description: "A standard conditional statement that specifies under which conditions the action should be triggered.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ControlEvent = new TableDefinition(
             "ControlEvent",
-            TupleDefinitions.ControlEvent,
+            SymbolDefinitions.ControlEvent,
             new[]
             {
                 new ColumnDefinition("Dialog_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Dialog", keyColumn: 1, description: "A foreign key to the Dialog table, name of the dialog.", modularizeType: ColumnModularizeType.Column),
@@ -407,23 +407,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: true, nullable: true, ColumnCategory.Condition, description: "A standard conditional statement that specifies under which conditions an event should be triggered.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
                 new ColumnDefinition("Ordering", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "An integer used to order several events tied to the same control. Can be left blank."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition CreateFolder = new TableDefinition(
             "CreateFolder",
-            TupleDefinitions.CreateFolder,
+            SymbolDefinitions.CreateFolder,
             new[]
             {
                 new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Directory", keyColumn: 1, description: "Primary key, could be foreign key into the Directory table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition CustomAction = new TableDefinition(
             "CustomAction",
-            TupleDefinitions.CustomAction,
+            SymbolDefinitions.CustomAction,
             new[]
             {
                 new ColumnDefinition("Action", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, name of action, normally appears in sequence table unless private use.", modularizeType: ColumnModularizeType.Column),
@@ -432,12 +432,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Target", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Excecution parameter, depends on the type of custom action", modularizeType: ColumnModularizeType.Property, forceLocalizable: true),
                 new ColumnDefinition("ExtendedType", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "A numeric custom action type that extends code type or option flags of the Type column."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition DrLocator = new TableDefinition(
             "DrLocator",
-            TupleDefinitions.DrLocator,
+            SymbolDefinitions.DrLocator,
             new[]
             {
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The Signature_ represents a unique file signature and is also the foreign key in the Signature table.", modularizeType: ColumnModularizeType.Column),
@@ -445,12 +445,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Path", ColumnType.String, 255, primaryKey: true, nullable: true, ColumnCategory.AnyPath, description: "The path on the user system. This is a either a subpath below the value of the Parent or a full path. The path may contain properties enclosed within [ ] that will be expanded.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Depth", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "The depth below the path to which the Signature_ is recursively searched. If absent, the depth is assumed to be 0."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition DuplicateFile = new TableDefinition(
             "DuplicateFile",
-            TupleDefinitions.DuplicateFile,
+            SymbolDefinitions.DuplicateFile,
             new[]
             {
                 new ColumnDefinition("FileKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key used to identify a particular file entry", modularizeType: ColumnModularizeType.Column),
@@ -459,12 +459,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DestName", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Filename, description: "Filename to be given to the duplicate file."),
                 new ColumnDefinition("DestFolder", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, description: "Name of a property whose value is assumed to resolve to the full pathname to a destination folder.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Environment = new TableDefinition(
             "Environment",
-            TupleDefinitions.Environment,
+            SymbolDefinitions.Environment,
             new[]
             {
                 new ColumnDefinition("Environment", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique identifier for the environmental variable setting", modularizeType: ColumnModularizeType.Column),
@@ -472,23 +472,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Value", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The value to set in the environmental settings.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the installing of the environmental value.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Error = new TableDefinition(
             "Error",
-            TupleDefinitions.Error,
+            SymbolDefinitions.Error,
             new[]
             {
                 new ColumnDefinition("Error", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "Integer error number, obtained from header file IError(...) macros."),
                 new ColumnDefinition("Message", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Template, description: "Error formatting template, obtained from user ed. or localizers.", modularizeType: ColumnModularizeType.Property, useCData: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition EventMapping = new TableDefinition(
             "EventMapping",
-            TupleDefinitions.EventMapping,
+            SymbolDefinitions.EventMapping,
             new[]
             {
                 new ColumnDefinition("Dialog_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Dialog", keyColumn: 1, description: "A foreign key to the Dialog table, name of the Dialog.", modularizeType: ColumnModularizeType.Column),
@@ -496,12 +496,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Event", ColumnType.String, 50, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "An identifier that specifies the type of the event that the control subscribes to."),
                 new ColumnDefinition("Attribute", ColumnType.String, 50, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "The name of the control attribute, that is set when this event is received."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Extension = new TableDefinition(
             "Extension",
-            TupleDefinitions.Extension,
+            SymbolDefinitions.Extension,
             new[]
             {
                 new ColumnDefinition("Extension", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, description: "The extension associated with the table row."),
@@ -510,53 +510,53 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("MIME_", ColumnType.String, 64, primaryKey: false, nullable: true, ColumnCategory.Text, keyTable: "MIME", keyColumn: 1, description: "Optional Context identifier, typically \"type/format\" associated with the extension"),
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Required foreign key into the Feature Table, specifying the feature to validate or install in order for the CLSID factory to be operational."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MIME = new TableDefinition(
             "MIME",
-            TupleDefinitions.MIME,
+            SymbolDefinitions.MIME,
             new[]
             {
                 new ColumnDefinition("ContentType", ColumnType.String, 64, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Primary key. Context identifier, typically \"type/format\"."),
                 new ColumnDefinition("Extension_", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Text, keyTable: "Extension", keyColumn: 1, description: "Optional associated extension (without dot)"),
                 new ColumnDefinition("CLSID", ColumnType.String, 38, primaryKey: false, nullable: true, ColumnCategory.Guid, description: "Optional associated CLSID."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition FeatureComponents = new TableDefinition(
             "FeatureComponents",
-            TupleDefinitions.FeatureComponents,
+            SymbolDefinitions.FeatureComponents,
             new[]
             {
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Foreign key into Feature table."),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into Component table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition FileSFPCatalog = new TableDefinition(
             "FileSFPCatalog",
-            TupleDefinitions.FileSFPCatalog,
+            SymbolDefinitions.FileSFPCatalog,
             new[]
             {
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "File associated with the catalog", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("SFPCatalog_", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Filename, keyTable: "SFPCatalog", keyColumn: 1, description: "Catalog associated with the file"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition SFPCatalog = new TableDefinition(
             "SFPCatalog",
-            TupleDefinitions.SFPCatalog,
+            SymbolDefinitions.SFPCatalog,
             new[]
             {
                 new ColumnDefinition("SFPCatalog", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Filename, description: "File name for the catalog."),
                 new ColumnDefinition("Catalog", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "SFP Catalog"),
                 new ColumnDefinition("Dependency", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Parent catalog - only used by SFP", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Font = new TableDefinition(
@@ -567,12 +567,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Primary key, foreign key into File table referencing font file.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("FontTitle", ColumnType.String, 128, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Font name."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IniFile = new TableDefinition(
             "IniFile",
-            TupleDefinitions.IniFile,
+            SymbolDefinitions.IniFile,
             new[]
             {
                 new ColumnDefinition("IniFile", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -584,12 +584,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Action", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "0;1;3", description: "The type of modification to be made, one of iifEnum"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the installing of the .INI value.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IniLocator = new TableDefinition(
             "IniLocator",
-            TupleDefinitions.IniLocator,
+            SymbolDefinitions.IniLocator,
             new[]
             {
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The table key. The Signature_ represents a unique file signature and is also the foreign key in the Signature table.", modularizeType: ColumnModularizeType.Column),
@@ -599,7 +599,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Field", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "The field in the .INI line. If Field is null or 0 the entire line is read."),
                 new ColumnDefinition("Type", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2, description: "An integer value that determines if the .INI value read is a filename or a directory location or to be used as is w/o interpretation."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition InstallExecuteSequence = new TableDefinition(
@@ -611,7 +611,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition InstallUISequence = new TableDefinition(
@@ -623,34 +623,34 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the action if evaluates to expFalse.If the expression syntax is invalid, the engine will terminate, returning iesBadActionData.", forceLocalizable: true),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -4, maxValue: 32767, description: "Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IsolatedComponent = new TableDefinition(
             "IsolatedComponent",
-            TupleDefinitions.IsolatedComponent,
+            SymbolDefinitions.IsolatedComponent,
             new[]
             {
                 new ColumnDefinition("Component_Shared", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Key to Component table item to be isolated", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_Application", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Key to Component table item for application", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition LaunchCondition = new TableDefinition(
             "LaunchCondition",
-            TupleDefinitions.LaunchCondition,
+            SymbolDefinitions.LaunchCondition,
             new[]
             {
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Condition, description: "Expression which must evaluate to TRUE in order for install to commence.", forceLocalizable: true),
                 new ColumnDefinition("Description", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Localizable text to display when condition fails and install must abort."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ListBox = new TableDefinition(
             "ListBox",
-            TupleDefinitions.ListBox,
+            SymbolDefinitions.ListBox,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A named property to be tied to this item. All the items tied to the same property become part of the same listbox.", modularizeType: ColumnModularizeType.Column),
@@ -658,12 +658,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Value", ColumnType.String, 64, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The value string associated with this item. Selecting the line will set the associated property to this value.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Text", ColumnType.Localized, 64, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The visible text to be assigned to the item. Optional. If this entry or the entire column is missing, the text is the same as the value."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ListView = new TableDefinition(
             "ListView",
-            TupleDefinitions.ListView,
+            SymbolDefinitions.ListView,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A named property to be tied to this item. All the items tied to the same property become part of the same listview.", modularizeType: ColumnModularizeType.Column),
@@ -672,12 +672,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Text", ColumnType.Localized, 64, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The visible text to be assigned to the item. Optional. If this entry or the entire column is missing, the text is the same as the value.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Binary_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Binary", keyColumn: 1, description: "The name of the icon to be displayed with the icon. The binary information is looked up from the Binary Table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition LockPermissions = new TableDefinition(
             "LockPermissions",
-            TupleDefinitions.LockPermissions,
+            SymbolDefinitions.LockPermissions,
             new[]
             {
                 new ColumnDefinition("LockObject", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Foreign key into Registry or File table", modularizeType: ColumnModularizeType.Column),
@@ -686,12 +686,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("User", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Formatted, description: "User for permissions to be set.  (usually a property)", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Permission", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: -2147483647, maxValue: 2147483647, description: "Permission Access mask.  Full Control = 268435456 (GENERIC_ALL = 0x10000000)"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiLockPermissionsEx = new TableDefinition(
             "MsiLockPermissionsEx",
-            TupleDefinitions.MsiLockPermissionsEx,
+            SymbolDefinitions.MsiLockPermissionsEx,
             new[]
             {
                 new ColumnDefinition("MsiLockPermissionsEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -700,12 +700,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("SDDLText", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.FormattedSDDLText, description: "String to indicate permissions to be applied to the LockObject", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Expression which must evaluate to TRUE in order for this set of permissions to be applied", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Media = new TableDefinition(
             "Media",
-            TupleDefinitions.Media,
+            SymbolDefinitions.Media,
             new[]
             {
                 new ColumnDefinition("DiskId", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 32767, description: "Primary key, integer to determine sort order for table."),
@@ -716,12 +716,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Source", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Property, description: "The property defining the location of the cabinet file."),
             },
             strongRowType: typeof(MediaRow),
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MoveFile = new TableDefinition(
             "MoveFile",
-            TupleDefinitions.MoveFile,
+            SymbolDefinitions.MoveFile,
             new[]
             {
                 new ColumnDefinition("FileKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key that uniquely identifies a particular MoveFile record", modularizeType: ColumnModularizeType.Column),
@@ -732,12 +732,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DestFolder", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "Name of a property whose value is assumed to resolve to the full path to the destination directory", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Options", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Integer value specifying the MoveFile operating mode, one of imfoEnum"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiAssembly = new TableDefinition(
             "MsiAssembly",
-            TupleDefinitions.Assembly,
+            SymbolDefinitions.Assembly,
             new[]
             {
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into Component table.", modularizeType: ColumnModularizeType.Column),
@@ -746,35 +746,35 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_Application", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Foreign key into File table, denoting the application context for private assemblies. Null for global assemblies.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Assembly attributes"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiAssemblyName = new TableDefinition(
             "MsiAssemblyName",
-            TupleDefinitions.MsiAssemblyName,
+            SymbolDefinitions.MsiAssemblyName,
             new[]
             {
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into Component table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, description: "The name part of the name-value pairs for the assembly name."),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The value part of the name-value pairs for the assembly name."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiDigitalCertificate = new TableDefinition(
             "MsiDigitalCertificate",
-            TupleDefinitions.MsiDigitalCertificate,
+            SymbolDefinitions.MsiDigitalCertificate,
             new[]
             {
                 new ColumnDefinition("DigitalCertificate", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A unique identifier for the row"),
                 new ColumnDefinition("CertData", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "A certificate context blob for a signer certificate"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiDigitalSignature = new TableDefinition(
             "MsiDigitalSignature",
-            TupleDefinitions.MsiDigitalSignature,
+            SymbolDefinitions.MsiDigitalSignature,
             new[]
             {
                 new ColumnDefinition("Table", ColumnType.String, 32, primaryKey: true, nullable: false, ColumnCategory.Unknown, possibilities: "Media", description: "Reference to another table name (only Media table is supported)"),
@@ -782,12 +782,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DigitalCertificate_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "MsiDigitalCertificate", keyColumn: 1, description: "Foreign key to MsiDigitalCertificate table identifying the signer certificate"),
                 new ColumnDefinition("Hash", ColumnType.Object, 0, primaryKey: false, nullable: true, ColumnCategory.Binary, description: "The encoded hash blob from the digital signature"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiEmbeddedChainer = new TableDefinition(
             "MsiEmbeddedChainer",
-            TupleDefinitions.MsiEmbeddedChainer,
+            SymbolDefinitions.MsiEmbeddedChainer,
             new[]
             {
                 new ColumnDefinition("MsiEmbeddedChainer", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -796,12 +796,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Source", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.CustomSource, description: "The location of the executable file for the user-defined function.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Type", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "2;18;50", description: "The functions listed in the MsiEmbeddedChainer table are described using the following custom action numeric types."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiEmbeddedUI = new TableDefinition(
             "MsiEmbeddedUI",
-            TupleDefinitions.MsiEmbeddedUI,
+            SymbolDefinitions.MsiEmbeddedUI,
             new[]
             {
                 new ColumnDefinition("MsiEmbeddedUI", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -810,12 +810,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("MessageFilter", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Specifies the types of messages that are sent to the user interface DLL."),
                 new ColumnDefinition("Data", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "This column contains binary information."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiFileHash = new TableDefinition(
             "MsiFileHash",
-            TupleDefinitions.MsiFileHash,
+            SymbolDefinitions.MsiFileHash,
             new[]
             {
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Primary key, foreign key into File table referencing file with this hash", modularizeType: ColumnModularizeType.Column),
@@ -825,92 +825,92 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("HashPart3", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Size of file in bytes (long integer)."),
                 new ColumnDefinition("HashPart4", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Size of file in bytes (long integer)."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiPackageCertificate = new TableDefinition(
             "MsiPackageCertificate",
-            TupleDefinitions.MsiPackageCertificate,
+            SymbolDefinitions.MsiPackageCertificate,
             new[]
             {
                 new ColumnDefinition("PackageCertificate", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. A unique identifier for the row."),
                 new ColumnDefinition("DigitalCertificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "MsiDigitalCertificate", keyColumn: 1, description: "Foreign key to MsiDigitalCertificate table identifying the signer certificate."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchCertificate = new TableDefinition(
             "MsiPatchCertificate",
-            TupleDefinitions.MsiPatchCertificate,
+            SymbolDefinitions.MsiPatchCertificate,
             new[]
             {
                 new ColumnDefinition("PatchCertificate", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. A unique identifier for the row."),
                 new ColumnDefinition("DigitalCertificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "MsiDigitalCertificate", keyColumn: 1, description: "Foreign key to MsiDigitalCertificate table identifying the signer certificate."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchHeaders = new TableDefinition(
             "MsiPatchHeaders",
-            TupleDefinitions.MsiPatchHeaders,
+            SymbolDefinitions.MsiPatchHeaders,
             new[]
             {
                 new ColumnDefinition("StreamRef", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. A unique identifier for the row."),
                 new ColumnDefinition("Header", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "Binary stream. The patch header, used for patch validation."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition PatchMetadata = new TableDefinition(
             "PatchMetadata",
-            TupleDefinitions.PatchMetadata,
+            SymbolDefinitions.PatchMetadata,
             new[]
             {
                 new ColumnDefinition("Company", ColumnType.String, 72, primaryKey: true, nullable: true, ColumnCategory.Identifier, description: "Primary key. The name of the company."),
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. The name of the property."),
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Non-null, non-empty value of the metadata property."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchMetadata = new TableDefinition(
             "MsiPatchMetadata",
-            TupleDefinitions.MsiPatchMetadata,
+            SymbolDefinitions.MsiPatchMetadata,
             new[]
             {
                 new ColumnDefinition("Company", ColumnType.String, 72, primaryKey: true, nullable: true, ColumnCategory.Unknown),
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchOldAssemblyFile = new TableDefinition(
             "MsiPatchOldAssemblyFile",
-            TupleDefinitions.MsiPatchOldAssemblyFile,
+            SymbolDefinitions.MsiPatchOldAssemblyFile,
             new[]
             {
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Foreign key into File table. Patch-only table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Assembly_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "MsiPatchOldAssemblyName", keyColumn: 1, description: "Foreign key into MsiPatchOldAssemblyName table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchOldAssemblyName = new TableDefinition(
             "MsiPatchOldAssemblyName",
-            TupleDefinitions.MsiPatchOldAssemblyName,
+            SymbolDefinitions.MsiPatchOldAssemblyName,
             new[]
             {
                 new ColumnDefinition("Assembly", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A unique identifier for the row.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, description: "The name part of the name-value pairs for the assembly name. This represents the old name for the assembly."),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The value part of the name-value pairs for the assembly name. This represents the old name for the assembly."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition PatchSequence = new TableDefinition(
             "PatchSequence",
-            TupleDefinitions.PatchSequence,
+            SymbolDefinitions.PatchSequence,
             new[]
             {
                 new ColumnDefinition("PatchFamily", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key. The name of the family for the patch."),
@@ -918,12 +918,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Sequence", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Sequence information in version (x.x.x.x) format."),
                 new ColumnDefinition("Supersede", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Indicates that this patch supersedes earlier patches."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition MsiPatchSequence = new TableDefinition(
             "MsiPatchSequence",
-            TupleDefinitions.MsiPatchSequence,
+            SymbolDefinitions.MsiPatchSequence,
             new[]
             {
                 new ColumnDefinition("PatchFamily", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
@@ -931,24 +931,24 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Sequence", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ODBCAttribute = new TableDefinition(
             "ODBCAttribute",
-            TupleDefinitions.ODBCAttribute,
+            SymbolDefinitions.ODBCAttribute,
             new[]
             {
                 new ColumnDefinition("Driver_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ODBCDriver", keyColumn: 1, description: "Reference to ODBC driver in ODBCDriver table", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attribute", ColumnType.String, 40, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Name of ODBC driver attribute"),
                 new ColumnDefinition("Value", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Value for ODBC driver attribute"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ODBCDriver = new TableDefinition(
             "ODBCDriver",
-            TupleDefinitions.ODBCDriver,
+            SymbolDefinitions.ODBCDriver,
             new[]
             {
                 new ColumnDefinition("Driver", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized.internal token for driver", modularizeType: ColumnModularizeType.Column),
@@ -957,12 +957,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Reference to key driver file", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File_Setup", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Optional reference to key driver setup DLL", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ODBCDataSource = new TableDefinition(
             "ODBCDataSource",
-            TupleDefinitions.ODBCDataSource,
+            SymbolDefinitions.ODBCDataSource,
             new[]
             {
                 new ColumnDefinition("DataSource", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized.internal token for data source", modularizeType: ColumnModularizeType.Column),
@@ -971,24 +971,24 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DriverDescription", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Reference to driver description, may be existing driver"),
                 new ColumnDefinition("Registration", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Registration option: 0=machine, 1=user, others t.b.d."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ODBCSourceAttribute = new TableDefinition(
             "ODBCSourceAttribute",
-            TupleDefinitions.ODBCSourceAttribute,
+            SymbolDefinitions.ODBCSourceAttribute,
             new[]
             {
                 new ColumnDefinition("DataSource_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ODBCDataSource", keyColumn: 1, description: "Reference to ODBC data source in ODBCDataSource table", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attribute", ColumnType.String, 32, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Name of ODBC data source attribute"),
                 new ColumnDefinition("Value", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Value for ODBC data source attribute"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ODBCTranslator = new TableDefinition(
             "ODBCTranslator",
-            TupleDefinitions.ODBCTranslator,
+            SymbolDefinitions.ODBCTranslator,
             new[]
             {
                 new ColumnDefinition("Translator", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized.internal token for translator", modularizeType: ColumnModularizeType.Column),
@@ -997,12 +997,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Reference to key translator file", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File_Setup", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Optional reference to key translator setup DLL", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Patch = new TableDefinition(
             "Patch",
-            TupleDefinitions.Patch,
+            SymbolDefinitions.Patch,
             new[]
             {
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token, foreign key to File table, must match identifier in cabinet.", modularizeType: ColumnModularizeType.Column),
@@ -1012,23 +1012,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Header", ColumnType.Object, 0, primaryKey: false, nullable: true, ColumnCategory.Binary, description: "Binary stream. The patch header, used for patch validation."),
                 new ColumnDefinition("StreamRef_", ColumnType.String, 38, primaryKey: false, nullable: true, ColumnCategory.Identifier, description: "Identifier. Foreign key to the StreamRef column of the MsiPatchHeaders table."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition PatchPackage = new TableDefinition(
             "PatchPackage",
-            TupleDefinitions.PatchPackage,
+            SymbolDefinitions.PatchPackage,
             new[]
             {
                 new ColumnDefinition("PatchId", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid, description: "A unique string GUID representing this patch."),
                 new ColumnDefinition("Media_", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "Foreign key to DiskId column of Media table. Indicates the disk containing the patch package."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition PublishComponent = new TableDefinition(
             "PublishComponent",
-            TupleDefinitions.PublishComponent,
+            SymbolDefinitions.PublishComponent,
             new[]
             {
                 new ColumnDefinition("ComponentId", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid, description: "A string GUID that represents the component id that will be requested by the alien product."),
@@ -1037,12 +1037,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("AppData", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "This is localisable Application specific data that can be associated with a Qualified Component."),
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Foreign key into the Feature table."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition RadioButton = new TableDefinition(
             "RadioButton",
-            TupleDefinitions.RadioButton,
+            SymbolDefinitions.RadioButton,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A named property to be tied to this radio button. All the buttons tied to the same property become part of the same group.", modularizeType: ColumnModularizeType.Column),
@@ -1055,12 +1055,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Text", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The visible title to be assigned to the radio button."),
                 new ColumnDefinition("Help", ColumnType.Localized, 50, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The help strings used with the button. The text is optional."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Registry = new TableDefinition(
             "Registry",
-            TupleDefinitions.Registry,
+            SymbolDefinitions.Registry,
             new[]
             {
                 new ColumnDefinition("Registry", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1070,12 +1070,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The registry value.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the installing of the registry value.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition RegLocator = new TableDefinition(
             "RegLocator",
-            TupleDefinitions.RegLocator,
+            SymbolDefinitions.RegLocator,
             new[]
             {
                 new ColumnDefinition("Signature_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The table key. The Signature_ represents a unique file signature and is also the foreign key in the Signature table. If the type is 0, the registry values refers a directory, and _Signature is not a foreign key.", modularizeType: ColumnModularizeType.Column),
@@ -1084,12 +1084,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The registry value name.", modularizeType: ColumnModularizeType.Property, forceLocalizable: true),
                 new ColumnDefinition("Type", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 18, description: "An integer value that determines if the registry value is a filename or a directory location or to be used as is w/o interpretation."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition RemoveFile = new TableDefinition(
             "RemoveFile",
-            TupleDefinitions.RemoveFile,
+            SymbolDefinitions.RemoveFile,
             new[]
             {
                 new ColumnDefinition("FileKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key used to identify a particular file entry", modularizeType: ColumnModularizeType.Column),
@@ -1098,7 +1098,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DirProperty", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "Name of a property whose value is assumed to resolve to the full pathname to the folder of the file to be removed.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("InstallMode", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "1;2;3", description: "Installation option, one of iimEnum."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition RemoveIniFile = new TableDefinition(
@@ -1115,12 +1115,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Action", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "2;4", description: "The type of modification to be made, one of iifEnum."),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the deletion of the .INI value.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition RemoveRegistry = new TableDefinition(
             "RemoveRegistry",
-            TupleDefinitions.RemoveRegistry,
+            SymbolDefinitions.RemoveRegistry,
             new[]
             {
                 new ColumnDefinition("RemoveRegistry", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1129,12 +1129,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Name", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The registry value name.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the deletion of the registry value.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ReserveCost = new TableDefinition(
             "ReserveCost",
-            TupleDefinitions.ReserveCost,
+            SymbolDefinitions.ReserveCost,
             new[]
             {
                 new ColumnDefinition("ReserveKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key that uniquely identifies a particular ReserveCost record", modularizeType: ColumnModularizeType.Column),
@@ -1143,7 +1143,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ReserveLocal", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "Disk space to reserve if linked component is installed locally."),
                 new ColumnDefinition("ReserveSource", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "Disk space to reserve if linked component is installed to run from the source location."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition SelfReg = new TableDefinition(
@@ -1154,12 +1154,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Foreign key into the File table denoting the module that needs to be registered.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Cost", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "The cost of registering the module."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ServiceControl = new TableDefinition(
             "ServiceControl",
-            TupleDefinitions.ServiceControl,
+            SymbolDefinitions.ServiceControl,
             new[]
             {
                 new ColumnDefinition("ServiceControl", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1169,12 +1169,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Wait", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Boolean for whether to wait for the service to fully start"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Required foreign key into the Component Table that controls the startup of the service", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ServiceInstall = new TableDefinition(
             "ServiceInstall",
-            TupleDefinitions.ServiceInstall,
+            SymbolDefinitions.ServiceInstall,
             new[]
             {
                 new ColumnDefinition("ServiceInstall", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1191,12 +1191,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Required foreign key into the Component Table that controls the startup of the service", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Description of service.", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiServiceConfig = new TableDefinition(
             "MsiServiceConfig",
-            TupleDefinitions.MsiServiceConfig,
+            SymbolDefinitions.MsiServiceConfig,
             new[]
             {
                 new ColumnDefinition("MsiServiceConfig", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1206,12 +1206,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Argument", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Argument(s) for service configuration. Value depends on the content of the ConfigType field"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Required foreign key into the Component Table that controls the configuration of the service", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiServiceConfigFailureActions = new TableDefinition(
             "MsiServiceConfigFailureActions",
-            TupleDefinitions.MsiServiceConfigFailureActions,
+            SymbolDefinitions.MsiServiceConfigFailureActions,
             new[]
             {
                 new ColumnDefinition("MsiServiceConfigFailureActions", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -1224,12 +1224,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DelayActions", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "A list of delays (time in milli-seconds), separated by [~] delmiters, to wait before taking the corresponding Action. Terminate with [~][~]"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Required foreign key into the Component Table that controls the configuration of failure actions for the service", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Shortcut = new TableDefinition(
             "Shortcut",
-            TupleDefinitions.Shortcut,
+            SymbolDefinitions.Shortcut,
             new[]
             {
                 new ColumnDefinition("Shortcut", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -1249,12 +1249,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DescriptionResourceDLL", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The Formatted string providing the full path to the language neutral file containing the MUI Manifest.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("DescriptionResourceId", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 32767, description: "The description name index for the shortcut. This must be a non-negative number."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MsiShortcutProperty = new TableDefinition(
             "MsiShortcutProperty",
-            TupleDefinitions.MsiShortcutProperty,
+            SymbolDefinitions.MsiShortcutProperty,
             new[]
             {
                 new ColumnDefinition("MsiShortcutProperty", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -1262,12 +1262,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("PropertyKey", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Canonical string representation of the Property Key being set", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("PropVariantValue", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "String representation of the value in the property", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Signature = new TableDefinition(
             "Signature",
-            TupleDefinitions.Signature,
+            SymbolDefinitions.Signature,
             new[]
             {
                 new ColumnDefinition("Signature", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The table key. The Signature represents a unique file signature.", modularizeType: ColumnModularizeType.Column),
@@ -1280,12 +1280,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("MaxDate", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "The maximum creation date of the file."),
                 new ColumnDefinition("Languages", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Language, description: "The languages supported by the file."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition TextStyle = new TableDefinition(
             "TextStyle",
-            TupleDefinitions.TextStyle,
+            SymbolDefinitions.TextStyle,
             new[]
             {
                 new ColumnDefinition("TextStyle", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of the style. The primary key of this table. This name is embedded in the texts to indicate a style change."),
@@ -1294,12 +1294,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Color", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 16777215, description: "A long integer indicating the color of the string in the RGB format (Red, Green, Blue each 0-255, RGB = R + 256*G + 256^2*B)."),
                 new ColumnDefinition("StyleBits", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 15, description: "A combination of style bits."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition TypeLib = new TableDefinition(
             "TypeLib",
-            TupleDefinitions.TypeLib,
+            SymbolDefinitions.TypeLib,
             new[]
             {
                 new ColumnDefinition("LibID", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid, description: "The GUID that represents the library."),
@@ -1311,23 +1311,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Feature", keyColumn: 1, description: "Required foreign key into the Feature Table, specifying the feature to validate or install in order for the type library to be operational."),
                 new ColumnDefinition("Cost", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "The cost associated with the registration of the typelib. This column is currently optional."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition UIText = new TableDefinition(
             "UIText",
-            TupleDefinitions.UIText,
+            SymbolDefinitions.UIText,
             new[]
             {
                 new ColumnDefinition("Key", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "A unique key that identifies the particular string."),
                 new ColumnDefinition("Text", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The localized version of the string."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition Upgrade = new TableDefinition(
             "Upgrade",
-            TupleDefinitions.Upgrade,
+            SymbolDefinitions.Upgrade,
             new[]
             {
                 new ColumnDefinition("UpgradeCode", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Guid, description: "The UpgradeCode GUID belonging to the products in this set."),
@@ -1339,12 +1339,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ActionProperty", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.UpperCase, description: "The property to set when a product in this set is found."),
             },
             strongRowType: typeof(UpgradeRow),
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Verb = new TableDefinition(
             "Verb",
-            TupleDefinitions.Verb,
+            SymbolDefinitions.Verb,
             new[]
             {
                 new ColumnDefinition("Extension_", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "Extension", keyColumn: 1, description: "The extension associated with the table row."),
@@ -1353,7 +1353,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Command", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The command text.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Argument", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Optional value for the command arguments.", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ModuleAdminExecuteSequence = new TableDefinition(
@@ -1367,7 +1367,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleAdminUISequence = new TableDefinition(
@@ -1381,7 +1381,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleAdvtExecuteSequence = new TableDefinition(
@@ -1395,7 +1395,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleAdvtUISequence = new TableDefinition(
@@ -1409,36 +1409,36 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleComponents = new TableDefinition(
             "ModuleComponents",
-            TupleDefinitions.ModuleComponents,
+            SymbolDefinitions.ModuleComponents,
             new[]
             {
                 new ColumnDefinition("Component", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Component contained in the module.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ModuleID", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ModuleSignature", keyColumn: 1, description: "Module containing the component.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Language", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, keyTable: "ModuleSignature", keyColumn: 2, description: "Default language ID for module (may be changed by transform).", forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ModuleSignature = new TableDefinition(
             "ModuleSignature",
-            TupleDefinitions.ModuleSignature,
+            SymbolDefinitions.ModuleSignature,
             new[]
             {
                 new ColumnDefinition("ModuleID", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Module identifier (String.GUID).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Language", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, description: "Default decimal language of module.", forceLocalizable: true),
                 new ColumnDefinition("Version", ColumnType.String, 32, primaryKey: false, nullable: false, ColumnCategory.Version, description: "Version of the module."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ModuleConfiguration = new TableDefinition(
             "ModuleConfiguration",
-            TupleDefinitions.ModuleConfiguration,
+            SymbolDefinitions.ModuleConfiguration,
             new[]
             {
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique identifier for this row."),
@@ -1452,12 +1452,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("HelpLocation", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Filename or namespace of the context-sensitive help for this item."),
                 new ColumnDefinition("HelpKeyword", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Keyword index into the HelpLocation for this item."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleDependency = new TableDefinition(
             "ModuleDependency",
-            TupleDefinitions.ModuleDependency,
+            SymbolDefinitions.ModuleDependency,
             new[]
             {
                 new ColumnDefinition("ModuleID", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ModuleSignature", keyColumn: 1, description: "Module requiring the dependency.", modularizeType: ColumnModularizeType.Column),
@@ -1466,12 +1466,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("RequiredLanguage", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, description: "LanguageID of the required module.", forceLocalizable: true),
                 new ColumnDefinition("RequiredVersion", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Version, description: "Version of the required version."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ModuleExclusion = new TableDefinition(
             "ModuleExclusion",
-            TupleDefinitions.ModuleExclusion,
+            SymbolDefinitions.ModuleExclusion,
             new[]
             {
                 new ColumnDefinition("ModuleID", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ModuleSignature", keyColumn: 1, description: "String.GUID of module with exclusion requirement.", modularizeType: ColumnModularizeType.Column),
@@ -1481,17 +1481,17 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ExcludedMinVersion", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Version, description: "Minimum version of excluded module."),
                 new ColumnDefinition("ExcludedMaxVersion", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Version, description: "Maximum version of excluded module."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ModuleIgnoreTable = new TableDefinition(
             "ModuleIgnoreTable",
-            TupleDefinitions.ModuleIgnoreTable,
+            SymbolDefinitions.ModuleIgnoreTable,
             new[]
             {
                 new ColumnDefinition("Table", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Table name to ignore during merge operation."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleInstallExecuteSequence = new TableDefinition(
@@ -1505,7 +1505,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleInstallUISequence = new TableDefinition(
@@ -1519,12 +1519,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("After", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Before (0) or After (1)"),
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ModuleSubstitution = new TableDefinition(
             "ModuleSubstitution",
-            TupleDefinitions.ModuleSubstitution,
+            SymbolDefinitions.ModuleSubstitution,
             new[]
             {
                 new ColumnDefinition("Table", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Table containing the data to be modified."),
@@ -1532,23 +1532,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Column", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Column containing the data to be modified."),
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Template for modification data."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Properties = new TableDefinition(
             "Properties",
-            TupleDefinitions.Properties,
+            SymbolDefinitions.Properties,
             new[]
             {
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Primary key, non-localized token"),
                 new ColumnDefinition("Value", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Value of the property"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ImageFamilies = new TableDefinition(
             "ImageFamilies",
-            TupleDefinitions.ImageFamilies,
+            SymbolDefinitions.ImageFamilies,
             new[]
             {
                 new ColumnDefinition("Family", ColumnType.String, 8, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Primary key"),
@@ -1558,12 +1558,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DiskPrompt", ColumnType.String, 128, primaryKey: false, nullable: true, ColumnCategory.Text, forceLocalizable: true),
                 new ColumnDefinition("VolumeLabel", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Text),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition UpgradedImages = new TableDefinition(
             "UpgradedImages",
-            TupleDefinitions.UpgradedImages,
+            SymbolDefinitions.UpgradedImages,
             new[]
             {
                 new ColumnDefinition("Upgraded", ColumnType.String, 13, primaryKey: true, nullable: false, ColumnCategory.Text, description: "Primary key"),
@@ -1572,23 +1572,23 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("SymbolPaths", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text),
                 new ColumnDefinition("Family", ColumnType.String, 8, primaryKey: false, nullable: false, ColumnCategory.Text, keyTable: "ImageFamilies", keyColumn: 1, description: "Foreign key, Family to which this image belongs"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition UpgradedFilesToIgnore = new TableDefinition(
             "UpgradedFilesToIgnore",
-            TupleDefinitions.UpgradedFilesToIgnore,
+            SymbolDefinitions.UpgradedFilesToIgnore,
             new[]
             {
                 new ColumnDefinition("Upgraded", ColumnType.String, 13, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "UpgradedImages", keyColumn: 1, description: "Foreign key, Upgraded image"),
                 new ColumnDefinition("FTK", ColumnType.String, 255, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "File", keyColumn: 1, description: "Foreign key, File to ignore", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition UpgradedFilesOptionalData = new TableDefinition(
             "UpgradedFiles_OptionalData",
-            TupleDefinitions.UpgradedFilesOptionalData,
+            SymbolDefinitions.UpgradedFilesOptionalData,
             new[]
             {
                 new ColumnDefinition("Upgraded", ColumnType.String, 13, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "UpgradedImages", keyColumn: 1, description: "Foreign key, Upgraded image"),
@@ -1597,12 +1597,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("AllowIgnoreOnPatchError", ColumnType.Number, 0, primaryKey: false, nullable: true, ColumnCategory.Integer),
                 new ColumnDefinition("IncludeWholeFile", ColumnType.Number, 0, primaryKey: false, nullable: true, ColumnCategory.Integer),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition TargetImages = new TableDefinition(
             "TargetImages",
-            TupleDefinitions.TargetImages,
+            SymbolDefinitions.TargetImages,
             new[]
             {
                 new ColumnDefinition("Target", ColumnType.String, 13, primaryKey: true, nullable: false, ColumnCategory.Text),
@@ -1613,12 +1613,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ProductValidateFlags", ColumnType.String, 16, primaryKey: false, nullable: true, ColumnCategory.Text),
                 new ColumnDefinition("IgnoreMissingSrcFiles", ColumnType.Number, 0, primaryKey: false, nullable: false, ColumnCategory.Integer),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition TargetFilesOptionalData = new TableDefinition(
             "TargetFiles_OptionalData",
-            TupleDefinitions.TargetFilesOptionalData,
+            SymbolDefinitions.TargetFilesOptionalData,
             new[]
             {
                 new ColumnDefinition("Target", ColumnType.String, 13, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "TargetImages", keyColumn: 1, description: "Foreign key, Target image"),
@@ -1628,12 +1628,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("IgnoreLengths", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text),
                 new ColumnDefinition("RetainOffsets", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition FamilyFileRanges = new TableDefinition(
             "FamilyFileRanges",
-            TupleDefinitions.FamilyFileRanges,
+            SymbolDefinitions.FamilyFileRanges,
             new[]
             {
                 new ColumnDefinition("Family", ColumnType.String, 8, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "ImageFamilies", keyColumn: 1, description: "Foreign key, Family"),
@@ -1641,12 +1641,12 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("RetainOffsets", ColumnType.String, 128, primaryKey: false, nullable: false, ColumnCategory.Text),
                 new ColumnDefinition("RetainLengths", ColumnType.String, 128, primaryKey: false, nullable: false, ColumnCategory.Text),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ExternalFiles = new TableDefinition(
             "ExternalFiles",
-            TupleDefinitions.ExternalFiles,
+            SymbolDefinitions.ExternalFiles,
             new[]
             {
                 new ColumnDefinition("Family", ColumnType.String, 8, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "ImageFamilies", keyColumn: 1, description: "Foreign key, Family"),
@@ -1658,7 +1658,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("RetainOffsets", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text),
                 new ColumnDefinition("Order", ColumnType.Number, 0, primaryKey: false, nullable: false, ColumnCategory.Integer),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Streams = new TableDefinition(
@@ -1670,18 +1670,18 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Data", ColumnType.Object, 0, primaryKey: false, nullable: true, ColumnCategory.Unknown),
             },
             unreal: true,
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition SummaryInformation = new TableDefinition(
             "_SummaryInformation",
-            TupleDefinitions.SummaryInformation,
+            SymbolDefinitions.SummaryInformation,
             new[]
             {
                 new ColumnDefinition("PropertyId", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown),
                 new ColumnDefinition("Value", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition TransformView = new TableDefinition(
@@ -1696,7 +1696,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Current", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition Validation = new TableDefinition(
@@ -1715,7 +1715,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Set", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Set of values that are permitted"),
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Description of column"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition[] All = new[]

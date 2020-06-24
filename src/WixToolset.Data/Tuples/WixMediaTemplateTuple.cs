@@ -2,30 +2,30 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixMediaTemplate = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixMediaTemplate,
+        public static readonly IntermediateSymbolDefinition WixMediaTemplate = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixMediaTemplate,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.CabinetTemplate), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.CompressionLevel), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.DiskPrompt), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.VolumeLabel), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.MaximumUncompressedMediaSize), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.MaximumCabinetSizeForLargeFileSplitting), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.CabinetTemplate), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.CompressionLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.DiskPrompt), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.VolumeLabel), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.MaximumUncompressedMediaSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateSymbolFields.MaximumCabinetSizeForLargeFileSplitting), IntermediateFieldType.Number),
             },
-            typeof(WixMediaTemplateTuple));
+            typeof(WixMediaTemplateSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixMediaTemplateTupleFields
+    public enum WixMediaTemplateSymbolFields
     {
         CabinetTemplate,
         CompressionLevel,
@@ -35,52 +35,52 @@ namespace WixToolset.Data.Tuples
         MaximumCabinetSizeForLargeFileSplitting,
     }
 
-    public class WixMediaTemplateTuple : IntermediateTuple
+    public class WixMediaTemplateSymbol : IntermediateSymbol
     {
-        public WixMediaTemplateTuple() : base(TupleDefinitions.WixMediaTemplate, null, null)
+        public WixMediaTemplateSymbol() : base(SymbolDefinitions.WixMediaTemplate, null, null)
         {
         }
 
-        public WixMediaTemplateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixMediaTemplate, sourceLineNumber, id)
+        public WixMediaTemplateSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixMediaTemplate, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixMediaTemplateTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixMediaTemplateSymbolFields index] => this.Fields[(int)index];
 
         public string CabinetTemplate
         {
-            get => (string)this.Fields[(int)WixMediaTemplateTupleFields.CabinetTemplate];
-            set => this.Set((int)WixMediaTemplateTupleFields.CabinetTemplate, value);
+            get => (string)this.Fields[(int)WixMediaTemplateSymbolFields.CabinetTemplate];
+            set => this.Set((int)WixMediaTemplateSymbolFields.CabinetTemplate, value);
         }
 
         public CompressionLevel? CompressionLevel
         {
-            get => (CompressionLevel?)this.Fields[(int)WixMediaTemplateTupleFields.CompressionLevel].AsNullableNumber();
-            set => this.Set((int)WixMediaTemplateTupleFields.CompressionLevel, (int?)value);
+            get => (CompressionLevel?)this.Fields[(int)WixMediaTemplateSymbolFields.CompressionLevel].AsNullableNumber();
+            set => this.Set((int)WixMediaTemplateSymbolFields.CompressionLevel, (int?)value);
         }
 
         public string DiskPrompt
         {
-            get => (string)this.Fields[(int)WixMediaTemplateTupleFields.DiskPrompt];
-            set => this.Set((int)WixMediaTemplateTupleFields.DiskPrompt, value);
+            get => (string)this.Fields[(int)WixMediaTemplateSymbolFields.DiskPrompt];
+            set => this.Set((int)WixMediaTemplateSymbolFields.DiskPrompt, value);
         }
 
         public string VolumeLabel
         {
-            get => (string)this.Fields[(int)WixMediaTemplateTupleFields.VolumeLabel];
-            set => this.Set((int)WixMediaTemplateTupleFields.VolumeLabel, value);
+            get => (string)this.Fields[(int)WixMediaTemplateSymbolFields.VolumeLabel];
+            set => this.Set((int)WixMediaTemplateSymbolFields.VolumeLabel, value);
         }
 
         public int? MaximumUncompressedMediaSize
         {
-            get => (int?)this.Fields[(int)WixMediaTemplateTupleFields.MaximumUncompressedMediaSize];
-            set => this.Set((int)WixMediaTemplateTupleFields.MaximumUncompressedMediaSize, value);
+            get => (int?)this.Fields[(int)WixMediaTemplateSymbolFields.MaximumUncompressedMediaSize];
+            set => this.Set((int)WixMediaTemplateSymbolFields.MaximumUncompressedMediaSize, value);
         }
 
         public int? MaximumCabinetSizeForLargeFileSplitting
         {
-            get => (int?)this.Fields[(int)WixMediaTemplateTupleFields.MaximumCabinetSizeForLargeFileSplitting];
-            set => this.Set((int)WixMediaTemplateTupleFields.MaximumCabinetSizeForLargeFileSplitting, value);
+            get => (int?)this.Fields[(int)WixMediaTemplateSymbolFields.MaximumCabinetSizeForLargeFileSplitting];
+            set => this.Set((int)WixMediaTemplateSymbolFields.MaximumCabinetSizeForLargeFileSplitting, value);
         }
     }
 }

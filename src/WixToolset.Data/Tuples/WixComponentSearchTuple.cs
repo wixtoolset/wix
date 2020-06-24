@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixComponentSearch = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixComponentSearch,
+        public static readonly IntermediateSymbolDefinition WixComponentSearch = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixComponentSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.Guid), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.ProductCode), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.Guid), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.ProductCode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComponentSearchSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixComponentSearchTuple));
+            typeof(WixComponentSearchSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixComponentSearchTupleFields
+    public enum WixComponentSearchSymbolFields
     {
         Guid,
         ProductCode,
@@ -37,34 +37,34 @@ namespace WixToolset.Data.Tuples
         WantDirectory = 0x4,
     }
 
-    public class WixComponentSearchTuple : IntermediateTuple
+    public class WixComponentSearchSymbol : IntermediateSymbol
     {
-        public WixComponentSearchTuple() : base(TupleDefinitions.WixComponentSearch, null, null)
+        public WixComponentSearchSymbol() : base(SymbolDefinitions.WixComponentSearch, null, null)
         {
         }
 
-        public WixComponentSearchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixComponentSearch, sourceLineNumber, id)
+        public WixComponentSearchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixComponentSearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixComponentSearchTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixComponentSearchSymbolFields index] => this.Fields[(int)index];
 
         public string Guid
         {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.Guid];
-            set => this.Set((int)WixComponentSearchTupleFields.Guid, value);
+            get => (string)this.Fields[(int)WixComponentSearchSymbolFields.Guid];
+            set => this.Set((int)WixComponentSearchSymbolFields.Guid, value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.ProductCode];
-            set => this.Set((int)WixComponentSearchTupleFields.ProductCode, value);
+            get => (string)this.Fields[(int)WixComponentSearchSymbolFields.ProductCode];
+            set => this.Set((int)WixComponentSearchSymbolFields.ProductCode, value);
         }
 
         public WixComponentSearchAttributes Attributes
         {
-            get => (WixComponentSearchAttributes)this.Fields[(int)WixComponentSearchTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixComponentSearchTupleFields.Attributes, (int)value);
+            get => (WixComponentSearchAttributes)this.Fields[(int)WixComponentSearchSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixComponentSearchSymbolFields.Attributes, (int)value);
         }
     }
 }

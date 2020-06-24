@@ -2,28 +2,28 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixGroup = new IntermediateTupleDefinition(
-            TupleDefinitionType.WixGroup,
+        public static readonly IntermediateSymbolDefinition WixGroup = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.WixGroup,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixGroupTupleFields.ParentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixGroupTupleFields.ParentType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixGroupTupleFields.ChildId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixGroupTupleFields.ChildType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ParentId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ParentType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ChildId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ChildType), IntermediateFieldType.String),
             },
-            typeof(WixGroupTuple));
+            typeof(WixGroupSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
     using System;
 
-    public enum WixGroupTupleFields
+    public enum WixGroupSymbolFields
     {
         ParentId,
         ParentType,
@@ -31,40 +31,40 @@ namespace WixToolset.Data.Tuples
         ChildType,
     }
 
-    public class WixGroupTuple : IntermediateTuple
+    public class WixGroupSymbol : IntermediateSymbol
     {
-        public WixGroupTuple() : base(TupleDefinitions.WixGroup, null, null)
+        public WixGroupSymbol() : base(SymbolDefinitions.WixGroup, null, null)
         {
         }
 
-        public WixGroupTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixGroup, sourceLineNumber, id)
+        public WixGroupSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixGroup, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixGroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixGroupSymbolFields index] => this.Fields[(int)index];
 
         public string ParentId
         {
-            get => (string)this.Fields[(int)WixGroupTupleFields.ParentId];
-            set => this.Set((int)WixGroupTupleFields.ParentId, value);
+            get => (string)this.Fields[(int)WixGroupSymbolFields.ParentId];
+            set => this.Set((int)WixGroupSymbolFields.ParentId, value);
         }
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixGroupTupleFields.ParentType], true);
-            set => this.Set((int)WixGroupTupleFields.ParentType, value.ToString());
+            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixGroupSymbolFields.ParentType], true);
+            set => this.Set((int)WixGroupSymbolFields.ParentType, value.ToString());
         }
 
         public string ChildId
         {
-            get => (string)this.Fields[(int)WixGroupTupleFields.ChildId];
-            set => this.Set((int)WixGroupTupleFields.ChildId, value);
+            get => (string)this.Fields[(int)WixGroupSymbolFields.ChildId];
+            set => this.Set((int)WixGroupSymbolFields.ChildId, value);
         }
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixGroupTupleFields.ChildType], true);
-            set => this.Set((int)WixGroupTupleFields.ChildType, value.ToString());
+            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixGroupSymbolFields.ChildType], true);
+            set => this.Set((int)WixGroupSymbolFields.ChildType, value.ToString());
         }
     }
 }

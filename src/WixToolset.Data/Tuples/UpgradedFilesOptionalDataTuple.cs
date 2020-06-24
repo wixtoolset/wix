@@ -2,27 +2,27 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition UpgradedFilesOptionalData = new IntermediateTupleDefinition(
-            TupleDefinitionType.UpgradedFilesOptionalData,
+        public static readonly IntermediateSymbolDefinition UpgradedFilesOptionalData = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.UpgradedFilesOptionalData,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataTupleFields.Upgraded), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataTupleFields.FTK), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataTupleFields.SymbolPaths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataTupleFields.IncludeWholeFile), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataSymbolFields.Upgraded), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataSymbolFields.FTK), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataSymbolFields.SymbolPaths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataSymbolFields.AllowIgnoreOnPatchError), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradedFilesOptionalDataSymbolFields.IncludeWholeFile), IntermediateFieldType.Bool),
             },
-            typeof(UpgradedFilesOptionalDataTuple));
+            typeof(UpgradedFilesOptionalDataSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum UpgradedFilesOptionalDataTupleFields
+    public enum UpgradedFilesOptionalDataSymbolFields
     {
         Upgraded,
         FTK,
@@ -31,46 +31,46 @@ namespace WixToolset.Data.Tuples
         IncludeWholeFile,
     }
 
-    public class UpgradedFilesOptionalDataTuple : IntermediateTuple
+    public class UpgradedFilesOptionalDataSymbol : IntermediateSymbol
     {
-        public UpgradedFilesOptionalDataTuple() : base(TupleDefinitions.UpgradedFilesOptionalData, null, null)
+        public UpgradedFilesOptionalDataSymbol() : base(SymbolDefinitions.UpgradedFilesOptionalData, null, null)
         {
         }
 
-        public UpgradedFilesOptionalDataTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.UpgradedFilesOptionalData, sourceLineNumber, id)
+        public UpgradedFilesOptionalDataSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.UpgradedFilesOptionalData, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UpgradedFilesOptionalDataTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UpgradedFilesOptionalDataSymbolFields index] => this.Fields[(int)index];
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.Upgraded];
-            set => this.Set((int)UpgradedFilesOptionalDataTupleFields.Upgraded, value);
+            get => (string)this.Fields[(int)UpgradedFilesOptionalDataSymbolFields.Upgraded];
+            set => this.Set((int)UpgradedFilesOptionalDataSymbolFields.Upgraded, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.FTK];
-            set => this.Set((int)UpgradedFilesOptionalDataTupleFields.FTK, value);
+            get => (string)this.Fields[(int)UpgradedFilesOptionalDataSymbolFields.FTK];
+            set => this.Set((int)UpgradedFilesOptionalDataSymbolFields.FTK, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.SymbolPaths];
-            set => this.Set((int)UpgradedFilesOptionalDataTupleFields.SymbolPaths, value);
+            get => (string)this.Fields[(int)UpgradedFilesOptionalDataSymbolFields.SymbolPaths];
+            set => this.Set((int)UpgradedFilesOptionalDataSymbolFields.SymbolPaths, value);
         }
 
         public bool? AllowIgnoreOnPatchError
         {
-            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError];
-            set => this.Set((int)UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError, value);
+            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataSymbolFields.AllowIgnoreOnPatchError];
+            set => this.Set((int)UpgradedFilesOptionalDataSymbolFields.AllowIgnoreOnPatchError, value);
         }
 
         public bool? IncludeWholeFile
         {
-            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.IncludeWholeFile];
-            set => this.Set((int)UpgradedFilesOptionalDataTupleFields.IncludeWholeFile, value);
+            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataSymbolFields.IncludeWholeFile];
+            set => this.Set((int)UpgradedFilesOptionalDataSymbolFields.IncludeWholeFile, value);
         }
     }
 }

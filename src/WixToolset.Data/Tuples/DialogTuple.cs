@@ -2,41 +2,41 @@
 
 namespace WixToolset.Data
 {
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    public static partial class TupleDefinitions
+    public static partial class SymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Dialog = new IntermediateTupleDefinition(
-            TupleDefinitionType.Dialog,
+        public static readonly IntermediateSymbolDefinition Dialog = new IntermediateSymbolDefinition(
+            SymbolDefinitionType.Dialog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.HCentering), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.VCentering), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Width), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Height), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.CustomPalette), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.ErrorDialog), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Visible), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Modal), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.KeepModeless), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.LeftScroll), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Minimize), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.RightAligned), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.RightToLeft), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.SystemModal), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.TrackDiskSpace), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Title), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.FirstControlRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.DefaultControlRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.CancelControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.HCentering), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.VCentering), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Width), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Height), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.CustomPalette), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.ErrorDialog), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Visible), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Modal), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.KeepModeless), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.LeftScroll), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Minimize), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.RightAligned), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.RightToLeft), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.SystemModal), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.TrackDiskSpace), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.Title), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.FirstControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.DefaultControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogSymbolFields.CancelControlRef), IntermediateFieldType.String),
             },
-            typeof(DialogTuple));
+            typeof(DialogSymbol));
     }
 }
 
-namespace WixToolset.Data.Tuples
+namespace WixToolset.Data.Symbols
 {
-    public enum DialogTupleFields
+    public enum DialogSymbolFields
     {
         HCentering,
         VCentering,
@@ -59,130 +59,130 @@ namespace WixToolset.Data.Tuples
         CancelControlRef,
     }
 
-    public class DialogTuple : IntermediateTuple
+    public class DialogSymbol : IntermediateSymbol
     {
-        public DialogTuple() : base(TupleDefinitions.Dialog, null, null)
+        public DialogSymbol() : base(SymbolDefinitions.Dialog, null, null)
         {
         }
 
-        public DialogTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Dialog, sourceLineNumber, id)
+        public DialogSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.Dialog, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[DialogTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[DialogSymbolFields index] => this.Fields[(int)index];
 
         public int HCentering
         {
-            get => (int)this.Fields[(int)DialogTupleFields.HCentering];
-            set => this.Set((int)DialogTupleFields.HCentering, value);
+            get => (int)this.Fields[(int)DialogSymbolFields.HCentering];
+            set => this.Set((int)DialogSymbolFields.HCentering, value);
         }
 
         public int VCentering
         {
-            get => (int)this.Fields[(int)DialogTupleFields.VCentering];
-            set => this.Set((int)DialogTupleFields.VCentering, value);
+            get => (int)this.Fields[(int)DialogSymbolFields.VCentering];
+            set => this.Set((int)DialogSymbolFields.VCentering, value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)DialogTupleFields.Width];
-            set => this.Set((int)DialogTupleFields.Width, value);
+            get => (int)this.Fields[(int)DialogSymbolFields.Width];
+            set => this.Set((int)DialogSymbolFields.Width, value);
         }
 
         public int Height
         {
-            get => (int)this.Fields[(int)DialogTupleFields.Height];
-            set => this.Set((int)DialogTupleFields.Height, value);
+            get => (int)this.Fields[(int)DialogSymbolFields.Height];
+            set => this.Set((int)DialogSymbolFields.Height, value);
         }
 
         public bool CustomPalette
         {
-            get => this.Fields[(int)DialogTupleFields.CustomPalette].AsBool();
-            set => this.Set((int)DialogTupleFields.CustomPalette, value);
+            get => this.Fields[(int)DialogSymbolFields.CustomPalette].AsBool();
+            set => this.Set((int)DialogSymbolFields.CustomPalette, value);
         }
 
         public bool ErrorDialog
         {
-            get => this.Fields[(int)DialogTupleFields.ErrorDialog].AsBool();
-            set => this.Set((int)DialogTupleFields.ErrorDialog, value);
+            get => this.Fields[(int)DialogSymbolFields.ErrorDialog].AsBool();
+            set => this.Set((int)DialogSymbolFields.ErrorDialog, value);
         }
 
         public bool Visible
         {
-            get => this.Fields[(int)DialogTupleFields.Visible].AsBool();
-            set => this.Set((int)DialogTupleFields.Visible, value);
+            get => this.Fields[(int)DialogSymbolFields.Visible].AsBool();
+            set => this.Set((int)DialogSymbolFields.Visible, value);
         }
 
         public bool Modal
         {
-            get => this.Fields[(int)DialogTupleFields.Modal].AsBool();
-            set => this.Set((int)DialogTupleFields.Modal, value);
+            get => this.Fields[(int)DialogSymbolFields.Modal].AsBool();
+            set => this.Set((int)DialogSymbolFields.Modal, value);
         }
 
         public bool KeepModeless
         {
-            get => this.Fields[(int)DialogTupleFields.KeepModeless].AsBool();
-            set => this.Set((int)DialogTupleFields.KeepModeless, value);
+            get => this.Fields[(int)DialogSymbolFields.KeepModeless].AsBool();
+            set => this.Set((int)DialogSymbolFields.KeepModeless, value);
         }
 
         public bool LeftScroll
         {
-            get => this.Fields[(int)DialogTupleFields.LeftScroll].AsBool();
-            set => this.Set((int)DialogTupleFields.LeftScroll, value);
+            get => this.Fields[(int)DialogSymbolFields.LeftScroll].AsBool();
+            set => this.Set((int)DialogSymbolFields.LeftScroll, value);
         }
 
         public bool Minimize
         {
-            get => this.Fields[(int)DialogTupleFields.Minimize].AsBool();
-            set => this.Set((int)DialogTupleFields.Minimize, value);
+            get => this.Fields[(int)DialogSymbolFields.Minimize].AsBool();
+            set => this.Set((int)DialogSymbolFields.Minimize, value);
         }
 
         public bool RightAligned
         {
-            get => this.Fields[(int)DialogTupleFields.RightAligned].AsBool();
-            set => this.Set((int)DialogTupleFields.RightAligned, value);
+            get => this.Fields[(int)DialogSymbolFields.RightAligned].AsBool();
+            set => this.Set((int)DialogSymbolFields.RightAligned, value);
         }
 
         public bool RightToLeft
         {
-            get => this.Fields[(int)DialogTupleFields.RightToLeft].AsBool();
-            set => this.Set((int)DialogTupleFields.RightToLeft, value);
+            get => this.Fields[(int)DialogSymbolFields.RightToLeft].AsBool();
+            set => this.Set((int)DialogSymbolFields.RightToLeft, value);
         }
 
         public bool TrackDiskSpace
         {
-            get => this.Fields[(int)DialogTupleFields.TrackDiskSpace].AsBool();
-            set => this.Set((int)DialogTupleFields.TrackDiskSpace, value);
+            get => this.Fields[(int)DialogSymbolFields.TrackDiskSpace].AsBool();
+            set => this.Set((int)DialogSymbolFields.TrackDiskSpace, value);
         }
 
         public bool SystemModal
         {
-            get => this.Fields[(int)DialogTupleFields.SystemModal].AsBool();
-            set => this.Set((int)DialogTupleFields.SystemModal, value);
+            get => this.Fields[(int)DialogSymbolFields.SystemModal].AsBool();
+            set => this.Set((int)DialogSymbolFields.SystemModal, value);
         }
 
         public string Title
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Title];
-            set => this.Set((int)DialogTupleFields.Title, value);
+            get => (string)this.Fields[(int)DialogSymbolFields.Title];
+            set => this.Set((int)DialogSymbolFields.Title, value);
         }
 
         public string FirstControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.FirstControlRef];
-            set => this.Set((int)DialogTupleFields.FirstControlRef, value);
+            get => (string)this.Fields[(int)DialogSymbolFields.FirstControlRef];
+            set => this.Set((int)DialogSymbolFields.FirstControlRef, value);
         }
 
         public string DefaultControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.DefaultControlRef];
-            set => this.Set((int)DialogTupleFields.DefaultControlRef, value);
+            get => (string)this.Fields[(int)DialogSymbolFields.DefaultControlRef];
+            set => this.Set((int)DialogSymbolFields.DefaultControlRef, value);
         }
 
         public string CancelControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.CancelControlRef];
-            set => this.Set((int)DialogTupleFields.CancelControlRef, value);
+            get => (string)this.Fields[(int)DialogSymbolFields.CancelControlRef];
+            set => this.Set((int)DialogSymbolFields.CancelControlRef, value);
         }
     }
 }
