@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Converters", "src\WixToolset.Converters\WixToolset.Converters.csproj", "{6FAF6385-6598-4B89-972B-C31AFCA14538}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Converters.Tupleizer", "src\WixToolset.Converters.Tupleizer\WixToolset.Converters.Tupleizer.csproj", "{F051BCAF-698C-41D5-8427-164537CE5C5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Converters.Symbolizer", "src\WixToolset.Converters.Symbolizer\WixToolset.Converters.Symbolizer.csproj", "{F051BCAF-698C-41D5-8427-164537CE5C5C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{1B16A6C1-2B5D-4F9A-9DD5-FBC89B3CE31E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Converters", "src\test\WixToolsetTest.Converters\WixToolsetTest.Converters.csproj", "{485C5038-97E1-4729-A54D-848CC69569FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Converters.Tupleizer", "src\test\WixToolsetTest.Converters.Tupleizer\WixToolsetTest.Converters.Tupleizer.csproj", "{9DB36DB1-24A1-47A7-9E57-D48A2E33C13C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Converters.Symbolizer", "src\test\WixToolsetTest.Converters.Symbolizer\WixToolsetTest.Converters.Symbolizer.csproj", "{9DB36DB1-24A1-47A7-9E57-D48A2E33C13C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

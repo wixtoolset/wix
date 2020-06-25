@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WixToolset.Converters.Tupleizer\WixToolset.Converters.Tupleizer.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Converters.Symbolizer\WixToolset.Converters.Symbolizer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

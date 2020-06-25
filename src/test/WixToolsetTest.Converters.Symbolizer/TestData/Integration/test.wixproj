@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>d59f1c1e-9238-49fa-bfa2-ec1d9c2dda1d</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>TupleizerWixout</OutputName>
+    <OutputName>SymbolizerWixout</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

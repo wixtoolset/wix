@@ -2,7 +2,7 @@
   <Settings>
     <IgnoredTests>
       <NamedTestSelector>
-        <TestName>WixToolsetTest.Converters.Tupleizer.ConvertTuplesFixture.CanLoadWixoutAndConvertToIntermediate</TestName>
+        <TestName>WixToolsetTest.Converters.Symbolizer.ConvertSymbolsFixture.CanLoadWixoutAndConvertToIntermediate</TestName>
       </NamedTestSelector>
     </IgnoredTests>
   </Settings>

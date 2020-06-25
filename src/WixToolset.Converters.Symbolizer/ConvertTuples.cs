@@ -1,16 +1,16 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Converters.Tupleizer
+namespace WixToolset.Converters.Symbolizer
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using Wix3 = Microsoft.Tools.WindowsInstallerXml;
 
-    public static class ConvertTuples
+    public static class ConvertSymbols
     {
         public static Intermediate ConvertFile(string path)
         {
@@ -34,10 +34,10 @@ namespace WixToolset.Converters.Tupleizer
             {
                 foreach (Wix3.Row row in table.Rows)
                 {
-                    var tuple = GenerateTupleFromRow(row, wixMediaByDiskId, componentsById, fontsById, bindPathsById, selfRegById, wixFileById, wixDirectoryById);
-                    if (tuple != null)
+                    var symbol = GenerateSymbolFromRow(row, wixMediaByDiskId, componentsById, fontsById, bindPathsById, selfRegById, wixFileById, wixDirectoryById);
+                    if (symbol != null)
                     {
-                        section.Tuples.Add(tuple);
+                        section.Symbols.Add(symbol);
                     }
                 }
             }
@@ -77,31 +77,31 @@ namespace WixToolset.Converters.Tupleizer
             return byId;
         }
 
-        private static IntermediateTuple GenerateTupleFromRow(Wix3.Row row, Dictionary<int, Wix3.WixMediaRow> wixMediaByDiskId, Dictionary<string, Wix3.Row> componentsById, Dictionary<string, Wix3.Row> fontsById, Dictionary<string, Wix3.Row> bindPathsById, Dictionary<string, Wix3.Row> selfRegById, Dictionary<string, Wix3.Row> wixFileById, Dictionary<string, Wix3.Row> wixDirectoryById)
+        private static IntermediateSymbol GenerateSymbolFromRow(Wix3.Row row, Dictionary<int, Wix3.WixMediaRow> wixMediaByDiskId, Dictionary<string, Wix3.Row> componentsById, Dictionary<string, Wix3.Row> fontsById, Dictionary<string, Wix3.Row> bindPathsById, Dictionary<string, Wix3.Row> selfRegById, Dictionary<string, Wix3.Row> wixFileById, Dictionary<string, Wix3.Row> wixDirectoryById)
         {
             var name = row.Table.Name;
             switch (name)
             {
             case "_SummaryInformation":
-                return DefaultTupleFromRow(typeof(SummaryInformationTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(SummaryInformationSymbol), row, columnZeroIsId: false);
             case "ActionText":
-                return DefaultTupleFromRow(typeof(ActionTextTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ActionTextSymbol), row, columnZeroIsId: false);
             case "AppId":
-                return DefaultTupleFromRow(typeof(AppIdTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(AppIdSymbol), row, columnZeroIsId: false);
             case "AppSearch":
-                return DefaultTupleFromRow(typeof(AppSearchTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(AppSearchSymbol), row, columnZeroIsId: false);
             case "Billboard":
-                return DefaultTupleFromRow(typeof(BillboardTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(BillboardSymbol), row, columnZeroIsId: true);
             case "Binary":
-                return DefaultTupleFromRow(typeof(BinaryTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(BinarySymbol), row, columnZeroIsId: true);
             case "BindPath":
                 return null;
             case "CCPSearch":
-                return DefaultTupleFromRow(typeof(CCPSearchTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(CCPSearchSymbol), row, columnZeroIsId: true);
             case "Class":
-                return DefaultTupleFromRow(typeof(ClassTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ClassSymbol), row, columnZeroIsId: false);
             case "CompLocator":
-                return DefaultTupleFromRow(typeof(CompLocatorTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(CompLocatorSymbol), row, columnZeroIsId: false);
             case "Component":
             {
                 var attributes = FieldAsNullableInt(row, 3);
@@ -127,7 +127,7 @@ namespace WixToolset.Converters.Tupleizer
                     keyPathType = ComponentKeyPathType.OdbcDataSource;
                 }
 
-                return new ComponentTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ComponentSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     ComponentId = FieldAsString(row, 1),
                     DirectoryRef = FieldAsString(row, 2),
@@ -147,9 +147,9 @@ namespace WixToolset.Converters.Tupleizer
             }
 
             case "Condition":
-                return DefaultTupleFromRow(typeof(ConditionTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ConditionSymbol), row, columnZeroIsId: false);
             case "CreateFolder":
-                return DefaultTupleFromRow(typeof(CreateFolderTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(CreateFolderSymbol), row, columnZeroIsId: false);
             case "CustomAction":
             {
                 var caType = FieldAsInt(row, 1);
@@ -157,7 +157,7 @@ namespace WixToolset.Converters.Tupleizer
                 var sourceType = DetermineCustomActionSourceType(caType);
                 var targetType = DetermineCustomActionTargetType(caType);
 
-                return new CustomActionTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new CustomActionSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     ExecutionType = executionType,
                     SourceType = sourceType,
@@ -178,7 +178,7 @@ namespace WixToolset.Converters.Tupleizer
                 var id = FieldAsString(row, 0);
                 var splits = SplitDefaultDir(FieldAsString(row, 2));
 
-                var tuple = new DirectoryTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
+                var symbol = new DirectorySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
                 {
                     ParentDirectoryRef = FieldAsString(row, 1),
                     Name = splits[0],
@@ -189,19 +189,19 @@ namespace WixToolset.Converters.Tupleizer
 
                 if (wixDirectoryById.TryGetValue(id, out var wixDirectoryRow))
                 {
-                    tuple.ComponentGuidGenerationSeed = FieldAsString(wixDirectoryRow, 1);
+                    symbol.ComponentGuidGenerationSeed = FieldAsString(wixDirectoryRow, 1);
                 }
 
-                return tuple;
+                return symbol;
             }
             case "DrLocator":
-                return DefaultTupleFromRow(typeof(DrLocatorTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(DrLocatorSymbol), row, columnZeroIsId: false);
             case "DuplicateFile":
-                return DefaultTupleFromRow(typeof(DuplicateFileTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(DuplicateFileSymbol), row, columnZeroIsId: true);
             case "Error":
-                return DefaultTupleFromRow(typeof(ErrorTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ErrorSymbol), row, columnZeroIsId: false);
             case "Extension":
-                return DefaultTupleFromRow(typeof(ExtensionTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ExtensionSymbol), row, columnZeroIsId: false);
             case "Feature":
             {
                 var attributes = FieldAsInt(row, 7);
@@ -215,7 +215,7 @@ namespace WixToolset.Converters.Tupleizer
                     installDefault = FeatureInstallDefault.Source;
                 }
 
-                return new FeatureTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new FeatureSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     ParentFeatureRef = FieldAsString(row, 1),
                     Title = FieldAsString(row, 2),
@@ -231,71 +231,71 @@ namespace WixToolset.Converters.Tupleizer
             }
 
             case "FeatureComponents":
-                return DefaultTupleFromRow(typeof(FeatureComponentsTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(FeatureComponentsSymbol), row, columnZeroIsId: false);
             case "File":
             {
                 var attributes = FieldAsNullableInt(row, 6);
 
-                FileTupleAttributes tupleAttributes = 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesReadOnly) == WindowsInstallerConstants.MsidbFileAttributesReadOnly ? FileTupleAttributes.ReadOnly : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesHidden) == WindowsInstallerConstants.MsidbFileAttributesHidden ? FileTupleAttributes.Hidden : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesSystem) == WindowsInstallerConstants.MsidbFileAttributesSystem ? FileTupleAttributes.System : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesVital) == WindowsInstallerConstants.MsidbFileAttributesVital ? FileTupleAttributes.Vital : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesChecksum) == WindowsInstallerConstants.MsidbFileAttributesChecksum ? FileTupleAttributes.Checksum : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed ? FileTupleAttributes.Uncompressed : 0;
-                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed ? FileTupleAttributes.Compressed : 0;
+                FileSymbolAttributes symbolAttributes = 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesReadOnly) == WindowsInstallerConstants.MsidbFileAttributesReadOnly ? FileSymbolAttributes.ReadOnly : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesHidden) == WindowsInstallerConstants.MsidbFileAttributesHidden ? FileSymbolAttributes.Hidden : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesSystem) == WindowsInstallerConstants.MsidbFileAttributesSystem ? FileSymbolAttributes.System : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesVital) == WindowsInstallerConstants.MsidbFileAttributesVital ? FileSymbolAttributes.Vital : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesChecksum) == WindowsInstallerConstants.MsidbFileAttributesChecksum ? FileSymbolAttributes.Checksum : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed ? FileSymbolAttributes.Uncompressed : 0;
+                symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed ? FileSymbolAttributes.Compressed : 0;
 
                 var id = FieldAsString(row, 0);
 
-                var tuple = new FileTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
+                var symbol = new FileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
                 {
                     ComponentRef = FieldAsString(row, 1),
                     Name = FieldAsString(row, 2),
                     FileSize = FieldAsInt(row, 3),
                     Version = FieldAsString(row, 4),
                     Language = FieldAsString(row, 5),
-                    Attributes = tupleAttributes
+                    Attributes = symbolAttributes
                 };
 
                 if (bindPathsById.TryGetValue(id, out var bindPathRow))
                 {
-                    tuple.BindPath = FieldAsString(bindPathRow, 1) ?? String.Empty;
+                    symbol.BindPath = FieldAsString(bindPathRow, 1) ?? String.Empty;
                 }
 
                 if (fontsById.TryGetValue(id, out var fontRow))
                 {
-                    tuple.FontTitle = FieldAsString(fontRow, 1) ?? String.Empty;
+                    symbol.FontTitle = FieldAsString(fontRow, 1) ?? String.Empty;
                 }
 
                 if (selfRegById.TryGetValue(id, out var selfRegRow))
                 {
-                    tuple.SelfRegCost = FieldAsNullableInt(selfRegRow, 1) ?? 0;
+                    symbol.SelfRegCost = FieldAsNullableInt(selfRegRow, 1) ?? 0;
                 }
 
                 if (wixFileById.TryGetValue(id, out var wixFileRow))
                 {
-                    tuple.DirectoryRef = FieldAsString(wixFileRow, 4);
-                    tuple.DiskId = FieldAsNullableInt(wixFileRow, 5) ?? 0;
-                    tuple.Source = new IntermediateFieldPathValue { Path = FieldAsString(wixFileRow, 6) };
-                    tuple.PatchGroup = FieldAsInt(wixFileRow, 8);
-                    tuple.Attributes |= FieldAsInt(wixFileRow, 9) != 0 ? FileTupleAttributes.GeneratedShortFileName : 0;
-                    tuple.PatchAttributes = (PatchAttributeType)FieldAsInt(wixFileRow, 10);
+                    symbol.DirectoryRef = FieldAsString(wixFileRow, 4);
+                    symbol.DiskId = FieldAsNullableInt(wixFileRow, 5) ?? 0;
+                    symbol.Source = new IntermediateFieldPathValue { Path = FieldAsString(wixFileRow, 6) };
+                    symbol.PatchGroup = FieldAsInt(wixFileRow, 8);
+                    symbol.Attributes |= FieldAsInt(wixFileRow, 9) != 0 ? FileSymbolAttributes.GeneratedShortFileName : 0;
+                    symbol.PatchAttributes = (PatchAttributeType)FieldAsInt(wixFileRow, 10);
                 }
 
-                return tuple;
+                return symbol;
             }
             case "Font":
                 return null;
             case "Icon":
-                return DefaultTupleFromRow(typeof(IconTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(IconSymbol), row, columnZeroIsId: true);
             case "IniLocator":
-                return DefaultTupleFromRow(typeof(IniLocatorTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(IniLocatorSymbol), row, columnZeroIsId: false);
             case "LockPermissions":
-                return DefaultTupleFromRow(typeof(LockPermissionsTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(LockPermissionsSymbol), row, columnZeroIsId: false);
             case "Media":
             {
                 var diskId = FieldAsInt(row, 0);
-                var tuple = new MediaTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, diskId))
+                var symbol = new MediaSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, diskId))
                 {
                     DiskId = diskId,
                     LastSequence = FieldAsNullableInt(row, 1),
@@ -309,24 +309,24 @@ namespace WixToolset.Converters.Tupleizer
                 {
                     var compressionLevel = FieldAsString(wixMediaRow, 1);
 
-                    tuple.CompressionLevel = String.IsNullOrEmpty(compressionLevel) ? null : (CompressionLevel?)Enum.Parse(typeof(CompressionLevel), compressionLevel, true);
-                    tuple.Layout = wixMediaRow.Layout;
+                    symbol.CompressionLevel = String.IsNullOrEmpty(compressionLevel) ? null : (CompressionLevel?)Enum.Parse(typeof(CompressionLevel), compressionLevel, true);
+                    symbol.Layout = wixMediaRow.Layout;
                 }
 
-                return tuple;
+                return symbol;
             }
             case "MIME":
-                return DefaultTupleFromRow(typeof(MIMETuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(MIMESymbol), row, columnZeroIsId: false);
             case "ModuleIgnoreTable":
-                return DefaultTupleFromRow(typeof(ModuleIgnoreTableTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ModuleIgnoreTableSymbol), row, columnZeroIsId: true);
             case "MoveFile":
-                return DefaultTupleFromRow(typeof(MoveFileTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(MoveFileSymbol), row, columnZeroIsId: true);
             case "MsiAssembly":
             {
                 var componentId = FieldAsString(row, 0);
                 if (componentsById.TryGetValue(componentId, out var componentRow))
                 {
-                    return new AssemblyTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(componentRow, 5)))
+                    return new AssemblySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(componentRow, 5)))
                     {
                         ComponentRef = componentId,
                         FeatureRef = FieldAsString(row, 1),
@@ -339,21 +339,21 @@ namespace WixToolset.Converters.Tupleizer
                 return null;
             }
             case "MsiLockPermissionsEx":
-                return DefaultTupleFromRow(typeof(MsiLockPermissionsExTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(MsiLockPermissionsExSymbol), row, columnZeroIsId: true);
             case "MsiShortcutProperty":
-                return DefaultTupleFromRow(typeof(MsiShortcutPropertyTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(MsiShortcutPropertySymbol), row, columnZeroIsId: true);
             case "ODBCDataSource":
-                return DefaultTupleFromRow(typeof(ODBCDataSourceTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ODBCDataSourceSymbol), row, columnZeroIsId: true);
             case "ODBCDriver":
-                return DefaultTupleFromRow(typeof(ODBCDriverTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ODBCDriverSymbol), row, columnZeroIsId: true);
             case "ODBCTranslator":
-                return DefaultTupleFromRow(typeof(ODBCTranslatorTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ODBCTranslatorSymbol), row, columnZeroIsId: true);
             case "ProgId":
-                return DefaultTupleFromRow(typeof(ProgIdTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(ProgIdSymbol), row, columnZeroIsId: false);
             case "Property":
-                return DefaultTupleFromRow(typeof(PropertyTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(PropertySymbol), row, columnZeroIsId: true);
             case "PublishComponent":
-                return DefaultTupleFromRow(typeof(PublishComponentTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(PublishComponentSymbol), row, columnZeroIsId: false);
             case "Registry":
             {
                 var value = FieldAsString(row, 4);
@@ -397,7 +397,7 @@ namespace WixToolset.Converters.Tupleizer
                     }
                 }
 
-                return new RegistryTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     Root = (RegistryRootType)FieldAsInt(row, 1),
                     Key = FieldAsString(row, 2),
@@ -412,7 +412,7 @@ namespace WixToolset.Converters.Tupleizer
             {
                 var type = FieldAsInt(row, 4);
 
-                return new RegLocatorTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RegLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     Root = (RegistryRootType)FieldAsInt(row, 1),
                     Key = FieldAsString(row, 2),
@@ -424,7 +424,7 @@ namespace WixToolset.Converters.Tupleizer
             case "RemoveFile":
             {
                 var installMode = FieldAsInt(row, 4);
-                return new RemoveFileTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RemoveFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     ComponentRef = FieldAsString(row, 1),
                     FileName = FieldAsString(row, 2),
@@ -435,7 +435,7 @@ namespace WixToolset.Converters.Tupleizer
             }
             case "RemoveRegistry":
             {
-                return new RemoveRegistryTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RemoveRegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     Action = RemoveRegistryActionType.RemoveOnInstall,
                     Root = (RegistryRootType)FieldAsInt(row, 1),
@@ -446,14 +446,14 @@ namespace WixToolset.Converters.Tupleizer
             }
 
             case "ReserveCost":
-                return DefaultTupleFromRow(typeof(ReserveCostTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ReserveCostSymbol), row, columnZeroIsId: true);
             case "SelfReg":
                 return null;
             case "ServiceControl":
             {
                 var events = FieldAsInt(row, 2);
                 var wait = FieldAsNullableInt(row, 4);
-                return new ServiceControlTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ServiceControlSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     Name = FieldAsString(row, 1),
                     Arguments = FieldAsString(row, 3),
@@ -469,12 +469,12 @@ namespace WixToolset.Converters.Tupleizer
             }
 
             case "ServiceInstall":
-                return DefaultTupleFromRow(typeof(ServiceInstallTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(ServiceInstallSymbol), row, columnZeroIsId: true);
             case "Shortcut":
             {
                 var splitName = FieldAsString(row, 2).Split('|');
 
-                return new ShortcutTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ShortcutSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     DirectoryRef = FieldAsString(row, 1),
                     Name = splitName.Length > 1 ? splitName[1] : splitName[0],
@@ -495,13 +495,13 @@ namespace WixToolset.Converters.Tupleizer
                 };
             }
             case "Signature":
-                return DefaultTupleFromRow(typeof(SignatureTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(SignatureSymbol), row, columnZeroIsId: true);
             case "UIText":
-                return DefaultTupleFromRow(typeof(UITextTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(UITextSymbol), row, columnZeroIsId: true);
             case "Upgrade":
             {
                 var attributes = FieldAsInt(row, 4);
-                return new UpgradeTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new UpgradeSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     UpgradeCode = FieldAsString(row, 0),
                     VersionMin = FieldAsString(row, 1),
@@ -518,11 +518,11 @@ namespace WixToolset.Converters.Tupleizer
                 };
             }
             case "Verb":
-                return DefaultTupleFromRow(typeof(VerbTuple), row, columnZeroIsId: false);
+                return DefaultSymbolFromRow(typeof(VerbSymbol), row, columnZeroIsId: false);
             case "WixAction":
             {
                 var sequenceTable = FieldAsString(row, 0);
-                return new WixActionTuple(SourceLineNumber4(row.SourceLineNumbers))
+                return new WixActionSymbol(SourceLineNumber4(row.SourceLineNumbers))
                 {
                     SequenceTable = (SequenceTable)Enum.Parse(typeof(SequenceTable), sequenceTable == "AdvtExecuteSequence" ? nameof(SequenceTable.AdvertiseExecuteSequence) : sequenceTable),
                     Action = FieldAsString(row, 1),
@@ -534,31 +534,31 @@ namespace WixToolset.Converters.Tupleizer
                 };
             }
             case "WixBootstrapperApplication":
-                return DefaultTupleFromRow(typeof(WixBootstrapperApplicationTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixBootstrapperApplicationSymbol), row, columnZeroIsId: true);
             case "WixBundleContainer":
-                return DefaultTupleFromRow(typeof(WixBundleContainerTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixBundleContainerSymbol), row, columnZeroIsId: true);
             case "WixBundleVariable":
-                return DefaultTupleFromRow(typeof(WixBundleVariableTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixBundleVariableSymbol), row, columnZeroIsId: true);
             case "WixChainItem":
-                return DefaultTupleFromRow(typeof(WixChainItemTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixChainItemSymbol), row, columnZeroIsId: true);
             case "WixCustomTable":
-                return DefaultTupleFromRow(typeof(WixCustomTableTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixCustomTableSymbol), row, columnZeroIsId: true);
             case "WixDirectory":
                 return null;
             case "WixFile":
                 return null;
             case "WixInstanceTransforms":
-                return DefaultTupleFromRow(typeof(WixInstanceTransformsTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixInstanceTransformsSymbol), row, columnZeroIsId: true);
             case "WixMedia":
                 return null;
             case "WixMerge":
-                return DefaultTupleFromRow(typeof(WixMergeTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixMergeSymbol), row, columnZeroIsId: true);
             case "WixPatchBaseline":
-                return DefaultTupleFromRow(typeof(WixPatchBaselineTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixPatchBaselineSymbol), row, columnZeroIsId: true);
             case "WixProperty":
             {
                 var attributes = FieldAsInt(row, 1);
-                return new WixPropertyTuple(SourceLineNumber4(row.SourceLineNumbers))
+                return new WixPropertySymbol(SourceLineNumber4(row.SourceLineNumbers))
                 {
                     PropertyRef = FieldAsString(row, 0),
                     Admin = (attributes & 0x1) == 0x1,
@@ -567,13 +567,13 @@ namespace WixToolset.Converters.Tupleizer
                 };
             }
             case "WixSuppressModularization":
-                return DefaultTupleFromRow(typeof(WixSuppressModularizationTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixSuppressModularizationSymbol), row, columnZeroIsId: true);
             case "WixUI":
-                return DefaultTupleFromRow(typeof(WixUITuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixUISymbol), row, columnZeroIsId: true);
             case "WixVariable":
-                return DefaultTupleFromRow(typeof(WixVariableTuple), row, columnZeroIsId: true);
+                return DefaultSymbolFromRow(typeof(WixVariableSymbol), row, columnZeroIsId: true);
             default:
-                return GenericTupleFromCustomRow(row, columnZeroIsId: false);
+                return GenericSymbolFromCustomRow(row, columnZeroIsId: false);
             }
         }
 
@@ -674,35 +674,35 @@ namespace WixToolset.Converters.Tupleizer
             }
         }
 
-        private static IntermediateTuple DefaultTupleFromRow(Type tupleType, Wix3.Row row, bool columnZeroIsId)
+        private static IntermediateSymbol DefaultSymbolFromRow(Type symbolType, Wix3.Row row, bool columnZeroIsId)
         {
-            var tuple = Activator.CreateInstance(tupleType) as IntermediateTuple;
+            var symbol = Activator.CreateInstance(symbolType) as IntermediateSymbol;
 
-            SetTupleFieldsFromRow(row, tuple, columnZeroIsId);
+            SetSymbolFieldsFromRow(row, symbol, columnZeroIsId);
 
-            tuple.SourceLineNumbers = SourceLineNumber4(row.SourceLineNumbers);
-            return tuple;
+            symbol.SourceLineNumbers = SourceLineNumber4(row.SourceLineNumbers);
+            return symbol;
         }
 
-        private static IntermediateTuple GenericTupleFromCustomRow(Wix3.Row row, bool columnZeroIsId)
+        private static IntermediateSymbol GenericSymbolFromCustomRow(Wix3.Row row, bool columnZeroIsId)
         {
             var columnDefinitions = row.Table.Definition.Columns.Cast<Wix3.ColumnDefinition>();
             var fieldDefinitions = columnDefinitions.Select(columnDefinition =>
                 new IntermediateFieldDefinition(columnDefinition.Name, ColumnType3ToIntermediateFieldType4(columnDefinition.Type))).ToArray();
-            var tupleDefinition = new IntermediateTupleDefinition(row.Table.Name, fieldDefinitions, null);
-            var tuple = new IntermediateTuple(tupleDefinition, SourceLineNumber4(row.SourceLineNumbers));
+            var symbolDefinition = new IntermediateSymbolDefinition(row.Table.Name, fieldDefinitions, null);
+            var symbol = new IntermediateSymbol(symbolDefinition, SourceLineNumber4(row.SourceLineNumbers));
 
-            SetTupleFieldsFromRow(row, tuple, columnZeroIsId);
+            SetSymbolFieldsFromRow(row, symbol, columnZeroIsId);
 
-            return tuple;
+            return symbol;
         }
 
-        private static void SetTupleFieldsFromRow(Wix3.Row row, IntermediateTuple tuple, bool columnZeroIsId)
+        private static void SetSymbolFieldsFromRow(Wix3.Row row, IntermediateSymbol symbol, bool columnZeroIsId)
         {
             int offset = 0;
             if (columnZeroIsId)
             {
-                tuple.Id = GetIdentifierForRow(row);
+                symbol.Id = GetIdentifierForRow(row);
                 offset = 1;
             }
 
@@ -715,15 +715,15 @@ namespace WixToolset.Converters.Tupleizer
                 case Wix3.ColumnType.Localized:
                 case Wix3.ColumnType.Object:
                 case Wix3.ColumnType.Preserved:
-                    tuple.Set(i - offset, FieldAsString(row, i));
+                    symbol.Set(i - offset, FieldAsString(row, i));
                     break;
                 case Wix3.ColumnType.Number:
                     int? nullableValue = FieldAsNullableInt(row, i);
                     // TODO: Consider whether null values should be coerced to their default value when
                     // a column is not nullable. For now, just pass through the null.
                     //int value = FieldAsInt(row, i);
-                    //tuple.Set(i - offset, column.IsNullable ? nullableValue : value);
-                    tuple.Set(i - offset, nullableValue);
+                    //symbol.Set(i - offset, column.IsNullable ? nullableValue : value);
+                    symbol.Set(i - offset, nullableValue);
                     break;
                 case Wix3.ColumnType.Unknown:
                     break;

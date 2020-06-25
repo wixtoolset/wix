@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="TupleizerWixout" Language="1033" Version="1.0.0.0" Manufacturer="FireGiant" UpgradeCode="14a02d7f-9b32-4c92-b1f1-da518bf4e32a">
+  <Product Id="*" Name="SymbolizerWixout" Language="1033" Version="1.0.0.0" Manufacturer="FireGiant" UpgradeCode="14a02d7f-9b32-4c92-b1f1-da518bf4e32a">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" IgnoreRemoveFailure="yes" />
     <MediaTemplate />
 
-    <Feature Id="ProductFeature" Title="TupleizerWixout" Level="1">
+    <Feature Id="ProductFeature" Title="SymbolizerWixout" Level="1">
       <Feature Id="ChildFeature">
         <ComponentGroupRef Id="ProductComponents" />
       </Feature>
@@ -20,7 +20,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="TupleizerWixout" />
+        <Directory Id="INSTALLFOLDER" Name="SymbolizerWixout" />
       </Directory>
     </Directory>
   </Fragment>
