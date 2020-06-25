@@ -7,7 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class WixlibQueryFixture
@@ -34,9 +34,9 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var intermediate = Intermediate.Load(wixlibPath);
-                var allTuples = intermediate.Sections.SelectMany(s => s.Tuples);
-                var wixSimpleRefTuples = allTuples.OfType<WixSimpleReferenceTuple>();
-                var repRef = wixSimpleRefTuples.Where(t => t.Table == "WixAction" &&
+                var allSymbols = intermediate.Sections.SelectMany(s => s.Symbols);
+                var wixSimpleRefSymbols = allSymbols.OfType<WixSimpleReferenceSymbol>();
+                var repRef = wixSimpleRefSymbols.Where(t => t.Table == "WixAction" &&
                                                            t.PrimaryKeys == "InstallExecuteSequence/RemoveExistingProducts")
                                                .SingleOrDefault();
                 Assert.NotNull(repRef);
@@ -65,12 +65,12 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var intermediate = Intermediate.Load(wixlibPath);
-                var allTuples = intermediate.Sections.SelectMany(s => s.Tuples);
-                var typeLibTuple = allTuples.OfType<TypeLibTuple>()
+                var allSymbols = intermediate.Sections.SelectMany(s => s.Symbols);
+                var typeLibSymbol = allSymbols.OfType<TypeLibSymbol>()
                                             .SingleOrDefault();
-                Assert.NotNull(typeLibTuple);
+                Assert.NotNull(typeLibSymbol);
 
-                var fields = typeLibTuple.Fields.Select(field => field?.Type == IntermediateFieldType.Bool
+                var fields = typeLibSymbol.Fields.Select(field => field?.Type == IntermediateFieldType.Bool
                                                         ? field.AsNullableNumber()?.ToString()
                                                         : field?.AsString())
                                                 .ToList();

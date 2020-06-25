@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -35,7 +35,7 @@ namespace WixToolset.Core
 
             // Bind.
             //
-            this.WriteBuildInfoTuple(context.IntermediateRepresentation, context.OutputPath, context.PdbPath);
+            this.WriteBuildInfoSymbol(context.IntermediateRepresentation, context.OutputPath, context.PdbPath);
 
             var bindResult = this.BackendBind(context);
 
@@ -74,14 +74,14 @@ namespace WixToolset.Core
             return null;
         }
 
-        private void WriteBuildInfoTuple(Intermediate output, string outputFile, string outputPdbPath)
+        private void WriteBuildInfoSymbol(Intermediate output, string outputFile, string outputPdbPath)
         {
             var entrySection = output.Sections.First(s => s.Type != SectionType.Fragment);
 
             var executingAssembly = Assembly.GetExecutingAssembly();
             var fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
 
-            var buildInfoTuple = entrySection.AddTuple(new WixBuildInfoTuple()
+            var buildInfoSymbol = entrySection.AddSymbol(new WixBuildInfoSymbol()
             {
                 WixVersion = fileVersion.FileVersion,
                 WixOutputFile = outputFile,
@@ -89,7 +89,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(outputPdbPath))
             {
-                buildInfoTuple.WixPdbFile = outputPdbPath;
+                buildInfoSymbol.WixPdbFile = outputPdbPath;
             }
         }
     }

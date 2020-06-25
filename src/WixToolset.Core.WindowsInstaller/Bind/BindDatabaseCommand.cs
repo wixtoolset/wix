@@ -8,7 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -147,7 +147,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Add binder variables for all properties.
             if (SectionType.Product == section.Type || variableCache != null)
             {
-                foreach (var propertyRow in section.Tuples.OfType<PropertyTuple>())
+                foreach (var propertyRow in section.Symbols.OfType<PropertySymbol>())
                 {
                     // Set the ProductCode if it is to be generated.
                     if ("ProductCode".Equals(propertyRow.Id.Id, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
@@ -256,13 +256,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Retrieve file information from merge modules.
             if (SectionType.Product == section.Type)
             {
-                var wixMergeTuples = section.Tuples.OfType<WixMergeTuple>().ToList();
+                var wixMergeSymbols = section.Symbols.OfType<WixMergeSymbol>().ToList();
 
-                if (wixMergeTuples.Any())
+                if (wixMergeSymbols.Any())
                 {
                     containsMergeModules = true;
 
-                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, wixMergeTuples, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, wixMergeSymbols, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
                     command.Execute();
 
                     fileFacades.AddRange(command.MergeModulesFileFacades);
@@ -294,7 +294,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-#if TODO_FINISH_UPDATE // use tuples instead of rows
+#if TODO_FINISH_UPDATE // use symbols instead of rows
             // Extended binder extensions can be called now that fields are resolved.
             {
                 Table updatedFiles = this.Output.EnsureTable(this.TableDefinitions["WixBindUpdatedFiles"]);
@@ -341,20 +341,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Add missing CreateFolder tuples to null-keypath components.
+            // Add missing CreateFolder symbols to null-keypath components.
             {
                 var command = new AddCreateFoldersCommand(section);
                 command.Execute();
             }
 
-            // Update tuples that reference text files on disk.
+            // Update symbols that reference text files on disk.
             {
                 var command = new UpdateFromTextFilesCommand(this.Messaging, section);
                 command.Execute();
             }
 
             // Assign files to media and update file sequences.
-            Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
+            Dictionary<MediaSymbol, IEnumerable<FileFacade>> filesByCabinetMedia;
             IEnumerable<FileFacade> uncompressedFiles;
             {
                 var order = new OptimizeFileFacadesOrderCommand(fileFacades);
@@ -391,7 +391,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (output.Type == OutputType.Module)
             {
                 // Modularize identifiers.
-                var modularize = new ModularizeCommand(output, modularizationSuffix, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                var modularize = new ModularizeCommand(output, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
                 modularize.Execute();
 
                 // Ensure all sequence tables in place because, mergemod.dll requires them.
@@ -418,7 +418,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
             {
-                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Tuples.OfType<WixPatchIdTuple>().FirstOrDefault());
+                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Symbols.OfType<WixPatchIdSymbol>().FirstOrDefault());
                 command.Execute();
             }
 
@@ -428,7 +428,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var mediaTemplate = section.Tuples.OfType<WixMediaTemplateTuple>().FirstOrDefault();
+                var mediaTemplate = section.Symbols.OfType<WixMediaTemplateSymbol>().FirstOrDefault();
 
                 var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper, mediaTemplate);
                 command.CabbingThreadCount = this.CabbingThreadCount;
@@ -578,7 +578,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return wixout;
         }
 
-        private string ResolveMedia(MediaTuple media, string mediaLayoutDirectory, string layoutDirectory)
+        private string ResolveMedia(MediaSymbol media, string mediaLayoutDirectory, string layoutDirectory)
         {
             string layout = null;
 

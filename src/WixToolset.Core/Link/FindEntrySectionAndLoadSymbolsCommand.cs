@@ -31,17 +31,17 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Gets the collection of loaded symbols.
         /// </summary>
-        public IDictionary<string, TupleWithSection> TuplesByName { get; private set; }
+        public IDictionary<string, SymbolWithSection> SymbolsByName { get; private set; }
 
         /// <summary>
         /// Gets the collection of possibly conflicting symbols.
         /// </summary>
-        public IEnumerable<TupleWithSection> PossibleConflicts { get; private set; }
+        public IEnumerable<SymbolWithSection> PossibleConflicts { get; private set; }
 
         public void Execute()
         {
-            var tuplesByName = new Dictionary<string, TupleWithSection>();
-            var possibleConflicts = new HashSet<TupleWithSection>();
+            var symbolsByName = new Dictionary<string, SymbolWithSection>();
+            var possibleConflicts = new HashSet<SymbolWithSection>();
 
             if (!Enum.TryParse(this.ExpectedOutputType.ToString(), out SectionType expectedEntrySectionType))
             {
@@ -66,44 +66,44 @@ namespace WixToolset.Core.Link
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.MultipleEntrySections(this.EntrySection.Tuples.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
-                        this.Messaging.Write(ErrorMessages.MultipleEntrySections2(section.Tuples.FirstOrDefault()?.SourceLineNumbers));
+                        this.Messaging.Write(ErrorMessages.MultipleEntrySections(this.EntrySection.Symbols.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
+                        this.Messaging.Write(ErrorMessages.MultipleEntrySections2(section.Symbols.FirstOrDefault()?.SourceLineNumbers));
                     }
                 }
 
                 // Load all the symbols from the section's tables that create symbols.
-                foreach (var tuple in section.Tuples.Where(t => t.Id != null))
+                foreach (var symbol in section.Symbols.Where(t => t.Id != null))
                 {
-                    var symbol = new TupleWithSection(section, tuple);
+                    var symbolWithSection = new SymbolWithSection(section, symbol);
 
-                    if (!tuplesByName.TryGetValue(symbol.Name, out var existingSymbol))
+                    if (!symbolsByName.TryGetValue(symbolWithSection.Name, out var existingSymbol))
                     {
-                        tuplesByName.Add(symbol.Name, symbol);
+                        symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
                     }
                     else // uh-oh, duplicate symbols.
                     {
                         // If the duplicate symbols are both private directories, there is a chance that they
-                        // point to identical tuples. Identical directory tuples are redundant and will not cause
+                        // point to identical symbols. Identical directory symbols are redundant and will not cause
                         // conflicts.
-                        if (AccessModifier.Private == existingSymbol.Access && AccessModifier.Private == symbol.Access &&
-                            TupleDefinitionType.Directory == existingSymbol.Tuple.Definition.Type && existingSymbol.Tuple.IsIdentical(symbol.Tuple))
+                        if (AccessModifier.Private == existingSymbol.Access && AccessModifier.Private == symbolWithSection.Access &&
+                            SymbolDefinitionType.Directory == existingSymbol.Symbol.Definition.Type && existingSymbol.Symbol.IsIdentical(symbolWithSection.Symbol))
                         {
-                            // Ensure identical symbol's tuple is marked redundant to ensure (should the tuple be
+                            // Ensure identical symbol's symbol is marked redundant to ensure (should the symbol be
                             // referenced into the final output) it will not add duplicate primary keys during
                             // the .IDT importing.
                             //symbol.Row.Redundant = true; - TODO: remove this
-                            existingSymbol.AddRedundant(symbol);
+                            existingSymbol.AddRedundant(symbolWithSection);
                         }
                         else
                         {
-                            existingSymbol.AddPossibleConflict(symbol);
+                            existingSymbol.AddPossibleConflict(symbolWithSection);
                             possibleConflicts.Add(existingSymbol);
                         }
                     }
                 }
             }
 
-            this.TuplesByName = tuplesByName;
+            this.SymbolsByName = symbolsByName;
             this.PossibleConflicts = possibleConflicts;
         }
     }

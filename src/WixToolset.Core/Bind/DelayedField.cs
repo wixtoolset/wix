@@ -6,26 +6,26 @@ namespace WixToolset.Core.Bind
     using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// Structure used to hold a row and field that contain binder variables, which need to be resolved
+    /// Holds a symbol and field that contain binder variables, which need to be resolved
     /// later, once the files have been resolved.
     /// </summary>
     internal class DelayedField : IDelayedField
     {
         /// <summary>
-        /// Basic constructor for struct
+        /// Creates a delayed field.
         /// </summary>
-        /// <param name="row">Row for the field.</param>
+        /// <param name="symbol">Symbol for the field.</param>
         /// <param name="field">Field needing further resolution.</param>
-        public DelayedField(IntermediateTuple row, IntermediateField field)
+        public DelayedField(IntermediateSymbol symbol, IntermediateField field)
         {
-            this.Row = row;
+            this.Symbol = symbol;
             this.Field = field;
         }
 
         /// <summary>
         /// The row containing the field.
         /// </summary>
-        public IntermediateTuple Row { get; }
+        public IntermediateSymbol Symbol { get; }
 
         /// <summary>
         /// The field needing further resolving.

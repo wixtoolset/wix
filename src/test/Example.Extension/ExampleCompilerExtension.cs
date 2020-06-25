@@ -92,8 +92,8 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Example", id);
-                tuple.Set(0, value);
+                var symbol = this.ParseHelper.CreateSymbol(section, sourceLineNumbers, "Example", id);
+                symbol.Set(0, value);
             }
         }
 
@@ -152,12 +152,12 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, this.BundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, this.BundleExtensionId);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new ExampleSearchTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new ExampleSearchSymbol(sourceLineNumbers, id)
                 {
                     SearchFor = searchFor,
                 });
@@ -176,7 +176,7 @@ namespace Example.Extension
                     {
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ExampleTupleDefinitions.ExampleSearch, refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ExampleSymbolDefinitions.ExampleSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);

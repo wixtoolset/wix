@@ -41,13 +41,13 @@ namespace WixToolset.Core.Bind
 
         private IEnumerable<ILibrarianExtension> LibrarianExtensions { get; }
 
-        public string Resolve(SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, string source)
+        public string Resolve(SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, string source)
         {
             var checkedPaths = new List<string>();
 
             foreach (var extension in this.LibrarianExtensions)
             {
-                var resolved = extension.ResolveFile(sourceLineNumbers, tupleDefinition, source);
+                var resolved = extension.ResolveFile(sourceLineNumbers, symbolDefinition, source);
 
                 if (resolved?.CheckedPaths != null)
                 {
@@ -60,7 +60,7 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.MustResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, BindStage.Normal, checkedPaths);
+            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, BindStage.Normal, checkedPaths);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace WixToolset.Core.Bind
         /// <param name="bindStage">The binding stage used to determine what collection of bind paths will be used</param>
         /// <param name="alreadyCheckedPaths">Optional collection of paths already checked.</param>
         /// <returns>Should return a valid path for the stream to be imported.</returns>
-        public string ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, IEnumerable<string> alreadyCheckedPaths = null)
+        public string ResolveFile(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, IEnumerable<string> alreadyCheckedPaths = null)
         {
             var checkedPaths = new List<string>();
 
@@ -83,7 +83,7 @@ namespace WixToolset.Core.Bind
 
             foreach (var extension in this.ResolverExtensions)
             {
-                var resolved = extension.ResolveFile(source, tupleDefinition, sourceLineNumbers, bindStage);
+                var resolved = extension.ResolveFile(source, symbolDefinition, sourceLineNumbers, bindStage);
 
                 if (resolved?.CheckedPaths != null)
                 {
@@ -96,10 +96,10 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.MustResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, bindStage, checkedPaths);
+            return this.MustResolveUsingBindPaths(source, symbolDefinition, sourceLineNumbers, bindStage, checkedPaths);
         }
 
-        private string MustResolveUsingBindPaths(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, List<string> checkedPaths)
+        private string MustResolveUsingBindPaths(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, List<string> checkedPaths)
         {
             string resolved = null;
 
@@ -180,7 +180,7 @@ namespace WixToolset.Core.Bind
 
             if (null == resolved)
             {
-                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, source, tupleDefinition.Name, checkedPaths));
+                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, source, symbolDefinition.Name, checkedPaths));
             }
 
             return resolved;

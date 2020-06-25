@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class WixlibFixture
@@ -80,11 +80,11 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var wixlib = Intermediate.Load(wixlibPath);
-                var binaryTuples = wixlib.Sections.SelectMany(s => s.Tuples).OfType<BinaryTuple>().ToList();
-                Assert.Equal(3, binaryTuples.Count);
-                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll"));
-                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll-1"));
-                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll-2"));
+                var binarySymbols = wixlib.Sections.SelectMany(s => s.Symbols).OfType<BinarySymbol>().ToList();
+                Assert.Equal(3, binarySymbols.Count);
+                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll"));
+                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll-1"));
+                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll-2"));
             }
         }
 
@@ -138,9 +138,9 @@ namespace WixToolsetTest.CoreIntegration
 
                 var section = intermediate.Sections.Single();
 
-                var wixFile = section.Tuples.OfType<FileTuple>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", wixFile[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var wixFile = section.Symbols.OfType<FileSymbol>().First();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", wixFile[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -183,11 +183,11 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
-                var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
+                var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id?.Id);
                 Assert.Equal("Bar", example[0].AsString());
             }
@@ -244,13 +244,13 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuples = section.Tuples.OfType<FileTuple>().OrderBy(t => Path.GetFileName(t.Source.Path)).ToArray();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileTuples[0][FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileTuples[0][FileTupleFields.Source].PreviousValue.AsPath().Path);
-                Assert.Equal(Path.Combine(folder, @"data\other.txt"), fileTuples[1][FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"other.txt", fileTuples[1][FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbols = section.Symbols.OfType<FileSymbol>().OrderBy(t => Path.GetFileName(t.Source.Path)).ToArray();
+                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbols[0][FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"example.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                Assert.Equal(Path.Combine(folder, @"data\other.txt"), fileSymbols[1][FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"other.txt", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
-                var examples = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).ToArray();
+                var examples = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).ToArray();
                 Assert.Equal(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
                 Assert.Equal(new[] { "Bar", "Value" }, examples.Select(t => t[0].AsString()).ToArray());
             }

@@ -26,7 +26,7 @@ namespace WixToolset.Core
 
         public IEnumerable<Intermediate> Intermediates { get; set; }
 
-        public ITupleDefinitionCreator TupleDefinitionCreator { get; set; }
+        public ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
     }

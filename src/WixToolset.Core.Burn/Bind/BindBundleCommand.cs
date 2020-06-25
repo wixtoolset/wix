@@ -13,7 +13,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -88,28 +88,28 @@ namespace WixToolset.Core.Burn
             // We shouldn't really get past the linker phase if there are
             // no group items... that means that there's no UX, no Chain,
             // *and* no Containers!
-            var chainPackageTuples = this.GetRequiredTuples<WixBundlePackageTuple>();
+            var chainPackageSymbols = this.GetRequiredSymbols<WixBundlePackageSymbol>();
 
-            var wixGroupTuples = this.GetRequiredTuples<WixGroupTuple>();
+            var wixGroupSymbols = this.GetRequiredSymbols<WixGroupSymbol>();
 
             // Ensure there is one and only one row in the WixBundle table.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
-            var bundleTuple = this.GetSingleTuple<WixBundleTuple>();
+            var bundleSymbol = this.GetSingleSymbol<WixBundleSymbol>();
 
-            bundleTuple.ProviderKey = bundleTuple.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
+            bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
-            bundleTuple.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
+            bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
             // Ensure there is one and only one row in the WixBootstrapperApplication table.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
-            var bundleApplicationTuple = this.GetSingleTuple<WixBootstrapperApplicationTuple>();
+            var bundleApplicationSymbol = this.GetSingleSymbol<WixBootstrapperApplicationSymbol>();
 
             // Ensure there is one and only one row in the WixChain table.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
-            var chainTuple = this.GetSingleTuple<WixChainTuple>();
+            var chainSymbol = this.GetSingleSymbol<WixChainSymbol>();
 
             if (this.Messaging.EncounteredError)
             {
@@ -122,7 +122,7 @@ namespace WixToolset.Core.Burn
             var orderSearchesCommand = new OrderSearchesCommand(this.Messaging, section);
             orderSearchesCommand.Execute();
             var orderedSearches = orderSearchesCommand.OrderedSearchFacades;
-            var extensionSearchTuplesById = orderSearchesCommand.ExtensionSearchTuplesByExtensionId;
+            var extensionSearchSymbolsById = orderSearchesCommand.ExtensionSearchSymbolsByExtensionId;
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
@@ -133,29 +133,29 @@ namespace WixToolset.Core.Burn
             }
 
             // Get the explicit payloads.
-            var payloadTuples = section.Tuples.OfType<WixBundlePayloadTuple>().ToDictionary(t => t.Id.Id);
+            var payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
 
             // Update explicitly authored payloads with their parent package and container (as appropriate)
             // to make it easier to gather the payloads later.
-            foreach (var groupTuple in wixGroupTuples)
+            foreach (var groupSymbol in wixGroupSymbols)
             {
-                if (ComplexReferenceChildType.Payload == groupTuple.ChildType)
+                if (ComplexReferenceChildType.Payload == groupSymbol.ChildType)
                 {
-                    var payloadTuple = payloadTuples[groupTuple.ChildId];
+                    var payloadSymbol = payloadSymbols[groupSymbol.ChildId];
 
-                    if (ComplexReferenceParentType.Package == groupTuple.ParentType)
+                    if (ComplexReferenceParentType.Package == groupSymbol.ParentType)
                     {
-                        Debug.Assert(String.IsNullOrEmpty(payloadTuple.PackageRef));
-                        payloadTuple.PackageRef = groupTuple.ParentId;
+                        Debug.Assert(String.IsNullOrEmpty(payloadSymbol.PackageRef));
+                        payloadSymbol.PackageRef = groupSymbol.ParentId;
                     }
-                    else if (ComplexReferenceParentType.Container == groupTuple.ParentType)
+                    else if (ComplexReferenceParentType.Container == groupSymbol.ParentType)
                     {
-                        Debug.Assert(String.IsNullOrEmpty(payloadTuple.ContainerRef));
-                        payloadTuple.ContainerRef = groupTuple.ParentId;
+                        Debug.Assert(String.IsNullOrEmpty(payloadSymbol.ContainerRef));
+                        payloadSymbol.ContainerRef = groupSymbol.ParentId;
                     }
-                    else if (ComplexReferenceParentType.Layout == groupTuple.ParentType)
+                    else if (ComplexReferenceParentType.Layout == groupSymbol.ParentType)
                     {
-                        payloadTuple.LayoutOnly = true;
+                        payloadSymbol.LayoutOnly = true;
                     }
                 }
             }
@@ -165,44 +165,44 @@ namespace WixToolset.Core.Burn
             // Process the explicitly authored payloads.
             ISet<string> processedPayloads;
             {
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, payloadTuples.Values, bundleTuple.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
                 trackedFiles.AddRange(command.TrackedFiles);
 
-                processedPayloads = new HashSet<string>(payloadTuples.Keys);
+                processedPayloads = new HashSet<string>(payloadSymbols.Keys);
             }
 
             IDictionary<string, PackageFacade> facades;
             {
-                var command = new GetPackageFacadesCommand(chainPackageTuples, section);
+                var command = new GetPackageFacadesCommand(chainPackageSymbols, section);
                 command.Execute();
 
                 facades = command.PackageFacades;
             }
 
-            // Process each package facade. Note this is likely to add payloads and other tuples so
+            // Process each package facade. Note this is likely to add payloads and other symbols so
             // note that any indexes created above may be out of date now.
             foreach (var facade in facades.Values)
             {
-                switch (facade.PackageTuple.Type)
+                switch (facade.PackageSymbol.Type)
                 {
                 case WixBundlePackageType.Exe:
                 {
-                    var command = new ProcessExePackageCommand(facade, payloadTuples);
+                    var command = new ProcessExePackageCommand(facade, payloadSymbols);
                     command.Execute();
                 }
                 break;
 
                 case WixBundlePackageType.Msi:
                 {
-                    var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, payloadTuples);
+                    var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, payloadSymbols);
                     command.Execute();
 
                     if (null != variableCache)
                     {
-                        var msiPackage = (WixBundleMsiPackageTuple)facade.SpecificPackageTuple;
+                        var msiPackage = (WixBundleMsiPackageSymbol)facade.SpecificPackageSymbol;
                         variableCache.Add(String.Concat("packageLanguage.", facade.PackageId), msiPackage.ProductLanguage.ToString());
 
                         if (null != msiPackage.Manufacturer)
@@ -215,14 +215,14 @@ namespace WixToolset.Core.Burn
 
                 case WixBundlePackageType.Msp:
                 {
-                    var command = new ProcessMspPackageCommand(this.Messaging, section, facade, payloadTuples);
+                    var command = new ProcessMspPackageCommand(this.Messaging, section, facade, payloadSymbols);
                     command.Execute();
                 }
                 break;
 
                 case WixBundlePackageType.Msu:
                 {
-                    var command = new ProcessMsuPackageCommand(facade, payloadTuples);
+                    var command = new ProcessMsuPackageCommand(facade, payloadSymbols);
                     command.Execute();
                 }
                 break;
@@ -230,7 +230,7 @@ namespace WixToolset.Core.Burn
 
                 if (null != variableCache)
                 {
-                    BindBundleCommand.PopulatePackageVariableCache(facade.PackageTuple, variableCache);
+                    BindBundleCommand.PopulatePackageVariableCache(facade.PackageSymbol, variableCache);
                 }
             }
 
@@ -241,13 +241,13 @@ namespace WixToolset.Core.Burn
 
             // Reindex the payloads now that all the payloads (minus the manifest payloads that will be created later)
             // are present.
-            payloadTuples = section.Tuples.OfType<WixBundlePayloadTuple>().ToDictionary(t => t.Id.Id);
+            payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
 
             // Process the payloads that were added by processing the packages.
             {
-                var toProcess = payloadTuples.Values.Where(r => !processedPayloads.Contains(r.Id.Id)).ToList();
+                var toProcess = payloadSymbols.Values.Where(r => !processedPayloads.Contains(r.Id.Id)).ToList();
 
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, toProcess, bundleTuple.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -258,34 +258,34 @@ namespace WixToolset.Core.Burn
 
             // Set the package metadata from the payloads now that we have the complete payload information.
             {
-                var payloadsByPackageId = payloadTuples.Values.ToLookup(p => p.PackageRef);
+                var payloadsByPackageId = payloadSymbols.Values.ToLookup(p => p.PackageRef);
 
                 foreach (var facade in facades.Values)
                 {
-                    facade.PackageTuple.Size = 0;
+                    facade.PackageSymbol.Size = 0;
 
                     var packagePayloads = payloadsByPackageId[facade.PackageId];
 
                     foreach (var payload in packagePayloads)
                     {
-                        facade.PackageTuple.Size += payload.FileSize.Value;
+                        facade.PackageSymbol.Size += payload.FileSize.Value;
                     }
 
-                    if (!facade.PackageTuple.InstallSize.HasValue)
+                    if (!facade.PackageSymbol.InstallSize.HasValue)
                     {
-                        facade.PackageTuple.InstallSize = facade.PackageTuple.Size;
+                        facade.PackageSymbol.InstallSize = facade.PackageSymbol.Size;
                     }
 
-                    var packagePayload = payloadTuples[facade.PackageTuple.PayloadRef];
+                    var packagePayload = payloadSymbols[facade.PackageSymbol.PayloadRef];
 
-                    if (String.IsNullOrEmpty(facade.PackageTuple.Description))
+                    if (String.IsNullOrEmpty(facade.PackageSymbol.Description))
                     {
-                        facade.PackageTuple.Description = packagePayload.Description;
+                        facade.PackageSymbol.Description = packagePayload.Description;
                     }
 
-                    if (String.IsNullOrEmpty(facade.PackageTuple.DisplayName))
+                    if (String.IsNullOrEmpty(facade.PackageSymbol.DisplayName))
                     {
-                        facade.PackageTuple.DisplayName = packagePayload.DisplayName;
+                        facade.PackageSymbol.DisplayName = packagePayload.DisplayName;
                     }
                 }
             }
@@ -293,7 +293,7 @@ namespace WixToolset.Core.Burn
             // Give the UX payloads their embedded IDs...
             var uxPayloadIndex = 0;
             {
-                foreach (var payload in payloadTuples.Values.Where(p => BurnConstants.BurnUXContainerName == p.ContainerRef))
+                foreach (var payload in payloadSymbols.Values.Where(p => BurnConstants.BurnUXContainerName == p.ContainerRef))
                 {
                     // In theory, UX payloads could be embedded in the UX CAB, external to the bundle EXE, or even
                     // downloaded. The current engine requires the UX to be fully present before any downloading starts,
@@ -317,7 +317,7 @@ namespace WixToolset.Core.Burn
 
                 // Give the embedded payloads without an embedded id yet an embedded id.
                 var payloadIndex = 0;
-                foreach (var payload in payloadTuples.Values)
+                foreach (var payload in payloadSymbols.Values)
                 {
                     Debug.Assert(PackagingType.Unknown != payload.Packaging);
 
@@ -341,11 +341,11 @@ namespace WixToolset.Core.Burn
             }
 
             // If catalog files exist, non-embedded payloads should validate with the catalogs.
-            var catalogs = section.Tuples.OfType<WixBundleCatalogTuple>().ToList();
+            var catalogs = section.Symbols.OfType<WixBundleCatalogSymbol>().ToList();
 
             if (catalogs.Count > 0)
             {
-                var command = new VerifyPayloadsWithCatalogCommand(this.Messaging, catalogs, payloadTuples.Values);
+                var command = new VerifyPayloadsWithCatalogCommand(this.Messaging, catalogs, payloadSymbols.Values);
                 command.Execute();
             }
 
@@ -355,12 +355,12 @@ namespace WixToolset.Core.Burn
             }
 
             IEnumerable<PackageFacade> orderedFacades;
-            IEnumerable<WixBundleRollbackBoundaryTuple> boundaries;
+            IEnumerable<WixBundleRollbackBoundarySymbol> boundaries;
             {
-                var groupTuples = section.Tuples.OfType<WixGroupTuple>();
-                var boundaryTuplesById = section.Tuples.OfType<WixBundleRollbackBoundaryTuple>().ToDictionary(b => b.Id.Id);
+                var groupSymbols = section.Symbols.OfType<WixGroupSymbol>();
+                var boundarySymbolsById = section.Symbols.OfType<WixBundleRollbackBoundarySymbol>().ToDictionary(b => b.Id.Id);
 
-                var command = new OrderPackagesAndRollbackBoundariesCommand(this.Messaging, groupTuples, boundaryTuplesById, facades);
+                var command = new OrderPackagesAndRollbackBoundariesCommand(this.Messaging, groupSymbols, boundarySymbolsById, facades);
                 command.Execute();
 
                 orderedFacades = command.OrderedPackageFacades;
@@ -374,24 +374,24 @@ namespace WixToolset.Core.Burn
                 resolveDelayedFieldsCommand.Execute();
             }
 
-            Dictionary<string, ProvidesDependencyTuple> dependencyTuplesByKey;
+            Dictionary<string, ProvidesDependencySymbol> dependencySymbolsByKey;
             {
                 var command = new ProcessDependencyProvidersCommand(this.Messaging, section, facades);
                 command.Execute();
 
                 if (!String.IsNullOrEmpty(command.BundleProviderKey))
                 {
-                    bundleTuple.ProviderKey = command.BundleProviderKey; // set the overridable bundle provider key.
+                    bundleSymbol.ProviderKey = command.BundleProviderKey; // set the overridable bundle provider key.
                 }
-                dependencyTuplesByKey = command.DependencyTuplesByKey;
+                dependencySymbolsByKey = command.DependencySymbolsByKey;
             }
 
             // Update the bundle per-machine/per-user scope based on the chained packages.
-            this.ResolveBundleInstallScope(section, bundleTuple, orderedFacades);
+            this.ResolveBundleInstallScope(section, bundleSymbol, orderedFacades);
 
             // Generate data for all manifests.
             {
-                var command = new GenerateManifestDataFromIRCommand(this.Messaging, section, this.BackendExtensions, this.InternalBurnBackendHelper, extensionSearchTuplesById);
+                var command = new GenerateManifestDataFromIRCommand(this.Messaging, section, this.BackendExtensions, this.InternalBurnBackendHelper, extensionSearchSymbolsById);
                 command.Execute();
             }
 
@@ -409,12 +409,12 @@ namespace WixToolset.Core.Burn
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
-                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleTuple, orderedFacades, uxPayloadIndex, payloadTuples, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, orderedFacades, uxPayloadIndex, payloadSymbols, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
                 baManifestPath = command.OutputPath;
-                payloadTuples.Add(baManifestPayload.Id.Id, baManifestPayload);
+                payloadSymbols.Add(baManifestPayload.Id.Id, baManifestPayload);
                 ++uxPayloadIndex;
 
                 trackedFiles.Add(this.BackendHelper.TrackFile(baManifestPath, TrackedFileType.Temporary));
@@ -423,12 +423,12 @@ namespace WixToolset.Core.Burn
             // Generate the bundle extension manifest...
             string bextManifestPath;
             {
-                var command = new CreateBundleExtensionManifestCommand(section, bundleTuple, uxPayloadIndex, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBundleExtensionManifestCommand(section, bundleSymbol, uxPayloadIndex, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var bextManifestPayload = command.BundleExtensionManifestPayloadRow;
                 bextManifestPath = command.OutputPath;
-                payloadTuples.Add(bextManifestPayload.Id.Id, bextManifestPayload);
+                payloadSymbols.Add(bextManifestPayload.Id.Id, bextManifestPayload);
                 ++uxPayloadIndex;
 
                 trackedFiles.Add(this.BackendHelper.TrackFile(bextManifestPath, TrackedFileType.Temporary));
@@ -436,11 +436,11 @@ namespace WixToolset.Core.Burn
 
             // Create all the containers except the UX container first so the manifest (that goes in the UX container)
             // can contain all size and hash information about the non-UX containers.
-            WixBundleContainerTuple uxContainer;
-            IEnumerable<WixBundlePayloadTuple> uxPayloads;
-            IEnumerable<WixBundleContainerTuple> containers;
+            WixBundleContainerSymbol uxContainer;
+            IEnumerable<WixBundlePayloadSymbol> uxPayloads;
+            IEnumerable<WixBundleContainerSymbol> containers;
             {
-                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationTuple, payloadTuples, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
+                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationSymbol, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -450,13 +450,13 @@ namespace WixToolset.Core.Burn
                 uxPayloads = command.UXContainerPayloads;
                 containers = command.Containers;
             }
-            
+
             // Create the bundle manifest.
             string manifestPath;
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleTuple, containers, chainTuple, orderedFacades, boundaries, uxPayloads, payloadTuples, orderedSearches, catalogs, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, orderedSearches, catalogs, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;
@@ -475,7 +475,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleTuple, uxContainer, containers);
+                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleSymbol, uxContainer, containers);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);
@@ -483,7 +483,7 @@ namespace WixToolset.Core.Burn
             }
 
 #if TODO // does this need to come back, or do they only need to be in TrackedFiles?
-            this.ContentFilePaths = payloadTuples.Values.Where(p => p.ContentFile).Select(p => p.FullFileName).ToList();
+            this.ContentFilePaths = payloadSymbols.Values.Where(p => p.ContentFile).Select(p => p.FullFileName).ToList();
 #endif
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;
@@ -522,7 +522,7 @@ namespace WixToolset.Core.Burn
         /// </summary>
         /// <param name="package">The package with properties to cache.</param>
         /// <param name="variableCache">The property cache.</param>
-        private static void PopulatePackageVariableCache(WixBundlePackageTuple package, IDictionary<string, string> variableCache)
+        private static void PopulatePackageVariableCache(WixBundlePackageSymbol package, IDictionary<string, string> variableCache)
         {
             var id = package.Id.Id;
 
@@ -533,17 +533,17 @@ namespace WixToolset.Core.Burn
             variableCache.Add(String.Concat("packageVersion.", id), package.Version);
         }
 
-        private void ResolveBundleInstallScope(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> facades)
+        private void ResolveBundleInstallScope(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> facades)
         {
-            var dependencyTuplesById = section.Tuples.OfType<ProvidesDependencyTuple>().ToDictionary(t => t.Id.Id);
+            var dependencySymbolsById = section.Symbols.OfType<ProvidesDependencySymbol>().ToDictionary(t => t.Id.Id);
 
             foreach (var facade in facades)
             {
-                if (bundleTuple.PerMachine && YesNoDefaultType.No == facade.PackageTuple.PerMachine)
+                if (bundleSymbol.PerMachine && YesNoDefaultType.No == facade.PackageSymbol.PerMachine)
                 {
-                    this.Messaging.Write(VerboseMessages.SwitchingToPerUserPackage(facade.PackageTuple.SourceLineNumbers, facade.PackageId));
+                    this.Messaging.Write(VerboseMessages.SwitchingToPerUserPackage(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
 
-                    bundleTuple.Attributes &= ~WixBundleAttributes.PerMachine;
+                    bundleSymbol.Attributes &= ~WixBundleAttributes.PerMachine;
                     break;
                 }
             }
@@ -551,45 +551,45 @@ namespace WixToolset.Core.Burn
             foreach (var facade in facades)
             {
                 // Update package scope from bundle scope if default.
-                if (YesNoDefaultType.Default == facade.PackageTuple.PerMachine)
+                if (YesNoDefaultType.Default == facade.PackageSymbol.PerMachine)
                 {
-                    facade.PackageTuple.PerMachine = bundleTuple.PerMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+                    facade.PackageSymbol.PerMachine = bundleSymbol.PerMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
                 }
 
                 // We will only register packages in the same scope as the bundle. Warn if any packages with providers
                 // are in a different scope and not permanent (permanents typically don't need a ref-count).
-                if (!bundleTuple.PerMachine &&
-                    YesNoDefaultType.Yes == facade.PackageTuple.PerMachine &&
-                    !facade.PackageTuple.Permanent &&
-                    dependencyTuplesById.ContainsKey(facade.PackageId))
+                if (!bundleSymbol.PerMachine &&
+                    YesNoDefaultType.Yes == facade.PackageSymbol.PerMachine &&
+                    !facade.PackageSymbol.Permanent &&
+                    dependencySymbolsById.ContainsKey(facade.PackageId))
                 {
-                    this.Messaging.Write(WarningMessages.NoPerMachineDependencies(facade.PackageTuple.SourceLineNumbers, facade.PackageId));
+                    this.Messaging.Write(WarningMessages.NoPerMachineDependencies(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
                 }
             }
         }
 
-        private IEnumerable<T> GetRequiredTuples<T>() where T : IntermediateTuple
+        private IEnumerable<T> GetRequiredSymbols<T>() where T : IntermediateSymbol
         {
-            var tuples = this.Output.Sections.Single().Tuples.OfType<T>().ToList();
+            var symbols = this.Output.Sections.Single().Symbols.OfType<T>().ToList();
 
-            if (0 == tuples.Count)
+            if (0 == symbols.Count)
             {
                 throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
-            return tuples;
+            return symbols;
         }
 
-        private T GetSingleTuple<T>() where T : IntermediateTuple
+        private T GetSingleSymbol<T>() where T : IntermediateSymbol
         {
-            var tuples = this.Output.Sections.Single().Tuples.OfType<T>().ToList();
+            var symbols = this.Output.Sections.Single().Symbols.OfType<T>().ToList();
 
-            if (1 != tuples.Count)
+            if (1 != symbols.Count)
             {
                 throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
-            return tuples[0];
+            return symbols[0];
         }
     }
 }

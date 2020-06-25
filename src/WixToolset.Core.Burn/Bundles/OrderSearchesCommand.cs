@@ -8,7 +8,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class OrderSearchesCommand
@@ -23,32 +23,32 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        public IDictionary<string, IList<IntermediateTuple>> ExtensionSearchTuplesByExtensionId { get; private set; }
+        public IDictionary<string, IList<IntermediateSymbol>> ExtensionSearchSymbolsByExtensionId { get; private set; }
 
         public IList<ISearchFacade> OrderedSearchFacades { get; private set; }
 
         public void Execute()
         {
-            this.ExtensionSearchTuplesByExtensionId = new Dictionary<string, IList<IntermediateTuple>>();
+            this.ExtensionSearchSymbolsByExtensionId = new Dictionary<string, IList<IntermediateSymbol>>();
             this.OrderedSearchFacades = new List<ISearchFacade>();
 
-            var searchRelationTuples = this.Section.Tuples.OfType<WixSearchRelationTuple>().ToList();
-            var searchTuples = this.Section.Tuples.OfType<WixSearchTuple>().ToList();
-            if (searchTuples.Count == 0)
+            var searchRelationSymbols = this.Section.Symbols.OfType<WixSearchRelationSymbol>().ToList();
+            var searchSymbols = this.Section.Symbols.OfType<WixSearchSymbol>().ToList();
+            if (searchSymbols.Count == 0)
             {
                 // nothing to do!
                 return;
             }
 
-            var tupleDictionary = searchTuples.ToDictionary(t => t.Id.Id);
+            var symbolDictionary = searchSymbols.ToDictionary(t => t.Id.Id);
 
             var constraints = new Constraints();
-            if (searchRelationTuples.Count > 0)
+            if (searchRelationSymbols.Count > 0)
             {
                 // add relational info to our data...
-                foreach (var searchRelationTuple in searchRelationTuples)
+                foreach (var searchRelationSymbol in searchRelationSymbols)
                 {
-                    constraints.AddConstraint(searchRelationTuple.Id.Id, searchRelationTuple.ParentSearchRef);
+                    constraints.AddConstraint(searchRelationSymbol.Id.Id, searchRelationSymbol.ParentSearchRef);
                 }
             }
 
@@ -67,10 +67,10 @@ namespace WixToolset.Core.Burn.Bundles
             // lexicographically at each step to ensure a deterministic ordering
             // based on 'after' dependencies and ID.
             var sorter = new TopologicalSort();
-            var sortedIds = sorter.Sort(tupleDictionary.Keys, constraints);
+            var sortedIds = sorter.Sort(symbolDictionary.Keys, constraints);
 
             // Now, create the search facades with the searches in order...
-            this.OrderSearches(sortedIds, tupleDictionary);
+            this.OrderSearches(sortedIds, symbolDictionary);
         }
 
         /// <summary>
@@ -313,49 +313,49 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void OrderSearches(List<string> sortedIds, Dictionary<string, WixSearchTuple> searchTupleDictionary)
+        private void OrderSearches(List<string> sortedIds, Dictionary<string, WixSearchSymbol> searchSymbolDictionary)
         {
             // TODO: Although the WixSearch tables are defined in the Util extension,
             // the Bundle Binder has to know all about them. We hope to revisit all
             // of this in the 4.0 timeframe.
-            var legacySearchesById = this.Section.Tuples
-                .Where(t => t.Definition.Type == TupleDefinitionType.WixComponentSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixFileSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixProductSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixRegistrySearch)
+            var legacySearchesById = this.Section.Symbols
+                .Where(t => t.Definition.Type == SymbolDefinitionType.WixComponentSearch ||
+                       t.Definition.Type == SymbolDefinitionType.WixFileSearch ||
+                       t.Definition.Type == SymbolDefinitionType.WixProductSearch ||
+                       t.Definition.Type == SymbolDefinitionType.WixRegistrySearch)
                 .ToDictionary(t => t.Id.Id);
-            var setVariablesById = this.Section.Tuples
-                .OfType<WixSetVariableTuple>()
+            var setVariablesById = this.Section.Symbols
+                .OfType<WixSetVariableSymbol>()
                 .ToDictionary(t => t.Id.Id);
-            var extensionSearchesById = this.Section.Tuples
-                .Where(t => t.Definition.HasTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag))
+            var extensionSearchesById = this.Section.Symbols
+                .Where(t => t.Definition.HasTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag))
                 .ToDictionary(t => t.Id.Id);
 
             foreach (var searchId in sortedIds)
             {
-                var searchTuple = searchTupleDictionary[searchId];
-                if (legacySearchesById.TryGetValue(searchId, out var specificSearchTuple))
+                var searchSymbol = searchSymbolDictionary[searchId];
+                if (legacySearchesById.TryGetValue(searchId, out var specificSearchSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new LegacySearchFacade(searchTuple, specificSearchTuple));
+                    this.OrderedSearchFacades.Add(new LegacySearchFacade(searchSymbol, specificSearchSymbol));
                 }
-                else if (setVariablesById.TryGetValue(searchId, out var setVariableTuple))
+                else if (setVariablesById.TryGetValue(searchId, out var setVariableSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new SetVariableSearchFacade(searchTuple, setVariableTuple));
+                    this.OrderedSearchFacades.Add(new SetVariableSearchFacade(searchSymbol, setVariableSymbol));
                 }
-                else if (extensionSearchesById.TryGetValue(searchId, out var extensionSearchTuple))
+                else if (extensionSearchesById.TryGetValue(searchId, out var extensionSearchSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new ExtensionSearchFacade(searchTuple));
+                    this.OrderedSearchFacades.Add(new ExtensionSearchFacade(searchSymbol));
 
-                    if (!this.ExtensionSearchTuplesByExtensionId.TryGetValue(searchTuple.BundleExtensionRef, out var extensionSearchTuples))
+                    if (!this.ExtensionSearchSymbolsByExtensionId.TryGetValue(searchSymbol.BundleExtensionRef, out var extensionSearchSymbols))
                     {
-                        extensionSearchTuples = new List<IntermediateTuple>();
-                        this.ExtensionSearchTuplesByExtensionId[searchTuple.BundleExtensionRef] = extensionSearchTuples;
+                        extensionSearchSymbols = new List<IntermediateSymbol>();
+                        this.ExtensionSearchSymbolsByExtensionId[searchSymbol.BundleExtensionRef] = extensionSearchSymbols;
                     }
-                    extensionSearchTuples.Add(extensionSearchTuple);
+                    extensionSearchSymbols.Add(extensionSearchSymbol);
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.MissingBundleSearch(searchTuple.SourceLineNumbers, searchId));
+                    this.Messaging.Write(ErrorMessages.MissingBundleSearch(searchSymbol.SourceLineNumbers, searchId));
                 }
             }
         }

@@ -11,7 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
@@ -463,9 +463,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     ref duplicateFilesSequence);
             if (!hasPatchFilesAction)
             {
-                WindowsInstallerStandard.TryGetStandardAction(tableName, "PatchFiles", out var patchFilesActionTuple);
+                WindowsInstallerStandard.TryGetStandardAction(tableName, "PatchFiles", out var patchFilesActionSymbol);
 
-                var sequence = patchFilesActionTuple.Sequence;
+                var sequence = patchFilesActionSymbol.Sequence;
 
                 // Test for default sequence value's appropriateness
                 if (installFilesSequence >= sequence || (0 != duplicateFilesSequence && duplicateFilesSequence <= sequence))
@@ -474,14 +474,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (duplicateFilesSequence < installFilesSequence)
                         {
-                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionTuple.Action));
+                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
                         }
                         else
                         {
                             sequence = (duplicateFilesSequence + installFilesSequence) / 2;
                             if (installFilesSequence == sequence || duplicateFilesSequence == sequence)
                             {
-                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionTuple.Action));
+                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
                             }
                         }
                     }
@@ -498,8 +498,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 var patchAction = sequenceTable.CreateRow(null);
-                patchAction[0] = patchFilesActionTuple.Action;
-                patchAction[1] = patchFilesActionTuple.Condition;
+                patchAction[0] = patchFilesActionSymbol.Action;
+                patchAction[1] = patchFilesActionSymbol.Condition;
                 patchAction[2] = sequence;
                 patchAction.Operation = RowOperation.Add;
             }

@@ -12,7 +12,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -44,7 +44,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IMessaging Messaging { get; }
 
-        private ITupleDefinitionCreator Creator { get; set; }
+        private ISymbolDefinitionCreator Creator { get; set; }
 
         public bool ContainsProperty(string possibleProperty)
         {
@@ -54,7 +54,7 @@ namespace WixToolset.Core.ExtensibilityServices
         public void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
         {
 
-            section.AddTuple(new WixComplexReferenceTuple(sourceLineNumbers)
+            section.AddSymbol(new WixComplexReferenceSymbol(sourceLineNumbers)
             {
                 Parent = parentId,
                 ParentType = parentType,
@@ -64,16 +64,16 @@ namespace WixToolset.Core.ExtensibilityServices
                 IsPrimary = isPrimary
             });
 
-            this.CreateWixGroupTuple(section, sourceLineNumbers, parentType, parentId, childType, childId);
+            this.CreateWixGroupSymbol(section, sourceLineNumbers, parentType, parentId, childType, childId);
         }
 
         [Obsolete]
         public Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            return this.CreateDirectoryTuple(section, sourceLineNumbers, id, parentId, name, sectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
+            return this.CreateDirectorySymbol(section, sourceLineNumbers, id, parentId, name, sectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
         }
 
-        public Identifier CreateDirectoryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
+        public Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
             if (String.IsNullOrEmpty(shortName) && !name.Equals("SourceDir") && !this.IsValidShortFilename(name))
             {
@@ -86,7 +86,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
 
             // For anonymous directories, create the identifier. If this identifier already exists in the
-            // active section, bail so we don't add duplicate anonymous directory tuples (which are legal
+            // active section, bail so we don't add duplicate anonymous directory symbols (which are legal
             // but bloat the intermediate and ultimately make the linker do "busy work").
             if (null == id)
             {
@@ -98,7 +98,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
             }
 
-            var tuple = section.AddTuple(new DirectoryTuple(sourceLineNumbers, id)
+            var symbol = section.AddSymbol(new DirectorySymbol(sourceLineNumbers, id)
             {
                 ParentDirectoryRef = parentId,
                 Name = name,
@@ -107,7 +107,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 SourceShortName = shortSourceName
             });
 
-            return tuple.Id;
+            return symbol.Id;
         }
 
         public string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds)
@@ -122,9 +122,9 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (1 == inlineSyntax.Length)
                 {
                     id = inlineSyntax[0];
-                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, id);
+                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, id);
                 }
-                else // start creating tuples for the entries in the inline syntax
+                else // start creating symbols for the entries in the inline syntax
                 {
                     id = parentId;
 
@@ -138,14 +138,14 @@ namespace WixToolset.Core.ExtensibilityServices
                         //}
 
                         id = inlineSyntax[0].TrimEnd(':');
-                        this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, id);
+                        this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, id);
 
                         pathStartsAt = 1;
                     }
 
                     for (var i = pathStartsAt; i < inlineSyntax.Length; ++i)
                     {
-                        var inlineId = this.CreateDirectoryTuple(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
+                        var inlineId = this.CreateDirectorySymbol(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
                         id = inlineId.Id;
                     }
                 }
@@ -174,10 +174,10 @@ namespace WixToolset.Core.ExtensibilityServices
         [Obsolete]
         public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
-            return this.CreateRegistryTuple(section, sourceLineNumbers, root, key, name, value, componentId, escapeLeadingHash);
+            return this.CreateRegistrySymbol(section, sourceLineNumbers, root, key, name, value, componentId, escapeLeadingHash);
         }
 
-        public Identifier CreateRegistryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
+        public Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
             if (RegistryRootType.Unknown == root)
             {
@@ -202,7 +202,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var id = this.CreateIdentifier("reg", componentId, ((int)root).ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
 
-            var tuple = section.AddTuple(new RegistryTuple(sourceLineNumbers, id)
+            var symbol = section.AddSymbol(new RegistrySymbol(sourceLineNumbers, id)
             {
                 Root = root,
                 Key = key,
@@ -211,30 +211,30 @@ namespace WixToolset.Core.ExtensibilityServices
                 ComponentRef = componentId,
             });
 
-            return tuple.Id;
+            return symbol.Id;
         }
 
-        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys)
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys)
         {
-            section.AddTuple(new WixSimpleReferenceTuple(sourceLineNumbers)
+            section.AddSymbol(new WixSimpleReferenceSymbol(sourceLineNumbers)
             {
-                Table = tupleName,
+                Table = symbolName,
                 PrimaryKeys = String.Join("/", primaryKeys)
             });
         }
 
-        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys)
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, params string[] primaryKeys)
         {
-            this.CreateSimpleReference(section, sourceLineNumbers, tupleDefinition.Name, primaryKeys);
+            this.CreateSimpleReference(section, sourceLineNumbers, symbolDefinition.Name, primaryKeys);
         }
 
         [Obsolete]
         public void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
         {
-            this.CreateWixGroupTuple(section, sourceLineNumbers, parentType, parentId, childType, childId);
+            this.CreateWixGroupSymbol(section, sourceLineNumbers, parentType, parentId, childType, childId);
         }
 
-        public void CreateWixGroupTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
+        public void CreateWixGroupSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
         {
             if (null == parentId || ComplexReferenceParentType.Unknown == parentType)
             {
@@ -246,7 +246,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException("childId");
             }
 
-            section.AddTuple(new WixGroupTuple(sourceLineNumbers)
+            section.AddSymbol(new WixGroupSymbol(sourceLineNumbers)
             {
                 ParentId = parentId,
                 ParentType = parentType,
@@ -255,7 +255,7 @@ namespace WixToolset.Core.ExtensibilityServices
             });
         }
 
-        public void CreateWixSearchTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
+        public void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
         {
             // TODO: verify variable is not a standard bundle variable
             if (variable == null)
@@ -263,7 +263,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, elementName, "Variable"));
             }
 
-            section.AddTuple(new WixSearchTuple(sourceLineNumbers, id)
+            section.AddSymbol(new WixSearchSymbol(sourceLineNumbers, id)
             {
                 Variable = variable,
                 Condition = condition,
@@ -272,20 +272,20 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (after != null)
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixSearch, after);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixSearch, after);
                 // TODO: We're currently defaulting to "always run after", which we will need to change...
-                this.CreateWixSearchRelationTuple(section, sourceLineNumbers, id, after, 2);
+                this.CreateWixSearchRelationSymbol(section, sourceLineNumbers, id, after, 2);
             }
 
             if (!String.IsNullOrEmpty(bundleExtensionId))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixBundleExtension, bundleExtensionId);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundleExtension, bundleExtensionId);
             }
         }
 
-        public void CreateWixSearchRelationTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
+        public void CreateWixSearchRelationSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
         {
-            section.AddTuple(new WixSearchRelationTuple(sourceLineNumbers, id)
+            section.AddSymbol(new WixSearchRelationSymbol(sourceLineNumbers, id)
             {
                 ParentSearchRef = parentId,
                 Attributes = attributes,
@@ -293,43 +293,43 @@ namespace WixToolset.Core.ExtensibilityServices
         }
 
         [Obsolete]
-        public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
+        public IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
         {
-            return this.CreateTuple(section, sourceLineNumbers, tableName, identifier);
+            return this.CreateSymbol(section, sourceLineNumbers, tableName, identifier);
         }
 
         [Obsolete]
-        public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
+        public IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null)
         {
-            return this.CreateTuple(section, sourceLineNumbers, tupleType, identifier);
+            return this.CreateSymbol(section, sourceLineNumbers, symbolType, identifier);
         }
 
-        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, Identifier identifier = null)
+        public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, Identifier identifier = null)
         {
             if (this.Creator == null)
             {
-                this.CreateTupleDefinitionCreator();
+                this.CreateSymbolDefinitionCreator();
             }
 
-            if (!this.Creator.TryGetTupleDefinitionByName(tupleName, out var tupleDefinition))
+            if (!this.Creator.TryGetSymbolDefinitionByName(symbolName, out var symbolDefinition))
             {
-                throw new ArgumentException(nameof(tupleName));
+                throw new ArgumentException(nameof(symbolName));
             }
 
-            return this.CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
+            return this.CreateSymbol(section, sourceLineNumbers, symbolDefinition, identifier);
         }
 
         [Obsolete]
-        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
+        public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null)
         {
-            var tupleDefinition = TupleDefinitions.ByType(tupleType);
+            var symbolDefinition = SymbolDefinitions.ByType(symbolType);
 
-            return this.CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
+            return this.CreateSymbol(section, sourceLineNumbers, symbolDefinition, identifier);
         }
 
-        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier = null)
+        public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, Identifier identifier = null)
         {
-            return section.AddTuple(tupleDefinition.CreateTuple(sourceLineNumbers, identifier));
+            return section.AddSymbol(symbolDefinition.CreateSymbol(sourceLineNumbers, identifier));
         }
 
         public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
@@ -384,34 +384,34 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
         {
-            section.AddTuple(new WixEnsureTableTuple(sourceLineNumbers)
+            section.AddSymbol(new WixEnsureTableSymbol(sourceLineNumbers)
             {
                 Table = tableDefinition.Name,
             });
 
             // TODO: Check if the given table definition is a custom table. For now we have to assume that it isn't.
-            //this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixCustomTable, tableDefinition.Name);
+            //this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableDefinition.Name);
         }
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
         {
-            section.AddTuple(new WixEnsureTableTuple(sourceLineNumbers)
+            section.AddSymbol(new WixEnsureTableSymbol(sourceLineNumbers)
             {
                 Table = tableName,
             });
 
             if (this.Creator == null)
             {
-                this.CreateTupleDefinitionCreator();
+                this.CreateSymbolDefinitionCreator();
             }
 
-            // TODO: The tableName may not be the same as the tupleName. For now, we have to assume that it is.
+            // TODO: The tableName may not be the same as the symbolName. For now, we have to assume that it is.
             // We don't add custom table definitions to the tableDefinitions collection,
             // so if it's not in there, it better be a custom table. If the Id is just wrong,
             // instead of a custom table, we get an unresolved reference at link time.
-            if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var _))
+            if (!this.Creator.TryGetSymbolDefinitionByName(tableName, out var _))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixCustomTable, tableName);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableName);
             }
         }
 
@@ -898,11 +898,11 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        public WixActionTuple ScheduleActionTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition, string beforeAction, string afterAction, bool overridable = false)
+        public WixActionSymbol ScheduleActionSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition, string beforeAction, string afterAction, bool overridable = false)
         {
             var actionId = new Identifier(access, sequence, actionName);
 
-            var actionTuple = section.AddTuple(new WixActionTuple(sourceLineNumbers, actionId)
+            var actionSymbol = section.AddSymbol(new WixActionSymbol(sourceLineNumbers, actionId)
             {
                 SequenceTable = sequence,
                 Action = actionName,
@@ -916,11 +916,11 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (WindowsInstallerStandard.IsStandardAction(beforeAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), beforeAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, beforeAction);
                 }
             }
 
@@ -928,15 +928,15 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (WindowsInstallerStandard.IsStandardAction(afterAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), afterAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, afterAction);
                 }
             }
 
-            return actionTuple;
+            return actionSymbol;
         }
 
         public void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform currentPlatform, CustomActionPlatforms supportedPlatforms)
@@ -968,7 +968,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         break;
                 }
 
-                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, name + suffix);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, name + suffix);
             }
         }
 
@@ -984,9 +984,9 @@ namespace WixToolset.Core.ExtensibilityServices
             this.Messaging.Write(ErrorMessages.UnexpectedElement(sourceLineNumbers, parentElement.Name.LocalName, childElement.Name.LocalName));
         }
 
-        private void CreateTupleDefinitionCreator()
+        private void CreateSymbolDefinitionCreator()
         {
-            this.Creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+            this.Creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
         }
 
         private static bool TryFindExtension(IEnumerable<ICompilerExtension> extensions, XNamespace ns, out ICompilerExtension extension)

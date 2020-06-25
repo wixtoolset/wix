@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class ExtensionFixture
@@ -58,11 +58,11 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"example.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
-                var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
+                var example = section.Symbols.Where(t => t.Definition.Type == SymbolDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id?.Id);
                 Assert.Equal("Bar", example[0].AsString());
             }
@@ -96,7 +96,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var property = section.Tuples.OfType<PropertyTuple>().Where(p => p.Id.Id == "ExampleProperty").Single();
+                var property = section.Symbols.OfType<PropertySymbol>().Where(p => p.Id.Id == "ExampleProperty").Single();
                 Assert.Equal("ExampleProperty", property.Id.Id);
                 Assert.Equal("test", property.Value);
             }
@@ -111,7 +111,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var exception = Assert.Throws<WixException>(() => 
+                var exception = Assert.Throws<WixException>(() =>
                     WixRunner.Execute(new[]
                     {
                         "build",

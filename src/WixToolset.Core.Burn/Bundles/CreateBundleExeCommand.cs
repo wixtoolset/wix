@@ -8,19 +8,19 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CreateBundleExeCommand
     {
-        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBundleTuple bundleTuple, WixBundleContainerTuple uxContainer, IEnumerable<WixBundleContainerTuple> containers)
+        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.IntermediateFolder = intermediateFolder;
             this.OutputPath = outputPath;
-            this.BundleTuple = bundleTuple;
+            this.BundleSymbol = bundleSymbol;
             this.UXContainer = uxContainer;
             this.Containers = containers;
         }
@@ -35,11 +35,11 @@ namespace WixToolset.Core.Burn.Bundles
 
         private string OutputPath { get; }
 
-        private WixBundleTuple BundleTuple { get; }
+        private WixBundleSymbol BundleSymbol { get; }
 
-        private WixBundleContainerTuple UXContainer { get; }
+        private WixBundleContainerSymbol UXContainer { get; }
 
-        private IEnumerable<WixBundleContainerTuple> Containers { get; }
+        private IEnumerable<WixBundleContainerSymbol> Containers { get; }
 
         public void Execute()
         {
@@ -47,7 +47,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             // Copy the burn.exe to a writable location then mark it to be moved to its final build location.
 
-            var stubPlatform = this.BundleTuple.Platform.ToString();
+            var stubPlatform = this.BundleSymbol.Platform.ToString();
             var stubFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), stubPlatform, "burn.exe");
 
             var bundleTempPath = Path.Combine(this.IntermediateFolder, bundleFilename);
@@ -59,19 +59,19 @@ namespace WixToolset.Core.Burn.Bundles
                 this.Messaging.Write(ErrorMessages.InsecureBundleFilename(bundleFilename));
             }
 
-            this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleTuple.SourceLineNumbers);
+            this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleSymbol.SourceLineNumbers);
 
             File.Copy(stubFile, bundleTempPath, true);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
-            this.UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleTuple);
+            this.UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol);
 
             // Update the .wixburn section to point to at the UX and attached container(s) then attach the containers
             // if they should be attached.
             using (var writer = BurnWriter.Open(this.Messaging, bundleTempPath))
             {
                 var burnStubFile = new FileInfo(bundleTempPath);
-                writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleTuple.BundleId);
+                writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleSymbol.BundleId);
 
                 // Always attach the UX container first
                 writer.AppendContainer(this.UXContainer.WorkingPath, BurnWriter.Container.UX);
@@ -91,7 +91,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleTuple bundleInfo)
+        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo)
         {
             var resources = new Dtf.Resources.ResourceCollection();
             var version = new Dtf.Resources.VersionResource("#1", 1033);

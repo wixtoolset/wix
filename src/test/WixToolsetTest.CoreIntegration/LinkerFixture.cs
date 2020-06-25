@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using Xunit;
@@ -27,12 +27,12 @@ namespace WixToolsetTest.CoreIntegration
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
-            var creator = serviceProvider.GetService<ITupleDefinitionCreator>();
+            var creator = serviceProvider.GetService<ISymbolDefinitionCreator>();
             var context = serviceProvider.GetService<ILinkContext>();
             context.Extensions = Enumerable.Empty<WixToolset.Extensibility.ILinkerExtension>();
             context.ExtensionData = Enumerable.Empty<WixToolset.Extensibility.IExtensionData>();
             context.Intermediates = new[] { intermediate1, intermediate2 };
-            context.TupleDefinitionCreator = creator;
+            context.SymbolDefinitionCreator = creator;
 
             var linker = serviceProvider.GetService<ILinker>();
             linker.Link(context);
@@ -72,10 +72,10 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var actions = section.Tuples.OfType<WixActionTuple>().Where(wat => wat.Action.StartsWith("Set")).ToList();
+                var actions = section.Symbols.OfType<WixActionSymbol>().Where(wat => wat.Action.StartsWith("Set")).ToList();
                 Assert.Equal(2, actions.Count);
-                //Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
-                //Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+                //Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileSymbolFields.Source].AsPath().Path);
+                //Assert.Equal(@"test.txt", wixFile[WixFileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
     }

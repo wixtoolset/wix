@@ -4,7 +4,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
 
     /// <summary>

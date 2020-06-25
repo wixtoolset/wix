@@ -11,7 +11,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Text;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -19,7 +19,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private static readonly Version EmptyVersion = new Version(0, 0, 0, 0);
 
-        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadTuple> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
 
@@ -37,7 +37,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
+        private IEnumerable<WixBundlePayloadSymbol> Payloads { get; }
 
         private PackagingType DefaultPackaging { get; }
 
@@ -92,7 +92,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.TrackedFiles = trackedFiles;
         }
 
-        private void UpdatePayloadPackagingType(WixBundlePayloadTuple payload)
+        private void UpdatePayloadPackagingType(WixBundlePayloadSymbol payload)
         {
             if (!payload.Packaging.HasValue || PackagingType.Unknown == payload.Packaging)
             {
@@ -118,7 +118,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void UpdatePayloadFileInformation(WixBundlePayloadTuple payload, IntermediateFieldPathValue sourceFile)
+        private void UpdatePayloadFileInformation(WixBundlePayloadSymbol payload, IntermediateFieldPathValue sourceFile)
         {
             var fileInfo = new FileInfo(sourceFile.Path);
 
@@ -165,7 +165,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void UpdatePayloadVersionInformation(WixBundlePayloadTuple payload, IntermediateFieldPathValue sourceFile)
+        private void UpdatePayloadVersionInformation(WixBundlePayloadSymbol payload, IntermediateFieldPathValue sourceFile)
         {
             var versionInfo = FileVersionInfo.GetVersionInfo(sourceFile.Path);
 

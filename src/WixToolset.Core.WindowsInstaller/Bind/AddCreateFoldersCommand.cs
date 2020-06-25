@@ -5,10 +5,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
-    /// Add CreateFolder tuples, if not already present, for null-keypath components.
+    /// Add CreateFolder symbols, if not already present, for null-keypath components.
     /// </summary>
     internal class AddCreateFoldersCommand
     {
@@ -21,15 +21,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var createFolderTuplesByComponentRef = new HashSet<string>(this.Section.Tuples.OfType<CreateFolderTuple>().Select(t => t.ComponentRef));
-            foreach (var componentTuple in this.Section.Tuples.OfType<ComponentTuple>().Where(t => t.KeyPathType == ComponentKeyPathType.Directory).ToList())
+            var createFolderSymbolsByComponentRef = new HashSet<string>(this.Section.Symbols.OfType<CreateFolderSymbol>().Select(t => t.ComponentRef));
+            foreach (var componentSymbol in this.Section.Symbols.OfType<ComponentSymbol>().Where(t => t.KeyPathType == ComponentKeyPathType.Directory).ToList())
             {
-                if (!createFolderTuplesByComponentRef.Contains(componentTuple.Id.Id))
+                if (!createFolderSymbolsByComponentRef.Contains(componentSymbol.Id.Id))
                 {
-                    this.Section.AddTuple(new CreateFolderTuple(componentTuple.SourceLineNumbers)
+                    this.Section.AddSymbol(new CreateFolderSymbol(componentSymbol.SourceLineNumbers)
                     {
-                        DirectoryRef = componentTuple.DirectoryRef,
-                        ComponentRef = componentTuple.Id.Id,
+                        DirectoryRef = componentSymbol.DirectoryRef,
+                        ComponentRef = componentSymbol.Id.Id,
                     });
                 }
             }

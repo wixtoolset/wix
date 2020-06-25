@@ -4,12 +4,12 @@ namespace WixToolset.Core.Link
 {
     using WixToolset.Data;
 
-    internal static class IntermediateTupleExtensions
+    internal static class IntermediateSymbolExtensions
     {
-        public static bool IsIdentical(this IntermediateTuple first, IntermediateTuple second)
+        public static bool IsIdentical(this IntermediateSymbol first, IntermediateSymbol second)
         {
-            var identical = (first.Definition.Type == second.Definition.Type && 
-                             first.Definition.Name == second.Definition.Name && 
+            var identical = (first.Definition.Type == second.Definition.Type &&
+                             first.Definition.Name == second.Definition.Name &&
                              first.Definition.FieldDefinitions.Length == second.Definition.FieldDefinitions.Length);
 
             for (int i = 0; identical && i < first.Definition.FieldDefinitions.Length; ++i)

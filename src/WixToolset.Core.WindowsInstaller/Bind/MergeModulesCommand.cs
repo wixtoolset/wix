@@ -13,7 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
@@ -46,8 +46,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var wixMergeTuples = this.Section.Tuples.OfType<WixMergeTuple>().ToList();
-            if (!wixMergeTuples.Any())
+            var wixMergeSymbols = this.Section.Symbols.OfType<WixMergeSymbol>().ToList();
+            if (!wixMergeSymbols.Any())
             {
                 return;
             }
@@ -69,10 +69,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 merge.OpenDatabase(this.OutputPath);
                 databaseOpen = true;
 
-                var featureModulesByMergeId = this.Section.Tuples.OfType<WixFeatureModulesTuple>().GroupBy(t => t.WixMergeRef).ToDictionary(g => g.Key);
+                var featureModulesByMergeId = this.Section.Symbols.OfType<WixFeatureModulesSymbol>().GroupBy(t => t.WixMergeRef).ToDictionary(g => g.Key);
 
                 // process all the merge rows
-                foreach (var wixMergeRow in wixMergeTuples)
+                foreach (var wixMergeRow in wixMergeSymbols)
                 {
                     var moduleOpen = false;
 
@@ -217,7 +217,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             using (var db = new Database(this.OutputPath, OpenDatabase.Direct))
             {
                 // Suppress individual actions.
-                foreach (var suppressAction in this.Section.Tuples.OfType<WixSuppressActionTuple>())
+                foreach (var suppressAction in this.Section.Symbols.OfType<WixSuppressActionSymbol>())
                 {
                     var tableName = suppressAction.SequenceTable.WindowsInstallerTableName();
                     if (db.TableExists(tableName))

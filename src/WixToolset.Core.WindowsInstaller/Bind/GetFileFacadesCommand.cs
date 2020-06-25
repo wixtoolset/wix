@@ -8,7 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class GetFileFacadesCommand
     {
@@ -25,10 +25,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var facades = new List<FileFacade>();
 
-            var assemblyFile = this.Section.Tuples.OfType<AssemblyTuple>().ToDictionary(t => t.Id.Id);
-            //var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.Id.Id);
+            var assemblyFile = this.Section.Symbols.OfType<AssemblySymbol>().ToDictionary(t => t.Id.Id);
+            //var deltaPatchFiles = this.Section.Symbols.OfType<WixDeltaPatchFileSymbol>().ToDictionary(t => t.Id.Id);
 
-            foreach (var file in this.Section.Tuples.OfType<FileTuple>())
+            foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
             {
                 assemblyFile.TryGetValue(file.Id.Id, out var assembly);
 
@@ -49,13 +49,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Merge data from the WixPatchSymbolPaths rows into the WixDeltaPatchFile rows.
         /// </summary>
-        public void ResolveDeltaPatchSymbolPaths(Dictionary<string, WixDeltaPatchFileTuple> deltaPatchFiles, IEnumerable<FileFacade> facades)
+        public void ResolveDeltaPatchSymbolPaths(Dictionary<string, WixDeltaPatchFileSymbol> deltaPatchFiles, IEnumerable<FileFacade> facades)
         {
             ILookup<string, FileFacade> filesByComponent = null;
             ILookup<string, FileFacade> filesByDirectory = null;
             ILookup<string, FileFacade> filesByDiskId = null;
 
-            foreach (var row in this.Section.Tuples.OfType<WixDeltaPatchSymbolPathsTuple>().OrderBy(r => r.SymbolType))
+            foreach (var row in this.Section.Symbols.OfType<WixDeltaPatchSymbolPathsSymbol>().OrderBy(r => r.SymbolType))
             {
                 switch (row.SymbolType)
                 {
@@ -119,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="row">Row from the WixPatchSymbolsPaths table.</param>
         /// <param name="file">FileRow into which to set symbol information.</param>
         /// <comment>This includes PreviousData as well.</comment>
-        private void MergeSymbolPaths(WixDeltaPatchSymbolPathsTuple row, WixDeltaPatchFileTuple file)
+        private void MergeSymbolPaths(WixDeltaPatchSymbolPathsSymbol row, WixDeltaPatchFileSymbol file)
         {
             if (file.SymbolPaths is null)
             {

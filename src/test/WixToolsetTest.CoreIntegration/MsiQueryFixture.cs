@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
@@ -1074,7 +1074,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
-                Assert.Empty(section.Tuples.OfType<FileTuple>());
+                Assert.Empty(section.Symbols.OfType<FileSymbol>());
 
                 var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 Assert.Null(data.Tables["File"]);

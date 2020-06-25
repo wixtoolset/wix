@@ -10,26 +10,26 @@ namespace WixToolset.Core.Burn.Bind
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Burn.ExtensibilityServices;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     internal class GenerateManifestDataFromIRCommand
     {
-        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IList<IntermediateTuple>> extensionSearchTuplesById)
+        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IList<IntermediateSymbol>> extensionSearchSymbolsById)
         {
             this.Messaging = messaging;
             this.Section = section;
             this.BackendExtensions = backendExtensions;
             this.BackendHelper = backendHelper;
-            this.ExtensionSearchTuplesById = extensionSearchTuplesById;
+            this.ExtensionSearchSymbolsById = extensionSearchSymbolsById;
         }
 
         private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
 
         private IBurnBackendHelper BackendHelper { get; }
 
-        private IDictionary<string, IList<IntermediateTuple>> ExtensionSearchTuplesById { get; }
+        private IDictionary<string, IList<IntermediateSymbol>> ExtensionSearchSymbolsById { get; }
 
         private IMessaging Messaging { get; }
 
@@ -37,108 +37,108 @@ namespace WixToolset.Core.Burn.Bind
 
         public void Execute()
         {
-            var tuples = this.Section.Tuples.ToList();
-            var cellsByCustomDataAndElementId = new Dictionary<string, List<WixBundleCustomDataCellTuple>>();
-            var customDataById = new Dictionary<string, WixBundleCustomDataTuple>();
+            var symbols = this.Section.Symbols.ToList();
+            var cellsByCustomDataAndElementId = new Dictionary<string, List<WixBundleCustomDataCellSymbol>>();
+            var customDataById = new Dictionary<string, WixBundleCustomDataSymbol>();
 
-            foreach (var kvp in this.ExtensionSearchTuplesById)
+            foreach (var kvp in this.ExtensionSearchSymbolsById)
             {
                 var extensionId = kvp.Key;
-                var extensionSearchTuples = kvp.Value;
-                foreach (var extensionSearchTuple in extensionSearchTuples)
+                var extensionSearchSymbols = kvp.Value;
+                foreach (var extensionSearchSymbol in extensionSearchSymbols)
                 {
-                    this.BackendHelper.AddBundleExtensionData(extensionId, extensionSearchTuple, tupleIdIsIdAttribute: true);
-                    tuples.Remove(extensionSearchTuple);
+                    this.BackendHelper.AddBundleExtensionData(extensionId, extensionSearchSymbol, symbolIdIsIdAttribute: true);
+                    symbols.Remove(extensionSearchSymbol);
                 }
             }
 
-            foreach (var tuple in tuples)
+            foreach (var symbol in symbols)
             {
-                var unknownTuple = false;
-                switch (tuple.Definition.Type)
+                var unknownSymbol = false;
+                switch (symbol.Definition.Type)
                 {
-                    // Tuples used internally and are not added to a data manifest.
-                    case TupleDefinitionType.ProvidesDependency:
-                    case TupleDefinitionType.WixApprovedExeForElevation:
-                    case TupleDefinitionType.WixBootstrapperApplication:
-                    case TupleDefinitionType.WixBundle:
-                    case TupleDefinitionType.WixBundleCatalog:
-                    case TupleDefinitionType.WixBundleContainer:
-                    case TupleDefinitionType.WixBundleCustomDataAttribute:
-                    case TupleDefinitionType.WixBundleExePackage:
-                    case TupleDefinitionType.WixBundleExtension:
-                    case TupleDefinitionType.WixBundleMsiFeature:
-                    case TupleDefinitionType.WixBundleMsiPackage:
-                    case TupleDefinitionType.WixBundleMsiProperty:
-                    case TupleDefinitionType.WixBundleMspPackage:
-                    case TupleDefinitionType.WixBundleMsuPackage:
-                    case TupleDefinitionType.WixBundlePackage:
-                    case TupleDefinitionType.WixBundlePackageCommandLine:
-                    case TupleDefinitionType.WixBundlePackageExitCode:
-                    case TupleDefinitionType.WixBundlePackageGroup:
-                    case TupleDefinitionType.WixBundlePatchTargetCode:
-                    case TupleDefinitionType.WixBundlePayload:
-                    case TupleDefinitionType.WixBundlePayloadGroup:
-                    case TupleDefinitionType.WixBundleRelatedPackage:
-                    case TupleDefinitionType.WixBundleRollbackBoundary:
-                    case TupleDefinitionType.WixBundleSlipstreamMsp:
-                    case TupleDefinitionType.WixBundleUpdate:
-                    case TupleDefinitionType.WixBundleVariable:
-                    case TupleDefinitionType.WixBuildInfo:
-                    case TupleDefinitionType.WixChain:
-                    case TupleDefinitionType.WixComponentSearch:
-                    case TupleDefinitionType.WixDependencyProvider:
-                    case TupleDefinitionType.WixFileSearch:
-                    case TupleDefinitionType.WixGroup:
-                    case TupleDefinitionType.WixProductSearch:
-                    case TupleDefinitionType.WixRegistrySearch:
-                    case TupleDefinitionType.WixRelatedBundle:
-                    case TupleDefinitionType.WixSearch:
-                    case TupleDefinitionType.WixSearchRelation:
-                    case TupleDefinitionType.WixSetVariable:
-                    case TupleDefinitionType.WixUpdateRegistration:
+                    // Symbols used internally and are not added to a data manifest.
+                    case SymbolDefinitionType.ProvidesDependency:
+                    case SymbolDefinitionType.WixApprovedExeForElevation:
+                    case SymbolDefinitionType.WixBootstrapperApplication:
+                    case SymbolDefinitionType.WixBundle:
+                    case SymbolDefinitionType.WixBundleCatalog:
+                    case SymbolDefinitionType.WixBundleContainer:
+                    case SymbolDefinitionType.WixBundleCustomDataAttribute:
+                    case SymbolDefinitionType.WixBundleExePackage:
+                    case SymbolDefinitionType.WixBundleExtension:
+                    case SymbolDefinitionType.WixBundleMsiFeature:
+                    case SymbolDefinitionType.WixBundleMsiPackage:
+                    case SymbolDefinitionType.WixBundleMsiProperty:
+                    case SymbolDefinitionType.WixBundleMspPackage:
+                    case SymbolDefinitionType.WixBundleMsuPackage:
+                    case SymbolDefinitionType.WixBundlePackage:
+                    case SymbolDefinitionType.WixBundlePackageCommandLine:
+                    case SymbolDefinitionType.WixBundlePackageExitCode:
+                    case SymbolDefinitionType.WixBundlePackageGroup:
+                    case SymbolDefinitionType.WixBundlePatchTargetCode:
+                    case SymbolDefinitionType.WixBundlePayload:
+                    case SymbolDefinitionType.WixBundlePayloadGroup:
+                    case SymbolDefinitionType.WixBundleRelatedPackage:
+                    case SymbolDefinitionType.WixBundleRollbackBoundary:
+                    case SymbolDefinitionType.WixBundleSlipstreamMsp:
+                    case SymbolDefinitionType.WixBundleUpdate:
+                    case SymbolDefinitionType.WixBundleVariable:
+                    case SymbolDefinitionType.WixBuildInfo:
+                    case SymbolDefinitionType.WixChain:
+                    case SymbolDefinitionType.WixComponentSearch:
+                    case SymbolDefinitionType.WixDependencyProvider:
+                    case SymbolDefinitionType.WixFileSearch:
+                    case SymbolDefinitionType.WixGroup:
+                    case SymbolDefinitionType.WixProductSearch:
+                    case SymbolDefinitionType.WixRegistrySearch:
+                    case SymbolDefinitionType.WixRelatedBundle:
+                    case SymbolDefinitionType.WixSearch:
+                    case SymbolDefinitionType.WixSearchRelation:
+                    case SymbolDefinitionType.WixSetVariable:
+                    case SymbolDefinitionType.WixUpdateRegistration:
                         break;
 
-                    // Tuples used before binding.
-                    case TupleDefinitionType.WixComplexReference:
-                    case TupleDefinitionType.WixOrdering:
-                    case TupleDefinitionType.WixSimpleReference:
-                    case TupleDefinitionType.WixVariable:
+                    // Symbols used before binding.
+                    case SymbolDefinitionType.WixComplexReference:
+                    case SymbolDefinitionType.WixOrdering:
+                    case SymbolDefinitionType.WixSimpleReference:
+                    case SymbolDefinitionType.WixVariable:
                         break;
 
-                    // Tuples to investigate:
-                    case TupleDefinitionType.WixChainItem:
+                    // Symbols to investigate:
+                    case SymbolDefinitionType.WixChainItem:
                         break;
 
-                    case TupleDefinitionType.WixBundleCustomData:
-                        unknownTuple = !this.IndexBundleCustomDataTuple((WixBundleCustomDataTuple)tuple, customDataById);
+                    case SymbolDefinitionType.WixBundleCustomData:
+                        unknownSymbol = !this.IndexBundleCustomDataSymbol((WixBundleCustomDataSymbol)symbol, customDataById);
                         break;
 
-                    case TupleDefinitionType.WixBundleCustomDataCell:
-                        this.IndexBundleCustomDataCellTuple((WixBundleCustomDataCellTuple)tuple, cellsByCustomDataAndElementId);
+                    case SymbolDefinitionType.WixBundleCustomDataCell:
+                        this.IndexBundleCustomDataCellSymbol((WixBundleCustomDataCellSymbol)symbol, cellsByCustomDataAndElementId);
                         break;
 
-                    case TupleDefinitionType.MustBeFromAnExtension:
-                        unknownTuple = !this.AddTupleFromExtension(tuple);
+                    case SymbolDefinitionType.MustBeFromAnExtension:
+                        unknownSymbol = !this.AddSymbolFromExtension(symbol);
                         break;
 
                     default:
-                        unknownTuple = true;
+                        unknownSymbol = true;
                         break;
                 }
 
-                if (unknownTuple)
+                if (unknownSymbol)
                 {
-                    this.Messaging.Write(WarningMessages.TupleNotTranslatedToOutput(tuple));
+                    this.Messaging.Write(WarningMessages.SymbolNotTranslatedToOutput(symbol));
                 }
             }
 
-            this.AddIndexedCellTuples(customDataById, cellsByCustomDataAndElementId);
+            this.AddIndexedCellSymbols(customDataById, cellsByCustomDataAndElementId);
         }
 
-        private bool IndexBundleCustomDataTuple(WixBundleCustomDataTuple wixBundleCustomDataTuple, Dictionary<string, WixBundleCustomDataTuple> customDataById)
+        private bool IndexBundleCustomDataSymbol(WixBundleCustomDataSymbol wixBundleCustomDataSymbol, Dictionary<string, WixBundleCustomDataSymbol> customDataById)
         {
-            switch (wixBundleCustomDataTuple.Type)
+            switch (wixBundleCustomDataSymbol.Type)
             {
                 case WixBundleCustomDataType.BootstrapperApplication:
                 case WixBundleCustomDataType.BundleExtension:
@@ -147,38 +147,38 @@ namespace WixToolset.Core.Burn.Bind
                     return false;
             }
 
-            var customDataId = wixBundleCustomDataTuple.Id.Id;
-            customDataById.Add(customDataId, wixBundleCustomDataTuple);
+            var customDataId = wixBundleCustomDataSymbol.Id.Id;
+            customDataById.Add(customDataId, wixBundleCustomDataSymbol);
             return true;
         }
 
-        private void IndexBundleCustomDataCellTuple(WixBundleCustomDataCellTuple wixBundleCustomDataCellTuple, Dictionary<string, List<WixBundleCustomDataCellTuple>> cellsByCustomDataAndElementId)
+        private void IndexBundleCustomDataCellSymbol(WixBundleCustomDataCellSymbol wixBundleCustomDataCellSymbol, Dictionary<string, List<WixBundleCustomDataCellSymbol>> cellsByCustomDataAndElementId)
         {
-            var tableAndRowId = wixBundleCustomDataCellTuple.CustomDataRef + "/" + wixBundleCustomDataCellTuple.ElementId;
+            var tableAndRowId = wixBundleCustomDataCellSymbol.CustomDataRef + "/" + wixBundleCustomDataCellSymbol.ElementId;
             if (!cellsByCustomDataAndElementId.TryGetValue(tableAndRowId, out var cells))
             {
-                cells = new List<WixBundleCustomDataCellTuple>();
+                cells = new List<WixBundleCustomDataCellSymbol>();
                 cellsByCustomDataAndElementId.Add(tableAndRowId, cells);
             }
 
-            cells.Add(wixBundleCustomDataCellTuple);
+            cells.Add(wixBundleCustomDataCellSymbol);
         }
 
-        private void AddIndexedCellTuples(Dictionary<string, WixBundleCustomDataTuple> customDataById, Dictionary<string, List<WixBundleCustomDataCellTuple>> cellsByCustomDataAndElementId)
+        private void AddIndexedCellSymbols(Dictionary<string, WixBundleCustomDataSymbol> customDataById, Dictionary<string, List<WixBundleCustomDataCellSymbol>> cellsByCustomDataAndElementId)
         {
             foreach (var elementValues in cellsByCustomDataAndElementId.Values)
             {
                 var elementName = elementValues[0].CustomDataRef;
-                var customDataTuple = customDataById[elementName];
+                var customDataSymbol = customDataById[elementName];
 
-                var attributeNames = customDataTuple.AttributeNamesSeparated;
+                var attributeNames = customDataSymbol.AttributeNamesSeparated;
 
                 var elementValuesByAttribute = elementValues.ToDictionary(t => t.AttributeRef, t => t.Value);
 
                 var sb = new StringBuilder();
                 using (var writer = XmlWriter.Create(sb, BurnBackendHelper.WriterSettings))
                 {
-                    switch (customDataTuple.Type)
+                    switch (customDataSymbol.Type)
                     {
                         case WixBundleCustomDataType.BootstrapperApplication:
                             writer.WriteStartElement(elementName, BurnCommon.BADataNamespace);
@@ -202,13 +202,13 @@ namespace WixToolset.Core.Burn.Bind
                     writer.WriteEndElement();
                 }
 
-                switch (customDataTuple.Type)
+                switch (customDataSymbol.Type)
                 {
                     case WixBundleCustomDataType.BootstrapperApplication:
                         this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
                         break;
                     case WixBundleCustomDataType.BundleExtension:
-                        this.BackendHelper.AddBundleExtensionData(customDataTuple.BundleExtensionRef, sb.ToString());
+                        this.BackendHelper.AddBundleExtensionData(customDataSymbol.BundleExtensionRef, sb.ToString());
                         break;
                     default:
                         throw new NotImplementedException();
@@ -216,11 +216,11 @@ namespace WixToolset.Core.Burn.Bind
             }
         }
 
-        private bool AddTupleFromExtension(IntermediateTuple tuple)
+        private bool AddSymbolFromExtension(IntermediateSymbol symbol)
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryAddTupleToDataManifest(this.Section, tuple))
+                if (extension.TryAddSymbolToDataManifest(this.Section, symbol))
                 {
                     return true;
                 }

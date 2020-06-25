@@ -4,27 +4,27 @@ namespace Example.Extension
 {
     using WixToolset.Data;
 
-    public enum ExampleTupleFields
+    public enum ExampleSymbolFields
     {
         Value,
     }
 
-    public class ExampleTuple : IntermediateTuple
+    public class ExampleSymbol : IntermediateSymbol
     {
-        public ExampleTuple() : base(ExampleTupleDefinitions.Example, null, null)
+        public ExampleSymbol() : base(ExampleSymbolDefinitions.Example, null, null)
         {
         }
 
-        public ExampleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ExampleTupleDefinitions.Example, sourceLineNumber, id)
+        public ExampleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ExampleSymbolDefinitions.Example, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ExampleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ExampleSymbolFields index] => this.Fields[(int)index];
 
         public string Value
         {
-            get => this.Fields[(int)ExampleTupleFields.Value]?.AsString();
-            set => this.Set((int)ExampleTupleFields.Value, value);
+            get => this.Fields[(int)ExampleSymbolFields.Value]?.AsString();
+            set => this.Set((int)ExampleSymbolFields.Value, value);
         }
     }
 }

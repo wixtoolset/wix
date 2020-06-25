@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class CreateSpecialPropertiesCommand
     {
@@ -24,7 +24,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var secureProperties = new SortedSet<string>();
             var hiddenProperties = new SortedSet<string>();
 
-            foreach (var wixPropertyRow in this.Section.Tuples.OfType<WixPropertyTuple>())
+            foreach (var wixPropertyRow in this.Section.Symbols.OfType<WixPropertySymbol>())
             {
                 if (wixPropertyRow.Admin)
                 {
@@ -43,7 +43,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Hide properties for in-script custom actions that have HideTarget set.
-            var hideTargetCustomActions = this.Section.Tuples.OfType<CustomActionTuple>().Where(
+            var hideTargetCustomActions = this.Section.Symbols.OfType<CustomActionSymbol>().Where(
                 ca => ca.Hidden
                 && (ca.ExecutionType == CustomActionExecutionType.Deferred
                 || ca.ExecutionType == CustomActionExecutionType.Commit
@@ -52,12 +52,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             hiddenProperties.UnionWith(hideTargetCustomActions);
 
             // Ensure upgrade action properties are secure.
-            var actionProperties = this.Section.Tuples.OfType<UpgradeTuple>().Select(u => u.ActionProperty);
+            var actionProperties = this.Section.Symbols.OfType<UpgradeSymbol>().Select(u => u.ActionProperty);
             secureProperties.UnionWith(actionProperties);
 
             if (0 < adminProperties.Count)
             {
-                this.Section.AddTuple(new PropertyTuple(null, new Identifier(AccessModifier.Private, "AdminProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "AdminProperties"))
                 {
                     Value = String.Join(";", adminProperties),
                 });
@@ -65,7 +65,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < secureProperties.Count)
             {
-                this.Section.AddTuple(new PropertyTuple(null, new Identifier(AccessModifier.Private, "SecureCustomProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "SecureCustomProperties"))
                 {
                     Value = String.Join(";", secureProperties),
                 });
@@ -73,7 +73,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < hiddenProperties.Count)
             {
-                this.Section.AddTuple(new PropertyTuple(null, new Identifier(AccessModifier.Private, "MsiHiddenProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "MsiHiddenProperties"))
                 {
                     Value = String.Join(";", hiddenProperties)
                 });

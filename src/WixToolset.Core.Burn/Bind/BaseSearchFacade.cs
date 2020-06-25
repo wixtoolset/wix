@@ -4,23 +4,23 @@ namespace WixToolset.Core.Burn
 {
     using System;
     using System.Xml;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal abstract class BaseSearchFacade : ISearchFacade
     {
-        protected WixSearchTuple SearchTuple { get; set; }
+        protected WixSearchSymbol SearchSymbol { get; set; }
 
         public virtual void WriteXml(XmlTextWriter writer)
         {
-            writer.WriteAttributeString("Id", this.SearchTuple.Id.Id);
-            writer.WriteAttributeString("Variable", this.SearchTuple.Variable);
-            if (!String.IsNullOrEmpty(this.SearchTuple.Condition))
+            writer.WriteAttributeString("Id", this.SearchSymbol.Id.Id);
+            writer.WriteAttributeString("Variable", this.SearchSymbol.Variable);
+            if (!String.IsNullOrEmpty(this.SearchSymbol.Condition))
             {
-                writer.WriteAttributeString("Condition", this.SearchTuple.Condition);
+                writer.WriteAttributeString("Condition", this.SearchSymbol.Condition);
             }
-            if (!String.IsNullOrEmpty(this.SearchTuple.BundleExtensionRef))
+            if (!String.IsNullOrEmpty(this.SearchSymbol.BundleExtensionRef))
             {
-                writer.WriteAttributeString("ExtensionId", this.SearchTuple.BundleExtensionRef);
+                writer.WriteAttributeString("ExtensionId", this.SearchSymbol.BundleExtensionRef);
             }
         }
     }

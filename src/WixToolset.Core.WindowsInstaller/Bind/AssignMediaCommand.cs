@@ -8,7 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -40,7 +40,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Gets cabinets with their file rows.
         /// </summary>
-        public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileFacadesByCabinetMedia { get; private set; }
+        public Dictionary<MediaSymbol, IEnumerable<FileFacade>> FileFacadesByCabinetMedia { get; private set; }
 
         /// <summary>
         /// Get uncompressed file rows. This will contain file rows of File elements that are marked with compression=no.
@@ -50,49 +50,49 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var mediaTuples = this.Section.Tuples.OfType<MediaTuple>().ToList();
-            var mediaTemplateTuples = this.Section.Tuples.OfType<WixMediaTemplateTuple>().ToList();
+            var mediaSymbols = this.Section.Symbols.OfType<MediaSymbol>().ToList();
+            var mediaTemplateSymbols = this.Section.Symbols.OfType<WixMediaTemplateSymbol>().ToList();
 
-            // If both tuples are authored, it is an error.
-            if (mediaTemplateTuples.Count > 0 && mediaTuples.Count > 1)
+            // If both symbols are authored, it is an error.
+            if (mediaTemplateSymbols.Count > 0 && mediaSymbols.Count > 1)
             {
                 throw new WixException(ErrorMessages.MediaTableCollision(null));
             }
 
-            // If neither tuple is authored, default to a media template.
-            if (SectionType.Product == this.Section.Type && mediaTemplateTuples.Count == 0 && mediaTuples.Count == 0)
+            // If neither symbol is authored, default to a media template.
+            if (SectionType.Product == this.Section.Type && mediaTemplateSymbols.Count == 0 && mediaSymbols.Count == 0)
             {
-                var mediaTemplate = new WixMediaTemplateTuple()
+                var mediaTemplate = new WixMediaTemplateSymbol()
                 {
                     CabinetTemplate = "cab{0}.cab",
                 };
 
-                this.Section.AddTuple(mediaTemplate);
-                mediaTemplateTuples.Add(mediaTemplate);
+                this.Section.AddSymbol(mediaTemplate);
+                mediaTemplateSymbols.Add(mediaTemplate);
             }
 
             // When building merge module, all the files go to "#MergeModule.CABinet".
             if (SectionType.Module == this.Section.Type)
             {
-                var mergeModuleMediaTuple = this.Section.AddTuple(new MediaTuple
+                var mergeModuleMediaSymbol = this.Section.AddSymbol(new MediaSymbol
                 {
                     Cabinet = "#MergeModule.CABinet",
                 });
 
-                this.FileFacadesByCabinetMedia = new Dictionary<MediaTuple, IEnumerable<FileFacade>>
+                this.FileFacadesByCabinetMedia = new Dictionary<MediaSymbol, IEnumerable<FileFacade>>
                 {
-                    { mergeModuleMediaTuple, this.FileFacades }
+                    { mergeModuleMediaSymbol, this.FileFacades }
                 };
 
                 this.UncompressedFileFacades = Array.Empty<FileFacade>();
             }
-            else if (mediaTemplateTuples.Count == 0)
+            else if (mediaTemplateSymbols.Count == 0)
             {
-                var filesByCabinetMedia = new Dictionary<MediaTuple, List<FileFacade>>();
+                var filesByCabinetMedia = new Dictionary<MediaSymbol, List<FileFacade>>();
 
                 var uncompressedFiles = new List<FileFacade>();
 
-                this.ManuallyAssignFiles(mediaTuples, filesByCabinetMedia, uncompressedFiles);
+                this.ManuallyAssignFiles(mediaSymbols, filesByCabinetMedia, uncompressedFiles);
 
                 this.FileFacadesByCabinetMedia = filesByCabinetMedia.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<FileFacade>)kvp.Value);
 
@@ -100,11 +100,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                var filesByCabinetMedia = new Dictionary<MediaTuple, List<FileFacade>>();
+                var filesByCabinetMedia = new Dictionary<MediaSymbol, List<FileFacade>>();
 
                 var uncompressedFiles = new List<FileFacade>();
 
-                this.AutoAssignFiles(mediaTuples, filesByCabinetMedia, uncompressedFiles);
+                this.AutoAssignFiles(mediaSymbols, filesByCabinetMedia, uncompressedFiles);
 
                 this.FileFacadesByCabinetMedia = filesByCabinetMedia.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<FileFacade>)kvp.Value);
 
@@ -116,7 +116,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Assign files to cabinets based on MediaTemplate authoring.
         /// </summary>
         /// <param name="fileFacades">FileRowCollection</param>
-        private void AutoAssignFiles(List<MediaTuple> mediaTable, Dictionary<MediaTuple, List<FileFacade>> filesByCabinetMedia, List<FileFacade> uncompressedFiles)
+        private void AutoAssignFiles(List<MediaSymbol> mediaTable, Dictionary<MediaSymbol, List<FileFacade>> filesByCabinetMedia, List<FileFacade> uncompressedFiles)
         {
             const int MaxCabIndex = 999;
 
@@ -125,15 +125,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var maxPreCabSizeInMB = 0;
             var currentCabIndex = 0;
 
-            MediaTuple currentMediaRow = null;
+            MediaSymbol currentMediaRow = null;
 
-            var mediaTemplateTable = this.Section.Tuples.OfType<WixMediaTemplateTuple>();
+            var mediaTemplateTable = this.Section.Symbols.OfType<WixMediaTemplateSymbol>();
 
-            // Remove all previous media tuples since they will be replaced with
+            // Remove all previous media symbols since they will be replaced with
             // media template.
-            foreach (var mediaTuple in mediaTable)
+            foreach (var mediaSymbol in mediaTable)
             {
-                this.Section.Tuples.Remove(mediaTuple);
+                this.Section.Symbols.Remove(mediaSymbol);
             }
 
             // Auto assign files to cabinets based on maximum uncompressed media size
@@ -169,7 +169,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCabSizeInMB));
             }
 
-            var mediaTuplesByDiskId = new Dictionary<int, MediaTuple>();
+            var mediaSymbolsByDiskId = new Dictionary<int, MediaSymbol>();
 
             foreach (var facade in this.FileFacades)
             {
@@ -193,8 +193,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Overflow due to current file
                     if (currentPreCabSize > maxPreCabSizeInBytes)
                     {
-                        currentMediaRow = this.AddMediaTuple(mediaTemplateRow, ++currentCabIndex);
-                        mediaTuplesByDiskId.Add(currentMediaRow.DiskId, currentMediaRow);
+                        currentMediaRow = this.AddMediaSymbol(mediaTemplateRow, ++currentCabIndex);
+                        mediaSymbolsByDiskId.Add(currentMediaRow.DiskId, currentMediaRow);
                         filesByCabinetMedia.Add(currentMediaRow, new List<FileFacade>());
 
                         // Now files larger than MaxUncompressedMediaSize will be the only file in its cabinet so as to respect MaxUncompressedMediaSize
@@ -205,8 +205,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (currentMediaRow == null)
                         {
                             // Create new cab and MediaRow
-                            currentMediaRow = this.AddMediaTuple(mediaTemplateRow, ++currentCabIndex);
-                            mediaTuplesByDiskId.Add(currentMediaRow.DiskId, currentMediaRow);
+                            currentMediaRow = this.AddMediaSymbol(mediaTemplateRow, ++currentCabIndex);
+                            mediaSymbolsByDiskId.Add(currentMediaRow.DiskId, currentMediaRow);
                             filesByCabinetMedia.Add(currentMediaRow, new List<FileFacade>());
                         }
                     }
@@ -219,52 +219,52 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // If there are uncompressed files and no MediaRow, create a default one.
-            if (uncompressedFiles.Count > 0 && !this.Section.Tuples.OfType<MediaTuple>().Any())
+            if (uncompressedFiles.Count > 0 && !this.Section.Symbols.OfType<MediaSymbol>().Any())
             {
-                var defaultMediaRow = this.Section.AddTuple(new MediaTuple(null, new Identifier(AccessModifier.Private, 1))
+                var defaultMediaRow = this.Section.AddSymbol(new MediaSymbol(null, new Identifier(AccessModifier.Private, 1))
                 {
                     DiskId = 1,
                 });
 
-                mediaTuplesByDiskId.Add(1, defaultMediaRow);
+                mediaSymbolsByDiskId.Add(1, defaultMediaRow);
             }
         }
 
         /// <summary>
         /// Assign files to cabinets based on Media authoring.
         /// </summary>
-        private void ManuallyAssignFiles(List<MediaTuple> mediaTuples, Dictionary<MediaTuple, List<FileFacade>> filesByCabinetMedia, List<FileFacade> uncompressedFiles)
+        private void ManuallyAssignFiles(List<MediaSymbol> mediaSymbols, Dictionary<MediaSymbol, List<FileFacade>> filesByCabinetMedia, List<FileFacade> uncompressedFiles)
         {
-            var mediaTuplesByDiskId = new Dictionary<int, MediaTuple>();
+            var mediaSymbolsByDiskId = new Dictionary<int, MediaSymbol>();
 
-            if (mediaTuples.Any())
+            if (mediaSymbols.Any())
             {
-                var cabinetMediaTuples = new Dictionary<string, MediaTuple>(StringComparer.OrdinalIgnoreCase);
-                foreach (var mediaTuple in mediaTuples)
+                var cabinetMediaSymbols = new Dictionary<string, MediaSymbol>(StringComparer.OrdinalIgnoreCase);
+                foreach (var mediaSymbol in mediaSymbols)
                 {
                     // If the Media row has a cabinet, make sure it is unique across all Media rows.
-                    if (!String.IsNullOrEmpty(mediaTuple.Cabinet))
+                    if (!String.IsNullOrEmpty(mediaSymbol.Cabinet))
                     {
-                        if (cabinetMediaTuples.TryGetValue(mediaTuple.Cabinet, out var existingRow))
+                        if (cabinetMediaSymbols.TryGetValue(mediaSymbol.Cabinet, out var existingRow))
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName(mediaTuple.SourceLineNumbers, mediaTuple.Cabinet));
+                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName(mediaSymbol.SourceLineNumbers, mediaSymbol.Cabinet));
                             this.Messaging.Write(ErrorMessages.DuplicateCabinetName2(existingRow.SourceLineNumbers, existingRow.Cabinet));
                         }
                         else
                         {
-                            cabinetMediaTuples.Add(mediaTuple.Cabinet, mediaTuple);
+                            cabinetMediaSymbols.Add(mediaSymbol.Cabinet, mediaSymbol);
                         }
 
-                        filesByCabinetMedia.Add(mediaTuple, new List<FileFacade>());
+                        filesByCabinetMedia.Add(mediaSymbol, new List<FileFacade>());
                     }
 
-                    mediaTuplesByDiskId.Add(mediaTuple.DiskId, mediaTuple);
+                    mediaSymbolsByDiskId.Add(mediaSymbol.DiskId, mediaSymbol);
                 }
             }
 
             foreach (var facade in this.FileFacades)
             {
-                if (!mediaTuplesByDiskId.TryGetValue(facade.DiskId, out var mediaTuple))
+                if (!mediaSymbolsByDiskId.TryGetValue(facade.DiskId, out var mediaSymbol))
                 {
                     this.Messaging.Write(ErrorMessages.MissingMedia(facade.SourceLineNumber, facade.DiskId));
                     continue;
@@ -280,7 +280,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else // file is marked compressed.
                 {
-                    if (filesByCabinetMedia.TryGetValue(mediaTuple, out var cabinetFiles))
+                    if (filesByCabinetMedia.TryGetValue(mediaSymbol, out var cabinetFiles))
                     {
                         cabinetFiles.Add(facade);
                     }
@@ -293,18 +293,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
 
         /// <summary>
-        /// Adds a tuple to the section with cab name template filled in.
+        /// Adds a symbol to the section with cab name template filled in.
         /// </summary>
         /// <param name="mediaTable"></param>
         /// <param name="cabIndex"></param>
         /// <returns></returns>
-        private MediaTuple AddMediaTuple(WixMediaTemplateTuple mediaTemplateTuple, int cabIndex)
+        private MediaSymbol AddMediaSymbol(WixMediaTemplateSymbol mediaTemplateSymbol, int cabIndex)
         {
-            return this.Section.AddTuple(new MediaTuple(mediaTemplateTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex))
+            return this.Section.AddSymbol(new MediaSymbol(mediaTemplateSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex))
             {
                 DiskId = cabIndex,
                 Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex),
-                CompressionLevel = mediaTemplateTuple.CompressionLevel,
+                CompressionLevel = mediaTemplateSymbol.CompressionLevel,
             });
         }
     }

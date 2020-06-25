@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.IO;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
@@ -43,7 +43,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         type = 0x2;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, source); // add a reference to the appropriate Binary
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
                     case "CommandLine":
                         commandLine = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -58,7 +58,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         type = 0x12;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, source); // add a reference to the appropriate File
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, source); // add a reference to the appropriate File
                         break;
                     case "PropertySource":
                         if (null != source)
@@ -92,7 +92,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiEmbeddedChainerTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new MsiEmbeddedChainerSymbol(sourceLineNumbers, id)
                 {
                     Condition = condition,
                     CommandLine = commandLine,
@@ -318,7 +318,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiEmbeddedUITuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new MsiEmbeddedUISymbol(sourceLineNumbers, id)
                 {
                     FileName = name,
                     EntryPoint = true,
@@ -405,7 +405,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiEmbeddedUITuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new MsiEmbeddedUISymbol(sourceLineNumbers, id)
                 {
                     FileName = name,
                     Source = sourceFile

@@ -9,15 +9,15 @@ namespace Example.Extension
     {
         public string DefaultCulture => null;
 
-        public Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(ExampleExtensionData).Assembly, "Example.Extension.Example.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(ExampleExtensionData).Assembly, "Example.Extension.Example.wixlib", symbolDefinitions);
         }
 
-        public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = ExampleTupleDefinitions.ByName(name);
-            return tupleDefinition != null;
+            symbolDefinition = ExampleSymbolDefinitions.ByName(name);
+            return symbolDefinition != null;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -136,7 +136,7 @@ namespace WixToolset.Core
                             this.ParseCustomActionElement(child);
                             break;
                         case "CustomActionRef":
-                            this.ParseSimpleRefElement(child, TupleDefinitions.CustomAction);
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.CustomAction);
                             break;
                         case "CustomTable":
                             this.ParseCustomTableElement(child);
@@ -154,7 +154,7 @@ namespace WixToolset.Core
                             this.ParseEmbeddedChainerElement(child);
                             break;
                         case "EmbeddedChainerRef":
-                            this.ParseSimpleRefElement(child, TupleDefinitions.MsiEmbeddedChainer);
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.MsiEmbeddedChainer);
                             break;
                         case "EnsureTable":
                             this.ParseEnsureTableElement(child);
@@ -178,7 +178,7 @@ namespace WixToolset.Core
                             this.ParsePropertyElement(child);
                             break;
                         case "PropertyRef":
-                            this.ParseSimpleRefElement(child, TupleDefinitions.Property);
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
                             break;
                         case "SetDirectory":
                             this.ParseSetDirectoryElement(child);
@@ -197,7 +197,7 @@ namespace WixToolset.Core
                             this.ParseUIElement(child);
                             break;
                         case "UIRef":
-                            this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixUI);
                             break;
                         case "WixVariable":
                             this.ParseWixVariableElement(child);
@@ -216,13 +216,13 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = this.Core.AddTuple(new ModuleSignatureTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
+                    var symbol = this.Core.AddSymbol(new ModuleSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
                     {
                         ModuleID = this.activeName,
                         Version = version
                     });
 
-                    tuple.Set((int)ModuleSignatureTupleFields.Language, this.activeLanguage);
+                    symbol.Set((int)ModuleSignatureSymbolFields.Language, this.activeLanguage);
                 }
             }
             finally
@@ -284,7 +284,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new ModuleDependencyTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new ModuleDependencySymbol(sourceLineNumbers)
                 {
                     ModuleID = this.activeName,
                     RequiredID = requiredId,
@@ -292,7 +292,7 @@ namespace WixToolset.Core
                     RequiredVersion = requiredVersion
                 });
 
-                tuple.Set((int)ModuleDependencyTupleFields.ModuleLanguage, this.activeLanguage);
+                symbol.Set((int)ModuleDependencySymbolFields.ModuleLanguage, this.activeLanguage);
             }
         }
 
@@ -365,7 +365,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new ModuleExclusionTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new ModuleExclusionSymbol(sourceLineNumbers)
                 {
                     ModuleID = this.activeName,
                     ExcludedID = excludedId,
@@ -373,8 +373,8 @@ namespace WixToolset.Core
                     ExcludedMaxVersion = excludedMaxVersion
                 });
 
-                tuple.Set((int)ModuleExclusionTupleFields.ModuleLanguage, this.activeLanguage);
-                tuple.Set((int)ModuleExclusionTupleFields.ExcludedLanguage, excludedLanguageField);
+                symbol.Set((int)ModuleExclusionSymbolFields.ModuleLanguage, this.activeLanguage);
+                symbol.Set((int)ModuleExclusionSymbolFields.ExcludedLanguage, excludedLanguageField);
             }
         }
 
@@ -485,7 +485,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ModuleConfigurationTuple(sourceLineNumbers, name)
+                this.Core.AddSymbol(new ModuleConfigurationSymbol(sourceLineNumbers, name)
                 {
                     Format = format,
                     Type = type,
@@ -563,7 +563,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ModuleSubstitutionTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new ModuleSubstitutionSymbol(sourceLineNumbers)
                 {
                     Table = table,
                     Row = rowKeys,
@@ -616,7 +616,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixSuppressModularizationTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name)));
+                this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name)));
             }
         }
 
@@ -658,7 +658,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ModuleIgnoreTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, id)));
+                this.Core.AddSymbol(new ModuleIgnoreTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, id)));
             }
         }
     }

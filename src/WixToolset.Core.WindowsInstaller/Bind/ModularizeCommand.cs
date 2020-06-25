@@ -10,18 +10,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
 
     internal class ModularizeCommand
     {
-        public ModularizeCommand(WindowsInstallerData output, string modularizationSuffix, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
+        public ModularizeCommand(WindowsInstallerData output, string modularizationSuffix, IEnumerable<WixSuppressModularizationSymbol> suppressSymbols)
         {
             this.Output = output;
             this.ModularizationSuffix = modularizationSuffix;
 
             // Gather all the unique suppress modularization identifiers.
-            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressTuples.Select(s => s.Id.Id));
+            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressSymbols.Select(s => s.Id.Id));
         }
 
         private WindowsInstallerData Output { get; }
@@ -144,17 +144,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             Debug.Assert(ColumnModularizeType.Condition == modularizeType);
 
-                            // This heinous looking regular expression is actually quite an elegant way 
-                            // to shred the entire condition into the identifiers that need to be 
+                            // This heinous looking regular expression is actually quite an elegant way
+                            // to shred the entire condition into the identifiers that need to be
                             // modularized.  Let's break it down piece by piece:
                             //
                             // 1. Look for the operators: NOT, EQV, XOR, OR, AND, IMP (plus a space).  Note that the
                             //    regular expression is case insensitive so we don't have to worry about
                             //    all the permutations of these strings.
-                            // 2. Look for quoted strings.  Quoted strings are just text and are ignored 
+                            // 2. Look for quoted strings.  Quoted strings are just text and are ignored
                             //    outright.
-                            // 3. Look for environment variables.  These look like identifiers we might 
-                            //    otherwise be interested in but start with a percent sign.  Like quoted 
+                            // 3. Look for environment variables.  These look like identifiers we might
+                            //    otherwise be interested in but start with a percent sign.  Like quoted
                             //    strings these enviroment variable references are ignored outright.
                             // 4. Match all identifiers that are things that need to be modularized.  Note
                             //    the special characters (!, $, ?, &) that denote Component and Feature states.

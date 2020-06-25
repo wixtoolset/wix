@@ -12,7 +12,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
     using WixToolset.Core.WindowsInstaller.Msi;
 
@@ -21,10 +21,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ExtractMergeModuleFilesCommand
     {
-        public ExtractMergeModuleFilesCommand(IMessaging messaging, IEnumerable<WixMergeTuple> wixMergeTuples, IEnumerable<FileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
+        public ExtractMergeModuleFilesCommand(IMessaging messaging, IEnumerable<WixMergeSymbol> wixMergeSymbols, IEnumerable<FileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
         {
             this.Messaging = messaging;
-            this.WixMergeTuples = wixMergeTuples;
+            this.WixMergeSymbols = wixMergeSymbols;
             this.FileFacades = fileFacades;
             this.OutputInstallerVersion = installerVersion;
             this.IntermediateFolder = intermediateFolder;
@@ -33,7 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IMessaging Messaging { get; }
 
-        private IEnumerable<WixMergeTuple> WixMergeTuples { get; }
+        private IEnumerable<WixMergeSymbol> WixMergeSymbols { get; }
 
         private IEnumerable<FileFacade> FileFacades { get; }
 
@@ -61,7 +61,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // is a lot more costly for the common cases.
             var indexedFileFacades = this.FileFacades.ToDictionary(f => f.Id, StringComparer.Ordinal);
 
-            foreach (var wixMergeRow in this.WixMergeTuples)
+            foreach (var wixMergeRow in this.WixMergeSymbols)
             {
                 var containsFiles = this.CreateFacadesForMergeModuleFiles(wixMergeRow, mergeModulesFileFacades, indexedFileFacades);
 
@@ -75,7 +75,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.MergeModulesFileFacades = mergeModulesFileFacades;
         }
 
-        private bool CreateFacadesForMergeModuleFiles(WixMergeTuple wixMergeRow, List<FileFacade> mergeModulesFileFacades, Dictionary<string, FileFacade> indexedFileFacades)
+        private bool CreateFacadesForMergeModuleFiles(WixMergeSymbol wixMergeRow, List<FileFacade> mergeModulesFileFacades, Dictionary<string, FileFacade> indexedFileFacades)
         {
             var containsFiles = false;
 
@@ -96,13 +96,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 // NOTE: this is very tricky - the merge module file rows are not added to the
                                 // file table because they should not be created via idt import.  Instead, these
                                 // rows are created by merging in the actual modules.
-                                var fileTuple = new FileTuple(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
-                                fileTuple.Attributes = wixMergeRow.FileAttributes;
-                                fileTuple.DirectoryRef = record[2];
-                                fileTuple.DiskId = wixMergeRow.DiskId;
-                                fileTuple.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
+                                var fileSymbol = new FileSymbol(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
+                                fileSymbol.Attributes = wixMergeRow.FileAttributes;
+                                fileSymbol.DirectoryRef = record[2];
+                                fileSymbol.DiskId = wixMergeRow.DiskId;
+                                fileSymbol.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
 
-                                var mergeModuleFileFacade = new FileFacade(true, fileTuple);
+                                var mergeModuleFileFacade = new FileFacade(true, fileSymbol);
 
                                 // If case-sensitive collision with another merge module or a user-authored file identifier.
                                 if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.Id, out var collidingFacade))
@@ -159,7 +159,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return containsFiles;
         }
 
-        private void ExtractFilesFromMergeModule(IMsmMerge2 merge, WixMergeTuple wixMergeRow)
+        private void ExtractFilesFromMergeModule(IMsmMerge2 merge, WixMergeSymbol wixMergeRow)
         {
             var moduleOpen = false;
             short mergeLanguage;

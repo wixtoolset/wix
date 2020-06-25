@@ -10,7 +10,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Text;
     using System.Xml;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
     using Dtf = WixToolset.Dtf.WindowsInstaller;
 
@@ -22,18 +22,18 @@ namespace WixToolset.Core.Burn.Bundles
         private const string PatchMetadataFormat = "SELECT `Value` FROM `MsiPatchMetadata` WHERE `Property` = '{0}'";
         private static readonly Encoding XmlOutputEncoding = new UTF8Encoding(false);
 
-        public ProcessMspPackageCommand(IMessaging messaging, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadTuple> payloadTuples)
+        public ProcessMspPackageCommand(IMessaging messaging, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
             this.Messaging = messaging;
 
-            this.AuthoredPayloads = payloadTuples;
+            this.AuthoredPayloads = payloadSymbols;
             this.Section = section;
             this.Facade = facade;
         }
 
         public IMessaging Messaging { get; }
 
-        public Dictionary<string, WixBundlePayloadTuple> AuthoredPayloads { private get; set; }
+        public Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { private get; set; }
 
         public PackageFacade Facade { private get; set; }
 
@@ -44,9 +44,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         public void Execute()
         {
-            var packagePayload = this.AuthoredPayloads[this.Facade.PackageTuple.PayloadRef];
+            var packagePayload = this.AuthoredPayloads[this.Facade.PackageSymbol.PayloadRef];
 
-            var mspPackage = (WixBundleMspPackageTuple)this.Facade.SpecificPackageTuple;
+            var mspPackage = (WixBundleMspPackageSymbol)this.Facade.SpecificPackageSymbol;
 
             var sourcePath = packagePayload.SourceFile.Path;
 
@@ -60,14 +60,14 @@ namespace WixToolset.Core.Burn.Bundles
 
                 using (var db = new Dtf.Database(sourcePath))
                 {
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.DisplayName))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
                     {
-                        this.Facade.PackageTuple.DisplayName = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "DisplayName");
+                        this.Facade.PackageSymbol.DisplayName = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "DisplayName");
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.Description))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Description))
                     {
-                        this.Facade.PackageTuple.Description = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "Description");
+                        this.Facade.PackageSymbol.Description = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "Description");
                     }
 
                     mspPackage.Manufacturer = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "ManufacturerName");
@@ -81,13 +81,13 @@ namespace WixToolset.Core.Burn.Bundles
                 return;
             }
 
-            if (String.IsNullOrEmpty(this.Facade.PackageTuple.CacheId))
+            if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageTuple.CacheId = mspPackage.PatchCode;
+                this.Facade.PackageSymbol.CacheId = mspPackage.PatchCode;
             }
         }
 
-        private void ProcessPatchXml(WixBundlePayloadTuple packagePayload, WixBundleMspPackageTuple mspPackage, string sourcePath)
+        private void ProcessPatchXml(WixBundlePayloadSymbol packagePayload, WixBundleMspPackageSymbol mspPackage, string sourcePath)
         {
             var uniqueTargetCodes = new HashSet<string>();
 
@@ -127,7 +127,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (uniqueTargetCodes.Add(targetCode))
                 {
-                    this.Section.AddTuple(new WixBundlePatchTargetCodeTuple(packagePayload.SourceLineNumbers)
+                    this.Section.AddSymbol(new WixBundlePatchTargetCodeSymbol(packagePayload.SourceLineNumbers)
                     {
                         PackageRef = packagePayload.Id.Id,
                         TargetCode = targetCode,

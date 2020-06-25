@@ -24,9 +24,9 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             this.BootstrapperApplicationManifestData.AddXml(xml);
         }
 
-        public void AddBootstrapperApplicationData(IntermediateTuple tuple, bool tupleIdIsIdAttribute = false)
+        public void AddBootstrapperApplicationData(IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
         {
-            this.BootstrapperApplicationManifestData.AddTuple(tuple, tupleIdIsIdAttribute, BurnCommon.BADataNamespace);
+            this.BootstrapperApplicationManifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnCommon.BADataNamespace);
         }
 
         public void AddBundleExtensionData(string extensionId, string xml)
@@ -35,10 +35,10 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             manifestData.AddXml(xml);
         }
 
-        public void AddBundleExtensionData(string extensionId, IntermediateTuple tuple, bool tupleIdIsIdAttribute = false)
+        public void AddBundleExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
         {
             var manifestData = this.GetBundleExtensionManifestData(extensionId);
-            manifestData.AddTuple(tuple, tupleIdIsIdAttribute, BurnCommon.BundleExtensionDataNamespace);
+            manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnCommon.BundleExtensionDataNamespace);
         }
 
         public void WriteBootstrapperApplicationData(XmlWriter writer)
@@ -90,21 +90,21 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
             private StringBuilder Builder { get; }
 
-            public void AddTuple(IntermediateTuple tuple, bool tupleIdIsIdAttribute, string ns)
+            public void AddSymbol(IntermediateSymbol symbol, bool symbolIdIsIdAttribute, string ns)
             {
                 // There might be a more efficient way to do this,
                 // but this is an easy way to ensure we're creating valid XML.
                 var sb = new StringBuilder();
                 using (var writer = XmlWriter.Create(sb, WriterSettings))
                 {
-                    writer.WriteStartElement(tuple.Definition.Name, ns);
+                    writer.WriteStartElement(symbol.Definition.Name, ns);
 
-                    if (tupleIdIsIdAttribute && tuple.Id != null)
+                    if (symbolIdIsIdAttribute && symbol.Id != null)
                     {
-                        writer.WriteAttributeString("Id", tuple.Id.Id);
+                        writer.WriteAttributeString("Id", symbol.Id.Id);
                     }
 
-                    foreach (var field in tuple.Fields)
+                    foreach (var field in symbol.Fields)
                     {
                         if (!field.IsNull())
                         {

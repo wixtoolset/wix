@@ -6,7 +6,7 @@ namespace WixToolset.Core.Link
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -15,19 +15,19 @@ namespace WixToolset.Core.Link
     internal class ResolveReferencesCommand
     {
         private readonly IntermediateSection entrySection;
-        private readonly IDictionary<string, TupleWithSection> tuplesWithSections;
-        private HashSet<TupleWithSection> referencedTuples;
+        private readonly IDictionary<string, SymbolWithSection> symbolsWithSections;
+        private HashSet<SymbolWithSection> referencedSymbols;
         private HashSet<IntermediateSection> resolvedSections;
 
-        public ResolveReferencesCommand(IMessaging messaging, IntermediateSection entrySection, IDictionary<string, TupleWithSection> tuplesWithSections)
+        public ResolveReferencesCommand(IMessaging messaging, IntermediateSection entrySection, IDictionary<string, SymbolWithSection> symbolsWithSections)
         {
             this.Messaging = messaging;
             this.entrySection = entrySection;
-            this.tuplesWithSections = tuplesWithSections;
+            this.symbolsWithSections = symbolsWithSections;
             this.BuildingMergeModule = (SectionType.Module == entrySection.Type);
         }
 
-        public IEnumerable<TupleWithSection> ReferencedTupleWithSections => this.referencedTuples;
+        public IEnumerable<SymbolWithSection> ReferencedSymbolWithSections => this.referencedSymbols;
 
         public IEnumerable<IntermediateSection> ResolvedSections => this.resolvedSections;
 
@@ -41,7 +41,7 @@ namespace WixToolset.Core.Link
         public void Execute()
         {
             this.resolvedSections = new HashSet<IntermediateSection>();
-            this.referencedTuples = new HashSet<TupleWithSection>();
+            this.referencedSymbols = new HashSet<SymbolWithSection>();
 
             this.RecursivelyResolveReferences(this.entrySection);
         }
@@ -60,10 +60,10 @@ namespace WixToolset.Core.Link
             }
 
             // Process all of the references contained in this section using the collection of
-            // tuples provided.  Then recursively call this method to process the
-            // located tuple's section.  All in all this is a very simple depth-first
+            // symbols provided.  Then recursively call this method to process the
+            // located symbol's section.  All in all this is a very simple depth-first
             // search of the references per-section.
-            foreach (var wixSimpleReferenceRow in section.Tuples.OfType<WixSimpleReferenceTuple>())
+            foreach (var wixSimpleReferenceRow in section.Symbols.OfType<WixSimpleReferenceSymbol>())
             {
                 // If we're building a Merge Module, ignore all references to the Media table
                 // because Merge Modules don't have Media tables.
@@ -72,44 +72,44 @@ namespace WixToolset.Core.Link
                     continue;
                 }
 
-                if (!this.tuplesWithSections.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var tupleWithSection))
+                if (!this.symbolsWithSections.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbolWithSection))
                 {
                     this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName));
                 }
-                else // see if the tuple (and any of its duplicates) are appropriately accessible.
+                else // see if the symbol (and any of its duplicates) are appropriately accessible.
                 {
-                    var accessible = this.DetermineAccessibleTuples(section, tupleWithSection);
+                    var accessible = this.DetermineAccessibleSymbols(section, symbolWithSection);
                     if (!accessible.Any())
                     {
-                        this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, tupleWithSection.Access));
+                        this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbolWithSection.Access));
                     }
                     else if (1 == accessible.Count)
                     {
-                        var accessibleTuple = accessible[0];
-                        this.referencedTuples.Add(accessibleTuple);
+                        var accessibleSymbol = accessible[0];
+                        this.referencedSymbols.Add(accessibleSymbol);
 
-                        if (null != accessibleTuple.Section)
+                        if (null != accessibleSymbol.Section)
                         {
-                            this.RecursivelyResolveReferences(accessibleTuple.Section);
+                            this.RecursivelyResolveReferences(accessibleSymbol.Section);
                         }
                     }
-                    else // display errors for the duplicate tuples.
+                    else // display errors for the duplicate symbols.
                     {
-                        var accessibleTuple = accessible[0];
+                        var accessibleSymbol = accessible[0];
                         var referencingSourceLineNumber = wixSimpleReferenceRow.SourceLineNumbers?.ToString();
 
                         if (String.IsNullOrEmpty(referencingSourceLineNumber))
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleTuple.Tuple.SourceLineNumbers, accessibleTuple.Name));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleSymbol.Name));
                         }
                         else
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleTuple.Tuple.SourceLineNumbers, accessibleTuple.Name, referencingSourceLineNumber));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Symbol.SourceLineNumbers, accessibleSymbol.Name, referencingSourceLineNumber));
                         }
 
                         foreach (var accessibleDuplicate in accessible.Skip(1))
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateSymbol2(accessibleDuplicate.Tuple.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol2(accessibleDuplicate.Symbol.SourceLineNumbers));
                         }
                     }
                 }
@@ -117,67 +117,67 @@ namespace WixToolset.Core.Link
         }
 
         /// <summary>
-        /// Determine if the tuple and any of its duplicates are accessbile by referencing section.
+        /// Determine if the symbol and any of its duplicates are accessbile by referencing section.
         /// </summary>
-        /// <param name="referencingSection">Section referencing the tuple.</param>
-        /// <param name="tupleWithSection">Tuple being referenced.</param>
-        /// <returns>List of tuples accessible by referencing section.</returns>
-        private List<TupleWithSection> DetermineAccessibleTuples(IntermediateSection referencingSection, TupleWithSection tupleWithSection)
+        /// <param name="referencingSection">Section referencing the symbol.</param>
+        /// <param name="symbolWithSection">Symbol being referenced.</param>
+        /// <returns>List of symbols accessible by referencing section.</returns>
+        private List<SymbolWithSection> DetermineAccessibleSymbols(IntermediateSection referencingSection, SymbolWithSection symbolWithSection)
         {
-            var accessibleTuples = new List<TupleWithSection>();
+            var accessibleSymbols = new List<SymbolWithSection>();
 
-            if (this.AccessibleTuple(referencingSection, tupleWithSection))
+            if (this.AccessibleSymbol(referencingSection, symbolWithSection))
             {
-                accessibleTuples.Add(tupleWithSection);
+                accessibleSymbols.Add(symbolWithSection);
             }
 
-            foreach (var dupe in tupleWithSection.PossiblyConflicts)
+            foreach (var dupe in symbolWithSection.PossiblyConflicts)
             {
-                // don't count overridable WixActionTuples
-                var tupleAction = tupleWithSection.Tuple as WixActionTuple;
-                var dupeAction = dupe.Tuple as WixActionTuple;
-                if (tupleAction?.Overridable != dupeAction?.Overridable)
+                // don't count overridable WixActionSymbols
+                var symbolAction = symbolWithSection.Symbol as WixActionSymbol;
+                var dupeAction = dupe.Symbol as WixActionSymbol;
+                if (symbolAction?.Overridable != dupeAction?.Overridable)
                 {
                     continue;
                 }
 
-                if (this.AccessibleTuple(referencingSection, dupe))
+                if (this.AccessibleSymbol(referencingSection, dupe))
                 {
-                    accessibleTuples.Add(dupe);
+                    accessibleSymbols.Add(dupe);
                 }
             }
 
-            foreach (var dupe in tupleWithSection.Redundants)
+            foreach (var dupe in symbolWithSection.Redundants)
             {
-                if (this.AccessibleTuple(referencingSection, dupe))
+                if (this.AccessibleSymbol(referencingSection, dupe))
                 {
-                    accessibleTuples.Add(dupe);
+                    accessibleSymbols.Add(dupe);
                 }
             }
 
-            return accessibleTuples;
+            return accessibleSymbols;
         }
 
         /// <summary>
-        /// Determine if a single tuple is accessible by the referencing section.
+        /// Determine if a single symbol is accessible by the referencing section.
         /// </summary>
-        /// <param name="referencingSection">Section referencing the tuple.</param>
-        /// <param name="tupleWithSection">Tuple being referenced.</param>
-        /// <returns>True if tuple is accessible.</returns>
-        private bool AccessibleTuple(IntermediateSection referencingSection, TupleWithSection tupleWithSection)
+        /// <param name="referencingSection">Section referencing the symbol.</param>
+        /// <param name="symbolWithSection">Symbol being referenced.</param>
+        /// <returns>True if symbol is accessible.</returns>
+        private bool AccessibleSymbol(IntermediateSection referencingSection, SymbolWithSection symbolWithSection)
         {
-            switch (tupleWithSection.Access)
+            switch (symbolWithSection.Access)
             {
                 case AccessModifier.Public:
                     return true;
                 case AccessModifier.Internal:
-                    return tupleWithSection.Section.CompilationId.Equals(referencingSection.CompilationId) || (null != tupleWithSection.Section.LibraryId && tupleWithSection.Section.LibraryId.Equals(referencingSection.LibraryId));
+                    return symbolWithSection.Section.CompilationId.Equals(referencingSection.CompilationId) || (null != symbolWithSection.Section.LibraryId && symbolWithSection.Section.LibraryId.Equals(referencingSection.LibraryId));
                 case AccessModifier.Protected:
-                    return tupleWithSection.Section.CompilationId.Equals(referencingSection.CompilationId);
+                    return symbolWithSection.Section.CompilationId.Equals(referencingSection.CompilationId);
                 case AccessModifier.Private:
-                    return referencingSection == tupleWithSection.Section;
+                    return referencingSection == symbolWithSection.Section;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(tupleWithSection.Access));
+                    throw new ArgumentOutOfRangeException(nameof(symbolWithSection.Access));
             }
         }
     }

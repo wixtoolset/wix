@@ -5,25 +5,25 @@ namespace WixToolset.Core.Bind
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
 
     public class FileFacade
     {
-        public FileFacade(FileTuple file, AssemblyTuple assembly)
+        public FileFacade(FileSymbol file, AssemblySymbol assembly)
         {
-            this.FileTuple = file;
-            this.AssemblyTuple = assembly;
+            this.FileSymbol = file;
+            this.AssemblySymbol = assembly;
 
             this.Identifier = file.Id;
             this.ComponentRef = file.ComponentRef;
         }
 
-        public FileFacade(bool fromModule, FileTuple file)
+        public FileFacade(bool fromModule, FileSymbol file)
         {
             this.FromModule = fromModule;
-            this.FileTuple = file;
+            this.FileSymbol = file;
 
             this.Identifier = file.Id;
             this.ComponentRef = file.ComponentRef;
@@ -44,9 +44,9 @@ namespace WixToolset.Core.Bind
 
         private FileRow FileRow { get; }
 
-        private FileTuple FileTuple { get; }
+        private FileSymbol FileSymbol { get; }
 
-        private AssemblyTuple AssemblyTuple { get; }
+        private AssemblySymbol AssemblySymbol { get; }
 
         public string Id => this.Identifier.Id;
 
@@ -56,12 +56,12 @@ namespace WixToolset.Core.Bind
 
         public int DiskId
         {
-            get => this.FileRow == null ? this.FileTuple.DiskId ?? 1 : this.FileRow.DiskId;
+            get => this.FileRow == null ? this.FileSymbol.DiskId ?? 1 : this.FileRow.DiskId;
             set
             {
                 if (this.FileRow == null)
                 {
-                    this.FileTuple.DiskId = value;
+                    this.FileSymbol.DiskId = value;
                 }
                 else
                 {
@@ -70,16 +70,16 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public string FileName => this.FileRow == null ? this.FileTuple.Name : this.FileRow.FileName;
+        public string FileName => this.FileRow == null ? this.FileSymbol.Name : this.FileRow.FileName;
 
         public int FileSize
         {
-            get => this.FileRow == null ? this.FileTuple.FileSize : this.FileRow.FileSize;
+            get => this.FileRow == null ? this.FileSymbol.FileSize : this.FileRow.FileSize;
             set
             {
                 if (this.FileRow == null)
                 {
-                    this.FileTuple.FileSize = value;
+                    this.FileSymbol.FileSize = value;
                 }
                 else
                 {
@@ -90,12 +90,12 @@ namespace WixToolset.Core.Bind
 
         public string Language
         {
-            get => this.FileRow == null ? this.FileTuple.Language : this.FileRow.Language;
+            get => this.FileRow == null ? this.FileSymbol.Language : this.FileRow.Language;
             set
             {
                 if (this.FileRow == null)
                 {
-                    this.FileTuple.Language = value;
+                    this.FileSymbol.Language = value;
                 }
                 else
                 {
@@ -104,16 +104,16 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public int? PatchGroup => this.FileRow == null ? this.FileTuple.PatchGroup : null;
+        public int? PatchGroup => this.FileRow == null ? this.FileSymbol.PatchGroup : null;
 
         public int Sequence
         {
-            get => this.FileRow == null ? this.FileTuple.Sequence : this.FileRow.Sequence;
+            get => this.FileRow == null ? this.FileSymbol.Sequence : this.FileRow.Sequence;
             set
             {
                 if (this.FileRow == null)
                 {
-                    this.FileTuple.Sequence = value;
+                    this.FileSymbol.Sequence = value;
                 }
                 else
                 {
@@ -122,22 +122,22 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public SourceLineNumber SourceLineNumber => this.FileRow == null ? this.FileTuple.SourceLineNumbers : this.FileRow.SourceLineNumbers;
+        public SourceLineNumber SourceLineNumber => this.FileRow == null ? this.FileSymbol.SourceLineNumbers : this.FileRow.SourceLineNumbers;
 
-        public string SourcePath => this.FileRow == null ? this.FileTuple.Source.Path : this.FileRow.Source;
+        public string SourcePath => this.FileRow == null ? this.FileSymbol.Source.Path : this.FileRow.Source;
 
-        public bool Compressed => this.FileRow == null ? (this.FileTuple.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed : (this.FileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed;
+        public bool Compressed => this.FileRow == null ? (this.FileSymbol.Attributes & FileSymbolAttributes.Compressed) == FileSymbolAttributes.Compressed : (this.FileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed;
 
-        public bool Uncompressed => this.FileRow == null ? (this.FileTuple.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed : (this.FileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
+        public bool Uncompressed => this.FileRow == null ? (this.FileSymbol.Attributes & FileSymbolAttributes.Uncompressed) == FileSymbolAttributes.Uncompressed : (this.FileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
 
         public string Version
         {
-            get => this.FileRow == null ? this.FileTuple.Version : this.FileRow.Version;
+            get => this.FileRow == null ? this.FileSymbol.Version : this.FileRow.Version;
             set
             {
                 if (this.FileRow == null)
                 {
-                    this.FileTuple.Version = value;
+                    this.FileSymbol.Version = value;
                 }
                 else
                 {
@@ -146,22 +146,22 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public AssemblyType? AssemblyType => this.FileRow == null ? this.AssemblyTuple?.Type : null;
+        public AssemblyType? AssemblyType => this.FileRow == null ? this.AssemblySymbol?.Type : null;
 
-        public string AssemblyApplicationFileRef => this.FileRow == null ? this.AssemblyTuple?.ApplicationFileRef : throw new NotImplementedException();
+        public string AssemblyApplicationFileRef => this.FileRow == null ? this.AssemblySymbol?.ApplicationFileRef : throw new NotImplementedException();
 
-        public string AssemblyManifestFileRef => this.FileRow == null ? this.AssemblyTuple?.ManifestFileRef : throw new NotImplementedException();
+        public string AssemblyManifestFileRef => this.FileRow == null ? this.AssemblySymbol?.ManifestFileRef : throw new NotImplementedException();
 
         /// <summary>
         /// Gets the set of MsiAssemblyName rows created for this file.
         /// </summary>
         /// <value>RowCollection of MsiAssemblyName table.</value>
-        public List<MsiAssemblyNameTuple> AssemblyNames { get; set; }
+        public List<MsiAssemblyNameSymbol> AssemblyNames { get; set; }
 
         /// <summary>
         /// Gets or sets the MsiFileHash row for this file.
         /// </summary>
-        public MsiFileHashTuple Hash { get; set; }
+        public MsiFileHashSymbol Hash { get; set; }
 
         /// <summary>
         /// Allows direct access to the underlying FileRow as requried for patching.

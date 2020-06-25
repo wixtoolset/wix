@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -258,7 +258,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new ImageFamiliesTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new ImageFamiliesSymbol(sourceLineNumbers)
                 {
                     Family = name,
                     MediaSrcPropName = mediaSrcProp,
@@ -268,12 +268,12 @@ namespace WixToolset.Core
 
                 if (CompilerConstants.IntegerNotSet != diskId)
                 {
-                    tuple.MediaDiskId = diskId;
+                    symbol.MediaDiskId = diskId;
                 }
 
                 if (CompilerConstants.IntegerNotSet != sequenceStart)
                 {
-                    tuple.FileSequenceStart = sequenceStart;
+                    symbol.FileSequenceStart = sequenceStart;
                 }
             }
         }
@@ -379,7 +379,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new UpgradedImagesTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new UpgradedImagesSymbol(sourceLineNumbers)
                 {
                     Upgraded = upgrade,
                     MsiPath = sourceFile,
@@ -462,7 +462,7 @@ namespace WixToolset.Core
             {
                 if (ignore)
                 {
-                    this.Core.AddTuple(new UpgradedFilesToIgnoreTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new UpgradedFilesToIgnoreSymbol(sourceLineNumbers)
                     {
                         Upgraded = upgrade,
                         FTK = file
@@ -470,7 +470,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.AddTuple(new UpgradedFilesOptionalDataTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new UpgradedFilesOptionalDataSymbol(sourceLineNumbers)
                     {
                         Upgraded = upgrade,
                         FTK = file,
@@ -591,7 +591,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new TargetImagesTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new TargetImagesSymbol(sourceLineNumbers)
                 {
                     Target = target,
                     MsiPath = sourceFile,
@@ -673,7 +673,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new TargetFilesOptionalDataTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new TargetFilesOptionalDataSymbol(sourceLineNumbers)
                 {
                     Target = target,
                     FTK = file,
@@ -684,9 +684,9 @@ namespace WixToolset.Core
 
                 if (null != protectOffsets)
                 {
-                    tuple.RetainOffsets = protectOffsets;
+                    symbol.RetainOffsets = protectOffsets;
 
-                    this.Core.AddTuple(new FamilyFileRangesTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new FamilyFileRangesSymbol(sourceLineNumbers)
                     {
                         Family = family,
                         FTK = file,
@@ -793,7 +793,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new ExternalFilesTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new ExternalFilesSymbol(sourceLineNumbers)
                 {
                     Family = family,
                     FTK = file,
@@ -805,17 +805,17 @@ namespace WixToolset.Core
 
                 if (null != protectOffsets)
                 {
-                    tuple.RetainOffsets = protectOffsets;
+                    symbol.RetainOffsets = protectOffsets;
                 }
 
                 if (CompilerConstants.IntegerNotSet != order)
                 {
-                    tuple.Order = order;
+                    symbol.Order = order;
                 }
 
                 if (null != protectOffsets)
                 {
-                    this.Core.AddTuple(new FamilyFileRangesTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new FamilyFileRangesSymbol(sourceLineNumbers)
                     {
                         Family = family,
                         FTK = file,
@@ -890,7 +890,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new FamilyFileRangesTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new FamilyFileRangesSymbol(sourceLineNumbers)
                 {
                     Family = family,
                     FTK = file,
@@ -1251,7 +1251,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "ProductCode"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.TargetImages, target);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.TargetImages, target);
                         break;
                     case "Sequence":
                         sequence = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
@@ -1282,7 +1282,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new PatchSequenceTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new PatchSequenceSymbol(sourceLineNumbers)
                 {
                     PatchFamily = family,
                     Target = target,
@@ -1294,7 +1294,7 @@ namespace WixToolset.Core
 
         private void AddPatchMetadata(SourceLineNumber sourceLineNumbers, string company, string property, string value)
         {
-            this.Core.AddTuple(new PatchMetadataTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
+            this.Core.AddSymbol(new PatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
             {
                 Company = company,
                 Property = property,

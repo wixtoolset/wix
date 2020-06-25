@@ -9,34 +9,34 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 
     internal class WindowsInstallerBackendHelper : IWindowsInstallerBackendHelper
     {
-        public Row CreateRow(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinition tableDefinition)
+        public Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinition tableDefinition)
         {
             var table = output.EnsureTable(tableDefinition);
 
-            var row = table.CreateRow(tuple.SourceLineNumbers);
+            var row = table.CreateRow(symbol.SourceLineNumbers);
             row.SectionId = section.Id;
 
             return row;
         }
 
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public bool TryAddSymbolToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
-            var tableDefinition = tableDefinitions.FirstOrDefault(t => t.TupleDefinition?.Name == tuple.Definition.Name);
+            var tableDefinition = tableDefinitions.FirstOrDefault(t => t.SymbolDefinition?.Name == symbol.Definition.Name);
             if (tableDefinition == null)
             {
                 return false;
             }
 
-            var row = this.CreateRow(section, tuple, output, tableDefinition);
+            var row = this.CreateRow(section, symbol, output, tableDefinition);
             var rowOffset = 0;
 
-            if (tableDefinition.TupleIdIsPrimaryKey)
+            if (tableDefinition.SymbolIdIsPrimaryKey)
             {
-                row[0] = tuple.Id.Id;
+                row[0] = symbol.Id.Id;
                 rowOffset = 1;
             }
 
-            for (var i = 0; i < tuple.Fields.Length; ++i)
+            for (var i = 0; i < symbol.Fields.Length; ++i)
             {
                 if (i < tableDefinition.Columns.Length)
                 {
@@ -45,11 +45,11 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
                     switch (column.Type)
                     {
                     case ColumnType.Number:
-                        row[i + rowOffset] = column.Nullable ? tuple.AsNullableNumber(i) : tuple.AsNumber(i);
+                        row[i + rowOffset] = column.Nullable ? symbol.AsNullableNumber(i) : symbol.AsNumber(i);
                         break;
 
                     default:
-                        row[i + rowOffset] = tuple.AsString(i);
+                        row[i + rowOffset] = symbol.AsString(i);
                         break;
                     }
                 }

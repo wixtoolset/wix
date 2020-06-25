@@ -88,7 +88,7 @@ namespace WixToolset.Core.CommandLine
 
             var filterCultures = this.commandLine.CalculateFilterCultures();
 
-            var creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+            var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
 
             this.EvaluateSourceFiles(sourceFiles, creator, out var codeFiles, out var wixipl);
 
@@ -174,7 +174,7 @@ namespace WixToolset.Core.CommandLine
             return this.commandLine.TryParseArgument(argument, parser);
         }
 
-        private void EvaluateSourceFiles(IEnumerable<SourceFile> sourceFiles, ITupleDefinitionCreator creator, out List<SourceFile> codeFiles, out Intermediate wixipl)
+        private void EvaluateSourceFiles(IEnumerable<SourceFile> sourceFiles, ISymbolDefinitionCreator creator, out List<SourceFile> codeFiles, out Intermediate wixipl)
         {
             codeFiles = new List<SourceFile>();
 
@@ -278,7 +278,7 @@ namespace WixToolset.Core.CommandLine
             return library;
         }
 
-        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ITupleDefinitionCreator creator, CancellationToken cancellationToken)
+        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator, CancellationToken cancellationToken)
         {
             var libraries = this.LoadLibraries(libraryFiles, creator);
 
@@ -292,7 +292,7 @@ namespace WixToolset.Core.CommandLine
             context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
             context.ExpectedOutputType = this.OutputType;
             context.Intermediates = intermediates.Concat(libraries).ToList();
-            context.TupleDefinitionCreator = creator;
+            context.SymbolDefinitionCreator = creator;
             context.CancellationToken = cancellationToken;
 
             var linker = this.ServiceProvider.GetService<ILinker>();
@@ -382,7 +382,7 @@ namespace WixToolset.Core.CommandLine
             }
         }
 
-        private IEnumerable<Intermediate> LoadLibraries(IEnumerable<string> libraryFiles, ITupleDefinitionCreator creator)
+        private IEnumerable<Intermediate> LoadLibraries(IEnumerable<string> libraryFiles, ISymbolDefinitionCreator creator)
         {
             try
             {

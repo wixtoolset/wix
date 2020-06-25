@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.Collections;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
@@ -70,13 +70,13 @@ namespace WixToolset.Core
                         this.ParseBillboardActionElement(child);
                         break;
                     case "ComboBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ComboBox, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ComboBox, "ListItem");
                         break;
                     case "Dialog":
                         this.ParseDialogElement(child);
                         break;
                     case "DialogRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.Dialog);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.Dialog);
                         break;
                     case "EmbeddedUI":
                         if (0 < embeddedUICount) // there can be only one embedded UI
@@ -91,10 +91,10 @@ namespace WixToolset.Core
                         this.ParseErrorElement(child);
                         break;
                     case "ListBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListBox, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ListBox, "ListItem");
                         break;
                     case "ListView":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListView, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ListView, "ListItem");
                         break;
                     case "ProgressText":
                         this.ParseActionTextElement(child);
@@ -132,10 +132,10 @@ namespace WixToolset.Core
                         this.ParsePropertyElement(child);
                         break;
                     case "PropertyRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.Property);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
                         break;
                     case "UIRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixUI);
                         break;
 
                     default:
@@ -151,7 +151,7 @@ namespace WixToolset.Core
 
             if (null != id && !this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixUITuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixUISymbol(sourceLineNumbers, id));
             }
         }
 
@@ -159,10 +159,10 @@ namespace WixToolset.Core
         /// Parses a list item element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="tupleType">Type of tuple to create.</param>
+        /// <param name="symbolType">Type of symbol to create.</param>
         /// <param name="property">Identifier of property referred to by list item.</param>
         /// <param name="order">Relative order of list items.</param>
-        private void ParseListItemElement(XElement node, TupleDefinitionType tupleType, string property, ref int order)
+        private void ParseListItemElement(XElement node, SymbolDefinitionType symbolType, string property, ref int order)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string icon = null;
@@ -176,10 +176,10 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                     case "Icon":
-                        if (TupleDefinitionType.ListView == tupleType)
+                        if (SymbolDefinitionType.ListView == symbolType)
                         {
                             icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, icon);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, icon);
                         }
                         else
                         {
@@ -212,10 +212,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                switch (tupleType)
+                switch (symbolType)
                 {
-                    case TupleDefinitionType.ComboBox:
-                        this.Core.AddTuple(new ComboBoxTuple(sourceLineNumbers)
+                    case SymbolDefinitionType.ComboBox:
+                        this.Core.AddSymbol(new ComboBoxSymbol(sourceLineNumbers)
                         {
                             Property = property,
                             Order = ++order,
@@ -223,8 +223,8 @@ namespace WixToolset.Core
                             Text = text,
                         });
                         break;
-                    case TupleDefinitionType.ListBox:
-                        this.Core.AddTuple(new ListBoxTuple(sourceLineNumbers)
+                    case SymbolDefinitionType.ListBox:
+                        this.Core.AddSymbol(new ListBoxSymbol(sourceLineNumbers)
                         {
                             Property = property,
                             Order = ++order,
@@ -232,8 +232,8 @@ namespace WixToolset.Core
                             Text = text,
                         });
                         break;
-                    case TupleDefinitionType.ListView:
-                        var tuple = this.Core.AddTuple(new ListViewTuple(sourceLineNumbers)
+                    case SymbolDefinitionType.ListView:
+                        var symbol = this.Core.AddSymbol(new ListViewSymbol(sourceLineNumbers)
                         {
                             Property = property,
                             Order = ++order,
@@ -243,11 +243,11 @@ namespace WixToolset.Core
 
                         if (null != icon)
                         {
-                            tuple.BinaryRef = icon;
+                            symbol.BinaryRef = icon;
                         }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(tupleType));
+                        throw new ArgumentOutOfRangeException(nameof(symbolType));
                 }
             }
         }
@@ -284,7 +284,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Icon", "Text"));
                         }
                         text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, text);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, text);
                         type = RadioButtonType.Bitmap;
                         break;
                     case "Height":
@@ -299,7 +299,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Text"));
                         }
                         text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, text);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, text);
                         type = RadioButtonType.Icon;
                         break;
                     case "Text":
@@ -365,7 +365,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new RadioButtonTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new RadioButtonSymbol(sourceLineNumbers)
                 {
                     Property = property,
                     Order = ++order,
@@ -374,10 +374,10 @@ namespace WixToolset.Core
                     Help = (null != tooltip || null != help) ? String.Concat(tooltip, "|", help) : null
                 });
 
-                tuple.Set((int)RadioButtonTupleFields.X, x);
-                tuple.Set((int)RadioButtonTupleFields.Y, y);
-                tuple.Set((int)RadioButtonTupleFields.Width, width);
-                tuple.Set((int)RadioButtonTupleFields.Height, height);
+                symbol.Set((int)RadioButtonSymbolFields.X, x);
+                symbol.Set((int)RadioButtonSymbolFields.Y, y);
+                symbol.Set((int)RadioButtonSymbolFields.Width, width);
+                symbol.Set((int)RadioButtonSymbolFields.Height, height);
             }
 
             return type;
@@ -401,7 +401,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         action = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixAction, "InstallExecuteSequence", action);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixAction, "InstallExecuteSequence", action);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -464,7 +464,7 @@ namespace WixToolset.Core
                         break;
                     case "Feature":
                         feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Feature, feature);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, feature);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -490,12 +490,12 @@ namespace WixToolset.Core
                     {
                     case "Control":
                         // These are all thrown away.
-                        ControlTuple lastTabTuple = null;
+                        ControlSymbol lastTabSymbol = null;
                         string firstControl = null;
                         string defaultControl = null;
                         string cancelControl = null;
 
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabTuple, ref firstControl, ref defaultControl, ref cancelControl);
+                        this.ParseControlElement(child, id.Id, SymbolDefinitionType.BBControl, ref lastTabSymbol, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -511,7 +511,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new BillboardTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new BillboardSymbol(sourceLineNumbers, id)
                 {
                     FeatureRef = feature,
                     Action = action,
@@ -524,9 +524,9 @@ namespace WixToolset.Core
         /// Parses a control group element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="tupleType">Tuple type referred to by control group.</param>
+        /// <param name="symbolType">Symbol type referred to by control group.</param>
         /// <param name="childTag">Expected child elements.</param>
-        private void ParseControlGroupElement(XElement node, TupleDefinitionType tupleType, string childTag)
+        private void ParseControlGroupElement(XElement node, SymbolDefinitionType symbolType, string childTag)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var order = 0;
@@ -569,7 +569,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "ListItem":
-                        this.ParseListItemElement(child, tupleType, property, ref order);
+                        this.ParseListItemElement(child, symbolType, property, ref order);
                         break;
                     case "Property":
                         this.ParsePropertyElement(child);
@@ -607,7 +607,7 @@ namespace WixToolset.Core
                     {
                     case "Property":
                         property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, property);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, property);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -704,7 +704,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ActionTextTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new ActionTextSymbol(sourceLineNumbers)
                 {
                     Action = action,
                     Description = message,
@@ -755,7 +755,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new UITextTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new UITextSymbol(sourceLineNumbers, id)
                 {
                     Text = text,
                 });
@@ -860,7 +860,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new TextStyleTuple(sourceLineNumbers, id)
+                var symbol = this.Core.AddSymbol(new TextStyleSymbol(sourceLineNumbers, id)
                 {
                     FaceName = faceName,
                     Red = red,
@@ -872,7 +872,7 @@ namespace WixToolset.Core
                     Underline = underline,
                 });
 
-                tuple.Set((int)TextStyleTupleFields.Size, size);
+                symbol.Set((int)TextStyleSymbolFields.Size, size);
             }
         }
 
@@ -976,7 +976,7 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            ControlTuple lastTabTuple = null;
+            ControlSymbol lastTabSymbol = null;
             string cancelControl = null;
             string defaultControl = null;
             string firstControl = null;
@@ -988,7 +988,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "Control":
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabTuple, ref firstControl, ref defaultControl, ref cancelControl);
+                        this.ParseControlElement(child, id.Id, SymbolDefinitionType.Control, ref lastTabSymbol, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -1001,11 +1001,11 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null != lastTabTuple && null != lastTabTuple.Control)
+            if (null != lastTabSymbol && null != lastTabSymbol.Control)
             {
-                if (firstControl != lastTabTuple.Control)
+                if (firstControl != lastTabSymbol.Control)
                 {
-                    lastTabTuple.NextControlRef = firstControl;
+                    lastTabSymbol.NextControlRef = firstControl;
                 }
             }
 
@@ -1016,7 +1016,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new DialogTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new DialogSymbol(sourceLineNumbers, id)
                 {
                     HCentering = x,
                     VCentering = y,
@@ -1047,12 +1047,12 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="dialog">Identifier for parent dialog.</param>
         /// <param name="table">Table control belongs in.</param>
-        /// <param name="lastTabTuple">Last control in the tab order.</param>
+        /// <param name="lastTabSymbol">Last control in the tab order.</param>
         /// <param name="firstControl">Name of the first control in the tab order.</param>
         /// <param name="defaultControl">Name of the default control.</param>
         /// <param name="cancelControl">Name of the candle control.</param>
         /// <param name="trackDiskSpace">True if the containing dialog tracks disk space.</param>
-        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tupleType, ref ControlTuple lastTabTuple, ref string firstControl, ref string defaultControl, ref string cancelControl)
+        private void ParseControlElement(XElement node, string dialog, SymbolDefinitionType symbolType, ref ControlSymbol lastTabSymbol, ref string firstControl, ref string defaultControl, ref string cancelControl)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier controlId = null;
@@ -1379,13 +1379,13 @@ namespace WixToolset.Core
                         this.ParseBinaryElement(child);
                         break;
                     case "ComboBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ComboBox, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ComboBox, "ListItem");
                         break;
                     case "ListBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListBox, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ListBox, "ListItem");
                         break;
                     case "ListView":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListView, "ListItem");
+                        this.ParseControlGroupElement(child, SymbolDefinitionType.ListView, "ListItem");
                         break;
                     case "Property":
                         this.ParsePropertyElement(child);
@@ -1454,7 +1454,7 @@ namespace WixToolset.Core
             }
 
             // the logic for creating control rows is a little tricky because of the way tabable controls are set
-            IntermediateTuple tuple = null;
+            IntermediateSymbol symbol = null;
             if (!this.Core.EncounteredError)
             {
                 if ("CheckBox" == controlType)
@@ -1469,7 +1469,7 @@ namespace WixToolset.Core
                     }
                     else if (!String.IsNullOrEmpty(property))
                     {
-                        this.Core.AddTuple(new CheckBoxTuple(sourceLineNumbers)
+                        this.Core.AddSymbol(new CheckBoxSymbol(sourceLineNumbers)
                         {
                             Property = property,
                             Value = checkboxValue,
@@ -1477,15 +1477,15 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.CheckBox, checkBoxPropertyRef);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CheckBox, checkBoxPropertyRef);
                     }
                 }
 
                 var id = new Identifier(controlId.Access, dialog, controlId.Id);
 
-                if (TupleDefinitionType.BBControl == tupleType)
+                if (SymbolDefinitionType.BBControl == symbolType)
                 {
-                    var bbTuple = this.Core.AddTuple(new BBControlTuple(sourceLineNumbers, id)
+                    var bbSymbol = this.Core.AddSymbol(new BBControlSymbol(sourceLineNumbers, id)
                     {
                         BillboardRef = dialog,
                         BBControl = controlId.Id,
@@ -1503,16 +1503,16 @@ namespace WixToolset.Core
                         SourceFile = String.IsNullOrEmpty(sourceFile) ? null : new IntermediateFieldPathValue { Path = sourceFile }
                     });
 
-                    bbTuple.Set((int)BBControlTupleFields.X, x);
-                    bbTuple.Set((int)BBControlTupleFields.Y, y);
-                    bbTuple.Set((int)BBControlTupleFields.Width, width);
-                    bbTuple.Set((int)BBControlTupleFields.Height, height);
+                    bbSymbol.Set((int)BBControlSymbolFields.X, x);
+                    bbSymbol.Set((int)BBControlSymbolFields.Y, y);
+                    bbSymbol.Set((int)BBControlSymbolFields.Width, width);
+                    bbSymbol.Set((int)BBControlSymbolFields.Height, height);
 
-                    tuple = bbTuple;
+                    symbol = bbSymbol;
                 }
                 else
                 {
-                    var controlTuple = this.Core.AddTuple(new ControlTuple(sourceLineNumbers, id)
+                    var controlSymbol = this.Core.AddSymbol(new ControlSymbol(sourceLineNumbers, id)
                     {
                         DialogRef = dialog,
                         Control = controlId.Id,
@@ -1532,17 +1532,17 @@ namespace WixToolset.Core
                         SourceFile = String.IsNullOrEmpty(sourceFile) ? null : new IntermediateFieldPathValue { Path = sourceFile }
                     });
 
-                    controlTuple.Set((int)BBControlTupleFields.X, x);
-                    controlTuple.Set((int)BBControlTupleFields.Y, y);
-                    controlTuple.Set((int)BBControlTupleFields.Width, width);
-                    controlTuple.Set((int)BBControlTupleFields.Height, height);
+                    controlSymbol.Set((int)BBControlSymbolFields.X, x);
+                    controlSymbol.Set((int)BBControlSymbolFields.Y, y);
+                    controlSymbol.Set((int)BBControlSymbolFields.Width, width);
+                    controlSymbol.Set((int)BBControlSymbolFields.Height, height);
 
-                    tuple = controlTuple;
+                    symbol = controlSymbol;
                 }
 
                 if (!String.IsNullOrEmpty(defaultCondition))
                 {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ControlConditionSymbol(sourceLineNumbers)
                     {
                         DialogRef = dialog,
                         ControlRef = controlId.Id,
@@ -1553,7 +1553,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(enableCondition))
                 {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ControlConditionSymbol(sourceLineNumbers)
                     {
                         DialogRef = dialog,
                         ControlRef = controlId.Id,
@@ -1564,7 +1564,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(disableCondition))
                 {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ControlConditionSymbol(sourceLineNumbers)
                     {
                         DialogRef = dialog,
                         ControlRef = controlId.Id,
@@ -1575,7 +1575,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(hideCondition))
                 {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ControlConditionSymbol(sourceLineNumbers)
                     {
                         DialogRef = dialog,
                         ControlRef = controlId.Id,
@@ -1586,7 +1586,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(showCondition))
                 {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ControlConditionSymbol(sourceLineNumbers)
                     {
                         DialogRef = dialog,
                         ControlRef = controlId.Id,
@@ -1598,15 +1598,15 @@ namespace WixToolset.Core
 
             if (!notTabbable)
             {
-                if (tuple is ControlTuple controlTuple)
+                if (symbol is ControlSymbol controlSymbol)
                 {
-                    if (null != lastTabTuple)
+                    if (null != lastTabSymbol)
                     {
-                        lastTabTuple.NextControlRef = controlTuple.Control;
+                        lastTabSymbol.NextControlRef = controlSymbol.Control;
                     }
-                    lastTabTuple = controlTuple;
+                    lastTabSymbol = controlSymbol;
                 }
-                else if (tuple != null)
+                else if (symbol != null)
                 {
                     this.Core.Write(ErrorMessages.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
                 }
@@ -1621,7 +1621,7 @@ namespace WixToolset.Core
             // add a reference if the identifier of the binary entry is known during compilation
             if (("Bitmap" == controlType || "Icon" == controlType) && Common.IsIdentifier(text))
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, text);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, text);
             }
         }
 
@@ -1665,7 +1665,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                         }
                         dialog = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Dialog, dialog);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Dialog, dialog);
                         break;
                     case "Event":
                         controlEvent = Compiler.UppercaseFirstChar(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
@@ -1726,7 +1726,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ControlEventTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new ControlEventSymbol(sourceLineNumbers)
                 {
                     DialogRef = dialog,
                     ControlRef = control,
@@ -1739,18 +1739,18 @@ namespace WixToolset.Core
 
             if ("DoAction" == controlEvent && null != argument)
             {
-                // if we're not looking at a standard action or a formatted string then create a reference 
+                // if we're not looking at a standard action or a formatted string then create a reference
                 // to the custom action.
                 if (!WindowsInstallerStandard.IsStandardAction(argument) && !Common.ContainsProperty(argument))
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.CustomAction, argument);
+                    this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CustomAction, argument);
                 }
             }
 
             // if we're referring to a dialog but not through a property, add it to the references
             if (("NewDialog" == controlEvent || "SpawnDialog" == controlEvent || "SpawnWaitDialog" == controlEvent || "SelectionBrowse" == controlEvent) && Common.IsIdentifier(argument))
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Dialog, argument);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Dialog, argument);
             }
         }
 
@@ -1793,7 +1793,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new EventMappingTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new EventMappingSymbol(sourceLineNumbers)
                 {
                     DialogRef = dialog,
                     ControlRef = control,

@@ -9,7 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Text.RegularExpressions;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
@@ -85,25 +85,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var section = this.Intermediate.Sections.First();
 
-            var tuples = this.Intermediate.Sections.SelectMany(s => s.Tuples).ToList();
+            var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols).ToList();
 
-            // Get the patch id from the WixPatchId tuple.
-            var patchIdTuple = tuples.OfType<WixPatchIdTuple>().FirstOrDefault();
+            // Get the patch id from the WixPatchId symbol.
+            var patchIdSymbol = symbols.OfType<WixPatchIdSymbol>().FirstOrDefault();
 
-            if (String.IsNullOrEmpty(patchIdTuple.Id?.Id))
+            if (String.IsNullOrEmpty(patchIdSymbol.Id?.Id))
             {
                 this.Messaging.Write(ErrorMessages.ExpectedPatchIdInWixMsp());
                 return subStorages;
             }
 
-            if (String.IsNullOrEmpty(patchIdTuple.ClientPatchId))
+            if (String.IsNullOrEmpty(patchIdSymbol.ClientPatchId))
             {
                 this.Messaging.Write(ErrorMessages.ExpectedClientPatchIdInWixMsp());
                 return subStorages;
             }
 
             // enumerate patch.Media to map diskId to Media row
-            var patchMediaByDiskId = tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
+            var patchMediaByDiskId = symbols.OfType<MediaSymbol>().ToDictionary(t => t.DiskId);
 
             if (patchMediaByDiskId.Count == 0)
             {
@@ -112,23 +112,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // populate MSP summary information
-            var patchMetadata = this.PopulateSummaryInformation(summaryInfo, tuples, patchIdTuple, section.Codepage);
+            var patchMetadata = this.PopulateSummaryInformation(summaryInfo, symbols, patchIdSymbol, section.Codepage);
 
             // enumerate transforms
             var productCodes = new SortedSet<string>();
             var transformNames = new List<string>();
             var validTransform = new List<Tuple<string, WindowsInstallerData>>();
 
-            var baselineTuplesById = tuples.OfType<WixPatchBaselineTuple>().ToDictionary(t => t.Id.Id);
+            var baselineSymbolsById = symbols.OfType<WixPatchBaselineSymbol>().ToDictionary(t => t.Id.Id);
 
             foreach (var mainTransform in this.Transforms)
             {
-                var baselineTuple = baselineTuplesById[mainTransform.Baseline];
+                var baselineSymbol = baselineSymbolsById[mainTransform.Baseline];
 
-                var patchRefTuples = tuples.OfType<WixPatchRefTuple>().ToList();
-                if (patchRefTuples.Count > 0)
+                var patchRefSymbols = symbols.OfType<WixPatchRefSymbol>().ToList();
+                if (patchRefSymbols.Count > 0)
                 {
-                    if (!this.ReduceTransform(mainTransform.Transform, patchRefTuples))
+                    if (!this.ReduceTransform(mainTransform.Transform, patchRefSymbols))
                     {
                         // transform has none of the content authored into this patch
                         continue;
@@ -139,7 +139,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Validate(mainTransform);
 
                 // ensure consistent File.Sequence within each Media
-                var mediaTuple = patchMediaByDiskId[baselineTuple.DiskId];
+                var mediaSymbol = patchMediaByDiskId[baselineSymbol.DiskId];
 
                 // Ensure that files are sequenced after the last file in any transform.
                 var transformMediaTable = mainTransform.Transform.Tables["Media"];
@@ -147,25 +147,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     foreach (MediaRow transformMediaRow in transformMediaTable.Rows)
                     {
-                        if (!mediaTuple.LastSequence.HasValue || mediaTuple.LastSequence < transformMediaRow.LastSequence)
+                        if (!mediaSymbol.LastSequence.HasValue || mediaSymbol.LastSequence < transformMediaRow.LastSequence)
                         {
                             // The Binder will pre-increment the sequence.
-                            mediaTuple.LastSequence = transformMediaRow.LastSequence;
+                            mediaSymbol.LastSequence = transformMediaRow.LastSequence;
                         }
                     }
                 }
 
                 // Use the Media/@DiskId if greater than the last sequence for backward compatibility.
-                if (!mediaTuple.LastSequence.HasValue || mediaTuple.LastSequence < mediaTuple.DiskId)
+                if (!mediaSymbol.LastSequence.HasValue || mediaSymbol.LastSequence < mediaSymbol.DiskId)
                 {
-                    mediaTuple.LastSequence = mediaTuple.DiskId;
+                    mediaSymbol.LastSequence = mediaSymbol.DiskId;
                 }
 
                 // Ignore media table in the transform.
                 mainTransform.Transform.Tables.Remove("Media");
                 mainTransform.Transform.Tables.Remove("MsiDigitalSignature");
 
-                var pairedTransform = this.BuildPairedTransform(summaryInfo, patchMetadata, patchIdTuple, mainTransform.Transform, mediaTuple, baselineTuple, out var productCode);
+                var pairedTransform = this.BuildPairedTransform(summaryInfo, patchMetadata, patchIdSymbol, mainTransform.Transform, mediaSymbol, baselineSymbol, out var productCode);
 
                 productCode = productCode.ToUpperInvariant();
                 productCodes.Add(productCode);
@@ -205,17 +205,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Finish filling tables with transform-dependent data.
-            productCodes = FinalizePatchProductCodes(tuples, productCodes);
+            productCodes = FinalizePatchProductCodes(symbols, productCodes);
 
             // Semicolon delimited list of the product codes that can accept the patch.
-            summaryInfo.Add(SummaryInformationType.PatchProductCodes, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.PatchProductCodes, new SummaryInformationSymbol(patchIdSymbol.SourceLineNumbers)
             {
                 PropertyId = SummaryInformationType.PatchProductCodes,
                 Value = String.Join(";", productCodes)
             });
 
             // Semicolon delimited list of transform substorage names in the order they are applied.
-            summaryInfo.Add(SummaryInformationType.TransformNames, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.TransformNames, new SummaryInformationSymbol(patchIdSymbol.SourceLineNumbers)
             {
                 PropertyId = SummaryInformationType.TransformNames,
                 Value = String.Join(";", transformNames)
@@ -224,7 +224,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Put the summary information that was extracted back in now that it is updated.
             foreach (var readSummaryInfo in summaryInfo.Values.OrderBy(s => s.PropertyId))
             {
-                section.AddTuple(readSummaryInfo);
+                section.AddSymbol(readSummaryInfo);
             }
 
             this.SubStorages = subStorages;
@@ -232,19 +232,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return subStorages;
         }
 
-        private Dictionary<SummaryInformationType, SummaryInformationTuple> ExtractPatchSummaryInfo()
+        private Dictionary<SummaryInformationType, SummaryInformationSymbol> ExtractPatchSummaryInfo()
         {
-            var result = new Dictionary<SummaryInformationType, SummaryInformationTuple>();
+            var result = new Dictionary<SummaryInformationType, SummaryInformationSymbol>();
 
             foreach (var section in this.Intermediate.Sections)
             {
-                for (var i = section.Tuples.Count - 1; i >= 0; i--)
+                for (var i = section.Symbols.Count - 1; i >= 0; i--)
                 {
-                    if (section.Tuples[i] is SummaryInformationTuple patchSummaryInfo)
+                    if (section.Symbols[i] is SummaryInformationSymbol patchSummaryInfo)
                     {
-                        // Remove all summary information from the tuples and remember those that
+                        // Remove all summary information from the symbols and remember those that
                         // are not calculated or reserved.
-                        section.Tuples.RemoveAt(i);
+                        section.Symbols.RemoveAt(i);
 
                         if (patchSummaryInfo.PropertyId != SummaryInformationType.PatchProductCodes &&
                             patchSummaryInfo.PropertyId != SummaryInformationType.PatchCode &&
@@ -262,39 +262,39 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
-        private Dictionary<string, MsiPatchMetadataTuple> PopulateSummaryInformation(Dictionary<SummaryInformationType, SummaryInformationTuple> summaryInfo, List<IntermediateTuple> tuples, WixPatchIdTuple patchIdTuple, int codepage)
+        private Dictionary<string, MsiPatchMetadataSymbol> PopulateSummaryInformation(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, List<IntermediateSymbol> symbols, WixPatchIdSymbol patchIdSymbol, int codepage)
         {
             // PID_CODEPAGE
             if (!summaryInfo.ContainsKey(SummaryInformationType.Codepage))
             {
                 // Set the code page by default to the same code page for the
                 // string pool in the database.
-                AddSummaryInformation(SummaryInformationType.Codepage, codepage.ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Codepage, codepage.ToString(CultureInfo.InvariantCulture), patchIdSymbol.SourceLineNumbers);
             }
 
             // GUID patch code for the patch.
-            AddSummaryInformation(SummaryInformationType.PatchCode, patchIdTuple.Id.Id, patchIdTuple.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchCode, patchIdSymbol.Id.Id, patchIdSymbol.SourceLineNumbers);
 
             // Indicates the minimum Windows Installer version that is required to install the patch.
-            AddSummaryInformation(SummaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchIdSymbol.SourceLineNumbers);
 
             if (!summaryInfo.ContainsKey(SummaryInformationType.Security))
             {
-                AddSummaryInformation(SummaryInformationType.Security, "4", patchIdTuple.SourceLineNumbers); // Read-only enforced;
+                AddSummaryInformation(SummaryInformationType.Security, "4", patchIdSymbol.SourceLineNumbers); // Read-only enforced;
             }
 
             // Use authored comments or default to display name.
-            MsiPatchMetadataTuple commentsTuple = null;
+            MsiPatchMetadataSymbol commentsSymbol = null;
 
-            var metadataTuples = tuples.OfType<MsiPatchMetadataTuple>().Where(t => String.IsNullOrEmpty(t.Company)).ToDictionary(t => t.Property);
+            var metadataSymbols = symbols.OfType<MsiPatchMetadataSymbol>().Where(t => String.IsNullOrEmpty(t.Company)).ToDictionary(t => t.Property);
 
             if (!summaryInfo.ContainsKey(SummaryInformationType.Title) &&
-                metadataTuples.TryGetValue("DisplayName", out var displayName))
+                metadataSymbols.TryGetValue("DisplayName", out var displayName))
             {
                 AddSummaryInformation(SummaryInformationType.Title, displayName.Value, displayName.SourceLineNumbers);
 
                 // Default comments to use display name as-is.
-                commentsTuple = displayName;
+                commentsSymbol = displayName;
             }
 
             // TODO: This code below seems unnecessary given the codepage is set at the top of this method.
@@ -305,38 +305,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             //}
 
             if (!summaryInfo.ContainsKey(SummaryInformationType.PatchPackageName) &&
-                metadataTuples.TryGetValue("Description", out var description))
+                metadataSymbols.TryGetValue("Description", out var description))
             {
                 AddSummaryInformation(SummaryInformationType.PatchPackageName, description.Value, description.SourceLineNumbers);
             }
 
             if (!summaryInfo.ContainsKey(SummaryInformationType.Author) &&
-                metadataTuples.TryGetValue("ManufacturerName", out var manufacturer))
+                metadataSymbols.TryGetValue("ManufacturerName", out var manufacturer))
             {
                 AddSummaryInformation(SummaryInformationType.Author, manufacturer.Value, manufacturer.SourceLineNumbers);
             }
 
             // Special metadata marshalled through the build.
-            //var wixMetadataValues = tuples.OfType<WixPatchMetadataTuple>().ToDictionary(t => t.Id.Id, t => t.Value);
+            //var wixMetadataValues = symbols.OfType<WixPatchMetadataSymbol>().ToDictionary(t => t.Id.Id, t => t.Value);
 
             //if (wixMetadataValues.TryGetValue("Comments", out var wixComments))
-            if (metadataTuples.TryGetValue("Comments", out var wixComments))
+            if (metadataSymbols.TryGetValue("Comments", out var wixComments))
             {
-                commentsTuple = wixComments;
+                commentsSymbol = wixComments;
             }
 
             // Write the package comments to summary info.
             if (!summaryInfo.ContainsKey(SummaryInformationType.Comments) &&
-                commentsTuple != null)
+                commentsSymbol != null)
             {
-                AddSummaryInformation(SummaryInformationType.Comments, commentsTuple.Value, commentsTuple.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Comments, commentsSymbol.Value, commentsSymbol.SourceLineNumbers);
             }
 
-            return metadataTuples;
+            return metadataSymbols;
 
             void AddSummaryInformation(SummaryInformationType type, string value, SourceLineNumber sourceLineNumber)
             {
-                summaryInfo.Add(type, new SummaryInformationTuple(sourceLineNumber)
+                summaryInfo.Add(type, new SummaryInformationSymbol(sourceLineNumber)
                 {
                     PropertyId = type,
                     Value = value
@@ -379,9 +379,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Reduce the transform according to the patch references.
         /// </summary>
         /// <param name="transform">transform generated by torch.</param>
-        /// <param name="patchRefTuples">Table contains patch family filter.</param>
+        /// <param name="patchRefSymbols">Table contains patch family filter.</param>
         /// <returns>true if the transform is not empty</returns>
-        private bool ReduceTransform(WindowsInstallerData transform, IEnumerable<WixPatchRefTuple> patchRefTuples)
+        private bool ReduceTransform(WindowsInstallerData transform, IEnumerable<WixPatchRefSymbol> patchRefSymbols)
         {
             // identify sections to keep
             var oldSections = new Dictionary<string, Row>();
@@ -402,10 +402,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var directoryLockPermissionsIndex = new Dictionary<string, List<Row>>();
             var directoryMsiLockPermissionsExIndex = new Dictionary<string, List<Row>>();
 
-            foreach (var patchRefTuple in patchRefTuples)
+            foreach (var patchRefSymbol in patchRefSymbols)
             {
-                var tableName = patchRefTuple.Table;
-                var key = patchRefTuple.PrimaryKeys;
+                var tableName = patchRefSymbol.Table;
+                var key = patchRefSymbol.PrimaryKeys;
 
                 // Short circuit filtering if all changes should be included.
                 if ("*" == tableName && "*" == key)
@@ -1090,7 +1090,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Create the #transform for the given main transform.
         /// </summary>
-        private WindowsInstallerData BuildPairedTransform(Dictionary<SummaryInformationType, SummaryInformationTuple> summaryInfo, Dictionary<string, MsiPatchMetadataTuple> patchMetadata, WixPatchIdTuple patchIdTuple, WindowsInstallerData mainTransform, MediaTuple mediaTuple, WixPatchBaselineTuple baselineTuple, out string productCode)
+        private WindowsInstallerData BuildPairedTransform(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, Dictionary<string, MsiPatchMetadataSymbol> patchMetadata, WixPatchIdSymbol patchIdSymbol, WindowsInstallerData mainTransform, MediaSymbol mediaSymbol, WixPatchBaselineSymbol baselineSymbol, out string productCode)
         {
             productCode = null;
 
@@ -1106,11 +1106,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var mainSummaryTable = mainTransform.Tables["_SummaryInformation"];
             var mainSummaryRows = mainSummaryTable.Rows.ToDictionary(r => r.FieldAsInteger(0));
 
-            var baselineValidationFlags = ((int)baselineTuple.ValidationFlags).ToString(CultureInfo.InvariantCulture);
+            var baselineValidationFlags = ((int)baselineSymbol.ValidationFlags).ToString(CultureInfo.InvariantCulture);
 
             if (!mainSummaryRows.ContainsKey((int)SummaryInformationType.TransformValidationFlags))
             {
-                var mainSummaryRow = mainSummaryTable.CreateRow(baselineTuple.SourceLineNumbers);
+                var mainSummaryRow = mainSummaryTable.CreateRow(baselineSymbol.SourceLineNumbers);
                 mainSummaryRow[0] = (int)SummaryInformationType.TransformValidationFlags;
                 mainSummaryRow[1] = baselineValidationFlags;
             }
@@ -1177,7 +1177,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     mainFileRow.CopyTo(pairedFileRow);
 
                     // Override authored media for patch bind.
-                    mainFileRow.DiskId = mediaTuple.DiskId;
+                    mainFileRow.DiskId = mediaSymbol.DiskId;
 
                     // Suppress any change to File.Sequence to avoid bloat.
                     mainFileRow.Fields[7].Modified = false;
@@ -1200,78 +1200,78 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Add Media row to pairedTransform
             var pairedMediaTable = pairedTransform.EnsureTable(this.tableDefinitions["Media"]);
-            var pairedMediaRow = (MediaRow)pairedMediaTable.CreateRow(mediaTuple.SourceLineNumbers);
+            var pairedMediaRow = (MediaRow)pairedMediaTable.CreateRow(mediaSymbol.SourceLineNumbers);
             pairedMediaRow.Operation = RowOperation.Add;
-            pairedMediaRow.DiskId = mediaTuple.DiskId;
-            pairedMediaRow.LastSequence = mediaTuple.LastSequence ?? 0;
-            pairedMediaRow.DiskPrompt = mediaTuple.DiskPrompt;
-            pairedMediaRow.Cabinet = mediaTuple.Cabinet;
-            pairedMediaRow.VolumeLabel = mediaTuple.VolumeLabel;
-            pairedMediaRow.Source = mediaTuple.Source;
+            pairedMediaRow.DiskId = mediaSymbol.DiskId;
+            pairedMediaRow.LastSequence = mediaSymbol.LastSequence ?? 0;
+            pairedMediaRow.DiskPrompt = mediaSymbol.DiskPrompt;
+            pairedMediaRow.Cabinet = mediaSymbol.Cabinet;
+            pairedMediaRow.VolumeLabel = mediaSymbol.VolumeLabel;
+            pairedMediaRow.Source = mediaSymbol.Source;
 
             // Add PatchPackage for this Media
             var pairedPackageTable = pairedTransform.EnsureTable(this.tableDefinitions["PatchPackage"]);
             pairedPackageTable.Operation = TableOperation.Add;
-            var pairedPackageRow = pairedPackageTable.CreateRow(mediaTuple.SourceLineNumbers);
+            var pairedPackageRow = pairedPackageTable.CreateRow(mediaSymbol.SourceLineNumbers);
             pairedPackageRow.Operation = RowOperation.Add;
-            pairedPackageRow[0] = patchIdTuple.Id.Id;
-            pairedPackageRow[1] = mediaTuple.DiskId;
+            pairedPackageRow[0] = patchIdSymbol.Id.Id;
+            pairedPackageRow[1] = mediaSymbol.DiskId;
 
             // Add the property to the patch transform's Property table.
             var pairedPropertyTable = pairedTransform.EnsureTable(this.tableDefinitions["Property"]);
             pairedPropertyTable.Operation = TableOperation.Add;
 
             // Add property to both identify client patches and whether those patches are removable or not
-            patchMetadata.TryGetValue("AllowRemoval", out var allowRemovalTuple);
+            patchMetadata.TryGetValue("AllowRemoval", out var allowRemovalSymbol);
 
-            var pairedPropertyRow = pairedPropertyTable.CreateRow(allowRemovalTuple?.SourceLineNumbers);
+            var pairedPropertyRow = pairedPropertyTable.CreateRow(allowRemovalSymbol?.SourceLineNumbers);
             pairedPropertyRow.Operation = RowOperation.Add;
-            pairedPropertyRow[0] = String.Concat(patchIdTuple.ClientPatchId, ".AllowRemoval");
-            pairedPropertyRow[1] = allowRemovalTuple?.Value ?? "0";
+            pairedPropertyRow[0] = String.Concat(patchIdSymbol.ClientPatchId, ".AllowRemoval");
+            pairedPropertyRow[1] = allowRemovalSymbol?.Value ?? "0";
 
             // Add this patch code GUID to the patch transform to identify
             // which patches are installed, including in multi-patch
             // installations.
-            pairedPropertyRow = pairedPropertyTable.CreateRow(patchIdTuple.SourceLineNumbers);
+            pairedPropertyRow = pairedPropertyTable.CreateRow(patchIdSymbol.SourceLineNumbers);
             pairedPropertyRow.Operation = RowOperation.Add;
-            pairedPropertyRow[0] = String.Concat(patchIdTuple.ClientPatchId, ".PatchCode");
-            pairedPropertyRow[1] = patchIdTuple.Id.Id;
+            pairedPropertyRow[0] = String.Concat(patchIdSymbol.ClientPatchId, ".PatchCode");
+            pairedPropertyRow[1] = patchIdSymbol.Id.Id;
 
             // Add PATCHNEWPACKAGECODE to apply to admin layouts.
-            pairedPropertyRow = pairedPropertyTable.CreateRow(patchIdTuple.SourceLineNumbers);
+            pairedPropertyRow = pairedPropertyTable.CreateRow(patchIdSymbol.SourceLineNumbers);
             pairedPropertyRow.Operation = RowOperation.Add;
             pairedPropertyRow[0] = "PATCHNEWPACKAGECODE";
-            pairedPropertyRow[1] = patchIdTuple.Id.Id;
+            pairedPropertyRow[1] = patchIdSymbol.Id.Id;
 
             // Add PATCHNEWSUMMARYCOMMENTS and PATCHNEWSUMMARYSUBJECT to apply to admin layouts.
-            if (summaryInfo.TryGetValue(SummaryInformationType.Subject, out var subjectTuple))
+            if (summaryInfo.TryGetValue(SummaryInformationType.Subject, out var subjectSymbol))
             {
-                pairedPropertyRow = pairedPropertyTable.CreateRow(subjectTuple.SourceLineNumbers);
+                pairedPropertyRow = pairedPropertyTable.CreateRow(subjectSymbol.SourceLineNumbers);
                 pairedPropertyRow.Operation = RowOperation.Add;
                 pairedPropertyRow[0] = "PATCHNEWSUMMARYSUBJECT";
-                pairedPropertyRow[1] = subjectTuple.Value;
+                pairedPropertyRow[1] = subjectSymbol.Value;
             }
 
-            if (summaryInfo.TryGetValue(SummaryInformationType.Comments, out var commentsTuple))
+            if (summaryInfo.TryGetValue(SummaryInformationType.Comments, out var commentsSymbol))
             {
-                pairedPropertyRow = pairedPropertyTable.CreateRow(commentsTuple.SourceLineNumbers);
+                pairedPropertyRow = pairedPropertyTable.CreateRow(commentsSymbol.SourceLineNumbers);
                 pairedPropertyRow.Operation = RowOperation.Add;
                 pairedPropertyRow[0] = "PATCHNEWSUMMARYCOMMENTS";
-                pairedPropertyRow[1] = commentsTuple.Value;
+                pairedPropertyRow[1] = commentsSymbol.Value;
             }
 
             return pairedTransform;
         }
 
-        private static SortedSet<string> FinalizePatchProductCodes(List<IntermediateTuple> tuples, SortedSet<string> productCodes)
+        private static SortedSet<string> FinalizePatchProductCodes(List<IntermediateSymbol> symbols, SortedSet<string> productCodes)
         {
-            var patchTargetTuples = tuples.OfType<WixPatchTargetTuple>().ToList();
+            var patchTargetSymbols = symbols.OfType<WixPatchTargetSymbol>().ToList();
 
-            if (patchTargetTuples.Any())
+            if (patchTargetSymbols.Any())
             {
                 var targets = new SortedSet<string>();
                 var replace = true;
-                foreach (var wixPatchTargetRow in patchTargetTuples)
+                foreach (var wixPatchTargetRow in patchTargetSymbols)
                 {
                     var target = wixPatchTargetRow.ProductCode.ToUpperInvariant();
                     if (target == "*")

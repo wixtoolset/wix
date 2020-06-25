@@ -7,7 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
@@ -32,13 +32,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public TableDefinitionCollection Execute()
         {
             var tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
-            var customColumnsById = this.Section.Tuples.OfType<WixCustomTableColumnTuple>().ToDictionary(t => t.Id.Id);
+            var customColumnsById = this.Section.Symbols.OfType<WixCustomTableColumnSymbol>().ToDictionary(t => t.Id.Id);
 
             if (customColumnsById.Any())
             {
-                foreach (var tuple in this.Section.Tuples.OfType<WixCustomTableTuple>())
+                foreach (var symbol in this.Section.Symbols.OfType<WixCustomTableSymbol>())
                 {
-                    var customTableDefinition = this.CreateCustomTable(tuple, customColumnsById);
+                    var customTableDefinition = this.CreateCustomTable(symbol, customColumnsById);
                     tableDefinitions.Add(customTableDefinition);
                 }
             }
@@ -60,14 +60,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return this.TableDefinitions;
         }
 
-        private TableDefinition CreateCustomTable(WixCustomTableTuple tuple, Dictionary<string, WixCustomTableColumnTuple> customColumnsById)
+        private TableDefinition CreateCustomTable(WixCustomTableSymbol symbol, Dictionary<string, WixCustomTableColumnSymbol> customColumnsById)
         {
-            var columnNames = tuple.ColumnNamesSeparated;
+            var columnNames = symbol.ColumnNamesSeparated;
             var columns = new List<ColumnDefinition>(columnNames.Length);
 
             foreach (var name in columnNames)
             {
-                var column = customColumnsById[tuple.Id.Id + "/" + name];
+                var column = customColumnsById[symbol.Id.Id + "/" + name];
 
                 var type = ColumnType.Unknown;
 
@@ -208,7 +208,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 columns.Add(columnDefinition);
             }
 
-            var customTable = new TableDefinition(tuple.Id.Id, null, columns, tuple.Unreal);
+            var customTable = new TableDefinition(symbol.Id.Id, null, columns, symbol.Unreal);
             return customTable;
         }
     }

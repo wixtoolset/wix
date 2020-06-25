@@ -89,17 +89,17 @@ namespace WixToolset.Core
 
                 var fileResolver = new FileResolver(context.BindPaths, context.Extensions);
 
-                foreach (var tuple in sections.SelectMany(s => s.Tuples))
+                foreach (var symbol in sections.SelectMany(s => s.Symbols))
                 {
-                    foreach (var field in tuple.Fields.Where(f => f?.Type == IntermediateFieldType.Path))
+                    foreach (var field in symbol.Fields.Where(f => f?.Type == IntermediateFieldType.Path))
                     {
                         var pathField = field.AsPath();
 
                         if (pathField != null && !String.IsNullOrEmpty(pathField.Path))
                         {
-                            var resolution = variableResolver.ResolveVariables(tuple.SourceLineNumbers, pathField.Path);
+                            var resolution = variableResolver.ResolveVariables(symbol.SourceLineNumbers, pathField.Path);
 
-                            var file = fileResolver.Resolve(tuple.SourceLineNumbers, tuple.Definition, resolution.Value);
+                            var file = fileResolver.Resolve(symbol.SourceLineNumbers, symbol.Definition, resolution.Value);
 
                             if (!String.IsNullOrEmpty(file))
                             {
@@ -108,7 +108,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.FileNotFound(tuple.SourceLineNumbers, pathField.Path, tuple.Definition.Name));
+                                this.Messaging.Write(ErrorMessages.FileNotFound(symbol.SourceLineNumbers, pathField.Path, symbol.Definition.Name));
                             }
                         }
                     }

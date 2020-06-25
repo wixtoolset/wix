@@ -11,24 +11,24 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
-            this.BundleTuple = bundleTuple;
+            this.BundleSymbol = bundleSymbol;
             this.ChainPackages = chainPackages;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
-            this.Payloads = payloadTuples;
+            this.Payloads = payloadSymbols;
             this.IntermediateFolder = intermediateFolder;
             this.InternalBurnBackendHelper = internalBurnBackendHelper;
         }
 
         private IntermediateSection Section { get; }
 
-        private WixBundleTuple BundleTuple { get; }
+        private WixBundleSymbol BundleSymbol { get; }
 
         private IEnumerable<PackageFacade> ChainPackages { get; }
 
@@ -36,11 +36,11 @@ namespace WixToolset.Core.Burn.Bundles
 
         private int LastUXPayloadIndex { get; }
 
-        private Dictionary<string, WixBundlePayloadTuple> Payloads { get; }
+        private Dictionary<string, WixBundlePayloadSymbol> Payloads { get; }
 
         private string IntermediateFolder { get; }
 
-        public WixBundlePayloadTuple BootstrapperApplicationManifestPayloadRow { get; private set; }
+        public WixBundlePayloadSymbol BootstrapperApplicationManifestPayloadRow { get; private set; }
 
         public string OutputPath { get; private set; }
 
@@ -84,12 +84,12 @@ namespace WixToolset.Core.Burn.Bundles
         {
             writer.WriteStartElement("WixBundleProperties");
 
-            writer.WriteAttributeString("DisplayName", this.BundleTuple.Name);
-            writer.WriteAttributeString("LogPathVariable", this.BundleTuple.LogPathVariable);
-            writer.WriteAttributeString("Compressed", this.BundleTuple.Compressed == true ? "yes" : "no");
-            writer.WriteAttributeString("Id", this.BundleTuple.BundleId.ToUpperInvariant());
-            writer.WriteAttributeString("UpgradeCode", this.BundleTuple.UpgradeCode);
-            writer.WriteAttributeString("PerMachine", this.BundleTuple.PerMachine ? "yes" : "no");
+            writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);
+            writer.WriteAttributeString("LogPathVariable", this.BundleSymbol.LogPathVariable);
+            writer.WriteAttributeString("Compressed", this.BundleSymbol.Compressed == true ? "yes" : "no");
+            writer.WriteAttributeString("Id", this.BundleSymbol.BundleId.ToUpperInvariant());
+            writer.WriteAttributeString("UpgradeCode", this.BundleSymbol.UpgradeCode);
+            writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
 
             writer.WriteEndElement();
         }
@@ -98,35 +98,35 @@ namespace WixToolset.Core.Burn.Bundles
         {
             foreach (var package in this.ChainPackages)
             {
-                var packagePayload = this.Payloads[package.PackageTuple.PayloadRef];
+                var packagePayload = this.Payloads[package.PackageSymbol.PayloadRef];
 
-                var size = package.PackageTuple.Size.ToString(CultureInfo.InvariantCulture);
+                var size = package.PackageSymbol.Size.ToString(CultureInfo.InvariantCulture);
 
                 writer.WriteStartElement("WixPackageProperties");
 
                 writer.WriteAttributeString("Package", package.PackageId);
-                writer.WriteAttributeString("Vital", package.PackageTuple.Vital == true ? "yes" : "no");
+                writer.WriteAttributeString("Vital", package.PackageSymbol.Vital == true ? "yes" : "no");
 
-                if (!String.IsNullOrEmpty(package.PackageTuple.DisplayName))
+                if (!String.IsNullOrEmpty(package.PackageSymbol.DisplayName))
                 {
-                    writer.WriteAttributeString("DisplayName", package.PackageTuple.DisplayName);
+                    writer.WriteAttributeString("DisplayName", package.PackageSymbol.DisplayName);
                 }
 
-                if (!String.IsNullOrEmpty(package.PackageTuple.Description))
+                if (!String.IsNullOrEmpty(package.PackageSymbol.Description))
                 {
-                    writer.WriteAttributeString("Description", package.PackageTuple.Description);
+                    writer.WriteAttributeString("Description", package.PackageSymbol.Description);
                 }
 
                 writer.WriteAttributeString("DownloadSize", size);
                 writer.WriteAttributeString("PackageSize", size);
-                writer.WriteAttributeString("InstalledSize", package.PackageTuple.InstallSize?.ToString(CultureInfo.InvariantCulture) ?? size);
-                writer.WriteAttributeString("PackageType", package.PackageTuple.Type.ToString());
-                writer.WriteAttributeString("Permanent", package.PackageTuple.Permanent ? "yes" : "no");
-                writer.WriteAttributeString("LogPathVariable", package.PackageTuple.LogPathVariable);
-                writer.WriteAttributeString("RollbackLogPathVariable", package.PackageTuple.RollbackLogPathVariable);
+                writer.WriteAttributeString("InstalledSize", package.PackageSymbol.InstallSize?.ToString(CultureInfo.InvariantCulture) ?? size);
+                writer.WriteAttributeString("PackageType", package.PackageSymbol.Type.ToString());
+                writer.WriteAttributeString("Permanent", package.PackageSymbol.Permanent ? "yes" : "no");
+                writer.WriteAttributeString("LogPathVariable", package.PackageSymbol.LogPathVariable);
+                writer.WriteAttributeString("RollbackLogPathVariable", package.PackageSymbol.RollbackLogPathVariable);
                 writer.WriteAttributeString("Compressed", packagePayload.Compressed == true ? "yes" : "no");
 
-                if (package.SpecificPackageTuple is WixBundleMsiPackageTuple msiPackage)
+                if (package.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
                 {
                     if (!String.IsNullOrEmpty(msiPackage.ProductCode))
                     {
@@ -138,7 +138,7 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
                     }
                 }
-                else if (package.SpecificPackageTuple is WixBundleMspPackageTuple mspPackage)
+                else if (package.SpecificPackageSymbol is WixBundleMspPackageSymbol mspPackage)
                 {
                     if (!String.IsNullOrEmpty(mspPackage.PatchCode))
                     {
@@ -146,17 +146,17 @@ namespace WixToolset.Core.Burn.Bundles
                     }
                 }
 
-                if (!String.IsNullOrEmpty(package.PackageTuple.Version))
+                if (!String.IsNullOrEmpty(package.PackageSymbol.Version))
                 {
-                    writer.WriteAttributeString("Version", package.PackageTuple.Version);
+                    writer.WriteAttributeString("Version", package.PackageSymbol.Version);
                 }
 
-                if (!String.IsNullOrEmpty(package.PackageTuple.InstallCondition))
+                if (!String.IsNullOrEmpty(package.PackageSymbol.InstallCondition))
                 {
-                    writer.WriteAttributeString("InstallCondition", package.PackageTuple.InstallCondition);
+                    writer.WriteAttributeString("InstallCondition", package.PackageSymbol.InstallCondition);
                 }
 
-                switch (package.PackageTuple.Cache)
+                switch (package.PackageSymbol.Cache)
                 {
                     case YesNoAlwaysType.No:
                         writer.WriteAttributeString("Cache", "no");
@@ -175,35 +175,35 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void WriteFeatureInfo(XmlTextWriter writer)
         {
-            var featureTuples = this.Section.Tuples.OfType<WixBundleMsiFeatureTuple>();
+            var featureSymbols = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>();
 
-            foreach (var featureTuple in featureTuples)
+            foreach (var featureSymbol in featureSymbols)
             {
                 writer.WriteStartElement("WixPackageFeatureInfo");
 
-                writer.WriteAttributeString("Package", featureTuple.PackageRef);
-                writer.WriteAttributeString("Feature", featureTuple.Name);
-                writer.WriteAttributeString("Size", featureTuple.Size.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Package", featureSymbol.PackageRef);
+                writer.WriteAttributeString("Feature", featureSymbol.Name);
+                writer.WriteAttributeString("Size", featureSymbol.Size.ToString(CultureInfo.InvariantCulture));
 
-                if (!String.IsNullOrEmpty(featureTuple.Parent))
+                if (!String.IsNullOrEmpty(featureSymbol.Parent))
                 {
-                    writer.WriteAttributeString("Parent", featureTuple.Parent);
+                    writer.WriteAttributeString("Parent", featureSymbol.Parent);
                 }
 
-                if (!String.IsNullOrEmpty(featureTuple.Title))
+                if (!String.IsNullOrEmpty(featureSymbol.Title))
                 {
-                    writer.WriteAttributeString("Title", featureTuple.Title);
+                    writer.WriteAttributeString("Title", featureSymbol.Title);
                 }
 
-                if (!String.IsNullOrEmpty(featureTuple.Description))
+                if (!String.IsNullOrEmpty(featureSymbol.Description))
                 {
-                    writer.WriteAttributeString("Description", featureTuple.Description);
+                    writer.WriteAttributeString("Description", featureSymbol.Description);
                 }
 
-                writer.WriteAttributeString("Display", featureTuple.Display.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Level", featureTuple.Level.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Directory", featureTuple.Directory);
-                writer.WriteAttributeString("Attributes", featureTuple.Attributes.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Display", featureSymbol.Display.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Level", featureSymbol.Level.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Directory", featureSymbol.Directory);
+                writer.WriteAttributeString("Attributes", featureSymbol.Attributes.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteEndElement();
             }
@@ -211,43 +211,43 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void WritePayloadInfo(XmlTextWriter writer)
         {
-            var payloadTuples = this.Section.Tuples.OfType<WixBundlePayloadTuple>();
+            var payloadSymbols = this.Section.Symbols.OfType<WixBundlePayloadSymbol>();
 
-            foreach (var payloadTuple in payloadTuples)
+            foreach (var payloadSymbol in payloadSymbols)
             {
                 writer.WriteStartElement("WixPayloadProperties");
 
-                writer.WriteAttributeString("Payload", payloadTuple.Id.Id);
+                writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
 
-                if (!String.IsNullOrEmpty(payloadTuple.PackageRef))
+                if (!String.IsNullOrEmpty(payloadSymbol.PackageRef))
                 {
-                    writer.WriteAttributeString("Package", payloadTuple.PackageRef);
+                    writer.WriteAttributeString("Package", payloadSymbol.PackageRef);
                 }
 
-                if (!String.IsNullOrEmpty(payloadTuple.ContainerRef))
+                if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
                 {
-                    writer.WriteAttributeString("Container", payloadTuple.ContainerRef);
+                    writer.WriteAttributeString("Container", payloadSymbol.ContainerRef);
                 }
 
-                writer.WriteAttributeString("Name", payloadTuple.Name);
-                writer.WriteAttributeString("Size", payloadTuple.FileSize.Value.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Name", payloadSymbol.Name);
+                writer.WriteAttributeString("Size", payloadSymbol.FileSize.Value.ToString(CultureInfo.InvariantCulture));
 
-                if (!String.IsNullOrEmpty(payloadTuple.DownloadUrl))
+                if (!String.IsNullOrEmpty(payloadSymbol.DownloadUrl))
                 {
-                    writer.WriteAttributeString("DownloadUrl", payloadTuple.DownloadUrl);
+                    writer.WriteAttributeString("DownloadUrl", payloadSymbol.DownloadUrl);
                 }
 
-                writer.WriteAttributeString("LayoutOnly", payloadTuple.LayoutOnly ? "yes" : "no");
+                writer.WriteAttributeString("LayoutOnly", payloadSymbol.LayoutOnly ? "yes" : "no");
 
                 writer.WriteEndElement();
             }
         }
 
-        private WixBundlePayloadTuple CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
+        private WixBundlePayloadSymbol CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
         {
             var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BADataFileName);
 
-            var tuple = this.Section.AddTuple(new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+            var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
             {
                 Name = BurnCommon.BADataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = baManifestPath },
@@ -260,11 +260,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             var fileInfo = new FileInfo(baManifestPath);
 
-            tuple.FileSize = (int)fileInfo.Length;
+            symbol.FileSize = (int)fileInfo.Length;
 
-            tuple.Hash = BundleHashAlgorithm.Hash(fileInfo);
+            symbol.Hash = BundleHashAlgorithm.Hash(fileInfo);
 
-            return tuple;
+            return symbol;
         }
     }
 }

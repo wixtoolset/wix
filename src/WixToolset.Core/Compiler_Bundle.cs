@@ -11,7 +11,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -85,7 +85,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixApprovedExeForElevationTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixApprovedExeForElevationSymbol(sourceLineNumbers, id)
                 {
                     Key = key,
                     ValueName = valueName,
@@ -287,7 +287,7 @@ namespace WixToolset.Core
                         this.ParseBundleExtensionElement(child);
                         break;
                     case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleExtension);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
                         break;
                     case "OptionalUpdateRegistration":
                         this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
@@ -308,7 +308,7 @@ namespace WixToolset.Core
                         this.ParseContainerElement(child);
                         break;
                     case "ContainerRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleContainer);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleContainer);
                         break;
                     case "Log":
                         if (logSeen)
@@ -332,7 +332,7 @@ namespace WixToolset.Core
                         this.ParseSetVariableElement(child);
                         break;
                     case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixSetVariable);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
                         break;
                     case "Update":
                         this.ParseUpdateElement(child);
@@ -361,7 +361,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new WixBundleTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new WixBundleSymbol(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     Version = version,
@@ -385,46 +385,46 @@ namespace WixToolset.Core
                 if (!String.IsNullOrEmpty(logVariablePrefixAndExtension))
                 {
                     var split = logVariablePrefixAndExtension.Split(':');
-                    tuple.LogPathVariable = split[0];
-                    tuple.LogPrefix = split[1];
-                    tuple.LogExtension = split[2];
+                    symbol.LogPathVariable = split[0];
+                    symbol.LogPrefix = split[1];
+                    symbol.LogExtension = split[2];
                 }
 
                 if (null != upgradeCode)
                 {
-                    this.Core.AddTuple(new WixRelatedBundleTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new WixRelatedBundleSymbol(sourceLineNumbers)
                     {
                         BundleId = upgradeCode,
                         Action = RelatedBundleActionType.Upgrade,
                     });
                 }
 
-                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, Compiler.BurnDefaultAttachedContainerId)
+                this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnDefaultAttachedContainerId)
                 {
                     Name = "bundle-attached.cab",
                     Type = ContainerType.Attached,
                 });
 
                 // Ensure that the bundle stores the well-known persisted values.
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_NAME))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_NAME))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true,
@@ -529,7 +529,7 @@ namespace WixToolset.Core
             {
                 this.CreatePayloadRow(sourceLineNumbers, id, Path.GetFileName(sourceFile), sourceFile, null, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, ComplexReferenceChildType.Unknown, null, YesNoDefaultType.Yes, YesNoType.Yes, null, null, null);
 
-                this.Core.AddTuple(new WixBundleCatalogTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixBundleCatalogSymbol(sourceLineNumbers, id)
                 {
                     PayloadRef = id.Id,
                 });
@@ -631,7 +631,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     Type = type,
@@ -694,7 +694,7 @@ namespace WixToolset.Core
             // Add the application as an attached container and if an Id was provided add that too.
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, Compiler.BurnUXContainerId)
+                this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
                 {
                     Name = "bundle-ux.cab",
                     Type = ContainerType.Attached
@@ -702,7 +702,7 @@ namespace WixToolset.Core
 
                 if (null != id)
                 {
-                    this.Core.AddTuple(new WixBootstrapperApplicationTuple(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id));
                 }
             }
         }
@@ -770,7 +770,7 @@ namespace WixToolset.Core
             }
             else
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBootstrapperApplication, id);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, id);
             }
         }
 
@@ -786,7 +786,7 @@ namespace WixToolset.Core
             string customDataId = null;
             WixBundleCustomDataType? customDataType = null;
             string extensionId = null;
-            var attributeDefinitions = new List<WixBundleCustomDataAttributeTuple>();
+            var attributeDefinitions = new List<WixBundleCustomDataAttributeSymbol>();
             var foundAttributeDefinitions = false;
 
             foreach (var attrib in node.Attributes())
@@ -816,7 +816,7 @@ namespace WixToolset.Core
                             break;
                         case "ExtensionId":
                             extensionId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundleExtension, extensionId);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundleExtension, extensionId);
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -890,9 +890,9 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    var attributeNames = String.Join(new string(WixBundleCustomDataTuple.AttributeNamesSeparator, 1), attributeDefinitions.Select(c => c.Name));
+                    var attributeNames = String.Join(new string(WixBundleCustomDataSymbol.AttributeNamesSeparator, 1), attributeDefinitions.Select(c => c.Name));
 
-                    this.Core.AddTuple(new WixBundleCustomDataTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, customDataId))
+                    this.Core.AddSymbol(new WixBundleCustomDataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, customDataId))
                     {
                         AttributeNames = attributeNames,
                         Type = customDataType.Value,
@@ -975,7 +975,7 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="sourceLineNumbers">Element's SourceLineNumbers.</param>
         /// <param name="customDataId">BundleCustomData Id.</param>
-        private WixBundleCustomDataAttributeTuple ParseBundleAttributeDefinitionElement(XElement node, SourceLineNumber sourceLineNumbers, string customDataId)
+        private WixBundleCustomDataAttributeSymbol ParseBundleAttributeDefinitionElement(XElement node, SourceLineNumber sourceLineNumbers, string customDataId)
         {
             string attributeName = null;
 
@@ -1004,7 +1004,7 @@ namespace WixToolset.Core
                 return null;
             }
 
-            var customDataAttribute = this.Core.AddTuple(new WixBundleCustomDataAttributeTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, attributeName))
+            var customDataAttribute = this.Core.AddSymbol(new WixBundleCustomDataAttributeSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, attributeName))
             {
                 CustomDataRef = customDataId,
                 Name = attributeName,
@@ -1058,7 +1058,7 @@ namespace WixToolset.Core
 
                         if (!this.Core.EncounteredError)
                         {
-                            this.Core.AddTuple(new WixBundleCustomDataCellTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, elementId, attributeName))
+                            this.Core.AddSymbol(new WixBundleCustomDataCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, elementId, attributeName))
                             {
                                 ElementId = elementId,
                                 AttributeRef = attributeName,
@@ -1075,7 +1075,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundleCustomData, customDataId);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundleCustomData, customDataId);
             }
         }
 
@@ -1138,7 +1138,7 @@ namespace WixToolset.Core
             // Add the BundleExtension.
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleExtensionTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixBundleExtensionSymbol(sourceLineNumbers, id)
                 {
                     PayloadRef = id.Id,
                 });
@@ -1236,7 +1236,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixUpdateRegistrationTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixUpdateRegistrationSymbol(sourceLineNumbers)
                 {
                     Manufacturer = manufacturer,
                     Department = department,
@@ -1493,15 +1493,15 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        private WixBundlePayloadTuple CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
+        private WixBundlePayloadSymbol CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
             Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, YesNoDefaultType compressed, YesNoType enableSignatureVerification, string displayName, string description,
             RemotePayload remotePayload)
         {
-            WixBundlePayloadTuple tuple = null;
+            WixBundlePayloadSymbol symbol = null;
 
             if (!this.Core.EncounteredError)
             {
-                tuple = this.Core.AddTuple(new WixBundlePayloadTuple(sourceLineNumbers, id)
+                symbol = this.Core.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, id)
                 {
                     Name = String.IsNullOrEmpty(name) ? Path.GetFileName(sourceFile) : name,
                     SourceFile = new IntermediateFieldPathValue { Path = sourceFile },
@@ -1515,19 +1515,19 @@ namespace WixToolset.Core
 
                 if (null != remotePayload)
                 {
-                    tuple.Description = remotePayload.Description;
-                    tuple.DisplayName = remotePayload.ProductName;
-                    tuple.Hash = remotePayload.Hash;
-                    tuple.PublicKey = remotePayload.CertificatePublicKey;
-                    tuple.Thumbprint = remotePayload.CertificateThumbprint;
-                    tuple.FileSize = remotePayload.Size;
-                    tuple.Version = remotePayload.Version;
+                    symbol.Description = remotePayload.Description;
+                    symbol.DisplayName = remotePayload.ProductName;
+                    symbol.Hash = remotePayload.Hash;
+                    symbol.PublicKey = remotePayload.CertificatePublicKey;
+                    symbol.Thumbprint = remotePayload.CertificateThumbprint;
+                    symbol.FileSize = remotePayload.Size;
+                    symbol.Version = remotePayload.Version;
                 }
 
                 this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId.Id, ComplexReferenceChildType.Payload, id.Id, previousType, previousId?.Id);
             }
 
-            return tuple;
+            return symbol;
         }
 
         /// <summary>
@@ -1599,7 +1599,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundlePayloadGroupTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixBundlePayloadGroupSymbol(sourceLineNumbers, id));
 
                 this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PayloadGroup, id.Id, ComplexReferenceChildType.Unknown, null);
             }
@@ -1627,7 +1627,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePayloadGroup, id.Id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, id.Id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -1682,7 +1682,7 @@ namespace WixToolset.Core
                 // TODO: Should we define our own enum for this, just to ensure there's no "cross-contamination"?
                 // TODO: Also, we could potentially include an 'Attributes' field to track things like
                 // 'before' vs. 'after', and explicit vs. inferred dependencies.
-                this.Core.AddTuple(new WixOrderingTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixOrderingSymbol(sourceLineNumbers)
                 {
                     ItemType = type,
                     ItemIdRef = id,
@@ -1739,7 +1739,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundlePackageExitCodeTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixBundlePackageExitCodeSymbol(sourceLineNumbers)
                 {
                     ChainPackageId = packageId,
                     Code = value,
@@ -1847,7 +1847,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixChainTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixChainSymbol(sourceLineNumbers)
                 {
                     Attributes = attributes
                 });
@@ -2393,13 +2393,13 @@ namespace WixToolset.Core
                 this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, ComplexReferenceParentType.Package, id,
                     ComplexReferenceChildType.Unknown, null, compressed, enableSignatureVerification, displayName, description, remotePayload);
 
-                this.Core.AddTuple(new WixChainItemTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
                 WixBundlePackageAttributes attributes = 0;
                 attributes |= (YesNoType.Yes == permanent) ? WixBundlePackageAttributes.Permanent : 0;
                 attributes |= (YesNoType.Yes == visible) ? WixBundlePackageAttributes.Visible : 0;
 
-                var chainPackageTuple = this.Core.AddTuple(new WixBundlePackageTuple(sourceLineNumbers, id)
+                var chainPackageSymbol = this.Core.AddSymbol(new WixBundlePackageSymbol(sourceLineNumbers, id)
                 {
                     Type = packageType,
                     PayloadRef = id.Id,
@@ -2412,28 +2412,28 @@ namespace WixToolset.Core
 
                 if (YesNoAlwaysType.NotSet != cache)
                 {
-                    chainPackageTuple.Cache = cache;
+                    chainPackageSymbol.Cache = cache;
                 }
 
                 if (YesNoType.NotSet != vital)
                 {
-                    chainPackageTuple.Vital = (vital == YesNoType.Yes);
+                    chainPackageSymbol.Vital = (vital == YesNoType.Yes);
                 }
 
                 if (YesNoDefaultType.NotSet != perMachine)
                 {
-                    chainPackageTuple.PerMachine = perMachine;
+                    chainPackageSymbol.PerMachine = perMachine;
                 }
 
                 if (CompilerConstants.IntegerNotSet != installSize)
                 {
-                    chainPackageTuple.InstallSize = installSize;
+                    chainPackageSymbol.InstallSize = installSize;
                 }
 
                 switch (packageType)
                 {
                 case WixBundlePackageType.Exe:
-                    this.Core.AddTuple(new WixBundleExePackageTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixBundleExePackageSymbol(sourceLineNumbers, id)
                     {
                         Attributes = WixBundleExePackageAttributes.None,
                         DetectCondition = detectCondition,
@@ -2449,7 +2449,7 @@ namespace WixToolset.Core
                     msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
                     msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
 
-                    this.Core.AddTuple(new WixBundleMsiPackageTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixBundleMsiPackageSymbol(sourceLineNumbers, id)
                     {
                         Attributes = msiAttributes
                     });
@@ -2459,14 +2459,14 @@ namespace WixToolset.Core
                     WixBundleMspPackageAttributes mspAttributes = 0;
                     mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
 
-                    this.Core.AddTuple(new WixBundleMspPackageTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixBundleMspPackageSymbol(sourceLineNumbers, id)
                     {
                         Attributes = mspAttributes
                     });
                     break;
 
                 case WixBundlePackageType.Msu:
-                    this.Core.AddTuple(new WixBundleMsuPackageTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixBundleMsuPackageSymbol(sourceLineNumbers, id)
                     {
                         DetectCondition = detectCondition,
                         MsuKB = msuKB
@@ -2530,7 +2530,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundlePackageCommandLineTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixBundlePackageCommandLineSymbol(sourceLineNumbers)
                 {
                     WixBundlePackageRef = packageId,
                     InstallArgument = installArgument,
@@ -2622,7 +2622,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundlePackageGroupTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixBundlePackageGroupSymbol(sourceLineNumbers, id));
             }
         }
 
@@ -2664,7 +2664,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePackageGroup, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackageGroup, id);
                         break;
                     case "After":
                         after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -2717,9 +2717,9 @@ namespace WixToolset.Core
         /// <param name="previousId">Identifier of previous item, if any.</param>
         private void CreateRollbackBoundary(SourceLineNumber sourceLineNumbers, Identifier id, YesNoType vital, YesNoType transaction, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
         {
-            this.Core.AddTuple(new WixChainItemTuple(sourceLineNumbers, id));
+            this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
-            var rollbackBoundary = this.Core.AddTuple(new WixBundleRollbackBoundaryTuple(sourceLineNumbers, id));
+            var rollbackBoundary = this.Core.AddSymbol(new WixBundleRollbackBoundarySymbol(sourceLineNumbers, id));
 
             if (YesNoType.NotSet != vital)
             {
@@ -2812,7 +2812,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new WixBundleMsiPropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
+                var symbol = this.Core.AddSymbol(new WixBundleMsiPropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
                 {
                     PackageRef = packageId,
                     Name = name,
@@ -2821,7 +2821,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(condition))
                 {
-                    tuple.Condition = condition;
+                    symbol.Condition = condition;
                 }
             }
         }
@@ -2844,7 +2844,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePackage, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackage, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2866,7 +2866,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleSlipstreamMspTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, id))
+                this.Core.AddSymbol(new WixBundleSlipstreamMspSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, id))
                 {
                     TargetPackageRef = packageId,
                     MspPackageRef = id
@@ -2940,7 +2940,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixRelatedBundleTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixRelatedBundleSymbol(sourceLineNumbers)
                 {
                     BundleId = id,
                     Action = actionType,
@@ -2986,7 +2986,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleUpdateTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixBundleUpdateSymbol(sourceLineNumbers)
                 {
                     Location = location
                 });
@@ -3052,11 +3052,11 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("sbv", variable, condition, after, value, type);
             }
 
-            this.Core.CreateWixSearchTuple(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
+            this.Core.CreateWixSearchSymbol(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
 
             if (!this.Messaging.EncounteredError)
             {
-                this.Core.AddTuple(new WixSetVariableTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixSetVariableSymbol(sourceLineNumbers, id)
                 {
                     Value = value,
                     Type = type,
@@ -3130,7 +3130,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
                 {
                     Value = value,
                     Type = type,
@@ -3145,7 +3145,7 @@ namespace WixToolset.Core
             var newType = type;
             if (newType == null && value != null)
             {
-                // Infer the type from the current value... 
+                // Infer the type from the current value...
                 if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
                 {
                     // Version constructor does not support simple "v#" syntax so check to see if the value is

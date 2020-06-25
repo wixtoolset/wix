@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -132,72 +132,72 @@ namespace WixToolset.Core
         {
             foreach (var section in context.IntermediateRepresentation.Sections)
             {
-                foreach (var tuple in section.Tuples.OfType<DialogTuple>())
+                foreach (var symbol in section.Symbols.OfType<DialogSymbol>())
                 {
-                    if (this.VariableResolver.TryGetLocalizedControl(tuple.Id.Id, null, out var localizedControl))
+                    if (this.VariableResolver.TryGetLocalizedControl(symbol.Id.Id, null, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
-                            tuple.HCentering = localizedControl.X;
+                            symbol.HCentering = localizedControl.X;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Y)
                         {
-                            tuple.VCentering = localizedControl.Y;
+                            symbol.VCentering = localizedControl.Y;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Width)
                         {
-                            tuple.Width = localizedControl.Width;
+                            symbol.Width = localizedControl.Width;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Height)
                         {
-                            tuple.Height = localizedControl.Height;
+                            symbol.Height = localizedControl.Height;
                         }
 
-                        tuple.RightAligned |= localizedControl.RightAligned;
-                        tuple.RightToLeft |= localizedControl.RightToLeft;
-                        tuple.LeftScroll |= localizedControl.LeftScroll;
+                        symbol.RightAligned |= localizedControl.RightAligned;
+                        symbol.RightToLeft |= localizedControl.RightToLeft;
+                        symbol.LeftScroll |= localizedControl.LeftScroll;
 
                         if (!String.IsNullOrEmpty(localizedControl.Text))
                         {
-                            tuple.Title = localizedControl.Text;
+                            symbol.Title = localizedControl.Text;
                         }
                     }
                 }
 
-                foreach (var tuple in section.Tuples.OfType<ControlTuple>())
+                foreach (var symbol in section.Symbols.OfType<ControlSymbol>())
                 {
-                    if (this.VariableResolver.TryGetLocalizedControl(tuple.DialogRef, tuple.Control, out var localizedControl))
+                    if (this.VariableResolver.TryGetLocalizedControl(symbol.DialogRef, symbol.Control, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
-                            tuple.X = localizedControl.X;
+                            symbol.X = localizedControl.X;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Y)
                         {
-                            tuple.Y = localizedControl.Y;
+                            symbol.Y = localizedControl.Y;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Width)
                         {
-                            tuple.Width = localizedControl.Width;
+                            symbol.Width = localizedControl.Width;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Height)
                         {
-                            tuple.Height = localizedControl.Height;
+                            symbol.Height = localizedControl.Height;
                         }
 
-                        tuple.RightAligned |= localizedControl.RightAligned;
-                        tuple.RightToLeft |= localizedControl.RightToLeft;
-                        tuple.LeftScroll |= localizedControl.LeftScroll;
+                        symbol.RightAligned |= localizedControl.RightAligned;
+                        symbol.RightToLeft |= localizedControl.RightToLeft;
+                        symbol.LeftScroll |= localizedControl.LeftScroll;
 
                         if (!String.IsNullOrEmpty(localizedControl.Text))
                         {
-                            tuple.Text = localizedControl.Text;
+                            symbol.Text = localizedControl.Text;
                         }
                     }
                 }
@@ -215,10 +215,10 @@ namespace WixToolset.Core
             }
 
             // Gather all the wix variables.
-            var wixVariableTuples = context.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
-            foreach (var tuple in wixVariableTuples)
+            var wixVariableSymbols = context.IntermediateRepresentation.Sections.SelectMany(s => s.Symbols).OfType<WixVariableSymbol>();
+            foreach (var symbol in wixVariableSymbols)
             {
-                this.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.Id.Id, tuple.Value, tuple.Overridable);
+                this.VariableResolver.AddVariable(symbol.SourceLineNumbers, symbol.Id.Id, symbol.Value, symbol.Overridable);
             }
 
             return codepage;
@@ -234,7 +234,7 @@ namespace WixToolset.Core
             AddFilteredLocalizations(result, filter, localizations);
 
             // Filter localizations provided by extensions with data.
-            var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
+            var creator = context.ServiceProvider.GetService<ISymbolDefinitionCreator>();
 
             foreach (var data in context.ExtensionData)
             {

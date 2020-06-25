@@ -9,7 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Bind;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -41,7 +41,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public bool LongNamesInImage { private get; set; }
 
-        public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
+        public Func<MediaSymbol, string, string, string> ResolveMedia { private get; set; }
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
@@ -55,7 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var directories = new Dictionary<string, IResolvedDirectory>();
 
-            var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
+            var mediaRows = this.Section.Symbols.OfType<MediaSymbol>().ToDictionary(t => t.DiskId);
 
             using (var db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
             {
@@ -78,11 +78,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // for each file in the array of uncompressed files
                         foreach (FileFacade facade in this.FileFacades)
                         {
-                            var mediaTuple = mediaRows[facade.DiskId];
+                            var mediaSymbol = mediaRows[facade.DiskId];
                             string relativeFileLayoutPath = null;
-                            string mediaLayoutFolder = mediaTuple.Layout;
+                            string mediaLayoutFolder = mediaSymbol.Layout;
 
-                            var mediaLayoutDirectory = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
+                            var mediaLayoutDirectory = this.ResolveMedia(mediaSymbol, mediaLayoutFolder, this.LayoutDirectory);
 
                             // setup up the query record and find the appropriate file in the
                             // previously executed file view

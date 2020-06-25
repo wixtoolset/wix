@@ -6,58 +6,58 @@ namespace Example.Extension
     using WixToolset.Data;
     using WixToolset.Data.Burn;
 
-    public enum ExampleTupleDefinitionType
+    public enum ExampleSymbolDefinitionType
     {
         Example,
         ExampleSearch,
     }
 
-    public static class ExampleTupleDefinitions
+    public static class ExampleSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Example = new IntermediateTupleDefinition(
-            ExampleTupleDefinitionType.Example.ToString(),
+        public static readonly IntermediateSymbolDefinition Example = new IntermediateSymbolDefinition(
+            ExampleSymbolDefinitionType.Example.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExampleTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExampleSymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ExampleTuple));
+            typeof(ExampleSymbol));
 
-        public static readonly IntermediateTupleDefinition ExampleSearch = new IntermediateTupleDefinition(
-            ExampleTupleDefinitionType.ExampleSearch.ToString(),
+        public static readonly IntermediateSymbolDefinition ExampleSearch = new IntermediateSymbolDefinition(
+            ExampleSymbolDefinitionType.ExampleSearch.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExampleSearchTupleFields.SearchFor), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExampleSearchSymbolFields.SearchFor), IntermediateFieldType.String),
             },
-            typeof(ExampleSearchTuple));
+            typeof(ExampleSearchSymbol));
 
-        static ExampleTupleDefinitions()
+        static ExampleSymbolDefinitions()
         {
-            ExampleSearch.AddTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag);
+            ExampleSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
         }
 
-        public static bool TryGetTupleType(string name, out ExampleTupleDefinitionType type)
+        public static bool TryGetSymbolType(string name, out ExampleSymbolDefinitionType type)
         {
             return Enum.TryParse(name, out type);
         }
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!TryGetTupleType(name, out var type))
+            if (!TryGetSymbolType(name, out var type))
             {
                 return null;
             }
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(ExampleTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(ExampleSymbolDefinitionType type)
         {
             switch (type)
             {
-                case ExampleTupleDefinitionType.Example:
-                    return ExampleTupleDefinitions.Example;
+                case ExampleSymbolDefinitionType.Example:
+                    return ExampleSymbolDefinitions.Example;
 
-                case ExampleTupleDefinitionType.ExampleSearch:
-                    return ExampleTupleDefinitions.ExampleSearch;
+                case ExampleSymbolDefinitionType.ExampleSearch:
+                    return ExampleSymbolDefinitions.ExampleSearch;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

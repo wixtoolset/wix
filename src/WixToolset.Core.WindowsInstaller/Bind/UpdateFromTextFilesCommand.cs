@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class UpdateFromTextFilesCommand
@@ -23,17 +23,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            foreach (var bbControl in this.Section.Tuples.OfType<BBControlTuple>().Where(t => t.SourceFile != null))
+            foreach (var bbControl in this.Section.Symbols.OfType<BBControlSymbol>().Where(t => t.SourceFile != null))
             {
                 bbControl.Text = this.ReadTextFile(bbControl.SourceLineNumbers, bbControl.SourceFile.Path);
             }
 
-            foreach (var control in this.Section.Tuples.OfType<ControlTuple>().Where(t => t.SourceFile != null))
+            foreach (var control in this.Section.Symbols.OfType<ControlSymbol>().Where(t => t.SourceFile != null))
             {
                 control.Text = this.ReadTextFile(control.SourceLineNumbers, control.SourceFile.Path);
             }
 
-            foreach (var customAction in this.Section.Tuples.OfType<CustomActionTuple>().Where(c => c.ScriptFile != null))
+            foreach (var customAction in this.Section.Symbols.OfType<CustomActionSymbol>().Where(c => c.ScriptFile != null))
             {
                 customAction.Target = this.ReadTextFile(customAction.SourceLineNumbers, customAction.ScriptFile.Path);
             }

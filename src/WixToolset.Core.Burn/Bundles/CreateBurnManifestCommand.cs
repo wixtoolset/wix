@@ -12,20 +12,20 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<WixBundleContainerTuple> containers, WixChainTuple chainTuple, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundaryTuple> boundaries, IEnumerable<WixBundlePayloadTuple> uxPayloads, Dictionary<string, WixBundlePayloadTuple> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, IEnumerable<WixBundleCatalogTuple> catalogs, string intermediateFolder)
+        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, IEnumerable<WixBundleCatalogSymbol> catalogs, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendExtensions = backendExtensions;
             this.ExecutableName = executableName;
             this.Section = section;
-            this.BundleTuple = bundleTuple;
-            this.Chain = chainTuple;
+            this.BundleSymbol = bundleSymbol;
+            this.Chain = chainSymbol;
             this.Containers = containers;
             this.OrderedPackages = orderedPackages;
             this.RollbackBoundaries = boundaries;
@@ -46,23 +46,23 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        private WixBundleTuple BundleTuple { get; }
+        private WixBundleSymbol BundleSymbol { get; }
 
-        private WixChainTuple Chain { get; }
+        private WixChainSymbol Chain { get; }
 
-        private IEnumerable<WixBundleRollbackBoundaryTuple> RollbackBoundaries { get; }
+        private IEnumerable<WixBundleRollbackBoundarySymbol> RollbackBoundaries { get; }
 
         private IEnumerable<PackageFacade> OrderedPackages { get; }
 
         private IEnumerable<ISearchFacade> OrderedSearches { get; }
 
-        private Dictionary<string, WixBundlePayloadTuple> Payloads { get; }
+        private Dictionary<string, WixBundlePayloadSymbol> Payloads { get; }
 
-        private IEnumerable<WixBundleContainerTuple> Containers { get; }
+        private IEnumerable<WixBundleContainerSymbol> Containers { get; }
 
-        private IEnumerable<WixBundlePayloadTuple> UXContainerPayloads { get; }
+        private IEnumerable<WixBundlePayloadSymbol> UXContainerPayloads { get; }
 
-        private IEnumerable<WixBundleCatalogTuple> Catalogs { get; }
+        private IEnumerable<WixBundleCatalogSymbol> Catalogs { get; }
 
         private string IntermediateFolder { get; }
 
@@ -77,32 +77,32 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteStartElement("BurnManifest", BurnCommon.BurnNamespace);
 
                 // Write the condition, if there is one
-                if (null != this.BundleTuple.Condition)
+                if (null != this.BundleSymbol.Condition)
                 {
-                    writer.WriteElementString("Condition", this.BundleTuple.Condition);
+                    writer.WriteElementString("Condition", this.BundleSymbol.Condition);
                 }
 
                 // Write the log element if default logging wasn't disabled.
-                if (!String.IsNullOrEmpty(this.BundleTuple.LogPrefix))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.LogPrefix))
                 {
                     writer.WriteStartElement("Log");
-                    if (!String.IsNullOrEmpty(this.BundleTuple.LogPathVariable))
+                    if (!String.IsNullOrEmpty(this.BundleSymbol.LogPathVariable))
                     {
-                        writer.WriteAttributeString("PathVariable", this.BundleTuple.LogPathVariable);
+                        writer.WriteAttributeString("PathVariable", this.BundleSymbol.LogPathVariable);
                     }
-                    writer.WriteAttributeString("Prefix", this.BundleTuple.LogPrefix);
-                    writer.WriteAttributeString("Extension", this.BundleTuple.LogExtension);
+                    writer.WriteAttributeString("Prefix", this.BundleSymbol.LogPrefix);
+                    writer.WriteAttributeString("Extension", this.BundleSymbol.LogExtension);
                     writer.WriteEndElement();
                 }
 
 
                 // Get update if specified.
-                var updateTuple = this.Section.Tuples.OfType<WixBundleUpdateTuple>().FirstOrDefault();
+                var updateSymbol = this.Section.Symbols.OfType<WixBundleUpdateSymbol>().FirstOrDefault();
 
-                if (null != updateTuple)
+                if (null != updateSymbol)
                 {
                     writer.WriteStartElement("Update");
-                    writer.WriteAttributeString("Location", updateTuple.Location);
+                    writer.WriteAttributeString("Location", updateSymbol.Location);
                     writer.WriteEndElement(); // </Update>
                 }
 
@@ -110,7 +110,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 // For the related bundles with duplicated identifiers the second instance is ignored (i.e. the Duplicates
                 // enumeration in the index row list is not used).
-                var relatedBundles = this.Section.Tuples.OfType<WixRelatedBundleTuple>();
+                var relatedBundles = this.Section.Symbols.OfType<WixRelatedBundleSymbol>();
                 var distinctRelatedBundles = new HashSet<string>();
 
                 foreach (var relatedBundle in relatedBundles)
@@ -125,7 +125,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 // Write the variables
-                var variables = this.Section.Tuples.OfType<WixBundleVariableTuple>();
+                var variables = this.Section.Symbols.OfType<WixBundleVariableSymbol>();
 
                 foreach (var variable in variables)
                 {
@@ -149,7 +149,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 // write the UX element
                 writer.WriteStartElement("UX");
-                if (!String.IsNullOrEmpty(this.BundleTuple.SplashScreenSourceFile))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.SplashScreenSourceFile))
                 {
                     writer.WriteAttributeString("SplashScreen", "yes");
                 }
@@ -214,66 +214,66 @@ namespace WixToolset.Core.Burn.Bundles
                 // Write the registration information...
                 writer.WriteStartElement("Registration");
 
-                writer.WriteAttributeString("Id", this.BundleTuple.BundleId);
+                writer.WriteAttributeString("Id", this.BundleSymbol.BundleId);
                 writer.WriteAttributeString("ExecutableName", this.ExecutableName);
-                writer.WriteAttributeString("PerMachine", this.BundleTuple.PerMachine ? "yes" : "no");
-                writer.WriteAttributeString("Tag", this.BundleTuple.Tag);
-                writer.WriteAttributeString("Version", this.BundleTuple.Version);
-                writer.WriteAttributeString("ProviderKey", this.BundleTuple.ProviderKey);
+                writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
+                writer.WriteAttributeString("Tag", this.BundleSymbol.Tag);
+                writer.WriteAttributeString("Version", this.BundleSymbol.Version);
+                writer.WriteAttributeString("ProviderKey", this.BundleSymbol.ProviderKey);
 
                 writer.WriteStartElement("Arp");
-                writer.WriteAttributeString("Register", (this.BundleTuple.DisableModify || this.BundleTuple.SingleChangeUninstallButton) && this.BundleTuple.DisableRemove ? "no" : "yes"); // do not register if disabled modify and remove.
-                writer.WriteAttributeString("DisplayName", this.BundleTuple.Name);
-                writer.WriteAttributeString("DisplayVersion", this.BundleTuple.Version);
+                writer.WriteAttributeString("Register", (this.BundleSymbol.DisableModify || this.BundleSymbol.SingleChangeUninstallButton) && this.BundleSymbol.DisableRemove ? "no" : "yes"); // do not register if disabled modify and remove.
+                writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);
+                writer.WriteAttributeString("DisplayVersion", this.BundleSymbol.Version);
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.Manufacturer))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.Manufacturer))
                 {
-                    writer.WriteAttributeString("Publisher", this.BundleTuple.Manufacturer);
+                    writer.WriteAttributeString("Publisher", this.BundleSymbol.Manufacturer);
                 }
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.HelpUrl))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.HelpUrl))
                 {
-                    writer.WriteAttributeString("HelpLink", this.BundleTuple.HelpUrl);
+                    writer.WriteAttributeString("HelpLink", this.BundleSymbol.HelpUrl);
                 }
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.HelpTelephone))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.HelpTelephone))
                 {
-                    writer.WriteAttributeString("HelpTelephone", this.BundleTuple.HelpTelephone);
+                    writer.WriteAttributeString("HelpTelephone", this.BundleSymbol.HelpTelephone);
                 }
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.AboutUrl))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.AboutUrl))
                 {
-                    writer.WriteAttributeString("AboutUrl", this.BundleTuple.AboutUrl);
+                    writer.WriteAttributeString("AboutUrl", this.BundleSymbol.AboutUrl);
                 }
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.UpdateUrl))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.UpdateUrl))
                 {
-                    writer.WriteAttributeString("UpdateUrl", this.BundleTuple.UpdateUrl);
+                    writer.WriteAttributeString("UpdateUrl", this.BundleSymbol.UpdateUrl);
                 }
 
-                if (!String.IsNullOrEmpty(this.BundleTuple.ParentName))
+                if (!String.IsNullOrEmpty(this.BundleSymbol.ParentName))
                 {
-                    writer.WriteAttributeString("ParentDisplayName", this.BundleTuple.ParentName);
+                    writer.WriteAttributeString("ParentDisplayName", this.BundleSymbol.ParentName);
                 }
 
-                if (this.BundleTuple.DisableModify)
+                if (this.BundleSymbol.DisableModify)
                 {
                     writer.WriteAttributeString("DisableModify", "yes");
                 }
 
-                if (this.BundleTuple.DisableRemove)
+                if (this.BundleSymbol.DisableRemove)
                 {
                     writer.WriteAttributeString("DisableRemove", "yes");
                 }
 
-                if (this.BundleTuple.SingleChangeUninstallButton)
+                if (this.BundleSymbol.SingleChangeUninstallButton)
                 {
                     writer.WriteAttributeString("DisableModify", "button");
                 }
                 writer.WriteEndElement(); // </Arp>
 
                 // Get update registration if specified.
-                var updateRegistrationInfo = this.Section.Tuples.OfType<WixUpdateRegistrationTuple>().FirstOrDefault();
+                var updateRegistrationInfo = this.Section.Symbols.OfType<WixUpdateRegistrationSymbol>().FirstOrDefault();
 
                 if (null != updateRegistrationInfo)
                 {
@@ -327,28 +327,28 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 // Index a few tables by package.
-                var targetCodesByPatch = this.Section.Tuples.OfType<WixBundlePatchTargetCodeTuple>().ToLookup(r => r.PackageRef);
-                var msiFeaturesByPackage = this.Section.Tuples.OfType<WixBundleMsiFeatureTuple>().ToLookup(r => r.PackageRef);
-                var msiPropertiesByPackage = this.Section.Tuples.OfType<WixBundleMsiPropertyTuple>().ToLookup(r => r.PackageRef);
+                var targetCodesByPatch = this.Section.Symbols.OfType<WixBundlePatchTargetCodeSymbol>().ToLookup(r => r.PackageRef);
+                var msiFeaturesByPackage = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>().ToLookup(r => r.PackageRef);
+                var msiPropertiesByPackage = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>().ToLookup(r => r.PackageRef);
                 var payloadsByPackage = this.Payloads.Values.ToLookup(p => p.PackageRef);
-                var relatedPackagesByPackage = this.Section.Tuples.OfType<WixBundleRelatedPackageTuple>().ToLookup(r => r.PackageRef);
-                var slipstreamMspsByPackage = this.Section.Tuples.OfType<WixBundleSlipstreamMspTuple>().ToLookup(r => r.MspPackageRef);
-                var exitCodesByPackage = this.Section.Tuples.OfType<WixBundlePackageExitCodeTuple>().ToLookup(r => r.ChainPackageId);
-                var commandLinesByPackage = this.Section.Tuples.OfType<WixBundlePackageCommandLineTuple>().ToLookup(r => r.WixBundlePackageRef);
+                var relatedPackagesByPackage = this.Section.Symbols.OfType<WixBundleRelatedPackageSymbol>().ToLookup(r => r.PackageRef);
+                var slipstreamMspsByPackage = this.Section.Symbols.OfType<WixBundleSlipstreamMspSymbol>().ToLookup(r => r.MspPackageRef);
+                var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
+                var commandLinesByPackage = this.Section.Symbols.OfType<WixBundlePackageCommandLineSymbol>().ToLookup(r => r.WixBundlePackageRef);
 
-                var dependenciesByPackage = this.Section.Tuples.OfType<ProvidesDependencyTuple>().ToLookup(p => p.PackageRef);
+                var dependenciesByPackage = this.Section.Symbols.OfType<ProvidesDependencySymbol>().ToLookup(p => p.PackageRef);
 
 
                 // Build up the list of target codes from all the MSPs in the chain.
-                var targetCodes = new List<WixBundlePatchTargetCodeTuple>();
+                var targetCodes = new List<WixBundlePatchTargetCodeSymbol>();
 
                 foreach (var package in this.OrderedPackages)
                 {
-                    writer.WriteStartElement(String.Format(CultureInfo.InvariantCulture, "{0}Package", package.PackageTuple.Type));
+                    writer.WriteStartElement(String.Format(CultureInfo.InvariantCulture, "{0}Package", package.PackageSymbol.Type));
 
                     writer.WriteAttributeString("Id", package.PackageId);
 
-                    switch (package.PackageTuple.Cache)
+                    switch (package.PackageSymbol.Cache)
                     {
                         case YesNoAlwaysType.No:
                             writer.WriteAttributeString("Cache", "no");
@@ -361,39 +361,39 @@ namespace WixToolset.Core.Burn.Bundles
                             break;
                     }
 
-                    writer.WriteAttributeString("CacheId", package.PackageTuple.CacheId);
-                    writer.WriteAttributeString("InstallSize", Convert.ToString(package.PackageTuple.InstallSize));
-                    writer.WriteAttributeString("Size", Convert.ToString(package.PackageTuple.Size));
-                    writer.WriteAttributeString("PerMachine", YesNoDefaultType.Yes == package.PackageTuple.PerMachine ? "yes" : "no");
-                    writer.WriteAttributeString("Permanent", package.PackageTuple.Permanent ? "yes" : "no");
-                    writer.WriteAttributeString("Vital", package.PackageTuple.Vital == false ? "no" : "yes");
+                    writer.WriteAttributeString("CacheId", package.PackageSymbol.CacheId);
+                    writer.WriteAttributeString("InstallSize", Convert.ToString(package.PackageSymbol.InstallSize));
+                    writer.WriteAttributeString("Size", Convert.ToString(package.PackageSymbol.Size));
+                    writer.WriteAttributeString("PerMachine", YesNoDefaultType.Yes == package.PackageSymbol.PerMachine ? "yes" : "no");
+                    writer.WriteAttributeString("Permanent", package.PackageSymbol.Permanent ? "yes" : "no");
+                    writer.WriteAttributeString("Vital", package.PackageSymbol.Vital == false ? "no" : "yes");
 
-                    if (null != package.PackageTuple.RollbackBoundaryRef)
+                    if (null != package.PackageSymbol.RollbackBoundaryRef)
                     {
-                        writer.WriteAttributeString("RollbackBoundaryForward", package.PackageTuple.RollbackBoundaryRef);
+                        writer.WriteAttributeString("RollbackBoundaryForward", package.PackageSymbol.RollbackBoundaryRef);
                     }
 
-                    if (!String.IsNullOrEmpty(package.PackageTuple.RollbackBoundaryBackwardRef))
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.RollbackBoundaryBackwardRef))
                     {
-                        writer.WriteAttributeString("RollbackBoundaryBackward", package.PackageTuple.RollbackBoundaryBackwardRef);
+                        writer.WriteAttributeString("RollbackBoundaryBackward", package.PackageSymbol.RollbackBoundaryBackwardRef);
                     }
 
-                    if (!String.IsNullOrEmpty(package.PackageTuple.LogPathVariable))
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.LogPathVariable))
                     {
-                        writer.WriteAttributeString("LogPathVariable", package.PackageTuple.LogPathVariable);
+                        writer.WriteAttributeString("LogPathVariable", package.PackageSymbol.LogPathVariable);
                     }
 
-                    if (!String.IsNullOrEmpty(package.PackageTuple.RollbackLogPathVariable))
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.RollbackLogPathVariable))
                     {
-                        writer.WriteAttributeString("RollbackLogPathVariable", package.PackageTuple.RollbackLogPathVariable);
+                        writer.WriteAttributeString("RollbackLogPathVariable", package.PackageSymbol.RollbackLogPathVariable);
                     }
 
-                    if (!String.IsNullOrEmpty(package.PackageTuple.InstallCondition))
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.InstallCondition))
                     {
-                        writer.WriteAttributeString("InstallCondition", package.PackageTuple.InstallCondition);
+                        writer.WriteAttributeString("InstallCondition", package.PackageSymbol.InstallCondition);
                     }
 
-                    if (package.SpecificPackageTuple is WixBundleExePackageTuple exePackage) // EXE
+                    if (package.SpecificPackageSymbol is WixBundleExePackageSymbol exePackage) // EXE
                     {
                         writer.WriteAttributeString("DetectCondition", exePackage.DetectCondition);
                         writer.WriteAttributeString("InstallArguments", exePackage.InstallCommand);
@@ -405,7 +405,7 @@ namespace WixToolset.Core.Burn.Bundles
                             writer.WriteAttributeString("Protocol", exePackage.ExeProtocol);
                         }
                     }
-                    else if (package.SpecificPackageTuple is WixBundleMsiPackageTuple msiPackage) // MSI
+                    else if (package.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage) // MSI
                     {
                         writer.WriteAttributeString("ProductCode", msiPackage.ProductCode);
                         writer.WriteAttributeString("Language", msiPackage.ProductLanguage.ToString(CultureInfo.InvariantCulture));
@@ -415,7 +415,7 @@ namespace WixToolset.Core.Burn.Bundles
                             writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
                         }
                     }
-                    else if (package.SpecificPackageTuple is WixBundleMspPackageTuple mspPackage) // MSP
+                    else if (package.SpecificPackageSymbol is WixBundleMspPackageSymbol mspPackage) // MSP
                     {
                         writer.WriteAttributeString("PatchCode", mspPackage.PatchCode);
                         writer.WriteAttributeString("PatchXml", mspPackage.PatchXml);
@@ -436,7 +436,7 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                         }
                     }
-                    else if (package.SpecificPackageTuple is WixBundleMsuPackageTuple msuPackage) // MSU
+                    else if (package.SpecificPackageSymbol is WixBundleMsuPackageSymbol msuPackage) // MSU
                     {
                         writer.WriteAttributeString("DetectCondition", msuPackage.DetectCondition);
                         writer.WriteAttributeString("KB", msuPackage.MsuKB);
@@ -567,14 +567,14 @@ namespace WixToolset.Core.Burn.Bundles
 
                     // Write any contained Payloads with the PackagePayload being first
                     writer.WriteStartElement("PayloadRef");
-                    writer.WriteAttributeString("Id", package.PackageTuple.PayloadRef);
+                    writer.WriteAttributeString("Id", package.PackageSymbol.PayloadRef);
                     writer.WriteEndElement();
 
                     var packagePayloads = payloadsByPackage[package.PackageId];
 
                     foreach (var payload in packagePayloads)
                     {
-                        if (payload.Id.Id != package.PackageTuple.PayloadRef)
+                        if (payload.Id.Id != package.PackageSymbol.PayloadRef)
                         {
                             writer.WriteStartElement("PayloadRef");
                             writer.WriteAttributeString("Id", payload.Id.Id);
@@ -598,7 +598,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 // Write the ApprovedExeForElevation elements.
-                var approvedExesForElevation = this.Section.Tuples.OfType<WixApprovedExeForElevationTuple>();
+                var approvedExesForElevation = this.Section.Symbols.OfType<WixApprovedExeForElevationSymbol>();
 
                 foreach (var approvedExeForElevation in approvedExesForElevation)
                 {
@@ -620,7 +620,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 // Write the BundleExtension elements.
-                var bundleExtensions = this.Section.Tuples.OfType<WixBundleExtensionTuple>();
+                var bundleExtensions = this.Section.Symbols.OfType<WixBundleExtensionSymbol>();
 
                 foreach (var bundleExtension in bundleExtensions)
                 {
@@ -635,7 +635,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void WriteBurnManifestContainerAttributes(XmlTextWriter writer, string executableName, WixBundleContainerTuple container)
+        private void WriteBurnManifestContainerAttributes(XmlTextWriter writer, string executableName, WixBundleContainerSymbol container)
         {
             writer.WriteAttributeString("Id", container.Id.Id);
             writer.WriteAttributeString("FileSize", container.Size.Value.ToString(CultureInfo.InvariantCulture));
@@ -669,7 +669,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void WriteBurnManifestPayloadAttributes(XmlTextWriter writer, WixBundlePayloadTuple payload, bool embeddedOnly, Dictionary<string, WixBundlePayloadTuple> allPayloads)
+        private void WriteBurnManifestPayloadAttributes(XmlTextWriter writer, WixBundlePayloadSymbol payload, bool embeddedOnly, Dictionary<string, WixBundlePayloadSymbol> allPayloads)
         {
             Debug.Assert(!embeddedOnly || PackagingType.Embedded == payload.Packaging);
 

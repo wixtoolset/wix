@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Binds the summary information table of a database.
@@ -49,13 +49,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var foundCreatingApplication = false;
             var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            foreach (var summaryInformationTuple in this.Section.Tuples.OfType<SummaryInformationTuple>())
+            foreach (var summaryInformationSymbol in this.Section.Symbols.OfType<SummaryInformationSymbol>())
             {
-                switch (summaryInformationTuple.PropertyId)
+                switch (summaryInformationSymbol.PropertyId)
                 {
                     case SummaryInformationType.Codepage: // PID_CODEPAGE
                         // make sure the code page is an int and not a web name or null
-                        var codepage = summaryInformationTuple.Value;
+                        var codepage = summaryInformationSymbol.Value;
 
                         if (String.IsNullOrEmpty(codepage))
                         {
@@ -63,11 +63,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            summaryInformationTuple.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationTuple.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
+                            summaryInformationSymbol.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationSymbol.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
                         }
                         break;
                     case SummaryInformationType.PackageCode: // PID_REVNUMBER
-                        var packageCode = summaryInformationTuple.Value;
+                        var packageCode = summaryInformationSymbol.Value;
 
                         if (SectionType.Module == this.Section.Type)
                         {
@@ -76,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         else if ("*" == packageCode)
                         {
                             // set the revision number (package/patch code) if it should be automatically generated
-                            summaryInformationTuple.Value = Common.GenerateGuid();
+                            summaryInformationSymbol.Value = Common.GenerateGuid();
                         }
                         break;
                     case SummaryInformationType.Created:
@@ -86,7 +86,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         foundLastSaveDataTime = true;
                         break;
                     case SummaryInformationType.WindowsInstallerVersion:
-                        this.InstallerVersion = summaryInformationTuple[SummaryInformationTupleFields.Value].AsNumber();
+                        this.InstallerVersion = summaryInformationSymbol[SummaryInformationSymbolFields.Value].AsNumber();
                         break;
                     case SummaryInformationType.WordCount:
                         if (SectionType.Patch == this.Section.Type)
@@ -96,7 +96,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            var attributes = summaryInformationTuple[SummaryInformationTupleFields.Value].AsNumber();
+                            var attributes = summaryInformationSymbol[SummaryInformationSymbolFields.Value].AsNumber();
                             this.LongNames = (0 == (attributes & 1));
                             this.Compressed = (2 == (attributes & 2));
                         }
@@ -110,7 +110,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the create time/date property if its not already set
             if (!foundCreateDataTime)
             {
-                this.Section.AddTuple(new SummaryInformationTuple(null)
+                this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
                     PropertyId = SummaryInformationType.Created,
                     Value = now,
@@ -120,7 +120,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the last save time/date property if its not already set
             if (!foundLastSaveDataTime)
             {
-                this.Section.AddTuple(new SummaryInformationTuple(null)
+                this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
                     PropertyId = SummaryInformationType.LastSaved,
                     Value = now,
@@ -130,7 +130,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the creating application property if its not already set
             if (!foundCreatingApplication)
             {
-                this.Section.AddTuple(new SummaryInformationTuple(null)
+                this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
                     PropertyId = SummaryInformationType.CreatingApplication,
                     Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString()),

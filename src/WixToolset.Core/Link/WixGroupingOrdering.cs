@@ -10,7 +10,7 @@ namespace WixToolset.Core.Link
     using System.Linq;
     using System.Text;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
     using WixToolset.Data.Burn;
 
@@ -155,7 +155,7 @@ namespace WixToolset.Core.Link
             foreach (int rowIndex in sortedIndexes)
             {
                 //wixGroupTable.Rows.RemoveAt(rowIndex);
-                this.EntrySection.Tuples.RemoveAt(rowIndex);
+                this.EntrySection.Symbols.RemoveAt(rowIndex);
             }
         }
 
@@ -173,7 +173,7 @@ namespace WixToolset.Core.Link
             // groups to read from that table instead.
             foreach (var item in orderedItems)
             {
-                this.EntrySection.AddTuple(new WixGroupTuple(item.Row.SourceLineNumbers)
+                this.EntrySection.AddSymbol(new WixGroupSymbol(item.Row.SourceLineNumbers)
                 {
                     ParentId = parentId,
                     ParentType = (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), parentType),
@@ -238,9 +238,9 @@ namespace WixToolset.Core.Link
             //}
 
             // Collect all of the groups
-            for (int rowIndex = 0; rowIndex < this.EntrySection.Tuples.Count; ++rowIndex)
+            for (int rowIndex = 0; rowIndex < this.EntrySection.Symbols.Count; ++rowIndex)
             {
-                if (this.EntrySection.Tuples[rowIndex] is WixGroupTuple row)
+                if (this.EntrySection.Symbols[rowIndex] is WixGroupSymbol row)
                 {
                     var rowParentName = row.ParentId;
                     var rowParentType = row.ParentType.ToString();
@@ -357,7 +357,7 @@ namespace WixToolset.Core.Link
             //    return;
             //}
 
-            foreach (var row in this.EntrySection.Tuples.OfType<WixOrderingTuple>())
+            foreach (var row in this.EntrySection.Symbols.OfType<WixOrderingSymbol>())
             {
                 var rowItemType = row.ItemType.ToString();
                 var rowItemName = row.ItemIdRef;
@@ -513,7 +513,7 @@ namespace WixToolset.Core.Link
             private readonly ItemCollection beforeItems; // for checking for circular references
             private bool flattenedAfterItems;
 
-            public Item(IntermediateTuple row, string type, string id)
+            public Item(IntermediateSymbol row, string type, string id)
             {
                 this.Row = row;
                 this.Type = type;
@@ -526,7 +526,7 @@ namespace WixToolset.Core.Link
                 this.flattenedAfterItems = false;
             }
 
-            public IntermediateTuple Row { get; private set; }
+            public IntermediateSymbol Row { get; private set; }
             public string Type { get; private set; }
             public string Id { get; private set; }
             public string Key { get; private set; }

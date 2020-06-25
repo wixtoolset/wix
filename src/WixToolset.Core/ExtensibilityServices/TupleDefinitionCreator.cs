@@ -8,9 +8,9 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    internal class TupleDefinitionCreator : ITupleDefinitionCreator
+    internal class SymbolDefinitionCreator : ISymbolDefinitionCreator
     {
-        public TupleDefinitionCreator(IWixToolsetServiceProvider serviceProvider)
+        public SymbolDefinitionCreator(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
@@ -19,9 +19,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IEnumerable<IExtensionData> ExtensionData { get; set; }
 
-        private Dictionary<string, IntermediateTupleDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateTupleDefinition>();
+        private Dictionary<string, IntermediateSymbolDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateSymbolDefinition>();
 
-        public void AddCustomTupleDefinition(IntermediateTupleDefinition definition)
+        public void AddCustomSymbolDefinition(IntermediateSymbolDefinition definition)
         {
             if (!this.CustomDefinitionByName.TryGetValue(definition.Name, out var existing) || definition.Revision > existing.Revision)
             {
@@ -29,12 +29,12 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             // First, look in the built-ins.
-            tupleDefinition = TupleDefinitions.ByName(name);
+            symbolDefinition = SymbolDefinitions.ByName(name);
 
-            if (tupleDefinition == null)
+            if (symbolDefinition == null)
             {
                 if (this.ExtensionData == null)
                 {
@@ -44,20 +44,20 @@ namespace WixToolset.Core.ExtensibilityServices
                 // Second, look in the extensions.
                 foreach (var data in this.ExtensionData)
                 {
-                    if (data.TryGetTupleDefinitionByName(name, out tupleDefinition))
+                    if (data.TryGetSymbolDefinitionByName(name, out symbolDefinition))
                     {
                         break;
                     }
                 }
 
-                // Finally, look in the custom tuple definitions provided during an intermediate load.
-                if (tupleDefinition == null)
+                // Finally, look in the custom symbol definitions provided during an intermediate load.
+                if (symbolDefinition == null)
                 {
-                    this.CustomDefinitionByName.TryGetValue(name, out tupleDefinition);
+                    this.CustomDefinitionByName.TryGetValue(name, out symbolDefinition);
                 }
             }
 
-            return tupleDefinition != null;
+            return symbolDefinition != null;
         }
 
         private void LoadExtensionData()

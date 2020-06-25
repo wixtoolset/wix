@@ -5,17 +5,17 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class GetPackageFacadesCommand
     {
-        public GetPackageFacadesCommand(IEnumerable<WixBundlePackageTuple> chainPackageTuples, IntermediateSection section)
+        public GetPackageFacadesCommand(IEnumerable<WixBundlePackageSymbol> chainPackageSymbols, IntermediateSection section)
         {
-            this.ChainPackageTuples = chainPackageTuples;
+            this.ChainPackageSymbols = chainPackageSymbols;
             this.Section = section;
         }
 
-        private IEnumerable<WixBundlePackageTuple> ChainPackageTuples { get; }
+        private IEnumerable<WixBundlePackageSymbol> ChainPackageSymbols { get; }
 
         private IntermediateSection Section { get; }
 
@@ -23,14 +23,14 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void Execute()
         {
-            var exePackages = this.Section.Tuples.OfType<WixBundleExePackageTuple>().ToDictionary(t => t.Id.Id);
-            var msiPackages = this.Section.Tuples.OfType<WixBundleMsiPackageTuple>().ToDictionary(t => t.Id.Id);
-            var mspPackages = this.Section.Tuples.OfType<WixBundleMspPackageTuple>().ToDictionary(t => t.Id.Id);
-            var msuPackages = this.Section.Tuples.OfType<WixBundleMsuPackageTuple>().ToDictionary(t => t.Id.Id);
+            var exePackages = this.Section.Symbols.OfType<WixBundleExePackageSymbol>().ToDictionary(t => t.Id.Id);
+            var msiPackages = this.Section.Symbols.OfType<WixBundleMsiPackageSymbol>().ToDictionary(t => t.Id.Id);
+            var mspPackages = this.Section.Symbols.OfType<WixBundleMspPackageSymbol>().ToDictionary(t => t.Id.Id);
+            var msuPackages = this.Section.Symbols.OfType<WixBundleMsuPackageSymbol>().ToDictionary(t => t.Id.Id);
 
             var facades = new Dictionary<string, PackageFacade>();
 
-            foreach (var package in this.ChainPackageTuples)
+            foreach (var package in this.ChainPackageSymbols)
             {
                 var id = package.Id.Id;
                 switch (package.Type)

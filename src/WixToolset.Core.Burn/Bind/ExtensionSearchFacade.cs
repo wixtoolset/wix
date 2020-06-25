@@ -3,13 +3,13 @@
 namespace WixToolset.Core.Burn
 {
     using System.Xml;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class ExtensionSearchFacade : BaseSearchFacade
     {
-        public ExtensionSearchFacade(WixSearchTuple searchTuple)
+        public ExtensionSearchFacade(WixSearchSymbol searchSymbol)
         {
-            this.SearchTuple = searchTuple;
+            this.SearchSymbol = searchSymbol;
         }
 
         public override void WriteXml(XmlTextWriter writer)

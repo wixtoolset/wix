@@ -3,17 +3,17 @@
 namespace WixToolset.Core.Link
 {
     using System;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
-    internal static class WixComplexReferenceTupleExtensions
+    internal static class WixComplexReferenceSymbolExtensions
     {
         /// <summary>
         /// Creates a shallow copy of the ComplexReference.
         /// </summary>
         /// <returns>A shallow copy of the ComplexReference.</returns>
-        public static WixComplexReferenceTuple Clone(this WixComplexReferenceTuple source)
+        public static WixComplexReferenceSymbol Clone(this WixComplexReferenceSymbol source)
         {
-            var clone = new WixComplexReferenceTuple(source.SourceLineNumbers, source.Id);
+            var clone = new WixComplexReferenceSymbol(source.SourceLineNumbers, source.Id);
             clone.ParentType = source.ParentType;
             clone.Parent = source.Parent;
             clone.ParentLanguage = source.ParentLanguage;
@@ -29,23 +29,23 @@ namespace WixToolset.Core.Link
         /// </summary>
         /// <param name="obj">Complex reference to compare to.</param>
         /// <returns>Zero if the objects are equivalent, negative number if the provided object is less, positive if greater.</returns>
-        public static int CompareToWithoutConsideringPrimary(this WixComplexReferenceTuple tuple, WixComplexReferenceTuple other)
+        public static int CompareToWithoutConsideringPrimary(this WixComplexReferenceSymbol symbol, WixComplexReferenceSymbol other)
         {
-            var comparison = tuple.ChildType - other.ChildType;
+            var comparison = symbol.ChildType - other.ChildType;
             if (0 == comparison)
             {
-                comparison = String.Compare(tuple.Child, other.Child, StringComparison.Ordinal);
+                comparison = String.Compare(symbol.Child, other.Child, StringComparison.Ordinal);
                 if (0 == comparison)
                 {
-                    comparison = tuple.ParentType - other.ParentType;
+                    comparison = symbol.ParentType - other.ParentType;
                     if (0 == comparison)
                     {
-                        string thisParentLanguage = null == tuple.ParentLanguage ? String.Empty : tuple.ParentLanguage;
+                        string thisParentLanguage = null == symbol.ParentLanguage ? String.Empty : symbol.ParentLanguage;
                         string otherParentLanguage = null == other.ParentLanguage ? String.Empty : other.ParentLanguage;
                         comparison = String.Compare(thisParentLanguage, otherParentLanguage, StringComparison.Ordinal);
                         if (0 == comparison)
                         {
-                            comparison = String.Compare(tuple.Parent, other.Parent, StringComparison.Ordinal);
+                            comparison = String.Compare(symbol.Parent, other.Parent, StringComparison.Ordinal);
                         }
                     }
                 }
@@ -58,15 +58,15 @@ namespace WixToolset.Core.Link
         /// Changes all of the parent references to point to the passed in parent reference.
         /// </summary>
         /// <param name="parent">New parent complex reference.</param>
-        public static void Reparent(this WixComplexReferenceTuple tuple, WixComplexReferenceTuple parent)
+        public static void Reparent(this WixComplexReferenceSymbol symbol, WixComplexReferenceSymbol parent)
         {
-            tuple.Parent = parent.Parent;
-            tuple.ParentLanguage = parent.ParentLanguage;
-            tuple.ParentType = parent.ParentType;
+            symbol.Parent = parent.Parent;
+            symbol.ParentLanguage = parent.ParentLanguage;
+            symbol.ParentType = parent.ParentType;
 
-            if (!tuple.IsPrimary)
+            if (!symbol.IsPrimary)
             {
-                tuple.IsPrimary = parent.IsPrimary;
+                symbol.IsPrimary = parent.IsPrimary;
             }
         }
     }

@@ -12,7 +12,7 @@ namespace WixToolset.Core
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -252,16 +252,16 @@ namespace WixToolset.Core
             {
                 foreach (var section in target.Sections)
                 {
-                    foreach (var tuple in section.Tuples)
+                    foreach (var symbol in section.Symbols)
                     {
-                        foreach (var field in tuple.Fields)
+                        foreach (var field in symbol.Fields)
                         {
                             if (field?.Type == IntermediateFieldType.String)
                             {
                                 var data = field.AsString();
                                 if (!String.IsNullOrEmpty(data))
                                 {
-                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(tuple.SourceLineNumbers, data, errorOnUnknown: false);
+                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(symbol.SourceLineNumbers, data, errorOnUnknown: false);
                                     if (resolved.UpdatedValue)
                                     {
                                         field.Set(resolved.Value);
@@ -332,7 +332,7 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.SearchPropertyNotUppercase(sourceLineNumbers, "Property", "Id", propertyId.Id));
                 }
 
-                this.Core.AddTuple(new AppSearchTuple(sourceLineNumbers, new Identifier(propertyId.Access, propertyId.Id, signature))
+                this.Core.AddSymbol(new AppSearchSymbol(sourceLineNumbers, new Identifier(propertyId.Access, propertyId.Id, signature))
                 {
                     PropertyRef = propertyId.Id,
                     SignatureRef = signature
@@ -377,7 +377,7 @@ namespace WixToolset.Core
             {
                 var section = this.Core.ActiveSection;
 
-                // Add the tuple to a separate section if requested.
+                // Add the symbol to a separate section if requested.
                 if (fragment)
                 {
                     var id = String.Concat(this.Core.ActiveSection.Id, ".", propertyId.Id);
@@ -385,24 +385,24 @@ namespace WixToolset.Core
                     section = this.Core.CreateSection(id, SectionType.Fragment, this.Core.ActiveSection.Codepage, this.Context.CompilationId);
 
                     // Reference the property in the active section.
-                    this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, propertyId.Id);
+                    this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, propertyId.Id);
                 }
 
-                // Allow tuple to exist with no value so that PropertyRefs can be made for *Search elements
-                // the linker will remove these tuples before the final output is created.
-                section.AddTuple(new PropertyTuple(sourceLineNumbers, propertyId)
+                // Allow symbol to exist with no value so that PropertyRefs can be made for *Search elements
+                // the linker will remove these symbols before the final output is created.
+                section.AddSymbol(new PropertySymbol(sourceLineNumbers, propertyId)
                 {
                     Value = value,
                 });
 
                 if (admin || hidden || secure)
                 {
-                    this.AddWixPropertyTuple(sourceLineNumbers, propertyId, admin, secure, hidden, section);
+                    this.AddWixPropertySymbol(sourceLineNumbers, propertyId, admin, secure, hidden, section);
                 }
             }
         }
 
-        private void AddWixPropertyTuple(SourceLineNumber sourceLineNumbers, Identifier property, bool admin, bool secure, bool hidden, IntermediateSection section = null)
+        private void AddWixPropertySymbol(SourceLineNumber sourceLineNumbers, Identifier property, bool admin, bool secure, bool hidden, IntermediateSection section = null)
         {
             if (secure && property.Id != property.Id.ToUpperInvariant())
             {
@@ -416,7 +416,7 @@ namespace WixToolset.Core
                 this.Core.EnsureTable(sourceLineNumbers, WindowsInstallerTableDefinitions.Property); // Property table is always required when using WixProperty table.
             }
 
-            section.AddTuple(new WixPropertyTuple(sourceLineNumbers)
+            section.AddSymbol(new WixPropertySymbol(sourceLineNumbers)
             {
                 PropertyRef = property.Id,
                 Admin = admin,
@@ -552,7 +552,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new AppIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
+                    this.Core.AddSymbol(new AppIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
                     {
                         AppId = appId,
                         RemoteServerName = remoteServerName,
@@ -650,7 +650,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiAssemblyNameTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
+                this.Core.AddSymbol(new MsiAssemblyNameSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
                 {
                     ComponentRef = componentId,
                     Name = id,
@@ -737,14 +737,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new BinaryTuple(sourceLineNumbers, id)
+                var symbol = this.Core.AddSymbol(new BinarySymbol(sourceLineNumbers, id)
                 {
                     Data = new IntermediateFieldPathValue { Path = sourceFile }
                 });
 
                 if (YesNoType.Yes == suppressModularization)
                 {
-                    this.Core.AddTuple(new WixSuppressModularizationTuple(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, id));
                 }
             }
 
@@ -814,7 +814,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new IconTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new IconSymbol(sourceLineNumbers, id)
                 {
                     Data = new IntermediateFieldPathValue { Path = sourceFile },
                 });
@@ -840,7 +840,7 @@ namespace WixToolset.Core
                     {
                     case "Property":
                         property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, property);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, property);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -936,7 +936,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixInstanceTransformsTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixInstanceTransformsSymbol(sourceLineNumbers, id)
                 {
                     PropertyId = propertyId,
                     ProductCode = productCode,
@@ -973,7 +973,7 @@ namespace WixToolset.Core
                         break;
                     case "Feature":
                         feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Feature, feature);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, feature);
                         break;
                     case "Qualifier":
                         qualifier = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1003,7 +1003,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new PublishComponentTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new PublishComponentSymbol(sourceLineNumbers)
                 {
                     ComponentId = id,
                     Qualifier = qualifier,
@@ -1187,7 +1187,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(localFileServer))
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, localFileServer);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, localFileServer);
             }
 
             // Local variables used strictly for child node processing.
@@ -1260,7 +1260,7 @@ namespace WixToolset.Core
                 {
                     foreach (var context in contexts)
                     {
-                        var tuple = this.Core.AddTuple(new ClassTuple(sourceLineNumbers)
+                        var symbol = this.Core.AddSymbol(new ClassSymbol(sourceLineNumbers)
                         {
                             CLSID = classId,
                             Context = context,
@@ -1276,19 +1276,19 @@ namespace WixToolset.Core
 
                         if (null != appId)
                         {
-                            tuple.AppIdRef = appId;
-                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.AppId, appId);
+                            symbol.AppIdRef = appId;
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.AppId, appId);
                         }
 
                         if (null != icon)
                         {
-                            tuple.IconRef = icon;
-                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Icon, icon);
+                            symbol.IconRef = icon;
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Icon, icon);
                         }
 
                         if (CompilerConstants.IntegerNotSet != iconIndex)
                         {
-                            tuple.IconIndex = iconIndex;
+                            symbol.IconIndex = iconIndex;
                         }
                     }
                 }
@@ -1369,7 +1369,7 @@ namespace WixToolset.Core
 
                     if (null != icon) // ClassId default icon
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, icon);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, icon);
 
                         icon = String.Format(CultureInfo.InvariantCulture, "\"[#{0}]\"", icon);
 
@@ -1649,7 +1649,7 @@ namespace WixToolset.Core
             string maximum = null;
             string minimum = null;
             var excludeLanguages = false;
-            var maxInclusive = false; 
+            var maxInclusive = false;
             var minInclusive = true;
 
             foreach (var attrib in node.Attributes())
@@ -1699,7 +1699,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new UpgradeSymbol(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     VersionMin = minimum,
@@ -1850,7 +1850,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -1867,7 +1867,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new RegLocatorTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new RegLocatorSymbol(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
@@ -1898,7 +1898,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.RegLocator, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.RegLocator, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2085,7 +2085,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new CCPSearchTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, signature)));
+                this.Core.AddSymbol(new CCPSearchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, signature)));
             }
         }
 
@@ -2351,10 +2351,10 @@ namespace WixToolset.Core
                         encounteredODBCDataSource = true;
                         break;
                     case "ODBCDriver":
-                        this.ParseODBCDriverOrTranslator(child, id.Id, null, TupleDefinitionType.ODBCDriver);
+                        this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCDriver);
                         break;
                     case "ODBCTranslator":
-                        this.ParseODBCDriverOrTranslator(child, id.Id, null, TupleDefinitionType.ODBCTranslator);
+                        this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCTranslator);
                         break;
                     case "ProgId":
                         var foundExtension = false;
@@ -2480,7 +2480,7 @@ namespace WixToolset.Core
             }
 
             // if there isn't an @Id attribute value, replace the placeholder with the id of the keypath.
-            // either an explicit KeyPath="yes" attribute must be specified or requirements for 
+            // either an explicit KeyPath="yes" attribute must be specified or requirements for
             // generatable guid must be met.
             if (componentIdPlaceholderWixVariable == id.Id)
             {
@@ -2505,7 +2505,7 @@ namespace WixToolset.Core
             // finally add the Component table row
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ComponentTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, id)
                 {
                     ComponentId = guid,
                     DirectoryRef = directoryId,
@@ -2525,7 +2525,7 @@ namespace WixToolset.Core
 
                 if (multiInstance)
                 {
-                    this.Core.AddTuple(new WixInstanceComponentTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixInstanceComponentSymbol(sourceLineNumbers, id)
                     {
                         ComponentRef = id.Id,
                     });
@@ -2533,7 +2533,7 @@ namespace WixToolset.Core
 
                 if (0 < symbols.Count)
                 {
-                    this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Component, id.Id))
+                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Component, id.Id))
                     {
                         SymbolType = SymbolPathType.Component,
                         SymbolId = id.Id,
@@ -2544,7 +2544,7 @@ namespace WixToolset.Core
                 // Complus
                 if (CompilerConstants.IntegerNotSet != comPlusBits)
                 {
-                    this.Core.AddTuple(new ComplusTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ComplusSymbol(sourceLineNumbers)
                     {
                         ComponentRef = id.Id,
                         ExpType = comPlusBits,
@@ -2643,7 +2643,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixComponentGroupTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixComponentGroupSymbol(sourceLineNumbers, id));
 
                 // Add this componentGroup and its parent in WixGroup.
                 this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.ComponentGroup, id.Id);
@@ -2673,7 +2673,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixComponentGroup, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixComponentGroup, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2722,7 +2722,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Component, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2846,7 +2846,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -2863,7 +2863,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new CompLocatorTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new CompLocatorSymbol(sourceLineNumbers, id)
                 {
                     SignatureRef = id.Id,
                     ComponentId = componentId,
@@ -2934,7 +2934,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new CreateFolderTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new CreateFolderSymbol(sourceLineNumbers)
                 {
                     DirectoryRef = directoryId,
                     ComponentRef = componentId,
@@ -2994,7 +2994,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                         }
                         fileId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, fileId);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, fileId);
                         break;
                     case "SourceDirectory":
                         sourceDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
@@ -3059,7 +3059,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new MoveFileTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new MoveFileSymbol(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         SourceName  = sourceName,
@@ -3104,7 +3104,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new DuplicateFileTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new DuplicateFileSymbol(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         FileRef = fileId,
@@ -3158,7 +3158,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.Binary;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, source); // add a reference to the appropriate Binary
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
                     case "Directory":
                         if (null != source)
@@ -3185,12 +3185,12 @@ namespace WixToolset.Core
                         sourceType = CustomActionSourceType.File;
                         targetType = CustomActionTargetType.TextData;
 
-                        // The target can be either a formatted error string or a literal 
+                        // The target can be either a formatted error string or a literal
                         // error number. Try to convert to error number to determine whether
                         // to add a reference. No need to look at the value.
                         if (Int32.TryParse(target, out var ignored))
                         {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Error, target);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Error, target);
                         }
                         break;
                     case "ExeCommand":
@@ -3238,7 +3238,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.File;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, source); // add a reference to the appropriate File
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, source); // add a reference to the appropriate File
                         break;
                     case "HideTarget":
                         hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -3459,7 +3459,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new CustomActionTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, id)
                 {
                     ExecutionType = executionType,
                     Source = source,
@@ -3478,7 +3478,7 @@ namespace WixToolset.Core
 
                 if (YesNoType.Yes == suppressModularization)
                 {
-                    this.Core.AddTuple(new WixSuppressModularizationTuple(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, id));
                 }
             }
         }
@@ -3487,9 +3487,9 @@ namespace WixToolset.Core
         /// Parses a simple reference element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="tupleDefinition">Tuple which contains the target of the simple reference.</param>
+        /// <param name="symbolDefinition">Symbol which contains the target of the simple reference.</param>
         /// <returns>Id of the referenced element.</returns>
-        private string ParseSimpleRefElement(XElement node, IntermediateTupleDefinition tupleDefinition)
+        private string ParseSimpleRefElement(XElement node, IntermediateSymbolDefinition symbolDefinition)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string id = null;
@@ -3502,7 +3502,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, tupleDefinition.Name, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, symbolDefinition.Name, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3565,7 +3565,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.MsiPatchSequence, primaryKeys);
+            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.MsiPatchSequence, primaryKeys);
 
             this.Core.ParseForExtensionElements(node);
 
@@ -3628,7 +3628,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string tableId = null;
             var unreal = false;
-            var columns = new List<WixCustomTableColumnTuple>();
+            var columns = new List<WixCustomTableColumnSymbol>();
 
             foreach (var attrib in node.Attributes())
             {
@@ -3699,9 +3699,9 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var columnNames = String.Join(new string(WixCustomTableTuple.ColumnNamesSeparator, 1), columns.Select(c => c.Name));
+                    var columnNames = String.Join(new string(WixCustomTableSymbol.ColumnNamesSeparator, 1), columns.Select(c => c.Name));
 
-                    this.Core.AddTuple(new WixCustomTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
+                    this.Core.AddSymbol(new WixCustomTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
                     {
                         ColumnNames = columnNames,
                         Unreal = unreal,
@@ -3716,7 +3716,7 @@ namespace WixToolset.Core
         /// <param name="child">Element to parse.</param>
         /// <param name="childSourceLineNumbers">Element's SourceLineNumbers.</param>
         /// <param name="tableId">Table Id.</param>
-        private WixCustomTableColumnTuple ParseColumnElement(XElement child, SourceLineNumber childSourceLineNumbers, string tableId)
+        private WixCustomTableColumnSymbol ParseColumnElement(XElement child, SourceLineNumber childSourceLineNumbers, string tableId)
         {
             string columnName = null;
             IntermediateFieldType? columnType = null;
@@ -3968,12 +3968,12 @@ namespace WixToolset.Core
                 return null;
             }
 
-            var attributes = primaryKey ? WixCustomTableColumnTupleAttributes.PrimaryKey : WixCustomTableColumnTupleAttributes.None;
-            attributes |= localizable ? WixCustomTableColumnTupleAttributes.Localizable : WixCustomTableColumnTupleAttributes.None;
-            attributes |= nullable ? WixCustomTableColumnTupleAttributes.Nullable : WixCustomTableColumnTupleAttributes.None;
-            attributes |= columnUnreal ? WixCustomTableColumnTupleAttributes.Unreal : WixCustomTableColumnTupleAttributes.None;
+            var attributes = primaryKey ? WixCustomTableColumnSymbolAttributes.PrimaryKey : WixCustomTableColumnSymbolAttributes.None;
+            attributes |= localizable ? WixCustomTableColumnSymbolAttributes.Localizable : WixCustomTableColumnSymbolAttributes.None;
+            attributes |= nullable ? WixCustomTableColumnSymbolAttributes.Nullable : WixCustomTableColumnSymbolAttributes.None;
+            attributes |= columnUnreal ? WixCustomTableColumnSymbolAttributes.Unreal : WixCustomTableColumnSymbolAttributes.None;
 
-            var column = this.Core.AddTuple(new WixCustomTableColumnTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
+            var column = this.Core.AddSymbol(new WixCustomTableColumnSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
             {
                 TableRef = tableId,
                 Name = columnName,
@@ -4038,7 +4038,7 @@ namespace WixToolset.Core
 
                         if (!this.Core.EncounteredError)
                         {
-                            this.Core.AddTuple(new WixCustomTableCellTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, rowId, columnName))
+                            this.Core.AddSymbol(new WixCustomTableCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, rowId, columnName))
                             {
                                 RowId = rowId,
                                 ColumnRef = columnName,
@@ -4055,7 +4055,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixCustomTable, tableId);
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableId);
             }
         }
 
@@ -4153,7 +4153,7 @@ namespace WixToolset.Core
                     if (inlineSyntax[0].EndsWith(":"))
                     {
                         parentId = inlineSyntax[0].TrimEnd(':');
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, parentId);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, parentId);
 
                         pathStartsAt = 1;
                     }
@@ -4298,7 +4298,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new DirectoryTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new DirectorySymbol(sourceLineNumbers, id)
                 {
                     ParentDirectoryRef = parentId,
                     Name = name,
@@ -4310,7 +4310,7 @@ namespace WixToolset.Core
 
                 if (null != symbols)
                 {
-                    this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, id)
                     {
                         SymbolType = SymbolPathType.Directory,
                         SymbolId = id.Id,
@@ -4340,7 +4340,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, id);
                         break;
                     case "DiskId":
                         diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
@@ -4487,7 +4487,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, TupleDefinitions.Signature);
+                        signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -4532,7 +4532,7 @@ namespace WixToolset.Core
                     signature = id.Id;
                 }
 
-                var tuple = this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(access, rowId, parentSignature, path))
+                var symbol = this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(access, rowId, parentSignature, path))
                 {
                     SignatureRef = rowId,
                     Parent = parentSignature,
@@ -4541,7 +4541,7 @@ namespace WixToolset.Core
 
                 if (CompilerConstants.IntegerNotSet != depth)
                 {
-                    tuple.Depth = depth;
+                    symbol.Depth = depth;
                 }
             }
 
@@ -4645,7 +4645,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, TupleDefinitions.Signature);
+                        signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -4659,7 +4659,7 @@ namespace WixToolset.Core
             }
 
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.DrLocator, id.Id, parentSignature, path);
+            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.DrLocator, id.Id, parentSignature, path);
 
             return signature;
         }
@@ -4670,7 +4670,7 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">The type of parent.</param>
         /// <param name="parentId">Optional identifer for parent feature.</param>
-        /// <param name="lastDisplay">Display value for last feature used to get the features to display in the same order as specified 
+        /// <param name="lastDisplay">Display value for last feature used to get the features to display in the same order as specified
         /// in the source code.</param>
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseFeatureElement(XElement node, ComplexReferenceParentType parentType, string parentId, ref int lastDisplay)
@@ -4899,7 +4899,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new FeatureTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new FeatureSymbol(sourceLineNumbers, id)
                 {
                     ParentFeatureRef = null, // this field is set in the linker
                     Title = title,
@@ -4941,7 +4941,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Feature, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, id);
                         break;
                     case "IgnoreParent":
                         ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -5091,7 +5091,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixFeatureGroupTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixFeatureGroupSymbol(sourceLineNumbers, id));
 
                 //Add this FeatureGroup and its parent in WixGroup.
                 this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.FeatureGroup, id.Id);
@@ -5121,7 +5121,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixFeatureGroup, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixFeatureGroup, id);
                         break;
                     case "IgnoreParent":
                         ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -5290,7 +5290,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new EnvironmentTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new EnvironmentSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     Value = value,
@@ -5347,7 +5347,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new ErrorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddSymbol(new ErrorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
                     Message = message
                 });
@@ -5436,7 +5436,7 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new ExtensionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
+                    this.Core.AddSymbol(new ExtensionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
                     {
                         Extension = extension,
                         ComponentRef = componentId,
@@ -5542,11 +5542,11 @@ namespace WixToolset.Core
                         break;
                     case "AssemblyApplication":
                         assemblyApplication = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, assemblyApplication);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyApplication);
                         break;
                     case "AssemblyManifest":
                         assemblyManifest = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, assemblyManifest);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyManifest);
                         break;
                     case "BindPath":
                         bindPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
@@ -5560,7 +5560,7 @@ namespace WixToolset.Core
                         break;
                     case "CompanionFile":
                         companionFile = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, companionFile);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, companionFile);
                         break;
                     case "Compressed":
                         var compressedValue = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -5781,10 +5781,10 @@ namespace WixToolset.Core
                         this.ParseRangeElement(child, ref ignoreOffsets, ref ignoreLengths);
                         break;
                     case "ODBCDriver":
-                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, TupleDefinitionType.ODBCDriver);
+                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCDriver);
                         break;
                     case "ODBCTranslator":
-                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, TupleDefinitionType.ODBCTranslator);
+                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCTranslator);
                         break;
                     case "Permission":
                         this.ParsePermissionElement(child, id.Id, "File");
@@ -5848,17 +5848,17 @@ namespace WixToolset.Core
                     source = null == name ? Path.Combine(source, shortName) : Path.Combine(source, name);
                 }
 
-                var attributes = FileTupleAttributes.None;
-                attributes |= readOnly ? FileTupleAttributes.ReadOnly : 0;
-                attributes |= hidden ? FileTupleAttributes.Hidden : 0;
-                attributes |= system ? FileTupleAttributes.System : 0;
-                attributes |= vital ? FileTupleAttributes.Vital : 0;
-                attributes |= checksum ? FileTupleAttributes.Checksum : 0;
-                attributes |= compressed.HasValue && compressed == true ? FileTupleAttributes.Compressed : 0;
-                attributes |= compressed.HasValue && compressed == false ? FileTupleAttributes.Uncompressed : 0;
-                attributes |= generatedShortFileName ? FileTupleAttributes.GeneratedShortFileName : 0;
+                var attributes = FileSymbolAttributes.None;
+                attributes |= readOnly ? FileSymbolAttributes.ReadOnly : 0;
+                attributes |= hidden ? FileSymbolAttributes.Hidden : 0;
+                attributes |= system ? FileSymbolAttributes.System : 0;
+                attributes |= vital ? FileSymbolAttributes.Vital : 0;
+                attributes |= checksum ? FileSymbolAttributes.Checksum : 0;
+                attributes |= compressed.HasValue && compressed == true ? FileSymbolAttributes.Compressed : 0;
+                attributes |= compressed.HasValue && compressed == false ? FileSymbolAttributes.Uncompressed : 0;
+                attributes |= generatedShortFileName ? FileSymbolAttributes.GeneratedShortFileName : 0;
 
-                this.Core.AddTuple(new FileTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new FileSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -5897,7 +5897,7 @@ namespace WixToolset.Core
 
                 if (AssemblyType.NotAnAssembly != assemblyType)
                 {
-                    this.Core.AddTuple(new AssemblyTuple(sourceLineNumbers, id)
+                    this.Core.AddSymbol(new AssemblySymbol(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         FeatureRef = Guid.Empty.ToString("B"),
@@ -5911,7 +5911,7 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet != diskId)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
             }
 
             // If this component does not have a companion file this file is a possible keypath.
@@ -6052,7 +6052,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new SignatureTuple(sourceLineNumbers, id)
+                var symbol = this.Core.AddSymbol(new SignatureSymbol(sourceLineNumbers, id)
                 {
                     FileName = name ?? shortName,
                     MinVersion = minVersion,
@@ -6062,22 +6062,22 @@ namespace WixToolset.Core
 
                 if (CompilerConstants.IntegerNotSet != minSize)
                 {
-                    tuple.MinSize = minSize;
+                    symbol.MinSize = minSize;
                 }
 
                 if (CompilerConstants.IntegerNotSet != maxSize)
                 {
-                    tuple.MaxSize = maxSize;
+                    symbol.MaxSize = maxSize;
                 }
 
                 if (CompilerConstants.IntegerNotSet != minDate)
                 {
-                    tuple.MinDate = minDate;
+                    symbol.MinDate = minDate;
                 }
 
                 if (CompilerConstants.IntegerNotSet != maxDate)
                 {
-                    tuple.MaxDate = maxDate;
+                    symbol.MaxDate = maxDate;
                 }
 
                 // Create a DrLocator row to associate the file with a directory
@@ -6088,7 +6088,7 @@ namespace WixToolset.Core
                     {
                         // Creates the DrLocator row for the directory search while
                         // the parent DirectorySearch creates the file locator row.
-                        this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, parentSignature, id.Id, String.Empty))
+                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, parentSignature, id.Id, String.Empty))
                         {
                             SignatureRef = parentSignature,
                             Parent = id.Id
@@ -6096,7 +6096,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id.Id, parentSignature, String.Empty))
+                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id.Id, parentSignature, String.Empty))
                         {
                             SignatureRef = id.Id,
                             Parent = parentSignature
@@ -6191,7 +6191,7 @@ namespace WixToolset.Core
                         this.ParseBundleExtensionElement(child);
                         break;
                     case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleExtension);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
                         break;
                     case "ComplianceCheck":
                         this.ParseComplianceCheckElement(child);
@@ -6209,7 +6209,7 @@ namespace WixToolset.Core
                         this.ParseCustomActionElement(child);
                         break;
                     case "CustomActionRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.CustomAction);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.CustomAction);
                         break;
                     case "CustomTable":
                         this.ParseCustomTableElement(child);
@@ -6224,7 +6224,7 @@ namespace WixToolset.Core
                         this.ParseEmbeddedChainerElement(child);
                         break;
                     case "EmbeddedChainerRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.MsiEmbeddedChainer);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.MsiEmbeddedChainer);
                         break;
                     case "EnsureTable":
                         this.ParseEnsureTableElement(child);
@@ -6276,7 +6276,7 @@ namespace WixToolset.Core
                         this.ParsePropertyElement(child);
                         break;
                     case "PropertyRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.Property);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
                         break;
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
@@ -6291,7 +6291,7 @@ namespace WixToolset.Core
                         this.ParseSetVariableElement(child);
                         break;
                     case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixSetVariable);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
                         break;
                     case "SFPCatalog":
                         string parentName = null;
@@ -6301,7 +6301,7 @@ namespace WixToolset.Core
                         this.ParseUIElement(child);
                         break;
                     case "UIRef":
-                        this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixUI);
                         break;
                     case "Upgrade":
                         this.ParseUpgradeElement(child);
@@ -6325,7 +6325,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError && null != id)
             {
-                this.Core.AddTuple(new WixFragmentTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixFragmentSymbol(sourceLineNumbers, id));
             }
         }
 
@@ -6377,7 +6377,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                 {
                     Condition = condition,
                     Description = message
@@ -6521,7 +6521,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new IniFileTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new IniFileSymbol(sourceLineNumbers, id)
                 {
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     DirProperty = directory,
@@ -6688,7 +6688,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -6705,7 +6705,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new IniLocatorTuple(sourceLineNumbers, id)
+                var symbol = this.Core.AddSymbol(new IniLocatorSymbol(sourceLineNumbers, id)
                 {
                     SignatureRef = id.Id,
                     FileName = this.GetMsiFilenameValue(shortName, name),
@@ -6716,7 +6716,7 @@ namespace WixToolset.Core
 
                 if (CompilerConstants.IntegerNotSet != field)
                 {
-                    tuple.Field = field;
+                    symbol.Field = field;
                 }
             }
 
@@ -6741,7 +6741,7 @@ namespace WixToolset.Core
                     {
                     case "Shared":
                         shared = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Component, shared);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, shared);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -6763,7 +6763,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new IsolatedComponentTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new IsolatedComponentSymbol(sourceLineNumbers)
                 {
                     SharedComponentRef = shared,
                     ApplicationComponentRef = componentId
@@ -6805,7 +6805,7 @@ namespace WixToolset.Core
                         {
                             if ("PatchCertificates" == node.Name.LocalName)
                             {
-                                this.Core.AddTuple(new MsiPatchCertificateTuple(sourceLineNumbers)
+                                this.Core.AddSymbol(new MsiPatchCertificateSymbol(sourceLineNumbers)
                                 {
                                     PatchCertificate = name,
                                     DigitalCertificateRef = name,
@@ -6813,7 +6813,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                this.Core.AddTuple(new MsiPackageCertificateTuple(sourceLineNumbers)
+                                this.Core.AddSymbol(new MsiPackageCertificateSymbol(sourceLineNumbers)
                                 {
                                     PackageCertificate = name,
                                     DigitalCertificateRef = name,
@@ -6889,7 +6889,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiDigitalCertificateTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new MsiDigitalCertificateSymbol(sourceLineNumbers, id)
                 {
                     CertData = sourceFile
                 });
@@ -6962,7 +6962,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiDigitalSignatureTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "Media", diskId))
+                this.Core.AddSymbol(new MsiDigitalSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "Media", diskId))
                 {
                     Table = "Media",
                     SignObject = diskId,
@@ -7084,7 +7084,7 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 // create the row that performs the upgrade (or downgrade)
-                var tuple = this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new UpgradeSymbol(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     Remove = removeFeatures,
@@ -7095,21 +7095,21 @@ namespace WixToolset.Core
 
                 if (allowDowngrades)
                 {
-                    tuple.VersionMin = "0";
-                    tuple.Language = productLanguage;
-                    tuple.VersionMinInclusive = true;
+                    symbol.VersionMin = "0";
+                    symbol.Language = productLanguage;
+                    symbol.VersionMinInclusive = true;
                 }
                 else
                 {
-                    tuple.VersionMax = productVersion;
-                    tuple.Language = productLanguage;
-                    tuple.VersionMaxInclusive = allowSameVersionUpgrades;
+                    symbol.VersionMax = productVersion;
+                    symbol.Language = productLanguage;
+                    symbol.VersionMaxInclusive = allowSameVersionUpgrades;
                 }
 
                 // Add launch condition that blocks upgrades
                 if (blockUpgrades)
                 {
-                    this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                     {
                         Condition = Common.UpgradePreventedCondition,
                         Description = downgradeErrorMessage
@@ -7119,7 +7119,7 @@ namespace WixToolset.Core
                 // now create the Upgrade row and launch conditions to prevent downgrades (unless explicitly permitted)
                 if (!allowDowngrades)
                 {
-                    this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new UpgradeSymbol(sourceLineNumbers)
                     {
                         UpgradeCode = upgradeCode,
                         VersionMin = productVersion,
@@ -7129,7 +7129,7 @@ namespace WixToolset.Core
                         ActionProperty = Common.DowngradeDetectedProperty
                     });
 
-                    this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                     {
                         Condition = Common.DowngradePreventedCondition,
                         Description = downgradeErrorMessage
@@ -7158,7 +7158,7 @@ namespace WixToolset.Core
                         break;
                 }
 
-                this.Core.ScheduleActionTuple(sourceLineNumbers, AccessModifier.Public, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts", afterAction: after);
+                this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Public, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts", afterAction: after);
             }
         }
 
@@ -7199,7 +7199,7 @@ namespace WixToolset.Core
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
                         break;
                     case "EmbedCab":
                         embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -7331,7 +7331,7 @@ namespace WixToolset.Core
             // add the row to the section
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MediaTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
                     DiskId = id,
                     DiskPrompt = diskPrompt,
@@ -7344,7 +7344,7 @@ namespace WixToolset.Core
 
                 if (null != symbols)
                 {
-                    this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Media, id))
+                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Media, id))
                     {
                         SymbolType = SymbolPathType.Media,
                         SymbolId = id.ToString(CultureInfo.InvariantCulture),
@@ -7406,7 +7406,7 @@ namespace WixToolset.Core
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
                         this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                         break;
                     case "EmbedCab":
@@ -7440,12 +7440,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MediaTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, 1))
+                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, 1))
                 {
                     DiskId = 1
                 });
 
-                this.Core.AddTuple(new WixMediaTemplateTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixMediaTemplateSymbol(sourceLineNumbers)
                 {
                     CabinetTemplate = cabinetTemplate,
                     VolumeLabel = volumeLabel,
@@ -7478,7 +7478,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             var configData = String.Empty;
-            FileTupleAttributes attributes = 0;
+            FileSymbolAttributes attributes = 0;
             string language = null;
             string sourceFile = null;
 
@@ -7493,12 +7493,12 @@ namespace WixToolset.Core
                         break;
                     case "DiskId":
                         diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
                         break;
                     case "FileCompression":
                         var compress = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        attributes |= compress == YesNoType.Yes ? FileTupleAttributes.Compressed : 0;
-                        attributes |= compress == YesNoType.No ? FileTupleAttributes.Uncompressed : 0;
+                        attributes |= compress == YesNoType.Yes ? FileSymbolAttributes.Compressed : 0;
+                        attributes |= compress == YesNoType.No ? FileSymbolAttributes.Uncompressed : 0;
                         break;
                     case "Language":
                         language = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -7561,7 +7561,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.AddTuple(new WixMergeTuple(sourceLineNumbers, id)
+                var symbol = this.Core.AddSymbol(new WixMergeSymbol(sourceLineNumbers, id)
                 {
                     DirectoryRef = directoryId,
                     SourceFile = sourceFile,
@@ -7571,7 +7571,7 @@ namespace WixToolset.Core
                     FeatureRef = Guid.Empty.ToString("B")
                 });
 
-                tuple.Set((int)WixMergeTupleFields.Language, language);
+                symbol.Set((int)WixMergeSymbolFields.Language, language);
             }
         }
 
@@ -7692,7 +7692,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new ConditionTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new ConditionSymbol(sourceLineNumbers)
                     {
                         FeatureRef = featureId,
                         Level = level.Value,
@@ -7722,7 +7722,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixMerge, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixMerge, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -7815,7 +7815,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddTuple(new MIMETuple(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
+                    this.Core.AddSymbol(new MIMESymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
                     {
                         ContentType = contentType,
                         ExtensionRef = extension,
@@ -7894,7 +7894,7 @@ namespace WixToolset.Core
             if (patch)
             {
                 // /Patch/PatchProperty goes directly into MsiPatchMetadata table
-                this.Core.AddTuple(new MsiPatchMetadataTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, company, name))
+                this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, company, name))
                 {
                     Company = company,
                     Property = name,
@@ -7921,7 +7921,7 @@ namespace WixToolset.Core
         {
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new PropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddSymbol(new PropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
                 {
                     Value = value
                 });
@@ -7971,7 +7971,7 @@ namespace WixToolset.Core
 
             return id;
         }
-        
+
         /// <summary>
         /// Parses a ReplacePatch element.
         /// </summary>
@@ -8080,7 +8080,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixPatchRefTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixPatchRefSymbol(sourceLineNumbers)
                 {
                     Table = "*",
                     PrimaryKeys = "*",
@@ -8127,7 +8127,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixPatchRefTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new WixPatchRefSymbol(sourceLineNumbers)
                 {
                     Table = tableName,
                     PrimaryKeys = id
@@ -8245,7 +8245,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixPatchBaselineTuple(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixPatchBaselineSymbol(sourceLineNumbers, id)
                 {
                     DiskId = diskId ?? 1,
                     ValidationFlags = validationFlags,

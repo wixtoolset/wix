@@ -4,20 +4,20 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Initializes package state from the Exe contents.
     /// </summary>
     internal class ProcessExePackageCommand
     {
-        public ProcessExePackageCommand(PackageFacade facade, Dictionary<string, WixBundlePayloadTuple> payloadTuples)
+        public ProcessExePackageCommand(PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
-            this.AuthoredPayloads = payloadTuples;
+            this.AuthoredPayloads = payloadSymbols;
             this.Facade = facade;
         }
 
-        public Dictionary<string, WixBundlePayloadTuple> AuthoredPayloads { get; }
+        public Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { get; }
 
         public PackageFacade Facade { get; }
 
@@ -26,14 +26,14 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         public void Execute()
         {
-            var packagePayload = this.AuthoredPayloads[this.Facade.PackageTuple.PayloadRef];
+            var packagePayload = this.AuthoredPayloads[this.Facade.PackageSymbol.PayloadRef];
 
-            if (String.IsNullOrEmpty(this.Facade.PackageTuple.CacheId))
+            if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
             {
-                this.Facade.PackageTuple.CacheId = packagePayload.Hash;
+                this.Facade.PackageSymbol.CacheId = packagePayload.Hash;
             }
 
-            this.Facade.PackageTuple.Version = packagePayload.Version;
+            this.Facade.PackageSymbol.Version = packagePayload.Version;
         }
     }
 }

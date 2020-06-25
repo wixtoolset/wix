@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
@@ -51,9 +51,9 @@ namespace WixToolsetTest.CoreIntegration
 
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().First();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().First();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -86,9 +86,9 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -244,14 +244,14 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var errors = section.Tuples.OfType<ErrorTuple>().ToDictionary(t => t.Id.Id);
+                var errors = section.Symbols.OfType<ErrorSymbol>().ToDictionary(t => t.Id.Id);
                 Assert.Equal("Category 55 Emergency Doomsday Crisis", errors["1234"].Message.Trim());
                 Assert.Equal(" ", errors["5678"].Message);
 
-                var customAction1 = section.Tuples.OfType<CustomActionTuple>().Where(t => t.Id.Id == "CanWeReferenceAnError_YesWeCan").Single();
+                var customAction1 = section.Symbols.OfType<CustomActionSymbol>().Where(t => t.Id.Id == "CanWeReferenceAnError_YesWeCan").Single();
                 Assert.Equal("1234", customAction1.Target);
 
-                var customAction2 = section.Tuples.OfType<CustomActionTuple>().Where(t => t.Id.Id == "TextErrorsWorkOKToo").Single();
+                var customAction2 = section.Symbols.OfType<CustomActionSymbol>().Where(t => t.Id.Id == "TextErrorsWorkOKToo").Single();
                 Assert.Equal("If you see this, something went wrong.", customAction2.Target);
             }
         }
@@ -353,10 +353,10 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal("filyIq8rqcxxf903Hsn5K9L0SWV73g", fileTuple.Id.Id);
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal("filyIq8rqcxxf903Hsn5K9L0SWV73g", fileSymbol.Id.Id);
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
                 var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var fileRows = data.Tables["File"].Rows;
@@ -405,15 +405,15 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
-                var upgradeTuple = section.Tuples.OfType<UpgradeTuple>().Single();
-                Assert.False(upgradeTuple.ExcludeLanguages);
-                Assert.True(upgradeTuple.IgnoreRemoveFailures);
-                Assert.False(upgradeTuple.VersionMaxInclusive);
-                Assert.True(upgradeTuple.VersionMinInclusive);
-                Assert.Equal("13.0.0", upgradeTuple.VersionMax);
-                Assert.Equal("12.0.0", upgradeTuple.VersionMin);
-                Assert.False(upgradeTuple.OnlyDetect);
-                Assert.Equal("BLAHBLAHBLAH", upgradeTuple.ActionProperty);
+                var upgradeSymbol = section.Symbols.OfType<UpgradeSymbol>().Single();
+                Assert.False(upgradeSymbol.ExcludeLanguages);
+                Assert.True(upgradeSymbol.IgnoreRemoveFailures);
+                Assert.False(upgradeSymbol.VersionMaxInclusive);
+                Assert.True(upgradeSymbol.VersionMinInclusive);
+                Assert.Equal("13.0.0", upgradeSymbol.VersionMax);
+                Assert.Equal("12.0.0", upgradeSymbol.VersionMin);
+                Assert.False(upgradeSymbol.OnlyDetect);
+                Assert.Equal("BLAHBLAHBLAH", upgradeSymbol.ActionProperty);
 
                 var pdb = WindowsInstallerData.Load(pdbPath, suppressVersionCheck: false);
                 var secureProperties = pdb.Tables["Property"].Rows.Where(row => row.GetKey() == "SecureCustomProperties").Single();
@@ -581,9 +581,9 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -617,11 +617,11 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"candle.exe", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
 
-                var msiAssemblyNameTuples = section.Tuples.OfType<MsiAssemblyNameTuple>();
+                var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
                 Assert.Equal(new[]
                 {
                     "culture",
@@ -630,7 +630,7 @@ namespace WixToolsetTest.CoreIntegration
                     "processorArchitecture",
                     "publicKeyToken",
                     "version"
-                }, msiAssemblyNameTuples.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
+                }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
 
                 Assert.Equal(new[]
                 {
@@ -640,7 +640,7 @@ namespace WixToolsetTest.CoreIntegration
                     "x86",
                     "256B3414DFA97718",
                     "3.0.0.0"
-                }, msiAssemblyNameTuples.OrderBy(a => a.Name).Select(a => a.Value).ToArray());
+                }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Value).ToArray());
             }
         }
 
@@ -671,7 +671,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var platformSummary = section.Tuples.OfType<SummaryInformationTuple>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                var platformSummary = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
                 Assert.Equal("x64;1033", platformSummary.Value);
             }
         }
@@ -704,12 +704,12 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 // Only one component is shared.
-                var sharedComponentTuples = section.Tuples.OfType<ComponentTuple>();
-                Assert.Equal(1, sharedComponentTuples.Sum(t => t.Shared ? 1 : 0));
+                var sharedComponentSymbols = section.Symbols.OfType<ComponentSymbol>();
+                Assert.Equal(1, sharedComponentSymbols.Sum(t => t.Shared ? 1 : 0));
 
                 // And it is this one.
-                var sharedComponentTuple = sharedComponentTuples.Single(t => t.Id.Id == "Shared.dll");
-                Assert.True(sharedComponentTuple.Shared);
+                var sharedComponentSymbol = sharedComponentSymbols.Single(t => t.Id.Id == "Shared.dll");
+                Assert.True(sharedComponentSymbol.Shared);
             }
         }
 
@@ -775,7 +775,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var progids = section.Tuples.OfType<ProgIdTuple>().OrderBy(tuple => tuple.ProgId).ToList();
+                var progids = section.Symbols.OfType<ProgIdSymbol>().OrderBy(symbol => symbol.ProgId).ToList();
                 Assert.Equal(new[]
                 {
                     "Foo.File.hol",

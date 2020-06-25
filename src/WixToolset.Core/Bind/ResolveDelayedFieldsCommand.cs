@@ -42,15 +42,15 @@ namespace WixToolset.Core.Bind
             {
                 try
                 {
-                    var propertyRow = delayedField.Row;
+                    var propertySymbol = delayedField.Symbol;
 
                     // process properties first in case they refer to other binder variables
-                    if (delayedField.Row.Definition.Type == TupleDefinitionType.Property)
+                    if (delayedField.Symbol.Definition.Type == SymbolDefinitionType.Property)
                     {
-                        var value = ResolveDelayedVariables(propertyRow.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
+                        var value = ResolveDelayedVariables(propertySymbol.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
 
                         // update the variable cache with the new value
-                        var key = String.Concat("property.", propertyRow.AsString(0));
+                        var key = String.Concat("property.", propertySymbol.Id.Id);
                         this.VariableCache[key] = value;
 
                         // update the field data
@@ -103,7 +103,7 @@ namespace WixToolset.Core.Bind
             {
                 try
                 {
-                    var value = ResolveDelayedVariables(delayedField.Row.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
+                    var value = ResolveDelayedVariables(delayedField.Symbol.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
                     delayedField.Field.Set(value);
                 }
                 catch (WixException we)

@@ -6,7 +6,7 @@ namespace WixToolset.Core.Bind
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -45,13 +45,13 @@ namespace WixToolset.Core.Bind
             var fileResolver = new FileResolver(this.BindPaths, this.Extensions);
 
             // Build the column lookup only when needed.
-            Dictionary<string, WixCustomTableColumnTuple> customColumnsById = null;
+            Dictionary<string, WixCustomTableColumnSymbol> customColumnsById = null;
 
             foreach (var sections in this.Intermediate.Sections)
             {
-                foreach (var tuple in sections.Tuples)
+                foreach (var symbol in sections.Symbols)
                 {
-                    foreach (var field in tuple.Fields)
+                    foreach (var field in symbol.Fields)
                     {
                         if (field.IsNull())
                         {
@@ -63,20 +63,20 @@ namespace WixToolset.Core.Bind
                         // Custom table cells require an extra look up to the column definition as the
                         // cell's data type is always a string (because strings can store anything) but
                         // the column definition may be more specific.
-                        if (tuple.Definition.Type == TupleDefinitionType.WixCustomTableCell)
+                        if (symbol.Definition.Type == SymbolDefinitionType.WixCustomTableCell)
                         {
                             // We only care about the Data in a CustomTable cell.
-                            if (field.Name != nameof(WixCustomTableCellTupleFields.Data))
+                            if (field.Name != nameof(WixCustomTableCellSymbolFields.Data))
                             {
                                 continue;
                             }
 
                             if (customColumnsById == null)
                             {
-                                customColumnsById = this.Intermediate.Sections.SelectMany(s => s.Tuples.OfType<WixCustomTableColumnTuple>()).ToDictionary(t => t.Id.Id);
+                                customColumnsById = this.Intermediate.Sections.SelectMany(s => s.Symbols.OfType<WixCustomTableColumnSymbol>()).ToDictionary(t => t.Id.Id);
                             }
 
-                            if (customColumnsById.TryGetValue(tuple.Fields[(int)WixCustomTableCellTupleFields.TableRef].AsString() + "/" + tuple.Fields[(int)WixCustomTableCellTupleFields.ColumnRef].AsString(), out var customColumn))
+                            if (customColumnsById.TryGetValue(symbol.Fields[(int)WixCustomTableCellSymbolFields.TableRef].AsString() + "/" + symbol.Fields[(int)WixCustomTableCellSymbolFields.ColumnRef].AsString(), out var customColumn))
                             {
                                 fieldType = customColumn.Type;
                             }
@@ -93,7 +93,7 @@ namespace WixToolset.Core.Bind
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
                                 {
-                                    var resolution = this.VariableResolver.ResolveVariables(tuple.SourceLineNumbers, original, !this.AllowUnresolvedVariables);
+                                    var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, original, !this.AllowUnresolvedVariables);
                                     if (resolution.UpdatedValue)
                                     {
                                         field.Set(resolution.Value);
@@ -101,7 +101,7 @@ namespace WixToolset.Core.Bind
 
                                     if (resolution.DelayedResolve)
                                     {
-                                        delayedFields.Add(new DelayedField(tuple, field));
+                                        delayedFields.Add(new DelayedField(symbol, field));
                                     }
 
                                     isDefault = resolution.IsDefault;
@@ -109,7 +109,7 @@ namespace WixToolset.Core.Bind
                             }
                         }
 
-                        // Move to next tuple if we've hit an error resolving variables.
+                        // Move to next symbol if we've hit an error resolving variables.
                         if (this.Messaging.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
                         {
                             continue;
@@ -122,7 +122,7 @@ namespace WixToolset.Core.Bind
 
 #if TODO_PATCHING
                             // Skip file resolution if the file is to be deleted.
-                            if (RowOperation.Delete == tuple.Operation)
+                            if (RowOperation.Delete == symbol.Operation)
                             {
                                 continue;
                             }
@@ -151,13 +151,13 @@ namespace WixToolset.Core.Bind
 #endif
 
                                         // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, tuple.Definition, tuple.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
                                         field.Set(value);
                                     }
                                     else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
                                     {
                                         // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, tuple.Definition, tuple.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
                                         field.Set(value);
                                     }
 #if TODO_PATCHING
@@ -179,7 +179,7 @@ namespace WixToolset.Core.Bind
                                             }
                                         }
 
-                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, tuple.Definition.Name, tuple.SourceLineNumbers, BindStage.Updated);
+                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, symbol.Definition.Name, symbol.SourceLineNumbers, BindStage.Updated);
                                     }
 #endif
                                 }
@@ -192,7 +192,7 @@ namespace WixToolset.Core.Bind
 #if TODO_PATCHING
                             if (null != objectField.PreviousData)
                             {
-                                objectField.PreviousData = this.BindVariableResolver.ResolveVariables(tuple.SourceLineNumbers, objectField.PreviousData, false, out isDefault);
+                                objectField.PreviousData = this.BindVariableResolver.ResolveVariables(symbol.SourceLineNumbers, objectField.PreviousData, false, out isDefault);
 
                                 if (!Messaging.Instance.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
                                 {
@@ -217,7 +217,7 @@ namespace WixToolset.Core.Bind
                                             if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated)
                                             {
                                                 // resolve the path to the file
-                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, tuple.Definition.Name, tuple.SourceLineNumbers, BindStage.Normal);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, symbol.Definition.Name, symbol.SourceLineNumbers, BindStage.Normal);
                                             }
                                             else
                                             {
@@ -235,14 +235,14 @@ namespace WixToolset.Core.Bind
                                                 }
 
                                                 // resolve the path to the file
-                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, tuple.Definition.Name, tuple.SourceLineNumbers, BindStage.Target);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, symbol.Definition.Name, symbol.SourceLineNumbers, BindStage.Target);
 
                                             }
                                         }
                                         catch (WixFileNotFoundException)
                                         {
                                             // display the error with source line information
-                                            Messaging.Instance.Write(WixErrors.FileNotFound(tuple.SourceLineNumbers, (string)objectField.PreviousData));
+                                            Messaging.Instance.Write(WixErrors.FileNotFound(symbol.SourceLineNumbers, (string)objectField.PreviousData));
                                         }
                                     }
                                 }

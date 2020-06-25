@@ -10,7 +10,7 @@ namespace WixToolset.Core
     using System.Linq;
     using WixToolset.Core.Link;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -60,9 +60,9 @@ namespace WixToolset.Core
         {
             this.Context = context;
 
-            if (this.Context.TupleDefinitionCreator == null)
+            if (this.Context.SymbolDefinitionCreator == null)
             {
-                this.Context.TupleDefinitionCreator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+                this.Context.SymbolDefinitionCreator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
             }
 
             foreach (var extension in this.Context.Extensions)
@@ -85,7 +85,7 @@ namespace WixToolset.Core
                 // Add sections from the extensions with data.
                 foreach (var data in this.Context.ExtensionData)
                 {
-                    var library = data.GetLibrary(this.Context.TupleDefinitionCreator);
+                    var library = data.GetLibrary(this.Context.SymbolDefinitionCreator);
 
                     if (library != null)
                     {
@@ -107,7 +107,7 @@ namespace WixToolset.Core
 
                 var multipleFeatureComponents = new Hashtable();
 
-                var wixVariables = new Dictionary<string, WixVariableTuple>();
+                var wixVariables = new Dictionary<string, WixVariableSymbol>();
 
 #if MOVE_TO_BACKEND
                 // verify that modularization types match for foreign key relationships
@@ -149,12 +149,12 @@ namespace WixToolset.Core
                     throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                 }
 
-                // Add the missing standard action tuples.
-                this.LoadStandardActions(find.EntrySection, find.TuplesByName);
+                // Add the missing standard action symbols.
+                this.LoadStandardActions(find.EntrySection, find.SymbolsByName);
 
-                // Resolve the tuple references to find the set of sections we care about for linking.
+                // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
-                var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.TuplesByName);
+                var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
 
                 resolve.Execute();
 
@@ -190,16 +190,16 @@ namespace WixToolset.Core
                 }
 
                 // Display an error message for Components that were not referenced by a Feature.
-                foreach (var tupleWithSection in resolve.ReferencedTupleWithSections.Where(s => s.Tuple.Definition.Type == TupleDefinitionType.Component))
+                foreach (var symbolWithSection in resolve.ReferencedSymbolWithSections.Where(s => s.Symbol.Definition.Type == SymbolDefinitionType.Component))
                 {
-                    if (!referencedComponents.Contains(tupleWithSection.Name))
+                    if (!referencedComponents.Contains(symbolWithSection.Name))
                     {
-                        this.Messaging.Write(ErrorMessages.OrphanedComponent(tupleWithSection.Tuple.SourceLineNumbers, tupleWithSection.Tuple.Id.Id));
+                        this.Messaging.Write(ErrorMessages.OrphanedComponent(symbolWithSection.Symbol.SourceLineNumbers, symbolWithSection.Symbol.Id.Id));
                     }
                 }
 
                 // Report duplicates that would ultimately end up being primary key collisions.
-                var reportDupes = new ReportConflictingTuplesCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
+                var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
                 reportDupes.Execute();
 
                 if (this.Messaging.EncounteredError)
@@ -208,7 +208,7 @@ namespace WixToolset.Core
                 }
 
                 // resolve the feature to feature connects
-                this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.TuplesByName);
+                this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.SymbolsByName);
 
                 // Create the section to hold the linked content.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
@@ -225,17 +225,17 @@ namespace WixToolset.Core
                         sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
                     }
 
-                    foreach (var tuple in section.Tuples)
+                    foreach (var symbol in section.Symbols)
                     {
-                        var copyTuple = true; // by default, copy tuples.
+                        var copySymbol = true; // by default, copy symbols.
 
                         // handle special tables
-                        switch (tuple.Definition.Type)
+                        switch (symbol.Definition.Type)
                         {
-                            case TupleDefinitionType.Class:
+                            case SymbolDefinitionType.Class:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)ClassTupleFields.ComponentRef, (int)ClassTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)ClassSymbolFields.ComponentRef, (int)ClassSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
@@ -287,48 +287,48 @@ namespace WixToolset.Core
                                 }
                                 break;
 #endif
-                            case TupleDefinitionType.Extension:
+                            case SymbolDefinitionType.Extension:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)ExtensionTupleFields.ComponentRef, (int)ExtensionTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)ExtensionSymbolFields.ComponentRef, (int)ExtensionSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
 #if MOVE_TO_BACKEND
-                            case TupleDefinitionType.ModuleSubstitution:
+                            case SymbolDefinitionType.ModuleSubstitution:
                                 containsModuleSubstitution = true;
                                 break;
 
-                            case TupleDefinitionType.ModuleConfiguration:
+                            case SymbolDefinitionType.ModuleConfiguration:
                                 containsModuleConfiguration = true;
                                 break;
 #endif
 
-                            case TupleDefinitionType.Assembly:
+                            case SymbolDefinitionType.Assembly:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)AssemblyTupleFields.ComponentRef, (int)AssemblyTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)AssemblySymbolFields.ComponentRef, (int)AssemblySymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
-                            case TupleDefinitionType.PublishComponent:
+                            case SymbolDefinitionType.PublishComponent:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)PublishComponentTupleFields.ComponentRef, (int)PublishComponentTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)PublishComponentSymbolFields.ComponentRef, (int)PublishComponentSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
-                            case TupleDefinitionType.Shortcut:
+                            case SymbolDefinitionType.Shortcut:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)ShortcutTupleFields.ComponentRef, (int)ShortcutTupleFields.Target, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)ShortcutSymbolFields.ComponentRef, (int)ShortcutSymbolFields.Target, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
-                            case TupleDefinitionType.TypeLib:
+                            case SymbolDefinitionType.TypeLib:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, (int)TypeLibTupleFields.ComponentRef, (int)TypeLibTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(symbol, (int)TypeLibSymbolFields.ComponentRef, (int)TypeLibSymbolFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
@@ -352,51 +352,51 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.WixMerge:
+                            case SymbolDefinitionType.WixMerge:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, -1, (int)WixMergeTupleFields.FeatureRef, modulesToFeatures, null);
+                                    this.ResolveFeatures(symbol, -1, (int)WixMergeSymbolFields.FeatureRef, modulesToFeatures, null);
                                 }
                                 break;
 
-                            case TupleDefinitionType.WixComplexReference:
-                                copyTuple = false;
+                            case SymbolDefinitionType.WixComplexReference:
+                                copySymbol = false;
                                 break;
 
-                            case TupleDefinitionType.WixSimpleReference:
-                                copyTuple = false;
+                            case SymbolDefinitionType.WixSimpleReference:
+                                copySymbol = false;
                                 break;
 
-                            case TupleDefinitionType.WixVariable:
+                            case SymbolDefinitionType.WixVariable:
                             // check for colliding values and collect the wix variable rows
                             {
-                                var wixVariableTuple = (WixVariableTuple)tuple;
-                                var id = wixVariableTuple.Id.Id;
+                                var wixVariableSymbol = (WixVariableSymbol)symbol;
+                                var id = wixVariableSymbol.Id.Id;
 
-                                if (wixVariables.TryGetValue(id, out var collidingTuple))
+                                if (wixVariables.TryGetValue(id, out var collidingSymbol))
                                 {
-                                    if (collidingTuple.Overridable && !wixVariableTuple.Overridable)
+                                    if (collidingSymbol.Overridable && !wixVariableSymbol.Overridable)
                                     {
-                                        wixVariables[id] = wixVariableTuple;
+                                        wixVariables[id] = wixVariableSymbol;
                                     }
-                                    else if (!wixVariableTuple.Overridable || (collidingTuple.Overridable && wixVariableTuple.Overridable))
+                                    else if (!wixVariableSymbol.Overridable || (collidingSymbol.Overridable && wixVariableSymbol.Overridable))
                                     {
-                                        this.Messaging.Write(ErrorMessages.WixVariableCollision(wixVariableTuple.SourceLineNumbers, id));
+                                        this.Messaging.Write(ErrorMessages.WixVariableCollision(wixVariableSymbol.SourceLineNumbers, id));
                                     }
                                 }
                                 else
                                 {
-                                    wixVariables.Add(id, wixVariableTuple);
+                                    wixVariables.Add(id, wixVariableSymbol);
                                 }
                             }
 
-                            copyTuple = false;
+                            copySymbol = false;
                             break;
                         }
 
-                        if (copyTuple)
+                        if (copySymbol)
                         {
-                            resolvedSection.AddTuple(tuple);
+                            resolvedSection.AddSymbol(symbol);
                         }
                     }
                 }
@@ -406,7 +406,7 @@ namespace WixToolset.Core
                 {
                     foreach (var feature in connectToFeature.ConnectFeatures)
                     {
-                        resolvedSection.AddTuple(new WixFeatureModulesTuple
+                        resolvedSection.AddSymbol(new WixFeatureModulesSymbol
                         {
                             FeatureRef = feature,
                             WixMergeRef = connectToFeature.ChildId
@@ -462,16 +462,16 @@ namespace WixToolset.Core
                 {
                     //var componentSectionIds = new Dictionary<string, string>();
 
-                    //foreach (var componentTuple in entrySection.Tuples.OfType<ComponentTuple>())
+                    //foreach (var componentSymbol in entrySection.Symbols.OfType<ComponentSymbol>())
                     //{
-                    //    componentSectionIds.Add(componentTuple.Id.Id, componentTuple.SectionId);
+                    //    componentSectionIds.Add(componentSymbol.Id.Id, componentSymbol.SectionId);
                     //}
 
-                    //foreach (var featureComponentTuple in entrySection.Tuples.OfType<FeatureComponentsTuple>())
+                    //foreach (var featureComponentSymbol in entrySection.Symbols.OfType<FeatureComponentsSymbol>())
                     //{
-                    //    if (componentSectionIds.TryGetValue(featureComponentTuple.Component_, out var componentSectionId))
+                    //    if (componentSectionIds.TryGetValue(featureComponentSymbol.Component_, out var componentSectionId))
                     //    {
-                    //        featureComponentTuple.SectionId = componentSectionId;
+                    //        featureComponentSymbol.SectionId = componentSectionId;
                     //    }
                     //}
                 }
@@ -544,9 +544,9 @@ namespace WixToolset.Core
 #endif
 
                 // copy the wix variable rows to the output after all overriding has been accounted for.
-                foreach (var tuple in wixVariables.Values)
+                foreach (var symbol in wixVariables.Values)
                 {
-                    resolvedSection.AddTuple(tuple);
+                    resolvedSection.AddSymbol(symbol);
                 }
 
                 // Bundles have groups of data that must be flattened in a way different from other types.
@@ -734,17 +734,17 @@ namespace WixToolset.Core
         /// <summary>
         /// Load the standard action symbols.
         /// </summary>
-        /// <param name="tuplesByName">Collection of symbols.</param>
-        private void LoadStandardActions(IntermediateSection section, IDictionary<string, TupleWithSection> tuplesByName)
+        /// <param name="symbolsByName">Collection of symbols.</param>
+        private void LoadStandardActions(IntermediateSection section, IDictionary<string, SymbolWithSection> symbolsByName)
         {
-            foreach (var actionTuple in WindowsInstallerStandard.StandardActions())
+            foreach (var actionSymbol in WindowsInstallerStandard.StandardActions())
             {
-                var tupleWithSection = new TupleWithSection(section, actionTuple);
+                var symbolWithSection = new SymbolWithSection(section, actionSymbol);
 
-                // If the action's tuple has not already been defined (i.e. overriden by the user), add it now.
-                if (!tuplesByName.ContainsKey(tupleWithSection.Name))
+                // If the action's symbol has not already been defined (i.e. overriden by the user), add it now.
+                if (!symbolsByName.ContainsKey(symbolWithSection.Name))
                 {
-                    tuplesByName.Add(tupleWithSection.Name, tupleWithSection);
+                    symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
                 }
             }
         }
@@ -752,7 +752,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Process the complex references.
         /// </summary>
-        /// <param name="resolvedSection">Active section to add tuples to.</param>
+        /// <param name="resolvedSection">Active section to add symbols to.</param>
         /// <param name="sections">Sections that are referenced during the link process.</param>
         /// <param name="referencedComponents">Collection of all components referenced by complex reference.</param>
         /// <param name="componentsToFeatures">Component to feature complex references.</param>
@@ -764,8 +764,8 @@ namespace WixToolset.Core
 
             foreach (var section in sections)
             {
-                // Need ToList since we might want to add tuples while processing.
-                foreach (var wixComplexReferenceRow in section.Tuples.OfType<WixComplexReferenceTuple>().ToList())
+                // Need ToList since we might want to add symbols while processing.
+                foreach (var wixComplexReferenceRow in section.Symbols.OfType<WixComplexReferenceSymbol>().ToList())
                 {
                     ConnectToFeature connection;
                     switch (wixComplexReferenceRow.ParentType)
@@ -799,7 +799,7 @@ namespace WixToolset.Core
                                     }
 
                                     // add a row to the FeatureComponents table
-                                    section.AddTuple(new FeatureComponentsTuple
+                                    section.AddSymbol(new FeatureComponentsSymbol
                                     {
                                         FeatureRef = wixComplexReferenceRow.Parent,
                                         ComponentRef = wixComplexReferenceRow.Child,
@@ -867,7 +867,7 @@ namespace WixToolset.Core
                                         componentsToModules.Add(wixComplexReferenceRow.Child, wixComplexReferenceRow); // should always be new
 
                                         // add a row to the ModuleComponents table
-                                        section.AddTuple(new ModuleComponentsTuple
+                                        section.AddSymbol(new ModuleComponentsSymbol
                                         {
                                             Component = wixComplexReferenceRow.Child,
                                             ModuleID = wixComplexReferenceRow.Parent,
@@ -931,7 +931,7 @@ namespace WixToolset.Core
         /// <param name="sections">Sections that are referenced during the link process.</param>
         private void FlattenSectionsComplexReferences(IEnumerable<IntermediateSection> sections)
         {
-            var parentGroups = new Dictionary<string, List<WixComplexReferenceTuple>>();
+            var parentGroups = new Dictionary<string, List<WixComplexReferenceSymbol>>();
             var parentGroupsSections = new Dictionary<string, IntermediateSection>();
             var parentGroupsNeedingProcessing = new Dictionary<string, IntermediateSection>();
 
@@ -945,12 +945,12 @@ namespace WixToolset.Core
             foreach (var section in sections)
             {
                 // Count down because we'll sometimes remove items from the list.
-                for (var i = section.Tuples.Count - 1; i >= 0; --i)
+                for (var i = section.Symbols.Count - 1; i >= 0; --i)
                 {
                     // Only process the "grouping parents" such as FeatureGroup, ComponentGroup, Feature,
                     // and Module. Non-grouping complex references are simple and
                     // resolved during normal complex reference resolutions.
-                    if (section.Tuples[i] is WixComplexReferenceTuple wixComplexReferenceRow &&
+                    if (section.Symbols[i] is WixComplexReferenceSymbol wixComplexReferenceRow &&
                         (ComplexReferenceParentType.FeatureGroup == wixComplexReferenceRow.ParentType ||
                          ComplexReferenceParentType.ComponentGroup == wixComplexReferenceRow.ParentType ||
                          ComplexReferenceParentType.Feature == wixComplexReferenceRow.ParentType ||
@@ -965,12 +965,12 @@ namespace WixToolset.Core
                         // Step 2.
                         if (!parentGroups.TryGetValue(parentTypeAndId, out var childrenComplexRefs))
                         {
-                            childrenComplexRefs = new List<WixComplexReferenceTuple>();
+                            childrenComplexRefs = new List<WixComplexReferenceSymbol>();
                             parentGroups.Add(parentTypeAndId, childrenComplexRefs);
                         }
 
                         childrenComplexRefs.Add(wixComplexReferenceRow);
-                        section.Tuples.RemoveAt(i);
+                        section.Symbols.RemoveAt(i);
 
                         // Remember the mapping from set of complex references with a common
                         // parent to their section. We'll need this to add them back to the
@@ -1034,7 +1034,7 @@ namespace WixToolset.Core
                         (ComplexReferenceParentType.ComponentGroup != wixComplexReferenceRow.ParentType) &&
                         (ComplexReferenceParentType.PatchFamilyGroup != wixComplexReferenceRow.ParentType))
                     {
-                        section.AddTuple(wixComplexReferenceRow);
+                        section.AddSymbol(wixComplexReferenceRow);
                     }
                 }
             }
@@ -1059,12 +1059,12 @@ namespace WixToolset.Core
         /// <param name="loopDetector">Stack of groups processed thus far. Used to detect loops.</param>
         /// <param name="parentGroups">Hash table of complex references grouped by parent id.</param>
         /// <param name="parentGroupsNeedingProcessing">Hash table of parent groups that still have nested groups that need to be flattened.</param>
-        private void FlattenGroup(string parentTypeAndId, Stack<string> loopDetector, Dictionary<string, List<WixComplexReferenceTuple>> parentGroups, Dictionary<string, IntermediateSection> parentGroupsNeedingProcessing)
+        private void FlattenGroup(string parentTypeAndId, Stack<string> loopDetector, Dictionary<string, List<WixComplexReferenceSymbol>> parentGroups, Dictionary<string, IntermediateSection> parentGroupsNeedingProcessing)
         {
             Debug.Assert(parentGroupsNeedingProcessing.ContainsKey(parentTypeAndId));
             loopDetector.Push(parentTypeAndId); // push this complex reference parent identfier into the stack for loop verifying
 
-            var allNewChildComplexReferences = new List<WixComplexReferenceTuple>();
+            var allNewChildComplexReferences = new List<WixComplexReferenceSymbol>();
 
             var referencesToParent = parentGroups[parentTypeAndId];
             foreach (var wixComplexReferenceRow in referencesToParent)
@@ -1158,7 +1158,7 @@ namespace WixToolset.Core
                 }
             }
 
-            int ComplexReferenceComparision(WixComplexReferenceTuple x, WixComplexReferenceTuple y)
+            int ComplexReferenceComparision(WixComplexReferenceSymbol x, WixComplexReferenceSymbol y)
             {
                 var comparison = x.ChildType - y.ChildType;
                 if (0 == comparison)
@@ -1242,11 +1242,11 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="featuresToFeatures">Feature to feature complex references.</param>
         /// <param name="allSymbols">All symbols loaded from the sections.</param>
-        private void ResolveFeatureToFeatureConnects(ConnectToFeatureCollection featuresToFeatures, IDictionary<string, TupleWithSection> allSymbols)
+        private void ResolveFeatureToFeatureConnects(ConnectToFeatureCollection featuresToFeatures, IDictionary<string, SymbolWithSection> allSymbols)
         {
             foreach (ConnectToFeature connection in featuresToFeatures)
             {
-                var wixSimpleReferenceRow = new WixSimpleReferenceTuple
+                var wixSimpleReferenceRow = new WixSimpleReferenceSymbol
                 {
                     Table = "Feature",
                     PrimaryKeys = connection.ChildId
@@ -1254,8 +1254,8 @@ namespace WixToolset.Core
 
                 if (allSymbols.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbol))
                 {
-                    var featureTuple = (FeatureTuple)symbol.Tuple;
-                    featureTuple.ParentFeatureRef = connection.PrimaryFeature;
+                    var featureSymbol = (FeatureSymbol)symbol.Symbol;
+                    featureSymbol.ParentFeatureRef = connection.PrimaryFeature;
                 }
             }
         }
@@ -1308,15 +1308,15 @@ namespace WixToolset.Core
         /// <summary>
         /// Resolve features for columns that have null guid placeholders.
         /// </summary>
-        /// <param name="tuple">Tuple to resolve.</param>
+        /// <param name="symbol">Symbol to resolve.</param>
         /// <param name="connectionColumn">Number of the column containing the connection identifier.</param>
         /// <param name="featureColumn">Number of the column containing the feature.</param>
         /// <param name="connectToFeatures">Connect to feature complex references.</param>
         /// <param name="multipleFeatureComponents">Hashtable of known components under multiple features.</param>
-        private void ResolveFeatures(IntermediateTuple tuple, int connectionColumn, int featureColumn, ConnectToFeatureCollection connectToFeatures, Hashtable multipleFeatureComponents)
+        private void ResolveFeatures(IntermediateSymbol symbol, int connectionColumn, int featureColumn, ConnectToFeatureCollection connectToFeatures, Hashtable multipleFeatureComponents)
         {
-            var connectionId = connectionColumn < 0 ? tuple.Id.Id : tuple.AsString(connectionColumn);
-            var featureId = tuple.AsString(featureColumn);
+            var connectionId = connectionColumn < 0 ? symbol.Id.Id : symbol.AsString(connectionColumn);
+            var featureId = symbol.AsString(featureColumn);
 
             if (EmptyGuid == featureId)
             {
@@ -1327,11 +1327,11 @@ namespace WixToolset.Core
                     // display an error for the component or merge module as appropriate
                     if (null != multipleFeatureComponents)
                     {
-                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(tuple.SourceLineNumbers, connectionId, tuple.Definition.Name, tuple.Id.Id));
+                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(symbol.SourceLineNumbers, connectionId, symbol.Definition.Name, symbol.Id.Id));
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(tuple.SourceLineNumbers, connectionId));
+                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(symbol.SourceLineNumbers, connectionId));
                     }
                 }
                 else
@@ -1359,7 +1359,7 @@ namespace WixToolset.Core
                     }
 
                     // set the feature
-                    tuple.Set(featureColumn, connection.PrimaryFeature);
+                    symbol.Set(featureColumn, connection.PrimaryFeature);
                 }
             }
         }

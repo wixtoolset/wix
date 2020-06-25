@@ -10,7 +10,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Runtime.InteropServices;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -32,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
 
-        public CreateCabinetsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, WixMediaTemplateTuple mediaTemplate)
+        public CreateCabinetsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, WixMediaTemplateSymbol mediaTemplate)
         {
             this.fileTransfers = new List<IFileTransfer>();
 
@@ -51,7 +51,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
-        private WixMediaTemplateTuple MediaTemplate { get; }
+        private WixMediaTemplateSymbol MediaTemplate { get; }
 
         /// <summary>
         /// Sets the number of threads to use for cabinet creation.
@@ -80,9 +80,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string ModularizationSuffix { private get; set; }
 
-        public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileFacadesByCabinet { private get; set; }
+        public Dictionary<MediaSymbol, IEnumerable<FileFacade>> FileFacadesByCabinet { private get; set; }
 
-        public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
+        public Func<MediaSymbol, string, string, string> ResolveMedia { private get; set; }
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
@@ -113,12 +113,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var entry in this.FileFacadesByCabinet)
             {
-                var mediaTuple = entry.Key;
+                var mediaSymbol = entry.Key;
                 var files = entry.Value;
-                var compressionLevel = mediaTuple.CompressionLevel ?? this.DefaultCompressionLevel ?? CompressionLevel.Medium;
-                var cabinetDir = this.ResolveMedia(mediaTuple, mediaTuple.Layout, this.LayoutDirectory);
+                var compressionLevel = mediaSymbol.CompressionLevel ?? this.DefaultCompressionLevel ?? CompressionLevel.Medium;
+                var cabinetDir = this.ResolveMedia(mediaSymbol, mediaSymbol.Layout, this.LayoutDirectory);
 
-                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaTuple, compressionLevel, files);
+                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaSymbol, compressionLevel, files);
                 if (null != cabinetWorkItem)
                 {
                     cabinetBuilder.Enqueue(cabinetWorkItem);
@@ -176,28 +176,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <param name="output">Output for the current database.</param>
         /// <param name="cabinetDir">Directory to create cabinet in.</param>
-        /// <param name="mediaTuple">Media tuple containing information about the cabinet.</param>
+        /// <param name="mediaSymbol">Media symbol containing information about the cabinet.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaTuple mediaTuple, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
-            var tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaTuple.Cabinet);
+            var tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaSymbol.Cabinet);
 
             // check for an empty cabinet
             if (!fileFacades.Any())
             {
                 // Remove the leading '#' from the embedded cabinet name to make the warning easier to understand
-                var cabinetName = mediaTuple.Cabinet.TrimStart('#');
+                var cabinetName = mediaSymbol.Cabinet.TrimStart('#');
 
                 // If building a patch, remind them to run -p for torch.
                 if (OutputType.Patch == output.Type)
                 {
-                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaTuple.SourceLineNumbers, cabinetName, true));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaSymbol.SourceLineNumbers, cabinetName, true));
                 }
                 else
                 {
-                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaTuple.SourceLineNumbers, cabinetName));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaSymbol.SourceLineNumbers, cabinetName));
                 }
             }
 
@@ -213,7 +213,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else // reuse the cabinet from the cabinet cache.
             {
-                this.Messaging.Write(VerboseMessages.ReusingCabCache(mediaTuple.SourceLineNumbers, mediaTuple.Cabinet, resolvedCabinet.Path));
+                this.Messaging.Write(VerboseMessages.ReusingCabCache(mediaSymbol.SourceLineNumbers, mediaSymbol.Cabinet, resolvedCabinet.Path));
 
                 try
                 {
@@ -227,27 +227,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (Exception e)
                 {
-                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaTuple.SourceLineNumbers, resolvedCabinet.Path, e.Message));
+                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaSymbol.SourceLineNumbers, resolvedCabinet.Path, e.Message));
                 }
             }
 
-            var trackResolvedCabinet = this.BackendHelper.TrackFile(resolvedCabinet.Path, TrackedFileType.Intermediate, mediaTuple.SourceLineNumbers);
+            var trackResolvedCabinet = this.BackendHelper.TrackFile(resolvedCabinet.Path, TrackedFileType.Intermediate, mediaSymbol.SourceLineNumbers);
             this.trackedFiles.Add(trackResolvedCabinet);
 
-            if (mediaTuple.Cabinet.StartsWith("#", StringComparison.Ordinal))
+            if (mediaSymbol.Cabinet.StartsWith("#", StringComparison.Ordinal))
             {
                 var streamsTable = output.EnsureTable(this.TableDefinitions["_Streams"]);
 
-                var streamRow = streamsTable.CreateRow(mediaTuple.SourceLineNumbers);
-                streamRow[0] = mediaTuple.Cabinet.Substring(1);
+                var streamRow = streamsTable.CreateRow(mediaSymbol.SourceLineNumbers);
+                streamRow[0] = mediaSymbol.Cabinet.Substring(1);
                 streamRow[1] = resolvedCabinet.Path;
             }
             else
             {
-                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaTuple.Cabinet), TrackedFileType.Final, mediaTuple.SourceLineNumbers);
+                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaSymbol.Cabinet), TrackedFileType.Final, mediaSymbol.SourceLineNumbers);
                 this.trackedFiles.Add(trackDestination);
 
-                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaTuple.SourceLineNumbers);
+                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaSymbol.SourceLineNumbers);
                 this.fileTransfers.Add(transfer);
             }
 
@@ -372,7 +372,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // The new Row has to be inserted just after the last cab in this cabinet split chain according to DiskID Sort
-                // This is because the FDI Extract requires DiskID of Split Cabinets to be continuous. It Fails otherwise with 
+                // This is because the FDI Extract requires DiskID of Split Cabinets to be continuous. It Fails otherwise with
                 // Error 2350 (FDI Server Error) as next DiskID did not have the right split cabinet during extraction
                 MediaRow newMediaRow = (MediaRow)mediaTable.CreateRow(null);
                 newMediaRow.Cabinet = newCabinetName;

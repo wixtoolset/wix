@@ -8,21 +8,21 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Linq;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Creates cabinet files.
     /// </summary>
     internal class CreateContainerCommand
     {
-        public CreateContainerCommand(IEnumerable<WixBundlePayloadTuple> payloads, string outputPath, CompressionLevel? compressionLevel)
+        public CreateContainerCommand(IEnumerable<WixBundlePayloadSymbol> payloads, string outputPath, CompressionLevel? compressionLevel)
         {
             this.Payloads = payloads;
             this.OutputPath = outputPath;
             this.CompressionLevel = compressionLevel;
         }
 
-        public CreateContainerCommand(string manifestPath, IEnumerable<WixBundlePayloadTuple> payloads, string outputPath, CompressionLevel? compressionLevel)
+        public CreateContainerCommand(string manifestPath, IEnumerable<WixBundlePayloadSymbol> payloads, string outputPath, CompressionLevel? compressionLevel)
         {
             this.ManifestFile = manifestPath;
             this.Payloads = payloads;
@@ -36,7 +36,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private string OutputPath { get; }
 
-        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
+        private IEnumerable<WixBundlePayloadSymbol> Payloads { get; }
 
         public string Hash { get; private set; }
 

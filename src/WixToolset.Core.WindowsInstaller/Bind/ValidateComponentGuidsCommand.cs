@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -32,30 +32,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var componentGuidConditions = new Dictionary<string, bool>();
 
-            foreach (var componentTuple in this.Section.Tuples.OfType<ComponentTuple>())
+            foreach (var componentSymbol in this.Section.Symbols.OfType<ComponentSymbol>())
             {
                 // We don't care about unmanaged components and if there's a * GUID remaining,
                 // there's already an error that prevented it from being replaced with a real GUID.
-                if (!String.IsNullOrEmpty(componentTuple.ComponentId) && "*" != componentTuple.ComponentId)
+                if (!String.IsNullOrEmpty(componentSymbol.ComponentId) && "*" != componentSymbol.ComponentId)
                 {
-                    var thisComponentHasCondition = !String.IsNullOrEmpty(componentTuple.Condition);
+                    var thisComponentHasCondition = !String.IsNullOrEmpty(componentSymbol.Condition);
                     var allComponentsHaveConditions = thisComponentHasCondition;
 
-                    if (componentGuidConditions.TryGetValue(componentTuple.ComponentId, out var alreadyCheckedCondition))
+                    if (componentGuidConditions.TryGetValue(componentSymbol.ComponentId, out var alreadyCheckedCondition))
                     {
                         allComponentsHaveConditions = thisComponentHasCondition && alreadyCheckedCondition;
 
                         if (allComponentsHaveConditions)
                         {
-                            this.Messaging.Write(WarningMessages.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(componentTuple.SourceLineNumbers, componentTuple.Id.Id, componentTuple.ComponentId));
+                            this.Messaging.Write(WarningMessages.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId));
                         }
                         else
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateComponentGuids(componentTuple.SourceLineNumbers, componentTuple.Id.Id, componentTuple.ComponentId));
+                            this.Messaging.Write(ErrorMessages.DuplicateComponentGuids(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId));
                         }
                     }
 
-                    componentGuidConditions[componentTuple.ComponentId] = allComponentsHaveConditions;
+                    componentGuidConditions[componentSymbol.ComponentId] = allComponentsHaveConditions;
                 }
             }
         }

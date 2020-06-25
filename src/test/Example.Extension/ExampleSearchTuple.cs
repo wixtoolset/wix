@@ -4,27 +4,27 @@ namespace Example.Extension
 {
     using WixToolset.Data;
 
-    public enum ExampleSearchTupleFields
+    public enum ExampleSearchSymbolFields
     {
         SearchFor,
     }
 
-    public class ExampleSearchTuple : IntermediateTuple
+    public class ExampleSearchSymbol : IntermediateSymbol
     {
-        public ExampleSearchTuple() : base(ExampleTupleDefinitions.ExampleSearch, null, null)
+        public ExampleSearchSymbol() : base(ExampleSymbolDefinitions.ExampleSearch, null, null)
         {
         }
 
-        public ExampleSearchTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ExampleTupleDefinitions.ExampleSearch, sourceLineNumber, id)
+        public ExampleSearchSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ExampleSymbolDefinitions.ExampleSearch, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ExampleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ExampleSymbolFields index] => this.Fields[(int)index];
 
         public string SearchFor
         {
-            get => this.Fields[(int)ExampleSearchTupleFields.SearchFor]?.AsString();
-            set => this.Set((int)ExampleSearchTupleFields.SearchFor, value);
+            get => this.Fields[(int)ExampleSearchSymbolFields.SearchFor]?.AsString();
+            set => this.Set((int)ExampleSearchSymbolFields.SearchFor, value);
         }
     }
 }

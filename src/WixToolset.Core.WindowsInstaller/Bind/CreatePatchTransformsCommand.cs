@@ -9,7 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
@@ -34,16 +34,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var patchTransforms = new List<PatchTransform>();
 
-            var tuples = this.Intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixPatchBaselineTuple>();
+            var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols).OfType<WixPatchBaselineSymbol>();
 
-            foreach (var tuple in tuples)
+            foreach (var symbol in symbols)
             {
                 WindowsInstallerData transform;
 
-                if (tuple.TransformFile is null)
+                if (symbol.TransformFile is null)
                 {
-                    var baselineData = this.GetData(tuple.BaselineFile.Path);
-                    var updateData = this.GetData(tuple.UpdateFile.Path);
+                    var baselineData = this.GetData(symbol.BaselineFile.Path);
+                    var updateData = this.GetData(symbol.UpdateFile.Path);
 
                     var command = new GenerateTransformCommand(this.Messaging, baselineData, updateData, preserveUnchangedRows: true, showPedanticMessages: false);
                     transform = command.Execute();
@@ -52,11 +52,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     var exportBasePath = Path.Combine(this.IntermediateFolder, "_trans"); // TODO: come up with a better path.
 
-                    var command = new UnbindTransformCommand(this.Messaging, tuple.TransformFile.Path, exportBasePath, this.IntermediateFolder);
+                    var command = new UnbindTransformCommand(this.Messaging, symbol.TransformFile.Path, exportBasePath, this.IntermediateFolder);
                     transform = command.Execute();
                 }
 
-                patchTransforms.Add(new PatchTransform(tuple.Id.Id, transform));
+                patchTransforms.Add(new PatchTransform(symbol.Id.Id, transform));
             }
 
             this.PatchTransforms = patchTransforms;

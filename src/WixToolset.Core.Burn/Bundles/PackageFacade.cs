@@ -4,22 +4,22 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System.Diagnostics;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class PackageFacade
     {
-        public PackageFacade(WixBundlePackageTuple packageTuple, IntermediateTuple specificPackageTuple)
+        public PackageFacade(WixBundlePackageSymbol packageSymbol, IntermediateSymbol specificPackageSymbol)
         {
-            Debug.Assert(packageTuple.Id.Id == specificPackageTuple.Id.Id);
+            Debug.Assert(packageSymbol.Id.Id == specificPackageSymbol.Id.Id);
 
-            this.PackageTuple = packageTuple;
-            this.SpecificPackageTuple = specificPackageTuple;
+            this.PackageSymbol = packageSymbol;
+            this.SpecificPackageSymbol = specificPackageSymbol;
         }
 
-        public string PackageId => this.PackageTuple.Id.Id;
+        public string PackageId => this.PackageSymbol.Id.Id;
 
-        public WixBundlePackageTuple PackageTuple { get; }
+        public WixBundlePackageSymbol PackageSymbol { get; }
 
-        public IntermediateTuple SpecificPackageTuple { get; }
+        public IntermediateSymbol SpecificPackageSymbol { get; }
     }
 }

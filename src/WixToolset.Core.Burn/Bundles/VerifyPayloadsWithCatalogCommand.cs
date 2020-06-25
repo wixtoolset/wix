@@ -9,12 +9,12 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class VerifyPayloadsWithCatalogCommand
     {
-        public VerifyPayloadsWithCatalogCommand(IMessaging messaging, IEnumerable<WixBundleCatalogTuple> catalogs, IEnumerable<WixBundlePayloadTuple> payloads)
+        public VerifyPayloadsWithCatalogCommand(IMessaging messaging, IEnumerable<WixBundleCatalogSymbol> catalogs, IEnumerable<WixBundlePayloadSymbol> payloads)
         {
             this.Messaging = messaging;
             this.Catalogs = catalogs;
@@ -23,9 +23,9 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IMessaging Messaging { get; }
 
-        private IEnumerable<WixBundleCatalogTuple> Catalogs { get; }
+        private IEnumerable<WixBundleCatalogSymbol> Catalogs { get; }
 
-        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
+        private IEnumerable<WixBundlePayloadSymbol> Payloads { get; }
 
         public void Execute()
         {

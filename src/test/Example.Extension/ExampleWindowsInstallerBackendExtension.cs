@@ -11,23 +11,23 @@ namespace Example.Extension
     {
         public override IEnumerable<TableDefinition> TableDefinitions => ExampleTableDefinitions.All;
 
-        public override bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public override bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
-            if (ExampleTupleDefinitions.TryGetTupleType(tuple.Definition.Name, out var tupleType))
+            if (ExampleSymbolDefinitions.TryGetSymbolType(symbol.Definition.Name, out var symbolType))
             {
-                switch (tupleType)
+                switch (symbolType)
                 {
-                    case ExampleTupleDefinitionType.Example:
+                    case ExampleSymbolDefinitionType.Example:
                         {
-                            var row = (ExampleRow)this.BackendHelper.CreateRow(section, tuple, output, ExampleTableDefinitions.ExampleTable);
-                            row.Example = tuple.Id.Id;
-                            row.Value = tuple[0].AsString();
+                            var row = (ExampleRow)this.BackendHelper.CreateRow(section, symbol, output, ExampleTableDefinitions.ExampleTable);
+                            row.Example = symbol.Id.Id;
+                            row.Value = symbol[0].AsString();
                         }
                         return true;
                 }
             }
 
-            return base.TryAddTupleToOutput(section, tuple, output, tableDefinitions);
+            return base.TryAddSymbolToOutput(section, symbol, output, tableDefinitions);
         }
     }
 }

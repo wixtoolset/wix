@@ -11,7 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Bind;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -43,15 +43,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var assemblyNameTuples = this.Section.Tuples.OfType<MsiAssemblyNameTuple>().ToDictionary(t => t.Id.Id);
+            var assemblyNameSymbols = this.Section.Symbols.OfType<MsiAssemblyNameSymbol>().ToDictionary(t => t.Id.Id);
 
             foreach (var file in this.UpdateFileFacades)
             {
-                this.UpdateFileFacade(file, assemblyNameTuples);
+                this.UpdateFileFacade(file, assemblyNameSymbols);
             }
         }
 
-        private void UpdateFileFacade(FileFacade facade, Dictionary<string, MsiAssemblyNameTuple> assemblyNameTuples)
+        private void UpdateFileFacade(FileFacade facade, Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols)
         {
             FileInfo fileInfo = null;
             try
@@ -155,7 +155,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (null == facade.Hash)
                     {
-                        facade.Hash = this.Section.AddTuple(new MsiFileHashTuple(facade.SourceLineNumber, facade.Identifier));
+                        facade.Hash = this.Section.AddSymbol(new MsiFileHashSymbol(facade.SourceLineNumber, facade.Identifier));
                     }
 
                     facade.Hash.Options = 0;
@@ -220,23 +220,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     var assemblyName = AssemblyNameReader.ReadAssembly(facade.SourceLineNumber, fileInfo.FullName, version);
 
-                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "name", assemblyName.Name);
-                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "culture", assemblyName.Culture);
-                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "version", assemblyName.Version);
+                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "name", assemblyName.Name);
+                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "culture", assemblyName.Culture);
+                    this.SetMsiAssemblyName(assemblyNameSymbols, facade, "version", assemblyName.Version);
 
                     if (!String.IsNullOrEmpty(assemblyName.Architecture))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "processorArchitecture", assemblyName.Architecture);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "processorArchitecture", assemblyName.Architecture);
                     }
                     // TODO: WiX v3 seemed to do this but not clear it should actually be done.
                     //else if (!String.IsNullOrEmpty(file.WixFile.ProcessorArchitecture))
                     //{
-                    //    this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
+                    //    this.SetMsiAssemblyName(assemblyNameSymbols, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
                     //}
 
                     if (assemblyName.StrongNamedSigned)
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "publicKeyToken", assemblyName.PublicKeyToken);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "publicKeyToken", assemblyName.PublicKeyToken);
                     }
                     else if (facade.AssemblyApplicationFileRef == null)
                     {
@@ -245,7 +245,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (!String.IsNullOrEmpty(assemblyName.FileVersion))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "fileVersion", assemblyName.FileVersion);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "fileVersion", assemblyName.FileVersion);
                     }
 
                     // add the assembly name to the information cache
@@ -276,27 +276,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (!String.IsNullOrEmpty(assemblyName.Name))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "name", assemblyName.Name);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "name", assemblyName.Name);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Version))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "version", assemblyName.Version);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "version", assemblyName.Version);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Type))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "type", assemblyName.Type);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "type", assemblyName.Type);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Architecture))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "processorArchitecture", assemblyName.Architecture);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "processorArchitecture", assemblyName.Architecture);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.PublicKeyToken))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "publicKeyToken", assemblyName.PublicKeyToken);
+                        this.SetMsiAssemblyName(assemblyNameSymbols, facade, "publicKeyToken", assemblyName.PublicKeyToken);
                     }
                 }
                 catch (WixException e)
@@ -310,11 +310,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Set an MsiAssemblyName row.  If it was directly authored, override the value, otherwise
         /// create a new row.
         /// </summary>
-        /// <param name="assemblyNameTuples">MsiAssemblyName table.</param>
+        /// <param name="assemblyNameSymbols">MsiAssemblyName table.</param>
         /// <param name="facade">FileFacade containing the assembly read for the MsiAssemblyName row.</param>
         /// <param name="name">MsiAssemblyName name.</param>
         /// <param name="value">MsiAssemblyName value.</param>
-        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameTuple> assemblyNameTuples, FileFacade facade, string name, string value)
+        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols, FileFacade facade, string name, string value)
         {
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))
@@ -333,9 +333,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 // override directly authored value
                 var lookup = String.Concat(facade.ComponentRef, "/", name);
-                if (!assemblyNameTuples.TryGetValue(lookup, out var assemblyNameTuple))
+                if (!assemblyNameSymbols.TryGetValue(lookup, out var assemblyNameSymbol))
                 {
-                    assemblyNameTuple = this.Section.AddTuple(new MsiAssemblyNameTuple(facade.SourceLineNumber, new Identifier(AccessModifier.Private, facade.ComponentRef, name))
+                    assemblyNameSymbol = this.Section.AddSymbol(new MsiAssemblyNameSymbol(facade.SourceLineNumber, new Identifier(AccessModifier.Private, facade.ComponentRef, name))
                     {
                         ComponentRef = facade.ComponentRef,
                         Name = name,
@@ -344,15 +344,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (null == facade.AssemblyNames)
                     {
-                        facade.AssemblyNames = new List<MsiAssemblyNameTuple>();
+                        facade.AssemblyNames = new List<MsiAssemblyNameSymbol>();
                     }
 
-                    facade.AssemblyNames.Add(assemblyNameTuple);
+                    facade.AssemblyNames.Add(assemblyNameSymbol);
 
-                    assemblyNameTuples.Add(assemblyNameTuple.Id.Id, assemblyNameTuple);
+                    assemblyNameSymbols.Add(assemblyNameSymbol.Id.Id, assemblyNameSymbol);
                 }
 
-                assemblyNameTuple.Value = value;
+                assemblyNameSymbol.Value = value;
 
                 if (this.VariableCache != null)
                 {

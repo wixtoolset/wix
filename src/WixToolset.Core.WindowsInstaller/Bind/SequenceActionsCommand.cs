@@ -7,12 +7,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
-    /// Set sequence numbers for all the actions and create tuples in the output object.
+    /// Set sequence numbers for all the actions and create symbols in the output object.
     /// </summary>
     internal class SequenceActionsCommand
     {
@@ -32,38 +32,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var requiredActionTuples = new Dictionary<string, WixActionTuple>();
+            var requiredActionSymbols = new Dictionary<string, WixActionSymbol>();
 
-            // Get the standard actions required based on tuples in the section.
-            var overridableActionTuples = this.GetRequiredStandardActions();
+            // Get the standard actions required based on symbols in the section.
+            var overridableActionSymbols = this.GetRequiredStandardActions();
 
-            // Index all the action tuples and look for collisions.
-            foreach (var actionTuple in this.Section.Tuples.OfType<WixActionTuple>())
+            // Index all the action symbols and look for collisions.
+            foreach (var actionSymbol in this.Section.Symbols.OfType<WixActionSymbol>())
             {
-                if (actionTuple.Overridable) // overridable action
+                if (actionSymbol.Overridable) // overridable action
                 {
-                    if (overridableActionTuples.TryGetValue(actionTuple.Id.Id, out var collidingActionTuple))
+                    if (overridableActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol))
                     {
-                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
-                        if (null != collidingActionTuple.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                        if (null != collidingActionSymbol.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionTuple.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionSymbol.SourceLineNumbers));
                         }
                     }
                     else
                     {
-                        overridableActionTuples.Add(actionTuple.Id.Id, actionTuple);
+                        overridableActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
                     }
                 }
                 else // unsequenced or sequenced action.
                 {
                     // Unsequenced action (allowed for certain standard actions).
-                    if (null == actionTuple.Before && null == actionTuple.After && !actionTuple.Sequence.HasValue)
+                    if (null == actionSymbol.Before && null == actionSymbol.After && !actionSymbol.Sequence.HasValue)
                     {
-                        if (WindowsInstallerStandard.TryGetStandardAction(actionTuple.Id.Id, out var standardAction))
+                        if (WindowsInstallerStandard.TryGetStandardAction(actionSymbol.Id.Id, out var standardAction))
                         {
                             // Populate the sequence from the standard action
-                            actionTuple.Sequence = standardAction.Sequence;
+                            actionSymbol.Sequence = standardAction.Sequence;
                         }
                         else // not a supported unscheduled action.
                         {
@@ -71,109 +71,109 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (requiredActionTuples.TryGetValue(actionTuple.Id.Id, out var collidingActionTuple))
+                    if (requiredActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol))
                     {
-                        this.Messaging.Write(ErrorMessages.ActionCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
-                        if (null != collidingActionTuple.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.ActionCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                        if (null != collidingActionSymbol.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionCollision2(collidingActionTuple.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionCollision2(collidingActionSymbol.SourceLineNumbers));
                         }
                     }
                     else
                     {
-                        requiredActionTuples.Add(actionTuple.Id.Id, actionTuple);
+                        requiredActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
                     }
                 }
             }
 
-            // Add the overridable action tuples that are not overridden to the required action tuples.
-            foreach (var actionTuple in overridableActionTuples.Values)
+            // Add the overridable action symbols that are not overridden to the required action symbols.
+            foreach (var actionSymbol in overridableActionSymbols.Values)
             {
-                if (!requiredActionTuples.ContainsKey(actionTuple.Id.Id))
+                if (!requiredActionSymbols.ContainsKey(actionSymbol.Id.Id))
                 {
-                    requiredActionTuples.Add(actionTuple.Id.Id, actionTuple);
+                    requiredActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
                 }
             }
 
             // Suppress the required actions that are overridable.
-            foreach (var suppressActionTuple in this.Section.Tuples.OfType<WixSuppressActionTuple>())
+            foreach (var suppressActionSymbol in this.Section.Symbols.OfType<WixSuppressActionSymbol>())
             {
-                var key = suppressActionTuple.Id.Id;
+                var key = suppressActionSymbol.Id.Id;
 
-                // If there is an overridable tuple to suppress; suppress it. There is no warning if there
+                // If there is an overridable symbol to suppress; suppress it. There is no warning if there
                 // is no action to suppress because the action may be suppressed from a merge module in
                 // the binder.
-                if (requiredActionTuples.TryGetValue(key, out var requiredActionTuple))
+                if (requiredActionSymbols.TryGetValue(key, out var requiredActionSymbol))
                 {
-                    if (requiredActionTuple.Overridable)
+                    if (requiredActionSymbol.Overridable)
                     {
-                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionTuple.SourceLineNumbers, suppressActionTuple.Action, suppressActionTuple.SequenceTable.ToString()));
-                        if (null != requiredActionTuple.SourceLineNumbers)
+                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionSymbol.SourceLineNumbers, suppressActionSymbol.Action, suppressActionSymbol.SequenceTable.ToString()));
+                        if (null != requiredActionSymbol.SourceLineNumbers)
                         {
-                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionTuple.SourceLineNumbers));
+                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionSymbol.SourceLineNumbers));
                         }
 
-                        requiredActionTuples.Remove(key);
+                        requiredActionSymbols.Remove(key);
                     }
-                    else // suppressing a non-overridable action tuple
+                    else // suppressing a non-overridable action symbol
                     {
-                        this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction(suppressActionTuple.SourceLineNumbers, suppressActionTuple.SequenceTable.ToString(), suppressActionTuple.Action));
-                        if (null != requiredActionTuple.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction(suppressActionSymbol.SourceLineNumbers, suppressActionSymbol.SequenceTable.ToString(), suppressActionSymbol.Action));
+                        if (null != requiredActionSymbol.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction2(requiredActionTuple.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction2(requiredActionSymbol.SourceLineNumbers));
                         }
                     }
                 }
             }
 
             // Build up dependency trees of the relatively scheduled actions.
-            // Use ToList() to create a copy of the required action tuples so that new tuples can
+            // Use ToList() to create a copy of the required action symbols so that new symbols can
             // be added while enumerating.
-            foreach (var actionTuple in requiredActionTuples.Values.ToList())
+            foreach (var actionSymbol in requiredActionSymbols.Values.ToList())
             {
-                if (!actionTuple.Sequence.HasValue)
+                if (!actionSymbol.Sequence.HasValue)
                 {
                     // check for standard actions that don't have a sequence number in a merge module
-                    if (SectionType.Module == this.Section.Type && WindowsInstallerStandard.IsStandardAction(actionTuple.Action))
+                    if (SectionType.Module == this.Section.Type && WindowsInstallerStandard.IsStandardAction(actionSymbol.Action))
                     {
-                        this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                        this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                     }
 
-                    this.SequenceActionTuple(actionTuple, requiredActionTuples);
+                    this.SequenceActionSymbol(actionSymbol, requiredActionSymbols);
                 }
-                else if (SectionType.Module == this.Section.Type && 0 < actionTuple.Sequence && !WindowsInstallerStandard.IsStandardAction(actionTuple.Action)) // check for custom actions and dialogs that have a sequence number
+                else if (SectionType.Module == this.Section.Type && 0 < actionSymbol.Sequence && !WindowsInstallerStandard.IsStandardAction(actionSymbol.Action)) // check for custom actions and dialogs that have a sequence number
                 {
-                    this.Messaging.Write(ErrorMessages.CustomActionSequencedInModule(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                    this.Messaging.Write(ErrorMessages.CustomActionSequencedInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                 }
             }
 
             // Look for standard actions with sequence restrictions that aren't necessarily scheduled based
             // on the presence of a particular table.
-            if (requiredActionTuples.ContainsKey("InstallExecuteSequence/DuplicateFiles") && !requiredActionTuples.ContainsKey("InstallExecuteSequence/InstallFiles"))
+            if (requiredActionSymbols.ContainsKey("InstallExecuteSequence/DuplicateFiles") && !requiredActionSymbols.ContainsKey("InstallExecuteSequence/InstallFiles"))
             {
                 WindowsInstallerStandard.TryGetStandardAction("InstallExecuteSequence/InstallFiles", out var standardAction);
-                requiredActionTuples.Add(standardAction.Id.Id, standardAction);
+                requiredActionSymbols.Add(standardAction.Id.Id, standardAction);
             }
 
             // Schedule actions.
-            List<WixActionTuple> scheduledActionTuples;
+            List<WixActionSymbol> scheduledActionSymbols;
             if (SectionType.Module == this.Section.Type)
             {
-                scheduledActionTuples = requiredActionTuples.Values.ToList();
+                scheduledActionSymbols = requiredActionSymbols.Values.ToList();
             }
             else
             {
-                scheduledActionTuples = this.ScheduleActions(requiredActionTuples);
+                scheduledActionSymbols = this.ScheduleActions(requiredActionSymbols);
             }
 
-            // Remove all existing WixActionTuples from the section then add the
+            // Remove all existing WixActionSymbols from the section then add the
             // scheduled actions back to the section. Note: we add the indices in
             // reverse order to make it easy to remove them from the list later.
             var removeIndices = new List<int>();
-            for (var i = this.Section.Tuples.Count - 1; i >= 0; --i)
+            for (var i = this.Section.Symbols.Count - 1; i >= 0; --i)
             {
-                var tuple = this.Section.Tuples[i];
-                if (tuple.Definition.Type == TupleDefinitionType.WixAction)
+                var symbol = this.Section.Symbols[i];
+                if (symbol.Definition.Type == SymbolDefinitionType.WixAction)
                 {
                     removeIndices.Add(i);
                 }
@@ -181,164 +181,164 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var removeIndex in removeIndices)
             {
-                this.Section.Tuples.RemoveAt(removeIndex);
+                this.Section.Symbols.RemoveAt(removeIndex);
             }
 
-            foreach (var action in scheduledActionTuples)
+            foreach (var action in scheduledActionSymbols)
             {
-                this.Section.AddTuple(action);
+                this.Section.AddSymbol(action);
             }
         }
 
-        private Dictionary<string, WixActionTuple> GetRequiredStandardActions()
+        private Dictionary<string, WixActionSymbol> GetRequiredStandardActions()
         {
-            var overridableActionTuples = new Dictionary<string, WixActionTuple>();
+            var overridableActionSymbols = new Dictionary<string, WixActionSymbol>();
 
             var requiredActionIds = this.GetRequiredActionIds();
 
             foreach (var actionId in requiredActionIds)
             {
                 WindowsInstallerStandard.TryGetStandardAction(actionId, out var standardAction);
-                overridableActionTuples.Add(standardAction.Id.Id, standardAction);
+                overridableActionSymbols.Add(standardAction.Id.Id, standardAction);
             }
 
-            return overridableActionTuples;
+            return overridableActionSymbols;
         }
 
-        private List<WixActionTuple> ScheduleActions(Dictionary<string, WixActionTuple> requiredActionTuples)
+        private List<WixActionSymbol> ScheduleActions(Dictionary<string, WixActionSymbol> requiredActionSymbols)
         {
-            var scheduledActionTuples = new List<WixActionTuple>();
+            var scheduledActionSymbols = new List<WixActionSymbol>();
 
             // Process each sequence table individually.
             foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
             {
-                // Create a collection of just the action tuples in this sequence
-                var sequenceActionTuples = requiredActionTuples.Values.Where(a => a.SequenceTable == sequenceTable).ToList();
+                // Create a collection of just the action symbols in this sequence
+                var sequenceActionSymbols = requiredActionSymbols.Values.Where(a => a.SequenceTable == sequenceTable).ToList();
 
                 // Schedule the absolutely scheduled actions (by sorting them by their sequence numbers).
-                var absoluteActionTuples = new List<WixActionTuple>();
-                foreach (var actionTuple in sequenceActionTuples)
+                var absoluteActionSymbols = new List<WixActionSymbol>();
+                foreach (var actionSymbol in sequenceActionSymbols)
                 {
-                    if (actionTuple.Sequence.HasValue)
+                    if (actionSymbol.Sequence.HasValue)
                     {
                         // Look for sequence number collisions
-                        foreach (var sequenceScheduledActionTuple in absoluteActionTuples)
+                        foreach (var sequenceScheduledActionSymbol in absoluteActionSymbols)
                         {
-                            if (sequenceScheduledActionTuple.Sequence == actionTuple.Sequence)
+                            if (sequenceScheduledActionSymbol.Sequence == actionSymbol.Sequence)
                             {
-                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, sequenceScheduledActionTuple.Action, actionTuple.Sequence ?? 0));
-                                if (null != sequenceScheduledActionTuple.SourceLineNumbers)
+                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, sequenceScheduledActionSymbol.Action, actionSymbol.Sequence ?? 0));
+                                if (null != sequenceScheduledActionSymbol.SourceLineNumbers)
                                 {
-                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionTuple.SourceLineNumbers));
+                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionSymbol.SourceLineNumbers));
                                 }
                             }
                         }
 
-                        absoluteActionTuples.Add(actionTuple);
+                        absoluteActionSymbols.Add(actionSymbol);
                     }
                 }
 
-                absoluteActionTuples.Sort((x, y) => (x.Sequence ?? 0).CompareTo(y.Sequence ?? 0));
+                absoluteActionSymbols.Sort((x, y) => (x.Sequence ?? 0).CompareTo(y.Sequence ?? 0));
 
                 // Schedule the relatively scheduled actions (by resolving the dependency trees).
                 var previousUsedSequence = 0;
-                var relativeActionTuples = new List<WixActionTuple>();
-                for (int j = 0; j < absoluteActionTuples.Count; j++)
+                var relativeActionSymbols = new List<WixActionSymbol>();
+                for (int j = 0; j < absoluteActionSymbols.Count; j++)
                 {
-                    var absoluteActionTuple = absoluteActionTuples[j];
+                    var absoluteActionSymbol = absoluteActionSymbols[j];
 
-                    // Get all the relatively scheduled action tuples occuring before and after this absolutely scheduled action tuple.
-                    var relativeActions = this.GetAllRelativeActionsForSequenceType(sequenceTable, absoluteActionTuple);
+                    // Get all the relatively scheduled action symbols occuring before and after this absolutely scheduled action symbol.
+                    var relativeActions = this.GetAllRelativeActionsForSequenceType(sequenceTable, absoluteActionSymbol);
 
                     // Check for relatively scheduled actions occuring before/after a special action
                     // (those actions with a negative sequence number).
-                    if (absoluteActionTuple.Sequence < 0 && (relativeActions.PreviousActions.Any() || relativeActions.NextActions.Any()))
+                    if (absoluteActionSymbol.Sequence < 0 && (relativeActions.PreviousActions.Any() || relativeActions.NextActions.Any()))
                     {
                         // Create errors for all the before actions.
-                        foreach (var actionTuple in relativeActions.PreviousActions)
+                        foreach (var actionSymbol in relativeActions.PreviousActions)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, absoluteActionTuple.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, absoluteActionSymbol.Action));
                         }
 
                         // Create errors for all the after actions.
-                        foreach (var actionTuple in relativeActions.NextActions)
+                        foreach (var actionSymbol in relativeActions.NextActions)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, absoluteActionTuple.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, absoluteActionSymbol.Action));
                         }
 
                         // If there is source line information for the absolutely scheduled action display it
-                        if (absoluteActionTuple.SourceLineNumbers != null)
+                        if (absoluteActionSymbol.SourceLineNumbers != null)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction2(absoluteActionTuple.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction2(absoluteActionSymbol.SourceLineNumbers));
                         }
 
                         continue;
                     }
 
-                    // Schedule the action tuples before this one.
-                    var unusedSequence = absoluteActionTuple.Sequence - 1;
+                    // Schedule the action symbols before this one.
+                    var unusedSequence = absoluteActionSymbol.Sequence - 1;
                     for (var i = relativeActions.PreviousActions.Count - 1; i >= 0; i--)
                     {
-                        var relativeActionTuple = relativeActions.PreviousActions[i];
+                        var relativeActionSymbol = relativeActions.PreviousActions[i];
 
                         // look for collisions
                         if (unusedSequence == previousUsedSequence)
                         {
-                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionTuple.SourceLineNumbers, relativeActionTuple.SequenceTable.ToString(), relativeActionTuple.Action, absoluteActionTuple.Action));
-                            if (absoluteActionTuple.SourceLineNumbers != null)
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionSymbol.SourceLineNumbers, relativeActionSymbol.SequenceTable.ToString(), relativeActionSymbol.Action, absoluteActionSymbol.Action));
+                            if (absoluteActionSymbol.SourceLineNumbers != null)
                             {
-                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionTuple.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionSymbol.SourceLineNumbers));
                             }
 
                             unusedSequence++;
                         }
 
-                        relativeActionTuple.Sequence = unusedSequence;
-                        relativeActionTuples.Add(relativeActionTuple);
+                        relativeActionSymbol.Sequence = unusedSequence;
+                        relativeActionSymbols.Add(relativeActionSymbol);
 
                         unusedSequence--;
                     }
 
                     // Determine the next used action sequence number.
                     var nextUsedSequence = Int16.MaxValue + 1;
-                    if (absoluteActionTuples.Count > j + 1)
+                    if (absoluteActionSymbols.Count > j + 1)
                     {
-                        nextUsedSequence = absoluteActionTuples[j + 1].Sequence ?? 0;
+                        nextUsedSequence = absoluteActionSymbols[j + 1].Sequence ?? 0;
                     }
 
-                    // Schedule the action tuples after this one.
-                    unusedSequence = absoluteActionTuple.Sequence + 1;
+                    // Schedule the action symbols after this one.
+                    unusedSequence = absoluteActionSymbol.Sequence + 1;
                     for (var i = 0; i < relativeActions.NextActions.Count; i++)
                     {
-                        var relativeActionTuple = relativeActions.NextActions[i];
+                        var relativeActionSymbol = relativeActions.NextActions[i];
 
                         if (unusedSequence == nextUsedSequence)
                         {
-                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionTuple.SourceLineNumbers, relativeActionTuple.SequenceTable.ToString(), relativeActionTuple.Action, absoluteActionTuple.Action));
-                            if (absoluteActionTuple.SourceLineNumbers != null)
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionSymbol.SourceLineNumbers, relativeActionSymbol.SequenceTable.ToString(), relativeActionSymbol.Action, absoluteActionSymbol.Action));
+                            if (absoluteActionSymbol.SourceLineNumbers != null)
                             {
-                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionTuple.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionSymbol.SourceLineNumbers));
                             }
 
                             unusedSequence--;
                         }
 
-                        relativeActionTuple.Sequence = unusedSequence;
-                        relativeActionTuples.Add(relativeActionTuple);
+                        relativeActionSymbol.Sequence = unusedSequence;
+                        relativeActionSymbols.Add(relativeActionSymbol);
 
                         unusedSequence++;
                     }
 
                     // keep track of this sequence number as the previous used sequence number for the next iteration
-                    previousUsedSequence = absoluteActionTuple.Sequence ?? 0;
+                    previousUsedSequence = absoluteActionSymbol.Sequence ?? 0;
                 }
 
                 // add the absolutely and relatively scheduled actions to the list of scheduled actions
-                scheduledActionTuples.AddRange(absoluteActionTuples);
-                scheduledActionTuples.AddRange(relativeActionTuples);
+                scheduledActionSymbols.AddRange(absoluteActionSymbols);
+                scheduledActionSymbols.AddRange(relativeActionSymbols);
             }
 
-            return scheduledActionTuples;
+            return scheduledActionSymbols;
         }
 
         private IEnumerable<string> GetRequiredActionIds()
@@ -396,16 +396,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 set.Add("InstallUISequence/ValidateProductID");
             }
 
-            // Gather the required actions for each tuple type.
-            foreach (var tupleType in this.Section.Tuples.Select(t => t.Definition.Type).Distinct())
+            // Gather the required actions for each symbol type.
+            foreach (var symbolType in this.Section.Symbols.Select(t => t.Definition.Type).Distinct())
             {
-                switch (tupleType)
+                switch (symbolType)
                 {
-                    case TupleDefinitionType.AppSearch:
+                    case SymbolDefinitionType.AppSearch:
                         set.Add("InstallExecuteSequence/AppSearch");
                         set.Add("InstallUISequence/AppSearch");
                         break;
-                    case TupleDefinitionType.CCPSearch:
+                    case SymbolDefinitionType.CCPSearch:
                         set.Add("InstallExecuteSequence/AppSearch");
                         set.Add("InstallExecuteSequence/CCPSearch");
                         set.Add("InstallExecuteSequence/RMCCPSearch");
@@ -413,40 +413,40 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallUISequence/CCPSearch");
                         set.Add("InstallUISequence/RMCCPSearch");
                         break;
-                    case TupleDefinitionType.Class:
+                    case SymbolDefinitionType.Class:
                         set.Add("AdvertiseExecuteSequence/RegisterClassInfo");
                         set.Add("InstallExecuteSequence/RegisterClassInfo");
                         set.Add("InstallExecuteSequence/UnregisterClassInfo");
                         break;
-                    case TupleDefinitionType.Complus:
+                    case SymbolDefinitionType.Complus:
                         set.Add("InstallExecuteSequence/RegisterComPlus");
                         set.Add("InstallExecuteSequence/UnregisterComPlus");
                         break;
-                    case TupleDefinitionType.CreateFolder:
+                    case SymbolDefinitionType.CreateFolder:
                         set.Add("InstallExecuteSequence/CreateFolders");
                         set.Add("InstallExecuteSequence/RemoveFolders");
                         break;
-                    case TupleDefinitionType.DuplicateFile:
+                    case SymbolDefinitionType.DuplicateFile:
                         set.Add("InstallExecuteSequence/DuplicateFiles");
                         set.Add("InstallExecuteSequence/RemoveDuplicateFiles");
                         break;
-                    case TupleDefinitionType.Environment:
+                    case SymbolDefinitionType.Environment:
                         set.Add("InstallExecuteSequence/WriteEnvironmentStrings");
                         set.Add("InstallExecuteSequence/RemoveEnvironmentStrings");
                         break;
-                    case TupleDefinitionType.Extension:
+                    case SymbolDefinitionType.Extension:
                         set.Add("AdvertiseExecuteSequence/RegisterExtensionInfo");
                         set.Add("InstallExecuteSequence/RegisterExtensionInfo");
                         set.Add("InstallExecuteSequence/UnregisterExtensionInfo");
                         break;
-                    case TupleDefinitionType.File:
+                    case SymbolDefinitionType.File:
                         set.Add("InstallExecuteSequence/InstallFiles");
                         set.Add("InstallExecuteSequence/RemoveFiles");
 
                         var foundFont = false;
                         var foundSelfReg = false;
                         var foundBindPath = false;
-                        foreach (var file in this.Section.Tuples.OfType<FileTuple>())
+                        foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
                         {
                             if (!foundFont && !String.IsNullOrEmpty(file.FontTitle))
                             {
@@ -469,83 +469,83 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                         }
                         break;
-                    case TupleDefinitionType.IniFile:
+                    case SymbolDefinitionType.IniFile:
                         set.Add("InstallExecuteSequence/WriteIniValues");
                         set.Add("InstallExecuteSequence/RemoveIniValues");
                         break;
-                    case TupleDefinitionType.IsolatedComponent:
+                    case SymbolDefinitionType.IsolatedComponent:
                         set.Add("InstallExecuteSequence/IsolateComponents");
                         break;
-                    case TupleDefinitionType.LaunchCondition:
+                    case SymbolDefinitionType.LaunchCondition:
                         set.Add("InstallExecuteSequence/LaunchConditions");
                         set.Add("InstallUISequence/LaunchConditions");
                         break;
-                    case TupleDefinitionType.MIME:
+                    case SymbolDefinitionType.MIME:
                         set.Add("AdvertiseExecuteSequence/RegisterMIMEInfo");
                         set.Add("InstallExecuteSequence/RegisterMIMEInfo");
                         set.Add("InstallExecuteSequence/UnregisterMIMEInfo");
                         break;
-                    case TupleDefinitionType.MoveFile:
+                    case SymbolDefinitionType.MoveFile:
                         set.Add("InstallExecuteSequence/MoveFiles");
                         break;
-                    case TupleDefinitionType.Assembly:
+                    case SymbolDefinitionType.Assembly:
                         set.Add("AdvertiseExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiUnpublishAssemblies");
                         break;
-                    case TupleDefinitionType.MsiServiceConfig:
-                    case TupleDefinitionType.MsiServiceConfigFailureActions:
+                    case SymbolDefinitionType.MsiServiceConfig:
+                    case SymbolDefinitionType.MsiServiceConfigFailureActions:
                         set.Add("InstallExecuteSequence/MsiConfigureServices");
                         break;
-                    case TupleDefinitionType.ODBCDataSource:
-                    case TupleDefinitionType.ODBCTranslator:
-                    case TupleDefinitionType.ODBCDriver:
+                    case SymbolDefinitionType.ODBCDataSource:
+                    case SymbolDefinitionType.ODBCTranslator:
+                    case SymbolDefinitionType.ODBCDriver:
                         set.Add("InstallExecuteSequence/SetODBCFolders");
                         set.Add("InstallExecuteSequence/InstallODBC");
                         set.Add("InstallExecuteSequence/RemoveODBC");
                         break;
-                    case TupleDefinitionType.ProgId:
+                    case SymbolDefinitionType.ProgId:
                         set.Add("AdvertiseExecuteSequence/RegisterProgIdInfo");
                         set.Add("InstallExecuteSequence/RegisterProgIdInfo");
                         set.Add("InstallExecuteSequence/UnregisterProgIdInfo");
                         break;
-                    case TupleDefinitionType.PublishComponent:
+                    case SymbolDefinitionType.PublishComponent:
                         set.Add("AdvertiseExecuteSequence/PublishComponents");
                         set.Add("InstallExecuteSequence/PublishComponents");
                         set.Add("InstallExecuteSequence/UnpublishComponents");
                         break;
-                    case TupleDefinitionType.Registry:
-                    case TupleDefinitionType.RemoveRegistry:
+                    case SymbolDefinitionType.Registry:
+                    case SymbolDefinitionType.RemoveRegistry:
                         set.Add("InstallExecuteSequence/WriteRegistryValues");
                         set.Add("InstallExecuteSequence/RemoveRegistryValues");
                         break;
-                    case TupleDefinitionType.RemoveFile:
+                    case SymbolDefinitionType.RemoveFile:
                         set.Add("InstallExecuteSequence/RemoveFiles");
                         break;
-                    case TupleDefinitionType.ServiceControl:
+                    case SymbolDefinitionType.ServiceControl:
                         set.Add("InstallExecuteSequence/StartServices");
                         set.Add("InstallExecuteSequence/StopServices");
                         set.Add("InstallExecuteSequence/DeleteServices");
                         break;
-                    case TupleDefinitionType.ServiceInstall:
+                    case SymbolDefinitionType.ServiceInstall:
                         set.Add("InstallExecuteSequence/InstallServices");
                         break;
-                    case TupleDefinitionType.Shortcut:
+                    case SymbolDefinitionType.Shortcut:
                         set.Add("AdvertiseExecuteSequence/CreateShortcuts");
                         set.Add("InstallExecuteSequence/CreateShortcuts");
                         set.Add("InstallExecuteSequence/RemoveShortcuts");
                         break;
-                    case TupleDefinitionType.TypeLib:
+                    case SymbolDefinitionType.TypeLib:
                         set.Add("InstallExecuteSequence/RegisterTypeLibraries");
                         set.Add("InstallExecuteSequence/UnregisterTypeLibraries");
                         break;
-                    case TupleDefinitionType.Upgrade:
+                    case SymbolDefinitionType.Upgrade:
                         set.Add("InstallExecuteSequence/FindRelatedProducts");
                         set.Add("InstallUISequence/FindRelatedProducts");
 
                         // Only add the MigrateFeatureStates action if MigrateFeature attribute is set on
                         // at least one UpgradeVersion element.
-                        if (this.Section.Tuples.OfType<UpgradeTuple>().Any(t => t.MigrateFeatures))
+                        if (this.Section.Symbols.OfType<UpgradeSymbol>().Any(t => t.MigrateFeatures))
                         {
                             set.Add("InstallExecuteSequence/MigrateFeatureStates");
                             set.Add("InstallUISequence/MigrateFeatureStates");
@@ -557,7 +557,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return set;
         }
 
-        private IEnumerable<WixActionTuple> GetActions(SequenceTable sequence, string[] actionNames)
+        private IEnumerable<WixActionSymbol> GetActions(SequenceTable sequence, string[] actionNames)
         {
             foreach (var action in WindowsInstallerStandard.StandardActions())
             {
@@ -571,64 +571,64 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Sequence an action before or after a standard action.
         /// </summary>
-        /// <param name="actionTuple">The action tuple to be sequenced.</param>
-        /// <param name="requiredActionTuples">Collection of actions which must be included.</param>
-        private void SequenceActionTuple(WixActionTuple actionTuple, Dictionary<string, WixActionTuple> requiredActionTuples)
+        /// <param name="actionSymbol">The action symbol to be sequenced.</param>
+        /// <param name="requiredActionSymbols">Collection of actions which must be included.</param>
+        private void SequenceActionSymbol(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols)
         {
             var after = false;
 
-            if (actionTuple.After != null)
+            if (actionSymbol.After != null)
             {
                 after = true;
             }
-            else if (actionTuple.Before == null)
+            else if (actionSymbol.Before == null)
             {
                 throw new InvalidOperationException("Found an action with no Sequence, Before, or After column set.");
             }
 
-            var parentActionName = (after ? actionTuple.After : actionTuple.Before);
-            var parentActionKey = actionTuple.SequenceTable.ToString() + "/" + parentActionName;
+            var parentActionName = (after ? actionSymbol.After : actionSymbol.Before);
+            var parentActionKey = actionSymbol.SequenceTable.ToString() + "/" + parentActionName;
 
-            if (!requiredActionTuples.TryGetValue(parentActionKey, out var parentActionTuple))
+            if (!requiredActionSymbols.TryGetValue(parentActionKey, out var parentActionSymbol))
             {
                 // If the missing parent action is a standard action (with a suggested sequence number), add it.
-                if (WindowsInstallerStandard.TryGetStandardAction(parentActionKey, out parentActionTuple))
+                if (WindowsInstallerStandard.TryGetStandardAction(parentActionKey, out parentActionSymbol))
                 {
                     // Create a clone to avoid modifying the static copy of the object.
-                    // TODO: consider this: parentActionTuple = parentActionTuple.Clone();
+                    // TODO: consider this: parentActionSymbol = parentActionSymbol.Clone();
 
-                    requiredActionTuples.Add(parentActionTuple.Id.Id, parentActionTuple);
+                    requiredActionSymbols.Add(parentActionSymbol.Id.Id, parentActionSymbol);
                 }
                 else
                 {
                     throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an action with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
                 }
             }
-            else if (actionTuple == parentActionTuple || this.ContainsChildActionTuple(actionTuple, parentActionTuple)) // cycle detected
+            else if (actionSymbol == parentActionSymbol || this.ContainsChildActionSymbol(actionSymbol, parentActionSymbol)) // cycle detected
             {
-                throw new WixException(ErrorMessages.ActionCircularDependency(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, parentActionTuple.Action));
+                throw new WixException(ErrorMessages.ActionCircularDependency(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, parentActionSymbol.Action));
             }
 
-            // Add this action to the appropriate list of dependent action tuples.
-            var relativeActions = this.GetRelativeActions(parentActionTuple);
-            var relatedTuples = (after ? relativeActions.NextActions : relativeActions.PreviousActions);
-            relatedTuples.Add(actionTuple);
+            // Add this action to the appropriate list of dependent action symbols.
+            var relativeActions = this.GetRelativeActions(parentActionSymbol);
+            var relatedSymbols = (after ? relativeActions.NextActions : relativeActions.PreviousActions);
+            relatedSymbols.Add(actionSymbol);
         }
 
-        private bool ContainsChildActionTuple(WixActionTuple childTuple, WixActionTuple parentTuple)
+        private bool ContainsChildActionSymbol(WixActionSymbol childSymbol, WixActionSymbol parentSymbol)
         {
             var result = false;
 
-            if (this.RelativeActionsForActions.TryGetValue(childTuple.Id.Id, out var relativeActions))
+            if (this.RelativeActionsForActions.TryGetValue(childSymbol.Id.Id, out var relativeActions))
             {
-                result = relativeActions.NextActions.Any(a => a.SequenceTable == parentTuple.SequenceTable && a.Id.Id == parentTuple.Id.Id) ||
-                     relativeActions.PreviousActions.Any(a => a.SequenceTable == parentTuple.SequenceTable && a.Id.Id == parentTuple.Id.Id);
+                result = relativeActions.NextActions.Any(a => a.SequenceTable == parentSymbol.SequenceTable && a.Id.Id == parentSymbol.Id.Id) ||
+                     relativeActions.PreviousActions.Any(a => a.SequenceTable == parentSymbol.SequenceTable && a.Id.Id == parentSymbol.Id.Id);
             }
 
             return result;
         }
 
-        private RelativeActions GetRelativeActions(WixActionTuple action)
+        private RelativeActions GetRelativeActions(WixActionSymbol action)
         {
             if (!this.RelativeActionsForActions.TryGetValue(action.Id.Id, out var relativeActions))
             {
@@ -639,7 +639,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return relativeActions;
         }
 
-        private RelativeActions GetAllRelativeActionsForSequenceType(SequenceTable sequenceType, WixActionTuple action)
+        private RelativeActions GetAllRelativeActionsForSequenceType(SequenceTable sequenceType, WixActionSymbol action)
         {
             var relativeActions = new RelativeActions();
 
@@ -653,7 +653,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return relativeActions;
         }
 
-        private void RecurseRelativeActionsForSequenceType(SequenceTable sequenceType, List<WixActionTuple> actions, List<WixActionTuple> visitedActions)
+        private void RecurseRelativeActionsForSequenceType(SequenceTable sequenceType, List<WixActionSymbol> actions, List<WixActionSymbol> visitedActions)
         {
             foreach (var action in actions.Where(a => a.SequenceTable == sequenceType))
             {
@@ -673,9 +673,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private class RelativeActions
         {
-            public List<WixActionTuple> PreviousActions { get; } = new List<WixActionTuple>();
+            public List<WixActionSymbol> PreviousActions { get; } = new List<WixActionSymbol>();
 
-            public List<WixActionTuple> NextActions { get; } = new List<WixActionTuple>();
+            public List<WixActionSymbol> NextActions { get; } = new List<WixActionSymbol>();
         }
     }
 }

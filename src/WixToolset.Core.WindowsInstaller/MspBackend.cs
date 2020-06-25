@@ -10,7 +10,7 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;

@@ -14,7 +14,7 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Xml.Linq;
     using WixToolset.Core;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
@@ -92,7 +92,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         private OutputType OutputType { get; set; }
 
-        private Dictionary<string, WixActionTuple> StandardActions { get; }
+        private Dictionary<string, WixActionSymbol> StandardActions { get; }
 
         /// <summary>
         /// Decompile the database file.
@@ -262,23 +262,23 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Creates an action element.
         /// </summary>
-        /// <param name="actionTuple">The action from which the element should be created.</param>
-        private void CreateActionElement(WixActionTuple actionTuple)
+        /// <param name="actionSymbol">The action from which the element should be created.</param>
+        private void CreateActionElement(WixActionSymbol actionSymbol)
         {
             Wix.ISchemaElement actionElement = null;
 
-            if (null != this.core.GetIndexedElement("CustomAction", actionTuple.Action)) // custom action
+            if (null != this.core.GetIndexedElement("CustomAction", actionSymbol.Action)) // custom action
             {
                 var custom = new Wix.Custom();
 
-                custom.Action = actionTuple.Action;
+                custom.Action = actionSymbol.Action;
 
-                if (null != actionTuple.Condition)
+                if (null != actionSymbol.Condition)
                 {
-                    custom.Content = actionTuple.Condition;
+                    custom.Content = actionSymbol.Condition;
                 }
 
-                switch (actionTuple.Sequence)
+                switch (actionSymbol.Sequence)
                 {
                 case (-4):
                     custom.OnExit = Wix.ExitType.suspend;
@@ -293,35 +293,35 @@ namespace WixToolset.Core.WindowsInstaller
                     custom.OnExit = Wix.ExitType.success;
                     break;
                 default:
-                    if (null != actionTuple.Before)
+                    if (null != actionSymbol.Before)
                     {
-                        custom.Before = actionTuple.Before;
+                        custom.Before = actionSymbol.Before;
                     }
-                    else if (null != actionTuple.After)
+                    else if (null != actionSymbol.After)
                     {
-                        custom.After = actionTuple.After;
+                        custom.After = actionSymbol.After;
                     }
-                    else if (actionTuple.Sequence.HasValue)
+                    else if (actionSymbol.Sequence.HasValue)
                     {
-                        custom.Sequence = actionTuple.Sequence.Value;
+                        custom.Sequence = actionSymbol.Sequence.Value;
                     }
                     break;
                 }
 
                 actionElement = custom;
             }
-            else if (null != this.core.GetIndexedElement("Dialog", actionTuple.Action)) // dialog
+            else if (null != this.core.GetIndexedElement("Dialog", actionSymbol.Action)) // dialog
             {
                 var show = new Wix.Show();
 
-                show.Dialog = actionTuple.Action;
+                show.Dialog = actionSymbol.Action;
 
-                if (null != actionTuple.Condition)
+                if (null != actionSymbol.Condition)
                 {
-                    show.Content = actionTuple.Condition;
+                    show.Content = actionSymbol.Condition;
                 }
 
-                switch (actionTuple.Sequence)
+                switch (actionSymbol.Sequence)
                 {
                 case (-4):
                     show.OnExit = Wix.ExitType.suspend;
@@ -336,17 +336,17 @@ namespace WixToolset.Core.WindowsInstaller
                     show.OnExit = Wix.ExitType.success;
                     break;
                 default:
-                    if (null != actionTuple.Before)
+                    if (null != actionSymbol.Before)
                     {
-                        show.Before = actionTuple.Before;
+                        show.Before = actionSymbol.Before;
                     }
-                    else if (null != actionTuple.After)
+                    else if (null != actionSymbol.After)
                     {
-                        show.After = actionTuple.After;
+                        show.After = actionSymbol.After;
                     }
-                    else if (actionTuple.Sequence.HasValue)
+                    else if (actionSymbol.Sequence.HasValue)
                     {
-                        show.Sequence = actionTuple.Sequence.Value;
+                        show.Sequence = actionSymbol.Sequence.Value;
                     }
                     break;
                 }
@@ -355,18 +355,18 @@ namespace WixToolset.Core.WindowsInstaller
             }
             else // possibly a standard action without suggested sequence information
             {
-                actionElement = this.CreateStandardActionElement(actionTuple);
+                actionElement = this.CreateStandardActionElement(actionSymbol);
             }
 
             // add the action element to the appropriate sequence element
             if (null != actionElement)
             {
-                var sequenceTable = actionTuple.SequenceTable.ToString();
+                var sequenceTable = actionSymbol.SequenceTable.ToString();
                 var sequenceElement = (Wix.IParentElement)this.sequenceElements[sequenceTable];
 
                 if (null == sequenceElement)
                 {
-                    switch (actionTuple.SequenceTable)
+                    switch (actionSymbol.SequenceTable)
                     {
                     case SequenceTable.AdminExecuteSequence:
                         sequenceElement = new Wix.AdminExecuteSequence();
@@ -397,7 +397,7 @@ namespace WixToolset.Core.WindowsInstaller
                 }
                 catch (System.ArgumentException) // action/dialog is not valid for this sequence
                 {
-                    this.Messaging.Write(WarningMessages.IllegalActionInSequence(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                    this.Messaging.Write(WarningMessages.IllegalActionInSequence(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                 }
             }
         }
@@ -405,40 +405,40 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Creates a standard action element.
         /// </summary>
-        /// <param name="actionTuple">The action row from which the element should be created.</param>
+        /// <param name="actionSymbol">The action row from which the element should be created.</param>
         /// <returns>The created element.</returns>
-        private Wix.ISchemaElement CreateStandardActionElement(WixActionTuple actionTuple)
+        private Wix.ISchemaElement CreateStandardActionElement(WixActionSymbol actionSymbol)
         {
             Wix.ActionSequenceType actionElement = null;
 
-            switch (actionTuple.Action)
+            switch (actionSymbol.Action)
             {
             case "AllocateRegistrySpace":
                 actionElement = new Wix.AllocateRegistrySpace();
                 break;
             case "AppSearch":
-                this.StandardActions.TryGetValue(actionTuple.Id.Id, out var appSearchActionRow);
+                this.StandardActions.TryGetValue(actionSymbol.Id.Id, out var appSearchActionRow);
 
-                if (null != actionTuple.Before || null != actionTuple.After || (null != appSearchActionRow && actionTuple.Sequence != appSearchActionRow.Sequence))
+                if (null != actionSymbol.Before || null != actionSymbol.After || (null != appSearchActionRow && actionSymbol.Sequence != appSearchActionRow.Sequence))
                 {
                     var appSearch = new Wix.AppSearch();
 
-                    if (null != actionTuple.Condition)
+                    if (null != actionSymbol.Condition)
                     {
-                        appSearch.Content = actionTuple.Condition;
+                        appSearch.Content = actionSymbol.Condition;
                     }
 
-                    if (null != actionTuple.Before)
+                    if (null != actionSymbol.Before)
                     {
-                        appSearch.Before = actionTuple.Before;
+                        appSearch.Before = actionSymbol.Before;
                     }
-                    else if (null != actionTuple.After)
+                    else if (null != actionSymbol.After)
                     {
-                        appSearch.After = actionTuple.After;
+                        appSearch.After = actionSymbol.After;
                     }
-                    else if (actionTuple.Sequence.HasValue)
+                    else if (actionSymbol.Sequence.HasValue)
                     {
-                        appSearch.Sequence = actionTuple.Sequence.Value;
+                        appSearch.Sequence = actionSymbol.Sequence.Value;
                     }
 
                     return appSearch;
@@ -449,7 +449,7 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "CCPSearch":
                 var ccpSearch = new Wix.CCPSearch();
-                Decompiler.SequenceRelativeAction(actionTuple, ccpSearch);
+                Decompiler.SequenceRelativeAction(actionSymbol, ccpSearch);
                 return ccpSearch;
             case "CostFinalize":
                 actionElement = new Wix.CostFinalize();
@@ -468,7 +468,7 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "DisableRollback":
                 var disableRollback = new Wix.DisableRollback();
-                Decompiler.SequenceRelativeAction(actionTuple, disableRollback);
+                Decompiler.SequenceRelativeAction(actionSymbol, disableRollback);
                 return disableRollback;
             case "DuplicateFiles":
                 actionElement = new Wix.DuplicateFiles();
@@ -481,22 +481,22 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "FindRelatedProducts":
                 var findRelatedProducts = new Wix.FindRelatedProducts();
-                Decompiler.SequenceRelativeAction(actionTuple, findRelatedProducts);
+                Decompiler.SequenceRelativeAction(actionSymbol, findRelatedProducts);
                 return findRelatedProducts;
             case "ForceReboot":
                 var forceReboot = new Wix.ForceReboot();
-                Decompiler.SequenceRelativeAction(actionTuple, forceReboot);
+                Decompiler.SequenceRelativeAction(actionSymbol, forceReboot);
                 return forceReboot;
             case "InstallAdminPackage":
                 actionElement = new Wix.InstallAdminPackage();
                 break;
             case "InstallExecute":
                 var installExecute = new Wix.InstallExecute();
-                Decompiler.SequenceRelativeAction(actionTuple, installExecute);
+                Decompiler.SequenceRelativeAction(actionSymbol, installExecute);
                 return installExecute;
             case "InstallExecuteAgain":
                 var installExecuteAgain = new Wix.InstallExecuteAgain();
-                Decompiler.SequenceRelativeAction(actionTuple, installExecuteAgain);
+                Decompiler.SequenceRelativeAction(actionSymbol, installExecuteAgain);
                 return installExecuteAgain;
             case "InstallFiles":
                 actionElement = new Wix.InstallFiles();
@@ -521,7 +521,7 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "LaunchConditions":
                 var launchConditions = new Wix.LaunchConditions();
-                Decompiler.SequenceRelativeAction(actionTuple, launchConditions);
+                Decompiler.SequenceRelativeAction(actionSymbol, launchConditions);
                 return launchConditions;
             case "MigrateFeatureStates":
                 actionElement = new Wix.MigrateFeatureStates();
@@ -585,7 +585,7 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "RemoveExistingProducts":
                 var removeExistingProducts = new Wix.RemoveExistingProducts();
-                Decompiler.SequenceRelativeAction(actionTuple, removeExistingProducts);
+                Decompiler.SequenceRelativeAction(actionSymbol, removeExistingProducts);
                 return removeExistingProducts;
             case "RemoveFiles":
                 actionElement = new Wix.RemoveFiles();
@@ -607,15 +607,15 @@ namespace WixToolset.Core.WindowsInstaller
                 break;
             case "ResolveSource":
                 var resolveSource = new Wix.ResolveSource();
-                Decompiler.SequenceRelativeAction(actionTuple, resolveSource);
+                Decompiler.SequenceRelativeAction(actionSymbol, resolveSource);
                 return resolveSource;
             case "RMCCPSearch":
                 var rmccpSearch = new Wix.RMCCPSearch();
-                Decompiler.SequenceRelativeAction(actionTuple, rmccpSearch);
+                Decompiler.SequenceRelativeAction(actionSymbol, rmccpSearch);
                 return rmccpSearch;
             case "ScheduleReboot":
                 var scheduleReboot = new Wix.ScheduleReboot();
-                Decompiler.SequenceRelativeAction(actionTuple, scheduleReboot);
+                Decompiler.SequenceRelativeAction(actionSymbol, scheduleReboot);
                 return scheduleReboot;
             case "SelfRegModules":
                 actionElement = new Wix.SelfRegModules();
@@ -672,13 +672,13 @@ namespace WixToolset.Core.WindowsInstaller
                 actionElement = new Wix.WriteRegistryValues();
                 break;
             default:
-                this.Messaging.Write(WarningMessages.UnknownAction(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                this.Messaging.Write(WarningMessages.UnknownAction(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                 return null;
             }
 
             if (actionElement != null)
             {
-                this.SequenceStandardAction(actionTuple, actionElement);
+                this.SequenceStandardAction(actionSymbol, actionElement);
             }
 
             return actionElement;
@@ -687,48 +687,48 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Applies the condition and sequence to a standard action element based on the action row data.
         /// </summary>
-        /// <param name="actionTuple">Action data from the database.</param>
+        /// <param name="actionSymbol">Action data from the database.</param>
         /// <param name="actionElement">Element to be sequenced.</param>
-        private void SequenceStandardAction(WixActionTuple actionTuple, Wix.ActionSequenceType actionElement)
+        private void SequenceStandardAction(WixActionSymbol actionSymbol, Wix.ActionSequenceType actionElement)
         {
-            if (null != actionTuple.Condition)
+            if (null != actionSymbol.Condition)
             {
-                actionElement.Content = actionTuple.Condition;
+                actionElement.Content = actionSymbol.Condition;
             }
 
-            if ((null != actionTuple.Before || null != actionTuple.After) && 0 == actionTuple.Sequence)
+            if ((null != actionSymbol.Before || null != actionSymbol.After) && 0 == actionSymbol.Sequence)
             {
-                this.Messaging.Write(WarningMessages.DecompiledStandardActionRelativelyScheduledInModule(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                this.Messaging.Write(WarningMessages.DecompiledStandardActionRelativelyScheduledInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
             }
-            else if (actionTuple.Sequence.HasValue)
+            else if (actionSymbol.Sequence.HasValue)
             {
-                actionElement.Sequence = actionTuple.Sequence.Value;
+                actionElement.Sequence = actionSymbol.Sequence.Value;
             }
         }
 
         /// <summary>
         /// Applies the condition and relative sequence to an action element based on the action row data.
         /// </summary>
-        /// <param name="actionTuple">Action data from the database.</param>
+        /// <param name="actionSymbol">Action data from the database.</param>
         /// <param name="actionElement">Element to be sequenced.</param>
-        private static void SequenceRelativeAction(WixActionTuple actionTuple, Wix.ActionModuleSequenceType actionElement)
+        private static void SequenceRelativeAction(WixActionSymbol actionSymbol, Wix.ActionModuleSequenceType actionElement)
         {
-            if (null != actionTuple.Condition)
+            if (null != actionSymbol.Condition)
             {
-                actionElement.Content = actionTuple.Condition;
+                actionElement.Content = actionSymbol.Condition;
             }
 
-            if (null != actionTuple.Before)
+            if (null != actionSymbol.Before)
             {
-                actionElement.Before = actionTuple.Before;
+                actionElement.Before = actionSymbol.Before;
             }
-            else if (null != actionTuple.After)
+            else if (null != actionSymbol.After)
             {
-                actionElement.After = actionTuple.After;
+                actionElement.After = actionSymbol.After;
             }
-            else if (actionTuple.Sequence.HasValue)
+            else if (actionSymbol.Sequence.HasValue)
             {
-                actionElement.Sequence = actionTuple.Sequence.Value;
+                actionElement.Sequence = actionSymbol.Sequence.Value;
             }
         }
 
@@ -2507,53 +2507,53 @@ namespace WixToolset.Core.WindowsInstaller
 
                     if (null != table)
                     {
-                        var actionTuples = new List<WixActionTuple>();
+                        var actionSymbols = new List<WixActionSymbol>();
                         var needAbsoluteScheduling = this.SuppressRelativeActionSequencing;
-                        var nonSequencedActionRows = new Dictionary<string, WixActionTuple>();
-                        var suppressedRelativeActionRows = new Dictionary<string, WixActionTuple>();
+                        var nonSequencedActionRows = new Dictionary<string, WixActionSymbol>();
+                        var suppressedRelativeActionRows = new Dictionary<string, WixActionSymbol>();
 
                         // create a sorted array of actions in this table
                         foreach (var row in table.Rows)
                         {
                             var action = row.FieldAsString(0);
-                            var actionTuple = new WixActionTuple(null, new Identifier(AccessModifier.Public, sequenceTable, action));
+                            var actionSymbol = new WixActionSymbol(null, new Identifier(AccessModifier.Public, sequenceTable, action));
 
-                            actionTuple.Action = action;
+                            actionSymbol.Action = action;
 
                             if (null != row[1])
                             {
-                                actionTuple.Condition = Convert.ToString(row[1]);
+                                actionSymbol.Condition = Convert.ToString(row[1]);
                             }
 
-                            actionTuple.Sequence = Convert.ToInt32(row[2]);
+                            actionSymbol.Sequence = Convert.ToInt32(row[2]);
 
-                            actionTuple.SequenceTable = sequenceTable;
+                            actionSymbol.SequenceTable = sequenceTable;
 
-                            actionTuples.Add(actionTuple);
+                            actionSymbols.Add(actionSymbol);
                         }
-                        actionTuples = actionTuples.OrderBy(t => t.Sequence).ToList();
+                        actionSymbols = actionSymbols.OrderBy(t => t.Sequence).ToList();
 
-                        for (var i = 0; i < actionTuples.Count && !needAbsoluteScheduling; i++)
+                        for (var i = 0; i < actionSymbols.Count && !needAbsoluteScheduling; i++)
                         {
-                            var actionTuple = actionTuples[i];
-                            this.StandardActions.TryGetValue(actionTuple.Id.Id, out var standardActionRow);
+                            var actionSymbol = actionSymbols[i];
+                            this.StandardActions.TryGetValue(actionSymbol.Id.Id, out var standardActionRow);
 
                             // create actions for custom actions, dialogs, AppSearch when its moved, and standard actions with non-standard conditions
-                            if ("AppSearch" == actionTuple.Action || null == standardActionRow || actionTuple.Condition != standardActionRow.Condition)
+                            if ("AppSearch" == actionSymbol.Action || null == standardActionRow || actionSymbol.Condition != standardActionRow.Condition)
                             {
-                                WixActionTuple previousActionTuple = null;
-                                WixActionTuple nextActionTuple = null;
+                                WixActionSymbol previousActionSymbol = null;
+                                WixActionSymbol nextActionSymbol = null;
 
                                 // find the previous action row if there is one
                                 if (0 <= i - 1)
                                 {
-                                    previousActionTuple = actionTuples[i - 1];
+                                    previousActionSymbol = actionSymbols[i - 1];
                                 }
 
                                 // find the next action row if there is one
-                                if (actionTuples.Count > i + 1)
+                                if (actionSymbols.Count > i + 1)
                                 {
-                                    nextActionTuple = actionTuples[i + 1];
+                                    nextActionSymbol = actionSymbols[i + 1];
                                 }
 
                                 // the logic for setting the before or after attribute for an action:
@@ -2565,47 +2565,47 @@ namespace WixToolset.Core.WindowsInstaller
                                 // 6. If this action is AppSearch and has all standard information, ignore it.
                                 // 7. If this action is standard and has a non-standard condition, create the action without any scheduling information.
                                 // 8. Everything must be absolutely sequenced.
-                                if ((null != previousActionTuple && actionTuple.Sequence == previousActionTuple.Sequence) || (null != nextActionTuple && actionTuple.Sequence == nextActionTuple.Sequence))
+                                if ((null != previousActionSymbol && actionSymbol.Sequence == previousActionSymbol.Sequence) || (null != nextActionSymbol && actionSymbol.Sequence == nextActionSymbol.Sequence))
                                 {
                                     needAbsoluteScheduling = true;
                                 }
-                                else if (null != nextActionTuple && this.StandardActions.ContainsKey(nextActionTuple.Id.Id) && actionTuple.Sequence + 1 == nextActionTuple.Sequence)
+                                else if (null != nextActionSymbol && this.StandardActions.ContainsKey(nextActionSymbol.Id.Id) && actionSymbol.Sequence + 1 == nextActionSymbol.Sequence)
                                 {
-                                    actionTuple.Before = nextActionTuple.Action;
+                                    actionSymbol.Before = nextActionSymbol.Action;
                                 }
-                                else if (null != previousActionTuple && this.StandardActions.ContainsKey(previousActionTuple.Id.Id) && actionTuple.Sequence - 1 == previousActionTuple.Sequence)
+                                else if (null != previousActionSymbol && this.StandardActions.ContainsKey(previousActionSymbol.Id.Id) && actionSymbol.Sequence - 1 == previousActionSymbol.Sequence)
                                 {
-                                    actionTuple.After = previousActionTuple.Action;
+                                    actionSymbol.After = previousActionSymbol.Action;
                                 }
-                                else if (null == standardActionRow && null != previousActionTuple && actionTuple.Sequence - 1 == previousActionTuple.Sequence && previousActionTuple.Before != actionTuple.Action)
+                                else if (null == standardActionRow && null != previousActionSymbol && actionSymbol.Sequence - 1 == previousActionSymbol.Sequence && previousActionSymbol.Before != actionSymbol.Action)
                                 {
-                                    actionTuple.After = previousActionTuple.Action;
+                                    actionSymbol.After = previousActionSymbol.Action;
                                 }
-                                else if (null == standardActionRow && null != previousActionTuple && actionTuple.Sequence != previousActionTuple.Sequence && null != nextActionTuple && actionTuple.Sequence + 1 == nextActionTuple.Sequence)
+                                else if (null == standardActionRow && null != previousActionSymbol && actionSymbol.Sequence != previousActionSymbol.Sequence && null != nextActionSymbol && actionSymbol.Sequence + 1 == nextActionSymbol.Sequence)
                                 {
-                                    actionTuple.Before = nextActionTuple.Action;
+                                    actionSymbol.Before = nextActionSymbol.Action;
                                 }
-                                else if ("AppSearch" == actionTuple.Action && null != standardActionRow && actionTuple.Sequence == standardActionRow.Sequence && actionTuple.Condition == standardActionRow.Condition)
+                                else if ("AppSearch" == actionSymbol.Action && null != standardActionRow && actionSymbol.Sequence == standardActionRow.Sequence && actionSymbol.Condition == standardActionRow.Condition)
                                 {
                                     // ignore an AppSearch row which has the WiX standard sequence and a standard condition
                                 }
-                                else if (null != standardActionRow && actionTuple.Condition != standardActionRow.Condition) // standard actions get their standard sequence numbers
+                                else if (null != standardActionRow && actionSymbol.Condition != standardActionRow.Condition) // standard actions get their standard sequence numbers
                                 {
-                                    nonSequencedActionRows.Add(actionTuple.Id.Id, actionTuple);
+                                    nonSequencedActionRows.Add(actionSymbol.Id.Id, actionSymbol);
                                 }
-                                else if (0 < actionTuple.Sequence)
+                                else if (0 < actionSymbol.Sequence)
                                 {
                                     needAbsoluteScheduling = true;
                                 }
                             }
                             else
                             {
-                                suppressedRelativeActionRows.Add(actionTuple.Id.Id, actionTuple);
+                                suppressedRelativeActionRows.Add(actionSymbol.Id.Id, actionSymbol);
                             }
                         }
 
                         // create the actions now that we know if they must be absolutely or relatively scheduled
-                        foreach (var actionRow in actionTuples)
+                        foreach (var actionRow in actionSymbols)
                         {
                             var key = actionRow.Id.Id;
 
@@ -2650,7 +2650,7 @@ namespace WixToolset.Core.WindowsInstaller
                     {
                         foreach (var row in table.Rows)
                         {
-                            var actionRow = new WixActionTuple(null, new Identifier(AccessModifier.Public, sequenceTable, row.FieldAsString(0)));
+                            var actionRow = new WixActionSymbol(null, new Identifier(AccessModifier.Public, sequenceTable, row.FieldAsString(0)));
 
                             actionRow.Action = row.FieldAsString(0);
 

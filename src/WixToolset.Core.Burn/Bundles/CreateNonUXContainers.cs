@@ -8,18 +8,18 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CreateNonUXContainers
     {
-        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationTuple bootstrapperApplicationTuple, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
+        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
         {
             this.BackendHelper = backendHelper;
             this.Section = section;
-            this.BootstrapperApplicationTuple = bootstrapperApplicationTuple;
-            this.PayloadTuples = payloadTuples;
+            this.BootstrapperApplicationSymbol = bootstrapperApplicationSymbol;
+            this.PayloadSymbols = payloadSymbols;
             this.IntermediateFolder = intermediateFolder;
             this.LayoutFolder = layoutFolder;
             this.DefaultCompressionLevel = defaultCompressionLevel;
@@ -29,19 +29,19 @@ namespace WixToolset.Core.Burn.Bundles
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
-        public WixBundleContainerTuple UXContainer { get; set; }
+        public WixBundleContainerSymbol UXContainer { get; set; }
 
-        public IEnumerable<WixBundlePayloadTuple> UXContainerPayloads { get; private set; }
+        public IEnumerable<WixBundlePayloadSymbol> UXContainerPayloads { get; private set; }
 
-        public IEnumerable<WixBundleContainerTuple> Containers { get; private set; }
+        public IEnumerable<WixBundleContainerSymbol> Containers { get; private set; }
 
         private IBackendHelper BackendHelper { get; }
 
         private IntermediateSection Section { get; }
 
-        private WixBootstrapperApplicationTuple BootstrapperApplicationTuple { get; }
+        private WixBootstrapperApplicationSymbol BootstrapperApplicationSymbol { get; }
 
-        private Dictionary<string, WixBundlePayloadTuple> PayloadTuples { get; }
+        private Dictionary<string, WixBundlePayloadSymbol> PayloadSymbols { get; }
 
         private string IntermediateFolder { get; }
 
@@ -53,15 +53,15 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var fileTransfers = new List<IFileTransfer>();
             var trackedFiles = new List<ITrackedFile>();
-            var uxPayloadTuples = new List<WixBundlePayloadTuple>();
+            var uxPayloadSymbols = new List<WixBundlePayloadSymbol>();
 
             var attachedContainerIndex = 1; // count starts at one because UX container is "0".
 
-            var containerTuples = this.Section.Tuples.OfType<WixBundleContainerTuple>().ToList();
+            var containerSymbols = this.Section.Symbols.OfType<WixBundleContainerSymbol>().ToList();
 
-            var payloadsByContainer = this.PayloadTuples.Values.ToLookup(p => p.ContainerRef);
+            var payloadsByContainer = this.PayloadSymbols.Values.ToLookup(p => p.ContainerRef);
 
-            foreach (var container in containerTuples)
+            foreach (var container in containerSymbols)
             {
                 var containerId = container.Id.Id;
 
@@ -83,17 +83,17 @@ namespace WixToolset.Core.Burn.Bundles
 
                     // Gather the list of UX payloads but ensure the BootstrapperApplication Payload is the first
                     // in the list since that is the Payload that Burn attempts to load.
-                    var baPayloadId = this.BootstrapperApplicationTuple.Id.Id;
+                    var baPayloadId = this.BootstrapperApplicationSymbol.Id.Id;
 
                     foreach (var uxPayload in containerPayloads)
                     {
                         if (uxPayload.Id.Id == baPayloadId)
                         {
-                            uxPayloadTuples.Insert(0, uxPayload);
+                            uxPayloadSymbols.Insert(0, uxPayload);
                         }
                         else
                         {
-                            uxPayloadTuples.Add(uxPayload);
+                            uxPayloadSymbols.Add(uxPayload);
                         }
                     }
                 }
@@ -120,13 +120,13 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
-            this.Containers = containerTuples;
-            this.UXContainerPayloads = uxPayloadTuples;
+            this.Containers = containerSymbols;
+            this.UXContainerPayloads = uxPayloadSymbols;
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;
         }
 
-        private void CreateContainer(WixBundleContainerTuple container, IEnumerable<WixBundlePayloadTuple> containerPayloads)
+        private void CreateContainer(WixBundleContainerSymbol container, IEnumerable<WixBundlePayloadSymbol> containerPayloads)
         {
             var command = new CreateContainerCommand(containerPayloads, container.WorkingPath, this.DefaultCompressionLevel);
             command.Execute();

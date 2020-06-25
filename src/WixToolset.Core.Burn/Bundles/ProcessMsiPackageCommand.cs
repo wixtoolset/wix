@@ -12,7 +12,7 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Extensibility;
     using Dtf = WixToolset.Dtf.WindowsInstaller;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
 
@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private const string PropertySqlFormat = "SELECT `Value` FROM `Property` WHERE `Property` = '{0}'";
 
-        public ProcessMsiPackageCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<IBurnBackendExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadTuple> payloadTuples)
+        public ProcessMsiPackageCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<IBurnBackendExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
@@ -31,7 +31,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.BackendExtensions = backendExtensions;
 
-            this.AuthoredPayloads = payloadTuples;
+            this.AuthoredPayloads = payloadSymbols;
             this.Section = section;
             this.Facade = facade;
         }
@@ -44,7 +44,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
 
-        private Dictionary<string, WixBundlePayloadTuple> AuthoredPayloads { get; }
+        private Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { get; }
 
         private PackageFacade Facade { get; }
 
@@ -55,9 +55,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         public void Execute()
         {
-            var packagePayload = this.AuthoredPayloads[this.Facade.PackageTuple.PayloadRef];
+            var packagePayload = this.AuthoredPayloads[this.Facade.PackageSymbol.PayloadRef];
 
-            var msiPackage = (WixBundleMsiPackageTuple)this.Facade.SpecificPackageTuple;
+            var msiPackage = (WixBundleMsiPackageSymbol)this.Facade.SpecificPackageSymbol;
 
             var sourcePath = packagePayload.SourceFile.Path;
             var longNamesInImage = false;
@@ -82,8 +82,8 @@ namespace WixToolset.Core.Burn.Bundles
                     var perMachine = (0 == (sumInfo.WordCount & 8));
                     var x64 = (sumInfo.Template.Contains("x64") || sumInfo.Template.Contains("Intel64"));
 
-                    this.Facade.PackageTuple.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
-                    this.Facade.PackageTuple.Win64 = x64;
+                    this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
+                    this.Facade.PackageSymbol.Win64 = x64;
                 }
 
                 using (var db = new Dtf.Database(sourcePath))
@@ -111,33 +111,33 @@ namespace WixToolset.Core.Burn.Bundles
 
                         if (!String.IsNullOrEmpty(version) && Common.IsValidModuleOrBundleVersion(version))
                         {
-                            this.Messaging.Write(WarningMessages.VersionTruncated(this.Facade.PackageTuple.SourceLineNumbers, msiPackage.ProductVersion, sourcePath, version));
+                            this.Messaging.Write(WarningMessages.VersionTruncated(this.Facade.PackageSymbol.SourceLineNumbers, msiPackage.ProductVersion, sourcePath, version));
                             msiPackage.ProductVersion = version;
                         }
                         else
                         {
-                            this.Messaging.Write(ErrorMessages.InvalidProductVersion(this.Facade.PackageTuple.SourceLineNumbers, msiPackage.ProductVersion, sourcePath));
+                            this.Messaging.Write(ErrorMessages.InvalidProductVersion(this.Facade.PackageSymbol.SourceLineNumbers, msiPackage.ProductVersion, sourcePath));
                         }
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.CacheId))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.CacheId))
                     {
-                        this.Facade.PackageTuple.CacheId = String.Format("{0}v{1}", msiPackage.ProductCode, msiPackage.ProductVersion);
+                        this.Facade.PackageSymbol.CacheId = String.Format("{0}v{1}", msiPackage.ProductCode, msiPackage.ProductVersion);
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.DisplayName))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
                     {
-                        this.Facade.PackageTuple.DisplayName = ProcessMsiPackageCommand.GetProperty(db, "ProductName");
+                        this.Facade.PackageSymbol.DisplayName = ProcessMsiPackageCommand.GetProperty(db, "ProductName");
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.Description))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Description))
                     {
-                        this.Facade.PackageTuple.Description = ProcessMsiPackageCommand.GetProperty(db, "ARPCOMMENTS");
+                        this.Facade.PackageSymbol.Description = ProcessMsiPackageCommand.GetProperty(db, "ARPCOMMENTS");
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.Version))
+                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Version))
                     {
-                        this.Facade.PackageTuple.Version = msiPackage.ProductVersion;
+                        this.Facade.PackageSymbol.Version = msiPackage.ProductVersion;
                     }
 
                     var payloadNames = this.GetPayloadTargetNames(packagePayload.Id.Id);
@@ -168,7 +168,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                     // Add all external files as package payloads and calculate the total install size as the rollup of
                     // File table's sizes.
-                    this.Facade.PackageTuple.InstallSize = this.ImportExternalFileAsPayloadsAndReturnInstallSize(db, packagePayload, longNamesInImage, compressed, payloadNames);
+                    this.Facade.PackageSymbol.InstallSize = this.ImportExternalFileAsPayloadsAndReturnInstallSize(db, packagePayload, longNamesInImage, compressed, payloadNames);
 
                     // Add all dependency providers from the MSI.
                     this.ImportDependencyProviders(msiPackage, db);
@@ -176,13 +176,13 @@ namespace WixToolset.Core.Burn.Bundles
             }
             catch (Dtf.InstallerException e)
             {
-                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(this.Facade.PackageTuple.SourceLineNumbers, sourcePath, e.Message));
+                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath, e.Message));
             }
         }
 
         private ISet<string> GetPayloadTargetNames(string packageId)
         {
-            var payloadNames = this.Section.Tuples.OfType<WixBundlePayloadTuple>()
+            var payloadNames = this.Section.Symbols.OfType<WixBundlePayloadSymbol>()
                 .Where(p => p.PackageRef == packageId)
                 .Select(p => p.Name);
 
@@ -191,21 +191,21 @@ namespace WixToolset.Core.Burn.Bundles
 
         private ISet<string> GetMsiPropertyNames(string packageId)
         {
-            var properties = this.Section.Tuples.OfType<WixBundleMsiPropertyTuple>()
+            var properties = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>()
                 .Where(p => p.Id.Id == packageId)
                 .Select(p => p.Name);
 
             return new HashSet<string>(properties, StringComparer.Ordinal);
         }
 
-        private void SetPerMachineAppropriately(Dtf.Database db, WixBundleMsiPackageTuple msiPackage, string sourcePath)
+        private void SetPerMachineAppropriately(Dtf.Database db, WixBundleMsiPackageSymbol msiPackage, string sourcePath)
         {
             if (msiPackage.ForcePerMachine)
             {
-                if (YesNoDefaultType.No == this.Facade.PackageTuple.PerMachine)
+                if (YesNoDefaultType.No == this.Facade.PackageSymbol.PerMachine)
                 {
-                    this.Messaging.Write(WarningMessages.PerUserButForcingPerMachine(this.Facade.PackageTuple.SourceLineNumbers, sourcePath));
-                    this.Facade.PackageTuple.PerMachine = YesNoDefaultType.Yes; // ensure that we think the package is per-machine.
+                    this.Messaging.Write(WarningMessages.PerUserButForcingPerMachine(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
+                    this.Facade.PackageSymbol.PerMachine = YesNoDefaultType.Yes; // ensure that we think the package is per-machine.
                 }
 
                 // Force ALLUSERS=1 via the MSI command-line.
@@ -218,34 +218,34 @@ namespace WixToolset.Core.Burn.Bundles
                 if (String.IsNullOrEmpty(allusers))
                 {
                     // Not forced per-machine and no ALLUSERS property, flip back to per-user.
-                    if (YesNoDefaultType.Yes == this.Facade.PackageTuple.PerMachine)
+                    if (YesNoDefaultType.Yes == this.Facade.PackageSymbol.PerMachine)
                     {
-                        this.Messaging.Write(WarningMessages.ImplicitlyPerUser(this.Facade.PackageTuple.SourceLineNumbers, sourcePath));
-                        this.Facade.PackageTuple.PerMachine = YesNoDefaultType.No;
+                        this.Messaging.Write(WarningMessages.ImplicitlyPerUser(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
+                        this.Facade.PackageSymbol.PerMachine = YesNoDefaultType.No;
                     }
                 }
                 else if (allusers.Equals("1", StringComparison.Ordinal))
                 {
-                    if (YesNoDefaultType.No == this.Facade.PackageTuple.PerMachine)
+                    if (YesNoDefaultType.No == this.Facade.PackageSymbol.PerMachine)
                     {
-                        this.Messaging.Write(ErrorMessages.PerUserButAllUsersEquals1(this.Facade.PackageTuple.SourceLineNumbers, sourcePath));
+                        this.Messaging.Write(ErrorMessages.PerUserButAllUsersEquals1(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath));
                     }
                 }
                 else if (allusers.Equals("2", StringComparison.Ordinal))
                 {
-                    this.Messaging.Write(WarningMessages.DiscouragedAllUsersValue(this.Facade.PackageTuple.SourceLineNumbers, sourcePath, (YesNoDefaultType.Yes == this.Facade.PackageTuple.PerMachine) ? "machine" : "user"));
+                    this.Messaging.Write(WarningMessages.DiscouragedAllUsersValue(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath, (YesNoDefaultType.Yes == this.Facade.PackageSymbol.PerMachine) ? "machine" : "user"));
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.UnsupportedAllUsersValue(this.Facade.PackageTuple.SourceLineNumbers, sourcePath, allusers));
+                    this.Messaging.Write(ErrorMessages.UnsupportedAllUsersValue(this.Facade.PackageSymbol.SourceLineNumbers, sourcePath, allusers));
                 }
             }
         }
 
-        private void SetPackageVisibility(Dtf.Database db, WixBundleMsiPackageTuple msiPackage, ISet<string> msiPropertyNames)
+        private void SetPackageVisibility(Dtf.Database db, WixBundleMsiPackageSymbol msiPackage, ISet<string> msiPropertyNames)
         {
             var alreadyVisible = !ProcessMsiPackageCommand.HasProperty(db, "ARPSYSTEMCOMPONENT");
-            var visible = (this.Facade.PackageTuple.Attributes & WixBundlePackageAttributes.Visible) == WixBundlePackageAttributes.Visible;
+            var visible = (this.Facade.PackageSymbol.Attributes & WixBundlePackageAttributes.Visible) == WixBundlePackageAttributes.Visible;
 
             // If not already set to the correct visibility.
             if (alreadyVisible != visible)
@@ -283,7 +283,7 @@ namespace WixToolset.Core.Burn.Bundles
                             attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive ? WixBundleRelatedPackageAttributes.MaxInclusive : 0;
                             attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive ? WixBundleRelatedPackageAttributes.LangInclusive : 0;
 
-                            this.Section.AddTuple(new WixBundleRelatedPackageTuple(this.Facade.PackageTuple.SourceLineNumbers)
+                            this.Section.AddSymbol(new WixBundleRelatedPackageSymbol(this.Facade.PackageSymbol.SourceLineNumbers)
                             {
                                 PackageRef = this.Facade.PackageId,
                                 RelatedId = record.GetString(1),
@@ -358,7 +358,7 @@ namespace WixToolset.Core.Burn.Bundles
                                         }
                                     }
 
-                                    this.Section.AddTuple(new WixBundleMsiFeatureTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, this.Facade.PackageId, featureName))
+                                    this.Section.AddSymbol(new WixBundleMsiFeatureSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, this.Facade.PackageId, featureName))
                                     {
                                         PackageRef = this.Facade.PackageId,
                                         Name = featureName,
@@ -379,7 +379,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void ImportExternalCabinetAsPayloads(Dtf.Database db, WixBundlePayloadTuple packagePayload, ISet<string> payloadNames)
+        private void ImportExternalCabinetAsPayloads(Dtf.Database db, WixBundlePayloadSymbol packagePayload, ISet<string> payloadNames)
         {
             if (db.Tables.Contains("Media"))
             {
@@ -395,9 +395,9 @@ namespace WixToolset.Core.Burn.Bundles
                         if (!payloadNames.Contains(cabinetName))
                         {
                             var generatedId = Common.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
-                            var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageTuple.SourceLineNumbers, BindStage.Normal);
+                            var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers, BindStage.Normal);
 
-                            this.Section.AddTuple(new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                            this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                             {
                                 Name = cabinetName,
                                 SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -416,7 +416,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private long ImportExternalFileAsPayloadsAndReturnInstallSize(Dtf.Database db, WixBundlePayloadTuple packagePayload, bool longNamesInImage, bool compressed, ISet<string> payloadNames)
+        private long ImportExternalFileAsPayloadsAndReturnInstallSize(Dtf.Database db, WixBundlePayloadSymbol packagePayload, bool longNamesInImage, bool compressed, ISet<string> payloadNames)
         {
             long size = 0;
 
@@ -473,9 +473,9 @@ namespace WixToolset.Core.Burn.Bundles
                                 if (!payloadNames.Contains(name))
                                 {
                                     var generatedId = Common.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
-                                    var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageTuple.SourceLineNumbers, BindStage.Normal);
+                                    var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers, BindStage.Normal);
 
-                                    this.Section.AddTuple(new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                                    this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                                     {
                                         Name = name,
                                         SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -500,9 +500,9 @@ namespace WixToolset.Core.Burn.Bundles
             return size;
         }
 
-        private void AddMsiProperty(WixBundleMsiPackageTuple msiPackage, string name, string value)
+        private void AddMsiProperty(WixBundleMsiPackageSymbol msiPackage, string name, string value)
         {
-            this.Section.AddTuple(new WixBundleMsiPropertyTuple(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Private, msiPackage.Id.Id, name))
+            this.Section.AddSymbol(new WixBundleMsiPropertySymbol(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Private, msiPackage.Id.Id, name))
             {
                 PackageRef = msiPackage.Id.Id,
                 Name = name,
@@ -510,7 +510,7 @@ namespace WixToolset.Core.Burn.Bundles
             });
         }
 
-        private void ImportDependencyProviders(WixBundleMsiPackageTuple msiPackage, Dtf.Database db)
+        private void ImportDependencyProviders(WixBundleMsiPackageSymbol msiPackage, Dtf.Database db)
         {
             if (db.Tables.Contains("WixDependencyProvider"))
             {
@@ -529,12 +529,12 @@ namespace WixToolset.Core.Burn.Bundles
                             }
 
                             // Import the provider key and attributes.
-                            this.Section.AddTuple(new ProvidesDependencyTuple(msiPackage.SourceLineNumbers)
+                            this.Section.AddSymbol(new ProvidesDependencySymbol(msiPackage.SourceLineNumbers)
                             {
                                 PackageRef = msiPackage.Id.Id,
                                 Key = record.GetString(1),
                                 Version = record.GetString(2) ?? msiPackage.ProductVersion,
-                                DisplayName = record.GetString(3) ?? this.Facade.PackageTuple.DisplayName,
+                                DisplayName = record.GetString(3) ?? this.Facade.PackageSymbol.DisplayName,
                                 Attributes = record.GetInteger(4),
                                 Imported = true
                             });

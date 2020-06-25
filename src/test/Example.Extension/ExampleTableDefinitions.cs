@@ -8,14 +8,14 @@ namespace Example.Extension
     {
         public static readonly TableDefinition ExampleTable = new TableDefinition(
             "Wix4Example",
-            ExampleTupleDefinitions.Example,
+            ExampleSymbolDefinitions.Example,
             new[]
             {
                 new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
                 new ColumnDefinition("Value", ColumnType.String, 0, false, false, ColumnCategory.Formatted),
             },
             strongRowType: typeof(ExampleRow),
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition NotInAll = new TableDefinition(
@@ -26,7 +26,7 @@ namespace Example.Extension
                 new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
                 new ColumnDefinition("Value", ColumnType.String, 0, false, false, ColumnCategory.Formatted),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[] { ExampleTable };

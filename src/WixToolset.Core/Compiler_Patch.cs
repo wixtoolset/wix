@@ -8,7 +8,7 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -197,7 +197,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixPatchIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
+                this.Core.AddSymbol(new WixPatchIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
                 {
                     ClientPatchId = clientPatchId,
                     OptimizePatchSizeForLargeFiles = optimizePatchSizeForLargeFiles,
@@ -425,7 +425,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new MsiPatchSequenceTuple(sourceLineNumbers)
+                this.Core.AddSymbol(new MsiPatchSequenceSymbol(sourceLineNumbers)
                 {
                     PatchFamily = id.Id,
                     ProductCode = productCode,
@@ -504,7 +504,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixPatchFamilyGroupTuple(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixPatchFamilyGroupSymbol(sourceLineNumbers, id));
 
                 //Add this PatchFamilyGroup and its parent in WixGroup.
                 this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PatchFamilyGroup, id.Id);
@@ -532,7 +532,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixPatchFamilyGroup, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixPatchFamilyGroup, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -621,7 +621,7 @@ namespace WixToolset.Core
                 // By default, target ProductCodes should be added.
                 if (!replace)
                 {
-                    this.Core.AddTuple(new WixPatchTargetTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new WixPatchTargetSymbol(sourceLineNumbers)
                     {
                         ProductCode = "*"
                     });
@@ -629,7 +629,7 @@ namespace WixToolset.Core
 
                 foreach (var targetProductCode in targetProductCodes)
                 {
-                    this.Core.AddTuple(new WixPatchTargetTuple(sourceLineNumbers)
+                    this.Core.AddSymbol(new WixPatchTargetSymbol(sourceLineNumbers)
                     {
                         ProductCode = targetProductCode
                     });
@@ -639,7 +639,7 @@ namespace WixToolset.Core
 
         private void AddMsiPatchMetadata(SourceLineNumber sourceLineNumbers, string company, string property, string value)
         {
-            this.Core.AddTuple(new MsiPatchMetadataTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
+            this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
             {
                 Company = company,
                 Property = property,

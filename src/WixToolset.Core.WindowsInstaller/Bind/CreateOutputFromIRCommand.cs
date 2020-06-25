@@ -7,7 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
@@ -38,7 +38,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            this.Output = new WindowsInstallerData(this.Section.Tuples.First().SourceLineNumbers)
+            this.Output = new WindowsInstallerData(this.Section.Symbols.First().SourceLineNumbers)
             {
                 Codepage = this.Section.Codepage,
                 Type = SectionTypeToOutputType(this.Section.Type)
@@ -49,388 +49,388 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddSectionToOutput()
         {
-            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellTuple>>();
+            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellSymbol>>();
 
-            foreach (var tuple in this.Section.Tuples)
+            foreach (var symbol in this.Section.Symbols)
             {
-                var unknownTuple = false;
-                switch (tuple.Definition.Type)
+                var unknownSymbol = false;
+                switch (symbol.Definition.Type)
                 {
-                    case TupleDefinitionType.AppSearch:
-                        this.AddTupleDefaultly(tuple);
+                    case SymbolDefinitionType.AppSearch:
+                        this.AddSymbolDefaultly(symbol);
                         this.Output.EnsureTable(this.TableDefinitions["Signature"]);
                         break;
 
-                    case TupleDefinitionType.Assembly:
-                        this.AddAssemblyTuple((AssemblyTuple)tuple);
+                    case SymbolDefinitionType.Assembly:
+                        this.AddAssemblySymbol((AssemblySymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.BBControl:
-                        this.AddBBControlTuple((BBControlTuple)tuple);
+                    case SymbolDefinitionType.BBControl:
+                        this.AddBBControlSymbol((BBControlSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Class:
-                        this.AddClassTuple((ClassTuple)tuple);
+                    case SymbolDefinitionType.Class:
+                        this.AddClassSymbol((ClassSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Control:
-                        this.AddControlTuple((ControlTuple)tuple);
+                    case SymbolDefinitionType.Control:
+                        this.AddControlSymbol((ControlSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Component:
-                        this.AddComponentTuple((ComponentTuple)tuple);
+                    case SymbolDefinitionType.Component:
+                        this.AddComponentSymbol((ComponentSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.CustomAction:
-                        this.AddCustomActionTuple((CustomActionTuple)tuple);
+                    case SymbolDefinitionType.CustomAction:
+                        this.AddCustomActionSymbol((CustomActionSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Dialog:
-                        this.AddDialogTuple((DialogTuple)tuple);
+                    case SymbolDefinitionType.Dialog:
+                        this.AddDialogSymbol((DialogSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Directory:
-                        this.AddDirectoryTuple((DirectoryTuple)tuple);
+                    case SymbolDefinitionType.Directory:
+                        this.AddDirectorySymbol((DirectorySymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Environment:
-                        this.AddEnvironmentTuple((EnvironmentTuple)tuple);
+                    case SymbolDefinitionType.Environment:
+                        this.AddEnvironmentSymbol((EnvironmentSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Error:
-                        this.AddErrorTuple((ErrorTuple)tuple);
+                    case SymbolDefinitionType.Error:
+                        this.AddErrorSymbol((ErrorSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Feature:
-                        this.AddFeatureTuple((FeatureTuple)tuple);
+                    case SymbolDefinitionType.Feature:
+                        this.AddFeatureSymbol((FeatureSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.File:
-                        this.AddFileTuple((FileTuple)tuple);
+                    case SymbolDefinitionType.File:
+                        this.AddFileSymbol((FileSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.IniFile:
-                        this.AddIniFileTuple((IniFileTuple)tuple);
+                    case SymbolDefinitionType.IniFile:
+                        this.AddIniFileSymbol((IniFileSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Media:
-                        this.AddMediaTuple((MediaTuple)tuple);
+                    case SymbolDefinitionType.Media:
+                        this.AddMediaSymbol((MediaSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.ModuleConfiguration:
-                        this.AddModuleConfigurationTuple((ModuleConfigurationTuple)tuple);
+                    case SymbolDefinitionType.ModuleConfiguration:
+                        this.AddModuleConfigurationSymbol((ModuleConfigurationSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.MsiEmbeddedUI:
-                        this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple);
+                    case SymbolDefinitionType.MsiEmbeddedUI:
+                        this.AddMsiEmbeddedUISymbol((MsiEmbeddedUISymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.MsiServiceConfig:
-                        this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple);
+                    case SymbolDefinitionType.MsiServiceConfig:
+                        this.AddMsiServiceConfigSymbol((MsiServiceConfigSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.MsiServiceConfigFailureActions:
-                        this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple);
+                    case SymbolDefinitionType.MsiServiceConfigFailureActions:
+                        this.AddMsiServiceConfigFailureActionsSymbol((MsiServiceConfigFailureActionsSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.MoveFile:
-                        this.AddMoveFileTuple((MoveFileTuple)tuple);
+                    case SymbolDefinitionType.MoveFile:
+                        this.AddMoveFileSymbol((MoveFileSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.ProgId:
-                        this.AddTupleDefaultly(tuple);
+                    case SymbolDefinitionType.ProgId:
+                        this.AddSymbolDefaultly(symbol);
                         this.Output.EnsureTable(this.TableDefinitions["Extension"]);
                         break;
 
-                    case TupleDefinitionType.Property:
-                        this.AddPropertyTuple((PropertyTuple)tuple);
+                    case SymbolDefinitionType.Property:
+                        this.AddPropertySymbol((PropertySymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.RemoveFile:
-                        this.AddRemoveFileTuple((RemoveFileTuple)tuple);
+                    case SymbolDefinitionType.RemoveFile:
+                        this.AddRemoveFileSymbol((RemoveFileSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Registry:
-                        this.AddRegistryTuple((RegistryTuple)tuple);
+                    case SymbolDefinitionType.Registry:
+                        this.AddRegistrySymbol((RegistrySymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.RegLocator:
-                        this.AddRegLocatorTuple((RegLocatorTuple)tuple);
+                    case SymbolDefinitionType.RegLocator:
+                        this.AddRegLocatorSymbol((RegLocatorSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.RemoveRegistry:
-                        this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple);
+                    case SymbolDefinitionType.RemoveRegistry:
+                        this.AddRemoveRegistrySymbol((RemoveRegistrySymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.ServiceControl:
-                        this.AddServiceControlTuple((ServiceControlTuple)tuple);
+                    case SymbolDefinitionType.ServiceControl:
+                        this.AddServiceControlSymbol((ServiceControlSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.ServiceInstall:
-                        this.AddServiceInstallTuple((ServiceInstallTuple)tuple);
+                    case SymbolDefinitionType.ServiceInstall:
+                        this.AddServiceInstallSymbol((ServiceInstallSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Shortcut:
-                        this.AddShortcutTuple((ShortcutTuple)tuple);
+                    case SymbolDefinitionType.Shortcut:
+                        this.AddShortcutSymbol((ShortcutSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.TextStyle:
-                        this.AddTextStyleTuple((TextStyleTuple)tuple);
+                    case SymbolDefinitionType.TextStyle:
+                        this.AddTextStyleSymbol((TextStyleSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.Upgrade:
-                        this.AddUpgradeTuple((UpgradeTuple)tuple);
+                    case SymbolDefinitionType.Upgrade:
+                        this.AddUpgradeSymbol((UpgradeSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.WixAction:
-                        this.AddWixActionTuple((WixActionTuple)tuple);
+                    case SymbolDefinitionType.WixAction:
+                        this.AddWixActionSymbol((WixActionSymbol)symbol);
                         break;
 
-                    case TupleDefinitionType.WixCustomTableCell:
-                        this.IndexCustomTableCellTuple((WixCustomTableCellTuple)tuple, cellsByTableAndRowId);
+                    case SymbolDefinitionType.WixCustomTableCell:
+                        this.IndexCustomTableCellSymbol((WixCustomTableCellSymbol)symbol, cellsByTableAndRowId);
                         break;
 
-                    case TupleDefinitionType.WixEnsureTable:
-                        this.AddWixEnsureTableTuple((WixEnsureTableTuple)tuple);
+                    case SymbolDefinitionType.WixEnsureTable:
+                        this.AddWixEnsureTableSymbol((WixEnsureTableSymbol)symbol);
                         break;
 
-                    // Tuples used internally and are not added to the output.
-                    case TupleDefinitionType.WixBuildInfo:
-                    case TupleDefinitionType.WixBindUpdatedFiles:
-                    case TupleDefinitionType.WixComponentGroup:
-                    case TupleDefinitionType.WixComplexReference:
-                    case TupleDefinitionType.WixDeltaPatchFile:
-                    case TupleDefinitionType.WixDeltaPatchSymbolPaths:
-                    case TupleDefinitionType.WixFragment:
-                    case TupleDefinitionType.WixFeatureGroup:
-                    case TupleDefinitionType.WixInstanceComponent:
-                    case TupleDefinitionType.WixInstanceTransforms:
-                    case TupleDefinitionType.WixFeatureModules:
-                    case TupleDefinitionType.WixGroup:
-                    case TupleDefinitionType.WixMediaTemplate:
-                    case TupleDefinitionType.WixMerge:
-                    case TupleDefinitionType.WixOrdering:
-                    case TupleDefinitionType.WixPatchBaseline:
-                    case TupleDefinitionType.WixPatchFamilyGroup:
-                    case TupleDefinitionType.WixPatchId:
-                    case TupleDefinitionType.WixPatchRef:
-                    case TupleDefinitionType.WixPatchTarget:
-                    case TupleDefinitionType.WixProperty:
-                    case TupleDefinitionType.WixSimpleReference:
-                    case TupleDefinitionType.WixSuppressAction:
-                    case TupleDefinitionType.WixSuppressModularization:
-                    case TupleDefinitionType.WixUI:
-                    case TupleDefinitionType.WixVariable:
+                    // Symbols used internally and are not added to the output.
+                    case SymbolDefinitionType.WixBuildInfo:
+                    case SymbolDefinitionType.WixBindUpdatedFiles:
+                    case SymbolDefinitionType.WixComponentGroup:
+                    case SymbolDefinitionType.WixComplexReference:
+                    case SymbolDefinitionType.WixDeltaPatchFile:
+                    case SymbolDefinitionType.WixDeltaPatchSymbolPaths:
+                    case SymbolDefinitionType.WixFragment:
+                    case SymbolDefinitionType.WixFeatureGroup:
+                    case SymbolDefinitionType.WixInstanceComponent:
+                    case SymbolDefinitionType.WixInstanceTransforms:
+                    case SymbolDefinitionType.WixFeatureModules:
+                    case SymbolDefinitionType.WixGroup:
+                    case SymbolDefinitionType.WixMediaTemplate:
+                    case SymbolDefinitionType.WixMerge:
+                    case SymbolDefinitionType.WixOrdering:
+                    case SymbolDefinitionType.WixPatchBaseline:
+                    case SymbolDefinitionType.WixPatchFamilyGroup:
+                    case SymbolDefinitionType.WixPatchId:
+                    case SymbolDefinitionType.WixPatchRef:
+                    case SymbolDefinitionType.WixPatchTarget:
+                    case SymbolDefinitionType.WixProperty:
+                    case SymbolDefinitionType.WixSimpleReference:
+                    case SymbolDefinitionType.WixSuppressAction:
+                    case SymbolDefinitionType.WixSuppressModularization:
+                    case SymbolDefinitionType.WixUI:
+                    case SymbolDefinitionType.WixVariable:
                         break;
 
                     // Already processed by LoadTableDefinitions.
-                    case TupleDefinitionType.WixCustomTable:
-                    case TupleDefinitionType.WixCustomTableColumn:
+                    case SymbolDefinitionType.WixCustomTable:
+                    case SymbolDefinitionType.WixCustomTableColumn:
                         break;
 
-                    case TupleDefinitionType.MustBeFromAnExtension:
-                        unknownTuple = !this.AddTupleFromExtension(tuple);
+                    case SymbolDefinitionType.MustBeFromAnExtension:
+                        unknownSymbol = !this.AddSymbolFromExtension(symbol);
                         break;
 
                     default:
-                        unknownTuple = !this.AddTupleDefaultly(tuple);
+                        unknownSymbol = !this.AddSymbolDefaultly(symbol);
                         break;
                 }
 
-                if (unknownTuple)
+                if (unknownSymbol)
                 {
-                    this.Messaging.Write(WarningMessages.TupleNotTranslatedToOutput(tuple));
+                    this.Messaging.Write(WarningMessages.SymbolNotTranslatedToOutput(symbol));
                 }
             }
 
-            this.AddIndexedCellTuples(cellsByTableAndRowId);
+            this.AddIndexedCellSymbols(cellsByTableAndRowId);
         }
 
-        private void AddAssemblyTuple(AssemblyTuple tuple)
+        private void AddAssemblySymbol(AssemblySymbol symbol)
         {
-            var attributes = tuple.Type == AssemblyType.Win32Assembly ? 1 : (int?)null;
+            var attributes = symbol.Type == AssemblyType.Win32Assembly ? 1 : (int?)null;
 
-            var row = this.CreateRow(tuple, "MsiAssembly");
-            row[0] = tuple.ComponentRef;
-            row[1] = tuple.FeatureRef;
-            row[2] = tuple.ManifestFileRef;
-            row[3] = tuple.ApplicationFileRef;
+            var row = this.CreateRow(symbol, "MsiAssembly");
+            row[0] = symbol.ComponentRef;
+            row[1] = symbol.FeatureRef;
+            row[2] = symbol.ManifestFileRef;
+            row[3] = symbol.ApplicationFileRef;
             row[4] = attributes;
         }
 
-        private void AddBBControlTuple(BBControlTuple tuple)
+        private void AddBBControlSymbol(BBControlSymbol symbol)
         {
-            var attributes = tuple.Attributes;
-            attributes |= tuple.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
-            attributes |= tuple.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
-            attributes |= tuple.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
-            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
-            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
-            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
-            attributes |= tuple.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
-            attributes |= tuple.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
+            var attributes = symbol.Attributes;
+            attributes |= symbol.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
+            attributes |= symbol.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
+            attributes |= symbol.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
+            attributes |= symbol.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
+            attributes |= symbol.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
+            attributes |= symbol.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
+            attributes |= symbol.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
+            attributes |= symbol.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
 
-            var row = this.CreateRow(tuple, "BBControl");
-            row[0] = tuple.BillboardRef;
-            row[1] = tuple.BBControl;
-            row[2] = tuple.Type;
-            row[3] = tuple.X;
-            row[4] = tuple.Y;
-            row[5] = tuple.Width;
-            row[6] = tuple.Height;
+            var row = this.CreateRow(symbol, "BBControl");
+            row[0] = symbol.BillboardRef;
+            row[1] = symbol.BBControl;
+            row[2] = symbol.Type;
+            row[3] = symbol.X;
+            row[4] = symbol.Y;
+            row[5] = symbol.Width;
+            row[6] = symbol.Height;
             row[7] = attributes;
-            row[8] = tuple.Text;
+            row[8] = symbol.Text;
         }
 
-        private void AddClassTuple(ClassTuple tuple)
+        private void AddClassSymbol(ClassSymbol symbol)
         {
-            var row = this.CreateRow(tuple, "Class");
-            row[0] = tuple.CLSID;
-            row[1] = tuple.Context;
-            row[2] = tuple.ComponentRef;
-            row[3] = tuple.DefaultProgIdRef;
-            row[4] = tuple.Description;
-            row[5] = tuple.AppIdRef;
-            row[6] = tuple.FileTypeMask;
-            row[7] = tuple.IconRef;
-            row[8] = tuple.IconIndex;
-            row[9] = tuple.DefInprocHandler;
-            row[10] = tuple.Argument;
-            row[11] = tuple.FeatureRef;
-            row[12] = tuple.RelativePath ? (int?)1 : null;
+            var row = this.CreateRow(symbol, "Class");
+            row[0] = symbol.CLSID;
+            row[1] = symbol.Context;
+            row[2] = symbol.ComponentRef;
+            row[3] = symbol.DefaultProgIdRef;
+            row[4] = symbol.Description;
+            row[5] = symbol.AppIdRef;
+            row[6] = symbol.FileTypeMask;
+            row[7] = symbol.IconRef;
+            row[8] = symbol.IconIndex;
+            row[9] = symbol.DefInprocHandler;
+            row[10] = symbol.Argument;
+            row[11] = symbol.FeatureRef;
+            row[12] = symbol.RelativePath ? (int?)1 : null;
         }
 
-        private void AddControlTuple(ControlTuple tuple)
+        private void AddControlSymbol(ControlSymbol symbol)
         {
-            var text = tuple.Text;
-            var attributes = tuple.Attributes;
-            attributes |= tuple.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
-            attributes |= tuple.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
-            attributes |= tuple.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
-            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
-            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
-            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
-            attributes |= tuple.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
-            attributes |= tuple.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
+            var text = symbol.Text;
+            var attributes = symbol.Attributes;
+            attributes |= symbol.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
+            attributes |= symbol.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
+            attributes |= symbol.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
+            attributes |= symbol.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
+            attributes |= symbol.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
+            attributes |= symbol.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
+            attributes |= symbol.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
+            attributes |= symbol.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
 
             // If we're tracking disk space, and this is a non-FormatSize Text control,
             // and the text attribute starts with '[' and ends with ']', add a space.
             // It is not necessary for the whole string to be a property, just those
             // two characters matter.
-            if (tuple.TrackDiskSpace &&
-                "Text" == tuple.Type &&
+            if (symbol.TrackDiskSpace &&
+                "Text" == symbol.Type &&
                 WindowsInstallerConstants.MsidbControlAttributesFormatSize != (attributes & WindowsInstallerConstants.MsidbControlAttributesFormatSize) &&
                 null != text && text.StartsWith("[", StringComparison.Ordinal) && text.EndsWith("]", StringComparison.Ordinal))
             {
                 text = String.Concat(text, " ");
             }
 
-            var row = this.CreateRow(tuple, "Control");
-            row[0] = tuple.DialogRef;
-            row[1] = tuple.Control;
-            row[2] = tuple.Type;
-            row[3] = tuple.X;
-            row[4] = tuple.Y;
-            row[5] = tuple.Width;
-            row[6] = tuple.Height;
+            var row = this.CreateRow(symbol, "Control");
+            row[0] = symbol.DialogRef;
+            row[1] = symbol.Control;
+            row[2] = symbol.Type;
+            row[3] = symbol.X;
+            row[4] = symbol.Y;
+            row[5] = symbol.Width;
+            row[6] = symbol.Height;
             row[7] = attributes;
             row[8] = text;
-            row[9] = tuple.NextControlRef;
-            row[10] = tuple.Help;
+            row[9] = symbol.NextControlRef;
+            row[10] = symbol.Help;
         }
 
-        private void AddComponentTuple(ComponentTuple tuple)
+        private void AddComponentSymbol(ComponentSymbol symbol)
         {
-            var attributes = ComponentLocation.Either == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesOptional : 0;
-            attributes |= ComponentLocation.SourceOnly == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesSourceOnly : 0;
-            attributes |= ComponentKeyPathType.Registry == tuple.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath : 0;
-            attributes |= ComponentKeyPathType.OdbcDataSource == tuple.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource : 0;
-            attributes |= tuple.DisableRegistryReflection ? WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection : 0;
-            attributes |= tuple.NeverOverwrite ? WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite : 0;
-            attributes |= tuple.Permanent ? WindowsInstallerConstants.MsidbComponentAttributesPermanent : 0;
-            attributes |= tuple.SharedDllRefCount ? WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount : 0;
-            attributes |= tuple.Shared ? WindowsInstallerConstants.MsidbComponentAttributesShared : 0;
-            attributes |= tuple.Transitive ? WindowsInstallerConstants.MsidbComponentAttributesTransitive : 0;
-            attributes |= tuple.UninstallWhenSuperseded ? WindowsInstallerConstants.MsidbComponentAttributesUninstallOnSupersedence : 0;
-            attributes |= tuple.Win64 ? WindowsInstallerConstants.MsidbComponentAttributes64bit : 0;
+            var attributes = ComponentLocation.Either == symbol.Location ? WindowsInstallerConstants.MsidbComponentAttributesOptional : 0;
+            attributes |= ComponentLocation.SourceOnly == symbol.Location ? WindowsInstallerConstants.MsidbComponentAttributesSourceOnly : 0;
+            attributes |= ComponentKeyPathType.Registry == symbol.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath : 0;
+            attributes |= ComponentKeyPathType.OdbcDataSource == symbol.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource : 0;
+            attributes |= symbol.DisableRegistryReflection ? WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection : 0;
+            attributes |= symbol.NeverOverwrite ? WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite : 0;
+            attributes |= symbol.Permanent ? WindowsInstallerConstants.MsidbComponentAttributesPermanent : 0;
+            attributes |= symbol.SharedDllRefCount ? WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount : 0;
+            attributes |= symbol.Shared ? WindowsInstallerConstants.MsidbComponentAttributesShared : 0;
+            attributes |= symbol.Transitive ? WindowsInstallerConstants.MsidbComponentAttributesTransitive : 0;
+            attributes |= symbol.UninstallWhenSuperseded ? WindowsInstallerConstants.MsidbComponentAttributesUninstallOnSupersedence : 0;
+            attributes |= symbol.Win64 ? WindowsInstallerConstants.MsidbComponentAttributes64bit : 0;
 
-            var row = this.CreateRow(tuple, "Component");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.ComponentId;
-            row[2] = tuple.DirectoryRef;
+            var row = this.CreateRow(symbol, "Component");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ComponentId;
+            row[2] = symbol.DirectoryRef;
             row[3] = attributes;
-            row[4] = tuple.Condition;
-            row[5] = tuple.KeyPath;
+            row[4] = symbol.Condition;
+            row[5] = symbol.KeyPath;
         }
 
-        private void AddCustomActionTuple(CustomActionTuple tuple)
+        private void AddCustomActionSymbol(CustomActionSymbol symbol)
         {
-            var type = tuple.Win64 ? WindowsInstallerConstants.MsidbCustomActionType64BitScript : 0;
-            type |= tuple.IgnoreResult ? WindowsInstallerConstants.MsidbCustomActionTypeContinue : 0;
-            type |= tuple.Hidden ? WindowsInstallerConstants.MsidbCustomActionTypeHideTarget : 0;
-            type |= tuple.Async ? WindowsInstallerConstants.MsidbCustomActionTypeAsync : 0;
-            type |= CustomActionExecutionType.FirstSequence == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeFirstSequence : 0;
-            type |= CustomActionExecutionType.OncePerProcess == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeOncePerProcess : 0;
-            type |= CustomActionExecutionType.ClientRepeat == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeClientRepeat : 0;
-            type |= CustomActionExecutionType.Deferred == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript : 0;
-            type |= CustomActionExecutionType.Rollback == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeRollback : 0;
-            type |= CustomActionExecutionType.Commit == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeCommit : 0;
-            type |= CustomActionSourceType.File == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeSourceFile : 0;
-            type |= CustomActionSourceType.Directory == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeDirectory : 0;
-            type |= CustomActionSourceType.Property == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeProperty : 0;
-            type |= CustomActionTargetType.Dll == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeDll : 0;
-            type |= CustomActionTargetType.Exe == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeExe : 0;
-            type |= CustomActionTargetType.TextData == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeTextData : 0;
-            type |= CustomActionTargetType.JScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeJScript : 0;
-            type |= CustomActionTargetType.VBScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeVBScript : 0;
+            var type = symbol.Win64 ? WindowsInstallerConstants.MsidbCustomActionType64BitScript : 0;
+            type |= symbol.IgnoreResult ? WindowsInstallerConstants.MsidbCustomActionTypeContinue : 0;
+            type |= symbol.Hidden ? WindowsInstallerConstants.MsidbCustomActionTypeHideTarget : 0;
+            type |= symbol.Async ? WindowsInstallerConstants.MsidbCustomActionTypeAsync : 0;
+            type |= CustomActionExecutionType.FirstSequence == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeFirstSequence : 0;
+            type |= CustomActionExecutionType.OncePerProcess == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeOncePerProcess : 0;
+            type |= CustomActionExecutionType.ClientRepeat == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeClientRepeat : 0;
+            type |= CustomActionExecutionType.Deferred == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript : 0;
+            type |= CustomActionExecutionType.Rollback == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeRollback : 0;
+            type |= CustomActionExecutionType.Commit == symbol.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeCommit : 0;
+            type |= CustomActionSourceType.File == symbol.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeSourceFile : 0;
+            type |= CustomActionSourceType.Directory == symbol.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeDirectory : 0;
+            type |= CustomActionSourceType.Property == symbol.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeProperty : 0;
+            type |= CustomActionTargetType.Dll == symbol.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeDll : 0;
+            type |= CustomActionTargetType.Exe == symbol.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeExe : 0;
+            type |= CustomActionTargetType.TextData == symbol.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeTextData : 0;
+            type |= CustomActionTargetType.JScript == symbol.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeJScript : 0;
+            type |= CustomActionTargetType.VBScript == symbol.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeVBScript : 0;
 
             if (WindowsInstallerConstants.MsidbCustomActionTypeInScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeInScript))
             {
-                type |= tuple.Impersonate ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate;
-                type |= tuple.TSAware ? WindowsInstallerConstants.MsidbCustomActionTypeTSAware : 0;
+                type |= symbol.Impersonate ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate;
+                type |= symbol.TSAware ? WindowsInstallerConstants.MsidbCustomActionTypeTSAware : 0;
             }
 
-            var row = this.CreateRow(tuple, "CustomAction");
-            row[0] = tuple.Id.Id;
+            var row = this.CreateRow(symbol, "CustomAction");
+            row[0] = symbol.Id.Id;
             row[1] = type;
-            row[2] = tuple.Source;
-            row[3] = tuple.Target;
-            row[4] = tuple.PatchUninstall ? (int?)WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : null;
+            row[2] = symbol.Source;
+            row[3] = symbol.Target;
+            row[4] = symbol.PatchUninstall ? (int?)WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : null;
         }
 
-        private void AddDialogTuple(DialogTuple tuple)
+        private void AddDialogSymbol(DialogSymbol symbol)
         {
-            var attributes = tuple.Visible ? WindowsInstallerConstants.MsidbDialogAttributesVisible : 0;
-            attributes |= tuple.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
-            attributes |= tuple.Minimize ? WindowsInstallerConstants.MsidbDialogAttributesMinimize : 0;
-            attributes |= tuple.CustomPalette ? WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette : 0;
-            attributes |= tuple.ErrorDialog ? WindowsInstallerConstants.MsidbDialogAttributesError : 0;
-            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbDialogAttributesLeftScroll : 0;
-            attributes |= tuple.KeepModeless ? WindowsInstallerConstants.MsidbDialogAttributesKeepModeless : 0;
-            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbDialogAttributesRightAligned : 0;
-            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbDialogAttributesRTLRO : 0;
-            attributes |= tuple.SystemModal ? WindowsInstallerConstants.MsidbDialogAttributesSysModal : 0;
-            attributes |= tuple.TrackDiskSpace ? WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace : 0;
+            var attributes = symbol.Visible ? WindowsInstallerConstants.MsidbDialogAttributesVisible : 0;
+            attributes |= symbol.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
+            attributes |= symbol.Minimize ? WindowsInstallerConstants.MsidbDialogAttributesMinimize : 0;
+            attributes |= symbol.CustomPalette ? WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette : 0;
+            attributes |= symbol.ErrorDialog ? WindowsInstallerConstants.MsidbDialogAttributesError : 0;
+            attributes |= symbol.LeftScroll ? WindowsInstallerConstants.MsidbDialogAttributesLeftScroll : 0;
+            attributes |= symbol.KeepModeless ? WindowsInstallerConstants.MsidbDialogAttributesKeepModeless : 0;
+            attributes |= symbol.RightAligned ? WindowsInstallerConstants.MsidbDialogAttributesRightAligned : 0;
+            attributes |= symbol.RightToLeft ? WindowsInstallerConstants.MsidbDialogAttributesRTLRO : 0;
+            attributes |= symbol.SystemModal ? WindowsInstallerConstants.MsidbDialogAttributesSysModal : 0;
+            attributes |= symbol.TrackDiskSpace ? WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace : 0;
 
-            var row = this.CreateRow(tuple, "Dialog");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.HCentering;
-            row[2] = tuple.VCentering;
-            row[3] = tuple.Width;
-            row[4] = tuple.Height;
+            var row = this.CreateRow(symbol, "Dialog");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.HCentering;
+            row[2] = symbol.VCentering;
+            row[3] = symbol.Width;
+            row[4] = symbol.Height;
             row[5] = attributes;
-            row[6] = tuple.Title;
-            row[7] = tuple.FirstControlRef;
-            row[8] = tuple.DefaultControlRef;
-            row[9] = tuple.CancelControlRef;
+            row[6] = symbol.Title;
+            row[7] = symbol.FirstControlRef;
+            row[8] = symbol.DefaultControlRef;
+            row[9] = symbol.CancelControlRef;
 
             this.Output.EnsureTable(this.TableDefinitions["ListBox"]);
         }
 
-        private void AddDirectoryTuple(DirectoryTuple tuple)
+        private void AddDirectorySymbol(DirectorySymbol symbol)
         {
-            var sourceName = GetMsiFilenameValue(tuple.SourceShortName, tuple.SourceName);
-            var targetName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
+            var sourceName = GetMsiFilenameValue(symbol.SourceShortName, symbol.SourceName);
+            var targetName = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
 
             if (String.IsNullOrEmpty(targetName))
             {
@@ -439,20 +439,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var defaultDir = String.IsNullOrEmpty(sourceName) ? targetName : targetName + ":" + sourceName;
 
-            var row = this.CreateRow(tuple, "Directory");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.ParentDirectoryRef;
+            var row = this.CreateRow(symbol, "Directory");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ParentDirectoryRef;
             row[2] = defaultDir;
         }
 
-        private void AddEnvironmentTuple(EnvironmentTuple tuple)
+        private void AddEnvironmentSymbol(EnvironmentSymbol symbol)
         {
             var action = String.Empty;
-            var system = tuple.System ? "*" : String.Empty;
-            var uninstall = tuple.Permanent ? String.Empty : "-";
-            var value = tuple.Value;
+            var system = symbol.System ? "*" : String.Empty;
+            var uninstall = symbol.Permanent ? String.Empty : "-";
+            var value = symbol.Value;
 
-            switch (tuple.Action)
+            switch (symbol.Action)
             {
                 case EnvironmentActionType.Create:
                     action = "+";
@@ -465,219 +465,219 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
             }
 
-            switch (tuple.Part)
+            switch (symbol.Part)
             {
                 case EnvironmentPartType.First:
-                    value = String.Concat(value, tuple.Separator, "[~]");
+                    value = String.Concat(value, symbol.Separator, "[~]");
                     break;
                 case EnvironmentPartType.Last:
-                    value = String.Concat("[~]", tuple.Separator, value);
+                    value = String.Concat("[~]", symbol.Separator, value);
                     break;
             }
 
-            var row = this.CreateRow(tuple, "Environment");
-            row[0] = tuple.Id.Id;
-            row[1] = String.Concat(action, uninstall, system, tuple.Name);
+            var row = this.CreateRow(symbol, "Environment");
+            row[0] = symbol.Id.Id;
+            row[1] = String.Concat(action, uninstall, system, symbol.Name);
             row[2] = value;
-            row[3] = tuple.ComponentRef;
+            row[3] = symbol.ComponentRef;
         }
 
-        private void AddErrorTuple(ErrorTuple tuple)
+        private void AddErrorSymbol(ErrorSymbol symbol)
         {
-            var row = this.CreateRow(tuple, "Error");
-            row[0] = Convert.ToInt32(tuple.Id.Id);
-            row[1] = tuple.Message;
+            var row = this.CreateRow(symbol, "Error");
+            row[0] = Convert.ToInt32(symbol.Id.Id);
+            row[1] = symbol.Message;
         }
 
-        private void AddFeatureTuple(FeatureTuple tuple)
+        private void AddFeatureSymbol(FeatureSymbol symbol)
         {
-            var attributes = tuple.DisallowAbsent ? WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent : 0;
-            attributes |= tuple.DisallowAdvertise ? WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise : 0;
-            attributes |= FeatureInstallDefault.FollowParent == tuple.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFollowParent : 0;
-            attributes |= FeatureInstallDefault.Source == tuple.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorSource : 0;
-            attributes |= FeatureTypicalDefault.Advertise == tuple.TypicalDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorAdvertise : 0;
+            var attributes = symbol.DisallowAbsent ? WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent : 0;
+            attributes |= symbol.DisallowAdvertise ? WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise : 0;
+            attributes |= FeatureInstallDefault.FollowParent == symbol.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFollowParent : 0;
+            attributes |= FeatureInstallDefault.Source == symbol.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorSource : 0;
+            attributes |= FeatureTypicalDefault.Advertise == symbol.TypicalDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorAdvertise : 0;
 
-            var row = this.CreateRow(tuple, "Feature");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.ParentFeatureRef;
-            row[2] = tuple.Title;
-            row[3] = tuple.Description;
-            row[4] = tuple.Display;
-            row[5] = tuple.Level;
-            row[6] = tuple.DirectoryRef;
+            var row = this.CreateRow(symbol, "Feature");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ParentFeatureRef;
+            row[2] = symbol.Title;
+            row[3] = symbol.Description;
+            row[4] = symbol.Display;
+            row[5] = symbol.Level;
+            row[6] = symbol.DirectoryRef;
             row[7] = attributes;
         }
 
-        private void AddFileTuple(FileTuple tuple)
+        private void AddFileSymbol(FileSymbol symbol)
         {
-            var row = (FileRow)this.CreateRow(tuple, "File");
-            row.File = tuple.Id.Id;
-            row.Component = tuple.ComponentRef;
-            row.FileName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
-            row.FileSize = tuple.FileSize;
-            row.Version = tuple.Version;
-            row.Language = tuple.Language;
-            row.DiskId = tuple.DiskId ?? 1; // TODO: is 1 the correct thing to default here
-            row.Sequence = tuple.Sequence;
-            row.Source = tuple.Source.Path;
+            var row = (FileRow)this.CreateRow(symbol, "File");
+            row.File = symbol.Id.Id;
+            row.Component = symbol.ComponentRef;
+            row.FileName = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
+            row.FileSize = symbol.FileSize;
+            row.Version = symbol.Version;
+            row.Language = symbol.Language;
+            row.DiskId = symbol.DiskId ?? 1; // TODO: is 1 the correct thing to default here
+            row.Sequence = symbol.Sequence;
+            row.Source = symbol.Source.Path;
 
-            var attributes = (tuple.Attributes & FileTupleAttributes.Checksum) == FileTupleAttributes.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.Hidden) == FileTupleAttributes.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.ReadOnly) == FileTupleAttributes.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.System) == FileTupleAttributes.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
-            attributes |= (tuple.Attributes & FileTupleAttributes.Vital) == FileTupleAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
+            var attributes = (symbol.Attributes & FileSymbolAttributes.Checksum) == FileSymbolAttributes.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.Compressed) == FileSymbolAttributes.Compressed ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.Uncompressed) == FileSymbolAttributes.Uncompressed ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.Hidden) == FileSymbolAttributes.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.ReadOnly) == FileSymbolAttributes.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.System) == FileSymbolAttributes.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
+            attributes |= (symbol.Attributes & FileSymbolAttributes.Vital) == FileSymbolAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
 
-            if (tuple.FontTitle != null)
+            if (symbol.FontTitle != null)
             {
-                var fontRow = this.CreateRow(tuple, "Font");
-                fontRow[0] = tuple.Id.Id;
-                fontRow[1] = tuple.FontTitle;
+                var fontRow = this.CreateRow(symbol, "Font");
+                fontRow[0] = symbol.Id.Id;
+                fontRow[1] = symbol.FontTitle;
             }
 
-            if (tuple.SelfRegCost.HasValue)
+            if (symbol.SelfRegCost.HasValue)
             {
-                var selfRegRow = this.CreateRow(tuple, "SelfReg");
-                selfRegRow[0] = tuple.Id.Id;
-                selfRegRow[1] = tuple.SelfRegCost.Value;
+                var selfRegRow = this.CreateRow(symbol, "SelfReg");
+                selfRegRow[0] = symbol.Id.Id;
+                selfRegRow[1] = symbol.SelfRegCost.Value;
             }
         }
 
-        private void AddIniFileTuple(IniFileTuple tuple)
+        private void AddIniFileSymbol(IniFileSymbol symbol)
         {
-            var tableName = (InifFileActionType.AddLine == tuple.Action || InifFileActionType.AddTag == tuple.Action || InifFileActionType.CreateLine == tuple.Action) ? "IniFile" : "RemoveIniFile";
+            var tableName = (InifFileActionType.AddLine == symbol.Action || InifFileActionType.AddTag == symbol.Action || InifFileActionType.CreateLine == symbol.Action) ? "IniFile" : "RemoveIniFile";
 
-            var row = this.CreateRow(tuple, tableName);
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.FileName;
-            row[2] = tuple.DirProperty;
-            row[3] = tuple.Section;
-            row[4] = tuple.Key;
-            row[5] = tuple.Value;
-            row[6] = tuple.Action;
-            row[7] = tuple.ComponentRef;
+            var row = this.CreateRow(symbol, tableName);
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.FileName;
+            row[2] = symbol.DirProperty;
+            row[3] = symbol.Section;
+            row[4] = symbol.Key;
+            row[5] = symbol.Value;
+            row[6] = symbol.Action;
+            row[7] = symbol.ComponentRef;
         }
 
-        private void AddMediaTuple(MediaTuple tuple)
+        private void AddMediaSymbol(MediaSymbol symbol)
         {
             if (this.Section.Type != SectionType.Module)
             {
-                var row = (MediaRow)this.CreateRow(tuple, "Media");
-                row.DiskId = tuple.DiskId;
-                row.LastSequence = tuple.LastSequence ?? 0;
-                row.DiskPrompt = tuple.DiskPrompt;
-                row.Cabinet = tuple.Cabinet;
-                row.VolumeLabel = tuple.VolumeLabel;
-                row.Source = tuple.Source;
+                var row = (MediaRow)this.CreateRow(symbol, "Media");
+                row.DiskId = symbol.DiskId;
+                row.LastSequence = symbol.LastSequence ?? 0;
+                row.DiskPrompt = symbol.DiskPrompt;
+                row.Cabinet = symbol.Cabinet;
+                row.VolumeLabel = symbol.VolumeLabel;
+                row.Source = symbol.Source;
             }
         }
 
-        private void AddModuleConfigurationTuple(ModuleConfigurationTuple tuple)
+        private void AddModuleConfigurationSymbol(ModuleConfigurationSymbol symbol)
         {
-            var row = this.CreateRow(tuple, "ModuleConfiguration");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Format;
-            row[2] = tuple.Type;
-            row[3] = tuple.ContextData;
-            row[4] = tuple.DefaultValue;
-            row[5] = (tuple.KeyNoOrphan ? WindowsInstallerConstants.MsidbMsmConfigurableOptionKeyNoOrphan : 0) |
-                     (tuple.NonNullable ? WindowsInstallerConstants.MsidbMsmConfigurableOptionNonNullable : 0);
-            row[6] = tuple.DisplayName;
-            row[7] = tuple.Description;
-            row[8] = tuple.HelpLocation;
-            row[9] = tuple.HelpKeyword;
+            var row = this.CreateRow(symbol, "ModuleConfiguration");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Format;
+            row[2] = symbol.Type;
+            row[3] = symbol.ContextData;
+            row[4] = symbol.DefaultValue;
+            row[5] = (symbol.KeyNoOrphan ? WindowsInstallerConstants.MsidbMsmConfigurableOptionKeyNoOrphan : 0) |
+                     (symbol.NonNullable ? WindowsInstallerConstants.MsidbMsmConfigurableOptionNonNullable : 0);
+            row[6] = symbol.DisplayName;
+            row[7] = symbol.Description;
+            row[8] = symbol.HelpLocation;
+            row[9] = symbol.HelpKeyword;
         }
 
-        private void AddMsiEmbeddedUITuple(MsiEmbeddedUITuple tuple)
+        private void AddMsiEmbeddedUISymbol(MsiEmbeddedUISymbol symbol)
         {
-            var attributes = tuple.EntryPoint ? WindowsInstallerConstants.MsidbEmbeddedUI : 0;
-            attributes |= tuple.SupportsBasicUI ? WindowsInstallerConstants.MsidbEmbeddedHandlesBasic : 0;
+            var attributes = symbol.EntryPoint ? WindowsInstallerConstants.MsidbEmbeddedUI : 0;
+            attributes |= symbol.SupportsBasicUI ? WindowsInstallerConstants.MsidbEmbeddedHandlesBasic : 0;
 
-            var row = this.CreateRow(tuple, "MsiEmbeddedUI");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.FileName;
+            var row = this.CreateRow(symbol, "MsiEmbeddedUI");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.FileName;
             row[2] = attributes;
-            row[3] = tuple.MessageFilter;
-            row[4] = tuple.Source;
+            row[3] = symbol.MessageFilter;
+            row[4] = symbol.Source;
         }
 
-        private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple)
+        private void AddMsiServiceConfigSymbol(MsiServiceConfigSymbol symbol)
         {
-            var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
-            events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
-            events |= tuple.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
+            var events = symbol.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
+            events |= symbol.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
+            events |= symbol.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
 
-            var row = this.CreateRow(tuple, "MsiServiceConfigFailureActions");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Name;
+            var row = this.CreateRow(symbol, "MsiServiceConfigFailureActions");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Name;
             row[2] = events;
-            row[3] = tuple.ConfigType;
-            row[4] = tuple.Argument;
-            row[5] = tuple.ComponentRef;
+            row[3] = symbol.ConfigType;
+            row[4] = symbol.Argument;
+            row[5] = symbol.ComponentRef;
         }
 
-        private void AddMsiServiceConfigFailureActionsTuple(MsiServiceConfigFailureActionsTuple tuple)
+        private void AddMsiServiceConfigFailureActionsSymbol(MsiServiceConfigFailureActionsSymbol symbol)
         {
-            var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
-            events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
-            events |= tuple.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
+            var events = symbol.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
+            events |= symbol.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
+            events |= symbol.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
 
-            var row = this.CreateRow(tuple, "MsiServiceConfig");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Name;
+            var row = this.CreateRow(symbol, "MsiServiceConfig");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Name;
             row[2] = events;
-            row[3] = tuple.ResetPeriod.HasValue ? tuple.ResetPeriod : null;
-            row[4] = tuple.RebootMessage ?? "[~]";
-            row[5] = tuple.Command ?? "[~]";
-            row[6] = tuple.Actions;
-            row[7] = tuple.DelayActions;
-            row[8] = tuple.ComponentRef;
+            row[3] = symbol.ResetPeriod.HasValue ? symbol.ResetPeriod : null;
+            row[4] = symbol.RebootMessage ?? "[~]";
+            row[5] = symbol.Command ?? "[~]";
+            row[6] = symbol.Actions;
+            row[7] = symbol.DelayActions;
+            row[8] = symbol.ComponentRef;
         }
 
-        private void AddMoveFileTuple(MoveFileTuple tuple)
+        private void AddMoveFileSymbol(MoveFileSymbol symbol)
         {
-            var row = this.CreateRow(tuple, "MoveFile");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.ComponentRef;
-            row[2] = tuple.SourceName;
-            row[3] = tuple.DestName;
-            row[4] = tuple.SourceFolder;
-            row[5] = tuple.DestFolder;
-            row[6] = tuple.Delete ? WindowsInstallerConstants.MsidbMoveFileOptionsMove : 0;
+            var row = this.CreateRow(symbol, "MoveFile");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ComponentRef;
+            row[2] = symbol.SourceName;
+            row[3] = symbol.DestName;
+            row[4] = symbol.SourceFolder;
+            row[5] = symbol.DestFolder;
+            row[6] = symbol.Delete ? WindowsInstallerConstants.MsidbMoveFileOptionsMove : 0;
         }
 
-        private void AddPropertyTuple(PropertyTuple tuple)
+        private void AddPropertySymbol(PropertySymbol symbol)
         {
-            if (String.IsNullOrEmpty(tuple.Value))
+            if (String.IsNullOrEmpty(symbol.Value))
             {
                 return;
             }
 
-            var row = (PropertyRow)this.CreateRow(tuple, "Property");
-            row.Property = tuple.Id.Id;
-            row.Value = tuple.Value;
+            var row = (PropertyRow)this.CreateRow(symbol, "Property");
+            row.Property = symbol.Id.Id;
+            row.Value = symbol.Value;
         }
 
-        private void AddRemoveFileTuple(RemoveFileTuple tuple)
+        private void AddRemoveFileSymbol(RemoveFileSymbol symbol)
         {
-            var installMode = tuple.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
-            installMode |= tuple.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
+            var installMode = symbol.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
+            installMode |= symbol.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
 
-            var row = this.CreateRow(tuple, "RemoveFile");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.ComponentRef;
-            row[2] = tuple.FileName;
-            row[3] = tuple.DirProperty;
+            var row = this.CreateRow(symbol, "RemoveFile");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ComponentRef;
+            row[2] = symbol.FileName;
+            row[3] = symbol.DirProperty;
             row[4] = installMode;
         }
 
-        private void AddRegistryTuple(RegistryTuple tuple)
+        private void AddRegistrySymbol(RegistrySymbol symbol)
         {
-            var value = tuple.Value;
+            var value = symbol.Value;
 
-            switch (tuple.ValueType)
+            switch (symbol.ValueType)
             {
                 case RegistryValueType.Binary:
                     value = String.Concat("#x", value);
@@ -689,7 +689,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     value = String.Concat("#", value);
                     break;
                 case RegistryValueType.MultiString:
-                    switch (tuple.ValueAction)
+                    switch (symbol.ValueAction)
                     {
                         case RegistryValueActionType.Append:
                             value = String.Concat("[~]", value);
@@ -715,164 +715,164 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
             }
 
-            var row = this.CreateRow(tuple, "Registry");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Root;
-            row[2] = tuple.Key;
-            row[3] = tuple.Name;
+            var row = this.CreateRow(symbol, "Registry");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Root;
+            row[2] = symbol.Key;
+            row[3] = symbol.Name;
             row[4] = value;
-            row[5] = tuple.ComponentRef;
+            row[5] = symbol.ComponentRef;
         }
 
-        private void AddRegLocatorTuple(RegLocatorTuple tuple)
+        private void AddRegLocatorSymbol(RegLocatorSymbol symbol)
         {
-            var type = (int)tuple.Type;
-            type |= tuple.Win64 ? WindowsInstallerConstants.MsidbLocatorType64bit : 0;
+            var type = (int)symbol.Type;
+            type |= symbol.Win64 ? WindowsInstallerConstants.MsidbLocatorType64bit : 0;
 
-            var row = this.CreateRow(tuple, "RegLocator");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Root;
-            row[2] = tuple.Key;
-            row[3] = tuple.Name;
+            var row = this.CreateRow(symbol, "RegLocator");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Root;
+            row[2] = symbol.Key;
+            row[3] = symbol.Name;
             row[4] = type;
         }
 
-        private void AddRemoveRegistryTuple(RemoveRegistryTuple tuple)
+        private void AddRemoveRegistrySymbol(RemoveRegistrySymbol symbol)
         {
-            if (tuple.Action == RemoveRegistryActionType.RemoveOnInstall)
+            if (symbol.Action == RemoveRegistryActionType.RemoveOnInstall)
             {
-                var row = this.CreateRow(tuple, "RemoveRegistry");
-                row[0] = tuple.Id.Id;
-                row[1] = tuple.Root;
-                row[2] = tuple.Key;
-                row[3] = tuple.Name;
-                row[4] = tuple.ComponentRef;
+                var row = this.CreateRow(symbol, "RemoveRegistry");
+                row[0] = symbol.Id.Id;
+                row[1] = symbol.Root;
+                row[2] = symbol.Key;
+                row[3] = symbol.Name;
+                row[4] = symbol.ComponentRef;
             }
             else // Registry table is used to remove registry keys on uninstall.
             {
-                var row = this.CreateRow(tuple, "Registry");
-                row[0] = tuple.Id.Id;
-                row[1] = tuple.Root;
-                row[2] = tuple.Key;
-                row[3] = tuple.Name;
-                row[5] = tuple.ComponentRef;
+                var row = this.CreateRow(symbol, "Registry");
+                row[0] = symbol.Id.Id;
+                row[1] = symbol.Root;
+                row[2] = symbol.Key;
+                row[3] = symbol.Name;
+                row[5] = symbol.ComponentRef;
             }
         }
 
-        private void AddServiceControlTuple(ServiceControlTuple tuple)
+        private void AddServiceControlSymbol(ServiceControlSymbol symbol)
         {
-            var events = tuple.InstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventDelete : 0;
-            events |= tuple.UninstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete : 0;
-            events |= tuple.InstallStart ? WindowsInstallerConstants.MsidbServiceControlEventStart : 0;
-            events |= tuple.UninstallStart ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStart : 0;
-            events |= tuple.InstallStop ? WindowsInstallerConstants.MsidbServiceControlEventStop : 0;
-            events |= tuple.UninstallStop ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStop : 0;
+            var events = symbol.InstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventDelete : 0;
+            events |= symbol.UninstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete : 0;
+            events |= symbol.InstallStart ? WindowsInstallerConstants.MsidbServiceControlEventStart : 0;
+            events |= symbol.UninstallStart ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStart : 0;
+            events |= symbol.InstallStop ? WindowsInstallerConstants.MsidbServiceControlEventStop : 0;
+            events |= symbol.UninstallStop ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStop : 0;
 
-            var row = this.CreateRow(tuple, "ServiceControl");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Name;
+            var row = this.CreateRow(symbol, "ServiceControl");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Name;
             row[2] = events;
-            row[3] = tuple.Arguments;
-            if (tuple.Wait.HasValue)
+            row[3] = symbol.Arguments;
+            if (symbol.Wait.HasValue)
             {
-                row[4] = tuple.Wait.Value ? 1 : 0;
+                row[4] = symbol.Wait.Value ? 1 : 0;
             }
-            row[5] = tuple.ComponentRef;
+            row[5] = symbol.ComponentRef;
         }
 
-        private void AddServiceInstallTuple(ServiceInstallTuple tuple)
+        private void AddServiceInstallSymbol(ServiceInstallSymbol symbol)
         {
-            var errorControl = (int)tuple.ErrorControl;
-            errorControl |= tuple.Vital ? WindowsInstallerConstants.MsidbServiceInstallErrorControlVital : 0;
+            var errorControl = (int)symbol.ErrorControl;
+            errorControl |= symbol.Vital ? WindowsInstallerConstants.MsidbServiceInstallErrorControlVital : 0;
 
-            var serviceType = (int)tuple.ServiceType;
-            serviceType |= tuple.Interactive ? WindowsInstallerConstants.MsidbServiceInstallInteractive : 0;
+            var serviceType = (int)symbol.ServiceType;
+            serviceType |= symbol.Interactive ? WindowsInstallerConstants.MsidbServiceInstallInteractive : 0;
 
-            var row = this.CreateRow(tuple, "ServiceInstall");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Name;
-            row[2] = tuple.DisplayName;
+            var row = this.CreateRow(symbol, "ServiceInstall");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.Name;
+            row[2] = symbol.DisplayName;
             row[3] = serviceType;
-            row[4] = (int)tuple.StartType;
+            row[4] = (int)symbol.StartType;
             row[5] = errorControl;
-            row[6] = tuple.LoadOrderGroup;
-            row[7] = tuple.Dependencies;
-            row[8] = tuple.StartName;
-            row[9] = tuple.Password;
-            row[10] = tuple.Arguments;
-            row[11] = tuple.ComponentRef;
-            row[12] = tuple.Description;
+            row[6] = symbol.LoadOrderGroup;
+            row[7] = symbol.Dependencies;
+            row[8] = symbol.StartName;
+            row[9] = symbol.Password;
+            row[10] = symbol.Arguments;
+            row[11] = symbol.ComponentRef;
+            row[12] = symbol.Description;
         }
 
-        private void AddShortcutTuple(ShortcutTuple tuple)
+        private void AddShortcutSymbol(ShortcutSymbol symbol)
         {
-            var row = this.CreateRow(tuple, "Shortcut");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.DirectoryRef;
-            row[2] = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
-            row[3] = tuple.ComponentRef;
-            row[4] = tuple.Target;
-            row[5] = tuple.Arguments;
-            row[6] = tuple.Description;
-            row[7] = tuple.Hotkey;
-            row[8] = tuple.IconRef;
-            row[9] = tuple.IconIndex;
-            row[10] = (int?)tuple.Show;
-            row[11] = tuple.WorkingDirectory;
-            row[12] = tuple.DisplayResourceDll;
-            row[13] = tuple.DisplayResourceId;
-            row[14] = tuple.DescriptionResourceDll;
-            row[15] = tuple.DescriptionResourceId;
+            var row = this.CreateRow(symbol, "Shortcut");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.DirectoryRef;
+            row[2] = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
+            row[3] = symbol.ComponentRef;
+            row[4] = symbol.Target;
+            row[5] = symbol.Arguments;
+            row[6] = symbol.Description;
+            row[7] = symbol.Hotkey;
+            row[8] = symbol.IconRef;
+            row[9] = symbol.IconIndex;
+            row[10] = (int?)symbol.Show;
+            row[11] = symbol.WorkingDirectory;
+            row[12] = symbol.DisplayResourceDll;
+            row[13] = symbol.DisplayResourceId;
+            row[14] = symbol.DescriptionResourceDll;
+            row[15] = symbol.DescriptionResourceId;
         }
 
-        private void AddTextStyleTuple(TextStyleTuple tuple)
+        private void AddTextStyleSymbol(TextStyleSymbol symbol)
         {
-            var styleBits = tuple.Bold ? WindowsInstallerConstants.MsidbTextStyleStyleBitsBold : 0;
-            styleBits |= tuple.Italic ? WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic : 0;
-            styleBits |= tuple.Strike ? WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike : 0;
-            styleBits |= tuple.Underline ? WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline : 0;
+            var styleBits = symbol.Bold ? WindowsInstallerConstants.MsidbTextStyleStyleBitsBold : 0;
+            styleBits |= symbol.Italic ? WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic : 0;
+            styleBits |= symbol.Strike ? WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike : 0;
+            styleBits |= symbol.Underline ? WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline : 0;
 
             long? color = null;
 
-            if (tuple.Red.HasValue || tuple.Green.HasValue || tuple.Blue.HasValue)
+            if (symbol.Red.HasValue || symbol.Green.HasValue || symbol.Blue.HasValue)
             {
-                color = tuple.Red ?? 0;
-                color += (long)(tuple.Green ?? 0) * 256;
-                color += (long)(tuple.Blue ?? 0) * 65536;
+                color = symbol.Red ?? 0;
+                color += (long)(symbol.Green ?? 0) * 256;
+                color += (long)(symbol.Blue ?? 0) * 65536;
             }
 
-            var row = this.CreateRow(tuple, "TextStyle");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.FaceName;
-            row[2] = tuple.Size;
+            var row = this.CreateRow(symbol, "TextStyle");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.FaceName;
+            row[2] = symbol.Size;
             row[3] = color;
             row[4] = styleBits == 0 ? null : (int?)styleBits;
         }
 
-        private void AddUpgradeTuple(UpgradeTuple tuple)
+        private void AddUpgradeSymbol(UpgradeSymbol symbol)
         {
-            var row = (UpgradeRow)this.CreateRow(tuple, "Upgrade");
-            row.UpgradeCode = tuple.UpgradeCode;
-            row.VersionMin = tuple.VersionMin;
-            row.VersionMax = tuple.VersionMax;
-            row.Language = tuple.Language;
-            row.Remove = tuple.Remove;
-            row.ActionProperty = tuple.ActionProperty;
+            var row = (UpgradeRow)this.CreateRow(symbol, "Upgrade");
+            row.UpgradeCode = symbol.UpgradeCode;
+            row.VersionMin = symbol.VersionMin;
+            row.VersionMax = symbol.VersionMax;
+            row.Language = symbol.Language;
+            row.Remove = symbol.Remove;
+            row.ActionProperty = symbol.ActionProperty;
 
-            var attributes = tuple.MigrateFeatures ? WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures : 0;
-            attributes |= tuple.OnlyDetect ? WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect : 0;
-            attributes |= tuple.IgnoreRemoveFailures ? WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure : 0;
-            attributes |= tuple.VersionMinInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive : 0;
-            attributes |= tuple.VersionMaxInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive : 0;
-            attributes |= tuple.ExcludeLanguages ? WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive : 0;
+            var attributes = symbol.MigrateFeatures ? WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures : 0;
+            attributes |= symbol.OnlyDetect ? WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect : 0;
+            attributes |= symbol.IgnoreRemoveFailures ? WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure : 0;
+            attributes |= symbol.VersionMinInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive : 0;
+            attributes |= symbol.VersionMaxInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive : 0;
+            attributes |= symbol.ExcludeLanguages ? WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive : 0;
             row.Attributes = attributes;
         }
 
-        private void AddWixActionTuple(WixActionTuple tuple)
+        private void AddWixActionSymbol(WixActionSymbol symbol)
         {
             // Get the table definition for the action (and ensure the proper table exists for a module).
             string sequenceTableName = null;
-            switch (tuple.SequenceTable)
+            switch (symbol.SequenceTable)
             {
                 case SequenceTable.AdminExecuteSequence:
                     if (OutputType.Module == this.Output.Type)
@@ -932,60 +932,60 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // create the action sequence row in the output
-            var row = this.CreateRow(tuple, sequenceTableName);
+            var row = this.CreateRow(symbol, sequenceTableName);
 
             if (SectionType.Module == this.Section.Type)
             {
-                row[0] = tuple.Action;
-                if (0 != tuple.Sequence)
+                row[0] = symbol.Action;
+                if (0 != symbol.Sequence)
                 {
-                    row[1] = tuple.Sequence;
+                    row[1] = symbol.Sequence;
                 }
                 else
                 {
-                    var after = (null == tuple.Before);
-                    row[2] = after ? tuple.After : tuple.Before;
+                    var after = (null == symbol.Before);
+                    row[2] = after ? symbol.After : symbol.Before;
                     row[3] = after ? 1 : 0;
                 }
-                row[4] = tuple.Condition;
+                row[4] = symbol.Condition;
             }
             else
             {
-                row[0] = tuple.Action;
-                row[1] = tuple.Condition;
-                row[2] = tuple.Sequence;
+                row[0] = symbol.Action;
+                row[1] = symbol.Condition;
+                row[2] = symbol.Sequence;
             }
         }
 
-        private void IndexCustomTableCellTuple(WixCustomTableCellTuple wixCustomTableCellTuple, Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
+        private void IndexCustomTableCellSymbol(WixCustomTableCellSymbol wixCustomTableCellSymbol, Dictionary<string, List<WixCustomTableCellSymbol>> cellsByTableAndRowId)
         {
-            var tableAndRowId = wixCustomTableCellTuple.TableRef + "/" + wixCustomTableCellTuple.RowId;
+            var tableAndRowId = wixCustomTableCellSymbol.TableRef + "/" + wixCustomTableCellSymbol.RowId;
             if (!cellsByTableAndRowId.TryGetValue(tableAndRowId, out var cells))
             {
-                cells = new List<WixCustomTableCellTuple>();
+                cells = new List<WixCustomTableCellSymbol>();
                 cellsByTableAndRowId.Add(tableAndRowId, cells);
             }
 
-            cells.Add(wixCustomTableCellTuple);
+            cells.Add(wixCustomTableCellSymbol);
         }
 
-        private void AddIndexedCellTuples(Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
+        private void AddIndexedCellSymbols(Dictionary<string, List<WixCustomTableCellSymbol>> cellsByTableAndRowId)
         {
             foreach (var rowOfCells in cellsByTableAndRowId.Values)
             {
-                var firstCellTuple = rowOfCells[0];
-                var customTableDefinition = this.TableDefinitions[firstCellTuple.TableRef];
+                var firstCellSymbol = rowOfCells[0];
+                var customTableDefinition = this.TableDefinitions[firstCellSymbol.TableRef];
 
                 if (customTableDefinition.Unreal)
                 {
                     continue;
                 }
 
-                var customRow = this.CreateRow(firstCellTuple, customTableDefinition);
+                var customRow = this.CreateRow(firstCellSymbol, customTableDefinition);
                 var customRowFieldsByColumnName = customRow.Fields.ToDictionary(f => f.Column.Name);
 
 #if TODO // SectionId seems like a good thing to preserve.
-                customRow.SectionId = tuple.SectionId;
+                customRow.SectionId = symbol.SectionId;
 #endif
                 foreach (var cell in rowOfCells)
                 {
@@ -1037,23 +1037,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
                     {
-                        this.Messaging.Write(ErrorMessages.NoDataForColumn(firstCellTuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
+                        this.Messaging.Write(ErrorMessages.NoDataForColumn(firstCellSymbol.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
                     }
                 }
             }
         }
 
-        private void AddWixEnsureTableTuple(WixEnsureTableTuple tuple)
+        private void AddWixEnsureTableSymbol(WixEnsureTableSymbol symbol)
         {
-            var tableDefinition = this.TableDefinitions[tuple.Table];
+            var tableDefinition = this.TableDefinitions[symbol.Table];
             this.Output.EnsureTable(tableDefinition);
         }
 
-        private bool AddTupleFromExtension(IntermediateTuple tuple)
+        private bool AddSymbolFromExtension(IntermediateSymbol symbol)
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryAddTupleToOutput(this.Section, tuple, this.Output, this.TableDefinitions))
+                if (extension.TryAddSymbolToOutput(this.Section, symbol, this.Output, this.TableDefinitions))
                 {
                     return true;
                 }
@@ -1062,8 +1062,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return false;
         }
 
-        private bool AddTupleDefaultly(IntermediateTuple tuple) =>
-            this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(this.Section, tuple, this.Output, this.TableDefinitions);
+        private bool AddSymbolDefaultly(IntermediateSymbol symbol) =>
+            this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(this.Section, symbol, this.Output, this.TableDefinitions);
 
         private static OutputType SectionTypeToOutputType(SectionType type)
         {
@@ -1085,11 +1085,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private Row CreateRow(IntermediateTuple tuple, string tableDefinitionName) =>
-            this.CreateRow(tuple, this.TableDefinitions[tableDefinitionName]);
+        private Row CreateRow(IntermediateSymbol symbol, string tableDefinitionName) =>
+            this.CreateRow(symbol, this.TableDefinitions[tableDefinitionName]);
 
-        private Row CreateRow(IntermediateTuple tuple, TableDefinition tableDefinition) =>
-            this.BackendHelper.CreateRow(this.Section, tuple, this.Output, tableDefinition);
+        private Row CreateRow(IntermediateSymbol symbol, TableDefinition tableDefinition) =>
+            this.BackendHelper.CreateRow(this.Section, symbol, this.Output, tableDefinition);
 
         private static string GetMsiFilenameValue(string shortName, string longName)
         {

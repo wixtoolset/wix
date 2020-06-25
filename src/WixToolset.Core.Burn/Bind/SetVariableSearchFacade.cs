@@ -3,17 +3,17 @@
 namespace WixToolset.Core.Burn
 {
     using System.Xml;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class SetVariableSearchFacade : BaseSearchFacade
     {
-        public SetVariableSearchFacade(WixSearchTuple searchTuple, WixSetVariableTuple setVariableTuple)
+        public SetVariableSearchFacade(WixSearchSymbol searchSymbol, WixSetVariableSymbol setVariableSymbol)
         {
-            this.SearchTuple = searchTuple;
-            this.SetVariableTuple = setVariableTuple;
+            this.SearchSymbol = searchSymbol;
+            this.SetVariableSymbol = setVariableSymbol;
         }
 
-        private WixSetVariableTuple SetVariableTuple { get; }
+        private WixSetVariableSymbol SetVariableSymbol { get; }
 
         public override void WriteXml(XmlTextWriter writer)
         {
@@ -21,10 +21,10 @@ namespace WixToolset.Core.Burn
 
             base.WriteXml(writer);
 
-            if (this.SetVariableTuple.Type != null)
+            if (this.SetVariableSymbol.Type != null)
             {
-                writer.WriteAttributeString("Value", this.SetVariableTuple.Value);
-                writer.WriteAttributeString("Type", this.SetVariableTuple.Type);
+                writer.WriteAttributeString("Value", this.SetVariableSymbol.Value);
+                writer.WriteAttributeString("Type", this.SetVariableSymbol.Type);
             }
 
             writer.WriteEndElement();

@@ -7,7 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
@@ -33,9 +33,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void Execute()
         {
             // Create and add substorages for instance transforms.
-            var wixInstanceTransformsTuples = this.Section.Tuples.OfType<WixInstanceTransformsTuple>();
+            var wixInstanceTransformsSymbols = this.Section.Symbols.OfType<WixInstanceTransformsSymbol>();
 
-            if (wixInstanceTransformsTuples.Any())
+            if (wixInstanceTransformsSymbols.Any())
             {
                 string targetProductCode = null;
                 string targetUpgradeCode = null;
@@ -62,7 +62,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Index the Instance Component Rows, we'll get the Components rows from the real Component table.
-                var targetInstanceComponentTable = this.Section.Tuples.OfType<WixInstanceComponentTuple>();
+                var targetInstanceComponentTable = this.Section.Symbols.OfType<WixInstanceComponentSymbol>();
                 var instanceComponentGuids = targetInstanceComponentTable.ToDictionary(t => t.Id.Id, t => (ComponentRow)null);
 
                 if (instanceComponentGuids.Any())
@@ -79,11 +79,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Generate the instance transforms
-                foreach (var instanceTuple in wixInstanceTransformsTuples)
+                foreach (var instanceSymbol in wixInstanceTransformsSymbols)
                 {
-                    var instanceId = instanceTuple.Id.Id;
+                    var instanceId = instanceSymbol.Id.Id;
 
-                    var instanceTransform = new WindowsInstallerData(instanceTuple.SourceLineNumbers);
+                    var instanceTransform = new WindowsInstallerData(instanceSymbol.SourceLineNumbers);
                     instanceTransform.Type = OutputType.Transform;
                     instanceTransform.Codepage = this.Output.Codepage;
 
@@ -107,49 +107,49 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var propertyTable = instanceTransform.EnsureTable(this.TableDefinitions["Property"]);
 
                     // Change the ProductCode property
-                    var productCode = instanceTuple.ProductCode;
+                    var productCode = instanceSymbol.ProductCode;
                     if ("*" == productCode)
                     {
                         productCode = Common.GenerateGuid();
                     }
 
-                    var productCodeRow = propertyTable.CreateRow(instanceTuple.SourceLineNumbers);
+                    var productCodeRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);
                     productCodeRow.Operation = RowOperation.Modify;
                     productCodeRow.Fields[1].Modified = true;
                     productCodeRow[0] = "ProductCode";
                     productCodeRow[1] = productCode;
 
                     // Change the instance property
-                    var instanceIdRow = propertyTable.CreateRow(instanceTuple.SourceLineNumbers);
+                    var instanceIdRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);
                     instanceIdRow.Operation = RowOperation.Modify;
                     instanceIdRow.Fields[1].Modified = true;
-                    instanceIdRow[0] = instanceTuple.PropertyId;
+                    instanceIdRow[0] = instanceSymbol.PropertyId;
                     instanceIdRow[1] = instanceId;
 
-                    if (!String.IsNullOrEmpty(instanceTuple.ProductName))
+                    if (!String.IsNullOrEmpty(instanceSymbol.ProductName))
                     {
                         // Change the ProductName property
-                        var productNameRow = propertyTable.CreateRow(instanceTuple.SourceLineNumbers);
+                        var productNameRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);
                         productNameRow.Operation = RowOperation.Modify;
                         productNameRow.Fields[1].Modified = true;
                         productNameRow[0] = "ProductName";
-                        productNameRow[1] = instanceTuple.ProductName;
+                        productNameRow[1] = instanceSymbol.ProductName;
                     }
 
-                    if (!String.IsNullOrEmpty(instanceTuple.UpgradeCode))
+                    if (!String.IsNullOrEmpty(instanceSymbol.UpgradeCode))
                     {
                         // Change the UpgradeCode property
-                        var upgradeCodeRow = propertyTable.CreateRow(instanceTuple.SourceLineNumbers);
+                        var upgradeCodeRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);
                         upgradeCodeRow.Operation = RowOperation.Modify;
                         upgradeCodeRow.Fields[1].Modified = true;
                         upgradeCodeRow[0] = "UpgradeCode";
-                        upgradeCodeRow[1] = instanceTuple.UpgradeCode;
+                        upgradeCodeRow[1] = instanceSymbol.UpgradeCode;
 
                         // Change the Upgrade table
                         var targetUpgradeTable = this.Output.Tables["Upgrade"];
                         if (null != targetUpgradeTable && 0 <= targetUpgradeTable.Rows.Count)
                         {
-                            var upgradeId = instanceTuple.UpgradeCode;
+                            var upgradeId = instanceSymbol.UpgradeCode;
                             var upgradeTable = instanceTransform.EnsureTable(this.TableDefinitions["Upgrade"]);
                             foreach (var row in targetUpgradeTable.Rows)
                             {
@@ -235,19 +235,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (!summaryRows.ContainsKey((int)SummaryInformation.Transform.UpdatedPlatformAndLanguage))
                     {
-                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceTuple.SourceLineNumbers);
+                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceSymbol.SourceLineNumbers);
                         summaryRow[0] = (int)SummaryInformation.Transform.UpdatedPlatformAndLanguage;
                         summaryRow[1] = targetPlatformAndLanguage;
                     }
                     else if (!summaryRows.ContainsKey((int)SummaryInformation.Transform.ValidationFlags))
                     {
-                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceTuple.SourceLineNumbers);
+                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceSymbol.SourceLineNumbers);
                         summaryRow[0] = (int)SummaryInformation.Transform.ValidationFlags;
                         summaryRow[1] = "0";
                     }
                     else if (!summaryRows.ContainsKey((int)SummaryInformation.Transform.Security))
                     {
-                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceTuple.SourceLineNumbers);
+                        var summaryRow = instanceSummaryInformationTable.CreateRow(instanceSymbol.SourceLineNumbers);
                         summaryRow[0] = (int)SummaryInformation.Transform.Security;
                         summaryRow[1] = "4";
                     }

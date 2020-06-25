@@ -9,14 +9,14 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class CreateBundleExtensionManifestCommand
     {
-        public CreateBundleExtensionManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, int lastUXPayloadIndex, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBundleExtensionManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, int lastUXPayloadIndex, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
-            this.BundleTuple = bundleTuple;
+            this.BundleSymbol = bundleSymbol;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
             this.IntermediateFolder = intermediateFolder;
             this.InternalBurnBackendHelper = internalBurnBackendHelper;
@@ -24,7 +24,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        private WixBundleTuple BundleTuple { get; }
+        private WixBundleSymbol BundleSymbol { get; }
 
         private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
@@ -32,7 +32,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private string IntermediateFolder { get; }
 
-        public WixBundlePayloadTuple BundleExtensionManifestPayloadRow { get; private set; }
+        public WixBundlePayloadSymbol BundleExtensionManifestPayloadRow { get; private set; }
 
         public string OutputPath { get; private set; }
 
@@ -64,11 +64,11 @@ namespace WixToolset.Core.Burn.Bundles
             return path;
         }
 
-        private WixBundlePayloadTuple CreateBundleExtensionManifestPayloadRow(string bextManifestPath)
+        private WixBundlePayloadSymbol CreateBundleExtensionManifestPayloadRow(string bextManifestPath)
         {
             var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
 
-            var tuple = this.Section.AddTuple(new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+            var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
             {
                 Name = BurnCommon.BundleExtensionDataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = bextManifestPath },
@@ -81,11 +81,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             var fileInfo = new FileInfo(bextManifestPath);
 
-            tuple.FileSize = (int)fileInfo.Length;
+            symbol.FileSize = (int)fileInfo.Length;
 
-            tuple.Hash = BundleHashAlgorithm.Hash(fileInfo);
+            symbol.Hash = BundleHashAlgorithm.Hash(fileInfo);
 
-            return tuple;
+            return symbol;
         }
     }
 }

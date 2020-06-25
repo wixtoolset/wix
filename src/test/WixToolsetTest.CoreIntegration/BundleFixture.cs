@@ -12,7 +12,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class BundleFixture
@@ -81,14 +81,14 @@ namespace WixToolsetTest.CoreIntegration
                     var intermediate = Intermediate.Load(wixOutput);
                     var section = intermediate.Sections.Single();
 
-                    var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
-                    Assert.Equal("1.0.0.0", bundleTuple.Version);
+                    var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+                    Assert.Equal("1.0.0.0", bundleSymbol.Version);
 
-                    var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
+                    var previousVersion = bundleSymbol.Fields[(int)WixBundleSymbolFields.Version].PreviousValue;
                     Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
 
-                    var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
-                    Assert.Equal("test.msi", msiTuple.Id.Id);
+                    var msiSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single();
+                    Assert.Equal("test.msi", msiSymbol.Id.Id);
 
                     var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
                     extractResult.AssertSuccess();
@@ -111,7 +111,7 @@ namespace WixToolsetTest.CoreIntegration
 
                     var registrationElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration");
                     var registrationElement = (XmlNode)Assert.Single(registrationElements);
-                    Assert.Equal($"<Registration Id='{bundleTuple.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleTuple.BundleId}'>" +
+                    Assert.Equal($"<Registration Id='{bundleSymbol.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleId}'>" +
                         "<Arp Register='yes' DisplayName='~TestBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' />" +
                         "</Registration>", registrationElement.GetTestXml());
                 }

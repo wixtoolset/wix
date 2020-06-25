@@ -13,7 +13,7 @@ namespace WixToolset.Core
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -164,13 +164,13 @@ namespace WixToolset.Core
         public bool ShowPedanticMessages { get; set; }
 
         /// <summary>
-        /// Add a tuple to the active section.
+        /// Add a symbol to the active section.
         /// </summary>
-        /// <param name="tuple">Tuple to add.</param>
-        public T AddTuple<T>(T tuple)
-            where T : IntermediateTuple
+        /// <param name="symbol">Symbol to add.</param>
+        public T AddSymbol<T>(T symbol)
+            where T : IntermediateSymbol
         {
-            return this.ActiveSection.AddTuple(tuple);
+            return this.ActiveSection.AddSymbol(symbol);
         }
 
         /// <summary>
@@ -355,39 +355,39 @@ namespace WixToolset.Core
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId)
         {
-            return this.parseHelper.CreateRegistryTuple(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
+            return this.parseHelper.CreateRegistrySymbol(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
         }
 
         /// <summary>
-        /// Create a WixSimpleReferenceTuple in the active section.
+        /// Create a WixSimpleReferenceSymbol in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tupleName">The tuple name of the simple reference.</param>
+        /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys)
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys)
         {
             if (!this.EncounteredError)
             {
                 var joinedKeys = String.Join("/", primaryKeys);
-                var id = String.Concat(tupleName, ":", joinedKeys);
+                var id = String.Concat(symbolName, ":", joinedKeys);
 
                 // If this simple reference hasn't been added to the active section already, add it.
                 if (this.activeSectionSimpleReferences.Add(id))
                 {
-                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, tupleName, primaryKeys);
+                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, symbolName, primaryKeys);
                 }
             }
         }
 
         /// <summary>
-        /// Create a WixSimpleReferenceTuple in the active section.
+        /// Create a WixSimpleReferenceSymbol in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tupleDefinition">The tuple definition of the simple reference.</param>
+        /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys)
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, params string[] primaryKeys)
         {
-            this.CreateSimpleReference(sourceLineNumbers, tupleDefinition.Name, primaryKeys);
+            this.CreateSimpleReference(sourceLineNumbers, symbolDefinition.Name, primaryKeys);
         }
 
         /// <summary>
@@ -402,12 +402,12 @@ namespace WixToolset.Core
         {
             if (!this.EncounteredError)
             {
-                this.parseHelper.CreateWixGroupTuple(this.ActiveSection, sourceLineNumbers, parentType, parentId, childType, childId);
+                this.parseHelper.CreateWixGroupSymbol(this.ActiveSection, sourceLineNumbers, parentType, parentId, childType, childId);
             }
         }
 
         /// <summary>
-        /// Add the appropriate tuples to make sure that the given table shows up
+        /// Add the appropriate symbols to make sure that the given table shows up
         /// in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
@@ -421,7 +421,7 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Add the appropriate tuples to make sure that the given table shows up
+        /// Add the appropriate symbols to make sure that the given table shows up
         /// in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
@@ -1013,12 +1013,12 @@ namespace WixToolset.Core
         /// <returns>Identifier for the newly created row.</returns>
         internal Identifier CreateDirectoryRow(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            return this.parseHelper.CreateDirectoryTuple(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
+            return this.parseHelper.CreateDirectorySymbol(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
         }
 
-        public void CreateWixSearchTuple(SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after)
+        public void CreateWixSearchSymbol(SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after)
         {
-            this.parseHelper.CreateWixSearchTuple(this.ActiveSection, sourceLineNumbers, elementName, id, variable, condition, after, null);
+            this.parseHelper.CreateWixSearchSymbol(this.ActiveSection, sourceLineNumbers, elementName, id, variable, condition, after, null);
         }
 
         /// <summary>
@@ -1033,9 +1033,9 @@ namespace WixToolset.Core
             return this.parseHelper.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, resultUsedToCreateReference);
         }
 
-        internal WixActionTuple ScheduleActionTuple(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
+        internal WixActionSymbol ScheduleActionSymbol(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
         {
-            return this.parseHelper.ScheduleActionTuple(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
+            return this.parseHelper.ScheduleActionSymbol(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
         }
 
         /// <summary>

@@ -8,14 +8,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Creates delta patches and updates the appropriate rows to point to the newly generated patches.
     /// </summary>
     internal class CreateDeltaPatchesCommand
     {
-        public CreateDeltaPatchesCommand(List<FileFacade> fileFacades, string intermediateFolder, WixPatchIdTuple wixPatchId)
+        public CreateDeltaPatchesCommand(List<FileFacade> fileFacades, string intermediateFolder, WixPatchIdSymbol wixPatchId)
         {
             this.FileFacades = fileFacades;
             this.IntermediateFolder = intermediateFolder;
@@ -24,7 +24,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<FileFacade> FileFacades { get; }
 
-        private WixPatchIdTuple WixPatchId { get; }
+        private WixPatchIdSymbol WixPatchId { get; }
 
         private string IntermediateFolder { get; }
 
@@ -73,7 +73,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
             }
-#endif 
+#endif
 
             throw new NotImplementedException();
         }

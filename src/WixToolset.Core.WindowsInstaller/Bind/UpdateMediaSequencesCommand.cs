@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
 
     internal class UpdateMediaSequencesCommand
     {
@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
+            var mediaRows = this.Section.Symbols.OfType<MediaSymbol>().ToDictionary(t => t.DiskId);
 
             // Calculate sequence numbers and media disk id layout for all file media information objects.
             if (SectionType.Module == this.Section.Type)
@@ -37,25 +37,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             else
             {
                 var lastSequence = 0;
-                MediaTuple mediaTuple = null;
+                MediaSymbol mediaSymbol = null;
                 var patchGroups = new Dictionary<int, List<FileFacade>>();
 
                 // sequence the non-patch-added files
                 foreach (var facade in this.FileFacades)
                 {
-                    if (null == mediaTuple)
+                    if (null == mediaSymbol)
                     {
-                        mediaTuple = mediaRows[facade.DiskId];
+                        mediaSymbol = mediaRows[facade.DiskId];
                         if (SectionType.Patch == this.Section.Type)
                         {
                             // patch Media cannot start at zero
-                            lastSequence = mediaTuple.LastSequence ?? 1;
+                            lastSequence = mediaSymbol.LastSequence ?? 1;
                         }
                     }
-                    else if (mediaTuple.DiskId != facade.DiskId)
+                    else if (mediaSymbol.DiskId != facade.DiskId)
                     {
-                        mediaTuple.LastSequence = lastSequence;
-                        mediaTuple = mediaRows[facade.DiskId];
+                        mediaSymbol.LastSequence = lastSequence;
+                        mediaSymbol = mediaRows[facade.DiskId];
                     }
 
                     if (facade.PatchGroup.HasValue)
@@ -74,10 +74,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                if (null != mediaTuple)
+                if (null != mediaSymbol)
                 {
-                    mediaTuple.LastSequence = lastSequence;
-                    mediaTuple = null;
+                    mediaSymbol.LastSequence = lastSequence;
+                    mediaSymbol = null;
                 }
 
                 // sequence the patch-added files
@@ -85,23 +85,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     foreach (var facade in patchGroup)
                     {
-                        if (null == mediaTuple)
+                        if (null == mediaSymbol)
                         {
-                            mediaTuple = mediaRows[facade.DiskId];
+                            mediaSymbol = mediaRows[facade.DiskId];
                         }
-                        else if (mediaTuple.DiskId != facade.DiskId)
+                        else if (mediaSymbol.DiskId != facade.DiskId)
                         {
-                            mediaTuple.LastSequence = lastSequence;
-                            mediaTuple = mediaRows[facade.DiskId];
+                            mediaSymbol.LastSequence = lastSequence;
+                            mediaSymbol = mediaRows[facade.DiskId];
                         }
 
                         facade.Sequence = ++lastSequence;
                     }
                 }
 
-                if (null != mediaTuple)
+                if (null != mediaSymbol)
                 {
-                    mediaTuple.LastSequence = lastSequence;
+                    mediaSymbol.LastSequence = lastSequence;
                 }
             }
         }
