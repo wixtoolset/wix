@@ -17,6 +17,8 @@
     <Content Include="tools\wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.signing.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Sdk\Sdk.props" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Sdk\Sdk.targets" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

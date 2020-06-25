@@ -12,6 +12,7 @@
 
   <files>
     <file src="build\**\*" target="build" />
+    <file src="Sdk\**\*" target="Sdk" />
     <file src="tools\**\*" target="tools" />
   </files>
 </package>
