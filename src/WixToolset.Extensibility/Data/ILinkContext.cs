@@ -19,7 +19,7 @@ namespace WixToolset.Extensibility.Data
 
         IEnumerable<Intermediate> Intermediates { get; set; }
 
-        ITupleDefinitionCreator TupleDefinitionCreator { get; set; }
+        ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 
         CancellationToken CancellationToken { get; set; }
     }

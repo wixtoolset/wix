@@ -21,7 +21,7 @@ namespace WixToolset.Extensibility
         /// Messaging for use by the extension.
         /// </summary>
         protected IMessaging Messaging { get; private set; }
-        
+
         /// <summary>
         /// Called at the beginning of combining.
         /// </summary>
@@ -37,10 +37,10 @@ namespace WixToolset.Extensibility
         /// Resolves a path to a file path on disk.
         /// </summary>
         /// <param name="sourceLineNumber">Source line number for the path to resolve.</param>
-        /// <param name="tupleDefinition">Tuple related to the path to resolve.</param>
+        /// <param name="symbolDefinition">Symbol related to the path to resolve.</param>
         /// <param name="path">Path to resolve.</param>
         /// <returns>Optional resolved file result.</returns>
-        public virtual IResolveFileResult ResolveFile(SourceLineNumber sourceLineNumber, IntermediateTupleDefinition tupleDefinition, string path)
+        public virtual IResolveFileResult ResolveFile(SourceLineNumber sourceLineNumber, IntermediateSymbolDefinition symbolDefinition, string path)
         {
             return null;
         }

@@ -11,14 +11,14 @@ namespace WixToolset.Extensibility
     {
         public virtual string DefaultCulture => null;
 
-        public virtual Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public virtual Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
             return null;
         }
 
-        public virtual bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public virtual bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = null;
+            symbolDefinition = null;
             return false;
         }
     }

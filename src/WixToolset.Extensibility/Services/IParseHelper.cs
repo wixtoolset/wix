@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility.Services
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
 
@@ -39,38 +39,38 @@ namespace WixToolset.Extensibility.Services
         Identifier CreateIdentifierFromFilename(string filename);
 
         /// <summary>
-        /// Creates a tuple in the section.
+        /// Creates a symbol in the section.
         /// </summary>
-        /// <param name="section">Section to add the new tuple to.</param>
-        /// <param name="sourceLineNumbers">Source and line number of current tuple.</param>
-        /// <param name="tupleName">Name of tuple definition.</param>
-        /// <param name="identifier">Optional identifier for the tuple.</param>
-        /// <returns>New tuple.</returns>
-        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, Identifier identifier = null);
+        /// <param name="section">Section to add the new symbol to.</param>
+        /// <param name="sourceLineNumbers">Source and line number of current symbol.</param>
+        /// <param name="symbolName">Name of symbol definition.</param>
+        /// <param name="identifier">Optional identifier for the symbol.</param>
+        /// <returns>New symbol.</returns>
+        IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, Identifier identifier = null);
 
         /// <summary>
-        /// Creates a tuple in the section.
+        /// Creates a symbol in the section.
         /// </summary>
-        /// <param name="section">Section to add the new tuple to.</param>
-        /// <param name="sourceLineNumbers">Source and line number of current tuple.</param>
-        /// <param name="tupleDefinition">Tuple definition to create from.</param>
-        /// <param name="identifier">Optional identifier for the tuple.</param>
-        /// <returns>New tuple.</returns>
-        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier = null);
+        /// <param name="section">Section to add the new symbol to.</param>
+        /// <param name="sourceLineNumbers">Source and line number of current symbol.</param>
+        /// <param name="symbolDefinition">Symbol definition to create from.</param>
+        /// <param name="identifier">Optional identifier for the symbol.</param>
+        /// <returns>New symbol.</returns>
+        IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, Identifier identifier = null);
 
         [Obsolete]
-        IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+        IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
 
         [Obsolete]
-        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
+        IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null);
 
         [Obsolete]
-        IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
+        IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null);
 
         /// <summary>
         /// Creates a directory row from a name.
         /// </summary>
-        /// <param name="section">Section to add the new tuple to.</param>
+        /// <param name="section">Section to add the new symbol to.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
         /// <param name="id">Optional identifier for the new row.</param>
         /// <param name="parentId">Optional identifier for the parent row.</param>
@@ -80,7 +80,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="sourceName">Optional source name for the directory.</param>
         /// <param name="shortSourceName">Optional short source name for the directory.</param>
         /// <returns>Identifier for the newly created row.</returns>
-        Identifier CreateDirectoryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
+        Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
 
         [Obsolete]
         Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
@@ -88,7 +88,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Creates directories using the inline directory syntax.
         /// </summary>
-        /// <param name="section">Section to add the new tuple to.</param>
+        /// <param name="section">Section to add the new symbol to.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
         /// <param name="attribute">The attribute to parse.</param>
@@ -97,16 +97,16 @@ namespace WixToolset.Extensibility.Services
         string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds);
 
         /// <summary>
-        /// Creates a Registry tuple in the active section.
+        /// Creates a Registry symbol in the active section.
         /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of the current tuple.</param>
+        /// <param name="sourceLineNumbers">Source and line number of the current symbol.</param>
         /// <param name="root">The registry entry root.</param>
         /// <param name="key">The registry entry key.</param>
         /// <param name="name">The registry entry name.</param>
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
-        Identifier CreateRegistryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
+        Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         [Obsolete]
         Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
@@ -122,20 +122,20 @@ namespace WixToolset.Extensibility.Services
         string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args);
 
         /// <summary>
-        /// Create a WixSimpleReference tuple in the active section.
+        /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tupleName">The tuple name of the simple reference.</param>
+        /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys);
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys);
 
         /// <summary>
-        /// Create a WixSimpleReference tuple in the active section.
+        /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tupleDefinition">The tuple definition of the simple reference.</param>
+        /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys);
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, params string[] primaryKeys);
 
         /// <summary>
         /// Create a reference in the specified section for a custom action specialized for specific platforms,
@@ -149,7 +149,7 @@ namespace WixToolset.Extensibility.Services
         void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms);
 
         /// <summary>
-        /// Creates WixComplexReference and WixGroup tuples in the active section.
+        /// Creates WixComplexReference and WixGroup symbols in the active section.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
@@ -162,7 +162,7 @@ namespace WixToolset.Extensibility.Services
         void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary);
 
         /// <summary>
-        /// A tuple in the WixGroup table is added for this child node and its parent node.
+        /// A symbol in the WixGroup table is added for this child node and its parent node.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
@@ -170,13 +170,13 @@ namespace WixToolset.Extensibility.Services
         /// <param name="parentId">Id of the parenet node.</param>
         /// <param name="childType">Complex reference type of child</param>
         /// <param name="childId">Id of the Child Node.</param>
-        void CreateWixGroupTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
+        void CreateWixGroupSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         [Obsolete]
         void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         /// <summary>
-        /// Creates a tuple in the WixSearch table.
+        /// Creates a symbol in the WixSearch table.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line number for the search element.</param>
@@ -186,17 +186,17 @@ namespace WixToolset.Extensibility.Services
         /// <param name="condition">A condition to test before evaluating the search.</param>
         /// <param name="after">The search that this one will execute after.</param>
         /// <param name="bundleExtensionId">The id of the bundle extension that handles this search.</param>
-        void CreateWixSearchTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId);
+        void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
         /// <param name="id">Identifier of the search (key into the WixSearch table)</param>
         /// <param name="parentId">Identifier of the search that comes before (key into the WixSearch table)</param>
         /// <param name="attributes">Further details about the relation between id and parentId.</param>
-        void CreateWixSearchRelationTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes);
+        void CreateWixSearchRelationSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes);
 
         /// <summary>
         /// Checks if the string contains a property (i.e. "foo[Property]bar")
@@ -206,14 +206,14 @@ namespace WixToolset.Extensibility.Services
         bool ContainsProperty(string possibleProperty);
 
         /// <summary>
-        /// Add the appropriate tuples to make sure that the given table shows up in the resulting output.
+        /// Add the appropriate symbols to make sure that the given table shows up in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableName">Name of the table to ensure existance of.</param>
         void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName);
 
         /// <summary>
-        /// Add the appropriate tuples to make sure that the given table shows up in the resulting output.
+        /// Add the appropriate symbols to make sure that the given table shows up in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableDefinition">Definition of the table to ensure existance of.</param>
@@ -411,9 +411,9 @@ namespace WixToolset.Extensibility.Services
         void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element);
 
         /// <summary>
-        /// Schedules an action tuple.
+        /// Schedules an action symbol.
         /// </summary>
-        /// <param name="section">Section to add the tuple to.</param>
+        /// <param name="section">Section to add the symbol to.</param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="access">Access modifier for the scheduled action.</param>
         /// <param name="sequence">Sequence to add the action to.</param>
@@ -422,7 +422,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="beforeAction">Optional action to schedule before.</param>
         /// <param name="afterAction">Option action to schedule after.</param>
         /// <param name="overridable">Optional overridable flag.</param>
-        WixActionTuple ScheduleActionTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string name, string condition, string beforeAction, string afterAction, bool overridable = false);
+        WixActionSymbol ScheduleActionSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string name, string condition, string beforeAction, string afterAction, bool overridable = false);
 
         /// <summary>
         /// Called when the compiler encounters an unexpected attribute.

@@ -16,18 +16,18 @@ namespace WixToolset.Extensibility
         string DefaultCulture { get; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="tupleDefinition"></param>
+        /// <param name="symbolDefinition"></param>
         /// <returns>True </returns>
-        bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition);
+        bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition);
 
         /// <summary>
         /// Gets the library associated with this extension.
         /// </summary>
-        /// <param name="tupleDefinitions">The tuple definitions to use while loading the library.</param>
+        /// <param name="symbolDefinitions">The symbol definitions to use while loading the library.</param>
         /// <returns>The library for this extension or null if there is no library.</returns>
-        Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions);
+        Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions);
     }
 }

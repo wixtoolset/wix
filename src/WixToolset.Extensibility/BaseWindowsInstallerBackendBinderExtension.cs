@@ -5,7 +5,7 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -51,13 +51,13 @@ namespace WixToolset.Extensibility
 
         public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files) => null;
 
-        public virtual string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
+        public virtual string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
 
-        public virtual bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public virtual bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
-            if (this.TableDefinitions.Any(t => t.TupleDefinition == tuple.Definition))
+            if (this.TableDefinitions.Any(t => t.SymbolDefinition == symbol.Definition))
             {
-                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
+                return this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(section, symbol, output, tableDefinitions);
             }
 
             return false;

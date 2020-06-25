@@ -27,9 +27,9 @@ namespace WixToolset.Extensibility
         protected IBurnBackendHelper BackendHelper { get; private set; }
 
         /// <summary>
-        /// Optional tuple definitions.
+        /// Optional symbol definitions.
         /// </summary>
-        protected virtual IEnumerable<IntermediateTupleDefinition> TupleDefinitions => Enumerable.Empty<IntermediateTupleDefinition>();
+        protected virtual IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => Enumerable.Empty<IntermediateSymbolDefinition>();
 
         public virtual void BundleFinalize()
         {
@@ -56,12 +56,12 @@ namespace WixToolset.Extensibility
             return null;
         }
 
-        public virtual bool TryAddTupleToDataManifest(IntermediateSection section, IntermediateTuple tuple)
+        public virtual bool TryAddSymbolToDataManifest(IntermediateSection section, IntermediateSymbol symbol)
         {
-            if (this.TupleDefinitions.Any(t => t == tuple.Definition) &&
-                tuple.Definition.HasTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
+            if (this.SymbolDefinitions.Any(t => t == symbol.Definition) &&
+                symbol.Definition.HasTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag))
             {
-                this.BackendHelper.AddBootstrapperApplicationData(tuple);
+                this.BackendHelper.AddBootstrapperApplicationData(symbol);
                 return true;
             }
 

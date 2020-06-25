@@ -16,16 +16,16 @@ namespace WixToolset.Extensibility.Services
         void AddBootstrapperApplicationData(string xml);
 
         /// <summary>
-        /// Adds an XML element for the given tuple to the BootstrapperApplicationData manifest.
-        /// The tuple's name is used for the element's name.
-        /// All of the tuple's fields are used for the element's attributes.
+        /// Adds an XML element for the given symbol to the BootstrapperApplicationData manifest.
+        /// The symbol's name is used for the element's name.
+        /// All of the symbol's fields are used for the element's attributes.
         /// </summary>
-        /// <param name="tuple">The tuple to create the element from.</param>
-        /// <param name="tupleIdIsIdAttribute">
-        /// If true and the tuple has an Id,
-        /// then an Id attribute is created with a value of the tuple's Id.
+        /// <param name="symbol">The symbol to create the element from.</param>
+        /// <param name="symbolIdIsIdAttribute">
+        /// If true and the symbol has an Id,
+        /// then an Id attribute is created with a value of the symbol's Id.
         /// </param>
-        void AddBootstrapperApplicationData(IntermediateTuple tuple, bool tupleIdIsIdAttribute = false);
+        void AddBootstrapperApplicationData(IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false);
 
         /// <summary>
         /// Adds the given XML to the BundleExtensionData manifest for the given bundle extension.
@@ -35,16 +35,16 @@ namespace WixToolset.Extensibility.Services
         void AddBundleExtensionData(string extensionId, string xml);
 
         /// <summary>
-        /// Adds an XML element for the given tuple to the BundleExtensionData manifest for the given bundle extension.
-        /// The tuple's name is used for the element's name.
-        /// All of the tuple's fields are used for the element's attributes.
+        /// Adds an XML element for the given symbol to the BundleExtensionData manifest for the given bundle extension.
+        /// The symbol's name is used for the element's name.
+        /// All of the symbol's fields are used for the element's attributes.
         /// </summary>
         /// <param name="extensionId">The bundle extension's id.</param>
-        /// <param name="tuple">The tuple to create the element from.</param>
-        /// <param name="tupleIdIsIdAttribute">
-        /// If true and the tuple has an Id,
-        /// then an Id attribute is created with a value of the tuple's Id.
+        /// <param name="symbol">The symbol to create the element from.</param>
+        /// <param name="symbolIdIsIdAttribute">
+        /// If true and the symbol has an Id,
+        /// then an Id attribute is created with a value of the symbol's Id.
         /// </param>
-        void AddBundleExtensionData(string extensionId, IntermediateTuple tuple, bool tupleIdIsIdAttribute = false);
+        void AddBundleExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false);
     }
 }

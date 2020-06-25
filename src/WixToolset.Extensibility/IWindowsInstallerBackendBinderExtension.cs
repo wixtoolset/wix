@@ -4,7 +4,7 @@ namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
 
@@ -22,9 +22,9 @@ namespace WixToolset.Extensibility
 
         IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files);
 
-        string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory);
+        string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
-        bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
+        bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
