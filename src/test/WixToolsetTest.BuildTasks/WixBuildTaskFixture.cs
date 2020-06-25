@@ -8,7 +8,7 @@ namespace WixToolsetTest.BuildTasks
     using WixBuildTools.TestSupport;
     using WixToolset.BuildTasks;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class WixBuildTaskFixture
@@ -57,9 +57,9 @@ namespace WixToolsetTest.BuildTasks
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
     }

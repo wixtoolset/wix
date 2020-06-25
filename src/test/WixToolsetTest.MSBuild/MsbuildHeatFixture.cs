@@ -9,7 +9,7 @@ namespace WixToolsetTest.MSBuild
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class MsbuildHeatFixture
@@ -65,8 +65,8 @@ namespace WixToolsetTest.MSBuild
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(@"SourceDir\HeatFilePackage.wixproj", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(@"SourceDir\HeatFilePackage.wixproj", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
 
@@ -141,9 +141,9 @@ namespace WixToolsetTest.MSBuild
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
-                var fileTuples = section.Tuples.OfType<FileTuple>().ToArray();
-                Assert.Equal(@"SourceDir\MyProgram.txt", fileTuples[0][FileTupleFields.Source].PreviousValue.AsPath().Path);
-                Assert.Equal(@"SourceDir\MyProgram.json", fileTuples[1][FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbols = section.Symbols.OfType<FileSymbol>().ToArray();
+                Assert.Equal(@"SourceDir\MyProgram.txt", fileSymbols[0][FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                Assert.Equal(@"SourceDir\MyProgram.json", fileSymbols[1][FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
     }
