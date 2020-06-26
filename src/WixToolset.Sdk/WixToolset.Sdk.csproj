@@ -7,7 +7,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>WiX Toolset MSBuild integration</Description>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
-    <NuspecBasePath>$(OutputPath)publish\WixToolset.MSBuild\</NuspecBasePath>
+    <NuspecBasePath>$(OutputPath)publish\WixToolset.Sdk\</NuspecBasePath>
     <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
   </PropertyGroup>
 

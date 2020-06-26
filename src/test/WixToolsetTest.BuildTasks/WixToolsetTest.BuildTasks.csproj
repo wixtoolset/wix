@@ -10,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" Link="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\Package.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\data\test.txt" Link="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" Link="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\Package.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\data\test.txt" Link="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

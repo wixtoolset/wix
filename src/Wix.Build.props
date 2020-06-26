@@ -10,5 +10,5 @@
     <BindInputPaths Include="$(OutputPath)Win32\" />
   </ItemGroup>
 
-  <Import Project="$(OutputPath)\publish\WixToolset.MSBuild\build\WixToolset.MSBuild.props" />
+  <Import Project="$(OutputPath)\publish\WixToolset.Sdk\build\WixToolset.Sdk.props" />
 </Project>

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.BuildTasks", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-wix", "src\dotnet-wix\dotnet-wix.csproj", "{938BCA04-610B-4B99-9CB7-02BF7397A972}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.MSBuild", "src\WixToolset.MSBuild\WixToolset.MSBuild.csproj", "{0DF5D4CF-8457-469D-8288-13775E984F70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Sdk", "src\WixToolset.Sdk\WixToolset.Sdk.csproj", "{0DF5D4CF-8457-469D-8288-13775E984F70}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{449BE9B0-422F-4039-A030-BDD3E7D97878}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,7 +22,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thmviewer", "src\thmviewer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "heat", "src\heat\heat.csproj", "{B1F18B6F-FBD8-4911-B3BF-40D801DA77D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.MSBuild", "src\test\WixToolsetTest.MSBuild\WixToolsetTest.MSBuild.csproj", "{7B610B7B-C69D-4A4C-9D65-F304C44479E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Sdk", "src\test\WixToolsetTest.Sdk\WixToolsetTest.Sdk.csproj", "{7B610B7B-C69D-4A4C-9D65-F304C44479E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

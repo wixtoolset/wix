@@ -1,6 +1,6 @@
 // Copyright(c) .NET Foundation and contributors.All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.MSBuild
+namespace WixToolsetTest.Sdk
 {
     using System;
     using System.Collections.Generic;
@@ -17,8 +17,8 @@ namespace WixToolsetTest.MSBuild
 
     public static class MsbuildUtilities
     {
-        public static readonly string WixMsbuildPath = Path.Combine(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild");
-        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.MSBuild.props");
+        public static readonly string WixMsbuildPath = Path.Combine(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.Sdk");
+        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.Sdk.props");
 
         public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal")
         {
