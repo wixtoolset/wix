@@ -63,7 +63,9 @@ namespace WixToolset.Converters
         private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
         private static readonly XName TextElementName = WixNamespace + "Text";
         private static readonly XName UITextElementName = WixNamespace + "UIText";
+        private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
+        private static readonly XName UtilXmlConfigElementName = WixUtilNamespace + "XmlConfig";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
@@ -156,7 +158,9 @@ namespace WixToolset.Converters
                 { WixConverter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
                 { WixConverter.TextElementName, this.ConvertTextElement },
                 { WixConverter.UITextElementName, this.ConvertUITextElement },
+                { WixConverter.UtilCloseApplicationElementName, this.ConvertUtilCloseApplicationElementName },
                 { WixConverter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
+                { WixConverter.UtilXmlConfigElementName, this.ConvertUtilXmlConfigElement },
                 { WixConverter.PropertyElementName, this.ConvertPropertyElement },
                 { WixConverter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { WixConverter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
@@ -692,6 +696,8 @@ namespace WixToolset.Converters
             this.ConvertInnerTextToAttribute(xProperty, "Value");
         }
 
+        private void ConvertUtilCloseApplicationElementName(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+
         private void ConvertUtilPermissionExElement(XElement element)
         {
             if (this.SourceVersion < 4 && null == element.Attribute("Inheritable"))
@@ -706,6 +712,8 @@ namespace WixToolset.Converters
                 }
             }
         }
+
+        private void ConvertUtilXmlConfigElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
         /// <summary>
         /// Converts a Wix element.
