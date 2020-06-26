@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition FileSharePermissions = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.FileSharePermissions.ToString(),
+        public static readonly IntermediateSymbolDefinition FileSharePermissions = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.FileSharePermissions.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.FileShareRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.UserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.Permissions), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileSharePermissionsSymbolFields.FileShareRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSharePermissionsSymbolFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSharePermissionsSymbolFields.Permissions), IntermediateFieldType.Number),
             },
-            typeof(FileSharePermissionsTuple));
+            typeof(FileSharePermissionsSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum FileSharePermissionsTupleFields
+    public enum FileSharePermissionsSymbolFields
     {
         FileShareRef,
         UserRef,
         Permissions,
     }
 
-    public class FileSharePermissionsTuple : IntermediateTuple
+    public class FileSharePermissionsSymbol : IntermediateSymbol
     {
-        public FileSharePermissionsTuple() : base(UtilTupleDefinitions.FileSharePermissions, null, null)
+        public FileSharePermissionsSymbol() : base(UtilSymbolDefinitions.FileSharePermissions, null, null)
         {
         }
 
-        public FileSharePermissionsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.FileSharePermissions, sourceLineNumber, id)
+        public FileSharePermissionsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.FileSharePermissions, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FileSharePermissionsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FileSharePermissionsSymbolFields index] => this.Fields[(int)index];
 
         public string FileShareRef
         {
-            get => this.Fields[(int)FileSharePermissionsTupleFields.FileShareRef].AsString();
-            set => this.Set((int)FileSharePermissionsTupleFields.FileShareRef, value);
+            get => this.Fields[(int)FileSharePermissionsSymbolFields.FileShareRef].AsString();
+            set => this.Set((int)FileSharePermissionsSymbolFields.FileShareRef, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)FileSharePermissionsTupleFields.UserRef].AsString();
-            set => this.Set((int)FileSharePermissionsTupleFields.UserRef, value);
+            get => this.Fields[(int)FileSharePermissionsSymbolFields.UserRef].AsString();
+            set => this.Set((int)FileSharePermissionsSymbolFields.UserRef, value);
         }
 
         public int Permissions
         {
-            get => this.Fields[(int)FileSharePermissionsTupleFields.Permissions].AsNumber();
-            set => this.Set((int)FileSharePermissionsTupleFields.Permissions, value);
+            get => this.Fields[(int)FileSharePermissionsSymbolFields.Permissions].AsNumber();
+            set => this.Set((int)FileSharePermissionsSymbolFields.Permissions, value);
         }
     }
 }

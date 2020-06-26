@@ -3,29 +3,29 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition User = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.User.ToString(),
+        public static readonly IntermediateSymbolDefinition User = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.User.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UserTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserTupleFields.Domain), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserTupleFields.Password), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(UserSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserSymbolFields.Domain), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserSymbolFields.Password), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(UserTuple));
+            typeof(UserSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum UserTupleFields
+    public enum UserSymbolFields
     {
         ComponentRef,
         Name,
@@ -34,46 +34,46 @@ namespace WixToolset.Util.Tuples
         Attributes,
     }
 
-    public class UserTuple : IntermediateTuple
+    public class UserSymbol : IntermediateSymbol
     {
-        public UserTuple() : base(UtilTupleDefinitions.User, null, null)
+        public UserSymbol() : base(UtilSymbolDefinitions.User, null, null)
         {
         }
 
-        public UserTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.User, sourceLineNumber, id)
+        public UserSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.User, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[UserTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[UserSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)UserTupleFields.ComponentRef].AsString();
-            set => this.Set((int)UserTupleFields.ComponentRef, value);
+            get => this.Fields[(int)UserSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)UserSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)UserTupleFields.Name].AsString();
-            set => this.Set((int)UserTupleFields.Name, value);
+            get => this.Fields[(int)UserSymbolFields.Name].AsString();
+            set => this.Set((int)UserSymbolFields.Name, value);
         }
 
         public string Domain
         {
-            get => this.Fields[(int)UserTupleFields.Domain].AsString();
-            set => this.Set((int)UserTupleFields.Domain, value);
+            get => this.Fields[(int)UserSymbolFields.Domain].AsString();
+            set => this.Set((int)UserSymbolFields.Domain, value);
         }
 
         public string Password
         {
-            get => this.Fields[(int)UserTupleFields.Password].AsString();
-            set => this.Set((int)UserTupleFields.Password, value);
+            get => this.Fields[(int)UserSymbolFields.Password].AsString();
+            set => this.Set((int)UserSymbolFields.Password, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)UserTupleFields.Attributes].AsNumber();
-            set => this.Set((int)UserTupleFields.Attributes, value);
+            get => this.Fields[(int)UserSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)UserSymbolFields.Attributes, value);
         }
     }
 }

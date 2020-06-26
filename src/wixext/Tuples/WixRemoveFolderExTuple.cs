@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixRemoveFolderEx = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixRemoveFolderEx.ToString(),
+        public static readonly IntermediateSymbolDefinition WixRemoveFolderEx = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixRemoveFolderEx.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.InstallMode), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.Property), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.InstallMode), IntermediateFieldType.Number),
             },
-            typeof(WixRemoveFolderExTuple));
+            typeof(WixRemoveFolderExSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixRemoveFolderExTupleFields
+    public enum WixRemoveFolderExSymbolFields
     {
         ComponentRef,
         Property,
         InstallMode,
     }
 
-    public class WixRemoveFolderExTuple : IntermediateTuple
+    public class WixRemoveFolderExSymbol : IntermediateSymbol
     {
-        public WixRemoveFolderExTuple() : base(UtilTupleDefinitions.WixRemoveFolderEx, null, null)
+        public WixRemoveFolderExSymbol() : base(UtilSymbolDefinitions.WixRemoveFolderEx, null, null)
         {
         }
 
-        public WixRemoveFolderExTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixRemoveFolderEx, sourceLineNumber, id)
+        public WixRemoveFolderExSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixRemoveFolderEx, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixRemoveFolderExTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixRemoveFolderExSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixRemoveFolderExTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixRemoveFolderExTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixRemoveFolderExSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixRemoveFolderExSymbolFields.ComponentRef, value);
         }
 
         public string Property
         {
-            get => this.Fields[(int)WixRemoveFolderExTupleFields.Property].AsString();
-            set => this.Set((int)WixRemoveFolderExTupleFields.Property, value);
+            get => this.Fields[(int)WixRemoveFolderExSymbolFields.Property].AsString();
+            set => this.Set((int)WixRemoveFolderExSymbolFields.Property, value);
         }
 
         public int InstallMode
         {
-            get => this.Fields[(int)WixRemoveFolderExTupleFields.InstallMode].AsNumber();
-            set => this.Set((int)WixRemoveFolderExTupleFields.InstallMode, value);
+            get => this.Fields[(int)WixRemoveFolderExSymbolFields.InstallMode].AsNumber();
+            set => this.Set((int)WixRemoveFolderExSymbolFields.InstallMode, value);
         }
     }
 }

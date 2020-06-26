@@ -6,7 +6,7 @@ namespace WixToolset.Util
     using WixToolset.Data;
     using WixToolset.Data.Burn;
 
-    public enum UtilTupleDefinitionType
+    public enum UtilSymbolDefinitionType
     {
         EventManifest,
         FileShare,
@@ -30,13 +30,13 @@ namespace WixToolset.Util
         XmlFile,
     }
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out UtilTupleDefinitionType type))
+            if (!Enum.TryParse(name, out UtilSymbolDefinitionType type))
             {
                 return null;
             }
@@ -44,78 +44,78 @@ namespace WixToolset.Util
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(UtilTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(UtilSymbolDefinitionType type)
         {
             switch (type)
             {
-                case UtilTupleDefinitionType.EventManifest:
-                    return UtilTupleDefinitions.EventManifest;
+                case UtilSymbolDefinitionType.EventManifest:
+                    return UtilSymbolDefinitions.EventManifest;
 
-                case UtilTupleDefinitionType.FileShare:
-                    return UtilTupleDefinitions.FileShare;
+                case UtilSymbolDefinitionType.FileShare:
+                    return UtilSymbolDefinitions.FileShare;
 
-                case UtilTupleDefinitionType.FileSharePermissions:
-                    return UtilTupleDefinitions.FileSharePermissions;
+                case UtilSymbolDefinitionType.FileSharePermissions:
+                    return UtilSymbolDefinitions.FileSharePermissions;
 
-                case UtilTupleDefinitionType.Group:
-                    return UtilTupleDefinitions.Group;
+                case UtilSymbolDefinitionType.Group:
+                    return UtilSymbolDefinitions.Group;
 
-                case UtilTupleDefinitionType.Perfmon:
-                    return UtilTupleDefinitions.Perfmon;
+                case UtilSymbolDefinitionType.Perfmon:
+                    return UtilSymbolDefinitions.Perfmon;
 
-                case UtilTupleDefinitionType.PerfmonManifest:
-                    return UtilTupleDefinitions.PerfmonManifest;
+                case UtilSymbolDefinitionType.PerfmonManifest:
+                    return UtilSymbolDefinitions.PerfmonManifest;
 
-                case UtilTupleDefinitionType.PerformanceCategory:
-                    return UtilTupleDefinitions.PerformanceCategory;
+                case UtilSymbolDefinitionType.PerformanceCategory:
+                    return UtilSymbolDefinitions.PerformanceCategory;
 
-                case UtilTupleDefinitionType.SecureObjects:
-                    return UtilTupleDefinitions.SecureObjects;
+                case UtilSymbolDefinitionType.SecureObjects:
+                    return UtilSymbolDefinitions.SecureObjects;
 
-                case UtilTupleDefinitionType.ServiceConfig:
-                    return UtilTupleDefinitions.ServiceConfig;
+                case UtilSymbolDefinitionType.ServiceConfig:
+                    return UtilSymbolDefinitions.ServiceConfig;
 
-                case UtilTupleDefinitionType.User:
-                    return UtilTupleDefinitions.User;
+                case UtilSymbolDefinitionType.User:
+                    return UtilSymbolDefinitions.User;
 
-                case UtilTupleDefinitionType.UserGroup:
-                    return UtilTupleDefinitions.UserGroup;
+                case UtilSymbolDefinitionType.UserGroup:
+                    return UtilSymbolDefinitions.UserGroup;
 
-                case UtilTupleDefinitionType.WixCloseApplication:
-                    return UtilTupleDefinitions.WixCloseApplication;
+                case UtilSymbolDefinitionType.WixCloseApplication:
+                    return UtilSymbolDefinitions.WixCloseApplication;
 
-                case UtilTupleDefinitionType.WixDetectSHA2Support:
-                    return UtilTupleDefinitions.WixDetectSHA2Support;
+                case UtilSymbolDefinitionType.WixDetectSHA2Support:
+                    return UtilSymbolDefinitions.WixDetectSHA2Support;
 
-                case UtilTupleDefinitionType.WixFormatFiles:
-                    return UtilTupleDefinitions.WixFormatFiles;
+                case UtilSymbolDefinitionType.WixFormatFiles:
+                    return UtilSymbolDefinitions.WixFormatFiles;
 
-                case UtilTupleDefinitionType.WixInternetShortcut:
-                    return UtilTupleDefinitions.WixInternetShortcut;
+                case UtilSymbolDefinitionType.WixInternetShortcut:
+                    return UtilSymbolDefinitions.WixInternetShortcut;
 
-                case UtilTupleDefinitionType.WixRemoveFolderEx:
-                    return UtilTupleDefinitions.WixRemoveFolderEx;
+                case UtilSymbolDefinitionType.WixRemoveFolderEx:
+                    return UtilSymbolDefinitions.WixRemoveFolderEx;
 
-                case UtilTupleDefinitionType.WixRestartResource:
-                    return UtilTupleDefinitions.WixRestartResource;
+                case UtilSymbolDefinitionType.WixRestartResource:
+                    return UtilSymbolDefinitions.WixRestartResource;
 
-                case UtilTupleDefinitionType.WixTouchFile:
-                    return UtilTupleDefinitions.WixTouchFile;
+                case UtilSymbolDefinitionType.WixTouchFile:
+                    return UtilSymbolDefinitions.WixTouchFile;
 
-                case UtilTupleDefinitionType.XmlConfig:
-                    return UtilTupleDefinitions.XmlConfig;
+                case UtilSymbolDefinitionType.XmlConfig:
+                    return UtilSymbolDefinitions.XmlConfig;
 
-                case UtilTupleDefinitionType.XmlFile:
-                    return UtilTupleDefinitions.XmlFile;
+                case UtilSymbolDefinitionType.XmlFile:
+                    return UtilSymbolDefinitions.XmlFile;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
-        static UtilTupleDefinitions()
+        static UtilSymbolDefinitions()
         {
-            WixDetectSHA2Support.AddTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag);
+            WixDetectSHA2Support.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
         }
     }
 }

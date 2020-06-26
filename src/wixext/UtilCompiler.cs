@@ -11,10 +11,10 @@ namespace WixToolset.Util
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset Utility Extension.
@@ -447,7 +447,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -465,7 +465,7 @@ namespace WixToolset.Util
                         break;
                 }
 
-                section.AddTuple(new WixComponentSearchTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixComponentSearchSymbol(sourceLineNumbers, id)
                 {
                     Guid = guid,
                     ProductCode = productCode,
@@ -491,7 +491,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixComponentSearch, refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixComponentSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -549,11 +549,11 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, UtilConstants.UtilBundleExtensionId);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, UtilConstants.UtilBundleExtensionId);
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixDetectSHA2SupportTuple(sourceLineNumbers, id));
+                section.AddSymbol(new WixDetectSHA2SupportSymbol(sourceLineNumbers, id));
             }
         }
 
@@ -573,7 +573,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.WixDetectSHA2Support, refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.WixDetectSHA2Support, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -706,26 +706,26 @@ namespace WixToolset.Util
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             string eventSourceKey = $@"SYSTEM\CurrentControlSet\Services\EventLog\{logName}\{sourceName}";
-            var id = this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
+            var id = this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
 
             if (null != categoryMessageFile)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
             }
 
             if (CompilerConstants.IntegerNotSet != categoryCount)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
             }
 
             if (null != parameterMessageFile)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
             }
 
             if (0 != typesSupported)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
             }
 
             var componentKeyPath = this.CreateComponentKeyPath();
@@ -879,7 +879,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new WixCloseApplicationTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new WixCloseApplicationSymbol(sourceLineNumbers, id)
                 {
                     Target = target,
                     Description = description,
@@ -889,15 +889,15 @@ namespace WixToolset.Util
                 });
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
                 if (CompilerConstants.IntegerNotSet != terminateExitCode)
                 {
-                    tuple.TerminateExitCode = terminateExitCode;
+                    symbol.TerminateExitCode = terminateExitCode;
                 }
                 if (CompilerConstants.IntegerNotSet != timeout)
                 {
-                    tuple.Timeout = timeout * 1000; // make the timeout milliseconds in the table.
+                    symbol.Timeout = timeout * 1000; // make the timeout milliseconds in the table.
                 }
             }
         }
@@ -962,7 +962,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -994,7 +994,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixSearch, refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
@@ -1072,7 +1072,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, node.Name.LocalName, id, variable, condition, after, null);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, node.Name.LocalName, id, variable, condition, after, null);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -1100,7 +1100,7 @@ namespace WixToolset.Util
         /// <param name="attributes"></param>
         private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes)
         {
-            section.AddTuple(new WixFileSearchTuple(sourceLineNumbers, id)
+            section.AddSymbol(new WixFileSearchSymbol(sourceLineNumbers, id)
             {
                 Path = path,
                 Attributes = attributes,
@@ -1186,7 +1186,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new FileShareTuple(sourceLineNumbers, id)
+                section.AddSymbol(new FileShareSymbol(sourceLineNumbers, id)
                 {
                     ShareName = name,
                     ComponentRef = componentId,
@@ -1215,7 +1215,7 @@ namespace WixToolset.Util
                     {
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.User, user);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.User, user);
                             break;
                         default:
                             var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -1255,7 +1255,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new FileSharePermissionsTuple(sourceLineNumbers)
+                section.AddSymbol(new FileSharePermissionsSymbol(sourceLineNumbers)
                 {
                     FileShareRef = fileShareId.Id,
                     UserRef = user,
@@ -1311,7 +1311,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new GroupTuple(sourceLineNumbers, id)
+                section.AddSymbol(new GroupSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -1338,7 +1338,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             groupId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.Group, groupId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.Group, groupId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1355,7 +1355,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new UserGroupTuple(sourceLineNumbers)
+                section.AddSymbol(new UserGroupSymbol(sourceLineNumbers)
                 {
                     UserRef = userId,
                     GroupRef = groupId,
@@ -1478,7 +1478,7 @@ namespace WixToolset.Util
             // add the appropriate extension based on type of shortcut
             name = String.Concat(name, InternetShortcutType.Url == type ? ".url" : ".lnk");
 
-            section.AddTuple(new WixInternetShortcutTuple(sourceLineNumbers, shortcutId)
+            section.AddSymbol(new WixInternetShortcutSymbol(sourceLineNumbers, shortcutId)
             {
                 ComponentRef = componentId,
                 DirectoryRef = directoryId,
@@ -1495,7 +1495,7 @@ namespace WixToolset.Util
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CreateFolder");
 
             // use built-in MSI functionality to remove the shortcuts rather than doing so via CA
-            section.AddTuple(new RemoveFileTuple(sourceLineNumbers, shortcutId)
+            section.AddSymbol(new RemoveFileSymbol(sourceLineNumbers, shortcutId)
             {
                 ComponentRef = componentId,
                 DirProperty = directoryId,
@@ -1653,7 +1653,7 @@ namespace WixToolset.Util
                 sbSymbolicConstants.AppendFormat("#define LAST_{0}_COUNTER_OFFSET    {1}\r\n", objectName, symbolConstantsCounter);
 
                 // Add the calculated INI and H strings to the PerformanceCategory table.
-                section.AddTuple(new PerformanceCategoryTuple(sourceLineNumbers, id)
+                section.AddSymbol(new PerformanceCategorySymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -1666,15 +1666,15 @@ namespace WixToolset.Util
                 var linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
                 var performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
 
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
@@ -2148,7 +2148,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new PerfmonTuple(sourceLineNumbers)
+                section.AddSymbol(new PerfmonSymbol(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
@@ -2196,7 +2196,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new PerfmonManifestTuple(sourceLineNumbers)
+                section.AddSymbol(new PerfmonManifestSymbol(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
@@ -2250,13 +2250,13 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFormatFiles", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
-                section.AddTuple(new WixFormatFilesTuple(sourceLineNumbers)
+                section.AddSymbol(new WixFormatFilesSymbol(sourceLineNumbers)
                 {
                     BinaryRef = binaryId,
                     FileRef = fileId,
                 });
 
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binaryId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binaryId);
             }
         }
 
@@ -2303,7 +2303,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new EventManifestTuple(sourceLineNumbers)
+                section.AddSymbol(new EventManifestSymbol(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
@@ -2311,7 +2311,7 @@ namespace WixToolset.Util
 
                 if (null != messageFile)
                 {
-                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@messageFileName[\\]]",
@@ -2323,7 +2323,7 @@ namespace WixToolset.Util
                 }
                 if (null != parameterFile)
                 {
-                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@parameterFileName[\\]]",
@@ -2335,7 +2335,7 @@ namespace WixToolset.Util
                 }
                 if (null != resourceFile)
                 {
-                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@resourceFileName[\\]]",
@@ -2463,7 +2463,7 @@ namespace WixToolset.Util
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 var id = this.ParseHelper.CreateIdentifier("sec", objectId, tableName, domain, user);
-                section.AddTuple(new SecureObjectsTuple(sourceLineNumbers, id)
+                section.AddSymbol(new SecureObjectsSymbol(sourceLineNumbers, id)
                 {
                     SecureObject = objectId,
                     Table = tableName,
@@ -2550,7 +2550,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -2577,7 +2577,7 @@ namespace WixToolset.Util
                     attributes |= WixProductSearchAttributes.UpgradeCode;
                 }
 
-                section.AddTuple(new WixProductSearchTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixProductSearchSymbol(sourceLineNumbers, id)
                 {
                     Guid = productCode ?? upgradeCode,
                     Attributes = attributes,
@@ -2720,11 +2720,11 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixRegistrySearchTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixRegistrySearchSymbol(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
@@ -2811,7 +2811,7 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RemoveFoldersEx", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
-                section.AddTuple(new WixRemoveFolderExTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixRemoveFolderExSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Property = property,
@@ -2887,7 +2887,7 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RegisterRestartResources", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
-                section.AddTuple(new WixRestartResourceTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixRestartResourceSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Resource = resource,
@@ -2979,7 +2979,7 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedServiceConfig", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
-                section.AddTuple(new ServiceConfigTuple(sourceLineNumbers)
+                section.AddSymbol(new ServiceConfigSymbol(sourceLineNumbers)
                 {
                     ServiceName = serviceName,
                     ComponentRef = componentId,
@@ -3074,7 +3074,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixTouchFileTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixTouchFileSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Path = path,
@@ -3290,7 +3290,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new UserTuple(sourceLineNumbers, id)
+                section.AddSymbol(new UserSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -3424,7 +3424,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new XmlFileTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, id)
                 {
                     File = file,
                     ElementPath = elementPath,
@@ -3435,7 +3435,7 @@ namespace WixToolset.Util
                 });
                 if (-1 != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
 
@@ -3603,7 +3603,7 @@ namespace WixToolset.Util
                     this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, "ElementId", "Action", "Node", "On"));
                 }
 
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.XmlConfig, elementId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.XmlConfig, elementId);
             }
 
             var innerText = this.ParseHelper.GetTrimmedInnerText(element);
@@ -3653,7 +3653,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new XmlConfigTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new XmlConfigSymbol(sourceLineNumbers, id)
                 {
                     File = file,
                     ElementPath = elementId ?? elementPath,
@@ -3665,7 +3665,7 @@ namespace WixToolset.Util
                 });
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
 

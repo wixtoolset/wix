@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixRestartResource = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixRestartResource.ToString(),
+        public static readonly IntermediateSymbolDefinition WixRestartResource = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixRestartResource.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.Resource), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRestartResourceSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRestartResourceSymbolFields.Resource), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRestartResourceSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixRestartResourceTuple));
+            typeof(WixRestartResourceSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixRestartResourceTupleFields
+    public enum WixRestartResourceSymbolFields
     {
         ComponentRef,
         Resource,
         Attributes,
     }
 
-    public class WixRestartResourceTuple : IntermediateTuple
+    public class WixRestartResourceSymbol : IntermediateSymbol
     {
-        public WixRestartResourceTuple() : base(UtilTupleDefinitions.WixRestartResource, null, null)
+        public WixRestartResourceSymbol() : base(UtilSymbolDefinitions.WixRestartResource, null, null)
         {
         }
 
-        public WixRestartResourceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixRestartResource, sourceLineNumber, id)
+        public WixRestartResourceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixRestartResource, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixRestartResourceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixRestartResourceSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixRestartResourceTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixRestartResourceTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixRestartResourceSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixRestartResourceSymbolFields.ComponentRef, value);
         }
 
         public string Resource
         {
-            get => this.Fields[(int)WixRestartResourceTupleFields.Resource].AsString();
-            set => this.Set((int)WixRestartResourceTupleFields.Resource, value);
+            get => this.Fields[(int)WixRestartResourceSymbolFields.Resource].AsString();
+            set => this.Set((int)WixRestartResourceSymbolFields.Resource, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)WixRestartResourceTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixRestartResourceTupleFields.Attributes, value);
+            get => this.Fields[(int)WixRestartResourceSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixRestartResourceSymbolFields.Attributes, value);
         }
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PerfmonManifest = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.PerfmonManifest.ToString(),
+        public static readonly IntermediateSymbolDefinition PerfmonManifest = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.PerfmonManifest.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PerfmonManifestTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerfmonManifestTupleFields.File), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerfmonManifestTupleFields.ResourceFileDirectory), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonManifestSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonManifestSymbolFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonManifestSymbolFields.ResourceFileDirectory), IntermediateFieldType.String),
             },
-            typeof(PerfmonManifestTuple));
+            typeof(PerfmonManifestSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum PerfmonManifestTupleFields
+    public enum PerfmonManifestSymbolFields
     {
         ComponentRef,
         File,
         ResourceFileDirectory,
     }
 
-    public class PerfmonManifestTuple : IntermediateTuple
+    public class PerfmonManifestSymbol : IntermediateSymbol
     {
-        public PerfmonManifestTuple() : base(UtilTupleDefinitions.PerfmonManifest, null, null)
+        public PerfmonManifestSymbol() : base(UtilSymbolDefinitions.PerfmonManifest, null, null)
         {
         }
 
-        public PerfmonManifestTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.PerfmonManifest, sourceLineNumber, id)
+        public PerfmonManifestSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.PerfmonManifest, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PerfmonManifestTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PerfmonManifestSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)PerfmonManifestTupleFields.ComponentRef].AsString();
-            set => this.Set((int)PerfmonManifestTupleFields.ComponentRef, value);
+            get => this.Fields[(int)PerfmonManifestSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)PerfmonManifestSymbolFields.ComponentRef, value);
         }
 
         public string File
         {
-            get => this.Fields[(int)PerfmonManifestTupleFields.File].AsString();
-            set => this.Set((int)PerfmonManifestTupleFields.File, value);
+            get => this.Fields[(int)PerfmonManifestSymbolFields.File].AsString();
+            set => this.Set((int)PerfmonManifestSymbolFields.File, value);
         }
 
         public string ResourceFileDirectory
         {
-            get => this.Fields[(int)PerfmonManifestTupleFields.ResourceFileDirectory].AsString();
-            set => this.Set((int)PerfmonManifestTupleFields.ResourceFileDirectory, value);
+            get => this.Fields[(int)PerfmonManifestSymbolFields.ResourceFileDirectory].AsString();
+            set => this.Set((int)PerfmonManifestSymbolFields.ResourceFileDirectory, value);
         }
     }
 }

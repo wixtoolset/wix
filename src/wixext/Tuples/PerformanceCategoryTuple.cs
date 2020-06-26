@@ -3,28 +3,28 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition PerformanceCategory = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.PerformanceCategory.ToString(),
+        public static readonly IntermediateSymbolDefinition PerformanceCategory = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.PerformanceCategory.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.IniData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.ConstantData), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerformanceCategorySymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerformanceCategorySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerformanceCategorySymbolFields.IniData), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerformanceCategorySymbolFields.ConstantData), IntermediateFieldType.String),
             },
-            typeof(PerformanceCategoryTuple));
+            typeof(PerformanceCategorySymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum PerformanceCategoryTupleFields
+    public enum PerformanceCategorySymbolFields
     {
         ComponentRef,
         Name,
@@ -32,40 +32,40 @@ namespace WixToolset.Util.Tuples
         ConstantData,
     }
 
-    public class PerformanceCategoryTuple : IntermediateTuple
+    public class PerformanceCategorySymbol : IntermediateSymbol
     {
-        public PerformanceCategoryTuple() : base(UtilTupleDefinitions.PerformanceCategory, null, null)
+        public PerformanceCategorySymbol() : base(UtilSymbolDefinitions.PerformanceCategory, null, null)
         {
         }
 
-        public PerformanceCategoryTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.PerformanceCategory, sourceLineNumber, id)
+        public PerformanceCategorySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.PerformanceCategory, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PerformanceCategoryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PerformanceCategorySymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.ComponentRef].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.ComponentRef, value);
+            get => this.Fields[(int)PerformanceCategorySymbolFields.ComponentRef].AsString();
+            set => this.Set((int)PerformanceCategorySymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.Name].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.Name, value);
+            get => this.Fields[(int)PerformanceCategorySymbolFields.Name].AsString();
+            set => this.Set((int)PerformanceCategorySymbolFields.Name, value);
         }
 
         public string IniData
         {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.IniData].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.IniData, value);
+            get => this.Fields[(int)PerformanceCategorySymbolFields.IniData].AsString();
+            set => this.Set((int)PerformanceCategorySymbolFields.IniData, value);
         }
 
         public string ConstantData
         {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.ConstantData].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.ConstantData, value);
+            get => this.Fields[(int)PerformanceCategorySymbolFields.ConstantData].AsString();
+            set => this.Set((int)PerformanceCategorySymbolFields.ConstantData, value);
         }
     }
 }

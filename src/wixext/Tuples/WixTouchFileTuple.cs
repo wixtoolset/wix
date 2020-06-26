@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixTouchFile = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixTouchFile.ToString(),
+        public static readonly IntermediateSymbolDefinition WixTouchFile = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixTouchFile.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixTouchFileSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixTouchFileSymbolFields.Path), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixTouchFileSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixTouchFileTuple));
+            typeof(WixTouchFileSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixTouchFileTupleFields
+    public enum WixTouchFileSymbolFields
     {
         ComponentRef,
         Path,
         Attributes,
     }
 
-    public class WixTouchFileTuple : IntermediateTuple
+    public class WixTouchFileSymbol : IntermediateSymbol
     {
-        public WixTouchFileTuple() : base(UtilTupleDefinitions.WixTouchFile, null, null)
+        public WixTouchFileSymbol() : base(UtilSymbolDefinitions.WixTouchFile, null, null)
         {
         }
 
-        public WixTouchFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixTouchFile, sourceLineNumber, id)
+        public WixTouchFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixTouchFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixTouchFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixTouchFileSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixTouchFileTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixTouchFileTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixTouchFileSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixTouchFileSymbolFields.ComponentRef, value);
         }
 
         public string Path
         {
-            get => this.Fields[(int)WixTouchFileTupleFields.Path].AsString();
-            set => this.Set((int)WixTouchFileTupleFields.Path, value);
+            get => this.Fields[(int)WixTouchFileSymbolFields.Path].AsString();
+            set => this.Set((int)WixTouchFileSymbolFields.Path, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)WixTouchFileTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixTouchFileTupleFields.Attributes, value);
+            get => this.Fields[(int)WixTouchFileSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixTouchFileSymbolFields.Attributes, value);
         }
     }
 }

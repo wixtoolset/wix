@@ -3,31 +3,31 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SecureObjects = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.SecureObjects.ToString(),
+        public static readonly IntermediateSymbolDefinition SecureObjects = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.SecureObjects.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.SecureObject), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Table), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Domain), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.User), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Permission), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.SecureObject), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.Table), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.Domain), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.User), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.Permission), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SecureObjectsSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(SecureObjectsTuple));
+            typeof(SecureObjectsSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum SecureObjectsTupleFields
+    public enum SecureObjectsSymbolFields
     {
         SecureObject,
         Table,
@@ -38,58 +38,58 @@ namespace WixToolset.Util.Tuples
         ComponentRef,
     }
 
-    public class SecureObjectsTuple : IntermediateTuple
+    public class SecureObjectsSymbol : IntermediateSymbol
     {
-        public SecureObjectsTuple() : base(UtilTupleDefinitions.SecureObjects, null, null)
+        public SecureObjectsSymbol() : base(UtilSymbolDefinitions.SecureObjects, null, null)
         {
         }
 
-        public SecureObjectsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.SecureObjects, sourceLineNumber, id)
+        public SecureObjectsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.SecureObjects, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SecureObjectsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SecureObjectsSymbolFields index] => this.Fields[(int)index];
 
         public string SecureObject
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.SecureObject].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.SecureObject, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.SecureObject].AsString();
+            set => this.Set((int)SecureObjectsSymbolFields.SecureObject, value);
         }
 
         public string Table
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Table].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.Table, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.Table].AsString();
+            set => this.Set((int)SecureObjectsSymbolFields.Table, value);
         }
 
         public string Domain
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Domain].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.Domain, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.Domain].AsString();
+            set => this.Set((int)SecureObjectsSymbolFields.Domain, value);
         }
 
         public string User
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.User].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.User, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.User].AsString();
+            set => this.Set((int)SecureObjectsSymbolFields.User, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Attributes].AsNumber();
-            set => this.Set((int)SecureObjectsTupleFields.Attributes, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)SecureObjectsSymbolFields.Attributes, value);
         }
 
         public int? Permission
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Permission].AsNullableNumber();
-            set => this.Set((int)SecureObjectsTupleFields.Permission, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.Permission].AsNullableNumber();
+            set => this.Set((int)SecureObjectsSymbolFields.Permission, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.ComponentRef].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.ComponentRef, value);
+            get => this.Fields[(int)SecureObjectsSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)SecureObjectsSymbolFields.ComponentRef, value);
         }
     }
 }

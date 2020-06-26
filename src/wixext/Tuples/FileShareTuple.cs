@@ -3,28 +3,28 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition FileShare = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.FileShare.ToString(),
+        public static readonly IntermediateSymbolDefinition FileShare = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.FileShare.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.ShareName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileShareSymbolFields.ShareName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileShareSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileShareSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileShareSymbolFields.DirectoryRef), IntermediateFieldType.String),
             },
-            typeof(FileShareTuple));
+            typeof(FileShareSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum FileShareTupleFields
+    public enum FileShareSymbolFields
     {
         ShareName,
         ComponentRef,
@@ -32,40 +32,40 @@ namespace WixToolset.Util.Tuples
         DirectoryRef,
     }
 
-    public class FileShareTuple : IntermediateTuple
+    public class FileShareSymbol : IntermediateSymbol
     {
-        public FileShareTuple() : base(UtilTupleDefinitions.FileShare, null, null)
+        public FileShareSymbol() : base(UtilSymbolDefinitions.FileShare, null, null)
         {
         }
 
-        public FileShareTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.FileShare, sourceLineNumber, id)
+        public FileShareSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.FileShare, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[FileShareTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[FileShareSymbolFields index] => this.Fields[(int)index];
 
         public string ShareName
         {
-            get => this.Fields[(int)FileShareTupleFields.ShareName].AsString();
-            set => this.Set((int)FileShareTupleFields.ShareName, value);
+            get => this.Fields[(int)FileShareSymbolFields.ShareName].AsString();
+            set => this.Set((int)FileShareSymbolFields.ShareName, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)FileShareTupleFields.ComponentRef].AsString();
-            set => this.Set((int)FileShareTupleFields.ComponentRef, value);
+            get => this.Fields[(int)FileShareSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)FileShareSymbolFields.ComponentRef, value);
         }
 
         public string Description
         {
-            get => this.Fields[(int)FileShareTupleFields.Description].AsString();
-            set => this.Set((int)FileShareTupleFields.Description, value);
+            get => this.Fields[(int)FileShareSymbolFields.Description].AsString();
+            set => this.Set((int)FileShareSymbolFields.Description, value);
         }
 
         public string DirectoryRef
         {
-            get => this.Fields[(int)FileShareTupleFields.DirectoryRef].AsString();
-            set => this.Set((int)FileShareTupleFields.DirectoryRef, value);
+            get => this.Fields[(int)FileShareSymbolFields.DirectoryRef].AsString();
+            set => this.Set((int)FileShareSymbolFields.DirectoryRef, value);
         }
     }
 }

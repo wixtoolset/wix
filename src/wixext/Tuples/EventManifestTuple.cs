@@ -3,53 +3,53 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition EventManifest = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.EventManifest.ToString(),
+        public static readonly IntermediateSymbolDefinition EventManifest = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.EventManifest.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(EventManifestTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(EventManifestTupleFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EventManifestSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EventManifestSymbolFields.File), IntermediateFieldType.String),
             },
-            typeof(EventManifestTuple));
+            typeof(EventManifestSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum EventManifestTupleFields
+    public enum EventManifestSymbolFields
     {
         ComponentRef,
         File,
     }
 
-    public class EventManifestTuple : IntermediateTuple
+    public class EventManifestSymbol : IntermediateSymbol
     {
-        public EventManifestTuple() : base(UtilTupleDefinitions.EventManifest, null, null)
+        public EventManifestSymbol() : base(UtilSymbolDefinitions.EventManifest, null, null)
         {
         }
 
-        public EventManifestTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.EventManifest, sourceLineNumber, id)
+        public EventManifestSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.EventManifest, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[EventManifestTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[EventManifestSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)EventManifestTupleFields.ComponentRef].AsString();
-            set => this.Set((int)EventManifestTupleFields.ComponentRef, value);
+            get => this.Fields[(int)EventManifestSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)EventManifestSymbolFields.ComponentRef, value);
         }
 
         public string File
         {
-            get => this.Fields[(int)EventManifestTupleFields.File].AsString();
-            set => this.Set((int)EventManifestTupleFields.File, value);
+            get => this.Fields[(int)EventManifestSymbolFields.File].AsString();
+            set => this.Set((int)EventManifestSymbolFields.File, value);
         }
     }
 }

@@ -3,31 +3,31 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixInternetShortcut = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixInternetShortcut.ToString(),
+        public static readonly IntermediateSymbolDefinition WixInternetShortcut = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixInternetShortcut.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.DirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Target), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.IconFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.IconIndex), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.Target), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.IconFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutSymbolFields.IconIndex), IntermediateFieldType.Number),
             },
-            typeof(WixInternetShortcutTuple));
+            typeof(WixInternetShortcutSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixInternetShortcutTupleFields
+    public enum WixInternetShortcutSymbolFields
     {
         ComponentRef,
         DirectoryRef,
@@ -38,58 +38,58 @@ namespace WixToolset.Util.Tuples
         IconIndex,
     }
 
-    public class WixInternetShortcutTuple : IntermediateTuple
+    public class WixInternetShortcutSymbol : IntermediateSymbol
     {
-        public WixInternetShortcutTuple() : base(UtilTupleDefinitions.WixInternetShortcut, null, null)
+        public WixInternetShortcutSymbol() : base(UtilSymbolDefinitions.WixInternetShortcut, null, null)
         {
         }
 
-        public WixInternetShortcutTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixInternetShortcut, sourceLineNumber, id)
+        public WixInternetShortcutSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixInternetShortcut, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixInternetShortcutTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixInternetShortcutSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixInternetShortcutSymbolFields.ComponentRef, value);
         }
 
         public string DirectoryRef
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.DirectoryRef].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.DirectoryRef, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.DirectoryRef].AsString();
+            set => this.Set((int)WixInternetShortcutSymbolFields.DirectoryRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.Name].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.Name, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.Name].AsString();
+            set => this.Set((int)WixInternetShortcutSymbolFields.Name, value);
         }
 
         public string Target
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.Target].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.Target, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.Target].AsString();
+            set => this.Set((int)WixInternetShortcutSymbolFields.Target, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixInternetShortcutTupleFields.Attributes, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixInternetShortcutSymbolFields.Attributes, value);
         }
 
         public string IconFile
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.IconFile].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.IconFile, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.IconFile].AsString();
+            set => this.Set((int)WixInternetShortcutSymbolFields.IconFile, value);
         }
 
         public int? IconIndex
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.IconIndex].AsNullableNumber();
-            set => this.Set((int)WixInternetShortcutTupleFields.IconIndex, value);
+            get => this.Fields[(int)WixInternetShortcutSymbolFields.IconIndex].AsNullableNumber();
+            set => this.Set((int)WixInternetShortcutSymbolFields.IconIndex, value);
         }
     }
 }

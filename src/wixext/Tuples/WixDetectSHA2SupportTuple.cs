@@ -3,31 +3,31 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDetectSHA2Support = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixDetectSHA2Support.ToString(),
+        public static readonly IntermediateSymbolDefinition WixDetectSHA2Support = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixDetectSHA2Support.ToString(),
             new IntermediateFieldDefinition[0],
-            typeof(WixDetectSHA2SupportTuple));
+            typeof(WixDetectSHA2SupportSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public class WixDetectSHA2SupportTuple : IntermediateTuple
+    public class WixDetectSHA2SupportSymbol : IntermediateSymbol
     {
-        public WixDetectSHA2SupportTuple() : base(UtilTupleDefinitions.WixDetectSHA2Support, null, null)
+        public WixDetectSHA2SupportSymbol() : base(UtilSymbolDefinitions.WixDetectSHA2Support, null, null)
         {
         }
 
-        public WixDetectSHA2SupportTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixDetectSHA2Support, sourceLineNumber, id)
+        public WixDetectSHA2SupportSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixDetectSHA2Support, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[GroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[GroupSymbolFields index] => this.Fields[(int)index];
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Perfmon = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.Perfmon.ToString(),
+        public static readonly IntermediateSymbolDefinition Perfmon = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.Perfmon.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PerfmonTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerfmonTupleFields.File), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerfmonTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonSymbolFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(PerfmonTuple));
+            typeof(PerfmonSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum PerfmonTupleFields
+    public enum PerfmonSymbolFields
     {
         ComponentRef,
         File,
         Name,
     }
 
-    public class PerfmonTuple : IntermediateTuple
+    public class PerfmonSymbol : IntermediateSymbol
     {
-        public PerfmonTuple() : base(UtilTupleDefinitions.Perfmon, null, null)
+        public PerfmonSymbol() : base(UtilSymbolDefinitions.Perfmon, null, null)
         {
         }
 
-        public PerfmonTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.Perfmon, sourceLineNumber, id)
+        public PerfmonSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.Perfmon, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[PerfmonTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[PerfmonSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)PerfmonTupleFields.ComponentRef].AsString();
-            set => this.Set((int)PerfmonTupleFields.ComponentRef, value);
+            get => this.Fields[(int)PerfmonSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)PerfmonSymbolFields.ComponentRef, value);
         }
 
         public string File
         {
-            get => this.Fields[(int)PerfmonTupleFields.File].AsString();
-            set => this.Set((int)PerfmonTupleFields.File, value);
+            get => this.Fields[(int)PerfmonSymbolFields.File].AsString();
+            set => this.Set((int)PerfmonSymbolFields.File, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)PerfmonTupleFields.Name].AsString();
-            set => this.Set((int)PerfmonTupleFields.Name, value);
+            get => this.Fields[(int)PerfmonSymbolFields.Name].AsString();
+            set => this.Set((int)PerfmonSymbolFields.Name, value);
         }
     }
 }

@@ -3,53 +3,53 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixFormatFiles = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.WixFormatFiles.ToString(),
+        public static readonly IntermediateSymbolDefinition WixFormatFiles = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.WixFormatFiles.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.BinaryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFormatFilesSymbolFields.BinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFormatFilesSymbolFields.FileRef), IntermediateFieldType.String),
             },
-            typeof(WixFormatFilesTuple));
+            typeof(WixFormatFilesSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixFormatFilesTupleFields
+    public enum WixFormatFilesSymbolFields
     {
         BinaryRef,
         FileRef,
     }
 
-    public class WixFormatFilesTuple : IntermediateTuple
+    public class WixFormatFilesSymbol : IntermediateSymbol
     {
-        public WixFormatFilesTuple() : base(UtilTupleDefinitions.WixFormatFiles, null, null)
+        public WixFormatFilesSymbol() : base(UtilSymbolDefinitions.WixFormatFiles, null, null)
         {
         }
 
-        public WixFormatFilesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.WixFormatFiles, sourceLineNumber, id)
+        public WixFormatFilesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.WixFormatFiles, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixFormatFilesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixFormatFilesSymbolFields index] => this.Fields[(int)index];
 
         public string BinaryRef
         {
-            get => this.Fields[(int)WixFormatFilesTupleFields.BinaryRef].AsString();
-            set => this.Set((int)WixFormatFilesTupleFields.BinaryRef, value);
+            get => this.Fields[(int)WixFormatFilesSymbolFields.BinaryRef].AsString();
+            set => this.Set((int)WixFormatFilesSymbolFields.BinaryRef, value);
         }
 
         public string FileRef
         {
-            get => this.Fields[(int)WixFormatFilesTupleFields.FileRef].AsString();
-            set => this.Set((int)WixFormatFilesTupleFields.FileRef, value);
+            get => this.Fields[(int)WixFormatFilesSymbolFields.FileRef].AsString();
+            set => this.Set((int)WixFormatFilesSymbolFields.FileRef, value);
         }
     }
 }

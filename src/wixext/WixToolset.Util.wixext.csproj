@@ -20,16 +20,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\wixlib\util.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
 

@@ -7,7 +7,7 @@ namespace WixToolsetTest.Util
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Util;
     using Xunit;
 

@@ -3,61 +3,61 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Group = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.Group.ToString(),
+        public static readonly IntermediateSymbolDefinition Group = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.Group.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(GroupTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupTupleFields.Domain), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.Domain), IntermediateFieldType.String),
             },
-            typeof(GroupTuple));
+            typeof(GroupSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum GroupTupleFields
+    public enum GroupSymbolFields
     {
         ComponentRef,
         Name,
         Domain,
     }
 
-    public class GroupTuple : IntermediateTuple
+    public class GroupSymbol : IntermediateSymbol
     {
-        public GroupTuple() : base(UtilTupleDefinitions.Group, null, null)
+        public GroupSymbol() : base(UtilSymbolDefinitions.Group, null, null)
         {
         }
 
-        public GroupTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.Group, sourceLineNumber, id)
+        public GroupSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.Group, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[GroupTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[GroupSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)GroupTupleFields.ComponentRef].AsString();
-            set => this.Set((int)GroupTupleFields.ComponentRef, value);
+            get => this.Fields[(int)GroupSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)GroupSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)GroupTupleFields.Name].AsString();
-            set => this.Set((int)GroupTupleFields.Name, value);
+            get => this.Fields[(int)GroupSymbolFields.Name].AsString();
+            set => this.Set((int)GroupSymbolFields.Name, value);
         }
 
         public string Domain
         {
-            get => this.Fields[(int)GroupTupleFields.Domain].AsString();
-            set => this.Set((int)GroupTupleFields.Domain, value);
+            get => this.Fields[(int)GroupSymbolFields.Domain].AsString();
+            set => this.Set((int)GroupSymbolFields.Domain, value);
         }
     }
 }

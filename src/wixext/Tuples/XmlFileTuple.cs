@@ -3,31 +3,31 @@
 namespace WixToolset.Util
 {
     using WixToolset.Data;
-    using WixToolset.Util.Tuples;
+    using WixToolset.Util.Symbols;
 
-    public static partial class UtilTupleDefinitions
+    public static partial class UtilSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition XmlFile = new IntermediateTupleDefinition(
-            UtilTupleDefinitionType.XmlFile.ToString(),
+        public static readonly IntermediateSymbolDefinition XmlFile = new IntermediateSymbolDefinition(
+            UtilSymbolDefinitionType.XmlFile.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.File), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.ElementPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Flags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.ElementPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.Flags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileSymbolFields.Sequence), IntermediateFieldType.Number),
             },
-            typeof(XmlFileTuple));
+            typeof(XmlFileSymbol));
     }
 }
 
-namespace WixToolset.Util.Tuples
+namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
-    public enum XmlFileTupleFields
+    public enum XmlFileSymbolFields
     {
         File,
         ElementPath,
@@ -38,58 +38,58 @@ namespace WixToolset.Util.Tuples
         Sequence,
     }
 
-    public class XmlFileTuple : IntermediateTuple
+    public class XmlFileSymbol : IntermediateSymbol
     {
-        public XmlFileTuple() : base(UtilTupleDefinitions.XmlFile, null, null)
+        public XmlFileSymbol() : base(UtilSymbolDefinitions.XmlFile, null, null)
         {
         }
 
-        public XmlFileTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilTupleDefinitions.XmlFile, sourceLineNumber, id)
+        public XmlFileSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(UtilSymbolDefinitions.XmlFile, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[XmlFileTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[XmlFileSymbolFields index] => this.Fields[(int)index];
 
         public string File
         {
-            get => this.Fields[(int)XmlFileTupleFields.File].AsString();
-            set => this.Set((int)XmlFileTupleFields.File, value);
+            get => this.Fields[(int)XmlFileSymbolFields.File].AsString();
+            set => this.Set((int)XmlFileSymbolFields.File, value);
         }
 
         public string ElementPath
         {
-            get => this.Fields[(int)XmlFileTupleFields.ElementPath].AsString();
-            set => this.Set((int)XmlFileTupleFields.ElementPath, value);
+            get => this.Fields[(int)XmlFileSymbolFields.ElementPath].AsString();
+            set => this.Set((int)XmlFileSymbolFields.ElementPath, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)XmlFileTupleFields.Name].AsString();
-            set => this.Set((int)XmlFileTupleFields.Name, value);
+            get => this.Fields[(int)XmlFileSymbolFields.Name].AsString();
+            set => this.Set((int)XmlFileSymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)XmlFileTupleFields.Value].AsString();
-            set => this.Set((int)XmlFileTupleFields.Value, value);
+            get => this.Fields[(int)XmlFileSymbolFields.Value].AsString();
+            set => this.Set((int)XmlFileSymbolFields.Value, value);
         }
 
         public int Flags
         {
-            get => this.Fields[(int)XmlFileTupleFields.Flags].AsNumber();
-            set => this.Set((int)XmlFileTupleFields.Flags, value);
+            get => this.Fields[(int)XmlFileSymbolFields.Flags].AsNumber();
+            set => this.Set((int)XmlFileSymbolFields.Flags, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)XmlFileTupleFields.ComponentRef].AsString();
-            set => this.Set((int)XmlFileTupleFields.ComponentRef, value);
+            get => this.Fields[(int)XmlFileSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)XmlFileSymbolFields.ComponentRef, value);
         }
 
         public int? Sequence
         {
-            get => this.Fields[(int)XmlFileTupleFields.Sequence].AsNullableNumber();
-            set => this.Set((int)XmlFileTupleFields.Sequence, value);
+            get => this.Fields[(int)XmlFileSymbolFields.Sequence].AsNullableNumber();
+            set => this.Set((int)XmlFileSymbolFields.Sequence, value);
         }
     }
 }
