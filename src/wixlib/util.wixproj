@@ -1,91 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0139\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0139\build\WixToolset.MSBuild.props')" />
-  <Import Project="..\FindLocalWix.props" />
+<Project Sdk="WixToolset.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{1ACFFEFD-505A-41A5-ACBF-A02B7B473AA2}</ProjectGuid>
-    <OutputName>util</OutputName>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
-    <Pedantic>true</Pedantic>
   </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="UtilExtension.wxs" />
-    <Compile Include="UtilExtension_x86.wxs" />
-    <Compile Include="UtilExtension_x64.wxs" />
-    <Compile Include="UtilExtension_arm.wxs" />
-    <Compile Include="UtilExtension_arm64.wxs" />
-    <EmbeddedResource Include="en-us.wxl" />
-    <EmbeddedResource Include="de-de.wxl" />
-    <EmbeddedResource Include="es-es.wxl" />
-    <EmbeddedResource Include="fr-fr.wxl" />
-    <EmbeddedResource Include="ja-jp.wxl" />
-    <EmbeddedResource Include="pt-br.wxl" />
-    <EmbeddedResource Include="it-it.wxl" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)Win32">
-        <BindName>x86</BindName>
-    </BindInputPaths>
-    <BindInputPaths Include="$(OutputPath)x64)">
-        <BindName>x64</BindName>
-    </BindInputPaths>
-    <BindInputPaths Include="$(OutputPath)arm)">
-        <BindName>arm</BindName>
-    </BindInputPaths>
-    <BindInputPaths Include="$(OutputPath)arm64)">
-        <BindName>arm64</BindName>
-    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath)Win32" BindName='x86' />
+    <BindInputPaths Include="$(OutputPath)x64)" BindName='x64' />
+    <BindInputPaths Include="$(OutputPath)arm)" BindName='arm' />
+    <BindInputPaths Include="$(OutputPath)arm64)" BindName='arm64' />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\be\utilbe.vcxproj">
-      <Name>utilbe</Name>
-      <Project>{630C1EE7-2517-4A8C-83E3-DA1150308B58}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\utilca.vcxproj">
-      <Name>utilca</Name>
-      <Project>{076018F7-19BD-423A-ABBF-229273DA08D8}</Project>
-      <Properties>Platform=ARM</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\utilca.vcxproj">
-      <Name>utilca</Name>
-      <Project>{076018F7-19BD-423A-ABBF-229273DA08D8}</Project>
-      <Properties>Platform=ARM64</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\utilca.vcxproj">
-      <Name>utilca</Name>
-      <Project>{076018F7-19BD-423A-ABBF-229273DA08D8}</Project>
-      <Properties>Platform=x86</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\utilca.vcxproj">
-      <Name>utilca</Name>
-      <Project>{076018F7-19BD-423A-ABBF-229273DA08D8}</Project>
-      <Properties>Platform=x64</Properties>
-    </ProjectReference>
+    <ProjectReference Include="..\be\utilbe.vcxproj" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=ARM" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <None Include="caerr.wxi" />
-    <None Include="caDecor.wxi" />
-    <None Include="UtilExtension_Platform.wxi" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
-  
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
-  
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0139\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0139\build\WixToolset.MSBuild.props'))" />
-  </Target>
-  
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+
 </Project>
