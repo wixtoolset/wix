@@ -26,12 +26,6 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
-          <xs:annotation>
-            <xs:documentation>
-              Condition that determines if the application should be closed.  Must be blank or evaluate to true
-              for the application to be scheduled for closing.
-            </xs:documentation>
-          </xs:annotation>
           <xs:attribute name="Id" type="xs:string">
             <xs:annotation>
               <xs:documentation>Identifier for the close application (primary key). If the Id is not specified, one will be generated.</xs:documentation>
@@ -40,6 +34,14 @@
           <xs:attribute name="Target" type="xs:string" use="required">
             <xs:annotation>
               <xs:documentation>Name of the exectuable to be closed.  This should only be the file name.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="Condition" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                Condition that determines if the application should be closed.  Must be blank or evaluate to true
+                for the application to be scheduled for closing.
+              </xs:documentation>
             </xs:annotation>
           </xs:attribute>
           <xs:attribute name="Description" type="xs:string">
@@ -562,7 +564,7 @@
       <xs:attribute name="Name" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>
-                        The name of the shortcut file, which is visible to the user. (The .lnk 
+                        The name of the shortcut file, which is visible to the user. (The .lnk
                         extension is added automatically and by default, is not shown to the user.)
                     </xs:documentation>
         </xs:annotation>
@@ -571,9 +573,9 @@
         <xs:annotation>
           <xs:documentation>
                         URL that should be opened when the user selects the shortcut. Windows
-                        opens the URL in the appropriate handler for the protocol specified 
-                        in the URL. Note that this is a formatted field, so you can use 
-                        [#fileId] syntax to refer to a file being installed (using the file: 
+                        opens the URL in the appropriate handler for the protocol specified
+                        in the URL. Note that this is a formatted field, so you can use
+                        [#fileId] syntax to refer to a file being installed (using the file:
                         protocol).
                     </xs:documentation>
         </xs:annotation>
@@ -958,11 +960,11 @@
               <xse:remarks>
                 <html:p>The custom action that implements RemoveFolderEx does so by writing temporary rows to the RemoveFile table
                 for each subfolder of the root folder you specify. Because it might dramatically affect Windows Installer's
-                <html:a href="http://msdn.microsoft.com/en-us/library/aa368593.aspx">File Costing</html:a>, 
+                <html:a href="http://msdn.microsoft.com/en-us/library/aa368593.aspx">File Costing</html:a>,
                 the temporary rows must be written before the CostInitialize standard action. Unfortunately, MSI doesn't
                 create properties for the Directory hierarchy in your package until later, in the CostFinalize action.</html:p>
                 <html:p>An easy workaround for a typical use case of removing a folder during uninstall is to write the directory
-                path to the registry and to load it during uninstall. See 
+                path to the registry and to load it during uninstall. See
                 <html:a href="http://robmensching.com/blog/posts/2010/5/2/the-wix-toolsets-remember-property-pattern">The WiX toolset's "Remember Property" pattern</html:a>
                 for an example.</html:p>
                 <html:p>If you use custom actions to set properties, ensure that they are scheduled before the WixRemoveFoldersEx custom action.</html:p>
@@ -970,8 +972,8 @@
           </xs:appinfo>
           <xs:documentation>
               Remove a folder and all contained files and folders if the parent component is selected for installation or removal.
-              The folder must be specified in the Property attribute as the name of a property that will have a value that resolves 
-              to the full path of the folder before the CostInitialize action. Note that Directory ids cannot be used. 
+              The folder must be specified in the Property attribute as the name of a property that will have a value that resolves
+              to the full path of the folder before the CostInitialize action. Note that Directory ids cannot be used.
               For more details, see the Remarks.
           </xs:documentation>
       </xs:annotation>
@@ -987,8 +989,8 @@
                   <xs:documentation>
                       The id of a property that resolves to the full path of the source directory.  The property does not have
                       to exist in the installer database at creation time; it could be created at installation time by a custom
-                      action, on the command line, etc. The property value can contain environment variables surrounded by 
-                      percent signs such as from a REG_EXPAND_SZ registry value; environment variables will be expanded before 
+                      action, on the command line, etc. The property value can contain environment variables surrounded by
+                      percent signs such as from a REG_EXPAND_SZ registry value; environment variables will be expanded before
                       being evaluated for a full path.
                   </xs:documentation>
               </xs:annotation>
@@ -1390,8 +1392,8 @@
   <xs:element name="XmlFile">
     <xs:annotation>
       <xs:documentation>
-                Adds or removes .xml file entries.  If you use the XmlFile element you must reference WixUtilExtension.dll as it contains the XmlFile custom actions.
-            </xs:documentation>
+          Adds or removes .xml file entries.  If you use the XmlFile element you must reference WixUtilExtension.dll as it contains the XmlFile custom actions.
+      </xs:documentation>
       <xs:appinfo>
         <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
       </xs:appinfo>
@@ -1420,8 +1422,8 @@
       <xs:attribute name="Value" type="xs:string">
         <xs:annotation>
           <xs:documentation>
-                        The value to be written.  See the <html:a href="http://msdn.microsoft.com/library/aa368609(VS.85).aspx" target="_blank">Formatted topic</html:a> for information how to escape square brackets in the value.
-                    </xs:documentation>
+              The value to be written.  See the <html:a href="http://msdn.microsoft.com/library/aa368609(VS.85).aspx" target="_blank">Formatted topic</html:a> for information how to escape square brackets in the value.
+          </xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Action" use="required">
@@ -1471,8 +1473,8 @@
       <xs:attribute name="SelectionLanguage">
         <xs:annotation>
           <xs:documentation>
-                        Specify whether the DOM object should use XPath language or the old XSLPattern language (default) as the query language.                        
-                    </xs:documentation>
+              Specify whether the DOM object should use XPath language or the old XSLPattern language (default) as the query language.
+          </xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:NMTOKEN">
@@ -1486,13 +1488,13 @@
   <xs:element name="XmlConfig">
     <xs:annotation>
       <xs:documentation>
-                Adds or removes .xml file entries.  If you use the XmlConfig element you must reference WixUtilExtension.dll as it contains the XmlConfig custom actions.
-            </xs:documentation>
+          Adds or removes .xml file entries.  If you use the XmlConfig element you must reference WixUtilExtension.dll as it contains the XmlConfig custom actions.
+      </xs:documentation>
       <xs:appinfo>
         <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
       </xs:appinfo>
     </xs:annotation>
-    <xs:complexType mixed="true">
+    <xs:complexType>
       <xs:sequence>
         <xs:element ref="XmlConfig" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
@@ -1559,8 +1561,8 @@
       <xs:attribute name="Value" type="xs:string">
         <xs:annotation>
           <xs:documentation>
-                        The value to be written.  See the <html:a href="http://msdn.microsoft.com/library/aa368609(VS.85).aspx" target="_blank">Formatted topic</html:a> for information how to escape square brackets in the value.
-                    </xs:documentation>
+            The value to be written.  See the <html:a href="https://docs.microsoft.com/en-us/windows/win32/msi/formatted" target="_blank">Formatted topic</html:a> for information how to escape square brackets in the value.
+          </xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="VerifyPath" type="xs:string">

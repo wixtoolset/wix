@@ -761,6 +761,9 @@ namespace WixToolset.Util
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
                         case "Description":
                             description = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -869,9 +872,6 @@ namespace WixToolset.Util
             {
                 this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "TerminateProcess", "RebootPrompt", "yes"));
             }
-
-            // get the condition from the inner text of the element
-            condition = this.ParseHelper.GetConditionInnerText(element);
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
@@ -3604,23 +3604,6 @@ namespace WixToolset.Util
                 }
 
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.XmlConfig, elementId);
-            }
-
-            var innerText = this.ParseHelper.GetTrimmedInnerText(element);
-            if (null != value)
-            {
-                // cannot specify both the value attribute and inner text
-                if (!String.IsNullOrEmpty(innerText))
-                {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, element.Name.LocalName, "Value"));
-                }
-            }
-            else // value attribute not specified
-            {
-                if (!String.IsNullOrEmpty(innerText))
-                {
-                    value = innerText;
-                }
             }
 
             // find unexpected child elements

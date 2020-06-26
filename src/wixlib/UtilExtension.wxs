@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -8,71 +7,69 @@
 
     <Fragment>
         <UI Id="ConfigureUsersErrorText">
-            <Error Id="$(var.msierrUSRFailedUserCreate)">!(loc.msierrUSRFailedUserCreate)</Error>
-            <Error Id="$(var.msierrUSRFailedUserCreatePswd)">!(loc.msierrUSRFailedUserCreatePswd)</Error>
-            <Error Id="$(var.msierrUSRFailedUserGroupAdd)">!(loc.msierrUSRFailedUserGroupAdd)</Error>
-            <Error Id="$(var.msierrUSRFailedGrantLogonAsService)">Failed to grant 'logon as service' rights to user.  ([2]   [3]   [4]   [5])</Error>
-            <Error Id="$(var.msierrUSRFailedUserCreateExists)">!(loc.msierrUSRFailedUserCreateExists)</Error>
+            <Error Id="$(var.msierrUSRFailedUserCreate)" Message="!(loc.msierrUSRFailedUserCreate)" />
+            <Error Id="$(var.msierrUSRFailedUserCreatePswd)" Message="!(loc.msierrUSRFailedUserCreatePswd)" />
+            <Error Id="$(var.msierrUSRFailedUserGroupAdd)" Message="!(loc.msierrUSRFailedUserGroupAdd)" />
+            <Error Id="$(var.msierrUSRFailedGrantLogonAsService)" Message="Failed to grant 'logon as service' rights to user.  ([2]   [3]   [4]   [5])" />
+            <Error Id="$(var.msierrUSRFailedUserCreateExists)" Message="!(loc.msierrUSRFailedUserCreateExists)" />
         </UI>
     </Fragment>
 
     <Fragment>
         <UI Id="ConfigureSmbErrorsText">
-            <Error Id="$(var.msierrSMBFailedCreate)">!(loc.msierrSMBFailedCreate)</Error>
-            <Error Id="$(var.msierrSMBFailedDrop)">!(loc.msierrSMBFailedDrop)</Error>
+            <Error Id="$(var.msierrSMBFailedCreate)" Message="!(loc.msierrSMBFailedCreate)" />
+            <Error Id="$(var.msierrSMBFailedDrop)" Message="!(loc.msierrSMBFailedDrop)" />
         </UI>
     </Fragment>
 
     <Fragment>
-      <UI Id="PerCounterDataErrorsText">
-            <Error Id="$(var.msierrInstallPerfCounterData)">!(loc.msierrInstallPerfCounterData)</Error>
-            <Error Id="$(var.msierrUninstallPerfCounterData)">!(loc.msierrUninstallPerfCounterData)</Error>
+        <UI Id="PerCounterDataErrorsText">
+            <Error Id="$(var.msierrInstallPerfCounterData)" Message="!(loc.msierrInstallPerfCounterData)" />
+            <Error Id="$(var.msierrUninstallPerfCounterData)" Message="!(loc.msierrUninstallPerfCounterData)" />
         </UI>
     </Fragment>
 
     <Fragment>
-      <UI Id="ConfigurePerfmonErrorsText">
-            <Error Id="$(var.msierrPERFMONFailedRegisterDLL)">!(loc.msierrPERFMONFailedRegisterDLL)</Error>
-            <Error Id="$(var.msierrPERFMONFailedUnregisterDLL)">!(loc.msierrPERFMONFailedUnregisterDLL)</Error>
+        <UI Id="ConfigurePerfmonErrorsText">
+            <Error Id="$(var.msierrPERFMONFailedRegisterDLL)" Message="!(loc.msierrPERFMONFailedRegisterDLL)" />
+            <Error Id="$(var.msierrPERFMONFailedUnregisterDLL)" Message="!(loc.msierrPERFMONFailedUnregisterDLL)" />
         </UI>
     </Fragment>
 
     <Fragment>
         <UI Id="SecureObjectsErrors">
-            <Error Id="$(var.msierrSecureObjectsFailedCreateSD)">!(loc.msierrSecureObjectsFailedCreateSD)</Error>
-            <Error Id="$(var.msierrSecureObjectsFailedSet)">!(loc.msierrSecureObjectsFailedSet)</Error>
-            <Error Id="$(var.msierrSecureObjectsUnknownType)">!(loc.msierrSecureObjectsUnknownType)</Error>
+            <Error Id="$(var.msierrSecureObjectsFailedCreateSD)" Message="!(loc.msierrSecureObjectsFailedCreateSD)" />
+            <Error Id="$(var.msierrSecureObjectsFailedSet)" Message="!(loc.msierrSecureObjectsFailedSet)" />
+            <Error Id="$(var.msierrSecureObjectsUnknownType)" Message="!(loc.msierrSecureObjectsUnknownType)" />
         </UI>
     </Fragment>
 
     <Fragment>
-      <UI Id="XmlFileErrorsText">
-            <Error Id="$(var.msierrXmlFileFailedRead)">!(loc.msierrXmlFileFailedRead)</Error>
-            <Error Id="$(var.msierrXmlFileFailedOpen)">!(loc.msierrXmlFileFailedOpen)</Error>
-            <Error Id="$(var.msierrXmlFileFailedSelect)">!(loc.msierrXmlFileFailedSelect)</Error>
-            <Error Id="$(var.msierrXmlFileFailedSave)">!(loc.msierrXmlFileFailedSave)</Error>
+        <UI Id="XmlFileErrorsText">
+            <Error Id="$(var.msierrXmlFileFailedRead)" Message="!(loc.msierrXmlFileFailedRead)" />
+            <Error Id="$(var.msierrXmlFileFailedOpen)" Message="!(loc.msierrXmlFileFailedOpen)" />
+            <Error Id="$(var.msierrXmlFileFailedSelect)" Message="!(loc.msierrXmlFileFailedSelect)" />
+            <Error Id="$(var.msierrXmlFileFailedSave)" Message="!(loc.msierrXmlFileFailedSave)" />
         </UI>
     </Fragment>
 
     <Fragment>
-      <UI Id="XmlConfigErrorsText">
-            <Error Id="$(var.msierrXmlConfigFailedRead)">!(loc.msierrXmlConfigFailedRead)</Error>
-            <Error Id="$(var.msierrXmlConfigFailedOpen)">!(loc.msierrXmlConfigFailedOpen)</Error>
-            <Error Id="$(var.msierrXmlConfigFailedSelect)">!(loc.msierrXmlConfigFailedSelect)</Error>
-            <Error Id="$(var.msierrXmlConfigFailedSave)">!(loc.msierrXmlConfigFailedSave)</Error>
+        <UI Id="XmlConfigErrorsText">
+            <Error Id="$(var.msierrXmlConfigFailedRead)" Message="!(loc.msierrXmlConfigFailedRead)" />
+            <Error Id="$(var.msierrXmlConfigFailedOpen)" Message="!(loc.msierrXmlConfigFailedOpen)" />
+            <Error Id="$(var.msierrXmlConfigFailedSelect)" Message="!(loc.msierrXmlConfigFailedSelect)" />
+            <Error Id="$(var.msierrXmlConfigFailedSave)" Message="!(loc.msierrXmlConfigFailedSave)" />
         </UI>
     </Fragment>
 
     <!-- WiX OS-detection properties and custom action -->
     <Fragment>
         <CustomAction Id="$(var.Prefix)QueryOsInfo$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
-        
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
-        
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -159,13 +156,11 @@
 
     <Fragment>
         <CustomAction Id="$(var.Prefix)QueryOsDirs$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" />
-        
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
-        
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -266,14 +261,13 @@
         <CustomAction Id="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsWellKnownSID" Execute="firstSequence" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
+            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
-  
     <Fragment>
         <Property Id="WIX_ACCOUNT_LOCALSYSTEM" Secure="yes" />
         <CustomActionRef Id="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" />
@@ -305,25 +299,25 @@
     </Fragment>
 
     <Fragment>
-      <CustomAction Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
 
-      <InstallExecuteSequence>
-        <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
-      </InstallExecuteSequence>
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
 
-      <InstallUISequence>
-        <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
-      </InstallUISequence>
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
     </Fragment>
 
     <Fragment>
-      <Property Id="WIX_WDDM_DRIVER_PRESENT" Secure="yes" />
-      <CustomActionRef Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" />
+        <Property Id="WIX_WDDM_DRIVER_PRESENT" Secure="yes" />
+        <CustomActionRef Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" />
     </Fragment>
 
     <Fragment>
-      <Property Id="WIX_DWM_COMPOSITION_ENABLED" Secure="yes" />
-      <CustomActionRef Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" />
+        <Property Id="WIX_DWM_COMPOSITION_ENABLED" Secure="yes" />
+        <CustomActionRef Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" />
     </Fragment>
 
     <Fragment>
