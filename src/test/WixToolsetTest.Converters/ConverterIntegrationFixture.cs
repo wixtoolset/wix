@@ -28,7 +28,7 @@ namespace WixToolsetTest.Converters
                 File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
 
                 var messaging = new MockMessaging();
-                var converter = new Wix3Converter(messaging, 4);
+                var converter = new WixConverter(messaging, 4);
                 var errors = converter.ConvertFile(targetFile, true);
 
                 Assert.Equal(8, errors);
@@ -55,7 +55,7 @@ namespace WixToolsetTest.Converters
                 File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
 
                 var messaging = new MockMessaging();
-                var converter = new Wix3Converter(messaging, 4);
+                var converter = new WixConverter(messaging, 4);
                 var errors = converter.ConvertFile(targetFile, true);
 
                 Assert.Equal(7, errors);
@@ -164,7 +164,7 @@ namespace WixToolsetTest.Converters
         private static void EnsureFixed(string targetFile)
         {
             var messaging2 = new MockMessaging();
-            var converter2 = new Wix3Converter(messaging2, 4);
+            var converter2 = new WixConverter(messaging2, 4);
             var errors2 = converter2.ConvertFile(targetFile, true);
             Assert.Equal(0, errors2);
         }

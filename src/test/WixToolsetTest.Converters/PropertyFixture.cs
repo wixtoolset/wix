@@ -32,7 +32,7 @@ namespace WixToolsetTest.Converters
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
             var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
+            var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
 
@@ -66,7 +66,7 @@ namespace WixToolsetTest.Converters
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
             var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
+            var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
 
@@ -96,7 +96,7 @@ namespace WixToolsetTest.Converters
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
             var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
+            var converter = new WixConverter(messaging, 2, null, null);
             var errors = converter.ConvertDocument(document);
 
             var actual = UnformattedDocumentString(document);

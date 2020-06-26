@@ -17,7 +17,7 @@ namespace WixToolset.Converters
     /// <summary>
     /// WiX source code converter.
     /// </summary>
-    public class Wix3Converter
+    public class WixConverter
     {
         private static readonly Regex AddPrefix = new Regex(@"^[^a-zA-Z_]", RegexOptions.Compiled);
         private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}", RegexOptions.Compiled); // non 'words' and assorted valid characters
@@ -98,6 +98,18 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/2006/WixUnit", "http://wixtoolset.org/schemas/v4/wixunit" },
         };
 
+        private readonly static SortedSet<string> Wix3Namespaces = new SortedSet<string>
+        {
+            "http://schemas.microsoft.com/wix/2006/wi",
+            "http://schemas.microsoft.com/wix/2006/localization",
+        };
+
+        private readonly static SortedSet<string> Wix4Namespaces = new SortedSet<string>
+        {
+            "http://wixtoolset.org/schemas/v4/wxs",
+            "http://wixtoolset.org/schemas/v4/wxl",
+        };
+
         private readonly Dictionary<XName, Action<XElement>> ConvertElementMapping;
 
         /// <summary>
@@ -106,48 +118,48 @@ namespace WixToolset.Converters
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="errorsAsWarnings">Test errors to display as warnings.</param>
         /// <param name="ignoreErrors">Test errors to ignore.</param>
-        public Wix3Converter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
+        public WixConverter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
-                { Wix3Converter.AdminExecuteSequenceElementName, this.ConvertSequenceElement },
-                { Wix3Converter.AdminUISequenceSequenceElementName, this.ConvertSequenceElement },
-                { Wix3Converter.AdvertiseExecuteSequenceElementName, this.ConvertSequenceElement },
-                { Wix3Converter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
-                { Wix3Converter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
-                { Wix3Converter.ColumnElementName, this.ConvertColumnElement },
-                { Wix3Converter.CustomTableElementName, this.ConvertCustomTableElement },
-                { Wix3Converter.ControlElementName, this.ConvertControlElement },
-                { Wix3Converter.ComponentElementName, this.ConvertComponentElement },
-                { Wix3Converter.DirectoryElementName, this.ConvertDirectoryElement },
-                { Wix3Converter.FeatureElementName, this.ConvertFeatureElement },
-                { Wix3Converter.FileElementName, this.ConvertFileElement },
-                { Wix3Converter.FragmentElementName, this.ConvertFragmentElement },
-                { Wix3Converter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
-                { Wix3Converter.ErrorElementName, this.ConvertErrorElement },
-                { Wix3Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
-                { Wix3Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Wix3Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Wix3Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Wix3Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
-                { Wix3Converter.PermissionExElementName, this.ConvertPermissionExElement },
-                { Wix3Converter.ProductElementName, this.ConvertProductElement },
-                { Wix3Converter.ProgressTextElementName, this.ConvertProgressTextElement },
-                { Wix3Converter.PublishElementName, this.ConvertPublishElement },
-                { Wix3Converter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
-                { Wix3Converter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
-                { Wix3Converter.RowElementName, this.ConvertRowElement },
-                { Wix3Converter.CustomActionElementName, this.ConvertCustomActionElement },
-                { Wix3Converter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
-                { Wix3Converter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
-                { Wix3Converter.SetPropertyElementName, this.ConvertSetPropertyElement },
-                { Wix3Converter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
-                { Wix3Converter.TextElementName, this.ConvertTextElement },
-                { Wix3Converter.UITextElementName, this.ConvertUITextElement },
-                { Wix3Converter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
-                { Wix3Converter.PropertyElementName, this.ConvertPropertyElement },
-                { Wix3Converter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
-                { Wix3Converter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
+                { WixConverter.AdminExecuteSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.AdminUISequenceSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.AdvertiseExecuteSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.ColumnElementName, this.ConvertColumnElement },
+                { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
+                { WixConverter.ControlElementName, this.ConvertControlElement },
+                { WixConverter.ComponentElementName, this.ConvertComponentElement },
+                { WixConverter.DirectoryElementName, this.ConvertDirectoryElement },
+                { WixConverter.FeatureElementName, this.ConvertFeatureElement },
+                { WixConverter.FileElementName, this.ConvertFileElement },
+                { WixConverter.FragmentElementName, this.ConvertFragmentElement },
+                { WixConverter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
+                { WixConverter.ErrorElementName, this.ConvertErrorElement },
+                { WixConverter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.PayloadElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.PermissionExElementName, this.ConvertPermissionExElement },
+                { WixConverter.ProductElementName, this.ConvertProductElement },
+                { WixConverter.ProgressTextElementName, this.ConvertProgressTextElement },
+                { WixConverter.PublishElementName, this.ConvertPublishElement },
+                { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
+                { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
+                { WixConverter.RowElementName, this.ConvertRowElement },
+                { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
+                { WixConverter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
+                { WixConverter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
+                { WixConverter.SetPropertyElementName, this.ConvertSetPropertyElement },
+                { WixConverter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
+                { WixConverter.TextElementName, this.ConvertTextElement },
+                { WixConverter.UITextElementName, this.ConvertUITextElement },
+                { WixConverter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
+                { WixConverter.PropertyElementName, this.ConvertPropertyElement },
+                { WixConverter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
+                { WixConverter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
             };
 
             this.Messaging = messaging;
@@ -171,6 +183,8 @@ namespace WixToolset.Converters
 
         private string SourceFile { get; set; }
 
+        private int SourceVersion { get; set; }
+
         /// <summary>
         /// Convert a file.
         /// </summary>
@@ -184,6 +198,7 @@ namespace WixToolset.Converters
             // Set the instance info.
             this.Errors = 0;
             this.SourceFile = sourceFile;
+            this.SourceVersion = 0;
 
             try
             {
@@ -225,6 +240,7 @@ namespace WixToolset.Converters
         public int ConvertDocument(XDocument document)
         {
             this.Errors = 0;
+            this.SourceVersion = 0;
 
             var declaration = document.Declaration;
 
@@ -292,13 +308,13 @@ namespace WixToolset.Converters
 
         private void EnsurePrecedingWhitespaceCorrect(XText whitespace, XNode node, int level, ConverterTestType testType)
         {
-            if (!Wix3Converter.LeadingWhitespaceValid(this.IndentationAmount, level, whitespace.Value))
+            if (!WixConverter.LeadingWhitespaceValid(this.IndentationAmount, level, whitespace.Value))
             {
                 var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
 
                 if (this.OnError(testType, node, message))
                 {
-                    Wix3Converter.FixupWhitespace(this.IndentationAmount, level, whitespace);
+                    WixConverter.FixupWhitespace(this.IndentationAmount, level, whitespace);
                 }
             }
         }
@@ -323,8 +339,17 @@ namespace WixToolset.Converters
 
             foreach (var declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
             {
-                if (Wix3Converter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
+                if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
                 {
+                    if (Wix3Namespaces.Contains(declaration.Value))
+                    {
+                        this.SourceVersion = 3;
+                    }
+                    else if (Wix4Namespaces.Contains(declaration.Value))
+                    {
+                        this.SourceVersion = 4;
+                    }
+
                     if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
                     {
                         deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);
@@ -334,7 +359,7 @@ namespace WixToolset.Converters
 
             if (deprecatedToUpdatedNamespaces.Any())
             {
-                Wix3Converter.UpdateElementsWithDeprecatedNamespaces(element.DescendantsAndSelf(), deprecatedToUpdatedNamespaces);
+                WixConverter.UpdateElementsWithDeprecatedNamespaces(element.DescendantsAndSelf(), deprecatedToUpdatedNamespaces);
             }
 
             // Apply any specialized conversion actions.
@@ -457,7 +482,7 @@ namespace WixToolset.Converters
 
         private void ConvertFileElement(XElement element)
         {
-            if (null == element.Attribute("Id"))
+            if (this.SourceVersion < 4 && null == element.Attribute("Id"))
             {
                 var attribute = element.Attribute("Name");
 
@@ -470,7 +495,7 @@ namespace WixToolset.Converters
                 {
                     var name = Path.GetFileName(attribute.Value);
 
-                    if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the default", name))
+                    if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the v3 default", name))
                     {
                         IEnumerable<XAttribute> attributes = element.Attributes().ToList();
                         element.RemoveAttributes();
@@ -669,7 +694,7 @@ namespace WixToolset.Converters
 
         private void ConvertUtilPermissionExElement(XElement element)
         {
-            if (null == element.Attribute("Inheritable"))
+            if (this.SourceVersion < 4 && null == element.Attribute("Inheritable"))
             {
                 var inheritable = element.Parent.Name == CreateFolderElementName;
                 if (!inheritable)

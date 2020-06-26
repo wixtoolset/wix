@@ -133,7 +133,7 @@ namespace WixToolset.Converters
                 }
             }
 
-            var converter = new Wix3Converter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
+            var converter = new WixConverter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
 
             var errors = this.InspectSubDirectories(converter, Path.GetFullPath("."), cancellationToken);
 
@@ -204,7 +204,7 @@ namespace WixToolset.Converters
         /// </summary>
         /// <param name="directory">The directory whose sub-directories will be inspected.</param>
         /// <returns>The number of errors that were found.</returns>
-        private int InspectSubDirectories(Wix3Converter converter, string directory, CancellationToken cancellationToken)
+        private int InspectSubDirectories(WixConverter converter, string directory, CancellationToken cancellationToken)
         {
             var errors = 0;
 
