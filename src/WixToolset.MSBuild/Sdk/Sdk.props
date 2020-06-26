@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <TargetFramework Condition=" '$(TargetFramework)' == '' ">netstandard2.0</TargetFramework>
     <EnableDefaultItems Condition=" '$(EnableDefaultItems)' == '' ">true</EnableDefaultItems>
     <EnableDefaultCompileItems Condition=" '$(EnableDefaultCompileItems)' == '' ">true</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems Condition=" '$(EnableDefaultEmbeddedResourceItems)' == '' ">true</EnableDefaultEmbeddedResourceItems>
