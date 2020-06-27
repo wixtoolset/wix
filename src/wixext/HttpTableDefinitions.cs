@@ -8,7 +8,7 @@ namespace WixToolset.Http
     {
         public static readonly TableDefinition WixHttpUrlReservation = new TableDefinition(
             "WixHttpUrlReservation",
-            HttpTupleDefinitions.WixHttpUrlReservation,
+            HttpSymbolDefinitions.WixHttpUrlReservation,
             new[]
             {
                 new ColumnDefinition("WixHttpUrlReservation", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -17,12 +17,12 @@ namespace WixToolset.Http
                 new ColumnDefinition("Url", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "URL to be reserved.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing the component that controls the URL reservation.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition WixHttpUrlAce = new TableDefinition(
             "WixHttpUrlAce",
-            HttpTupleDefinitions.WixHttpUrlAce,
+            HttpSymbolDefinitions.WixHttpUrlAce,
             new[]
             {
                 new ColumnDefinition("WixHttpUrlAce", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -30,7 +30,7 @@ namespace WixToolset.Http
                 new ColumnDefinition("SecurityPrincipal", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "The security principal for this ACE.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Rights", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1073741824, description: "The rights for this ACE."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[]

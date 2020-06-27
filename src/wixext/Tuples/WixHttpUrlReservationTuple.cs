@@ -3,28 +3,28 @@
 namespace WixToolset.Http
 {
     using WixToolset.Data;
-    using WixToolset.Http.Tuples;
+    using WixToolset.Http.Symbols;
 
-    public static partial class HttpTupleDefinitions
+    public static partial class HttpSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixHttpUrlReservation = new IntermediateTupleDefinition(
-            HttpTupleDefinitionType.WixHttpUrlReservation.ToString(),
+        public static readonly IntermediateSymbolDefinition WixHttpUrlReservation = new IntermediateSymbolDefinition(
+            HttpSymbolDefinitionType.WixHttpUrlReservation.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.HandleExisting), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.Sddl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.Url), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationSymbolFields.HandleExisting), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationSymbolFields.Sddl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationSymbolFields.Url), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(WixHttpUrlReservationTuple));
+            typeof(WixHttpUrlReservationSymbol));
     }
 }
 
-namespace WixToolset.Http.Tuples
+namespace WixToolset.Http.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixHttpUrlReservationTupleFields
+    public enum WixHttpUrlReservationSymbolFields
     {
         HandleExisting,
         Sddl,
@@ -32,40 +32,40 @@ namespace WixToolset.Http.Tuples
         ComponentRef,
     }
 
-    public class WixHttpUrlReservationTuple : IntermediateTuple
+    public class WixHttpUrlReservationSymbol : IntermediateSymbol
     {
-        public WixHttpUrlReservationTuple() : base(HttpTupleDefinitions.WixHttpUrlReservation, null, null)
+        public WixHttpUrlReservationSymbol() : base(HttpSymbolDefinitions.WixHttpUrlReservation, null, null)
         {
         }
 
-        public WixHttpUrlReservationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(HttpTupleDefinitions.WixHttpUrlReservation, sourceLineNumber, id)
+        public WixHttpUrlReservationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(HttpSymbolDefinitions.WixHttpUrlReservation, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixHttpUrlReservationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixHttpUrlReservationSymbolFields index] => this.Fields[(int)index];
 
         public int HandleExisting
         {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.HandleExisting].AsNumber();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.HandleExisting, value);
+            get => this.Fields[(int)WixHttpUrlReservationSymbolFields.HandleExisting].AsNumber();
+            set => this.Set((int)WixHttpUrlReservationSymbolFields.HandleExisting, value);
         }
 
         public string Sddl
         {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.Sddl].AsString();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.Sddl, value);
+            get => this.Fields[(int)WixHttpUrlReservationSymbolFields.Sddl].AsString();
+            set => this.Set((int)WixHttpUrlReservationSymbolFields.Sddl, value);
         }
 
         public string Url
         {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.Url].AsString();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.Url, value);
+            get => this.Fields[(int)WixHttpUrlReservationSymbolFields.Url].AsString();
+            set => this.Set((int)WixHttpUrlReservationSymbolFields.Url, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.ComponentRef].AsString();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.ComponentRef, value);
+            get => this.Fields[(int)WixHttpUrlReservationSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)WixHttpUrlReservationSymbolFields.ComponentRef, value);
         }
     }
 }

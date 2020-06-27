@@ -7,7 +7,7 @@ namespace WixToolset.Http
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Http.Tuples;
+    using WixToolset.Http.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset Http Extension.
@@ -169,7 +169,7 @@ namespace WixToolset.Http
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixHttpUrlReservationTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixHttpUrlReservationSymbol(sourceLineNumbers, id)
                 {
                     HandleExisting = handleExisting,
                     Sddl = sddl,
@@ -180,14 +180,14 @@ namespace WixToolset.Http
                 if (this.Context.Platform == Platform.ARM)
                 {
                     // Ensure ARM version of the CA is referenced.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall_ARM");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall_ARM");
                 }
                 else
                 {
                     // All other supported platforms use x86.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall");
                 }
             }
         }
@@ -205,7 +205,7 @@ namespace WixToolset.Http
             var securityPrincipal = defaultSecurityPrincipal;
             var rights = HttpConstants.GENERIC_ALL;
             string rightsValue = null;
-            
+
             foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
@@ -263,7 +263,7 @@ namespace WixToolset.Http
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixHttpUrlAceTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixHttpUrlAceSymbol(sourceLineNumbers, id)
                 {
                     WixHttpUrlReservationRef = urlReservationId,
                     SecurityPrincipal = securityPrincipal,
