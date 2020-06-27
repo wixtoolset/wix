@@ -3,32 +3,32 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition Certificate = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.Certificate.ToString(),
+        public static readonly IntermediateSymbolDefinition Certificate = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.Certificate.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.StoreLocation), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.StoreName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.BinaryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.CertificatePath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.PFXPassword), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.StoreLocation), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.StoreName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.BinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.CertificatePath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateSymbolFields.PFXPassword), IntermediateFieldType.String),
             },
-            typeof(CertificateTuple));
+            typeof(CertificateSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum CertificateTupleFields
+    public enum CertificateSymbolFields
     {
         ComponentRef,
         Name,
@@ -40,64 +40,64 @@ namespace WixToolset.Iis.Tuples
         PFXPassword,
     }
 
-    public class CertificateTuple : IntermediateTuple
+    public class CertificateSymbol : IntermediateSymbol
     {
-        public CertificateTuple() : base(IisTupleDefinitions.Certificate, null, null)
+        public CertificateSymbol() : base(IisSymbolDefinitions.Certificate, null, null)
         {
         }
 
-        public CertificateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.Certificate, sourceLineNumber, id)
+        public CertificateSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.Certificate, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CertificateTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CertificateSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)CertificateTupleFields.ComponentRef].AsString();
-            set => this.Set((int)CertificateTupleFields.ComponentRef, value);
+            get => this.Fields[(int)CertificateSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)CertificateSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)CertificateTupleFields.Name].AsString();
-            set => this.Set((int)CertificateTupleFields.Name, value);
+            get => this.Fields[(int)CertificateSymbolFields.Name].AsString();
+            set => this.Set((int)CertificateSymbolFields.Name, value);
         }
 
         public int StoreLocation
         {
-            get => this.Fields[(int)CertificateTupleFields.StoreLocation].AsNumber();
-            set => this.Set((int)CertificateTupleFields.StoreLocation, value);
+            get => this.Fields[(int)CertificateSymbolFields.StoreLocation].AsNumber();
+            set => this.Set((int)CertificateSymbolFields.StoreLocation, value);
         }
 
         public string StoreName
         {
-            get => this.Fields[(int)CertificateTupleFields.StoreName].AsString();
-            set => this.Set((int)CertificateTupleFields.StoreName, value);
+            get => this.Fields[(int)CertificateSymbolFields.StoreName].AsString();
+            set => this.Set((int)CertificateSymbolFields.StoreName, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)CertificateTupleFields.Attributes].AsNumber();
-            set => this.Set((int)CertificateTupleFields.Attributes, value);
+            get => this.Fields[(int)CertificateSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)CertificateSymbolFields.Attributes, value);
         }
 
         public string BinaryRef
         {
-            get => this.Fields[(int)CertificateTupleFields.BinaryRef].AsString();
-            set => this.Set((int)CertificateTupleFields.BinaryRef, value);
+            get => this.Fields[(int)CertificateSymbolFields.BinaryRef].AsString();
+            set => this.Set((int)CertificateSymbolFields.BinaryRef, value);
         }
 
         public string CertificatePath
         {
-            get => this.Fields[(int)CertificateTupleFields.CertificatePath].AsString();
-            set => this.Set((int)CertificateTupleFields.CertificatePath, value);
+            get => this.Fields[(int)CertificateSymbolFields.CertificatePath].AsString();
+            set => this.Set((int)CertificateSymbolFields.CertificatePath, value);
         }
 
         public string PFXPassword
         {
-            get => this.Fields[(int)CertificateTupleFields.PFXPassword].AsString();
-            set => this.Set((int)CertificateTupleFields.PFXPassword, value);
+            get => this.Fields[(int)CertificateSymbolFields.PFXPassword].AsString();
+            set => this.Set((int)CertificateSymbolFields.PFXPassword, value);
         }
     }
 }

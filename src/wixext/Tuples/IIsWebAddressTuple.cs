@@ -3,29 +3,29 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsWebAddress = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsWebAddress.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsWebAddress = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsWebAddress.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.WebRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.IP), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Port), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Header), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Secure), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressSymbolFields.WebRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressSymbolFields.IP), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressSymbolFields.Port), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressSymbolFields.Header), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressSymbolFields.Secure), IntermediateFieldType.Number),
             },
-            typeof(IIsWebAddressTuple));
+            typeof(IIsWebAddressSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsWebAddressTupleFields
+    public enum IIsWebAddressSymbolFields
     {
         WebRef,
         IP,
@@ -34,46 +34,46 @@ namespace WixToolset.Iis.Tuples
         Secure,
     }
 
-    public class IIsWebAddressTuple : IntermediateTuple
+    public class IIsWebAddressSymbol : IntermediateSymbol
     {
-        public IIsWebAddressTuple() : base(IisTupleDefinitions.IIsWebAddress, null, null)
+        public IIsWebAddressSymbol() : base(IisSymbolDefinitions.IIsWebAddress, null, null)
         {
         }
 
-        public IIsWebAddressTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsWebAddress, sourceLineNumber, id)
+        public IIsWebAddressSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsWebAddress, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsWebAddressTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsWebAddressSymbolFields index] => this.Fields[(int)index];
 
         public string WebRef
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.WebRef].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.WebRef, value);
+            get => this.Fields[(int)IIsWebAddressSymbolFields.WebRef].AsString();
+            set => this.Set((int)IIsWebAddressSymbolFields.WebRef, value);
         }
 
         public string IP
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.IP].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.IP, value);
+            get => this.Fields[(int)IIsWebAddressSymbolFields.IP].AsString();
+            set => this.Set((int)IIsWebAddressSymbolFields.IP, value);
         }
 
         public string Port
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Port].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.Port, value);
+            get => this.Fields[(int)IIsWebAddressSymbolFields.Port].AsString();
+            set => this.Set((int)IIsWebAddressSymbolFields.Port, value);
         }
 
         public string Header
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Header].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.Header, value);
+            get => this.Fields[(int)IIsWebAddressSymbolFields.Header].AsString();
+            set => this.Set((int)IIsWebAddressSymbolFields.Header, value);
         }
 
         public int? Secure
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Secure].AsNullableNumber();
-            set => this.Set((int)IIsWebAddressTupleFields.Secure, value);
+            get => this.Fields[(int)IIsWebAddressSymbolFields.Secure].AsNullableNumber();
+            set => this.Set((int)IIsWebAddressSymbolFields.Secure, value);
         }
     }
 }

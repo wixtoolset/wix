@@ -3,38 +3,38 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsWebDirProperties = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsWebDirProperties.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsWebDirProperties = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsWebDirProperties.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Access), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Authorization), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AnonymousUserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.IIsControlledPassword), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.LogVisits), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Index), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.DefaultDoc), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AspDetailedError), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.HttpExpires), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.CacheControlMaxAge), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.CacheControlCustom), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.NoCustomError), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AccessSSLFlags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AuthenticationProviders), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.Access), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.Authorization), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AnonymousUserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.IIsControlledPassword), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.LogVisits), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.Index), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.DefaultDoc), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AspDetailedError), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.HttpExpires), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.CacheControlMaxAge), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.CacheControlCustom), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.NoCustomError), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AccessSSLFlags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AuthenticationProviders), IntermediateFieldType.String),
             },
-            typeof(IIsWebDirPropertiesTuple));
+            typeof(IIsWebDirPropertiesSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsWebDirPropertiesTupleFields
+    public enum IIsWebDirPropertiesSymbolFields
     {
         Access,
         Authorization,
@@ -52,100 +52,100 @@ namespace WixToolset.Iis.Tuples
         AuthenticationProviders,
     }
 
-    public class IIsWebDirPropertiesTuple : IntermediateTuple
+    public class IIsWebDirPropertiesSymbol : IntermediateSymbol
     {
-        public IIsWebDirPropertiesTuple() : base(IisTupleDefinitions.IIsWebDirProperties, null, null)
+        public IIsWebDirPropertiesSymbol() : base(IisSymbolDefinitions.IIsWebDirProperties, null, null)
         {
         }
 
-        public IIsWebDirPropertiesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsWebDirProperties, sourceLineNumber, id)
+        public IIsWebDirPropertiesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsWebDirProperties, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsWebDirPropertiesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsWebDirPropertiesSymbolFields index] => this.Fields[(int)index];
 
         public int? Access
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Access].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.Access, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.Access].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.Access, value);
         }
 
         public int? Authorization
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Authorization].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.Authorization, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.Authorization].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.Authorization, value);
         }
 
         public string AnonymousUserRef
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AnonymousUserRef].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.AnonymousUserRef, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.AnonymousUserRef].AsString();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.AnonymousUserRef, value);
         }
 
         public int? IIsControlledPassword
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.IIsControlledPassword].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.IIsControlledPassword, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.IIsControlledPassword].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.IIsControlledPassword, value);
         }
 
         public int? LogVisits
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.LogVisits].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.LogVisits, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.LogVisits].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.LogVisits, value);
         }
 
         public int? Index
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Index].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.Index, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.Index].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.Index, value);
         }
 
         public string DefaultDoc
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.DefaultDoc].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.DefaultDoc, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.DefaultDoc].AsString();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.DefaultDoc, value);
         }
 
         public int? AspDetailedError
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AspDetailedError].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.AspDetailedError, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.AspDetailedError].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.AspDetailedError, value);
         }
 
         public string HttpExpires
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.HttpExpires].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.HttpExpires, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.HttpExpires].AsString();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.HttpExpires, value);
         }
 
         public int? CacheControlMaxAge
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.CacheControlMaxAge].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.CacheControlMaxAge, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.CacheControlMaxAge].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.CacheControlMaxAge, value);
         }
 
         public string CacheControlCustom
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.CacheControlCustom].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.CacheControlCustom, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.CacheControlCustom].AsString();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.CacheControlCustom, value);
         }
 
         public int? NoCustomError
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.NoCustomError].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.NoCustomError, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.NoCustomError].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.NoCustomError, value);
         }
 
         public int? AccessSSLFlags
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AccessSSLFlags].AsNullableNumber();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.AccessSSLFlags, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.AccessSSLFlags].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.AccessSSLFlags, value);
         }
 
         public string AuthenticationProviders
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AuthenticationProviders].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.AuthenticationProviders, value);
+            get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.AuthenticationProviders].AsString();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.AuthenticationProviders, value);
         }
     }
 }

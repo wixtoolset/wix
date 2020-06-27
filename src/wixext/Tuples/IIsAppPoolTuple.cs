@@ -3,39 +3,39 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsAppPool = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsAppPool.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsAppPool = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsAppPool.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.UserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleMinutes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleRequests), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleTimes), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.IdleTimeout), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.QueueLimit), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.CPUMon), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.MaxProc), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.VirtualMemory), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.PrivateMemory), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.ManagedRuntimeVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.ManagedPipelineMode), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.RecycleMinutes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.RecycleRequests), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.RecycleTimes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.IdleTimeout), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.QueueLimit), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.CPUMon), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.MaxProc), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.VirtualMemory), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.PrivateMemory), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.ManagedRuntimeVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolSymbolFields.ManagedPipelineMode), IntermediateFieldType.String),
             },
-            typeof(IIsAppPoolTuple));
+            typeof(IIsAppPoolSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsAppPoolTupleFields
+    public enum IIsAppPoolSymbolFields
     {
         Name,
         ComponentRef,
@@ -54,106 +54,106 @@ namespace WixToolset.Iis.Tuples
         ManagedPipelineMode,
     }
 
-    public class IIsAppPoolTuple : IntermediateTuple
+    public class IIsAppPoolSymbol : IntermediateSymbol
     {
-        public IIsAppPoolTuple() : base(IisTupleDefinitions.IIsAppPool, null, null)
+        public IIsAppPoolSymbol() : base(IisSymbolDefinitions.IIsAppPool, null, null)
         {
         }
 
-        public IIsAppPoolTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsAppPool, sourceLineNumber, id)
+        public IIsAppPoolSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsAppPool, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsAppPoolTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsAppPoolSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.Name].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.Name, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.Name].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.Name, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.ComponentRef].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.ComponentRef, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.ComponentRef, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.Attributes].AsNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.Attributes, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.Attributes, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.UserRef].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.UserRef, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.UserRef].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.UserRef, value);
         }
 
         public int? RecycleMinutes
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleMinutes].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.RecycleMinutes, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.RecycleMinutes].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.RecycleMinutes, value);
         }
 
         public int? RecycleRequests
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleRequests].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.RecycleRequests, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.RecycleRequests].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.RecycleRequests, value);
         }
 
         public string RecycleTimes
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleTimes].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.RecycleTimes, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.RecycleTimes].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.RecycleTimes, value);
         }
 
         public int? IdleTimeout
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.IdleTimeout].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.IdleTimeout, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.IdleTimeout].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.IdleTimeout, value);
         }
 
         public int? QueueLimit
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.QueueLimit].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.QueueLimit, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.QueueLimit].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.QueueLimit, value);
         }
 
         public string CPUMon
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.CPUMon].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.CPUMon, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.CPUMon].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.CPUMon, value);
         }
 
         public int? MaxProc
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.MaxProc].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.MaxProc, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.MaxProc].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.MaxProc, value);
         }
 
         public int? VirtualMemory
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.VirtualMemory].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.VirtualMemory, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.VirtualMemory].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.VirtualMemory, value);
         }
 
         public int? PrivateMemory
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.PrivateMemory].AsNullableNumber();
-            set => this.Set((int)IIsAppPoolTupleFields.PrivateMemory, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.PrivateMemory].AsNullableNumber();
+            set => this.Set((int)IIsAppPoolSymbolFields.PrivateMemory, value);
         }
 
         public string ManagedRuntimeVersion
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.ManagedRuntimeVersion].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.ManagedRuntimeVersion, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.ManagedRuntimeVersion].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.ManagedRuntimeVersion, value);
         }
 
         public string ManagedPipelineMode
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.ManagedPipelineMode].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.ManagedPipelineMode, value);
+            get => this.Fields[(int)IIsAppPoolSymbolFields.ManagedPipelineMode].AsString();
+            set => this.Set((int)IIsAppPoolSymbolFields.ManagedPipelineMode, value);
         }
     }
 }

@@ -3,45 +3,45 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsWebLog = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsWebLog.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsWebLog = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsWebLog.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebLogTupleFields.Format), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebLogSymbolFields.Format), IntermediateFieldType.String),
             },
-            typeof(IIsWebLogTuple));
+            typeof(IIsWebLogSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsWebLogTupleFields
+    public enum IIsWebLogSymbolFields
     {
         Format,
     }
 
-    public class IIsWebLogTuple : IntermediateTuple
+    public class IIsWebLogSymbol : IntermediateSymbol
     {
-        public IIsWebLogTuple() : base(IisTupleDefinitions.IIsWebLog, null, null)
+        public IIsWebLogSymbol() : base(IisSymbolDefinitions.IIsWebLog, null, null)
         {
         }
 
-        public IIsWebLogTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsWebLog, sourceLineNumber, id)
+        public IIsWebLogSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsWebLog, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsWebLogTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsWebLogSymbolFields index] => this.Fields[(int)index];
 
         public string Format
         {
-            get => this.Fields[(int)IIsWebLogTupleFields.Format].AsString();
-            set => this.Set((int)IIsWebLogTupleFields.Format, value);
+            get => this.Fields[(int)IIsWebLogSymbolFields.Format].AsString();
+            set => this.Set((int)IIsWebLogSymbolFields.Format, value);
         }
     }
 }

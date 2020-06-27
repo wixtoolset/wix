@@ -8,7 +8,7 @@ namespace WixToolset.Iis
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset Internet Information Services Extension.
@@ -159,7 +159,7 @@ namespace WixToolset.Iis
                         case "BinaryKey":
                             attributes |= 2; // SCA_CERT_ATTRIBUTE_BINARYDATA
                             binaryKey = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binaryKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binaryKey);
                             break;
                         case "CertificatePath":
                             certificatePath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -287,13 +287,13 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallCertificates and UninstallCertificates since nothing will happen without them
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "InstallCertificates");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "UninstallCertificates");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "InstallCertificates");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "UninstallCertificates");
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, IisTableDefinitions.CertificateHash); // Certificate CustomActions require the CertificateHash table
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new CertificateTuple(sourceLineNumbers, id)
+                section.AddSymbol(new CertificateSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -325,7 +325,7 @@ namespace WixToolset.Iis
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.Certificate, id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.Certificate, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -347,9 +347,9 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.Certificate, id.Id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.Certificate, id.Id);
 
-                section.AddTuple(new IIsWebSiteCertificatesTuple(sourceLineNumbers)
+                section.AddSymbol(new IIsWebSiteCertificatesSymbol(sourceLineNumbers)
                 {
                     WebRef = webId,
                     CertificateRef = id.Id,
@@ -422,7 +422,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsMimeMapTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsMimeMapSymbol(sourceLineNumbers, id)
                 {
                     ParentType = (int)parentType,
                     ParentValue = parentId,
@@ -533,7 +533,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebAddressTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsWebAddressSymbol(sourceLineNumbers, id)
                 {
                     WebRef = parentWeb,
                     IP = ip,
@@ -639,7 +639,7 @@ namespace WixToolset.Iis
                             break;
                         case "WebAppPool":
                             appPool = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsAppPool, appPool);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsAppPool, appPool);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -688,7 +688,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsWebApplicationTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new IIsWebApplicationSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     Isolation = isolation,
@@ -698,37 +698,37 @@ namespace WixToolset.Iis
 
                 if (YesNoDefaultType.Default != allowSessions)
                 {
-                    tuple.AllowSessions = YesNoDefaultType.Yes == allowSessions ? 1 : 0;
+                    symbol.AllowSessions = YesNoDefaultType.Yes == allowSessions ? 1 : 0;
                 }
 
                 if (CompilerConstants.IntegerNotSet != sessionTimeout)
                 {
-                    tuple.SessionTimeout = sessionTimeout;
+                    symbol.SessionTimeout = sessionTimeout;
                 }
 
                 if (YesNoDefaultType.Default != buffer)
                 {
-                    tuple.Buffer = YesNoDefaultType.Yes == buffer ? 1 : 0;
+                    symbol.Buffer = YesNoDefaultType.Yes == buffer ? 1 : 0;
                 }
 
                 if (YesNoDefaultType.Default != parentPaths)
                 {
-                    tuple.ParentPaths = YesNoDefaultType.Yes == parentPaths ? 1 : 0;
+                    symbol.ParentPaths = YesNoDefaultType.Yes == parentPaths ? 1 : 0;
                 }
 
                 if (CompilerConstants.IntegerNotSet != scriptTimeout)
                 {
-                    tuple.ScriptTimeout = scriptTimeout;
+                    symbol.ScriptTimeout = scriptTimeout;
                 }
 
                 if (YesNoDefaultType.Default != serverDebugging)
                 {
-                    tuple.ServerDebugging = YesNoDefaultType.Yes == serverDebugging ? 1 : 0;
+                    symbol.ServerDebugging = YesNoDefaultType.Yes == serverDebugging ? 1 : 0;
                 }
 
                 if (YesNoDefaultType.Default != clientDebugging)
                 {
-                    tuple.ClientDebugging = YesNoDefaultType.Yes == clientDebugging ? 1 : 0;
+                    symbol.ClientDebugging = YesNoDefaultType.Yes == clientDebugging ? 1 : 0;
                 }
             }
 
@@ -798,7 +798,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsWebApplicationExtensionTuple(sourceLineNumbers)
+                var symbol = section.AddSymbol(new IIsWebApplicationExtensionSymbol(sourceLineNumbers)
                 {
                     ApplicationRef = application,
                     Extension = extension,
@@ -808,7 +808,7 @@ namespace WixToolset.Iis
 
                 if (0 < attributes)
                 {
-                    tuple.Attributes = attributes;
+                    symbol.Attributes = attributes;
                 }
             }
         }
@@ -925,7 +925,7 @@ namespace WixToolset.Iis
                             {
                                 switch (managedPipelineMode)
                                 {
-                                    // In 3.5 we allowed lower case values (per camel case enum style), we now use formatted fields, 
+                                    // In 3.5 we allowed lower case values (per camel case enum style), we now use formatted fields,
                                     // so the value needs to match exactly what we pass in to IIS which uses pascal case.
                                     case "classic":
                                         managedPipelineMode = "Classic";
@@ -1113,7 +1113,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsAppPoolTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new IIsAppPoolSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     ComponentRef = componentId,
@@ -1127,37 +1127,37 @@ namespace WixToolset.Iis
 
                 if (CompilerConstants.IntegerNotSet != recycleMinutes)
                 {
-                    tuple.RecycleMinutes = recycleMinutes;
+                    symbol.RecycleMinutes = recycleMinutes;
                 }
 
                 if (CompilerConstants.IntegerNotSet != recycleRequests)
                 {
-                    tuple.RecycleRequests = recycleRequests;
+                    symbol.RecycleRequests = recycleRequests;
                 }
 
                 if (CompilerConstants.IntegerNotSet != idleTimeout)
                 {
-                    tuple.IdleTimeout = idleTimeout;
+                    symbol.IdleTimeout = idleTimeout;
                 }
 
                 if (CompilerConstants.IntegerNotSet != queueLimit)
                 {
-                    tuple.QueueLimit = queueLimit;
+                    symbol.QueueLimit = queueLimit;
                 }
 
                 if (CompilerConstants.IntegerNotSet != maxWorkerProcs)
                 {
-                    tuple.MaxProc = maxWorkerProcs;
+                    symbol.MaxProc = maxWorkerProcs;
                 }
 
                 if (CompilerConstants.IntegerNotSet != virtualMemory)
                 {
-                    tuple.VirtualMemory = virtualMemory;
+                    symbol.VirtualMemory = virtualMemory;
                 }
 
                 if (CompilerConstants.IntegerNotSet != privateMemory)
                 {
-                    tuple.PrivateMemory = privateMemory;
+                    symbol.PrivateMemory = privateMemory;
                 }
             }
         }
@@ -1201,7 +1201,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1278,17 +1278,17 @@ namespace WixToolset.Iis
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebApplication, application);
             }
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebDirProperties, dirProperties);
 
             // Reference ConfigureIIs since nothing will happen without it
             this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebDirTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsWebDirSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     WebRef = parentWeb,
@@ -1557,7 +1557,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsWebDirPropertiesTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new IIsWebDirPropertiesSymbol(sourceLineNumbers, id)
                 {
                     AnonymousUserRef = anonymousUser,
                     IIsControlledPassword = iisControlledPassword ? 1 : 0,
@@ -1568,47 +1568,47 @@ namespace WixToolset.Iis
 
                 if (accessSet)
                 {
-                    tuple.Access = access;
+                    symbol.Access = access;
                 }
 
                 if (authorizationSet)
                 {
-                    tuple.Authorization = authorization;
+                    symbol.Authorization = authorization;
                 }
 
                 if (YesNoType.NotSet != logVisits)
                 {
-                    tuple.LogVisits = YesNoType.Yes == logVisits ? 1 : 0;
+                    symbol.LogVisits = YesNoType.Yes == logVisits ? 1 : 0;
                 }
 
                 if (YesNoType.NotSet != index)
                 {
-                    tuple.Index = YesNoType.Yes == index ? 1 : 0;
+                    symbol.Index = YesNoType.Yes == index ? 1 : 0;
                 }
 
                 if (YesNoType.NotSet != aspDetailedError)
                 {
-                    tuple.AspDetailedError = YesNoType.Yes == aspDetailedError ? 1 : 0;
+                    symbol.AspDetailedError = YesNoType.Yes == aspDetailedError ? 1 : 0;
                 }
 
                 if (CompilerConstants.LongNotSet != cacheControlMaxAge)
                 {
-                    tuple.CacheControlMaxAge = unchecked((int)cacheControlMaxAge);
+                    symbol.CacheControlMaxAge = unchecked((int)cacheControlMaxAge);
                 }
 
                 if (YesNoType.NotSet != notCustomError)
                 {
-                    tuple.NoCustomError = YesNoType.Yes == notCustomError ? 1 : 0;
+                    symbol.NoCustomError = YesNoType.Yes == notCustomError ? 1 : 0;
                 }
 
                 if (accessSSLFlagsSet)
                 {
-                    tuple.AccessSSLFlags = accessSSLFlags;
+                    symbol.AccessSSLFlags = accessSSLFlags;
                 }
 
                 if (null != authenticationProviders)
                 {
-                    tuple.AuthenticationProviders = authenticationProviders;
+                    symbol.AuthenticationProviders = authenticationProviders;
                 }
             }
 
@@ -1682,7 +1682,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebErrorTuple(sourceLineNumbers)
+                section.AddSymbol(new IIsWebErrorSymbol(sourceLineNumbers)
                 {
                     ErrorCode = errorCode,
                     SubCode = subCode,
@@ -1756,7 +1756,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1791,7 +1791,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsFilterTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new IIsFilterSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     ComponentRef = componentId,
@@ -1803,7 +1803,7 @@ namespace WixToolset.Iis
 
                 if (CompilerConstants.IntegerNotSet != loadOrder)
                 {
-                    tuple.LoadOrder = loadOrder;
+                    symbol.LoadOrder = loadOrder;
                 }
             }
         }
@@ -1879,7 +1879,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebLogTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsWebLogSymbol(sourceLineNumbers, id)
                 {
                     Format = type,
                 });
@@ -1950,7 +1950,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsPropertyTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsPropertySymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Attributes = 0,
@@ -2039,7 +2039,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebServiceExtensionTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsWebServiceExtensionSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     File = file,
@@ -2118,7 +2118,7 @@ namespace WixToolset.Iis
                             break;
                         case "Directory":
                             directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, directory);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, directory);
                             break;
                         case "DirProperties":
                             if (null == componentId)
@@ -2169,7 +2169,7 @@ namespace WixToolset.Iis
                             }
 
                             log = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebLog, log);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebLog, log);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -2310,12 +2310,12 @@ namespace WixToolset.Iis
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebApplication, application);
             }
 
             if (null != dirProperties)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebDirProperties, dirProperties);
             }
 
             if (null != componentId)
@@ -2326,7 +2326,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new IIsWebSiteTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new IIsWebSiteSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Description = description,
@@ -2340,22 +2340,22 @@ namespace WixToolset.Iis
 
                 if (CompilerConstants.IntegerNotSet != connectionTimeout)
                 {
-                    tuple.ConnectionTimeout = connectionTimeout;
+                    symbol.ConnectionTimeout = connectionTimeout;
                 }
 
                 if (CompilerConstants.IntegerNotSet != state)
                 {
-                    tuple.State = state;
+                    symbol.State = state;
                 }
 
                 if (0 != attributes)
                 {
-                    tuple.Attributes = attributes;
+                    symbol.Attributes = attributes;
                 }
 
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
         }
@@ -2415,7 +2415,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsHttpHeaderTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsHttpHeaderSymbol(sourceLineNumbers, id)
                 {
                     HttpHeader = id.Id,
                     ParentType = (int)parentType,
@@ -2457,7 +2457,7 @@ namespace WixToolset.Iis
                             break;
                         case "Directory":
                             directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, directory);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, directory);
                             break;
                         case "DirProperties":
                             dirProperties = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2472,7 +2472,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -2576,12 +2576,12 @@ namespace WixToolset.Iis
 
             if (null != dirProperties)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebDirProperties, dirProperties);
             }
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisSymbolDefinitions.IIsWebApplication, application);
             }
 
             // Reference ConfigureIIs since nothing will happen without it
@@ -2589,7 +2589,7 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new IIsWebVirtualDirTuple(sourceLineNumbers, id)
+                section.AddSymbol(new IIsWebVirtualDirSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     WebRef = parentWeb,
@@ -2603,7 +2603,7 @@ namespace WixToolset.Iis
 
         private void AddReferenceToConfigureIIs(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "ConfigureIIs");
         }
     }
 }

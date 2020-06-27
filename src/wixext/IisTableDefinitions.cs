@@ -8,7 +8,7 @@ namespace WixToolset.Iis
     {
         public static readonly TableDefinition Certificate = new TableDefinition(
             "Certificate",
-            IisTupleDefinitions.Certificate,
+            IisSymbolDefinitions.Certificate,
             new[]
             {
                 new ColumnDefinition("Certificate", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyColumn: 1, description: "Identifier for the certificate in the package.", modularizeType: ColumnModularizeType.Column),
@@ -21,34 +21,34 @@ namespace WixToolset.Iis
                 new ColumnDefinition("CertificatePath", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Property to path of certificate.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("PFXPassword", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Hidden property to a pfx password", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition CertificateHash = new TableDefinition(
             "CertificateHash",
-            IisTupleDefinitions.CertificateHash,
+            IisSymbolDefinitions.CertificateHash,
             new[]
             {
                 new ColumnDefinition("Certificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyColumn: 1, description: "Foreign key to certificate in Certificate table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Hash", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Base64 encoded SHA1 hash of certificate populated at run-time."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IIsWebSiteCertificates = new TableDefinition(
             "IIsWebSiteCertificates",
-            IisTupleDefinitions.IIsWebSiteCertificates,
+            IisSymbolDefinitions.IIsWebSiteCertificates,
             new[]
             {
                 new ColumnDefinition("Web_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebSite", keyColumn: 1, description: "The index into the IIsWebSite table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Certificate_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Text, keyTable: "Certificate", keyColumn: 1, description: "The index into the Certificate table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IIsAppPool = new TableDefinition(
             "IIsAppPool",
-            IisTupleDefinitions.IIsAppPool,
+            IisSymbolDefinitions.IIsAppPool,
             new[]
             {
                 new ColumnDefinition("AppPool", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token for apppool", modularizeType: ColumnModularizeType.Column),
@@ -68,12 +68,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("ManagedRuntimeVersion", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Specifies the .NET Framework version to be used by the application pool."),
                 new ColumnDefinition("ManagedPipelineMode", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Specifies the request-processing mode that is used to process requests for managed content."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsMimeMap = new TableDefinition(
             "IIsMimeMap",
-            IisTupleDefinitions.IIsMimeMap,
+            IisSymbolDefinitions.IIsMimeMap,
             new[]
             {
                 new ColumnDefinition("MimeMap", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token for Mime Map definitions", modularizeType: ColumnModularizeType.Column),
@@ -82,12 +82,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("MimeType", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Mime-type covered by the MimeMap."),
                 new ColumnDefinition("Extension", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Extension covered by the MimeMap."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsProperty = new TableDefinition(
             "IIsProperty",
-            IisTupleDefinitions.IIsProperty,
+            IisSymbolDefinitions.IIsProperty,
             new[]
             {
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Unique name of the IIsProperty"),
@@ -95,12 +95,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Attributes of the IIsProperty (unused)"),
                 new ColumnDefinition("Value", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Value of the IIsProperty"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebDirProperties = new TableDefinition(
             "IIsWebDirProperties",
-            IisTupleDefinitions.IIsWebDirProperties,
+            IisSymbolDefinitions.IIsWebDirProperties,
             new[]
             {
                 new ColumnDefinition("DirProperties", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token for Web Properties", modularizeType: ColumnModularizeType.Column),
@@ -119,12 +119,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("AccessSSLFlags", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Specifies AccessSSLFlags IIS metabase property."),
                 new ColumnDefinition("AuthenticationProviders", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Comma delimited list, in order of precedence, of Windows authentication providers that IIS will attempt to use: NTLM, Kerberos, Negotiate, and others."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebAddress = new TableDefinition(
             "IIsWebAddress",
-            IisTupleDefinitions.IIsWebAddress,
+            IisSymbolDefinitions.IIsWebAddress,
             new[]
             {
                 new ColumnDefinition("Address", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -134,12 +134,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Header", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Special header information for the web site"),
                 new ColumnDefinition("Secure", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether SSL is used to communicate with web site"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebSite = new TableDefinition(
             "IIsWebSite",
-            IisTupleDefinitions.IIsWebSite,
+            IisSymbolDefinitions.IIsWebSite,
             new[]
             {
                 new ColumnDefinition("Web", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -156,12 +156,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Log_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown, keyTable: "IIsWebLog", keyColumn: 1, description: "Foreign key reference to IIsWebLog data", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Id", ColumnType.String, 74, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Optional number or formatted value that resolves to number that acts as the WebSite Id."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebApplication = new TableDefinition(
             "IIsWebApplication",
-            IisTupleDefinitions.IIsWebApplication,
+            IisSymbolDefinitions.IIsWebApplication,
             new[]
             {
                 new ColumnDefinition("Application", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token for ASP Application", modularizeType: ColumnModularizeType.Column),
@@ -177,12 +177,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("ClientDebugging", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether to allow ASP client-side script debugging"),
                 new ColumnDefinition("AppPool_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsAppPool", keyColumn: 1, description: "App Pool this application should run under", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebApplicationExtension = new TableDefinition(
             "IIsWebApplicationExtension",
-            IisTupleDefinitions.IIsWebApplicationExtension,
+            IisSymbolDefinitions.IIsWebApplicationExtension,
             new[]
             {
                 new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the web site", modularizeType: ColumnModularizeType.Column),
@@ -191,12 +191,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Executable", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Path to extension (usually file property: [#file])", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "1;4;5", description: "Attributes for extension: 1 == Script, 4 == Check Path Info"),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IIsFilter = new TableDefinition(
             "IIsFilter",
-            IisTupleDefinitions.IIsFilter,
+            IisSymbolDefinitions.IIsFilter,
             new[]
             {
                 new ColumnDefinition("Filter", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -208,12 +208,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Flags", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "What do all these numbers mean?"),
                 new ColumnDefinition("LoadOrder", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "-1 == last in order, 0 == first in order, # == place in order"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebDir = new TableDefinition(
             "IIsWebDir",
-            IisTupleDefinitions.IIsWebDir,
+            IisSymbolDefinitions.IIsWebDir,
             new[]
             {
                 new ColumnDefinition("WebDir", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -223,12 +223,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory. This column is currently unused, but maintained for compatibility reasons.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebError = new TableDefinition(
             "IIsWebError",
-            IisTupleDefinitions.IIsWebError,
+            IisSymbolDefinitions.IIsWebError,
             new[]
             {
                 new ColumnDefinition("ErrorCode", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown, minValue: 400, maxValue: 599, description: "HTTP status code indicating error."),
@@ -238,12 +238,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("File", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Path to file for this custom error (usually file property: [#file]).  Must be null if URL is not null."),
                 new ColumnDefinition("URL", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "URL for this custom error.  Must be null if File is not null."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IIsHttpHeader = new TableDefinition(
             "IIsHttpHeader",
-            IisTupleDefinitions.IIsHttpHeader,
+            IisSymbolDefinitions.IIsHttpHeader,
             new[]
             {
                 new ColumnDefinition("HttpHeader", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -254,12 +254,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 0, description: "Attributes for HTTP Header: none"),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Order to add the HTTP Headers."),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition IIsWebServiceExtension = new TableDefinition(
             "IIsWebServiceExtension",
-            IisTupleDefinitions.IIsWebServiceExtension,
+            IisSymbolDefinitions.IIsWebServiceExtension,
             new[]
             {
                 new ColumnDefinition("WebServiceExtension", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -269,12 +269,12 @@ namespace WixToolset.Iis
                 new ColumnDefinition("Group", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "String used to identify groups of extensions.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 1, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 3, description: "Attributes for WebServiceExtension: 1 = Allow, 2 = UIDeletable"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebVirtualDir = new TableDefinition(
             "IIsWebVirtualDir",
-            IisTupleDefinitions.IIsWebVirtualDir,
+            IisSymbolDefinitions.IIsWebVirtualDir,
             new[]
             {
                 new ColumnDefinition("VirtualDir", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -285,18 +285,18 @@ namespace WixToolset.Iis
                 new ColumnDefinition("DirProperties_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebDirProperties", keyColumn: 1, description: "Foreign key referencing possible security information for the virtual directory", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "IIsWebApplication", keyColumn: 1, description: "Foreign key referencing possible ASP application for the virtual directory", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition IIsWebLog = new TableDefinition(
             "IIsWebLog",
-            IisTupleDefinitions.IIsWebLog,
+            IisSymbolDefinitions.IIsWebLog,
             new[]
             {
                 new ColumnDefinition("Log", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Format", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Type of log format"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[]

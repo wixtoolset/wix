@@ -5,7 +5,7 @@ namespace WixToolset.Iis
     using System;
     using WixToolset.Data;
 
-    public enum IisTupleDefinitionType
+    public enum IisSymbolDefinitionType
     {
         Certificate,
         CertificateHash,
@@ -27,13 +27,13 @@ namespace WixToolset.Iis
         IIsWebVirtualDir,
     }
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out IisTupleDefinitionType type))
+            if (!Enum.TryParse(name, out IisSymbolDefinitionType type))
             {
                 return null;
             }
@@ -41,63 +41,63 @@ namespace WixToolset.Iis
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(IisTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(IisSymbolDefinitionType type)
         {
             switch (type)
             {
-                case IisTupleDefinitionType.Certificate:
-                    return IisTupleDefinitions.Certificate;
+                case IisSymbolDefinitionType.Certificate:
+                    return IisSymbolDefinitions.Certificate;
 
-                case IisTupleDefinitionType.CertificateHash:
-                    return IisTupleDefinitions.CertificateHash;
+                case IisSymbolDefinitionType.CertificateHash:
+                    return IisSymbolDefinitions.CertificateHash;
 
-                case IisTupleDefinitionType.IIsAppPool:
-                    return IisTupleDefinitions.IIsAppPool;
+                case IisSymbolDefinitionType.IIsAppPool:
+                    return IisSymbolDefinitions.IIsAppPool;
 
-                case IisTupleDefinitionType.IIsFilter:
-                    return IisTupleDefinitions.IIsFilter;
+                case IisSymbolDefinitionType.IIsFilter:
+                    return IisSymbolDefinitions.IIsFilter;
 
-                case IisTupleDefinitionType.IIsHttpHeader:
-                    return IisTupleDefinitions.IIsHttpHeader;
+                case IisSymbolDefinitionType.IIsHttpHeader:
+                    return IisSymbolDefinitions.IIsHttpHeader;
 
-                case IisTupleDefinitionType.IIsMimeMap:
-                    return IisTupleDefinitions.IIsMimeMap;
+                case IisSymbolDefinitionType.IIsMimeMap:
+                    return IisSymbolDefinitions.IIsMimeMap;
 
-                case IisTupleDefinitionType.IIsProperty:
-                    return IisTupleDefinitions.IIsProperty;
+                case IisSymbolDefinitionType.IIsProperty:
+                    return IisSymbolDefinitions.IIsProperty;
 
-                case IisTupleDefinitionType.IIsWebAddress:
-                    return IisTupleDefinitions.IIsWebAddress;
+                case IisSymbolDefinitionType.IIsWebAddress:
+                    return IisSymbolDefinitions.IIsWebAddress;
 
-                case IisTupleDefinitionType.IIsWebApplication:
-                    return IisTupleDefinitions.IIsWebApplication;
+                case IisSymbolDefinitionType.IIsWebApplication:
+                    return IisSymbolDefinitions.IIsWebApplication;
 
-                case IisTupleDefinitionType.IIsWebApplicationExtension:
-                    return IisTupleDefinitions.IIsWebApplicationExtension;
+                case IisSymbolDefinitionType.IIsWebApplicationExtension:
+                    return IisSymbolDefinitions.IIsWebApplicationExtension;
 
-                case IisTupleDefinitionType.IIsWebDir:
-                    return IisTupleDefinitions.IIsWebDir;
+                case IisSymbolDefinitionType.IIsWebDir:
+                    return IisSymbolDefinitions.IIsWebDir;
 
-                case IisTupleDefinitionType.IIsWebDirProperties:
-                    return IisTupleDefinitions.IIsWebDirProperties;
+                case IisSymbolDefinitionType.IIsWebDirProperties:
+                    return IisSymbolDefinitions.IIsWebDirProperties;
 
-                case IisTupleDefinitionType.IIsWebError:
-                    return IisTupleDefinitions.IIsWebError;
+                case IisSymbolDefinitionType.IIsWebError:
+                    return IisSymbolDefinitions.IIsWebError;
 
-                case IisTupleDefinitionType.IIsWebLog:
-                    return IisTupleDefinitions.IIsWebLog;
+                case IisSymbolDefinitionType.IIsWebLog:
+                    return IisSymbolDefinitions.IIsWebLog;
 
-                case IisTupleDefinitionType.IIsWebServiceExtension:
-                    return IisTupleDefinitions.IIsWebServiceExtension;
+                case IisSymbolDefinitionType.IIsWebServiceExtension:
+                    return IisSymbolDefinitions.IIsWebServiceExtension;
 
-                case IisTupleDefinitionType.IIsWebSite:
-                    return IisTupleDefinitions.IIsWebSite;
+                case IisSymbolDefinitionType.IIsWebSite:
+                    return IisSymbolDefinitions.IIsWebSite;
 
-                case IisTupleDefinitionType.IIsWebSiteCertificates:
-                    return IisTupleDefinitions.IIsWebSiteCertificates;
+                case IisSymbolDefinitionType.IIsWebSiteCertificates:
+                    return IisSymbolDefinitions.IIsWebSiteCertificates;
 
-                case IisTupleDefinitionType.IIsWebVirtualDir:
-                    return IisTupleDefinitions.IIsWebVirtualDir;
+                case IisSymbolDefinitionType.IIsWebVirtualDir:
+                    return IisSymbolDefinitions.IIsWebVirtualDir;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

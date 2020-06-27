@@ -3,31 +3,31 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsHttpHeader = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsHttpHeader.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsHttpHeader = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsHttpHeader.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.HttpHeader), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.ParentType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.ParentValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.Value), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsHttpHeaderTupleFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.HttpHeader), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.ParentType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.ParentValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsHttpHeaderSymbolFields.Sequence), IntermediateFieldType.Number),
             },
-            typeof(IIsHttpHeaderTuple));
+            typeof(IIsHttpHeaderSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsHttpHeaderTupleFields
+    public enum IIsHttpHeaderSymbolFields
     {
         HttpHeader,
         ParentType,
@@ -38,58 +38,58 @@ namespace WixToolset.Iis.Tuples
         Sequence,
     }
 
-    public class IIsHttpHeaderTuple : IntermediateTuple
+    public class IIsHttpHeaderSymbol : IntermediateSymbol
     {
-        public IIsHttpHeaderTuple() : base(IisTupleDefinitions.IIsHttpHeader, null, null)
+        public IIsHttpHeaderSymbol() : base(IisSymbolDefinitions.IIsHttpHeader, null, null)
         {
         }
 
-        public IIsHttpHeaderTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsHttpHeader, sourceLineNumber, id)
+        public IIsHttpHeaderSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsHttpHeader, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsHttpHeaderTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsHttpHeaderSymbolFields index] => this.Fields[(int)index];
 
         public string HttpHeader
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.HttpHeader].AsString();
-            set => this.Set((int)IIsHttpHeaderTupleFields.HttpHeader, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.HttpHeader].AsString();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.HttpHeader, value);
         }
 
         public int ParentType
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.ParentType].AsNumber();
-            set => this.Set((int)IIsHttpHeaderTupleFields.ParentType, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.ParentType].AsNumber();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.ParentType, value);
         }
 
         public string ParentValue
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.ParentValue].AsString();
-            set => this.Set((int)IIsHttpHeaderTupleFields.ParentValue, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.ParentValue].AsString();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.ParentValue, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.Name].AsString();
-            set => this.Set((int)IIsHttpHeaderTupleFields.Name, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.Name].AsString();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.Value].AsString();
-            set => this.Set((int)IIsHttpHeaderTupleFields.Value, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.Value].AsString();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.Value, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.Attributes].AsNumber();
-            set => this.Set((int)IIsHttpHeaderTupleFields.Attributes, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.Attributes, value);
         }
 
         public int? Sequence
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.Sequence].AsNullableNumber();
-            set => this.Set((int)IIsHttpHeaderTupleFields.Sequence, value);
+            get => this.Fields[(int)IIsHttpHeaderSymbolFields.Sequence].AsNullableNumber();
+            set => this.Set((int)IIsHttpHeaderSymbolFields.Sequence, value);
         }
     }
 }

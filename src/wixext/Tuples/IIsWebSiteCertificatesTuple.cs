@@ -3,53 +3,53 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsWebSiteCertificates = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsWebSiteCertificates.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsWebSiteCertificates = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsWebSiteCertificates.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.WebRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.CertificateRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesSymbolFields.WebRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesSymbolFields.CertificateRef), IntermediateFieldType.String),
             },
-            typeof(IIsWebSiteCertificatesTuple));
+            typeof(IIsWebSiteCertificatesSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsWebSiteCertificatesTupleFields
+    public enum IIsWebSiteCertificatesSymbolFields
     {
         WebRef,
         CertificateRef,
     }
 
-    public class IIsWebSiteCertificatesTuple : IntermediateTuple
+    public class IIsWebSiteCertificatesSymbol : IntermediateSymbol
     {
-        public IIsWebSiteCertificatesTuple() : base(IisTupleDefinitions.IIsWebSiteCertificates, null, null)
+        public IIsWebSiteCertificatesSymbol() : base(IisSymbolDefinitions.IIsWebSiteCertificates, null, null)
         {
         }
 
-        public IIsWebSiteCertificatesTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsWebSiteCertificates, sourceLineNumber, id)
+        public IIsWebSiteCertificatesSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsWebSiteCertificates, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsWebSiteCertificatesTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsWebSiteCertificatesSymbolFields index] => this.Fields[(int)index];
 
         public string WebRef
         {
-            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.WebRef].AsString();
-            set => this.Set((int)IIsWebSiteCertificatesTupleFields.WebRef, value);
+            get => this.Fields[(int)IIsWebSiteCertificatesSymbolFields.WebRef].AsString();
+            set => this.Set((int)IIsWebSiteCertificatesSymbolFields.WebRef, value);
         }
 
         public string CertificateRef
         {
-            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.CertificateRef].AsString();
-            set => this.Set((int)IIsWebSiteCertificatesTupleFields.CertificateRef, value);
+            get => this.Fields[(int)IIsWebSiteCertificatesSymbolFields.CertificateRef].AsString();
+            set => this.Set((int)IIsWebSiteCertificatesSymbolFields.CertificateRef, value);
         }
     }
 }

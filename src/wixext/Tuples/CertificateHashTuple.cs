@@ -3,53 +3,53 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition CertificateHash = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.CertificateHash.ToString(),
+        public static readonly IntermediateSymbolDefinition CertificateHash = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.CertificateHash.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CertificateHashTupleFields.CertificateRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateHashTupleFields.Hash), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateHashSymbolFields.CertificateRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateHashSymbolFields.Hash), IntermediateFieldType.String),
             },
-            typeof(CertificateHashTuple));
+            typeof(CertificateHashSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum CertificateHashTupleFields
+    public enum CertificateHashSymbolFields
     {
         CertificateRef,
         Hash,
     }
 
-    public class CertificateHashTuple : IntermediateTuple
+    public class CertificateHashSymbol : IntermediateSymbol
     {
-        public CertificateHashTuple() : base(IisTupleDefinitions.CertificateHash, null, null)
+        public CertificateHashSymbol() : base(IisSymbolDefinitions.CertificateHash, null, null)
         {
         }
 
-        public CertificateHashTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.CertificateHash, sourceLineNumber, id)
+        public CertificateHashSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.CertificateHash, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[CertificateHashTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[CertificateHashSymbolFields index] => this.Fields[(int)index];
 
         public string CertificateRef
         {
-            get => this.Fields[(int)CertificateHashTupleFields.CertificateRef].AsString();
-            set => this.Set((int)CertificateHashTupleFields.CertificateRef, value);
+            get => this.Fields[(int)CertificateHashSymbolFields.CertificateRef].AsString();
+            set => this.Set((int)CertificateHashSymbolFields.CertificateRef, value);
         }
 
         public string Hash
         {
-            get => this.Fields[(int)CertificateHashTupleFields.Hash].AsString();
-            set => this.Set((int)CertificateHashTupleFields.Hash, value);
+            get => this.Fields[(int)CertificateHashSymbolFields.Hash].AsString();
+            set => this.Set((int)CertificateHashSymbolFields.Hash, value);
         }
     }
 }

@@ -3,29 +3,29 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsWebServiceExtension = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsWebServiceExtension.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsWebServiceExtension = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsWebServiceExtension.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.File), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Group), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionSymbolFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionSymbolFields.Group), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(IIsWebServiceExtensionTuple));
+            typeof(IIsWebServiceExtensionSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsWebServiceExtensionTupleFields
+    public enum IIsWebServiceExtensionSymbolFields
     {
         ComponentRef,
         File,
@@ -34,46 +34,46 @@ namespace WixToolset.Iis.Tuples
         Attributes,
     }
 
-    public class IIsWebServiceExtensionTuple : IntermediateTuple
+    public class IIsWebServiceExtensionSymbol : IntermediateSymbol
     {
-        public IIsWebServiceExtensionTuple() : base(IisTupleDefinitions.IIsWebServiceExtension, null, null)
+        public IIsWebServiceExtensionSymbol() : base(IisSymbolDefinitions.IIsWebServiceExtension, null, null)
         {
         }
 
-        public IIsWebServiceExtensionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsWebServiceExtension, sourceLineNumber, id)
+        public IIsWebServiceExtensionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsWebServiceExtension, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsWebServiceExtensionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsWebServiceExtensionSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.ComponentRef].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.ComponentRef, value);
+            get => this.Fields[(int)IIsWebServiceExtensionSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)IIsWebServiceExtensionSymbolFields.ComponentRef, value);
         }
 
         public string File
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.File].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.File, value);
+            get => this.Fields[(int)IIsWebServiceExtensionSymbolFields.File].AsString();
+            set => this.Set((int)IIsWebServiceExtensionSymbolFields.File, value);
         }
 
         public string Description
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.Description].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.Description, value);
+            get => this.Fields[(int)IIsWebServiceExtensionSymbolFields.Description].AsString();
+            set => this.Set((int)IIsWebServiceExtensionSymbolFields.Description, value);
         }
 
         public string Group
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.Group].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.Group, value);
+            get => this.Fields[(int)IIsWebServiceExtensionSymbolFields.Group].AsString();
+            set => this.Set((int)IIsWebServiceExtensionSymbolFields.Group, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.Attributes].AsNumber();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.Attributes, value);
+            get => this.Fields[(int)IIsWebServiceExtensionSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)IIsWebServiceExtensionSymbolFields.Attributes, value);
         }
     }
 }

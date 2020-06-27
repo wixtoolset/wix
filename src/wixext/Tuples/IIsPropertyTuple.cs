@@ -3,61 +3,61 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsProperty = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsProperty.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsProperty = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsPropertySymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsPropertySymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsPropertySymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(IIsPropertyTuple));
+            typeof(IIsPropertySymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsPropertyTupleFields
+    public enum IIsPropertySymbolFields
     {
         ComponentRef,
         Attributes,
         Value,
     }
 
-    public class IIsPropertyTuple : IntermediateTuple
+    public class IIsPropertySymbol : IntermediateSymbol
     {
-        public IIsPropertyTuple() : base(IisTupleDefinitions.IIsProperty, null, null)
+        public IIsPropertySymbol() : base(IisSymbolDefinitions.IIsProperty, null, null)
         {
         }
 
-        public IIsPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsProperty, sourceLineNumber, id)
+        public IIsPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsPropertySymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)IIsPropertyTupleFields.ComponentRef].AsString();
-            set => this.Set((int)IIsPropertyTupleFields.ComponentRef, value);
+            get => this.Fields[(int)IIsPropertySymbolFields.ComponentRef].AsString();
+            set => this.Set((int)IIsPropertySymbolFields.ComponentRef, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)IIsPropertyTupleFields.Attributes].AsNumber();
-            set => this.Set((int)IIsPropertyTupleFields.Attributes, value);
+            get => this.Fields[(int)IIsPropertySymbolFields.Attributes].AsNumber();
+            set => this.Set((int)IIsPropertySymbolFields.Attributes, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)IIsPropertyTupleFields.Value].AsString();
-            set => this.Set((int)IIsPropertyTupleFields.Value, value);
+            get => this.Fields[(int)IIsPropertySymbolFields.Value].AsString();
+            set => this.Set((int)IIsPropertySymbolFields.Value, value);
         }
     }
 }

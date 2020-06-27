@@ -3,28 +3,28 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsMimeMap = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsMimeMap.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsMimeMap = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsMimeMap.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.ParentType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.ParentValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.MimeType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.Extension), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsMimeMapSymbolFields.ParentType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsMimeMapSymbolFields.ParentValue), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsMimeMapSymbolFields.MimeType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsMimeMapSymbolFields.Extension), IntermediateFieldType.String),
             },
-            typeof(IIsMimeMapTuple));
+            typeof(IIsMimeMapSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsMimeMapTupleFields
+    public enum IIsMimeMapSymbolFields
     {
         ParentType,
         ParentValue,
@@ -32,40 +32,40 @@ namespace WixToolset.Iis.Tuples
         Extension,
     }
 
-    public class IIsMimeMapTuple : IntermediateTuple
+    public class IIsMimeMapSymbol : IntermediateSymbol
     {
-        public IIsMimeMapTuple() : base(IisTupleDefinitions.IIsMimeMap, null, null)
+        public IIsMimeMapSymbol() : base(IisSymbolDefinitions.IIsMimeMap, null, null)
         {
         }
 
-        public IIsMimeMapTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsMimeMap, sourceLineNumber, id)
+        public IIsMimeMapSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsMimeMap, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsMimeMapTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsMimeMapSymbolFields index] => this.Fields[(int)index];
 
         public int ParentType
         {
-            get => this.Fields[(int)IIsMimeMapTupleFields.ParentType].AsNumber();
-            set => this.Set((int)IIsMimeMapTupleFields.ParentType, value);
+            get => this.Fields[(int)IIsMimeMapSymbolFields.ParentType].AsNumber();
+            set => this.Set((int)IIsMimeMapSymbolFields.ParentType, value);
         }
 
         public string ParentValue
         {
-            get => this.Fields[(int)IIsMimeMapTupleFields.ParentValue].AsString();
-            set => this.Set((int)IIsMimeMapTupleFields.ParentValue, value);
+            get => this.Fields[(int)IIsMimeMapSymbolFields.ParentValue].AsString();
+            set => this.Set((int)IIsMimeMapSymbolFields.ParentValue, value);
         }
 
         public string MimeType
         {
-            get => this.Fields[(int)IIsMimeMapTupleFields.MimeType].AsString();
-            set => this.Set((int)IIsMimeMapTupleFields.MimeType, value);
+            get => this.Fields[(int)IIsMimeMapSymbolFields.MimeType].AsString();
+            set => this.Set((int)IIsMimeMapSymbolFields.MimeType, value);
         }
 
         public string Extension
         {
-            get => this.Fields[(int)IIsMimeMapTupleFields.Extension].AsString();
-            set => this.Set((int)IIsMimeMapTupleFields.Extension, value);
+            get => this.Fields[(int)IIsMimeMapSymbolFields.Extension].AsString();
+            set => this.Set((int)IIsMimeMapSymbolFields.Extension, value);
         }
     }
 }

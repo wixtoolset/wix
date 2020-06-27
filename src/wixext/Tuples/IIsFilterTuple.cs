@@ -3,31 +3,31 @@
 namespace WixToolset.Iis
 {
     using WixToolset.Data;
-    using WixToolset.Iis.Tuples;
+    using WixToolset.Iis.Symbols;
 
-    public static partial class IisTupleDefinitions
+    public static partial class IisSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition IIsFilter = new IntermediateTupleDefinition(
-            IisTupleDefinitionType.IIsFilter.ToString(),
+        public static readonly IntermediateSymbolDefinition IIsFilter = new IntermediateSymbolDefinition(
+            IisSymbolDefinitionType.IIsFilter.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.WebRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Flags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.LoadOrder), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.Path), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.WebRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.Flags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(IIsFilterSymbolFields.LoadOrder), IntermediateFieldType.Number),
             },
-            typeof(IIsFilterTuple));
+            typeof(IIsFilterSymbol));
     }
 }
 
-namespace WixToolset.Iis.Tuples
+namespace WixToolset.Iis.Symbols
 {
     using WixToolset.Data;
 
-    public enum IIsFilterTupleFields
+    public enum IIsFilterSymbolFields
     {
         Name,
         ComponentRef,
@@ -38,58 +38,58 @@ namespace WixToolset.Iis.Tuples
         LoadOrder,
     }
 
-    public class IIsFilterTuple : IntermediateTuple
+    public class IIsFilterSymbol : IntermediateSymbol
     {
-        public IIsFilterTuple() : base(IisTupleDefinitions.IIsFilter, null, null)
+        public IIsFilterSymbol() : base(IisSymbolDefinitions.IIsFilter, null, null)
         {
         }
 
-        public IIsFilterTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisTupleDefinitions.IIsFilter, sourceLineNumber, id)
+        public IIsFilterSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(IisSymbolDefinitions.IIsFilter, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[IIsFilterTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[IIsFilterSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Name].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Name, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.Name].AsString();
+            set => this.Set((int)IIsFilterSymbolFields.Name, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)IIsFilterTupleFields.ComponentRef].AsString();
-            set => this.Set((int)IIsFilterTupleFields.ComponentRef, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)IIsFilterSymbolFields.ComponentRef, value);
         }
 
         public string Path
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Path].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Path, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.Path].AsString();
+            set => this.Set((int)IIsFilterSymbolFields.Path, value);
         }
 
         public string WebRef
         {
-            get => this.Fields[(int)IIsFilterTupleFields.WebRef].AsString();
-            set => this.Set((int)IIsFilterTupleFields.WebRef, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.WebRef].AsString();
+            set => this.Set((int)IIsFilterSymbolFields.WebRef, value);
         }
 
         public string Description
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Description].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Description, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.Description].AsString();
+            set => this.Set((int)IIsFilterSymbolFields.Description, value);
         }
 
         public int Flags
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Flags].AsNumber();
-            set => this.Set((int)IIsFilterTupleFields.Flags, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.Flags].AsNumber();
+            set => this.Set((int)IIsFilterSymbolFields.Flags, value);
         }
 
         public int? LoadOrder
         {
-            get => this.Fields[(int)IIsFilterTupleFields.LoadOrder].AsNullableNumber();
-            set => this.Set((int)IIsFilterTupleFields.LoadOrder, value);
+            get => this.Fields[(int)IIsFilterSymbolFields.LoadOrder].AsNullableNumber();
+            set => this.Set((int)IIsFilterSymbolFields.LoadOrder, value);
         }
     }
 }
