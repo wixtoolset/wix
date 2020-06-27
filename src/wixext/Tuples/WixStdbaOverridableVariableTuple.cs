@@ -3,45 +3,45 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixStdbaOverridableVariable = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixStdbaOverridableVariable.ToString(),
+        public static readonly IntermediateSymbolDefinition WixStdbaOverridableVariable = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixStdbaOverridableVariable.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixStdbaOverridableVariableTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixStdbaOverridableVariableSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(WixStdbaOverridableVariableTuple));
+            typeof(WixStdbaOverridableVariableSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixStdbaOverridableVariableTupleFields
+    public enum WixStdbaOverridableVariableSymbolFields
     {
         Name,
     }
 
-    public class WixStdbaOverridableVariableTuple : IntermediateTuple
+    public class WixStdbaOverridableVariableSymbol : IntermediateSymbol
     {
-        public WixStdbaOverridableVariableTuple() : base(BalTupleDefinitions.WixStdbaOverridableVariable, null, null)
+        public WixStdbaOverridableVariableSymbol() : base(BalSymbolDefinitions.WixStdbaOverridableVariable, null, null)
         {
         }
 
-        public WixStdbaOverridableVariableTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixStdbaOverridableVariable, sourceLineNumber, id)
+        public WixStdbaOverridableVariableSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixStdbaOverridableVariable, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixStdbaOverridableVariableTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixStdbaOverridableVariableSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => this.Fields[(int)WixStdbaOverridableVariableTupleFields.Name].AsString();
-            set => this.Set((int)WixStdbaOverridableVariableTupleFields.Name, value);
+            get => this.Fields[(int)WixStdbaOverridableVariableSymbolFields.Name].AsString();
+            set => this.Set((int)WixStdbaOverridableVariableSymbolFields.Name, value);
         }
     }
 }

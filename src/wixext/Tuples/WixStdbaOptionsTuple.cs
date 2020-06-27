@@ -3,29 +3,29 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixStdbaOptions = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixStdbaOptions.ToString(),
+        public static readonly IntermediateSymbolDefinition WixStdbaOptions = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixStdbaOptions.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixStdbaOptionsTupleFields.SuppressOptionsUI), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixStdbaOptionsTupleFields.SuppressDowngradeFailure), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixStdbaOptionsTupleFields.SuppressRepair), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixStdbaOptionsTupleFields.ShowVersion), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixStdbaOptionsTupleFields.SupportCacheOnly), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixStdbaOptionsSymbolFields.SuppressOptionsUI), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixStdbaOptionsSymbolFields.SuppressDowngradeFailure), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixStdbaOptionsSymbolFields.SuppressRepair), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixStdbaOptionsSymbolFields.ShowVersion), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixStdbaOptionsSymbolFields.SupportCacheOnly), IntermediateFieldType.Number),
             },
-            typeof(WixStdbaOptionsTuple));
+            typeof(WixStdbaOptionsSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixStdbaOptionsTupleFields
+    public enum WixStdbaOptionsSymbolFields
     {
         SuppressOptionsUI,
         SuppressDowngradeFailure,
@@ -34,46 +34,46 @@ namespace WixToolset.Bal.Tuples
         SupportCacheOnly,
     }
 
-    public class WixStdbaOptionsTuple : IntermediateTuple
+    public class WixStdbaOptionsSymbol : IntermediateSymbol
     {
-        public WixStdbaOptionsTuple() : base(BalTupleDefinitions.WixStdbaOptions, null, null)
+        public WixStdbaOptionsSymbol() : base(BalSymbolDefinitions.WixStdbaOptions, null, null)
         {
         }
 
-        public WixStdbaOptionsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixStdbaOptions, sourceLineNumber, id)
+        public WixStdbaOptionsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixStdbaOptions, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixStdbaOptionsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixStdbaOptionsSymbolFields index] => this.Fields[(int)index];
 
         public int SuppressOptionsUI
         {
-            get => this.Fields[(int)WixStdbaOptionsTupleFields.SuppressOptionsUI].AsNumber();
-            set => this.Set((int)WixStdbaOptionsTupleFields.SuppressOptionsUI, value);
+            get => this.Fields[(int)WixStdbaOptionsSymbolFields.SuppressOptionsUI].AsNumber();
+            set => this.Set((int)WixStdbaOptionsSymbolFields.SuppressOptionsUI, value);
         }
 
         public int SuppressDowngradeFailure
         {
-            get => this.Fields[(int)WixStdbaOptionsTupleFields.SuppressDowngradeFailure].AsNumber();
-            set => this.Set((int)WixStdbaOptionsTupleFields.SuppressDowngradeFailure, value);
+            get => this.Fields[(int)WixStdbaOptionsSymbolFields.SuppressDowngradeFailure].AsNumber();
+            set => this.Set((int)WixStdbaOptionsSymbolFields.SuppressDowngradeFailure, value);
         }
 
         public int SuppressRepair
         {
-            get => this.Fields[(int)WixStdbaOptionsTupleFields.SuppressRepair].AsNumber();
-            set => this.Set((int)WixStdbaOptionsTupleFields.SuppressRepair, value);
+            get => this.Fields[(int)WixStdbaOptionsSymbolFields.SuppressRepair].AsNumber();
+            set => this.Set((int)WixStdbaOptionsSymbolFields.SuppressRepair, value);
         }
 
         public int ShowVersion
         {
-            get => this.Fields[(int)WixStdbaOptionsTupleFields.ShowVersion].AsNumber();
-            set => this.Set((int)WixStdbaOptionsTupleFields.ShowVersion, value);
+            get => this.Fields[(int)WixStdbaOptionsSymbolFields.ShowVersion].AsNumber();
+            set => this.Set((int)WixStdbaOptionsSymbolFields.ShowVersion, value);
         }
 
         public int SupportCacheOnly
         {
-            get => this.Fields[(int)WixStdbaOptionsTupleFields.SupportCacheOnly].AsNumber();
-            set => this.Set((int)WixStdbaOptionsTupleFields.SupportCacheOnly, value);
+            get => this.Fields[(int)WixStdbaOptionsSymbolFields.SupportCacheOnly].AsNumber();
+            set => this.Set((int)WixStdbaOptionsSymbolFields.SupportCacheOnly, value);
         }
     }
 }

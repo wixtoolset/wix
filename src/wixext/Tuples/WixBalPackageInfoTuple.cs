@@ -3,53 +3,53 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBalPackageInfo = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixBalPackageInfo.ToString(),
+        public static readonly IntermediateSymbolDefinition WixBalPackageInfo = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixBalPackageInfo.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBalPackageInfoTupleFields.PackageId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBalPackageInfoTupleFields.DisplayInternalUICondition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.PackageId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.DisplayInternalUICondition), IntermediateFieldType.String),
             },
-            typeof(WixBalPackageInfoTuple));
+            typeof(WixBalPackageInfoSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixBalPackageInfoTupleFields
+    public enum WixBalPackageInfoSymbolFields
     {
         PackageId,
         DisplayInternalUICondition,
     }
 
-    public class WixBalPackageInfoTuple : IntermediateTuple
+    public class WixBalPackageInfoSymbol : IntermediateSymbol
     {
-        public WixBalPackageInfoTuple() : base(BalTupleDefinitions.WixBalPackageInfo, null, null)
+        public WixBalPackageInfoSymbol() : base(BalSymbolDefinitions.WixBalPackageInfo, null, null)
         {
         }
 
-        public WixBalPackageInfoTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixBalPackageInfo, sourceLineNumber, id)
+        public WixBalPackageInfoSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixBalPackageInfo, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBalPackageInfoTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBalPackageInfoSymbolFields index] => this.Fields[(int)index];
 
         public string PackageId
         {
-            get => this.Fields[(int)WixBalPackageInfoTupleFields.PackageId].AsString();
-            set => this.Set((int)WixBalPackageInfoTupleFields.PackageId, value);
+            get => this.Fields[(int)WixBalPackageInfoSymbolFields.PackageId].AsString();
+            set => this.Set((int)WixBalPackageInfoSymbolFields.PackageId, value);
         }
 
         public string DisplayInternalUICondition
         {
-            get => this.Fields[(int)WixBalPackageInfoTupleFields.DisplayInternalUICondition].AsString();
-            set => this.Set((int)WixBalPackageInfoTupleFields.DisplayInternalUICondition, value);
+            get => this.Fields[(int)WixBalPackageInfoSymbolFields.DisplayInternalUICondition].AsString();
+            set => this.Set((int)WixBalPackageInfoSymbolFields.DisplayInternalUICondition, value);
         }
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixMbaPrereqInformation = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixMbaPrereqInformation.ToString(),
+        public static readonly IntermediateSymbolDefinition WixMbaPrereqInformation = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixMbaPrereqInformation.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationTupleFields.PackageId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationTupleFields.LicenseFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationTupleFields.LicenseUrl), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationSymbolFields.PackageId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationSymbolFields.LicenseFile), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMbaPrereqInformationSymbolFields.LicenseUrl), IntermediateFieldType.String),
             },
-            typeof(WixMbaPrereqInformationTuple));
+            typeof(WixMbaPrereqInformationSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixMbaPrereqInformationTupleFields
+    public enum WixMbaPrereqInformationSymbolFields
     {
         PackageId,
         LicenseFile,
         LicenseUrl,
     }
 
-    public class WixMbaPrereqInformationTuple : IntermediateTuple
+    public class WixMbaPrereqInformationSymbol : IntermediateSymbol
     {
-        public WixMbaPrereqInformationTuple() : base(BalTupleDefinitions.WixMbaPrereqInformation, null, null)
+        public WixMbaPrereqInformationSymbol() : base(BalSymbolDefinitions.WixMbaPrereqInformation, null, null)
         {
         }
 
-        public WixMbaPrereqInformationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixMbaPrereqInformation, sourceLineNumber, id)
+        public WixMbaPrereqInformationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixMbaPrereqInformation, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixMbaPrereqInformationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixMbaPrereqInformationSymbolFields index] => this.Fields[(int)index];
 
         public string PackageId
         {
-            get => this.Fields[(int)WixMbaPrereqInformationTupleFields.PackageId].AsString();
-            set => this.Set((int)WixMbaPrereqInformationTupleFields.PackageId, value);
+            get => this.Fields[(int)WixMbaPrereqInformationSymbolFields.PackageId].AsString();
+            set => this.Set((int)WixMbaPrereqInformationSymbolFields.PackageId, value);
         }
 
         public string LicenseFile
         {
-            get => this.Fields[(int)WixMbaPrereqInformationTupleFields.LicenseFile].AsString();
-            set => this.Set((int)WixMbaPrereqInformationTupleFields.LicenseFile, value);
+            get => this.Fields[(int)WixMbaPrereqInformationSymbolFields.LicenseFile].AsString();
+            set => this.Set((int)WixMbaPrereqInformationSymbolFields.LicenseFile, value);
         }
 
         public string LicenseUrl
         {
-            get => this.Fields[(int)WixMbaPrereqInformationTupleFields.LicenseUrl].AsString();
-            set => this.Set((int)WixMbaPrereqInformationTupleFields.LicenseUrl, value);
+            get => this.Fields[(int)WixMbaPrereqInformationSymbolFields.LicenseUrl].AsString();
+            set => this.Set((int)WixMbaPrereqInformationSymbolFields.LicenseUrl, value);
         }
     }
 }

@@ -5,9 +5,9 @@ namespace WixToolset.Bal
     using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -15,14 +15,14 @@ namespace WixToolset.Bal
     /// </summary>
     public sealed class BalCompiler : BaseCompilerExtension
     {
-        private readonly Dictionary<string, WixMbaPrereqInformationTuple> prereqInfoTuplesByPackageId;
+        private readonly Dictionary<string, WixMbaPrereqInformationSymbol> prereqInfoSymbolsByPackageId;
 
         /// <summary>
         /// Instantiate a new BalCompiler.
         /// </summary>
         public BalCompiler()
         {
-            this.prereqInfoTuplesByPackageId = new Dictionary<string, WixMbaPrereqInformationTuple>();
+            this.prereqInfoSymbolsByPackageId = new Dictionary<string, WixMbaPrereqInformationSymbol>();
         }
 
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/bal";
@@ -87,7 +87,7 @@ namespace WixToolset.Bal
         public override void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
-            WixMbaPrereqInformationTuple prereqInfo;
+            WixMbaPrereqInformationSymbol prereqInfo;
 
             switch (parentElement.Name.LocalName)
             {
@@ -110,7 +110,7 @@ namespace WixToolset.Bal
                                     case "MsiPackage":
                                     case "MspPackage":
                                         var displayInternalUICondition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
-                                        section.AddTuple(new WixBalPackageInfoTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, packageId))
+                                        section.AddSymbol(new WixBalPackageInfoSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, packageId))
                                         {
                                             PackageId = packageId,
                                             DisplayInternalUICondition = displayInternalUICondition,
@@ -123,7 +123,7 @@ namespace WixToolset.Bal
                                 break;
                             case "PrereqLicenseFile":
 
-                                if (!this.prereqInfoTuplesByPackageId.TryGetValue(packageId, out prereqInfo))
+                                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
                                 {
                                     // at the time the extension attribute is parsed, the compiler might not yet have
                                     // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
@@ -131,12 +131,12 @@ namespace WixToolset.Bal
 
                                     if (null != prereqPackage && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqPackage))
                                     {
-                                        prereqInfo = section.AddTuple(new WixMbaPrereqInformationTuple(sourceLineNumbers)
+                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
                                         {
                                             PackageId = packageId,
                                         });
 
-                                        this.prereqInfoTuplesByPackageId.Add(packageId, prereqInfo);
+                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
                                     }
                                     else
                                     {
@@ -156,7 +156,7 @@ namespace WixToolset.Bal
                                 break;
                             case "PrereqLicenseUrl":
 
-                                if (!this.prereqInfoTuplesByPackageId.TryGetValue(packageId, out prereqInfo))
+                                if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
                                 {
                                     // at the time the extension attribute is parsed, the compiler might not yet have
                                     // parsed the PrereqPackage attribute, so we need to get it directly from the parent element.
@@ -164,12 +164,12 @@ namespace WixToolset.Bal
 
                                     if (null != prereqPackage && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqPackage))
                                     {
-                                        prereqInfo = section.AddTuple(new WixMbaPrereqInformationTuple(sourceLineNumbers)
+                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
                                         {
                                             PackageId = packageId,
                                         });
 
-                                        this.prereqInfoTuplesByPackageId.Add(packageId, prereqInfo);
+                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
                                     }
                                     else
                                     {
@@ -190,14 +190,14 @@ namespace WixToolset.Bal
                             case "PrereqPackage":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {
-                                    if (!this.prereqInfoTuplesByPackageId.TryGetValue(packageId, out prereqInfo))
+                                    if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
                                     {
-                                        prereqInfo = section.AddTuple(new WixMbaPrereqInformationTuple(sourceLineNumbers)
+                                        prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
                                         {
                                             PackageId = packageId,
                                         });
 
-                                        this.prereqInfoTuplesByPackageId.Add(packageId, prereqInfo);
+                                        this.prereqInfoSymbolsByPackageId.Add(packageId, prereqInfo);
                                     }
                                 }
                                 break;
@@ -222,7 +222,7 @@ namespace WixToolset.Bal
                                 {
                                     // There can only be one.
                                     var id = new Identifier(AccessModifier.Public, "TheBAFactoryAssembly");
-                                    section.AddTuple(new WixBalBAFactoryAssemblyTuple(sourceLineNumbers, id)
+                                    section.AddSymbol(new WixBalBAFactoryAssemblySymbol(sourceLineNumbers, id)
                                     {
                                         PayloadId = payloadId,
                                     });
@@ -231,7 +231,7 @@ namespace WixToolset.Bal
                             case "BAFunctions":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {
-                                    section.AddTuple(new WixBalBAFunctionsTuple(sourceLineNumbers)
+                                    section.AddSymbol(new WixBalBAFunctionsSymbol(sourceLineNumbers)
                                     {
                                         PayloadId = payloadId,
                                     });
@@ -258,7 +258,7 @@ namespace WixToolset.Bal
                             case "Overridable":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {
-                                    section.AddTuple(new WixStdbaOverridableVariableTuple(sourceLineNumbers)
+                                    section.AddSymbol(new WixStdbaOverridableVariableSymbol(sourceLineNumbers)
                                     {
                                         Name = variableName.Value,
                                     });
@@ -318,7 +318,7 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixBalConditionTuple(sourceLineNumbers)
+                section.AddSymbol(new WixBalConditionSymbol(sourceLineNumbers)
                 {
                     Condition = condition,
                     Message = message,
@@ -378,13 +378,13 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new WixMbaPrereqInformationTuple(sourceLineNumbers)
+                section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
                 {
                     PackageId = packageId,
                     LicenseFile = licenseFile,
                     LicenseUrl = licenseUrl,
                 });
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixBundlePackage, packageId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePackage, packageId);
             }
         }
 
@@ -488,7 +488,7 @@ namespace WixToolset.Bal
             {
                 if (!String.IsNullOrEmpty(launchTarget))
                 {
-                    section.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTarget"))
+                    section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTarget"))
                     {
                         Value = launchTarget,
                         Type = "string",
@@ -497,7 +497,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(launchTargetElevatedId))
                 {
-                    section.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTargetElevatedId"))
+                    section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTargetElevatedId"))
                     {
                         Value = launchTargetElevatedId,
                         Type = "string",
@@ -506,7 +506,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(launchArguments))
                 {
-                    section.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchArguments"))
+                    section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchArguments"))
                     {
                         Value = launchArguments,
                         Type = "string",
@@ -515,7 +515,7 @@ namespace WixToolset.Bal
 
                 if (YesNoType.Yes == launchHidden)
                 {
-                    section.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchHidden"))
+                    section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchHidden"))
                     {
                         Value = "yes",
                         Type = "string",
@@ -525,7 +525,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(launchWorkingDir))
                 {
-                    section.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchWorkingFolder"))
+                    section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchWorkingFolder"))
                     {
                         Value = launchWorkingDir,
                         Type = "string",
@@ -534,7 +534,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(licenseFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLicenseRtf"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLicenseRtf"))
                     {
                         Value = licenseFile,
                     });
@@ -542,7 +542,7 @@ namespace WixToolset.Bal
 
                 if (null != licenseUrl)
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLicenseUrl"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLicenseUrl"))
                     {
                         Value = licenseUrl,
                     });
@@ -550,7 +550,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(logoFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLogo"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLogo"))
                     {
                         Value = logoFile,
                     });
@@ -558,7 +558,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(logoSideFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLogoSide"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaLogoSide"))
                     {
                         Value = logoSideFile,
                     });
@@ -566,7 +566,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(themeFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaThemeXml"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaThemeXml"))
                     {
                         Value = themeFile,
                     });
@@ -574,7 +574,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(localizationFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaThemeWxl"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixStdbaThemeWxl"))
                     {
                         Value = localizationFile,
                     });
@@ -582,30 +582,30 @@ namespace WixToolset.Bal
 
                 if (YesNoType.Yes == suppressOptionsUI || YesNoType.Yes == suppressDowngradeFailure || YesNoType.Yes == suppressRepair || YesNoType.Yes == showVersion || YesNoType.Yes == supportCacheOnly)
                 {
-                    var tuple = section.AddTuple(new WixStdbaOptionsTuple(sourceLineNumbers));
+                    var symbol = section.AddSymbol(new WixStdbaOptionsSymbol(sourceLineNumbers));
                     if (YesNoType.Yes == suppressOptionsUI)
                     {
-                        tuple.SuppressOptionsUI = 1;
+                        symbol.SuppressOptionsUI = 1;
                     }
 
                     if (YesNoType.Yes == suppressDowngradeFailure)
                     {
-                        tuple.SuppressDowngradeFailure = 1;
+                        symbol.SuppressDowngradeFailure = 1;
                     }
 
                     if (YesNoType.Yes == suppressRepair)
                     {
-                        tuple.SuppressRepair = 1;
+                        symbol.SuppressRepair = 1;
                     }
 
                     if (YesNoType.Yes == showVersion)
                     {
-                        tuple.ShowVersion = 1;
+                        symbol.ShowVersion = 1;
                     }
 
                     if (YesNoType.Yes == supportCacheOnly)
                     {
-                        tuple.SupportCacheOnly = 1;
+                        symbol.SupportCacheOnly = 1;
                     }
                 }
             }
@@ -654,7 +654,7 @@ namespace WixToolset.Bal
             {
                 if (!String.IsNullOrEmpty(logoFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaLogo"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaLogo"))
                     {
                         Value = logoFile,
                     });
@@ -662,7 +662,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(themeFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaThemeXml"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaThemeXml"))
                     {
                         Value = themeFile,
                     });
@@ -670,7 +670,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(localizationFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaThemeWxl"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaThemeWxl"))
                     {
                         Value = localizationFile,
                     });
@@ -725,7 +725,7 @@ namespace WixToolset.Bal
             {
                 if (!String.IsNullOrEmpty(logoFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaLogo"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaLogo"))
                     {
                         Value = logoFile,
                     });
@@ -733,7 +733,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(themeFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeXml"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeXml"))
                     {
                         Value = themeFile,
                     });
@@ -741,7 +741,7 @@ namespace WixToolset.Bal
 
                 if (!String.IsNullOrEmpty(localizationFile))
                 {
-                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeWxl"))
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeWxl"))
                     {
                         Value = localizationFile,
                     });
@@ -749,7 +749,7 @@ namespace WixToolset.Bal
 
                 if (YesNoType.Yes == selfContainedDeployment)
                 {
-                    section.AddTuple(new WixDncOptionsTuple(sourceLineNumbers)
+                    section.AddSymbol(new WixDncOptionsSymbol(sourceLineNumbers)
                     {
                         SelfContainedDeployment = 1,
                     });

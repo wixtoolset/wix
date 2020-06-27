@@ -6,7 +6,7 @@ namespace WixToolset.Bal
     using WixToolset.Data;
     using WixToolset.Data.Burn;
 
-    public enum BalTupleDefinitionType
+    public enum BalSymbolDefinitionType
     {
         WixBalBAFactoryAssembly,
         WixBalBAFunctions,
@@ -18,13 +18,13 @@ namespace WixToolset.Bal
         WixStdbaOverridableVariable,
     }
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out BalTupleDefinitionType type))
+            if (!Enum.TryParse(name, out BalSymbolDefinitionType type))
             {
                 return null;
             }
@@ -32,49 +32,49 @@ namespace WixToolset.Bal
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(BalTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(BalSymbolDefinitionType type)
         {
             switch (type)
             {
-                case BalTupleDefinitionType.WixBalBAFactoryAssembly:
-                    return BalTupleDefinitions.WixBalBAFactoryAssembly;
+                case BalSymbolDefinitionType.WixBalBAFactoryAssembly:
+                    return BalSymbolDefinitions.WixBalBAFactoryAssembly;
 
-                case BalTupleDefinitionType.WixBalBAFunctions:
-                    return BalTupleDefinitions.WixBalBAFunctions;
+                case BalSymbolDefinitionType.WixBalBAFunctions:
+                    return BalSymbolDefinitions.WixBalBAFunctions;
 
-                case BalTupleDefinitionType.WixBalCondition:
-                    return BalTupleDefinitions.WixBalCondition;
+                case BalSymbolDefinitionType.WixBalCondition:
+                    return BalSymbolDefinitions.WixBalCondition;
 
-                case BalTupleDefinitionType.WixBalPackageInfo:
-                    return BalTupleDefinitions.WixBalPackageInfo;
+                case BalSymbolDefinitionType.WixBalPackageInfo:
+                    return BalSymbolDefinitions.WixBalPackageInfo;
 
-                case BalTupleDefinitionType.WixDncOptions:
-                    return BalTupleDefinitions.WixDncOptions;
+                case BalSymbolDefinitionType.WixDncOptions:
+                    return BalSymbolDefinitions.WixDncOptions;
 
-                case BalTupleDefinitionType.WixMbaPrereqInformation:
-                    return BalTupleDefinitions.WixMbaPrereqInformation;
+                case BalSymbolDefinitionType.WixMbaPrereqInformation:
+                    return BalSymbolDefinitions.WixMbaPrereqInformation;
 
-                case BalTupleDefinitionType.WixStdbaOptions:
-                    return BalTupleDefinitions.WixStdbaOptions;
+                case BalSymbolDefinitionType.WixStdbaOptions:
+                    return BalSymbolDefinitions.WixStdbaOptions;
 
-                case BalTupleDefinitionType.WixStdbaOverridableVariable:
-                    return BalTupleDefinitions.WixStdbaOverridableVariable;
+                case BalSymbolDefinitionType.WixStdbaOverridableVariable:
+                    return BalSymbolDefinitions.WixStdbaOverridableVariable;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
-        static BalTupleDefinitions()
+        static BalSymbolDefinitions()
         {
-            WixBalBAFactoryAssembly.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixBalBAFunctions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixBalCondition.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixBalPackageInfo.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixDncOptions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
-            WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixBalBAFactoryAssembly.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixBalBAFunctions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixBalCondition.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixBalPackageInfo.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixDncOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
         }
     }
 }

@@ -5,27 +5,27 @@ namespace WixToolset.Bal
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     public class BalBurnBackendExtension : BaseBurnBackendExtension
     {
-        private static readonly IntermediateTupleDefinition[] BurnTupleDefinitions =
+        private static readonly IntermediateSymbolDefinition[] BurnSymbolDefinitions =
         {
-            BalTupleDefinitions.WixBalBAFactoryAssembly,
-            BalTupleDefinitions.WixBalBAFunctions,
-            BalTupleDefinitions.WixBalCondition,
-            BalTupleDefinitions.WixBalPackageInfo,
-            BalTupleDefinitions.WixDncOptions,
-            BalTupleDefinitions.WixMbaPrereqInformation,
-            BalTupleDefinitions.WixStdbaOptions,
-            BalTupleDefinitions.WixStdbaOverridableVariable,
+            BalSymbolDefinitions.WixBalBAFactoryAssembly,
+            BalSymbolDefinitions.WixBalBAFunctions,
+            BalSymbolDefinitions.WixBalCondition,
+            BalSymbolDefinitions.WixBalPackageInfo,
+            BalSymbolDefinitions.WixDncOptions,
+            BalSymbolDefinitions.WixMbaPrereqInformation,
+            BalSymbolDefinitions.WixStdbaOptions,
+            BalSymbolDefinitions.WixStdbaOverridableVariable,
         };
 
-        protected override IEnumerable<IntermediateTupleDefinition> TupleDefinitions => BurnTupleDefinitions;
+        protected override IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;
 
         public override void BundleFinalize()
         {
@@ -34,8 +34,8 @@ namespace WixToolset.Bal
             var intermediate = this.Context.IntermediateRepresentation;
             var section = intermediate.Sections.Single();
 
-            var baTuple = section.Tuples.OfType<WixBootstrapperApplicationTuple>().SingleOrDefault();
-            var baId = baTuple?.Id?.Id;
+            var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationSymbol>().SingleOrDefault();
+            var baId = baSymbol?.Id?.Id;
             if (null == baId)
             {
                 return;
@@ -59,46 +59,46 @@ namespace WixToolset.Bal
 
         private void VerifyBAFunctions(IntermediateSection section)
         {
-            WixBalBAFunctionsTuple baFunctionsTuple = null;
-            foreach (var tuple in section.Tuples.OfType<WixBalBAFunctionsTuple>())
+            WixBalBAFunctionsSymbol baFunctionsSymbol = null;
+            foreach (var symbol in section.Symbols.OfType<WixBalBAFunctionsSymbol>())
             {
-                if (null == baFunctionsTuple)
+                if (null == baFunctionsSymbol)
                 {
-                    baFunctionsTuple = tuple;
+                    baFunctionsSymbol = symbol;
                 }
                 else
                 {
-                    this.Messaging.Write(BalErrors.MultipleBAFunctions(tuple.SourceLineNumbers));
+                    this.Messaging.Write(BalErrors.MultipleBAFunctions(symbol.SourceLineNumbers));
                 }
             }
 
-            var payloadPropertiesTuples = section.Tuples.OfType<WixBundlePayloadTuple>().ToList();
-            if (null == baFunctionsTuple)
+            var payloadPropertiesSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToList();
+            if (null == baFunctionsSymbol)
             {
-                foreach (var payloadPropertiesTuple in payloadPropertiesTuples)
+                foreach (var payloadPropertiesSymbol in payloadPropertiesSymbols)
                 {
                     // TODO: Make core WiX canonicalize Name (this won't catch '.\bafunctions.dll').
-                    if (string.Equals(payloadPropertiesTuple.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(payloadPropertiesSymbol.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesTuple.SourceLineNumbers));
+                        this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesSymbol.SourceLineNumbers));
                     }
                 }
             }
             else
             {
-                var payloadId = baFunctionsTuple.Id;
-                var bundlePayloadTuple = payloadPropertiesTuples.Single(x => payloadId == x.Id);
-                if (BurnConstants.BurnUXContainerName != bundlePayloadTuple.ContainerRef)
+                var payloadId = baFunctionsSymbol.Id;
+                var bundlePayloadSymbol = payloadPropertiesSymbols.Single(x => payloadId == x.Id);
+                if (BurnConstants.BurnUXContainerName != bundlePayloadSymbol.ContainerRef)
                 {
-                    this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsTuple.SourceLineNumbers));
+                    this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsSymbol.SourceLineNumbers));
                 }
             }
         }
 
         private void VerifyPrereqPackages(IntermediateSection section, bool isDNC)
         {
-            var prereqInfoTuples = section.Tuples.OfType<WixMbaPrereqInformationTuple>().ToList();
-            if (prereqInfoTuples.Count == 0)
+            var prereqInfoSymbols = section.Symbols.OfType<WixMbaPrereqInformationSymbol>().ToList();
+            if (prereqInfoSymbols.Count == 0)
             {
                 var message = isDNC ? BalErrors.MissingDNCPrereq() : BalErrors.MissingMBAPrereq();
                 this.Messaging.Write(message);
@@ -108,24 +108,24 @@ namespace WixToolset.Bal
             var foundLicenseFile = false;
             var foundLicenseUrl = false;
 
-            foreach (var prereqInfoTuple in prereqInfoTuples)
+            foreach (var prereqInfoSymbol in prereqInfoSymbols)
             {
-                if (null != prereqInfoTuple.LicenseFile)
+                if (null != prereqInfoSymbol.LicenseFile)
                 {
                     if (foundLicenseFile || foundLicenseUrl)
                     {
-                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoTuple.SourceLineNumbers));
+                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoSymbol.SourceLineNumbers));
                         return;
                     }
 
                     foundLicenseFile = true;
                 }
 
-                if (null != prereqInfoTuple.LicenseUrl)
+                if (null != prereqInfoSymbol.LicenseUrl)
                 {
                     if (foundLicenseFile || foundLicenseUrl)
                     {
-                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoTuple.SourceLineNumbers));
+                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoSymbol.SourceLineNumbers));
                         return;
                     }
 
@@ -138,7 +138,7 @@ namespace WixToolset.Bal
         {
             var isSCD = false;
 
-            var dncOptions = section.Tuples.OfType<WixDncOptionsTuple>().SingleOrDefault();
+            var dncOptions = section.Symbols.OfType<WixDncOptionsSymbol>().SingleOrDefault();
             if (dncOptions != null)
             {
                 isSCD = dncOptions.SelfContainedDeployment != 0;

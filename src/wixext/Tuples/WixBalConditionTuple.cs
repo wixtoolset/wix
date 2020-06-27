@@ -3,53 +3,53 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBalCondition = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixBalCondition.ToString(),
+        public static readonly IntermediateSymbolDefinition WixBalCondition = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixBalCondition.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBalConditionTupleFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBalConditionTupleFields.Message), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalConditionSymbolFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalConditionSymbolFields.Message), IntermediateFieldType.String),
             },
-            typeof(WixBalConditionTuple));
+            typeof(WixBalConditionSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixBalConditionTupleFields
+    public enum WixBalConditionSymbolFields
     {
         Condition,
         Message,
     }
 
-    public class WixBalConditionTuple : IntermediateTuple
+    public class WixBalConditionSymbol : IntermediateSymbol
     {
-        public WixBalConditionTuple() : base(BalTupleDefinitions.WixBalCondition, null, null)
+        public WixBalConditionSymbol() : base(BalSymbolDefinitions.WixBalCondition, null, null)
         {
         }
 
-        public WixBalConditionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixBalCondition, sourceLineNumber, id)
+        public WixBalConditionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixBalCondition, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBalConditionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBalConditionSymbolFields index] => this.Fields[(int)index];
 
         public string Condition
         {
-            get => this.Fields[(int)WixBalConditionTupleFields.Condition].AsString();
-            set => this.Set((int)WixBalConditionTupleFields.Condition, value);
+            get => this.Fields[(int)WixBalConditionSymbolFields.Condition].AsString();
+            set => this.Set((int)WixBalConditionSymbolFields.Condition, value);
         }
 
         public string Message
         {
-            get => this.Fields[(int)WixBalConditionTupleFields.Message].AsString();
-            set => this.Set((int)WixBalConditionTupleFields.Message, value);
+            get => this.Fields[(int)WixBalConditionSymbolFields.Message].AsString();
+            set => this.Set((int)WixBalConditionSymbolFields.Message, value);
         }
     }
 }

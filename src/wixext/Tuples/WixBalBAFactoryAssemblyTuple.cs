@@ -3,45 +3,45 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixBalBAFactoryAssembly = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixBalBAFactoryAssembly.ToString(),
+        public static readonly IntermediateSymbolDefinition WixBalBAFactoryAssembly = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixBalBAFactoryAssembly.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBalBAFactoryTupleFields.PayloadId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalBAFactorySymbolFields.PayloadId), IntermediateFieldType.String),
             },
-            typeof(WixBalBAFactoryAssemblyTuple));
+            typeof(WixBalBAFactoryAssemblySymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixBalBAFactoryTupleFields
+    public enum WixBalBAFactorySymbolFields
     {
         PayloadId,
     }
 
-    public class WixBalBAFactoryAssemblyTuple : IntermediateTuple
+    public class WixBalBAFactoryAssemblySymbol : IntermediateSymbol
     {
-        public WixBalBAFactoryAssemblyTuple() : base(BalTupleDefinitions.WixBalBAFactoryAssembly, null, null)
+        public WixBalBAFactoryAssemblySymbol() : base(BalSymbolDefinitions.WixBalBAFactoryAssembly, null, null)
         {
         }
 
-        public WixBalBAFactoryAssemblyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixBalBAFactoryAssembly, sourceLineNumber, id)
+        public WixBalBAFactoryAssemblySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixBalBAFactoryAssembly, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixBalBAFactoryTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixBalBAFactorySymbolFields index] => this.Fields[(int)index];
 
         public string PayloadId
         {
-            get => this.Fields[(int)WixBalBAFactoryTupleFields.PayloadId].AsString();
-            set => this.Set((int)WixBalBAFactoryTupleFields.PayloadId, value);
+            get => this.Fields[(int)WixBalBAFactorySymbolFields.PayloadId].AsString();
+            set => this.Set((int)WixBalBAFactorySymbolFields.PayloadId, value);
         }
     }
 }

@@ -3,45 +3,45 @@
 namespace WixToolset.Bal
 {
     using WixToolset.Data;
-    using WixToolset.Bal.Tuples;
+    using WixToolset.Bal.Symbols;
 
-    public static partial class BalTupleDefinitions
+    public static partial class BalSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDncOptions = new IntermediateTupleDefinition(
-            BalTupleDefinitionType.WixDncOptions.ToString(),
+        public static readonly IntermediateSymbolDefinition WixDncOptions = new IntermediateSymbolDefinition(
+            BalSymbolDefinitionType.WixDncOptions.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDncOptionsTupleFields.SelfContainedDeployment), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixDncOptionsSymbolFields.SelfContainedDeployment), IntermediateFieldType.Number),
             },
-            typeof(WixDncOptionsTuple));
+            typeof(WixDncOptionsSymbol));
     }
 }
 
-namespace WixToolset.Bal.Tuples
+namespace WixToolset.Bal.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixDncOptionsTupleFields
+    public enum WixDncOptionsSymbolFields
     {
         SelfContainedDeployment,
     }
 
-    public class WixDncOptionsTuple : IntermediateTuple
+    public class WixDncOptionsSymbol : IntermediateSymbol
     {
-        public WixDncOptionsTuple() : base(BalTupleDefinitions.WixDncOptions, null, null)
+        public WixDncOptionsSymbol() : base(BalSymbolDefinitions.WixDncOptions, null, null)
         {
         }
 
-        public WixDncOptionsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalTupleDefinitions.WixDncOptions, sourceLineNumber, id)
+        public WixDncOptionsSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(BalSymbolDefinitions.WixDncOptions, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDncOptionsTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDncOptionsSymbolFields index] => this.Fields[(int)index];
 
         public int SelfContainedDeployment
         {
-            get => this.Fields[(int)WixDncOptionsTupleFields.SelfContainedDeployment].AsNumber();
-            set => this.Set((int)WixDncOptionsTupleFields.SelfContainedDeployment, value);
+            get => this.Fields[(int)WixDncOptionsSymbolFields.SelfContainedDeployment].AsNumber();
+            set => this.Set((int)WixDncOptionsSymbolFields.SelfContainedDeployment, value);
         }
     }
 }
