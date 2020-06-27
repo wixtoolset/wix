@@ -1,89 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<Project DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0133\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0133\build\WixToolset.MSBuild.props')" />
-  <Import Project="..\FindLocalWix.props" />
+<Project Sdk="WixToolset.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{45e4a6ac-3190-4e17-83f0-9935ffa5dc2b}</ProjectGuid>
-    <OutputName>netfx</OutputName>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
-    <Pedantic>true</Pedantic>
   </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="NetFxExtension.wxs" />
-    <Compile Include="NetFx1.wxs" />
-    <Compile Include="NetFx1.1.wxs" />
-    <Compile Include="NetFx2.wxs" />
-    <Compile Include="NetFx3.wxs" />
-    <Compile Include="NetFx3.5.wxs" />
-    <Compile Include="NetFx4.wxs" />
-    <Compile Include="NetFx4.5.wxs" />
-    <Compile Include="NetFx451.wxs" />
-    <Compile Include="NetFx452.wxs" />
-    <Compile Include="NetFx46.wxs" />
-    <Compile Include="NetFx461.wxs" />
-    <Compile Include="NetFx462.wxs" />
-    <Compile Include="NetFx47.wxs" />
-    <Compile Include="NetFx471.wxs" />
-    <Compile Include="NetFx472.wxs" />
-    <Compile Include="NetFx48.wxs" />
-    <Compile Include="NetFxExtension_arm.wxs" />
-    <Compile Include="NetFxExtension_arm64.wxs" />
-    <Compile Include="NetFxExtension_x64.wxs" />
-    <Compile Include="NetFxExtension_x86.wxs" />
-    <Compile Include="NetCore3.1.0_x64.wxs" />
-    <Compile Include="NetCore3.1.0_x86.wxs" />
-    <Compile Include="NetCore3.1.1_x64.wxs" />
-    <Compile Include="NetCore3.1.1_x86.wxs" />
-    <Compile Include="NetCore3.1.2_x64.wxs" />
-    <Compile Include="NetCore3.1.2_x86.wxs" />
-    <Compile Include="NetCore3.1.3_x64.wxs" />
-    <Compile Include="NetCore3.1.3_x86.wxs" />
-    <Compile Include="NetCore3.1.4_x64.wxs" />
-    <Compile Include="NetCore3.1.4_x86.wxs" />
-    <Compile Include="NetCoreShared.wxs" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="packages.config" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.*" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\ca\netfxca.vcxproj">
-      <Name>netfxca</Name>
-      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
-      <Properties>Platform=ARM</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\netfxca.vcxproj">
-      <Name>netfxca</Name>
-      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
-      <Properties>Platform=ARM64</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\netfxca.vcxproj">
-      <Name>netfxca</Name>
-      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
-      <Properties>Platform=x86</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\ca\netfxca.vcxproj">
-      <Name>netfxca</Name>
-      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
-      <Properties>Platform=x64</Properties>
-    </ProjectReference>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="WiX Toolset build tools (v4.0 or later) must be installed to build this project. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
-  </Target>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0133\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0133\build\WixToolset.MSBuild.props'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.Bal.wixext.4.0.40\build\WixToolset.Bal.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Bal.wixext.4.0.40\build\WixToolset.Bal.wixext.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.Util.wixext.4.0.36\build\WixToolset.Util.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Util.wixext.4.0.36\build\WixToolset.Util.wixext.targets'))" />
-  </Target>
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
-  <Import Project="..\..\packages\WixToolset.Bal.wixext.4.0.40\build\WixToolset.Bal.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Bal.wixext.4.0.40\build\WixToolset.Bal.wixext.targets')" />  
-  <Import Project="..\..\packages\WixToolset.Util.wixext.4.0.36\build\WixToolset.Util.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Util.wixext.4.0.36\build\WixToolset.Util.wixext.targets')" />
+
 </Project>
