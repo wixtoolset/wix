@@ -5,7 +5,7 @@ namespace WixToolset.ComPlus
     using System;
     using WixToolset.Data;
 
-    public enum ComPlusTupleDefinitionType
+    public enum ComPlusSymbolDefinitionType
     {
         ComPlusApplication,
         ComPlusApplicationProperty,
@@ -34,13 +34,13 @@ namespace WixToolset.ComPlus
         ComPlusUserInPartitionRole,
     }
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out ComPlusTupleDefinitionType type))
+            if (!Enum.TryParse(name, out ComPlusSymbolDefinitionType type))
             {
                 return null;
             }
@@ -48,84 +48,84 @@ namespace WixToolset.ComPlus
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(ComPlusTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(ComPlusSymbolDefinitionType type)
         {
             switch (type)
             {
-                case ComPlusTupleDefinitionType.ComPlusApplication:
-                    return ComPlusTupleDefinitions.ComPlusApplication;
+                case ComPlusSymbolDefinitionType.ComPlusApplication:
+                    return ComPlusSymbolDefinitions.ComPlusApplication;
 
-                case ComPlusTupleDefinitionType.ComPlusApplicationProperty:
-                    return ComPlusTupleDefinitions.ComPlusApplicationProperty;
+                case ComPlusSymbolDefinitionType.ComPlusApplicationProperty:
+                    return ComPlusSymbolDefinitions.ComPlusApplicationProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusApplicationRole:
-                    return ComPlusTupleDefinitions.ComPlusApplicationRole;
+                case ComPlusSymbolDefinitionType.ComPlusApplicationRole:
+                    return ComPlusSymbolDefinitions.ComPlusApplicationRole;
 
-                case ComPlusTupleDefinitionType.ComPlusApplicationRoleProperty:
-                    return ComPlusTupleDefinitions.ComPlusApplicationRoleProperty;
+                case ComPlusSymbolDefinitionType.ComPlusApplicationRoleProperty:
+                    return ComPlusSymbolDefinitions.ComPlusApplicationRoleProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusAssembly:
-                    return ComPlusTupleDefinitions.ComPlusAssembly;
+                case ComPlusSymbolDefinitionType.ComPlusAssembly:
+                    return ComPlusSymbolDefinitions.ComPlusAssembly;
 
-                case ComPlusTupleDefinitionType.ComPlusAssemblyDependency:
-                    return ComPlusTupleDefinitions.ComPlusAssemblyDependency;
+                case ComPlusSymbolDefinitionType.ComPlusAssemblyDependency:
+                    return ComPlusSymbolDefinitions.ComPlusAssemblyDependency;
 
-                case ComPlusTupleDefinitionType.ComPlusComponent:
-                    return ComPlusTupleDefinitions.ComPlusComponent;
+                case ComPlusSymbolDefinitionType.ComPlusComponent:
+                    return ComPlusSymbolDefinitions.ComPlusComponent;
 
-                case ComPlusTupleDefinitionType.ComPlusComponentProperty:
-                    return ComPlusTupleDefinitions.ComPlusComponentProperty;
+                case ComPlusSymbolDefinitionType.ComPlusComponentProperty:
+                    return ComPlusSymbolDefinitions.ComPlusComponentProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusGroupInApplicationRole:
-                    return ComPlusTupleDefinitions.ComPlusGroupInApplicationRole;
+                case ComPlusSymbolDefinitionType.ComPlusGroupInApplicationRole:
+                    return ComPlusSymbolDefinitions.ComPlusGroupInApplicationRole;
 
-                case ComPlusTupleDefinitionType.ComPlusGroupInPartitionRole:
-                    return ComPlusTupleDefinitions.ComPlusGroupInPartitionRole;
+                case ComPlusSymbolDefinitionType.ComPlusGroupInPartitionRole:
+                    return ComPlusSymbolDefinitions.ComPlusGroupInPartitionRole;
 
-                case ComPlusTupleDefinitionType.ComPlusInterface:
-                    return ComPlusTupleDefinitions.ComPlusInterface;
+                case ComPlusSymbolDefinitionType.ComPlusInterface:
+                    return ComPlusSymbolDefinitions.ComPlusInterface;
 
-                case ComPlusTupleDefinitionType.ComPlusInterfaceProperty:
-                    return ComPlusTupleDefinitions.ComPlusInterfaceProperty;
+                case ComPlusSymbolDefinitionType.ComPlusInterfaceProperty:
+                    return ComPlusSymbolDefinitions.ComPlusInterfaceProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusMethod:
-                    return ComPlusTupleDefinitions.ComPlusMethod;
+                case ComPlusSymbolDefinitionType.ComPlusMethod:
+                    return ComPlusSymbolDefinitions.ComPlusMethod;
 
-                case ComPlusTupleDefinitionType.ComPlusMethodProperty:
-                    return ComPlusTupleDefinitions.ComPlusMethodProperty;
+                case ComPlusSymbolDefinitionType.ComPlusMethodProperty:
+                    return ComPlusSymbolDefinitions.ComPlusMethodProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusPartition:
-                    return ComPlusTupleDefinitions.ComPlusPartition;
+                case ComPlusSymbolDefinitionType.ComPlusPartition:
+                    return ComPlusSymbolDefinitions.ComPlusPartition;
 
-                case ComPlusTupleDefinitionType.ComPlusPartitionProperty:
-                    return ComPlusTupleDefinitions.ComPlusPartitionProperty;
+                case ComPlusSymbolDefinitionType.ComPlusPartitionProperty:
+                    return ComPlusSymbolDefinitions.ComPlusPartitionProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusPartitionRole:
-                    return ComPlusTupleDefinitions.ComPlusPartitionRole;
+                case ComPlusSymbolDefinitionType.ComPlusPartitionRole:
+                    return ComPlusSymbolDefinitions.ComPlusPartitionRole;
 
-                case ComPlusTupleDefinitionType.ComPlusPartitionUser:
-                    return ComPlusTupleDefinitions.ComPlusPartitionUser;
+                case ComPlusSymbolDefinitionType.ComPlusPartitionUser:
+                    return ComPlusSymbolDefinitions.ComPlusPartitionUser;
 
-                case ComPlusTupleDefinitionType.ComPlusRoleForComponent:
-                    return ComPlusTupleDefinitions.ComPlusRoleForComponent;
+                case ComPlusSymbolDefinitionType.ComPlusRoleForComponent:
+                    return ComPlusSymbolDefinitions.ComPlusRoleForComponent;
 
-                case ComPlusTupleDefinitionType.ComPlusRoleForInterface:
-                    return ComPlusTupleDefinitions.ComPlusRoleForInterface;
+                case ComPlusSymbolDefinitionType.ComPlusRoleForInterface:
+                    return ComPlusSymbolDefinitions.ComPlusRoleForInterface;
 
-                case ComPlusTupleDefinitionType.ComPlusRoleForMethod:
-                    return ComPlusTupleDefinitions.ComPlusRoleForMethod;
+                case ComPlusSymbolDefinitionType.ComPlusRoleForMethod:
+                    return ComPlusSymbolDefinitions.ComPlusRoleForMethod;
 
-                case ComPlusTupleDefinitionType.ComPlusSubscription:
-                    return ComPlusTupleDefinitions.ComPlusSubscription;
+                case ComPlusSymbolDefinitionType.ComPlusSubscription:
+                    return ComPlusSymbolDefinitions.ComPlusSubscription;
 
-                case ComPlusTupleDefinitionType.ComPlusSubscriptionProperty:
-                    return ComPlusTupleDefinitions.ComPlusSubscriptionProperty;
+                case ComPlusSymbolDefinitionType.ComPlusSubscriptionProperty:
+                    return ComPlusSymbolDefinitions.ComPlusSubscriptionProperty;
 
-                case ComPlusTupleDefinitionType.ComPlusUserInApplicationRole:
-                    return ComPlusTupleDefinitions.ComPlusUserInApplicationRole;
+                case ComPlusSymbolDefinitionType.ComPlusUserInApplicationRole:
+                    return ComPlusSymbolDefinitions.ComPlusUserInApplicationRole;
 
-                case ComPlusTupleDefinitionType.ComPlusUserInPartitionRole:
-                    return ComPlusTupleDefinitions.ComPlusUserInPartitionRole;
+                case ComPlusSymbolDefinitionType.ComPlusUserInPartitionRole:
+                    return ComPlusSymbolDefinitions.ComPlusUserInPartitionRole;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

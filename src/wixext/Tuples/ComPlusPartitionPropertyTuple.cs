@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusPartitionProperty = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusPartitionProperty.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusPartitionProperty = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusPartitionProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.PartitionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertySymbolFields.PartitionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertySymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ComPlusPartitionPropertyTuple));
+            typeof(ComPlusPartitionPropertySymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusPartitionPropertyTupleFields
+    public enum ComPlusPartitionPropertySymbolFields
     {
         PartitionRef,
         Name,
         Value,
     }
 
-    public class ComPlusPartitionPropertyTuple : IntermediateTuple
+    public class ComPlusPartitionPropertySymbol : IntermediateSymbol
     {
-        public ComPlusPartitionPropertyTuple() : base(ComPlusTupleDefinitions.ComPlusPartitionProperty, null, null)
+        public ComPlusPartitionPropertySymbol() : base(ComPlusSymbolDefinitions.ComPlusPartitionProperty, null, null)
         {
         }
 
-        public ComPlusPartitionPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusPartitionProperty, sourceLineNumber, id)
+        public ComPlusPartitionPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusPartitionProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusPartitionPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusPartitionPropertySymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusPartitionPropertyTupleFields.PartitionRef].AsString();
-            set => this.Set((int)ComPlusPartitionPropertyTupleFields.PartitionRef, value);
+            get => this.Fields[(int)ComPlusPartitionPropertySymbolFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusPartitionPropertySymbolFields.PartitionRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusPartitionPropertyTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusPartitionPropertyTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusPartitionPropertySymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusPartitionPropertySymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)ComPlusPartitionPropertyTupleFields.Value].AsString();
-            set => this.Set((int)ComPlusPartitionPropertyTupleFields.Value, value);
+            get => this.Fields[(int)ComPlusPartitionPropertySymbolFields.Value].AsString();
+            set => this.Set((int)ComPlusPartitionPropertySymbolFields.Value, value);
         }
     }
 }

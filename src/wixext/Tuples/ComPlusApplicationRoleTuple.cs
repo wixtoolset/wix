@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusApplicationRole = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusApplicationRole.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusApplicationRole = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusApplicationRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleTupleFields.ApplicationRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleSymbolFields.ApplicationRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationRoleSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(ComPlusApplicationRoleTuple));
+            typeof(ComPlusApplicationRoleSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusApplicationRoleTupleFields
+    public enum ComPlusApplicationRoleSymbolFields
     {
         ApplicationRef,
         ComponentRef,
         Name,
     }
 
-    public class ComPlusApplicationRoleTuple : IntermediateTuple
+    public class ComPlusApplicationRoleSymbol : IntermediateSymbol
     {
-        public ComPlusApplicationRoleTuple() : base(ComPlusTupleDefinitions.ComPlusApplicationRole, null, null)
+        public ComPlusApplicationRoleSymbol() : base(ComPlusSymbolDefinitions.ComPlusApplicationRole, null, null)
         {
         }
 
-        public ComPlusApplicationRoleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusApplicationRole, sourceLineNumber, id)
+        public ComPlusApplicationRoleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusApplicationRole, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusApplicationRoleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusApplicationRoleSymbolFields index] => this.Fields[(int)index];
 
         public string ApplicationRef
         {
-            get => this.Fields[(int)ComPlusApplicationRoleTupleFields.ApplicationRef].AsString();
-            set => this.Set((int)ComPlusApplicationRoleTupleFields.ApplicationRef, value);
+            get => this.Fields[(int)ComPlusApplicationRoleSymbolFields.ApplicationRef].AsString();
+            set => this.Set((int)ComPlusApplicationRoleSymbolFields.ApplicationRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusApplicationRoleTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusApplicationRoleTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusApplicationRoleSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusApplicationRoleSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusApplicationRoleTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusApplicationRoleTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusApplicationRoleSymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusApplicationRoleSymbolFields.Name, value);
         }
     }
 }

@@ -3,31 +3,31 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusAssembly = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusAssembly.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusAssembly = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusAssembly.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.ApplicationRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.AssemblyName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.DllPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.TlbPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.PSDllPath), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.ApplicationRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.AssemblyName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.DllPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.TlbPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.PSDllPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblySymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(ComPlusAssemblyTuple));
+            typeof(ComPlusAssemblySymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusAssemblyTupleFields
+    public enum ComPlusAssemblySymbolFields
     {
         ApplicationRef,
         ComponentRef,
@@ -38,58 +38,58 @@ namespace WixToolset.ComPlus.Tuples
         Attributes,
     }
 
-    public class ComPlusAssemblyTuple : IntermediateTuple
+    public class ComPlusAssemblySymbol : IntermediateSymbol
     {
-        public ComPlusAssemblyTuple() : base(ComPlusTupleDefinitions.ComPlusAssembly, null, null)
+        public ComPlusAssemblySymbol() : base(ComPlusSymbolDefinitions.ComPlusAssembly, null, null)
         {
         }
 
-        public ComPlusAssemblyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusAssembly, sourceLineNumber, id)
+        public ComPlusAssemblySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusAssembly, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusAssemblyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusAssemblySymbolFields index] => this.Fields[(int)index];
 
         public string ApplicationRef
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.ApplicationRef].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.ApplicationRef, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.ApplicationRef].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.ApplicationRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.ComponentRef, value);
         }
 
         public string AssemblyName
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.AssemblyName].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.AssemblyName, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.AssemblyName].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.AssemblyName, value);
         }
 
         public string DllPath
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.DllPath].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.DllPath, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.DllPath].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.DllPath, value);
         }
 
         public string TlbPath
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.TlbPath].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.TlbPath, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.TlbPath].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.TlbPath, value);
         }
 
         public string PSDllPath
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.PSDllPath].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.PSDllPath, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.PSDllPath].AsString();
+            set => this.Set((int)ComPlusAssemblySymbolFields.PSDllPath, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.Attributes].AsNumber();
-            set => this.Set((int)ComPlusAssemblyTupleFields.Attributes, value);
+            get => this.Fields[(int)ComPlusAssemblySymbolFields.Attributes].AsNumber();
+            set => this.Set((int)ComPlusAssemblySymbolFields.Attributes, value);
         }
     }
 }

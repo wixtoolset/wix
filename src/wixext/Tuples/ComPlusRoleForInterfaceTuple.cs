@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusRoleForInterface = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusRoleForInterface.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusRoleForInterface = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusRoleForInterface.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceTupleFields.InterfaceRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceTupleFields.ApplicationRoleRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceSymbolFields.InterfaceRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceSymbolFields.ApplicationRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForInterfaceSymbolFields.ComponentRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusRoleForInterfaceTuple));
+            typeof(ComPlusRoleForInterfaceSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusRoleForInterfaceTupleFields
+    public enum ComPlusRoleForInterfaceSymbolFields
     {
         InterfaceRef,
         ApplicationRoleRef,
         ComponentRef,
     }
 
-    public class ComPlusRoleForInterfaceTuple : IntermediateTuple
+    public class ComPlusRoleForInterfaceSymbol : IntermediateSymbol
     {
-        public ComPlusRoleForInterfaceTuple() : base(ComPlusTupleDefinitions.ComPlusRoleForInterface, null, null)
+        public ComPlusRoleForInterfaceSymbol() : base(ComPlusSymbolDefinitions.ComPlusRoleForInterface, null, null)
         {
         }
 
-        public ComPlusRoleForInterfaceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusRoleForInterface, sourceLineNumber, id)
+        public ComPlusRoleForInterfaceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusRoleForInterface, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusRoleForInterfaceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusRoleForInterfaceSymbolFields index] => this.Fields[(int)index];
 
         public string InterfaceRef
         {
-            get => this.Fields[(int)ComPlusRoleForInterfaceTupleFields.InterfaceRef].AsString();
-            set => this.Set((int)ComPlusRoleForInterfaceTupleFields.InterfaceRef, value);
+            get => this.Fields[(int)ComPlusRoleForInterfaceSymbolFields.InterfaceRef].AsString();
+            set => this.Set((int)ComPlusRoleForInterfaceSymbolFields.InterfaceRef, value);
         }
 
         public string ApplicationRoleRef
         {
-            get => this.Fields[(int)ComPlusRoleForInterfaceTupleFields.ApplicationRoleRef].AsString();
-            set => this.Set((int)ComPlusRoleForInterfaceTupleFields.ApplicationRoleRef, value);
+            get => this.Fields[(int)ComPlusRoleForInterfaceSymbolFields.ApplicationRoleRef].AsString();
+            set => this.Set((int)ComPlusRoleForInterfaceSymbolFields.ApplicationRoleRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusRoleForInterfaceTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusRoleForInterfaceTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusRoleForInterfaceSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusRoleForInterfaceSymbolFields.ComponentRef, value);
         }
     }
 }

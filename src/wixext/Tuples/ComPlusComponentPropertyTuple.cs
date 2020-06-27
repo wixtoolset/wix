@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusComponentProperty = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusComponentProperty.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusComponentProperty = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusComponentProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertyTupleFields.ComPlusComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertyTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertyTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertySymbolFields.ComPlusComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusComponentPropertySymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ComPlusComponentPropertyTuple));
+            typeof(ComPlusComponentPropertySymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusComponentPropertyTupleFields
+    public enum ComPlusComponentPropertySymbolFields
     {
         ComPlusComponentRef,
         Name,
         Value,
     }
 
-    public class ComPlusComponentPropertyTuple : IntermediateTuple
+    public class ComPlusComponentPropertySymbol : IntermediateSymbol
     {
-        public ComPlusComponentPropertyTuple() : base(ComPlusTupleDefinitions.ComPlusComponentProperty, null, null)
+        public ComPlusComponentPropertySymbol() : base(ComPlusSymbolDefinitions.ComPlusComponentProperty, null, null)
         {
         }
 
-        public ComPlusComponentPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusComponentProperty, sourceLineNumber, id)
+        public ComPlusComponentPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusComponentProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusComponentPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusComponentPropertySymbolFields index] => this.Fields[(int)index];
 
         public string ComPlusComponentRef
         {
-            get => this.Fields[(int)ComPlusComponentPropertyTupleFields.ComPlusComponentRef].AsString();
-            set => this.Set((int)ComPlusComponentPropertyTupleFields.ComPlusComponentRef, value);
+            get => this.Fields[(int)ComPlusComponentPropertySymbolFields.ComPlusComponentRef].AsString();
+            set => this.Set((int)ComPlusComponentPropertySymbolFields.ComPlusComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusComponentPropertyTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusComponentPropertyTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusComponentPropertySymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusComponentPropertySymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)ComPlusComponentPropertyTupleFields.Value].AsString();
-            set => this.Set((int)ComPlusComponentPropertyTupleFields.Value, value);
+            get => this.Fields[(int)ComPlusComponentPropertySymbolFields.Value].AsString();
+            set => this.Set((int)ComPlusComponentPropertySymbolFields.Value, value);
         }
     }
 }

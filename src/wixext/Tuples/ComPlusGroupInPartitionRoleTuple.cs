@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusGroupInPartitionRole = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusGroupInPartitionRole.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusGroupInPartitionRole = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusGroupInPartitionRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleTupleFields.PartitionRoleRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleTupleFields.GroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleSymbolFields.PartitionRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInPartitionRoleSymbolFields.GroupRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusGroupInPartitionRoleTuple));
+            typeof(ComPlusGroupInPartitionRoleSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusGroupInPartitionRoleTupleFields
+    public enum ComPlusGroupInPartitionRoleSymbolFields
     {
         PartitionRoleRef,
         ComponentRef,
         GroupRef,
     }
 
-    public class ComPlusGroupInPartitionRoleTuple : IntermediateTuple
+    public class ComPlusGroupInPartitionRoleSymbol : IntermediateSymbol
     {
-        public ComPlusGroupInPartitionRoleTuple() : base(ComPlusTupleDefinitions.ComPlusGroupInPartitionRole, null, null)
+        public ComPlusGroupInPartitionRoleSymbol() : base(ComPlusSymbolDefinitions.ComPlusGroupInPartitionRole, null, null)
         {
         }
 
-        public ComPlusGroupInPartitionRoleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusGroupInPartitionRole, sourceLineNumber, id)
+        public ComPlusGroupInPartitionRoleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusGroupInPartitionRole, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusGroupInPartitionRoleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusGroupInPartitionRoleSymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRoleRef
         {
-            get => this.Fields[(int)ComPlusGroupInPartitionRoleTupleFields.PartitionRoleRef].AsString();
-            set => this.Set((int)ComPlusGroupInPartitionRoleTupleFields.PartitionRoleRef, value);
+            get => this.Fields[(int)ComPlusGroupInPartitionRoleSymbolFields.PartitionRoleRef].AsString();
+            set => this.Set((int)ComPlusGroupInPartitionRoleSymbolFields.PartitionRoleRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusGroupInPartitionRoleTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusGroupInPartitionRoleTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusGroupInPartitionRoleSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusGroupInPartitionRoleSymbolFields.ComponentRef, value);
         }
 
         public string GroupRef
         {
-            get => this.Fields[(int)ComPlusGroupInPartitionRoleTupleFields.GroupRef].AsString();
-            set => this.Set((int)ComPlusGroupInPartitionRoleTupleFields.GroupRef, value);
+            get => this.Fields[(int)ComPlusGroupInPartitionRoleSymbolFields.GroupRef].AsString();
+            set => this.Set((int)ComPlusGroupInPartitionRoleSymbolFields.GroupRef, value);
         }
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusMethodProperty = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusMethodProperty.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusMethodProperty = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusMethodProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.MethodRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertySymbolFields.MethodRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertySymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertySymbolFields.Value), IntermediateFieldType.String),
             },
-            typeof(ComPlusMethodPropertyTuple));
+            typeof(ComPlusMethodPropertySymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusMethodPropertyTupleFields
+    public enum ComPlusMethodPropertySymbolFields
     {
         MethodRef,
         Name,
         Value,
     }
 
-    public class ComPlusMethodPropertyTuple : IntermediateTuple
+    public class ComPlusMethodPropertySymbol : IntermediateSymbol
     {
-        public ComPlusMethodPropertyTuple() : base(ComPlusTupleDefinitions.ComPlusMethodProperty, null, null)
+        public ComPlusMethodPropertySymbol() : base(ComPlusSymbolDefinitions.ComPlusMethodProperty, null, null)
         {
         }
 
-        public ComPlusMethodPropertyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusMethodProperty, sourceLineNumber, id)
+        public ComPlusMethodPropertySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusMethodProperty, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusMethodPropertyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusMethodPropertySymbolFields index] => this.Fields[(int)index];
 
         public string MethodRef
         {
-            get => this.Fields[(int)ComPlusMethodPropertyTupleFields.MethodRef].AsString();
-            set => this.Set((int)ComPlusMethodPropertyTupleFields.MethodRef, value);
+            get => this.Fields[(int)ComPlusMethodPropertySymbolFields.MethodRef].AsString();
+            set => this.Set((int)ComPlusMethodPropertySymbolFields.MethodRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusMethodPropertyTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusMethodPropertyTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusMethodPropertySymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusMethodPropertySymbolFields.Name, value);
         }
 
         public string Value
         {
-            get => this.Fields[(int)ComPlusMethodPropertyTupleFields.Value].AsString();
-            set => this.Set((int)ComPlusMethodPropertyTupleFields.Value, value);
+            get => this.Fields[(int)ComPlusMethodPropertySymbolFields.Value].AsString();
+            set => this.Set((int)ComPlusMethodPropertySymbolFields.Value, value);
         }
     }
 }

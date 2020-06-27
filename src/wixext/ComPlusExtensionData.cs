@@ -16,15 +16,15 @@ namespace WixToolset.ComPlus
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = ComPlusTupleDefinitions.ByName(name);
-            return tupleDefinition != null;
+            symbolDefinition = ComPlusSymbolDefinitions.ByName(name);
+            return symbolDefinition != null;
         }
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(ComPlusExtensionData).Assembly, "WixToolset.ComPlus.complus.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(ComPlusExtensionData).Assembly, "WixToolset.ComPlus.complus.wixlib", symbolDefinitions);
         }
     }
 }

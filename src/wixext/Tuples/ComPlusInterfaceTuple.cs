@@ -3,53 +3,53 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusInterface = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusInterface.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusInterface = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusInterface.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.ComPlusComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.IID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusInterfaceSymbolFields.ComPlusComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusInterfaceSymbolFields.IID), IntermediateFieldType.String),
             },
-            typeof(ComPlusInterfaceTuple));
+            typeof(ComPlusInterfaceSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusInterfaceTupleFields
+    public enum ComPlusInterfaceSymbolFields
     {
         ComPlusComponentRef,
         IID,
     }
 
-    public class ComPlusInterfaceTuple : IntermediateTuple
+    public class ComPlusInterfaceSymbol : IntermediateSymbol
     {
-        public ComPlusInterfaceTuple() : base(ComPlusTupleDefinitions.ComPlusInterface, null, null)
+        public ComPlusInterfaceSymbol() : base(ComPlusSymbolDefinitions.ComPlusInterface, null, null)
         {
         }
 
-        public ComPlusInterfaceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusInterface, sourceLineNumber, id)
+        public ComPlusInterfaceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusInterface, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusInterfaceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusInterfaceSymbolFields index] => this.Fields[(int)index];
 
         public string ComPlusComponentRef
         {
-            get => this.Fields[(int)ComPlusInterfaceTupleFields.ComPlusComponentRef].AsString();
-            set => this.Set((int)ComPlusInterfaceTupleFields.ComPlusComponentRef, value);
+            get => this.Fields[(int)ComPlusInterfaceSymbolFields.ComPlusComponentRef].AsString();
+            set => this.Set((int)ComPlusInterfaceSymbolFields.ComPlusComponentRef, value);
         }
 
         public string IID
         {
-            get => this.Fields[(int)ComPlusInterfaceTupleFields.IID].AsString();
-            set => this.Set((int)ComPlusInterfaceTupleFields.IID, value);
+            get => this.Fields[(int)ComPlusInterfaceSymbolFields.IID].AsString();
+            set => this.Set((int)ComPlusInterfaceSymbolFields.IID, value);
         }
     }
 }

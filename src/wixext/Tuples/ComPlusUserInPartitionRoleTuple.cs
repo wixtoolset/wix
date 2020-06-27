@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusUserInPartitionRole = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusUserInPartitionRole.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusUserInPartitionRole = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusUserInPartitionRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleSymbolFields.PartitionRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleSymbolFields.UserRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusUserInPartitionRoleTuple));
+            typeof(ComPlusUserInPartitionRoleSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusUserInPartitionRoleTupleFields
+    public enum ComPlusUserInPartitionRoleSymbolFields
     {
         PartitionRoleRef,
         ComponentRef,
         UserRef,
     }
 
-    public class ComPlusUserInPartitionRoleTuple : IntermediateTuple
+    public class ComPlusUserInPartitionRoleSymbol : IntermediateSymbol
     {
-        public ComPlusUserInPartitionRoleTuple() : base(ComPlusTupleDefinitions.ComPlusUserInPartitionRole, null, null)
+        public ComPlusUserInPartitionRoleSymbol() : base(ComPlusSymbolDefinitions.ComPlusUserInPartitionRole, null, null)
         {
         }
 
-        public ComPlusUserInPartitionRoleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusUserInPartitionRole, sourceLineNumber, id)
+        public ComPlusUserInPartitionRoleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusUserInPartitionRole, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusUserInPartitionRoleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusUserInPartitionRoleSymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRoleRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleSymbolFields.PartitionRoleRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleSymbolFields.PartitionRoleRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleSymbolFields.ComponentRef, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.UserRef].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.UserRef, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleSymbolFields.UserRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleSymbolFields.UserRef, value);
         }
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusGroupInApplicationRole = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusGroupInApplicationRole.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusGroupInApplicationRole = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusGroupInApplicationRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleTupleFields.ApplicationRoleRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleTupleFields.GroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleSymbolFields.ApplicationRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusGroupInApplicationRoleSymbolFields.GroupRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusGroupInApplicationRoleTuple));
+            typeof(ComPlusGroupInApplicationRoleSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusGroupInApplicationRoleTupleFields
+    public enum ComPlusGroupInApplicationRoleSymbolFields
     {
         ApplicationRoleRef,
         ComponentRef,
         GroupRef,
     }
 
-    public class ComPlusGroupInApplicationRoleTuple : IntermediateTuple
+    public class ComPlusGroupInApplicationRoleSymbol : IntermediateSymbol
     {
-        public ComPlusGroupInApplicationRoleTuple() : base(ComPlusTupleDefinitions.ComPlusGroupInApplicationRole, null, null)
+        public ComPlusGroupInApplicationRoleSymbol() : base(ComPlusSymbolDefinitions.ComPlusGroupInApplicationRole, null, null)
         {
         }
 
-        public ComPlusGroupInApplicationRoleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusGroupInApplicationRole, sourceLineNumber, id)
+        public ComPlusGroupInApplicationRoleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusGroupInApplicationRole, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusGroupInApplicationRoleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusGroupInApplicationRoleSymbolFields index] => this.Fields[(int)index];
 
         public string ApplicationRoleRef
         {
-            get => this.Fields[(int)ComPlusGroupInApplicationRoleTupleFields.ApplicationRoleRef].AsString();
-            set => this.Set((int)ComPlusGroupInApplicationRoleTupleFields.ApplicationRoleRef, value);
+            get => this.Fields[(int)ComPlusGroupInApplicationRoleSymbolFields.ApplicationRoleRef].AsString();
+            set => this.Set((int)ComPlusGroupInApplicationRoleSymbolFields.ApplicationRoleRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusGroupInApplicationRoleTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusGroupInApplicationRoleTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusGroupInApplicationRoleSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusGroupInApplicationRoleSymbolFields.ComponentRef, value);
         }
 
         public string GroupRef
         {
-            get => this.Fields[(int)ComPlusGroupInApplicationRoleTupleFields.GroupRef].AsString();
-            set => this.Set((int)ComPlusGroupInApplicationRoleTupleFields.GroupRef, value);
+            get => this.Fields[(int)ComPlusGroupInApplicationRoleSymbolFields.GroupRef].AsString();
+            set => this.Set((int)ComPlusGroupInApplicationRoleSymbolFields.GroupRef, value);
         }
     }
 }

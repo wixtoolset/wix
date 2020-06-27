@@ -3,28 +3,28 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusApplication = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusApplication.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusApplication = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusApplication.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.PartitionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.ApplicationId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationSymbolFields.PartitionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationSymbolFields.ApplicationId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(ComPlusApplicationTuple));
+            typeof(ComPlusApplicationSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusApplicationTupleFields
+    public enum ComPlusApplicationSymbolFields
     {
         PartitionRef,
         ComponentRef,
@@ -32,40 +32,40 @@ namespace WixToolset.ComPlus.Tuples
         Name,
     }
 
-    public class ComPlusApplicationTuple : IntermediateTuple
+    public class ComPlusApplicationSymbol : IntermediateSymbol
     {
-        public ComPlusApplicationTuple() : base(ComPlusTupleDefinitions.ComPlusApplication, null, null)
+        public ComPlusApplicationSymbol() : base(ComPlusSymbolDefinitions.ComPlusApplication, null, null)
         {
         }
 
-        public ComPlusApplicationTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusApplication, sourceLineNumber, id)
+        public ComPlusApplicationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusApplication, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusApplicationTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusApplicationSymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.PartitionRef].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.PartitionRef, value);
+            get => this.Fields[(int)ComPlusApplicationSymbolFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusApplicationSymbolFields.PartitionRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusApplicationSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusApplicationSymbolFields.ComponentRef, value);
         }
 
         public string ApplicationId
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.ApplicationId].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.ApplicationId, value);
+            get => this.Fields[(int)ComPlusApplicationSymbolFields.ApplicationId].AsString();
+            set => this.Set((int)ComPlusApplicationSymbolFields.ApplicationId, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusApplicationSymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusApplicationSymbolFields.Name, value);
         }
     }
 }

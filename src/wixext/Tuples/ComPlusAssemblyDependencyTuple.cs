@@ -3,53 +3,53 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusAssemblyDependency = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusAssemblyDependency.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusAssemblyDependency = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusAssemblyDependency.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.AssemblyRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencySymbolFields.AssemblyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencySymbolFields.RequiredAssemblyRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusAssemblyDependencyTuple));
+            typeof(ComPlusAssemblyDependencySymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusAssemblyDependencyTupleFields
+    public enum ComPlusAssemblyDependencySymbolFields
     {
         AssemblyRef,
         RequiredAssemblyRef,
     }
 
-    public class ComPlusAssemblyDependencyTuple : IntermediateTuple
+    public class ComPlusAssemblyDependencySymbol : IntermediateSymbol
     {
-        public ComPlusAssemblyDependencyTuple() : base(ComPlusTupleDefinitions.ComPlusAssemblyDependency, null, null)
+        public ComPlusAssemblyDependencySymbol() : base(ComPlusSymbolDefinitions.ComPlusAssemblyDependency, null, null)
         {
         }
 
-        public ComPlusAssemblyDependencyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusAssemblyDependency, sourceLineNumber, id)
+        public ComPlusAssemblyDependencySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusAssemblyDependency, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusAssemblyDependencyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusAssemblyDependencySymbolFields index] => this.Fields[(int)index];
 
         public string AssemblyRef
         {
-            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.AssemblyRef].AsString();
-            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.AssemblyRef, value);
+            get => this.Fields[(int)ComPlusAssemblyDependencySymbolFields.AssemblyRef].AsString();
+            set => this.Set((int)ComPlusAssemblyDependencySymbolFields.AssemblyRef, value);
         }
 
         public string RequiredAssemblyRef
         {
-            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef].AsString();
-            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef, value);
+            get => this.Fields[(int)ComPlusAssemblyDependencySymbolFields.RequiredAssemblyRef].AsString();
+            set => this.Set((int)ComPlusAssemblyDependencySymbolFields.RequiredAssemblyRef, value);
         }
     }
 }

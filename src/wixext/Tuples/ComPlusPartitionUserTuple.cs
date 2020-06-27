@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusPartitionUser = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusPartitionUser.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusPartitionUser = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusPartitionUser.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserTupleFields.PartitionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserTupleFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserSymbolFields.PartitionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionUserSymbolFields.UserRef), IntermediateFieldType.String),
             },
-            typeof(ComPlusPartitionUserTuple));
+            typeof(ComPlusPartitionUserSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusPartitionUserTupleFields
+    public enum ComPlusPartitionUserSymbolFields
     {
         PartitionRef,
         ComponentRef,
         UserRef,
     }
 
-    public class ComPlusPartitionUserTuple : IntermediateTuple
+    public class ComPlusPartitionUserSymbol : IntermediateSymbol
     {
-        public ComPlusPartitionUserTuple() : base(ComPlusTupleDefinitions.ComPlusPartitionUser, null, null)
+        public ComPlusPartitionUserSymbol() : base(ComPlusSymbolDefinitions.ComPlusPartitionUser, null, null)
         {
         }
 
-        public ComPlusPartitionUserTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusPartitionUser, sourceLineNumber, id)
+        public ComPlusPartitionUserSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusPartitionUser, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusPartitionUserTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusPartitionUserSymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusPartitionUserTupleFields.PartitionRef].AsString();
-            set => this.Set((int)ComPlusPartitionUserTupleFields.PartitionRef, value);
+            get => this.Fields[(int)ComPlusPartitionUserSymbolFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusPartitionUserSymbolFields.PartitionRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusPartitionUserTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusPartitionUserTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusPartitionUserSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusPartitionUserSymbolFields.ComponentRef, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)ComPlusPartitionUserTupleFields.UserRef].AsString();
-            set => this.Set((int)ComPlusPartitionUserTupleFields.UserRef, value);
+            get => this.Fields[(int)ComPlusPartitionUserSymbolFields.UserRef].AsString();
+            set => this.Set((int)ComPlusPartitionUserSymbolFields.UserRef, value);
         }
     }
 }

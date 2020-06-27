@@ -3,61 +3,61 @@
 namespace WixToolset.ComPlus
 {
     using WixToolset.Data;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
 
-    public static partial class ComPlusTupleDefinitions
+    public static partial class ComPlusSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition ComPlusPartitionRole = new IntermediateTupleDefinition(
-            ComPlusTupleDefinitionType.ComPlusPartitionRole.ToString(),
+        public static readonly IntermediateSymbolDefinition ComPlusPartitionRole = new IntermediateSymbolDefinition(
+            ComPlusSymbolDefinitionType.ComPlusPartitionRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleTupleFields.PartitionRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleSymbolFields.PartitionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionRoleSymbolFields.Name), IntermediateFieldType.String),
             },
-            typeof(ComPlusPartitionRoleTuple));
+            typeof(ComPlusPartitionRoleSymbol));
     }
 }
 
-namespace WixToolset.ComPlus.Tuples
+namespace WixToolset.ComPlus.Symbols
 {
     using WixToolset.Data;
 
-    public enum ComPlusPartitionRoleTupleFields
+    public enum ComPlusPartitionRoleSymbolFields
     {
         PartitionRef,
         ComponentRef,
         Name,
     }
 
-    public class ComPlusPartitionRoleTuple : IntermediateTuple
+    public class ComPlusPartitionRoleSymbol : IntermediateSymbol
     {
-        public ComPlusPartitionRoleTuple() : base(ComPlusTupleDefinitions.ComPlusPartitionRole, null, null)
+        public ComPlusPartitionRoleSymbol() : base(ComPlusSymbolDefinitions.ComPlusPartitionRole, null, null)
         {
         }
 
-        public ComPlusPartitionRoleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusTupleDefinitions.ComPlusPartitionRole, sourceLineNumber, id)
+        public ComPlusPartitionRoleSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ComPlusSymbolDefinitions.ComPlusPartitionRole, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[ComPlusPartitionRoleTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[ComPlusPartitionRoleSymbolFields index] => this.Fields[(int)index];
 
         public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusPartitionRoleTupleFields.PartitionRef].AsString();
-            set => this.Set((int)ComPlusPartitionRoleTupleFields.PartitionRef, value);
+            get => this.Fields[(int)ComPlusPartitionRoleSymbolFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusPartitionRoleSymbolFields.PartitionRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusPartitionRoleTupleFields.ComponentRef].AsString();
-            set => this.Set((int)ComPlusPartitionRoleTupleFields.ComponentRef, value);
+            get => this.Fields[(int)ComPlusPartitionRoleSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusPartitionRoleSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)ComPlusPartitionRoleTupleFields.Name].AsString();
-            set => this.Set((int)ComPlusPartitionRoleTupleFields.Name, value);
+            get => this.Fields[(int)ComPlusPartitionRoleSymbolFields.Name].AsString();
+            set => this.Set((int)ComPlusPartitionRoleSymbolFields.Name, value);
         }
     }
 }

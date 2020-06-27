@@ -5,7 +5,7 @@ namespace WixToolset.ComPlus
     using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
-    using WixToolset.ComPlus.Tuples;
+    using WixToolset.ComPlus.Symbols;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
@@ -213,7 +213,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusPartitionTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusPartitionSymbol(sourceLineNumbers, key)
             {
                 ComponentRef = componentKey,
                 PartitionId = id,
@@ -222,7 +222,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusPartitionPropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusPartitionPropertySymbol(sourceLineNumbers)
                 {
                     PartitionRef = key?.Id,
                     Name = kvp.Key,
@@ -264,7 +264,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusPartition, partitionKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusPartition, partitionKey);
                             break;
                         case "Name":
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -308,7 +308,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusPartitionRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusPartitionRoleSymbol(sourceLineNumbers, key)
             {
                 PartitionRef = partitionKey,
                 Name = name,
@@ -343,7 +343,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             partitionRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusPartitionRole, partitionRoleKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusPartitionRole, partitionRoleKey);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -365,7 +365,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
             }
 
-            section.AddTuple(new ComPlusUserInPartitionRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusUserInPartitionRoleSymbol(sourceLineNumbers, key)
             {
                 PartitionRoleRef = partitionRoleKey,
                 ComponentRef = componentKey,
@@ -401,7 +401,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             partitionRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusPartitionRole, partitionRoleKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusPartitionRole, partitionRoleKey);
                             break;
                         case "Group":
                             group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -423,7 +423,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
             }
 
-            section.AddTuple(new ComPlusGroupInPartitionRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusGroupInPartitionRoleSymbol(sourceLineNumbers, key)
             {
                 PartitionRoleRef = partitionRoleKey,
                 ComponentRef = componentKey,
@@ -458,7 +458,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusPartition, partitionKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusPartition, partitionKey);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -480,7 +480,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Partition"));
             }
 
-            section.AddTuple(new ComPlusPartitionUserTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusPartitionUserSymbol(sourceLineNumbers, key)
             {
                 PartitionRef = partitionKey,
                 ComponentRef = componentKey,
@@ -519,7 +519,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusPartition, partitionKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusPartition, partitionKey);
                             break;
                         case "ApplicationId":
                             id = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
@@ -981,7 +981,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusApplicationTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusApplicationSymbol(sourceLineNumbers, key)
             {
                 PartitionRef = partitionKey,
                 ComponentRef = componentKey,
@@ -991,7 +991,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusApplicationPropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusApplicationPropertySymbol(sourceLineNumbers)
                 {
                     ApplicationRef = key?.Id,
                     Name = kvp.Key,
@@ -1035,7 +1035,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             applicationKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusApplication, applicationKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusApplication, applicationKey);
                             break;
                         case "Name":
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1086,7 +1086,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusApplicationRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusApplicationRoleSymbol(sourceLineNumbers, key)
             {
                 ApplicationRef = applicationKey,
                 ComponentRef = componentKey,
@@ -1095,7 +1095,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusApplicationRolePropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusApplicationRolePropertySymbol(sourceLineNumbers)
                 {
                     ApplicationRoleRef = key?.Id,
                     Name = kvp.Key,
@@ -1132,7 +1132,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusApplicationRole, applicationRoleKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusApplicationRole, applicationRoleKey);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1154,7 +1154,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
             }
 
-            section.AddTuple(new ComPlusUserInApplicationRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusUserInApplicationRoleSymbol(sourceLineNumbers, key)
             {
                 ApplicationRoleRef = applicationRoleKey,
                 ComponentRef = componentKey,
@@ -1190,7 +1190,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusApplicationRole, applicationRoleKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusApplicationRole, applicationRoleKey);
                             break;
                         case "Group":
                             group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1212,7 +1212,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
             }
 
-            section.AddTuple(new ComPlusGroupInApplicationRoleTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusGroupInApplicationRoleSymbol(sourceLineNumbers, key)
             {
                 ApplicationRoleRef = applicationRoleKey,
                 ComponentRef = componentKey,
@@ -1254,7 +1254,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             applicationKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusApplication, applicationKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusApplication, applicationKey);
                             break;
                         case "AssemblyName":
                             assemblyName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1374,7 +1374,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ComPlusWarnings.MissingComponents(sourceLineNumbers));
             }
 
-            section.AddTuple(new ComPlusAssemblyTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusAssemblySymbol(sourceLineNumbers, key)
             {
                 ApplicationRef = applicationKey,
                 ComponentRef = componentKey,
@@ -1419,7 +1419,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusAssemblyDependencyTuple(sourceLineNumbers)
+            section.AddSymbol(new ComPlusAssemblyDependencySymbol(sourceLineNumbers)
             {
                 AssemblyRef = assemblyKey,
                 RequiredAssemblyRef = requiredAssemblyKey,
@@ -1643,7 +1643,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusComponentTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusComponentSymbol(sourceLineNumbers, key)
             {
                 AssemblyRef = assemblyKey,
                 CLSID = clsid,
@@ -1651,7 +1651,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusComponentPropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusComponentPropertySymbol(sourceLineNumbers)
                 {
                     ComPlusComponentRef = key?.Id,
                     Name = kvp.Key,
@@ -1688,7 +1688,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             cpcomponentKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusComponent, cpcomponentKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusComponent, cpcomponentKey);
                             break;
                         case "ApplicationRole":
                             applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1709,7 +1709,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Component"));
             }
 
-            section.AddTuple(new ComPlusRoleForComponentTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusRoleForComponentSymbol(sourceLineNumbers, key)
             {
                 ComPlusComponentRef = cpcomponentKey,
                 ApplicationRoleRef = applicationRoleKey,
@@ -1785,7 +1785,7 @@ namespace WixToolset.ComPlus
                 }
             }
 
-            section.AddTuple(new ComPlusInterfaceTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusInterfaceSymbol(sourceLineNumbers, key)
             {
                 ComPlusComponentRef = cpcomponentKey,
                 IID = iid,
@@ -1793,7 +1793,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusInterfacePropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusInterfacePropertySymbol(sourceLineNumbers)
                 {
                     InterfaceRef = key?.Id,
                     Name = kvp.Key,
@@ -1830,7 +1830,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             interfaceKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusInterface, interfaceKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusInterface, interfaceKey);
                             break;
                         case "ApplicationRole":
                             applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1851,7 +1851,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Interface"));
             }
 
-            section.AddTuple(new ComPlusRoleForInterfaceTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusRoleForInterfaceSymbol(sourceLineNumbers, key)
             {
                 InterfaceRef = interfaceKey,
                 ApplicationRoleRef = applicationRoleKey,
@@ -1932,7 +1932,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ComPlusErrors.RequiredAttribute(sourceLineNumbers, node.Name.LocalName, "Index", "Name"));
             }
 
-            var tuple = section.AddTuple(new ComPlusMethodTuple(sourceLineNumbers, key)
+            var symbol = section.AddSymbol(new ComPlusMethodSymbol(sourceLineNumbers, key)
             {
                 InterfaceRef = interfaceKey,
                 Name = name,
@@ -1940,12 +1940,12 @@ namespace WixToolset.ComPlus
 
             if (CompilerConstants.IntegerNotSet != index)
             {
-                tuple.Index = index;
+                symbol.Index = index;
             }
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusMethodPropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusMethodPropertySymbol(sourceLineNumbers)
                 {
                     MethodRef = key?.Id,
                     Name = kvp.Key,
@@ -1982,7 +1982,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             methodKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusMethod, methodKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusMethod, methodKey);
                             break;
                         case "ApplicationRole":
                             applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2003,7 +2003,7 @@ namespace WixToolset.ComPlus
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Method"));
             }
 
-            section.AddTuple(new ComPlusRoleForMethodTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusRoleForMethodSymbol(sourceLineNumbers, key)
             {
                 MethodRef = methodKey,
                 ApplicationRoleRef = applicationRoleKey,
@@ -2044,7 +2044,7 @@ namespace WixToolset.ComPlus
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             cpcomponentKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusTupleDefinitions.ComPlusComponent, cpcomponentKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ComPlusSymbolDefinitions.ComPlusComponent, cpcomponentKey);
                             break;
                         case "SubscriptionId":
                             id = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
@@ -2109,7 +2109,7 @@ namespace WixToolset.ComPlus
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            section.AddTuple(new ComPlusSubscriptionTuple(sourceLineNumbers, key)
+            section.AddSymbol(new ComPlusSubscriptionSymbol(sourceLineNumbers, key)
             {
                 Subscription = key?.Id,
                 ComPlusComponentRef = cpcomponentKey,
@@ -2122,7 +2122,7 @@ namespace WixToolset.ComPlus
 
             foreach (var kvp in properties)
             {
-                section.AddTuple(new ComPlusSubscriptionPropertyTuple(sourceLineNumbers)
+                section.AddSymbol(new ComPlusSubscriptionPropertySymbol(sourceLineNumbers)
                 {
                     SubscriptionRef = key?.Id,
                     Name = kvp.Key,
