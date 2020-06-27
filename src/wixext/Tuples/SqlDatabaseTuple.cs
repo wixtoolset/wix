@@ -3,32 +3,32 @@
 namespace WixToolset.Sql
 {
     using WixToolset.Data;
-    using WixToolset.Sql.Tuples;
+    using WixToolset.Sql.Symbols;
 
-    public static partial class SqlTupleDefinitions
+    public static partial class SqlSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SqlDatabase = new IntermediateTupleDefinition(
-            SqlTupleDefinitionType.SqlDatabase.ToString(),
+        public static readonly IntermediateSymbolDefinition SqlDatabase = new IntermediateSymbolDefinition(
+            SqlSymbolDefinitionType.SqlDatabase.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Server), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Instance), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Database), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.UserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.FileSpecRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.LogFileSpecRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.Server), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.Instance), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.Database), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.FileSpecRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.LogFileSpecRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(SqlDatabaseTuple));
+            typeof(SqlDatabaseSymbol));
     }
 }
 
-namespace WixToolset.Sql.Tuples
+namespace WixToolset.Sql.Symbols
 {
     using WixToolset.Data;
 
-    public enum SqlDatabaseTupleFields
+    public enum SqlDatabaseSymbolFields
     {
         Server,
         Instance,
@@ -40,64 +40,64 @@ namespace WixToolset.Sql.Tuples
         Attributes,
     }
 
-    public class SqlDatabaseTuple : IntermediateTuple
+    public class SqlDatabaseSymbol : IntermediateSymbol
     {
-        public SqlDatabaseTuple() : base(SqlTupleDefinitions.SqlDatabase, null, null)
+        public SqlDatabaseSymbol() : base(SqlSymbolDefinitions.SqlDatabase, null, null)
         {
         }
 
-        public SqlDatabaseTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlTupleDefinitions.SqlDatabase, sourceLineNumber, id)
+        public SqlDatabaseSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlSymbolDefinitions.SqlDatabase, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SqlDatabaseTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SqlDatabaseSymbolFields index] => this.Fields[(int)index];
 
         public string Server
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.Server].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.Server, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.Server].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.Server, value);
         }
 
         public string Instance
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.Instance].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.Instance, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.Instance].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.Instance, value);
         }
 
         public string Database
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.Database].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.Database, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.Database].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.Database, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.ComponentRef].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.ComponentRef, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.ComponentRef, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.UserRef].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.UserRef, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.UserRef].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.UserRef, value);
         }
 
         public string FileSpecRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.FileSpecRef].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.FileSpecRef, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.FileSpecRef].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.FileSpecRef, value);
         }
 
         public string LogFileSpecRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.LogFileSpecRef].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.LogFileSpecRef, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.LogFileSpecRef].AsString();
+            set => this.Set((int)SqlDatabaseSymbolFields.LogFileSpecRef, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.Attributes].AsNumber();
-            set => this.Set((int)SqlDatabaseTupleFields.Attributes, value);
+            get => this.Fields[(int)SqlDatabaseSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)SqlDatabaseSymbolFields.Attributes, value);
         }
     }
 }

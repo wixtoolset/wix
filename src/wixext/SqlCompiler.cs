@@ -7,7 +7,7 @@ namespace WixToolset.Sql
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Sql.Tuples;
+    using WixToolset.Sql.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset SQL Server Extension.
@@ -319,7 +319,7 @@ namespace WixToolset.Sql
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new SqlDatabaseTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new SqlDatabaseSymbol(sourceLineNumbers, id)
                 {
                     Server = server,
                     Instance = instance,
@@ -332,7 +332,7 @@ namespace WixToolset.Sql
 
                 if (0 != attributes)
                 {
-                    tuple.Attributes = attributes;
+                    symbol.Attributes = attributes;
                 }
             }
         }
@@ -408,7 +408,7 @@ namespace WixToolset.Sql
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new SqlFileSpecTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new SqlFileSpecSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     Filename = fileName,
@@ -416,17 +416,17 @@ namespace WixToolset.Sql
 
                 if (null != size)
                 {
-                    tuple.Size = size;
+                    symbol.Size = size;
                 }
 
                 if (null != maxSize)
                 {
-                    tuple.MaxSize = maxSize;
+                    symbol.MaxSize = maxSize;
                 }
 
                 if (null != growthSize)
                 {
-                    tuple.GrowthSize = growthSize;
+                    symbol.GrowthSize = growthSize;
                 }
             }
 
@@ -461,7 +461,7 @@ namespace WixToolset.Sql
                             break;
                         case "BinaryKey":
                             binary = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binary);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binary);
                             break;
                         case "Sequence":
                             sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
@@ -472,7 +472,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, element.Parent.Name.LocalName));
                             }
                             sqlDb = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlTupleDefinitions.SqlDatabase, sqlDb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlSymbolDefinitions.SqlDatabase, sqlDb);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -599,7 +599,7 @@ namespace WixToolset.Sql
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new SqlScriptTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new SqlScriptSymbol(sourceLineNumbers, id)
                 {
                     SqlDbRef = sqlDb,
                     ComponentRef = componentId,
@@ -610,7 +610,7 @@ namespace WixToolset.Sql
 
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
         }
@@ -735,7 +735,7 @@ namespace WixToolset.Sql
                             }
 
                             sqlDb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlTupleDefinitions.SqlDatabase, sqlDb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlSymbolDefinitions.SqlDatabase, sqlDb);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -779,7 +779,7 @@ namespace WixToolset.Sql
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new SqlStringTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new SqlStringSymbol(sourceLineNumbers, id)
                 {
                     SqlDbRef = sqlDb,
                     ComponentRef = componentId,
@@ -790,15 +790,15 @@ namespace WixToolset.Sql
 
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
         }
 
         private void AddReferenceToInstallSqlData(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "InstallSqlData");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "UninstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "InstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "UninstallSqlData");
         }
     }
 }

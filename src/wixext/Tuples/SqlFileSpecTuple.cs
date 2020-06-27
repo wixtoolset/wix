@@ -3,29 +3,29 @@
 namespace WixToolset.Sql
 {
     using WixToolset.Data;
-    using WixToolset.Sql.Tuples;
+    using WixToolset.Sql.Symbols;
 
-    public static partial class SqlTupleDefinitions
+    public static partial class SqlSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SqlFileSpec = new IntermediateTupleDefinition(
-            SqlTupleDefinitionType.SqlFileSpec.ToString(),
+        public static readonly IntermediateSymbolDefinition SqlFileSpec = new IntermediateSymbolDefinition(
+            SqlSymbolDefinitionType.SqlFileSpec.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Filename), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Size), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.MaxSize), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.GrowthSize), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlFileSpecSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlFileSpecSymbolFields.Filename), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlFileSpecSymbolFields.Size), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlFileSpecSymbolFields.MaxSize), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlFileSpecSymbolFields.GrowthSize), IntermediateFieldType.String),
             },
-            typeof(SqlFileSpecTuple));
+            typeof(SqlFileSpecSymbol));
     }
 }
 
-namespace WixToolset.Sql.Tuples
+namespace WixToolset.Sql.Symbols
 {
     using WixToolset.Data;
 
-    public enum SqlFileSpecTupleFields
+    public enum SqlFileSpecSymbolFields
     {
         Name,
         Filename,
@@ -34,46 +34,46 @@ namespace WixToolset.Sql.Tuples
         GrowthSize,
     }
 
-    public class SqlFileSpecTuple : IntermediateTuple
+    public class SqlFileSpecSymbol : IntermediateSymbol
     {
-        public SqlFileSpecTuple() : base(SqlTupleDefinitions.SqlFileSpec, null, null)
+        public SqlFileSpecSymbol() : base(SqlSymbolDefinitions.SqlFileSpec, null, null)
         {
         }
 
-        public SqlFileSpecTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlTupleDefinitions.SqlFileSpec, sourceLineNumber, id)
+        public SqlFileSpecSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlSymbolDefinitions.SqlFileSpec, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SqlFileSpecTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SqlFileSpecSymbolFields index] => this.Fields[(int)index];
 
         public string Name
         {
-            get => this.Fields[(int)SqlFileSpecTupleFields.Name].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.Name, value);
+            get => this.Fields[(int)SqlFileSpecSymbolFields.Name].AsString();
+            set => this.Set((int)SqlFileSpecSymbolFields.Name, value);
         }
 
         public string Filename
         {
-            get => this.Fields[(int)SqlFileSpecTupleFields.Filename].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.Filename, value);
+            get => this.Fields[(int)SqlFileSpecSymbolFields.Filename].AsString();
+            set => this.Set((int)SqlFileSpecSymbolFields.Filename, value);
         }
 
         public string Size
         {
-            get => this.Fields[(int)SqlFileSpecTupleFields.Size].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.Size, value);
+            get => this.Fields[(int)SqlFileSpecSymbolFields.Size].AsString();
+            set => this.Set((int)SqlFileSpecSymbolFields.Size, value);
         }
 
         public string MaxSize
         {
-            get => this.Fields[(int)SqlFileSpecTupleFields.MaxSize].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.MaxSize, value);
+            get => this.Fields[(int)SqlFileSpecSymbolFields.MaxSize].AsString();
+            set => this.Set((int)SqlFileSpecSymbolFields.MaxSize, value);
         }
 
         public string GrowthSize
         {
-            get => this.Fields[(int)SqlFileSpecTupleFields.GrowthSize].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.GrowthSize, value);
+            get => this.Fields[(int)SqlFileSpecSymbolFields.GrowthSize].AsString();
+            set => this.Set((int)SqlFileSpecSymbolFields.GrowthSize, value);
         }
     }
 }

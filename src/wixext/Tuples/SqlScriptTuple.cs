@@ -3,30 +3,30 @@
 namespace WixToolset.Sql
 {
     using WixToolset.Data;
-    using WixToolset.Sql.Tuples;
+    using WixToolset.Sql.Symbols;
 
-    public static partial class SqlTupleDefinitions
+    public static partial class SqlSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SqlScript = new IntermediateTupleDefinition(
-            SqlTupleDefinitionType.SqlScript.ToString(),
+        public static readonly IntermediateSymbolDefinition SqlScript = new IntermediateSymbolDefinition(
+            SqlSymbolDefinitionType.SqlScript.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.SqlDbRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.ScriptBinaryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.UserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.SqlDbRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.ScriptBinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SqlScriptSymbolFields.Sequence), IntermediateFieldType.Number),
             },
-            typeof(SqlScriptTuple));
+            typeof(SqlScriptSymbol));
     }
 }
 
-namespace WixToolset.Sql.Tuples
+namespace WixToolset.Sql.Symbols
 {
     using WixToolset.Data;
 
-    public enum SqlScriptTupleFields
+    public enum SqlScriptSymbolFields
     {
         SqlDbRef,
         ComponentRef,
@@ -36,52 +36,52 @@ namespace WixToolset.Sql.Tuples
         Sequence,
     }
 
-    public class SqlScriptTuple : IntermediateTuple
+    public class SqlScriptSymbol : IntermediateSymbol
     {
-        public SqlScriptTuple() : base(SqlTupleDefinitions.SqlScript, null, null)
+        public SqlScriptSymbol() : base(SqlSymbolDefinitions.SqlScript, null, null)
         {
         }
 
-        public SqlScriptTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlTupleDefinitions.SqlScript, sourceLineNumber, id)
+        public SqlScriptSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlSymbolDefinitions.SqlScript, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SqlScriptTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SqlScriptSymbolFields index] => this.Fields[(int)index];
 
         public string SqlDbRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.SqlDbRef].AsString();
-            set => this.Set((int)SqlScriptTupleFields.SqlDbRef, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.SqlDbRef].AsString();
+            set => this.Set((int)SqlScriptSymbolFields.SqlDbRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.ComponentRef].AsString();
-            set => this.Set((int)SqlScriptTupleFields.ComponentRef, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)SqlScriptSymbolFields.ComponentRef, value);
         }
 
         public string ScriptBinaryRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.ScriptBinaryRef].AsString();
-            set => this.Set((int)SqlScriptTupleFields.ScriptBinaryRef, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.ScriptBinaryRef].AsString();
+            set => this.Set((int)SqlScriptSymbolFields.ScriptBinaryRef, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.UserRef].AsString();
-            set => this.Set((int)SqlScriptTupleFields.UserRef, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.UserRef].AsString();
+            set => this.Set((int)SqlScriptSymbolFields.UserRef, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)SqlScriptTupleFields.Attributes].AsNumber();
-            set => this.Set((int)SqlScriptTupleFields.Attributes, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)SqlScriptSymbolFields.Attributes, value);
         }
 
         public int? Sequence
         {
-            get => this.Fields[(int)SqlScriptTupleFields.Sequence].AsNullableNumber();
-            set => this.Set((int)SqlScriptTupleFields.Sequence, value);
+            get => this.Fields[(int)SqlScriptSymbolFields.Sequence].AsNullableNumber();
+            set => this.Set((int)SqlScriptSymbolFields.Sequence, value);
         }
     }
 }

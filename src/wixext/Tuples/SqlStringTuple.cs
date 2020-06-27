@@ -3,30 +3,30 @@
 namespace WixToolset.Sql
 {
     using WixToolset.Data;
-    using WixToolset.Sql.Tuples;
+    using WixToolset.Sql.Symbols;
 
-    public static partial class SqlTupleDefinitions
+    public static partial class SqlSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition SqlString = new IntermediateTupleDefinition(
-            SqlTupleDefinitionType.SqlString.ToString(),
+        public static readonly IntermediateSymbolDefinition SqlString = new IntermediateSymbolDefinition(
+            SqlSymbolDefinitionType.SqlString.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.SqlDbRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.SQL), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.UserRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.Sequence), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.SqlDbRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.SQL), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(SqlStringSymbolFields.Sequence), IntermediateFieldType.Number),
             },
-            typeof(SqlStringTuple));
+            typeof(SqlStringSymbol));
     }
 }
 
-namespace WixToolset.Sql.Tuples
+namespace WixToolset.Sql.Symbols
 {
     using WixToolset.Data;
 
-    public enum SqlStringTupleFields
+    public enum SqlStringSymbolFields
     {
         SqlDbRef,
         ComponentRef,
@@ -36,52 +36,52 @@ namespace WixToolset.Sql.Tuples
         Sequence,
     }
 
-    public class SqlStringTuple : IntermediateTuple
+    public class SqlStringSymbol : IntermediateSymbol
     {
-        public SqlStringTuple() : base(SqlTupleDefinitions.SqlString, null, null)
+        public SqlStringSymbol() : base(SqlSymbolDefinitions.SqlString, null, null)
         {
         }
 
-        public SqlStringTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlTupleDefinitions.SqlString, sourceLineNumber, id)
+        public SqlStringSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SqlSymbolDefinitions.SqlString, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[SqlStringTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[SqlStringSymbolFields index] => this.Fields[(int)index];
 
         public string SqlDbRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.SqlDbRef].AsString();
-            set => this.Set((int)SqlStringTupleFields.SqlDbRef, value);
+            get => this.Fields[(int)SqlStringSymbolFields.SqlDbRef].AsString();
+            set => this.Set((int)SqlStringSymbolFields.SqlDbRef, value);
         }
 
         public string ComponentRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.ComponentRef].AsString();
-            set => this.Set((int)SqlStringTupleFields.ComponentRef, value);
+            get => this.Fields[(int)SqlStringSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)SqlStringSymbolFields.ComponentRef, value);
         }
 
         public string SQL
         {
-            get => this.Fields[(int)SqlStringTupleFields.SQL].AsString();
-            set => this.Set((int)SqlStringTupleFields.SQL, value);
+            get => this.Fields[(int)SqlStringSymbolFields.SQL].AsString();
+            set => this.Set((int)SqlStringSymbolFields.SQL, value);
         }
 
         public string UserRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.UserRef].AsString();
-            set => this.Set((int)SqlStringTupleFields.UserRef, value);
+            get => this.Fields[(int)SqlStringSymbolFields.UserRef].AsString();
+            set => this.Set((int)SqlStringSymbolFields.UserRef, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)SqlStringTupleFields.Attributes].AsNumber();
-            set => this.Set((int)SqlStringTupleFields.Attributes, value);
+            get => this.Fields[(int)SqlStringSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)SqlStringSymbolFields.Attributes, value);
         }
 
         public int? Sequence
         {
-            get => this.Fields[(int)SqlStringTupleFields.Sequence].AsNullableNumber();
-            set => this.Set((int)SqlStringTupleFields.Sequence, value);
+            get => this.Fields[(int)SqlStringSymbolFields.Sequence].AsNullableNumber();
+            set => this.Set((int)SqlStringSymbolFields.Sequence, value);
         }
     }
 }

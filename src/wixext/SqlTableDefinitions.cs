@@ -8,7 +8,7 @@ namespace WixToolset.Sql
     {
         public static readonly TableDefinition SqlDatabase = new TableDefinition(
             "SqlDatabase",
-            SqlTupleDefinitions.SqlDatabase,
+            SqlSymbolDefinitions.SqlDatabase,
             new[]
             {
                 new ColumnDefinition("SqlDb", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -21,12 +21,12 @@ namespace WixToolset.Sql
                 new ColumnDefinition("FileSpec_Log", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "SqlFileSpec", keyColumn: 1, description: "Foreign key referencing SqlFileSpec.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 255, description: "1 == create on install, 2 == drop on uninstall, 4 == continue on error, 8 == drop on install, 16 == create on uninstall, 32 == confirm update existing table, 64 == create on reinstall, 128 == drop on reinstall"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition SqlFileSpec = new TableDefinition(
             "SqlFileSpec",
-            SqlTupleDefinitions.SqlFileSpec,
+            SqlSymbolDefinitions.SqlFileSpec,
             new[]
             {
                 new ColumnDefinition("FileSpec", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
@@ -36,12 +36,12 @@ namespace WixToolset.Sql
                 new ColumnDefinition("MaxSize", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Maximum size for file", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("GrowthSize", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Size file should grow when necessary", modularizeType: ColumnModularizeType.Property),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition SqlScript = new TableDefinition(
             "SqlScript",
-            SqlTupleDefinitions.SqlScript,
+            SqlSymbolDefinitions.SqlScript,
             new[]
             {
                 new ColumnDefinition("Script", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token"),
@@ -52,12 +52,12 @@ namespace WixToolset.Sql
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31", description: "1 == execute on install, 2 == execute on uninstall, 4 == continue on error, 8 == rollback on install, 16 == rollback on uninstall"),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Order to execute SQL Queries in"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition SqlString = new TableDefinition(
             "SqlString",
-            SqlTupleDefinitions.SqlString,
+            SqlSymbolDefinitions.SqlString,
             new[]
             {
                 new ColumnDefinition("String", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Id for the SqlString", modularizeType: ColumnModularizeType.Column),
@@ -68,7 +68,7 @@ namespace WixToolset.Sql
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, possibilities: "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31", description: "1 == execute on install, 2 == execute on uninstall, 4 == continue on error, 8 == rollback on install, 16 == rollback on uninstall"),
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Order to execute SQL Queries in"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[]

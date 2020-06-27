@@ -5,7 +5,7 @@ namespace WixToolset.Sql
     using System;
     using WixToolset.Data;
 
-    public enum SqlTupleDefinitionType
+    public enum SqlSymbolDefinitionType
     {
         SqlDatabase,
         SqlFileSpec,
@@ -13,13 +13,13 @@ namespace WixToolset.Sql
         SqlString,
     }
 
-    public static partial class SqlTupleDefinitions
+    public static partial class SqlSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out SqlTupleDefinitionType type))
+            if (!Enum.TryParse(name, out SqlSymbolDefinitionType type))
             {
                 return null;
             }
@@ -27,21 +27,21 @@ namespace WixToolset.Sql
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(SqlTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(SqlSymbolDefinitionType type)
         {
             switch (type)
             {
-                case SqlTupleDefinitionType.SqlDatabase:
-                    return SqlTupleDefinitions.SqlDatabase;
+                case SqlSymbolDefinitionType.SqlDatabase:
+                    return SqlSymbolDefinitions.SqlDatabase;
 
-                case SqlTupleDefinitionType.SqlFileSpec:
-                    return SqlTupleDefinitions.SqlFileSpec;
+                case SqlSymbolDefinitionType.SqlFileSpec:
+                    return SqlSymbolDefinitions.SqlFileSpec;
 
-                case SqlTupleDefinitionType.SqlScript:
-                    return SqlTupleDefinitions.SqlScript;
+                case SqlSymbolDefinitionType.SqlScript:
+                    return SqlSymbolDefinitions.SqlScript;
 
-                case SqlTupleDefinitionType.SqlString:
-                    return SqlTupleDefinitions.SqlString;
+                case SqlSymbolDefinitionType.SqlString:
+                    return SqlSymbolDefinitions.SqlString;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
