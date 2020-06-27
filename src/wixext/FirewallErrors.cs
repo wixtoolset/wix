@@ -12,11 +12,6 @@ namespace WixToolset.Firewall
             return Message(sourceLineNumbers, Ids.IllegalRemoteAddressWithScopeAttribute, "The RemoteAddress element cannot be specified because its parent FirewallException already specified the Scope attribute. To use RemoteAddress elements, omit the Scope attribute.");
         }
 
-        public static Message IllegalEmptyRemoteAddress(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalEmptyRemoteAddress, "The RemoteAddress element's inner text cannot be an empty string or completely whitespace.");
-        }
-
         public static Message NoExceptionSpecified(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.NoExceptionSpecified, "The FirewallException element doesn't identify the target of the firewall exception. To create an application exception, nest the FirewallException element under a File element or provide a value for the File or Program attributes. To create a port exception, provide a value for the Port attribute.");
@@ -35,7 +30,6 @@ namespace WixToolset.Firewall
         public enum Ids
         {
             IllegalRemoteAddressWithScopeAttribute = 6401,
-            IllegalEmptyRemoteAddress = 6402,
             NoExceptionSpecified = 6403,
         }
     }

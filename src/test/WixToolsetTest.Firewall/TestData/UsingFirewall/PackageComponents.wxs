@@ -6,7 +6,7 @@
        <Component>
          <File Source="example.txt" />
          <fw:FirewallException Id="ExampleFirewall" Description="An example firewall" Name="example" Port="42">
-           <fw:RemoteAddress>*</fw:RemoteAddress>
+           <fw:RemoteAddress Value="*" />
          </fw:FirewallException>
        </Component>
     </ComponentGroup>

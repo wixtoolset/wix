@@ -33,7 +33,7 @@
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
-                        Explicitly-listed remote addresses that this exception allows through the 
+                        Explicitly-listed remote addresses that this exception allows through the
                         firewall.
                     </xs:documentation>
                 </xs:annotation>
@@ -51,7 +51,7 @@
             <xs:attribute name="Name" type="xs:string" use="required">
                 <xs:annotation>
                     <xs:documentation>
-                        Name of this firewall exception, visible to the user in the firewall 
+                        Name of this firewall exception, visible to the user in the firewall
                         control panel.
                     </xs:documentation>
                 </xs:annotation>
@@ -63,7 +63,7 @@
                         The scope of this firewall exception, which indicates whether incoming
                         connections can come from any computer including those on the Internet
                         or only those on the local network subnet. To more precisely specify
-                        allowed remote address, specify a custom scope using RemoteAddress 
+                        allowed remote address, specify a custom scope using RemoteAddress
                         child elements.
                     </xs:documentation>
                 </xs:annotation>
@@ -78,10 +78,10 @@
             <xs:attribute name="Port" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>
-                        Port to allow through the firewall for this exception. 
+                        Port to allow through the firewall for this exception.
 
-                        If you use Port and also File or Program in the same 
-                        FirewallException element, the exception will fail to install on 
+                        If you use Port and also File or Program in the same
+                        FirewallException element, the exception will fail to install on
                         Windows XP and Windows Server 2003. IgnoreFailure="yes" can be used to
                         ignore the resulting failure, but the exception will not be added.
                     </xs:documentation>
@@ -91,11 +91,11 @@
             <xs:attribute name="Protocol">
                 <xs:annotation>
                     <xs:documentation>
-                        IP protocol used for this firewall exception. If Port is defined, 
-                        "tcp" is assumed if the protocol is not specified. 
+                        IP protocol used for this firewall exception. If Port is defined,
+                        "tcp" is assumed if the protocol is not specified.
 
-                        If you use Protocol and also File or Program in the same 
-                        FirewallException element, the exception will fail to install on 
+                        If you use Protocol and also File or Program in the same
+                        FirewallException element, the exception will fail to install on
                         Windows XP and Windows Server 2003. IgnoreFailure="yes" can be used to
                         ignore the resulting failure, but the exception will not be added.
                     </xs:documentation>
@@ -111,11 +111,11 @@
             <xs:attribute name="File" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>
-                        Identifier of a file to be granted access to all incoming ports and 
+                        Identifier of a file to be granted access to all incoming ports and
                         protocols. If you use File, you cannot also use Program.
 
-                        If you use File and also Port or Protocol in the same 
-                        FirewallException element, the exception will fail to install on 
+                        If you use File and also Port or Protocol in the same
+                        FirewallException element, the exception will fail to install on
                         Windows XP and Windows Server 2003. IgnoreFailure="yes" can be used to
                         ignore the resulting failure, but the exception will not be added.
                     </xs:documentation>
@@ -125,13 +125,13 @@
             <xs:attribute name="Program" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>
-                        Path to a target program to be granted access to all incoming ports and 
-                        protocols. Note that this is a formatted field, so you can use [#fileId] 
-                        syntax to refer to a file being installed. If you use Program, you cannot 
+                        Path to a target program to be granted access to all incoming ports and
+                        protocols. Note that this is a formatted field, so you can use [#fileId]
+                        syntax to refer to a file being installed. If you use Program, you cannot
                         also use File.
 
-                        If you use Program and also Port or Protocol in the same 
-                        FirewallException element, the exception will fail to install on 
+                        If you use Program and also Port or Protocol in the same
+                        FirewallException element, the exception will fail to install on
                         Windows XP and Windows Server 2003. IgnoreFailure="yes" can be used to
                         ignore the resulting failure, but the exception will not be added.
                     </xs:documentation>
@@ -141,7 +141,7 @@
             <xs:attribute name="IgnoreFailure" type="YesNoType">
                 <xs:annotation>
                     <xs:documentation>
-                        If "yes", failures to register this firewall exception will be silently 
+                        If "yes", failures to register this firewall exception will be silently
                         ignored. If "no" (the default), failures will cause rollback.
                     </xs:documentation>
                 </xs:annotation>
@@ -165,7 +165,7 @@
             <xs:attribute name="Description" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>
-                      Description for this firewall rule displayed in Windows Firewall manager in 
+                      Description for this firewall rule displayed in Windows Firewall manager in
                       Windows Vista and later.
                     </xs:documentation>
                 </xs:annotation>
@@ -184,26 +184,24 @@
     <xs:element name="RemoteAddress">
         <xs:annotation>
             <xs:documentation>
-                A remote address to which the port or program can listen. Address formats vary 
+                A remote address to which the port or program can listen. Address formats vary
                 based on the version of Windows and Windows Firewall the program is being installed
                 on. For Windows XP SP2 and Windows Server 2003 SP1, see
                 <html:a href="http://msdn.microsoft.com/en-us/library/aa365270.aspx">
                     RemoteAddresses Property</html:a>.
                 For Windows Vista and Windows Server 2008, see
-                <html:a href="http://msdn.microsoft.com/en-us/library/aa365366.aspx">
+                <html:a href="https://docs.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-inetfwrule-get_remoteaddresses">
                     RemoteAddresses Property</html:a>.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
+            <xs:attribute name="Value" type="xs:string" use="required">
+                <xs:annotation>
+                    <xs:documentation>
                             A remote address.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:extension>
-            </xs:simpleContent>
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
 

@@ -312,13 +312,19 @@ namespace WixToolset.Firewall
         private void ParseRemoteAddressElement(Intermediate intermediate, IntermediateSection section, XElement element, ref string remoteAddresses)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string address = null;
 
             // no attributes
             foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
-                    this.ParseHelper.UnexpectedAttribute(element, attrib);
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Value":
+                            address = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                    }
                 }
                 else
                 {
@@ -328,10 +334,9 @@ namespace WixToolset.Firewall
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            var address = this.ParseHelper.GetTrimmedInnerText(element);
             if (String.IsNullOrEmpty(address))
             {
-                this.Messaging.Write(FirewallErrors.IllegalEmptyRemoteAddress(sourceLineNumbers));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Value"));
             }
             else
             {
