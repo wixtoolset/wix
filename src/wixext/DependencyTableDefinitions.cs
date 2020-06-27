@@ -9,7 +9,7 @@ namespace WixToolset.Dependency
     {
         public static readonly TableDefinition WixDependencyProvider = new TableDefinition(
             "WixDependencyProvider",
-            TupleDefinitions.WixDependencyProvider,
+            SymbolDefinitions.WixDependencyProvider,
             new[]
             {
                 new ColumnDefinition("WixDependencyProvider", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -19,12 +19,12 @@ namespace WixToolset.Dependency
                 new ColumnDefinition("DisplayName", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The display name of the package."),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "A 32-bit word that specifies the attribute flags to be applied."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition WixDependency = new TableDefinition(
             "WixDependency",
-            DependencyTupleDefinitions.WixDependency,
+            DependencySymbolDefinitions.WixDependency,
             new[]
             {
                 new ColumnDefinition("WixDependency", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
@@ -33,18 +33,18 @@ namespace WixToolset.Dependency
                 new ColumnDefinition("MaxVersion", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Version, description: "The maximum version of the provider supported."),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "A 32-bit word that specifies the attribute flags to be applied."),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition WixDependencyRef = new TableDefinition(
             "WixDependencyRef",
-            DependencyTupleDefinitions.WixDependencyRef,
+            DependencySymbolDefinitions.WixDependencyRef,
             new[]
             {
                 new ColumnDefinition("WixDependencyProvider_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "WixDependencyProvider", keyColumn: 1, description: "Foreign key into the Component table.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("WixDependency_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "WixDependency", keyColumn: 1, description: "Foreign key into the WixDependency table.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: false
+            symbolIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition[] All = new[]

@@ -8,8 +8,8 @@ namespace WixToolset.Dependency
     using System.Text;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
-    using WixToolset.Dependency.Tuples;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Dependency.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
@@ -207,9 +207,9 @@ namespace WixToolset.Dependency
 
             if (!this.Messaging.EncounteredError)
             {
-                // Create the provider tuple for the bundle. The Component_ field is required
+                // Create the provider symbol for the bundle. The Component_ field is required
                 // in the table definition but unused for bundles, so just set it to the valid ID.
-                section.AddTuple(new WixDependencyProviderTuple(sourceLineNumbers, id)
+                section.AddSymbol(new WixDependencyProviderSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = id.Id,
                     ProviderKey = providerKey,
@@ -290,7 +290,7 @@ namespace WixToolset.Dependency
             else if (PackageType.None == packageType)
             {
                 // Make sure the ProductCode is authored and set the key.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Property, "ProductCode");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Property, "ProductCode");
                 key = "!(bind.property.ProductCode)";
             }
 
@@ -344,7 +344,7 @@ namespace WixToolset.Dependency
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = section.AddTuple(new WixDependencyProviderTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new WixDependencyProviderSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = parentId,
                     ProviderKey = key,
@@ -352,12 +352,12 @@ namespace WixToolset.Dependency
 
                 if (!String.IsNullOrEmpty(version))
                 {
-                    tuple.Version = version;
+                    symbol.Version = version;
                 }
 
                 if (!String.IsNullOrEmpty(displayName))
                 {
-                    tuple.DisplayName = displayName;
+                    symbol.DisplayName = displayName;
                 }
 
                 if (PackageType.None == packageType)
@@ -379,18 +379,18 @@ namespace WixToolset.Dependency
                     var root = RegistryRootType.MachineUser;
 
                     var value = "[ProductCode]";
-                    this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, null, value, parentId, false);
+                    this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, root, keyProvides, null, value, parentId, false);
 
                     value = !String.IsNullOrEmpty(version) ? version : "[ProductVersion]";
-                    var versionRegistryTuple =
-                        this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, "Version", value, parentId, false);
+                    var versionRegistrySymbol =
+                        this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, root, keyProvides, "Version", value, parentId, false);
 
                     value = !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]";
-                    this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId, false);
+                    this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId, false);
 
                     // Use the Version registry value and use that as a potential key path.
                     keyPath = this.CreateComponentKeyPath();
-                    keyPath.Id = versionRegistryTuple.Id;
+                    keyPath.Id = versionRegistrySymbol.Id;
                     keyPath.Explicit = false;
                     keyPath.Type = PossibleKeyPathType.Registry;
                 }
@@ -494,7 +494,7 @@ namespace WixToolset.Dependency
                     this.AddReferenceToWixDependencyRequire(section, sourceLineNumbers);
                 }
 
-                var tuple = section.AddTuple(new WixDependencyTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new WixDependencySymbol(sourceLineNumbers, id)
                 {
                     ProviderKey = providerKey,
                     MinVersion = minVersion,
@@ -503,13 +503,13 @@ namespace WixToolset.Dependency
 
                 if (0 != attributes)
                 {
-                    tuple.Attributes = attributes;
+                    symbol.Attributes = attributes;
                 }
 
-                // Create the relationship between this WixDependency tuple and the WixDependencyProvider tuple.
+                // Create the relationship between this WixDependency symbol and the WixDependencyProvider symbol.
                 if (!String.IsNullOrEmpty(providerId))
                 {
-                    section.AddTuple(new WixDependencyRefTuple(sourceLineNumbers)
+                    section.AddSymbol(new WixDependencyRefSymbol(sourceLineNumbers)
                     {
                         WixDependencyProviderRef = providerId,
                         WixDependencyRef = id.Id,
@@ -565,10 +565,10 @@ namespace WixToolset.Dependency
                 }
 
                 // Create a link dependency on the row that contains information we'll need during bind.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, DependencyTupleDefinitions.WixDependency, id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, DependencySymbolDefinitions.WixDependency, id);
 
                 // Create the relationship between the WixDependency row and the parent WixDependencyProvider row.
-                section.AddTuple(new WixDependencyRefTuple(sourceLineNumbers)
+                section.AddSymbol(new WixDependencyRefSymbol(sourceLineNumbers)
                 {
                     WixDependencyProviderRef = providerId,
                     WixDependencyRef = id,

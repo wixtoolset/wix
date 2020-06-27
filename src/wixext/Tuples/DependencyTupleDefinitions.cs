@@ -5,19 +5,19 @@ namespace WixToolset.Dependency
     using System;
     using WixToolset.Data;
 
-    public enum DependencyTupleDefinitionType
+    public enum DependencySymbolDefinitionType
     {
         WixDependency,
         WixDependencyRef,
     }
 
-    public static partial class DependencyTupleDefinitions
+    public static partial class DependencySymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out DependencyTupleDefinitionType type))
+            if (!Enum.TryParse(name, out DependencySymbolDefinitionType type))
             {
                 return null;
             }
@@ -25,15 +25,15 @@ namespace WixToolset.Dependency
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(DependencyTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(DependencySymbolDefinitionType type)
         {
             switch (type)
             {
-                case DependencyTupleDefinitionType.WixDependency:
-                    return DependencyTupleDefinitions.WixDependency;
+                case DependencySymbolDefinitionType.WixDependency:
+                    return DependencySymbolDefinitions.WixDependency;
 
-                case DependencyTupleDefinitionType.WixDependencyRef:
-                    return DependencyTupleDefinitions.WixDependencyRef;
+                case DependencySymbolDefinitionType.WixDependencyRef:
+                    return DependencySymbolDefinitions.WixDependencyRef;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

@@ -3,28 +3,28 @@
 namespace WixToolset.Dependency
 {
     using WixToolset.Data;
-    using WixToolset.Dependency.Tuples;
+    using WixToolset.Dependency.Symbols;
 
-    public static partial class DependencyTupleDefinitions
+    public static partial class DependencySymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDependency = new IntermediateTupleDefinition(
-            DependencyTupleDefinitionType.WixDependency.ToString(),
+        public static readonly IntermediateSymbolDefinition WixDependency = new IntermediateSymbolDefinition(
+            DependencySymbolDefinitionType.WixDependency.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.ProviderKey), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.MinVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.MaxVersion), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixDependencySymbolFields.ProviderKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencySymbolFields.MinVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencySymbolFields.MaxVersion), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencySymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(WixDependencyTuple));
+            typeof(WixDependencySymbol));
     }
 }
 
-namespace WixToolset.Dependency.Tuples
+namespace WixToolset.Dependency.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixDependencyTupleFields
+    public enum WixDependencySymbolFields
     {
         ProviderKey,
         MinVersion,
@@ -32,40 +32,40 @@ namespace WixToolset.Dependency.Tuples
         Attributes,
     }
 
-    public class WixDependencyTuple : IntermediateTuple
+    public class WixDependencySymbol : IntermediateSymbol
     {
-        public WixDependencyTuple() : base(DependencyTupleDefinitions.WixDependency, null, null)
+        public WixDependencySymbol() : base(DependencySymbolDefinitions.WixDependency, null, null)
         {
         }
 
-        public WixDependencyTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(DependencyTupleDefinitions.WixDependency, sourceLineNumber, id)
+        public WixDependencySymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(DependencySymbolDefinitions.WixDependency, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDependencyTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDependencySymbolFields index] => this.Fields[(int)index];
 
         public string ProviderKey
         {
-            get => this.Fields[(int)WixDependencyTupleFields.ProviderKey].AsString();
-            set => this.Set((int)WixDependencyTupleFields.ProviderKey, value);
+            get => this.Fields[(int)WixDependencySymbolFields.ProviderKey].AsString();
+            set => this.Set((int)WixDependencySymbolFields.ProviderKey, value);
         }
 
         public string MinVersion
         {
-            get => this.Fields[(int)WixDependencyTupleFields.MinVersion].AsString();
-            set => this.Set((int)WixDependencyTupleFields.MinVersion, value);
+            get => this.Fields[(int)WixDependencySymbolFields.MinVersion].AsString();
+            set => this.Set((int)WixDependencySymbolFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => this.Fields[(int)WixDependencyTupleFields.MaxVersion].AsString();
-            set => this.Set((int)WixDependencyTupleFields.MaxVersion, value);
+            get => this.Fields[(int)WixDependencySymbolFields.MaxVersion].AsString();
+            set => this.Set((int)WixDependencySymbolFields.MaxVersion, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)WixDependencyTupleFields.Attributes].AsNumber();
-            set => this.Set((int)WixDependencyTupleFields.Attributes, value);
+            get => this.Fields[(int)WixDependencySymbolFields.Attributes].AsNumber();
+            set => this.Set((int)WixDependencySymbolFields.Attributes, value);
         }
     }
 }

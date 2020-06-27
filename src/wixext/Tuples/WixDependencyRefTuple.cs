@@ -3,53 +3,53 @@
 namespace WixToolset.Dependency
 {
     using WixToolset.Data;
-    using WixToolset.Dependency.Tuples;
+    using WixToolset.Dependency.Symbols;
 
-    public static partial class DependencyTupleDefinitions
+    public static partial class DependencySymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixDependencyRef = new IntermediateTupleDefinition(
-            DependencyTupleDefinitionType.WixDependencyRef.ToString(),
+        public static readonly IntermediateSymbolDefinition WixDependencyRef = new IntermediateSymbolDefinition(
+            DependencySymbolDefinitionType.WixDependencyRef.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependencyProviderRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependencyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyRefSymbolFields.WixDependencyProviderRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyRefSymbolFields.WixDependencyRef), IntermediateFieldType.String),
             },
-            typeof(WixDependencyRefTuple));
+            typeof(WixDependencyRefSymbol));
     }
 }
 
-namespace WixToolset.Dependency.Tuples
+namespace WixToolset.Dependency.Symbols
 {
     using WixToolset.Data;
 
-    public enum WixDependencyRefTupleFields
+    public enum WixDependencyRefSymbolFields
     {
         WixDependencyProviderRef,
         WixDependencyRef,
     }
 
-    public class WixDependencyRefTuple : IntermediateTuple
+    public class WixDependencyRefSymbol : IntermediateSymbol
     {
-        public WixDependencyRefTuple() : base(DependencyTupleDefinitions.WixDependencyRef, null, null)
+        public WixDependencyRefSymbol() : base(DependencySymbolDefinitions.WixDependencyRef, null, null)
         {
         }
 
-        public WixDependencyRefTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(DependencyTupleDefinitions.WixDependencyRef, sourceLineNumber, id)
+        public WixDependencyRefSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(DependencySymbolDefinitions.WixDependencyRef, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[WixDependencyRefTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[WixDependencyRefSymbolFields index] => this.Fields[(int)index];
 
         public string WixDependencyProviderRef
         {
-            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependencyProviderRef].AsString();
-            set => this.Set((int)WixDependencyRefTupleFields.WixDependencyProviderRef, value);
+            get => this.Fields[(int)WixDependencyRefSymbolFields.WixDependencyProviderRef].AsString();
+            set => this.Set((int)WixDependencyRefSymbolFields.WixDependencyProviderRef, value);
         }
 
         public string WixDependencyRef
         {
-            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependencyRef].AsString();
-            set => this.Set((int)WixDependencyRefTupleFields.WixDependencyRef, value);
+            get => this.Fields[(int)WixDependencyRefSymbolFields.WixDependencyRef].AsString();
+            set => this.Set((int)WixDependencyRefSymbolFields.WixDependencyRef, value);
         }
     }
 }
