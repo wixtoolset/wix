@@ -9,15 +9,15 @@ namespace WixToolset.UI
     {
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = null;
-            return tupleDefinition != null;
+            symbolDefinition = null;
+            return symbolDefinition != null;
         }
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(UIExtensionData).Assembly, "WixToolset.UI.ui.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(UIExtensionData).Assembly, "WixToolset.UI.ui.wixlib", symbolDefinitions);
         }
     }
 }
