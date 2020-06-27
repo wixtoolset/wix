@@ -5,18 +5,18 @@ namespace WixToolset.DifxApp
     using System;
     using WixToolset.Data;
 
-    public enum DifxAppTupleDefinitionType
+    public enum DifxAppSymbolDefinitionType
     {
         MsiDriverPackages,
     }
 
-    public static partial class DifxAppTupleDefinitions
+    public static partial class DifxAppSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out DifxAppTupleDefinitionType type))
+            if (!Enum.TryParse(name, out DifxAppSymbolDefinitionType type))
             {
                 return null;
             }
@@ -24,12 +24,12 @@ namespace WixToolset.DifxApp
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(DifxAppTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(DifxAppSymbolDefinitionType type)
         {
             switch (type)
             {
-                case DifxAppTupleDefinitionType.MsiDriverPackages:
-                    return DifxAppTupleDefinitions.MsiDriverPackages;
+                case DifxAppSymbolDefinitionType.MsiDriverPackages:
+                    return DifxAppSymbolDefinitions.MsiDriverPackages;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

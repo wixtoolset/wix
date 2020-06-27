@@ -6,7 +6,7 @@ namespace WixToolset.DifxApp
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.DifxApp.Tuples;
+    using WixToolset.DifxApp.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -138,10 +138,10 @@ namespace WixToolset.DifxApp
                 switch (this.Context.Platform)
                 {
                     case Platform.X86:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MsiProcessDrivers");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MsiProcessDrivers");
                         break;
                     case Platform.X64:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MsiProcessDrivers_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MsiProcessDrivers_x64");
                         break;
                     case Platform.IA64:
                     case Platform.ARM:
@@ -149,7 +149,7 @@ namespace WixToolset.DifxApp
                         break;
                 }
 
-                var tuple = section.AddTuple(new MsiDriverPackagesTuple(sourceLineNumbers)
+                var symbol = section.AddSymbol(new MsiDriverPackagesSymbol(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     Flags = attributes,
@@ -157,7 +157,7 @@ namespace WixToolset.DifxApp
 
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    tuple.Sequence = sequence;
+                    symbol.Sequence = sequence;
                 }
             }
         }
