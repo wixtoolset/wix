@@ -31,7 +31,7 @@
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.*" />
+    <!-- <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.*" /> -->
   </ItemGroup>
 
   <ItemGroup>

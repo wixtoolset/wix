@@ -4,9 +4,7 @@
 
 nuget restore || exit /b
 
-msbuild -p:Configuration=%_C% -t:Restore || exit /b
-
-msbuild -p:Configuration=%_C% || exit /b
+msbuild -p:Configuration=%_C% -Restore || exit /b
 dotnet test -c %_C% --no-build src\test\WixToolsetTest.Bal || exit /b
 
 msbuild -p:Configuration=%_C% -t:Pack src\wixext\WixToolset.Bal.wixext.csproj || exit /b

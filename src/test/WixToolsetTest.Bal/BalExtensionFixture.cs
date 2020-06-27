@@ -69,7 +69,7 @@ namespace WixToolsetTest.Bal
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip test until cycle with Netfx.wixext and this repo is resolved")]
         public void CantBuildUsingMBAWithNoPrereqs()
         {
             using (var fs = new DisposableFileSystem())

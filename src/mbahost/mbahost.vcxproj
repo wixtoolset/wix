@@ -62,6 +62,8 @@
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj">
       <Project>{f2ba1935-70fa-4156-b161-fd03850b4faa}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
     </ProjectReference>
   </ItemGroup>
 

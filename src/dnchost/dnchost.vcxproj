@@ -63,6 +63,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Dnc.Host\WixToolset.Dnc.Host.csproj">
       <Project>{0D780900-C2FF-4FA2-8CB5-8A19768724C5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
     </ProjectReference>
   </ItemGroup>
