@@ -1,14 +1,9 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<Project DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0101\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0101\build\WixToolset.MSBuild.props')" />
-  <Import Project="..\FindLocalWix.props" />
+<Project Sdk="WixToolset.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{2D4FF07B-26F8-4BEF-B41C-E4383F86DC32}</ProjectGuid>
-    <OutputName>ui</OutputName>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
-    <Pedantic>true</Pedantic>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
 
@@ -26,110 +21,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="BrowseDlg.wxs" />
-    <Compile Include="CancelDlg.wxs" />
-    <Compile Include="Common.wxs" />
-    <Compile Include="Common_x86.wxs" />
-    <Compile Include="CustomizeDlg.wxs" />
-    <Compile Include="DiskCostDlg.wxs" />
-    <Compile Include="ErrorDlg.wxs" />
-    <Compile Include="ErrorProgressText.wxs" />
-    <Compile Include="ExitDialog.wxs" />
-    <Compile Include="FatalError.wxs" />
-    <Compile Include="FilesInUse.wxs" />
-    <Compile Include="InvalidDirDlg.wxs" />
-    <Compile Include="LicenseAgreementDlg.wxs" />
-    <Compile Include="MaintenanceTypeDlg.wxs" />
-    <Compile Include="MaintenanceWelcomeDlg.wxs" />
-    <Compile Include="MsiRMFilesInUse.wxs" />
-    <Compile Include="OutOfDiskDlg.wxs" />
-    <Compile Include="OutOfRbDiskDlg.wxs" />
-    <Compile Include="PrepareDlg.wxs" />
-    <Compile Include="ProgressDlg.wxs" />
-    <Compile Include="ResumeDlg.wxs" />
-    <Compile Include="SetupTypeDlg.wxs" />
-    <Compile Include="UserExit.wxs" />
-    <Compile Include="VerifyReadyDlg.wxs" />
-    <Compile Include="WaitForCostingDlg.wxs" />
-    <Compile Include="WelcomeDlg.wxs" />
-    <Compile Include="WixUI_FeatureTree.wxs" />
-    <Compile Include="InstallDirDlg.wxs" />
-    <Compile Include="WixUI_InstallDir.wxs" />
-    <Compile Include="WelcomeEulaDlg.wxs" />
-    <Compile Include="WixUI_Minimal.wxs" />
-    <Compile Include="WixUI_Mondo.wxs" />
-    <Compile Include="AdvancedWelcomeEulaDlg.wxs" />
-    <Compile Include="FeaturesDlg.wxs" />
-    <Compile Include="InstallScopeDlg.wxs" />
-    <!-- TODO: Reenable when able to compile
-    <Compile Include="WixUI_Advanced.wxs" />
-    -->
+    <BindInputPaths Include="$(OutputPath)Win32" BindName='x86' />
+    <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
+    <BindInputPaths Include="$(OutputPath)arm" BindName='arm' />
+    <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="WixUI_ar-SA.wxl" />
-    <EmbeddedResource Include="WixUI_bg-BG.wxl" />
-    <EmbeddedResource Include="WixUI_ca-ES.wxl" />
-    <EmbeddedResource Include="WixUI_cs-CZ.wxl" />
-    <EmbeddedResource Include="WixUI_da-DK.wxl" />
-    <EmbeddedResource Include="WixUI_de-DE.wxl" />
-    <EmbeddedResource Include="WixUI_el-GR.wxl" />
-    <EmbeddedResource Include="WixUI_en-US.wxl" />
-    <EmbeddedResource Include="WixUI_es-ES.wxl" />
-    <EmbeddedResource Include="WixUI_et-EE.wxl" />
-    <EmbeddedResource Include="WixUI_fi-FI.wxl" />
-    <EmbeddedResource Include="WixUI_fr-FR.wxl" />
-    <EmbeddedResource Include="WixUI_he-IL.wxl" />
-    <EmbeddedResource Include="WixUI_hi-IN.wxl" />
-    <EmbeddedResource Include="WixUI_hr-HR.wxl" />
-    <EmbeddedResource Include="WixUI_hu-HU.wxl" />
-    <EmbeddedResource Include="WixUI_it-IT.wxl" />
-    <EmbeddedResource Include="WixUI_ja-JP.wxl" />
-    <EmbeddedResource Include="WixUI_ko-KR.wxl" />
-    <EmbeddedResource Include="WixUI_kk-KZ.wxl" />
-    <EmbeddedResource Include="WixUI_lt-LT.wxl" />
-    <EmbeddedResource Include="WixUI_lv-LV.wxl" />
-    <EmbeddedResource Include="WixUI_nb-NO.wxl" />
-    <EmbeddedResource Include="WixUI_nl-NL.wxl" />
-    <EmbeddedResource Include="WixUI_pl-pl.wxl" />
-    <EmbeddedResource Include="WixUI_pt-BR.wxl" />
-    <EmbeddedResource Include="WixUI_pt-PT.wxl" />
-    <EmbeddedResource Include="WixUI_ro-RO.wxl" />
-    <EmbeddedResource Include="WixUI_ru-RU.wxl" />
-    <EmbeddedResource Include="WixUI_sk-SK.wxl" />
-    <EmbeddedResource Include="WixUI_sl-SI.wxl" />
-    <EmbeddedResource Include="WixUI_sq-AL.wxl" />
-    <EmbeddedResource Include="WixUI_sr-Latn-CS.wxl" />
-    <EmbeddedResource Include="WixUI_sv-SE.wxl" />
-    <EmbeddedResource Include="WixUI_th-TH.wxl" />
-    <EmbeddedResource Include="WixUI_tr-TR.wxl" />
-    <EmbeddedResource Include="WixUI_uk-UA.wxl" />
-    <EmbeddedResource Include="WixUI_zh-CN.wxl" />
-    <EmbeddedResource Include="WixUI_zh-HK.wxl" />
-    <EmbeddedResource Include="WixUI_zh-TW.wxl" />
+    <ProjectReference Include="..\ca\uica.vcxproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="packages.config" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.1.91" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ca\uica.vcxproj">
-      <Name>uica</Name>
-      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="WiX Toolset build tools (v4.0 or later) must be installed to build this project. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
-  </Target>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0101\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0101\build\WixToolset.MSBuild.props'))" />
-  </Target>
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
 </Project>
