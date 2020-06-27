@@ -3,34 +3,34 @@
 namespace WixToolset.Msmq
 {
     using WixToolset.Data;
-    using WixToolset.Msmq.Tuples;
+    using WixToolset.Msmq.Symbols;
 
-    public static partial class MsmqTupleDefinitions
+    public static partial class MsmqSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MessageQueue = new IntermediateTupleDefinition(
-            MsmqTupleDefinitionType.MessageQueue.ToString(),
+        public static readonly IntermediateSymbolDefinition MessageQueue = new IntermediateSymbolDefinition(
+            MsmqSymbolDefinitionType.MessageQueue.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.BasePriority), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.JournalQuota), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.Label), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.MulticastAddress), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.PathName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.PrivLevel), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.Quota), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.ServiceTypeGuid), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.BasePriority), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.JournalQuota), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.Label), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.MulticastAddress), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.PathName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.PrivLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.Quota), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.ServiceTypeGuid), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueSymbolFields.Attributes), IntermediateFieldType.Number),
             },
-            typeof(MessageQueueTuple));
+            typeof(MessageQueueSymbol));
     }
 }
 
-namespace WixToolset.Msmq.Tuples
+namespace WixToolset.Msmq.Symbols
 {
     using WixToolset.Data;
 
-    public enum MessageQueueTupleFields
+    public enum MessageQueueSymbolFields
     {
         ComponentRef,
         BasePriority,
@@ -44,76 +44,76 @@ namespace WixToolset.Msmq.Tuples
         Attributes,
     }
 
-    public class MessageQueueTuple : IntermediateTuple
+    public class MessageQueueSymbol : IntermediateSymbol
     {
-        public MessageQueueTuple() : base(MsmqTupleDefinitions.MessageQueue, null, null)
+        public MessageQueueSymbol() : base(MsmqSymbolDefinitions.MessageQueue, null, null)
         {
         }
 
-        public MessageQueueTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(MsmqTupleDefinitions.MessageQueue, sourceLineNumber, id)
+        public MessageQueueSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(MsmqSymbolDefinitions.MessageQueue, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MessageQueueTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MessageQueueSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)MessageQueueTupleFields.ComponentRef].AsString();
-            set => this.Set((int)MessageQueueTupleFields.ComponentRef, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)MessageQueueSymbolFields.ComponentRef, value);
         }
 
         public int? BasePriority
         {
-            get => this.Fields[(int)MessageQueueTupleFields.BasePriority].AsNullableNumber();
-            set => this.Set((int)MessageQueueTupleFields.BasePriority, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.BasePriority].AsNullableNumber();
+            set => this.Set((int)MessageQueueSymbolFields.BasePriority, value);
         }
 
         public int? JournalQuota
         {
-            get => this.Fields[(int)MessageQueueTupleFields.JournalQuota].AsNullableNumber();
-            set => this.Set((int)MessageQueueTupleFields.JournalQuota, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.JournalQuota].AsNullableNumber();
+            set => this.Set((int)MessageQueueSymbolFields.JournalQuota, value);
         }
 
         public string Label
         {
-            get => this.Fields[(int)MessageQueueTupleFields.Label].AsString();
-            set => this.Set((int)MessageQueueTupleFields.Label, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.Label].AsString();
+            set => this.Set((int)MessageQueueSymbolFields.Label, value);
         }
 
         public string MulticastAddress
         {
-            get => this.Fields[(int)MessageQueueTupleFields.MulticastAddress].AsString();
-            set => this.Set((int)MessageQueueTupleFields.MulticastAddress, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.MulticastAddress].AsString();
+            set => this.Set((int)MessageQueueSymbolFields.MulticastAddress, value);
         }
 
         public string PathName
         {
-            get => this.Fields[(int)MessageQueueTupleFields.PathName].AsString();
-            set => this.Set((int)MessageQueueTupleFields.PathName, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.PathName].AsString();
+            set => this.Set((int)MessageQueueSymbolFields.PathName, value);
         }
 
         public int? PrivLevel
         {
-            get => this.Fields[(int)MessageQueueTupleFields.PrivLevel].AsNullableNumber();
-            set => this.Set((int)MessageQueueTupleFields.PrivLevel, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.PrivLevel].AsNullableNumber();
+            set => this.Set((int)MessageQueueSymbolFields.PrivLevel, value);
         }
 
         public int? Quota
         {
-            get => this.Fields[(int)MessageQueueTupleFields.Quota].AsNullableNumber();
-            set => this.Set((int)MessageQueueTupleFields.Quota, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.Quota].AsNullableNumber();
+            set => this.Set((int)MessageQueueSymbolFields.Quota, value);
         }
 
         public string ServiceTypeGuid
         {
-            get => this.Fields[(int)MessageQueueTupleFields.ServiceTypeGuid].AsString();
-            set => this.Set((int)MessageQueueTupleFields.ServiceTypeGuid, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.ServiceTypeGuid].AsString();
+            set => this.Set((int)MessageQueueSymbolFields.ServiceTypeGuid, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)MessageQueueTupleFields.Attributes].AsNumber();
-            set => this.Set((int)MessageQueueTupleFields.Attributes, value);
+            get => this.Fields[(int)MessageQueueSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)MessageQueueSymbolFields.Attributes, value);
         }
     }
 }

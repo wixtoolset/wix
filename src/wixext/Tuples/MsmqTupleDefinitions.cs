@@ -5,20 +5,20 @@ namespace WixToolset.Msmq
     using System;
     using WixToolset.Data;
 
-    public enum MsmqTupleDefinitionType
+    public enum MsmqSymbolDefinitionType
     {
         MessageQueue,
         MessageQueueGroupPermission,
         MessageQueueUserPermission,
     }
 
-    public static partial class MsmqTupleDefinitions
+    public static partial class MsmqSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out MsmqTupleDefinitionType type))
+            if (!Enum.TryParse(name, out MsmqSymbolDefinitionType type))
             {
                 return null;
             }
@@ -26,18 +26,18 @@ namespace WixToolset.Msmq
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(MsmqTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(MsmqSymbolDefinitionType type)
         {
             switch (type)
             {
-                case MsmqTupleDefinitionType.MessageQueue:
-                    return MsmqTupleDefinitions.MessageQueue;
+                case MsmqSymbolDefinitionType.MessageQueue:
+                    return MsmqSymbolDefinitions.MessageQueue;
 
-                case MsmqTupleDefinitionType.MessageQueueGroupPermission:
-                    return MsmqTupleDefinitions.MessageQueueGroupPermission;
+                case MsmqSymbolDefinitionType.MessageQueueGroupPermission:
+                    return MsmqSymbolDefinitions.MessageQueueGroupPermission;
 
-                case MsmqTupleDefinitionType.MessageQueueUserPermission:
-                    return MsmqTupleDefinitions.MessageQueueUserPermission;
+                case MsmqSymbolDefinitionType.MessageQueueUserPermission:
+                    return MsmqSymbolDefinitions.MessageQueueUserPermission;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

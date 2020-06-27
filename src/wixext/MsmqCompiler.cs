@@ -7,7 +7,7 @@ namespace WixToolset.Msmq
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Msmq.Tuples;
+    using WixToolset.Msmq.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset MSMQ Extension.
@@ -221,7 +221,7 @@ namespace WixToolset.Msmq
                 }
             }
 
-            var tuple = section.AddTuple(new MessageQueueTuple(sourceLineNumbers, id)
+            var symbol = section.AddSymbol(new MessageQueueSymbol(sourceLineNumbers, id)
             {
                 ComponentRef = componentId,
                 Label = label,
@@ -233,24 +233,24 @@ namespace WixToolset.Msmq
 
             if (CompilerConstants.IntegerNotSet != basePriority)
             {
-                tuple.BasePriority = basePriority;
+                symbol.BasePriority = basePriority;
             }
             if (CompilerConstants.IntegerNotSet != journalQuota)
             {
-                tuple.JournalQuota = journalQuota;
+                symbol.JournalQuota = journalQuota;
             }
 
             if (CompilerConstants.IntegerNotSet != privLevel)
             {
-                tuple.PrivLevel = privLevel;
+                symbol.PrivLevel = privLevel;
             }
             if (CompilerConstants.IntegerNotSet != quota)
             {
-                tuple.Quota = quota;
+                symbol.Quota = quota;
             }
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MessageQueuingInstall");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MessageQueuingUninstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MessageQueuingInstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "MessageQueuingUninstall");
         }
 
         ///	<summary>
@@ -283,7 +283,7 @@ namespace WixToolset.Msmq
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             messageQueueId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, MsmqTupleDefinitions.MessageQueue, messageQueueId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, MsmqSymbolDefinitions.MessageQueue, messageQueueId);
                             break;
                         case "User":
                             if (null != group)
@@ -490,7 +490,7 @@ namespace WixToolset.Msmq
 
             if (null != user)
             {
-                section.AddTuple(new MessageQueueUserPermissionTuple(sourceLineNumbers, id)
+                section.AddSymbol(new MessageQueueUserPermissionSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     MessageQueueRef = messageQueueId,
@@ -500,7 +500,7 @@ namespace WixToolset.Msmq
             }
             if (null != group)
             {
-                section.AddTuple(new MessageQueueGroupPermissionTuple(sourceLineNumbers, id)
+                section.AddSymbol(new MessageQueueGroupPermissionSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     MessageQueueRef = messageQueueId,

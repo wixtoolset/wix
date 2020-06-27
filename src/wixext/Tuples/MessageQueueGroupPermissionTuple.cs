@@ -3,28 +3,28 @@
 namespace WixToolset.Msmq
 {
     using WixToolset.Data;
-    using WixToolset.Msmq.Tuples;
+    using WixToolset.Msmq.Symbols;
 
-    public static partial class MsmqTupleDefinitions
+    public static partial class MsmqSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition MessageQueueGroupPermission = new IntermediateTupleDefinition(
-            MsmqTupleDefinitionType.MessageQueueGroupPermission.ToString(),
+        public static readonly IntermediateSymbolDefinition MessageQueueGroupPermission = new IntermediateSymbolDefinition(
+            MsmqSymbolDefinitionType.MessageQueueGroupPermission.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionTupleFields.MessageQueueRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionTupleFields.GroupRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionTupleFields.Permissions), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionSymbolFields.MessageQueueRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionSymbolFields.GroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueGroupPermissionSymbolFields.Permissions), IntermediateFieldType.Number),
             },
-            typeof(MessageQueueGroupPermissionTuple));
+            typeof(MessageQueueGroupPermissionSymbol));
     }
 }
 
-namespace WixToolset.Msmq.Tuples
+namespace WixToolset.Msmq.Symbols
 {
     using WixToolset.Data;
 
-    public enum MessageQueueGroupPermissionTupleFields
+    public enum MessageQueueGroupPermissionSymbolFields
     {
         ComponentRef,
         MessageQueueRef,
@@ -32,40 +32,40 @@ namespace WixToolset.Msmq.Tuples
         Permissions,
     }
 
-    public class MessageQueueGroupPermissionTuple : IntermediateTuple
+    public class MessageQueueGroupPermissionSymbol : IntermediateSymbol
     {
-        public MessageQueueGroupPermissionTuple() : base(MsmqTupleDefinitions.MessageQueueGroupPermission, null, null)
+        public MessageQueueGroupPermissionSymbol() : base(MsmqSymbolDefinitions.MessageQueueGroupPermission, null, null)
         {
         }
 
-        public MessageQueueGroupPermissionTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(MsmqTupleDefinitions.MessageQueueGroupPermission, sourceLineNumber, id)
+        public MessageQueueGroupPermissionSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(MsmqSymbolDefinitions.MessageQueueGroupPermission, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[MessageQueueGroupPermissionTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[MessageQueueGroupPermissionSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)MessageQueueGroupPermissionTupleFields.ComponentRef].AsString();
-            set => this.Set((int)MessageQueueGroupPermissionTupleFields.ComponentRef, value);
+            get => this.Fields[(int)MessageQueueGroupPermissionSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)MessageQueueGroupPermissionSymbolFields.ComponentRef, value);
         }
 
         public string MessageQueueRef
         {
-            get => this.Fields[(int)MessageQueueGroupPermissionTupleFields.MessageQueueRef].AsString();
-            set => this.Set((int)MessageQueueGroupPermissionTupleFields.MessageQueueRef, value);
+            get => this.Fields[(int)MessageQueueGroupPermissionSymbolFields.MessageQueueRef].AsString();
+            set => this.Set((int)MessageQueueGroupPermissionSymbolFields.MessageQueueRef, value);
         }
 
         public string GroupRef
         {
-            get => this.Fields[(int)MessageQueueGroupPermissionTupleFields.GroupRef].AsString();
-            set => this.Set((int)MessageQueueGroupPermissionTupleFields.GroupRef, value);
+            get => this.Fields[(int)MessageQueueGroupPermissionSymbolFields.GroupRef].AsString();
+            set => this.Set((int)MessageQueueGroupPermissionSymbolFields.GroupRef, value);
         }
 
         public int Permissions
         {
-            get => this.Fields[(int)MessageQueueGroupPermissionTupleFields.Permissions].AsNumber();
-            set => this.Set((int)MessageQueueGroupPermissionTupleFields.Permissions, value);
+            get => this.Fields[(int)MessageQueueGroupPermissionSymbolFields.Permissions].AsNumber();
+            set => this.Set((int)MessageQueueGroupPermissionSymbolFields.Permissions, value);
         }
     }
 }
