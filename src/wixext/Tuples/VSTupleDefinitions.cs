@@ -5,7 +5,7 @@ namespace WixToolset.VisualStudio
     using System;
     using WixToolset.Data;
 
-    public enum VSTupleDefinitionType
+    public enum VSSymbolDefinitionType
     {
         HelpFile,
         HelpFileToNamespace,
@@ -15,13 +15,13 @@ namespace WixToolset.VisualStudio
         HelpPlugin,
     }
 
-    public static partial class VSTupleDefinitions
+    public static partial class VSSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out VSTupleDefinitionType type))
+            if (!Enum.TryParse(name, out VSSymbolDefinitionType type))
             {
                 return null;
             }
@@ -29,27 +29,27 @@ namespace WixToolset.VisualStudio
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(VSTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(VSSymbolDefinitionType type)
         {
             switch (type)
             {
-                case VSTupleDefinitionType.HelpFile:
-                    return VSTupleDefinitions.HelpFile;
+                case VSSymbolDefinitionType.HelpFile:
+                    return VSSymbolDefinitions.HelpFile;
 
-                case VSTupleDefinitionType.HelpFileToNamespace:
-                    return VSTupleDefinitions.HelpFileToNamespace;
+                case VSSymbolDefinitionType.HelpFileToNamespace:
+                    return VSSymbolDefinitions.HelpFileToNamespace;
 
-                case VSTupleDefinitionType.HelpFilter:
-                    return VSTupleDefinitions.HelpFilter;
+                case VSSymbolDefinitionType.HelpFilter:
+                    return VSSymbolDefinitions.HelpFilter;
 
-                case VSTupleDefinitionType.HelpFilterToNamespace:
-                    return VSTupleDefinitions.HelpFilterToNamespace;
+                case VSSymbolDefinitionType.HelpFilterToNamespace:
+                    return VSSymbolDefinitions.HelpFilterToNamespace;
 
-                case VSTupleDefinitionType.HelpNamespace:
-                    return VSTupleDefinitions.HelpNamespace;
+                case VSSymbolDefinitionType.HelpNamespace:
+                    return VSSymbolDefinitions.HelpNamespace;
 
-                case VSTupleDefinitionType.HelpPlugin:
-                    return VSTupleDefinitions.HelpPlugin;
+                case VSSymbolDefinitionType.HelpPlugin:
+                    return VSSymbolDefinitions.HelpPlugin;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));

@@ -7,10 +7,10 @@ namespace WixToolset.VisualStudio
     using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
-    using WixToolset.VisualStudio.Tuples;
+    using WixToolset.VisualStudio.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset Visual Studio Extension.
@@ -93,7 +93,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpNamespace, id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSSymbolDefinitions.HelpNamespace, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -212,7 +212,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpNamespaceTuple(sourceLineNumbers, id)
+                section.AddSymbol(new HelpNamespaceSymbol(sourceLineNumbers, id)
                 {
                     NamespaceName = name,
                     CollectionFileRef = fileId,
@@ -249,11 +249,11 @@ namespace WixToolset.VisualStudio
                             break;
                         case "AttributeIndex":
                             hxr = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxr);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, hxr);
                             break;
                         case "Index":
                             hxi = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxi);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, hxi);
                             break;
                         case "Language":
                             language = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
@@ -263,11 +263,11 @@ namespace WixToolset.VisualStudio
                             break;
                         case "SampleLocation":
                             samples = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, samples);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, samples);
                             break;
                         case "Search":
                             hxq = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxq);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, hxq);
                             break;
                         case "SuppressCustomActions":
                             suppressCAs = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -303,7 +303,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpFileTuple(sourceLineNumbers, id)
+                section.AddSymbol(new HelpFileSymbol(sourceLineNumbers, id)
                 {
                     HelpFileName = name,
                     LangID = language,
@@ -334,7 +334,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpFile, id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSSymbolDefinitions.HelpFile, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -356,7 +356,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpFileToNamespaceTuple(sourceLineNumbers, id)
+                section.AddSymbol(new HelpFileToNamespaceSymbol(sourceLineNumbers, id)
                 {
                     HelpFileRef = id.Id,
                     HelpNamespaceRef = collectionId.Id,
@@ -415,7 +415,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpFilterTuple(sourceLineNumbers, id)
+                section.AddSymbol(new HelpFilterSymbol(sourceLineNumbers, id)
                 {
                     Description = name,
                     QueryString = filterDefinition,
@@ -441,7 +441,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpFilter, id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSSymbolDefinitions.HelpFilter, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -463,7 +463,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpFilterToNamespaceTuple(sourceLineNumbers, id)
+                section.AddSymbol(new HelpFilterToNamespaceSymbol(sourceLineNumbers, id)
                 {
                     HelpFilterRef = id.Id,
                     HelpNamespaceRef = collectionId.Id,
@@ -533,7 +533,7 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new HelpPluginTuple(sourceLineNumbers, parentId)
+                section.AddSymbol(new HelpPluginSymbol(sourceLineNumbers, parentId)
                 {
                     HelpNamespaceRef = parentId.Id,
                     ParentHelpNamespaceRef = namespaceParent,
@@ -550,7 +550,7 @@ namespace WixToolset.VisualStudio
                         this.ParseHelper.CreateComplexReference(section, sourceLineNumbers, ComplexReferenceParentType.Feature, feature, String.Empty,
                             ComplexReferenceChildType.ComponentGroup, "Help2_VS2005_Namespace_Components", false);
                         // Reference CustomAction since nothing will happen without it
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_HxMerge_VSIPCC_VSCC");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "CA_HxMerge_VSIPCC_VSCC");
                     }
                 }
                 else if (pluginVS08)
@@ -561,13 +561,13 @@ namespace WixToolset.VisualStudio
                         this.ParseHelper.CreateComplexReference(section, sourceLineNumbers, ComplexReferenceParentType.Feature, feature, String.Empty,
                             ComplexReferenceChildType.ComponentGroup, "Help2_VS2008_Namespace_Components", false);
                         // Reference CustomAction since nothing will happen without it
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_ScheduleExtHelpPlugin_VSCC_VSIPCC");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "CA_ScheduleExtHelpPlugin_VSCC_VSIPCC");
                     }
                 }
                 else
                 {
                     // Reference the parent namespace to enforce the foreign key relationship
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpNamespace, namespaceParent);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSSymbolDefinitions.HelpNamespace, namespaceParent);
                 }
             }
         }
@@ -679,10 +679,10 @@ namespace WixToolset.VisualStudio
             if (!this.Messaging.EncounteredError)
             {
                 // Ensure there is a reference to the AppSearch Property that will find the VsixInstaller.exe.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Property, propertyId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Property, propertyId);
 
                 // Ensure there is a reference to the package file (even if we are a child under it).
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, fileId);
 
                 var cmdlinePrefix = "/q ";
 
@@ -699,12 +699,12 @@ namespace WixToolset.VisualStudio
                 var installCmdLinePerMachine = String.Concat(installCmdLinePerUser, " /admin");
                 var installConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
                 var installConditionPerMachine = String.Format("ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
-                var installPerUserCA = new CustomActionTuple(sourceLineNumbers, installNamePerUser)
+                var installPerUserCA = new CustomActionSymbol(sourceLineNumbers, installNamePerUser)
                 {
                     ExecutionType = CustomActionExecutionType.Deferred,
                     Impersonate = true,
                 };
-                var installPerMachineCA = new CustomActionTuple(sourceLineNumbers, installNamePerMachine)
+                var installPerMachineCA = new CustomActionSymbol(sourceLineNumbers, installNamePerMachine)
                 {
                     ExecutionType = CustomActionExecutionType.Deferred,
                     Impersonate = false,
@@ -724,13 +724,13 @@ namespace WixToolset.VisualStudio
                     var rollbackCmdLinePerMachine = String.Concat(rollbackCmdLinePerUser, " /admin");
                     var rollbackConditionPerUser = String.Format("NOT ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
                     var rollbackConditionPerMachine = String.Format("ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
-                    var rollbackPerUserCA = new CustomActionTuple(sourceLineNumbers, rollbackNamePerUser)
+                    var rollbackPerUserCA = new CustomActionSymbol(sourceLineNumbers, rollbackNamePerUser)
                     {
                         ExecutionType = CustomActionExecutionType.Rollback,
                         IgnoreResult = true,
                         Impersonate = true,
                     };
-                    var rollbackPerMachineCA = new CustomActionTuple(sourceLineNumbers, rollbackNamePerMachine)
+                    var rollbackPerMachineCA = new CustomActionSymbol(sourceLineNumbers, rollbackNamePerMachine)
                     {
                         ExecutionType = CustomActionExecutionType.Rollback,
                         IgnoreResult = true,
@@ -755,13 +755,13 @@ namespace WixToolset.VisualStudio
                     var uninstallCmdLinePerMachine = String.Concat(uninstallCmdLinePerUser, " /admin");
                     var uninstallConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
                     var uninstallConditionPerMachine = String.Format("ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
-                    var uninstallPerUserCA = new CustomActionTuple(sourceLineNumbers, uninstallNamePerUser)
+                    var uninstallPerUserCA = new CustomActionSymbol(sourceLineNumbers, uninstallNamePerUser)
                     {
                         ExecutionType = CustomActionExecutionType.Deferred,
                         IgnoreResult = true,
                         Impersonate = true,
                     };
-                    var uninstallPerMachineCA = new CustomActionTuple(sourceLineNumbers, uninstallNamePerMachine)
+                    var uninstallPerMachineCA = new CustomActionSymbol(sourceLineNumbers, uninstallNamePerMachine)
                     {
                         ExecutionType = CustomActionExecutionType.Deferred,
                         IgnoreResult = true,
@@ -774,7 +774,7 @@ namespace WixToolset.VisualStudio
             }
         }
 
-        private void SchedulePropertyExeAction(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier name, string source, string cmdline, CustomActionTuple caTemplate, string condition, string beforeAction, string afterAction)
+        private void SchedulePropertyExeAction(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier name, string source, string cmdline, CustomActionSymbol caTemplate, string condition, string beforeAction, string afterAction)
         {
             const SequenceTable sequence = SequenceTable.InstallExecuteSequence;
 
@@ -782,9 +782,9 @@ namespace WixToolset.VisualStudio
             caTemplate.Source = source;
             caTemplate.TargetType = CustomActionTargetType.Exe;
             caTemplate.Target = cmdline;
-            section.AddTuple(caTemplate);
+            section.AddSymbol(caTemplate);
 
-            section.AddTuple(new WixActionTuple(sourceLineNumbers, new Identifier(name.Access, sequence, name.Id))
+            section.AddSymbol(new WixActionSymbol(sourceLineNumbers, new Identifier(name.Access, sequence, name.Id))
             {
                 SequenceTable = SequenceTable.InstallExecuteSequence,
                 Action = name.Id,
@@ -799,11 +799,11 @@ namespace WixToolset.VisualStudio
             {
                 if (WindowsInstallerStandard.IsStandardAction(beforeAction))
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), beforeAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), beforeAction);
                 }
                 else
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, beforeAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, beforeAction);
                 }
             }
 
@@ -811,18 +811,18 @@ namespace WixToolset.VisualStudio
             {
                 if (WindowsInstallerStandard.IsStandardAction(afterAction))
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), afterAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixAction, sequence.ToString(), afterAction);
                 }
                 else
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, afterAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, afterAction);
                 }
             }
         }
 
         private void AddReferenceToRegisterMicrosoftHelp(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
         }
     }
 }

@@ -3,61 +3,61 @@
 namespace WixToolset.VisualStudio
 {
     using WixToolset.Data;
-    using WixToolset.VisualStudio.Tuples;
+    using WixToolset.VisualStudio.Symbols;
 
-    public static partial class VSTupleDefinitions
+    public static partial class VSSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition HelpNamespace = new IntermediateTupleDefinition(
-            VSTupleDefinitionType.HelpNamespace.ToString(),
+        public static readonly IntermediateSymbolDefinition HelpNamespace = new IntermediateSymbolDefinition(
+            VSSymbolDefinitionType.HelpNamespace.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(HelpNamespaceTupleFields.NamespaceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpNamespaceTupleFields.CollectionFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpNamespaceTupleFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpNamespaceSymbolFields.NamespaceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpNamespaceSymbolFields.CollectionFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpNamespaceSymbolFields.Description), IntermediateFieldType.String),
             },
-            typeof(HelpNamespaceTuple));
+            typeof(HelpNamespaceSymbol));
     }
 }
 
-namespace WixToolset.VisualStudio.Tuples
+namespace WixToolset.VisualStudio.Symbols
 {
     using WixToolset.Data;
 
-    public enum HelpNamespaceTupleFields
+    public enum HelpNamespaceSymbolFields
     {
         NamespaceName,
         CollectionFileRef,
         Description,
     }
 
-    public class HelpNamespaceTuple : IntermediateTuple
+    public class HelpNamespaceSymbol : IntermediateSymbol
     {
-        public HelpNamespaceTuple() : base(VSTupleDefinitions.HelpNamespace, null, null)
+        public HelpNamespaceSymbol() : base(VSSymbolDefinitions.HelpNamespace, null, null)
         {
         }
 
-        public HelpNamespaceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSTupleDefinitions.HelpNamespace, sourceLineNumber, id)
+        public HelpNamespaceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSSymbolDefinitions.HelpNamespace, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[HelpNamespaceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[HelpNamespaceSymbolFields index] => this.Fields[(int)index];
 
         public string NamespaceName
         {
-            get => this.Fields[(int)HelpNamespaceTupleFields.NamespaceName].AsString();
-            set => this.Set((int)HelpNamespaceTupleFields.NamespaceName, value);
+            get => this.Fields[(int)HelpNamespaceSymbolFields.NamespaceName].AsString();
+            set => this.Set((int)HelpNamespaceSymbolFields.NamespaceName, value);
         }
 
         public string CollectionFileRef
         {
-            get => this.Fields[(int)HelpNamespaceTupleFields.CollectionFileRef].AsString();
-            set => this.Set((int)HelpNamespaceTupleFields.CollectionFileRef, value);
+            get => this.Fields[(int)HelpNamespaceSymbolFields.CollectionFileRef].AsString();
+            set => this.Set((int)HelpNamespaceSymbolFields.CollectionFileRef, value);
         }
 
         public string Description
         {
-            get => this.Fields[(int)HelpNamespaceTupleFields.Description].AsString();
-            set => this.Set((int)HelpNamespaceTupleFields.Description, value);
+            get => this.Fields[(int)HelpNamespaceSymbolFields.Description].AsString();
+            set => this.Set((int)HelpNamespaceSymbolFields.Description, value);
         }
     }
 }

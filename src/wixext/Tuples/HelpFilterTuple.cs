@@ -3,53 +3,53 @@
 namespace WixToolset.VisualStudio
 {
     using WixToolset.Data;
-    using WixToolset.VisualStudio.Tuples;
+    using WixToolset.VisualStudio.Symbols;
 
-    public static partial class VSTupleDefinitions
+    public static partial class VSSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition HelpFilter = new IntermediateTupleDefinition(
-            VSTupleDefinitionType.HelpFilter.ToString(),
+        public static readonly IntermediateSymbolDefinition HelpFilter = new IntermediateSymbolDefinition(
+            VSSymbolDefinitionType.HelpFilter.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(HelpFilterTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpFilterTupleFields.QueryString), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpFilterSymbolFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpFilterSymbolFields.QueryString), IntermediateFieldType.String),
             },
-            typeof(HelpFilterTuple));
+            typeof(HelpFilterSymbol));
     }
 }
 
-namespace WixToolset.VisualStudio.Tuples
+namespace WixToolset.VisualStudio.Symbols
 {
     using WixToolset.Data;
 
-    public enum HelpFilterTupleFields
+    public enum HelpFilterSymbolFields
     {
         Description,
         QueryString,
     }
 
-    public class HelpFilterTuple : IntermediateTuple
+    public class HelpFilterSymbol : IntermediateSymbol
     {
-        public HelpFilterTuple() : base(VSTupleDefinitions.HelpFilter, null, null)
+        public HelpFilterSymbol() : base(VSSymbolDefinitions.HelpFilter, null, null)
         {
         }
 
-        public HelpFilterTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSTupleDefinitions.HelpFilter, sourceLineNumber, id)
+        public HelpFilterSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSSymbolDefinitions.HelpFilter, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[HelpFilterTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[HelpFilterSymbolFields index] => this.Fields[(int)index];
 
         public string Description
         {
-            get => this.Fields[(int)HelpFilterTupleFields.Description].AsString();
-            set => this.Set((int)HelpFilterTupleFields.Description, value);
+            get => this.Fields[(int)HelpFilterSymbolFields.Description].AsString();
+            set => this.Set((int)HelpFilterSymbolFields.Description, value);
         }
 
         public string QueryString
         {
-            get => this.Fields[(int)HelpFilterTupleFields.QueryString].AsString();
-            set => this.Set((int)HelpFilterTupleFields.QueryString, value);
+            get => this.Fields[(int)HelpFilterSymbolFields.QueryString].AsString();
+            set => this.Set((int)HelpFilterSymbolFields.QueryString, value);
         }
     }
 }

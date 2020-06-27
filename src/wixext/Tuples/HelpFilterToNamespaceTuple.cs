@@ -3,53 +3,53 @@
 namespace WixToolset.VisualStudio
 {
     using WixToolset.Data;
-    using WixToolset.VisualStudio.Tuples;
+    using WixToolset.VisualStudio.Symbols;
 
-    public static partial class VSTupleDefinitions
+    public static partial class VSSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition HelpFilterToNamespace = new IntermediateTupleDefinition(
-            VSTupleDefinitionType.HelpFilterToNamespace.ToString(),
+        public static readonly IntermediateSymbolDefinition HelpFilterToNamespace = new IntermediateSymbolDefinition(
+            VSSymbolDefinitionType.HelpFilterToNamespace.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(HelpFilterToNamespaceTupleFields.HelpFilterRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpFilterToNamespaceTupleFields.HelpNamespaceRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpFilterToNamespaceSymbolFields.HelpFilterRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpFilterToNamespaceSymbolFields.HelpNamespaceRef), IntermediateFieldType.String),
             },
-            typeof(HelpFilterToNamespaceTuple));
+            typeof(HelpFilterToNamespaceSymbol));
     }
 }
 
-namespace WixToolset.VisualStudio.Tuples
+namespace WixToolset.VisualStudio.Symbols
 {
     using WixToolset.Data;
 
-    public enum HelpFilterToNamespaceTupleFields
+    public enum HelpFilterToNamespaceSymbolFields
     {
         HelpFilterRef,
         HelpNamespaceRef,
     }
 
-    public class HelpFilterToNamespaceTuple : IntermediateTuple
+    public class HelpFilterToNamespaceSymbol : IntermediateSymbol
     {
-        public HelpFilterToNamespaceTuple() : base(VSTupleDefinitions.HelpFilterToNamespace, null, null)
+        public HelpFilterToNamespaceSymbol() : base(VSSymbolDefinitions.HelpFilterToNamespace, null, null)
         {
         }
 
-        public HelpFilterToNamespaceTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSTupleDefinitions.HelpFilterToNamespace, sourceLineNumber, id)
+        public HelpFilterToNamespaceSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSSymbolDefinitions.HelpFilterToNamespace, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[HelpFilterToNamespaceTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[HelpFilterToNamespaceSymbolFields index] => this.Fields[(int)index];
 
         public string HelpFilterRef
         {
-            get => this.Fields[(int)HelpFilterToNamespaceTupleFields.HelpFilterRef].AsString();
-            set => this.Set((int)HelpFilterToNamespaceTupleFields.HelpFilterRef, value);
+            get => this.Fields[(int)HelpFilterToNamespaceSymbolFields.HelpFilterRef].AsString();
+            set => this.Set((int)HelpFilterToNamespaceSymbolFields.HelpFilterRef, value);
         }
 
         public string HelpNamespaceRef
         {
-            get => this.Fields[(int)HelpFilterToNamespaceTupleFields.HelpNamespaceRef].AsString();
-            set => this.Set((int)HelpFilterToNamespaceTupleFields.HelpNamespaceRef, value);
+            get => this.Fields[(int)HelpFilterToNamespaceSymbolFields.HelpNamespaceRef].AsString();
+            set => this.Set((int)HelpFilterToNamespaceSymbolFields.HelpNamespaceRef, value);
         }
     }
 }

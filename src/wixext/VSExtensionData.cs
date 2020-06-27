@@ -13,15 +13,15 @@ namespace WixToolset.VisualStudio
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = VSTupleDefinitions.ByName(name);
-            return tupleDefinition != null;
+            symbolDefinition = VSSymbolDefinitions.ByName(name);
+            return symbolDefinition != null;
         }
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(VSExtensionData).Assembly, "WixToolset.VisualStudio.vs.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(VSExtensionData).Assembly, "WixToolset.VisualStudio.vs.wixlib", symbolDefinitions);
         }
     }
 }

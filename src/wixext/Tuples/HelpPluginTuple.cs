@@ -3,29 +3,29 @@
 namespace WixToolset.VisualStudio
 {
     using WixToolset.Data;
-    using WixToolset.VisualStudio.Tuples;
+    using WixToolset.VisualStudio.Symbols;
 
-    public static partial class VSTupleDefinitions
+    public static partial class VSSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition HelpPlugin = new IntermediateTupleDefinition(
-            VSTupleDefinitionType.HelpPlugin.ToString(),
+        public static readonly IntermediateSymbolDefinition HelpPlugin = new IntermediateSymbolDefinition(
+            VSSymbolDefinitionType.HelpPlugin.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(HelpPluginTupleFields.HelpNamespaceRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpPluginTupleFields.ParentHelpNamespaceRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpPluginTupleFields.HxTFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpPluginTupleFields.HxAFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HelpPluginTupleFields.ParentHxTFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpPluginSymbolFields.HelpNamespaceRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpPluginSymbolFields.ParentHelpNamespaceRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpPluginSymbolFields.HxTFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpPluginSymbolFields.HxAFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HelpPluginSymbolFields.ParentHxTFileRef), IntermediateFieldType.String),
             },
-            typeof(HelpPluginTuple));
+            typeof(HelpPluginSymbol));
     }
 }
 
-namespace WixToolset.VisualStudio.Tuples
+namespace WixToolset.VisualStudio.Symbols
 {
     using WixToolset.Data;
 
-    public enum HelpPluginTupleFields
+    public enum HelpPluginSymbolFields
     {
         HelpNamespaceRef,
         ParentHelpNamespaceRef,
@@ -34,46 +34,46 @@ namespace WixToolset.VisualStudio.Tuples
         ParentHxTFileRef,
     }
 
-    public class HelpPluginTuple : IntermediateTuple
+    public class HelpPluginSymbol : IntermediateSymbol
     {
-        public HelpPluginTuple() : base(VSTupleDefinitions.HelpPlugin, null, null)
+        public HelpPluginSymbol() : base(VSSymbolDefinitions.HelpPlugin, null, null)
         {
         }
 
-        public HelpPluginTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSTupleDefinitions.HelpPlugin, sourceLineNumber, id)
+        public HelpPluginSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(VSSymbolDefinitions.HelpPlugin, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[HelpPluginTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[HelpPluginSymbolFields index] => this.Fields[(int)index];
 
         public string HelpNamespaceRef
         {
-            get => this.Fields[(int)HelpPluginTupleFields.HelpNamespaceRef].AsString();
-            set => this.Set((int)HelpPluginTupleFields.HelpNamespaceRef, value);
+            get => this.Fields[(int)HelpPluginSymbolFields.HelpNamespaceRef].AsString();
+            set => this.Set((int)HelpPluginSymbolFields.HelpNamespaceRef, value);
         }
 
         public string ParentHelpNamespaceRef
         {
-            get => this.Fields[(int)HelpPluginTupleFields.ParentHelpNamespaceRef].AsString();
-            set => this.Set((int)HelpPluginTupleFields.ParentHelpNamespaceRef, value);
+            get => this.Fields[(int)HelpPluginSymbolFields.ParentHelpNamespaceRef].AsString();
+            set => this.Set((int)HelpPluginSymbolFields.ParentHelpNamespaceRef, value);
         }
 
         public string HxTFileRef
         {
-            get => this.Fields[(int)HelpPluginTupleFields.HxTFileRef].AsString();
-            set => this.Set((int)HelpPluginTupleFields.HxTFileRef, value);
+            get => this.Fields[(int)HelpPluginSymbolFields.HxTFileRef].AsString();
+            set => this.Set((int)HelpPluginSymbolFields.HxTFileRef, value);
         }
 
         public string HxAFileRef
         {
-            get => this.Fields[(int)HelpPluginTupleFields.HxAFileRef].AsString();
-            set => this.Set((int)HelpPluginTupleFields.HxAFileRef, value);
+            get => this.Fields[(int)HelpPluginSymbolFields.HxAFileRef].AsString();
+            set => this.Set((int)HelpPluginSymbolFields.HxAFileRef, value);
         }
 
         public string ParentHxTFileRef
         {
-            get => this.Fields[(int)HelpPluginTupleFields.ParentHxTFileRef].AsString();
-            set => this.Set((int)HelpPluginTupleFields.ParentHxTFileRef, value);
+            get => this.Fields[(int)HelpPluginSymbolFields.ParentHxTFileRef].AsString();
+            set => this.Set((int)HelpPluginSymbolFields.ParentHxTFileRef, value);
         }
     }
 }
