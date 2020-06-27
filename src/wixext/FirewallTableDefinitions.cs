@@ -8,7 +8,7 @@ namespace WixToolset.Firewall
     {
         public static readonly TableDefinition WixFirewallException = new TableDefinition(
             "WixFirewallException",
-            FirewallTupleDefinitions.WixFirewallException,
+            FirewallSymbolDefinitions.WixFirewallException,
             new[]
             {
                 new ColumnDefinition("WixFirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -23,7 +23,7 @@ namespace WixToolset.Firewall
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Description displayed in Windows Firewall manager for this firewall rule."),
                 new ColumnDefinition("Direction", ColumnType.Number, 1, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 1, maxValue: 2, description: "Direction (1=in; 2=out)"),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[]

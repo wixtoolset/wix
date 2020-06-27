@@ -8,7 +8,7 @@ namespace WixToolset.Firewall
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Firewall.Tuples;
+    using WixToolset.Firewall.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset Firewall Extension.
@@ -259,7 +259,7 @@ namespace WixToolset.Firewall
                     fileId = file;
                 }
 
-                var tuple = section.AddTuple(new WixFirewallExceptionTuple(sourceLineNumbers, id)
+                var symbol = section.AddSymbol(new WixFirewallExceptionSymbol(sourceLineNumbers, id)
                 {
                     Name = name,
                     RemoteAddresses = remoteAddresses,
@@ -271,7 +271,7 @@ namespace WixToolset.Firewall
 
                 if (!String.IsNullOrEmpty(port))
                 {
-                    tuple.Port = port;
+                    symbol.Port = port;
 
                     if (!protocol.HasValue)
                     {
@@ -282,22 +282,22 @@ namespace WixToolset.Firewall
 
                 if (protocol.HasValue)
                 {
-                    tuple.Protocol = protocol.Value;
+                    symbol.Protocol = protocol.Value;
                 }
 
                 if (!String.IsNullOrEmpty(fileId))
                 {
-                    tuple.Program = $"[#{fileId}]";
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
+                    symbol.Program = $"[#{fileId}]";
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, fileId);
                 }
                 else if (!String.IsNullOrEmpty(program))
                 {
-                    tuple.Program = program;
+                    symbol.Program = program;
                 }
 
                 if (CompilerConstants.IntegerNotSet != attributes)
                 {
-                    tuple.Attributes = attributes;
+                    symbol.Attributes = attributes;
                 }
 
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);

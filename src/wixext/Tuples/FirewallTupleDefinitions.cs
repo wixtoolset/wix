@@ -5,18 +5,18 @@ namespace WixToolset.Firewall
     using System;
     using WixToolset.Data;
 
-    public enum FirewallTupleDefinitionType
+    public enum FirewallSymbolDefinitionType
     {
         WixFirewallException,
     }
 
-    public static partial class FirewallTupleDefinitions
+    public static partial class FirewallSymbolDefinitions
     {
         public static readonly Version Version = new Version("4.0.0");
 
-        public static IntermediateTupleDefinition ByName(string name)
+        public static IntermediateSymbolDefinition ByName(string name)
         {
-            if (!Enum.TryParse(name, out FirewallTupleDefinitionType type))
+            if (!Enum.TryParse(name, out FirewallSymbolDefinitionType type))
             {
                 return null;
             }
@@ -24,12 +24,12 @@ namespace WixToolset.Firewall
             return ByType(type);
         }
 
-        public static IntermediateTupleDefinition ByType(FirewallTupleDefinitionType type)
+        public static IntermediateSymbolDefinition ByType(FirewallSymbolDefinitionType type)
         {
             switch (type)
             {
-                case FirewallTupleDefinitionType.WixFirewallException:
-                    return FirewallTupleDefinitions.WixFirewallException;
+                case FirewallSymbolDefinitionType.WixFirewallException:
+                    return FirewallSymbolDefinitions.WixFirewallException;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
