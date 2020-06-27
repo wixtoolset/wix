@@ -1,26 +1,26 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Netfx.Tuples
+namespace WixToolset.Netfx.Symbols
 {
     using WixToolset.Data;
 
-    public static class NetfxTupleDefinitionNames
+    public static class NetfxSymbolDefinitionNames
     {
         public static string NetFxNativeImage { get; } = "NetFxNativeImage";
     }
 
-    public static class NetfxTupleDefinitions
+    public static class NetfxSymbolDefinitions
     {
-        public static readonly IntermediateTupleDefinition NetFxNativeImage = new IntermediateTupleDefinition(
-            NetfxTupleDefinitionNames.NetFxNativeImage,
+        public static readonly IntermediateSymbolDefinition NetFxNativeImage = new IntermediateSymbolDefinition(
+            NetfxSymbolDefinitionNames.NetFxNativeImage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.FileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.Priority), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.ApplicationFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.Priority), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.ApplicationFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageSymbolFields.ApplicationBaseDirectoryRef), IntermediateFieldType.String),
             },
-            typeof(NetFxNativeImageTuple));
+            typeof(NetFxNativeImageSymbol));
     }
 }

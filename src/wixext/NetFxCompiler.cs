@@ -8,7 +8,7 @@ namespace WixToolset.Netfx
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Netfx.Tuples;
+    using WixToolset.Netfx.Symbols;
 
     /// <summary>
     /// The compiler for the WiX Toolset .NET Framework Extension.
@@ -75,7 +75,7 @@ namespace WixToolset.Netfx
                             // See if a formatted value is specified.
                             if (-1 == appBaseDirectory.IndexOf("[", StringComparison.Ordinal))
                             {
-                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, appBaseDirectory);
+                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, appBaseDirectory);
                             }
                             break;
                         case "AssemblyApplication":
@@ -84,7 +84,7 @@ namespace WixToolset.Netfx
                             // See if a formatted value is specified.
                             if (-1 == assemblyApplication.IndexOf("[", StringComparison.Ordinal))
                             {
-                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, assemblyApplication);
+                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, assemblyApplication);
                             }
                             break;
                         case "Debug":
@@ -149,7 +149,7 @@ namespace WixToolset.Netfx
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddTuple(new NetFxNativeImageTuple(sourceLineNumbers, id)
+                section.AddSymbol(new NetFxNativeImageSymbol(sourceLineNumbers, id)
                 {
                     FileRef = fileId,
                     Priority = priority,

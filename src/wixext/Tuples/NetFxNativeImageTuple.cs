@@ -1,10 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Netfx.Tuples
+namespace WixToolset.Netfx.Symbols
 {
     using WixToolset.Data;
 
-    public enum NetFxNativeImageTupleFields
+    public enum NetFxNativeImageSymbolFields
     {
         FileRef,
         Priority,
@@ -13,46 +13,46 @@ namespace WixToolset.Netfx.Tuples
         ApplicationBaseDirectoryRef,
     }
 
-    public class NetFxNativeImageTuple : IntermediateTuple
+    public class NetFxNativeImageSymbol : IntermediateSymbol
     {
-        public NetFxNativeImageTuple() : base(NetfxTupleDefinitions.NetFxNativeImage, null, null)
+        public NetFxNativeImageSymbol() : base(NetfxSymbolDefinitions.NetFxNativeImage, null, null)
         {
         }
 
-        public NetFxNativeImageTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(NetfxTupleDefinitions.NetFxNativeImage, sourceLineNumber, id)
+        public NetFxNativeImageSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(NetfxSymbolDefinitions.NetFxNativeImage, sourceLineNumber, id)
         {
         }
 
-        public IntermediateField this[NetFxNativeImageTupleFields index] => this.Fields[(int)index];
+        public IntermediateField this[NetFxNativeImageSymbolFields index] => this.Fields[(int)index];
 
         public string FileRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.FileRef].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.FileRef, value);
+            get => this.Fields[(int)NetFxNativeImageSymbolFields.FileRef].AsString();
+            set => this.Set((int)NetFxNativeImageSymbolFields.FileRef, value);
         }
 
         public int Priority
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.Priority].AsNumber();
-            set => this.Set((int)NetFxNativeImageTupleFields.Priority, value);
+            get => this.Fields[(int)NetFxNativeImageSymbolFields.Priority].AsNumber();
+            set => this.Set((int)NetFxNativeImageSymbolFields.Priority, value);
         }
 
         public int Attributes
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.Attributes].AsNumber();
-            set => this.Set((int)NetFxNativeImageTupleFields.Attributes, value);
+            get => this.Fields[(int)NetFxNativeImageSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)NetFxNativeImageSymbolFields.Attributes, value);
         }
 
         public string ApplicationFileRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.ApplicationFileRef].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.ApplicationFileRef, value);
+            get => this.Fields[(int)NetFxNativeImageSymbolFields.ApplicationFileRef].AsString();
+            set => this.Set((int)NetFxNativeImageSymbolFields.ApplicationFileRef, value);
         }
 
         public string ApplicationBaseDirectoryRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef, value);
+            get => this.Fields[(int)NetFxNativeImageSymbolFields.ApplicationBaseDirectoryRef].AsString();
+            set => this.Set((int)NetFxNativeImageSymbolFields.ApplicationBaseDirectoryRef, value);
         }
     }
 }

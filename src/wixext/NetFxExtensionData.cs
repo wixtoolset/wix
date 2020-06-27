@@ -4,22 +4,22 @@ namespace WixToolset.Netfx
 {
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Netfx.Tuples;
+    using WixToolset.Netfx.Symbols;
 
     /// <summary>
     /// The WiX Toolset .NET Framework Extension.
     /// </summary>
     public sealed class NetfxExtensionData : BaseExtensionData
     {
-        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            tupleDefinition = (name == NetfxTupleDefinitionNames.NetFxNativeImage) ? NetfxTupleDefinitions.NetFxNativeImage : null;
-            return tupleDefinition != null;
+            symbolDefinition = (name == NetfxSymbolDefinitionNames.NetFxNativeImage) ? NetfxSymbolDefinitions.NetFxNativeImage : null;
+            return symbolDefinition != null;
         }
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(NetfxExtensionData).Assembly, "WixToolset.Netfx.netfx.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(NetfxExtensionData).Assembly, "WixToolset.Netfx.netfx.wixlib", symbolDefinitions);
         }
     }
 }

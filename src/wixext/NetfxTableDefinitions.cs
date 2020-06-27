@@ -3,13 +3,13 @@
 namespace WixToolset.Netfx
 {
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Netfx.Tuples;
+    using WixToolset.Netfx.Symbols;
 
     public static class NetfxTableDefinitions
     {
         public static readonly TableDefinition NetFxNativeImage = new TableDefinition(
             "Wix4NetFxNativeImage",
-            NetfxTupleDefinitions.NetFxNativeImage,
+            NetfxSymbolDefinitions.NetFxNativeImage,
             new[]
             {
                 new ColumnDefinition("Wix4NetFxNativeImage", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -19,7 +19,7 @@ namespace WixToolset.Netfx
                 new ColumnDefinition("File_Application", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The application which loads this assembly.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Directory_ApplicationBase", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The directory containing the application which loads this assembly.", modularizeType: ColumnModularizeType.Column),
             },
-            tupleIdIsPrimaryKey: true
+            symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition[] All = new[]
