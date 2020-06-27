@@ -16,9 +16,9 @@ namespace WixToolset.DirectX
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            return Intermediate.Load(typeof(DirectXExtensionData).Assembly, "WixToolset.DirectX.directx.wixlib", tupleDefinitions);
+            return Intermediate.Load(typeof(DirectXExtensionData).Assembly, "WixToolset.DirectX.directx.wixlib", symbolDefinitions);
         }
     }
 }
