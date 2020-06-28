@@ -416,8 +416,9 @@ namespace WixToolset.Converters
 
         private void ConvertControlElement(XElement element)
         {
-            var xCondition = element.Element(ConditionElementName);
-            if (xCondition != null)
+            var remove = new List<XElement>();
+
+            foreach (var xCondition in element.Elements(ConditionElementName))
             {
                 var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
                 if (!String.IsNullOrEmpty(action) &&
@@ -425,8 +426,13 @@ namespace WixToolset.Converters
                     this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
                 {
                     element.Add(new XAttribute(action + "Condition", text));
-                    xCondition.Remove();
+                    remove.Add(xCondition);
                 }
+            }
+
+            for (var i = remove.Count - 1; i >= 0; i--)
+            {
+                remove[i].Remove();
             }
         }
 
@@ -517,8 +523,9 @@ namespace WixToolset.Converters
 
         private void ConvertFragmentElement(XElement element)
         {
-            var xCondition = element.Element(ConditionElementName);
-            if (xCondition != null)
+            var remove = new List<XElement>();
+
+            foreach (var xCondition in element.Elements(ConditionElementName))
             {
                 var message = xCondition.Attribute("Message")?.Value;
 
@@ -530,8 +537,13 @@ namespace WixToolset.Converters
                         new XAttribute("Condition", text),
                         new XAttribute("Message", message)
                         ));
-                    xCondition.Remove();
+                    remove.Add(xCondition);
                 }
+            }
+
+            for (var i = remove.Count - 1; i >= 0; i--)
+            {
+                remove[i].Remove();
             }
         }
 

@@ -20,6 +20,7 @@ namespace WixToolsetTest.Converters
                 "    <UI>",
                 "      <Dialog Id='Dlg1'>",
                 "        <Control Id='Control1'>",
+                "          <Condition Action='disable'>x=y</Condition>",
                 "          <Condition Action='hide'>a&lt;>b</Condition>",
                 "        </Control>",
                 "      </Dialog>",
@@ -33,7 +34,8 @@ namespace WixToolsetTest.Converters
                 "  <Fragment>",
                 "    <UI>",
                 "      <Dialog Id=\"Dlg1\">",
-                "        <Control Id=\"Control1\" HideCondition=\"a&lt;&gt;b\">",
+                "        <Control Id=\"Control1\" DisableCondition=\"x=y\" HideCondition=\"a&lt;&gt;b\">",
+                "          ",
                 "          ",
                 "        </Control>",
                 "      </Dialog>",
@@ -48,7 +50,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);
@@ -136,6 +138,9 @@ namespace WixToolsetTest.Converters
                 "    <Condition Message='Stop the install'>",
                 "      1&lt;2",
                 "    </Condition>",
+                "    <Condition Message='Do not stop'>",
+                "      1=2",
+                "    </Condition>",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -144,6 +149,7 @@ namespace WixToolsetTest.Converters
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -154,7 +160,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);
