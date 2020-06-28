@@ -24,6 +24,7 @@ namespace WixToolset.Converters
 
         private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
+        private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
 
         private static readonly XName AdminExecuteSequenceElementName = WixNamespace + "AdminExecuteSequence";
@@ -68,7 +69,11 @@ namespace WixToolset.Converters
         private static readonly XName UtilXmlConfigElementName = WixUtilNamespace + "XmlConfig";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
+        private static readonly XName Wix4ElementName = WixNamespace + "Wix";
+        private static readonly XName Wix3ElementName = Wix3Namespace + "Wix";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
+        private static readonly XName Include4ElementName = WixNamespace + "Include";
+        private static readonly XName Include3ElementName = Wix3Namespace + "Include";
         private static readonly XName IncludeElementWithoutNamespaceName = XNamespace.None + "Include";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
@@ -343,17 +348,17 @@ namespace WixToolset.Converters
 
             foreach (var declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
             {
+                if (element.Name == Wix3ElementName || element.Name == Include3ElementName)
+                {
+                    this.SourceVersion = 3;
+                }
+                else if (element.Name == Wix4ElementName || element.Name == Include4ElementName)
+                {
+                    this.SourceVersion = 4;
+                }
+
                 if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
                 {
-                    if (Wix3Namespaces.Contains(declaration.Value))
-                    {
-                        this.SourceVersion = 3;
-                    }
-                    else if (Wix4Namespaces.Contains(declaration.Value))
-                    {
-                        this.SourceVersion = 4;
-                    }
-
                     if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
                     {
                         deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);

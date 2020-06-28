@@ -331,7 +331,7 @@ namespace WixToolsetTest.Converters
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <File Source='path\\to\\foo.txt' />",
                 "</Wix>");
 
@@ -349,7 +349,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
             Assert.Equal(expected, actual);
         }
 
