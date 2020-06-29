@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.FaceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Size), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Size), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Red), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Green), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TextStyleSymbolFields.Blue), IntermediateFieldType.Number),
@@ -55,6 +55,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)TextStyleSymbolFields.FaceName];
             set => this.Set((int)TextStyleSymbolFields.FaceName, value);
+        }
+
+        public string LocalizedSize
+        {
+            get => (string)this.Fields[(int)TextStyleSymbolFields.Size];
+            set => this.Set((int)TextStyleSymbolFields.Size, value);
         }
 
         public int Size
