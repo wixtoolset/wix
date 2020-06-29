@@ -904,7 +904,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesTextStyleTableWhenSizeIsLocalized()
         {
             var folder = TestData.Get(@"TestData");

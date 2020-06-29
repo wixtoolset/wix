@@ -860,9 +860,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var symbol = this.Core.AddSymbol(new TextStyleSymbol(sourceLineNumbers, id)
+                this.Core.AddSymbol(new TextStyleSymbol(sourceLineNumbers, id)
                 {
                     FaceName = faceName,
+                    LocalizedSize = size,
                     Red = red,
                     Green = green,
                     Blue = blue,
@@ -871,8 +872,6 @@ namespace WixToolset.Core
                     Strike = strike,
                     Underline = underline,
                 });
-
-                symbol.Set((int)TextStyleSymbolFields.Size, size);
             }
         }
 
