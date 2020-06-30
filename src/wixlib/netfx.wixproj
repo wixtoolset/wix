@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <BindInputPaths Include="$(OutputPath)Win32" BindName='x86' />
+    <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
+    <BindInputPaths Include="$(OutputPath)arm" BindName='arm' />
+    <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM" />
     <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=ARM64" />
     <ProjectReference Include="..\ca\netfxca.vcxproj" Properties="Platform=x86" />
