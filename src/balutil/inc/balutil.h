@@ -145,6 +145,16 @@ DAPIV_(HRESULT) BalLog(
     );
 
 /*******************************************************************
+ BalLogArgs - logs a message with the engine.
+
+********************************************************************/
+DAPI_(HRESULT) BalLogArgs(
+    __in BOOTSTRAPPER_LOG_LEVEL level,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
+
+/*******************************************************************
  BalLogError - logs an error message with the engine.
 
 ********************************************************************/
@@ -152,6 +162,16 @@ DAPIV_(HRESULT) BalLogError(
     __in HRESULT hr,
     __in_z __format_string LPCSTR szFormat,
     ...
+    );
+
+/*******************************************************************
+ BalLogErrorArgs - logs an error message with the engine.
+
+********************************************************************/
+DAPI_(HRESULT) BalLogErrorArgs(
+    __in HRESULT hr,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
     );
 
 /*******************************************************************

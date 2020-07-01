@@ -251,6 +251,29 @@ DAPIV_(HRESULT) BalLog(
 {
     HRESULT hr = S_OK;
     va_list args;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    va_start(args, szFormat);
+    hr = BalLogArgs(level, szFormat, args);
+    va_end(args);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalLogArgs(
+    __in BOOTSTRAPPER_LOG_LEVEL level,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
     LPSTR sczFormattedAnsi = NULL;
     LPWSTR sczMessage = NULL;
 
@@ -260,9 +283,7 @@ DAPIV_(HRESULT) BalLog(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
-    va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&sczFormattedAnsi, szFormat, args);
-    va_end(args);
     ExitOnFailure(hr, "Failed to format log string.");
 
     hr = StrAllocStringAnsi(&sczMessage, sczFormattedAnsi, 0, CP_UTF8);
@@ -285,6 +306,29 @@ DAPIV_(HRESULT) BalLogError(
 {
     HRESULT hr = S_OK;
     va_list args;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    va_start(args, szFormat);
+    hr = BalLogErrorArgs(hrError, szFormat, args);
+    va_end(args);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalLogErrorArgs(
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
     LPSTR sczFormattedAnsi = NULL;
     LPWSTR sczMessage = NULL;
 
@@ -294,9 +338,7 @@ DAPIV_(HRESULT) BalLogError(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
-    va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&sczFormattedAnsi, szFormat, args);
-    va_end(args);
     ExitOnFailure(hr, "Failed to format error log string.");
 
     hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x: %S", hrError, sczFormattedAnsi);
