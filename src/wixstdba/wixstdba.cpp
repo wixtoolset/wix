@@ -5,6 +5,16 @@
 static HINSTANCE vhInstance = NULL;
 static IBootstrapperApplication* vpApplication = NULL;
 
+static void CALLBACK WixstdbaTraceError(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
+
 extern "C" BOOL WINAPI DllMain(
     IN HINSTANCE hInstance,
     IN DWORD dwReason,
@@ -35,6 +45,8 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     HRESULT hr = S_OK;
     IBootstrapperEngine* pEngine = NULL;
 
+    DutilInitialize(&WixstdbaTraceError);
+
     hr = BalInitializeFromCreateArgs(pArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
@@ -52,6 +64,7 @@ extern "C" void WINAPI BootstrapperApplicationDestroy()
 {
     ReleaseNullObject(vpApplication);
     BalUninitialize();
+    DutilUninitialize();
 }
 
 
@@ -63,6 +76,8 @@ extern "C" HRESULT WINAPI DncPrereqBootstrapperApplicationCreate(
     )
 {
     HRESULT hr = S_OK;
+
+    DutilInitialize(&WixstdbaTraceError);
 
     BalInitialize(pEngine);
 
@@ -78,6 +93,7 @@ extern "C" void WINAPI DncPrereqBootstrapperApplicationDestroy()
 {
     ReleaseNullObject(vpApplication);
     BalUninitialize();
+    DutilUninitialize();
 }
 
 
@@ -89,6 +105,8 @@ extern "C" HRESULT WINAPI MbaPrereqBootstrapperApplicationCreate(
     )
 {
     HRESULT hr = S_OK;
+
+    DutilInitialize(&WixstdbaTraceError);
 
     BalInitialize(pEngine);
 
@@ -104,4 +122,23 @@ extern "C" void WINAPI MbaPrereqBootstrapperApplicationDestroy()
 {
     ReleaseNullObject(vpApplication);
     BalUninitialize();
+    DutilUninitialize();
+}
+
+static void CALLBACK WixstdbaTraceError(
+    __in_z LPCSTR /*szFile*/,
+    __in int /*iLine*/,
+    __in REPORT_LEVEL /*rl*/,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    // BalLogError currently uses the Exit... macros,
+    // so if expanding the scope need to ensure this doesn't get called recursively.
+    if (DUTIL_SOURCE_THMUTIL == source)
+    {
+        BalLogErrorArgs(hrError, szFormat, args);
+    }
 }
