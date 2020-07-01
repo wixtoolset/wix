@@ -481,6 +481,32 @@ namespace WixToolset.Converters
 
         private void ConvertFeatureElement(XElement element)
         {
+            var xAbsent = element.Attribute("Absent");
+            if (xAbsent != null &&
+                this.OnError(ConverterTestType.FeatureAbsentAttributeReplaced, element, "The Feature element's Absent attribute has been replaced with the AllowAbsent attribute. Use the 'AllowAbsent' attribute instead."))
+            {
+                if (xAbsent.Value == "allow")
+                {
+                    element.Add(new XAttribute("AllowAbsent", "yes"));
+                }
+                xAbsent.Remove();
+            }
+
+            var xAllowAdvertise = element.Attribute("AllowAdvertise");
+            if (xAllowAdvertise != null)
+            {
+                if ((xAllowAdvertise.Value == "system" || xAllowAdvertise.Value == "allow") &&
+                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value deprecated. Set the value to 'yes' instead.", xAllowAdvertise.Value))
+                {
+                    xAllowAdvertise.Value = "yes";
+                }
+                else if (xAllowAdvertise.Value == "disallow" &&
+                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value deprecated. Remove the value instead.", xAllowAdvertise.Value))
+                {
+                    xAllowAdvertise.Remove();
+                }
+            }
+
             var xCondition = element.Element(ConditionElementName);
             if (xCondition != null)
             {
@@ -1132,6 +1158,16 @@ namespace WixToolset.Converters
             /// Displayed when the XML declaration is present in the source file.
             /// </summary>
             DeclarationPresent,
+
+            /// <summary>
+            /// The Feature Absent attribute renamed to AllowAbsent.
+            /// </summary>
+            FeatureAbsentAttributeReplaced,
+
+            /// <summary>
+            /// The Feature AllowAdvertise attribute value deprecated.
+            /// </summary>
+            FeatureAllowAdvertiseValueDeprecated,
         }
     }
 }
