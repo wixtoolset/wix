@@ -48,48 +48,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\logo.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\logoside.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\LoremIpsumLicense.rtf">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkTheme.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkLargeTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkSidebarTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.thm">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfTheme.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfLargeTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\*\mbapreq.wxl">
-      <CopyToOutputSubDirectory>Wixstdba%(RelativeDir)</CopyToOutputSubDirectory>
-    </None>
     <None Include="wixstdba.def" />
   </ItemGroup>
   <ItemGroup>
