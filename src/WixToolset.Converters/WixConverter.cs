@@ -601,7 +601,16 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertPublishElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+        private void ConvertPublishElement(XElement element)
+        {
+            this.ConvertInnerTextToAttribute(element, "Condition");
+
+            var xCondition = element.Attribute("Condition");
+            if (xCondition?.Value == "1")
+            {
+                xCondition.Remove();
+            }
+        }
 
         private void ConvertMultiStringValueElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
