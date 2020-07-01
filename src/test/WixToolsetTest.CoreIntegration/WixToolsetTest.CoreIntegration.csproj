@@ -33,6 +33,7 @@
     <Content Include="TestData\Class\DecompiledOldClassTableDef.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomAction\CustomActionCycle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable-Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTableWithFile.wxs" CopyToOutputDirectory="PreserveNewest" />
