@@ -26,6 +26,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
         private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
+        private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
 
         private static readonly XName AdminExecuteSequenceElementName = WixNamespace + "AdminExecuteSequence";
         private static readonly XName AdminUISequenceSequenceElementName = WixNamespace + "AdminUISequence";
@@ -40,10 +41,11 @@ namespace WixToolset.Converters
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
+        private static readonly XName ErrorElementName = WixNamespace + "Error";
         private static readonly XName FeatureElementName = WixNamespace + "Feature";
         private static readonly XName FileElementName = WixNamespace + "File";
         private static readonly XName FragmentElementName = WixNamespace + "Fragment";
-        private static readonly XName ErrorElementName = WixNamespace + "Error";
+        private static readonly XName FirewallRemoteAddressElementName = WixFirewallNamespace + "RemoteAddress";
         private static readonly XName LaunchElementName = WixNamespace + "Launch";
         private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
@@ -142,6 +144,7 @@ namespace WixToolset.Converters
                 { WixConverter.FeatureElementName, this.ConvertFeatureElement },
                 { WixConverter.FileElementName, this.ConvertFileElement },
                 { WixConverter.FragmentElementName, this.ConvertFragmentElement },
+                { WixConverter.FirewallRemoteAddressElementName, this.ConvertFirewallRemoteAddressElement },
                 { WixConverter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
                 { WixConverter.ErrorElementName, this.ConvertErrorElement },
                 { WixConverter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
@@ -546,6 +549,8 @@ namespace WixToolset.Converters
                 remove[i].Remove();
             }
         }
+
+        private void ConvertFirewallRemoteAddressElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
         private void ConvertEmbeddedChainerElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
 
