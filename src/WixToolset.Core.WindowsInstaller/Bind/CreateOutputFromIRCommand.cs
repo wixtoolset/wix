@@ -77,6 +77,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddControlSymbol((ControlSymbol)symbol);
                         break;
 
+                    case SymbolDefinitionType.ControlEvent:
+                        this.AddControlEventSymbol((ControlEventSymbol)symbol);
+                        break;
+
                     case SymbolDefinitionType.Component:
                         this.AddComponentSymbol((ComponentSymbol)symbol);
                         break;
@@ -337,6 +341,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = text;
             row[9] = symbol.NextControlRef;
             row[10] = symbol.Help;
+        }
+
+        private void AddControlEventSymbol(ControlEventSymbol symbol)
+        {
+            var row = this.CreateRow(symbol, "ControlEvent");
+            row[0] = symbol.DialogRef;
+            row[1] = symbol.ControlRef;
+            row[2] = symbol.Event;
+            row[3] = symbol.Argument;
+            row[4] = String.IsNullOrEmpty(symbol.Condition) ? "1" : symbol.Condition;
+            row[5] = symbol.Ordering;
         }
 
         private void AddComponentSymbol(ComponentSymbol symbol)
