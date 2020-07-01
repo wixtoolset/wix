@@ -4698,41 +4698,11 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
-                    case "Absent":
-                        var absentValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (absentValue)
-                        {
-                        case "allow": // this is the default
-                            break;
-                        case "disallow":
-                            //bits |= MsiInterop.MsidbFeatureAttributesUIDisallowAbsent;
-                            disallowAbsent = true;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, absentValue, "allow", "disallow"));
-                            break;
-                        }
+                    case "AllowAbsent":
+                        disallowAbsent = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
                         break;
                     case "AllowAdvertise":
-                        var advertiseValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (advertiseValue)
-                        {
-                        case "disallow":
-                        case "no":
-                            //bits |= MsiInterop.MsidbFeatureAttributesDisallowAdvertise;
-                            disallowAdvertise = true;
-                            break;
-                        case "allow":
-                        case "yes": // this is the default
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, advertiseValue, "no", "system", "yes"));
-                            break;
-                        }
+                        disallowAdvertise = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
                         break;
                     case "ConfigurableDirectory":
                         configurableDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
