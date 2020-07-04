@@ -14,3 +14,5 @@
 #include "aclutil.h"
 
 #include "cost.h"
+
+#include "caDecor.h"

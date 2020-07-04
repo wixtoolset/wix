@@ -7,6 +7,7 @@ namespace WixToolset.Http
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Http.Symbols;
 
     /// <summary>
@@ -177,18 +178,8 @@ namespace WixToolset.Http
                     ComponentRef = componentId,
                 });
 
-                if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure ARM version of the CA is referenced.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall_ARM");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall_ARM");
-                }
-                else
-                {
-                    // All other supported platforms use x86.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedHttpUrlReservationsInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedHttpUrlReservationsUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
             }
         }
 

@@ -3,37 +3,39 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caSuffix.wxi ?>
+    <?include caDecor.wxi ?>
+    
     <Fragment>
         <UIRef Id="WixHttpErrors" />
         <UI>
-            <ProgressText Action="WixSchedHttpUrlReservationsInstall$(var.Suffix)">!(loc.WixSchedHttpUrlReservationsInstall)</ProgressText>
-            <ProgressText Action="WixSchedHttpUrlReservationsUninstall$(var.Suffix)">!(loc.WixSchedHttpUrlReservationsUninstall)</ProgressText>
-            <ProgressText Action="WixRollbackHttpUrlReservationsInstall$(var.DeferredSuffix)">!(loc.WixRollbackHttpUrlReservationsInstall)</ProgressText>
-            <ProgressText Action="WixExecHttpUrlReservationsInstall$(var.DeferredSuffix)">!(loc.WixExecHttpUrlReservationsInstall)</ProgressText>
-            <ProgressText Action="WixRollbackHttpUrlReservationsUninstall$(var.DeferredSuffix)">!(loc.WixRollbackHttpUrlReservationsUninstall)</ProgressText>
-            <ProgressText Action="WixExecHttpUrlReservationsUninstall$(var.DeferredSuffix)">!(loc.WixExecHttpUrlReservationsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)SchedHttpUrlReservationsInstall$(var.Suffix)">!(loc.WixSchedHttpUrlReservationsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)SchedHttpUrlReservationsUninstall$(var.Suffix)">!(loc.WixSchedHttpUrlReservationsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)RollbackHttpUrlReservationsInstall$(var.Suffix)">!(loc.WixRollbackHttpUrlReservationsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)ExecHttpUrlReservationsInstall$(var.Suffix)">!(loc.WixExecHttpUrlReservationsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)RollbackHttpUrlReservationsUninstall$(var.Suffix)">!(loc.WixRollbackHttpUrlReservationsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)ExecHttpUrlReservationsUninstall$(var.Suffix)">!(loc.WixExecHttpUrlReservationsUninstall)</ProgressText>
         </UI>
 
-        <CustomAction Id="WixSchedHttpUrlReservationsInstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="SchedHttpUrlReservationsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixSchedHttpUrlReservationsUninstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="SchedHttpUrlReservationsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixRollbackHttpUrlReservationsInstall$(var.DeferredSuffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixExecHttpUrlReservationsInstall$(var.DeferredSuffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixRollbackHttpUrlReservationsUninstall$(var.DeferredSuffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixExecHttpUrlReservationsUninstall$(var.DeferredSuffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedHttpUrlReservationsInstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="SchedHttpUrlReservationsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedHttpUrlReservationsUninstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="SchedHttpUrlReservationsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpUrlReservationsInstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpUrlReservationsInstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpUrlReservationsUninstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpUrlReservationsUninstall$(var.Suffix)" BinaryKey="HttpCA$(var.Suffix)" DllEntry="ExecHttpUrlReservations" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
 
         <!--
             We need the HTTP server on Windows XP SP2 or later.
         -->
         <InstallExecuteSequence>
-            <Custom Action="WixSchedHttpUrlReservationsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes">
+            <Custom Action="$(var.Prefix)SchedHttpUrlReservationsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes">
                 <![CDATA[ VersionNT >= 600 OR (VersionNT >= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel >= 2) OR (MsiNTProductType > 1))) ]]>
             </Custom>
-            <Custom Action="WixSchedHttpUrlReservationsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">
+            <Custom Action="$(var.Prefix)SchedHttpUrlReservationsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">
                 <![CDATA[ VersionNT >= 600 OR (VersionNT >= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel >= 2) OR (MsiNTProductType > 1))) ]]>
             </Custom>
         </InstallExecuteSequence>
     </Fragment>
+    
     <Fragment>
         <Binary Id="HttpCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))httpca.dll" />
     </Fragment>

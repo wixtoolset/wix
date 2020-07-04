@@ -26,10 +26,14 @@
     <ClInclude Include="precomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="wixhttpca.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
