@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\iisca.vcxproj" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
 
   <ItemGroup>

@@ -63,4 +63,4 @@
 #include "scassl7.h"
 #include "scaexecIIS7.h"
 
-#include "caSuffix.h"
+#include "caDecor.h"

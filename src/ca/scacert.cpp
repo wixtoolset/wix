@@ -165,7 +165,7 @@ static HRESULT ConfigureCertificates(
 
     BYTE* pbCertificate = NULL;
     DWORD cbCertificate = 0;
-    DWORD cbPFXPassword = 0;
+    DWORD_PTR cbPFXPassword = 0;
 
     // Bail quickly if the Certificate table isn't around.
     if (S_OK != WcaTableExists(L"Certificate"))
@@ -273,7 +273,7 @@ static HRESULT ConfigureCertificates(
             // Pick the right action to run based on what store we're uninstalling from.
             if (CERT_SYSTEM_STORE_LOCAL_MACHINE == dwStoreLocation)
             {
-                wzAction = L"DeleteMachineCertificate";
+                wzAction = CUSTOM_ACTION_DECORATION(L"DeleteMachineCertificate");
                 if (pbCertificate)
                 {
                     wzRollbackAction = L"RollbackDeleteMachineCertificate";
@@ -281,7 +281,7 @@ static HRESULT ConfigureCertificates(
             }
             else
             {
-                wzAction = L"DeleteUserCertificate";
+                wzAction = CUSTOM_ACTION_DECORATION(L"DeleteUserCertificate");
                 if (pbCertificate)
                 {
                     wzRollbackAction = L"RollbackDeleteUserCertificate";
@@ -304,13 +304,13 @@ static HRESULT ConfigureCertificates(
             // Pick the right action to run based on what store we're installing into.
             if (CERT_SYSTEM_STORE_LOCAL_MACHINE == dwStoreLocation)
             {
-                wzAction = L"AddMachineCertificate";
-                wzRollbackAction = L"RollbackAddMachineCertificate";
+                wzAction = CUSTOM_ACTION_DECORATION(L"AddMachineCertificate");
+                wzRollbackAction = CUSTOM_ACTION_DECORATION(L"RollbackAddMachineCertificate");
             }
             else
             {
-                wzAction = L"AddUserCertificate";
-                wzRollbackAction = L"RollbackAddUserCertificate";
+                wzAction = CUSTOM_ACTION_DECORATION(L"AddUserCertificate");
+                wzRollbackAction = CUSTOM_ACTION_DECORATION(L"RollbackAddUserCertificate");
             }
             dwCost = COST_CERT_ADD;
         }

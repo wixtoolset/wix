@@ -12,13 +12,13 @@ HRESULT ScaMetabaseTransaction(__in_z LPCWSTR wzBackup)
 
     // TODO: These functions have been reported to hang IIS (O11:51709).  They may have been fixed in IIS6, but if not, need to be re-written the hard way
 
-    hr = WcaDoDeferredAction(L"StartMetabaseTransaction", wzBackup, COST_IIS_TRANSACTIONS);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"StartMetabaseTransaction"), wzBackup, COST_IIS_TRANSACTIONS);
     ExitOnFailure(hr, "Failed to schedule StartMetabaseTransaction");
 
-    hr = WcaDoDeferredAction(L"RollbackMetabaseTransaction", wzBackup, 0);   // rollback cost is irrelevant
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackMetabaseTransaction"), wzBackup, 0);   // rollback cost is irrelevant
     ExitOnFailure(hr, "Failed to schedule RollbackMetabaseTransaction");
 
-    hr = WcaDoDeferredAction(L"CommitMetabaseTransaction", wzBackup, 0);  // commit is free
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CommitMetabaseTransaction"), wzBackup, 0);  // commit is free
     ExitOnFailure(hr, "Failed to schedule StartMetabaseTransaction");
 
 LExit:

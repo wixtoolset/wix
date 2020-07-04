@@ -331,7 +331,7 @@ extern "C" UINT __stdcall ConfigureIIs(
         // This must remain trace only, CA data may contain password
         WcaLog(LOGMSG_TRACEONLY, "Custom Action Data for ConfigureIIS7Exec will be: %ls", pwzCustomActionData);
 
-        hr = WcaDoDeferredAction(L"ConfigureIIs7Exec", pwzCustomActionData, ConfigureIIsCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ConfigureIIs7Exec"), pwzCustomActionData, ConfigureIIsCost);
         ExitOnFailure(hr, "Failed to schedule ConfigureIIs7Exec custom action");
 
         ReleaseNullStr(pwzCustomActionData);
@@ -340,7 +340,7 @@ extern "C" UINT __stdcall ConfigureIIs(
         hr = WcaWriteStringToCaData(pwzScriptKey, &pwzCustomActionData);
         ExitOnFailure(hr, "Failed to add script key to CustomActionData.");
 
-        hr = WcaDoDeferredAction(L"WriteIIS7ConfigChanges", pwzCustomActionData, WriteIIS7ConfigChangesCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WriteIIS7ConfigChanges"), pwzCustomActionData, WriteIIS7ConfigChangesCost);
         ExitOnFailure(hr, "Failed to schedule WriteMetabaseChanges custom action");
     }
     else
@@ -348,7 +348,7 @@ extern "C" UINT __stdcall ConfigureIIs(
         // This must remain trace only, CA data may contain password
         WcaLog(LOGMSG_TRACEONLY, "Custom Action Data for ConfigureIISExec will be: %ls", pwzCustomActionData);
 
-        hr = WcaDoDeferredAction(L"ConfigureIIsExec", pwzCustomActionData, ConfigureIIsCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ConfigureIIsExec"), pwzCustomActionData, ConfigureIIsCost);
         ExitOnFailure(hr, "Failed to schedule ConfigureIISExec custom action");
 
         ReleaseNullStr(pwzCustomActionData);
@@ -357,7 +357,7 @@ extern "C" UINT __stdcall ConfigureIIs(
         hr = WcaWriteStringToCaData(pwzScriptKey, &pwzCustomActionData);
         ExitOnFailure(hr, "Failed to add script key to CustomActionData.");
 
-        hr = WcaDoDeferredAction(L"WriteMetabaseChanges", pwzCustomActionData, WriteMetabaseChangesCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"WriteMetabaseChanges"), pwzCustomActionData, WriteMetabaseChangesCost);
         ExitOnFailure(hr, "Failed to schedule WriteMetabaseChanges custom action");
     }
 

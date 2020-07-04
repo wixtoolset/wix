@@ -8,6 +8,7 @@ namespace WixToolset.Iis
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Iis.Symbols;
 
     /// <summary>
@@ -287,8 +288,8 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallCertificates and UninstallCertificates since nothing will happen without them
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "InstallCertificates");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "UninstallCertificates");
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallCertificates", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "UninstallCertificates", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, IisTableDefinitions.CertificateHash); // Certificate CustomActions require the CertificateHash table
 
             if (!this.Messaging.EncounteredError)
@@ -2603,7 +2604,7 @@ namespace WixToolset.Iis
 
         private void AddReferenceToConfigureIIs(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "ConfigureIIs");
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureIIs", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
     }
 }

@@ -8,13 +8,13 @@ HRESULT ScaIIS7ConfigTransaction(LPCWSTR wzBackup)
 {
     HRESULT hr = S_OK;
 
-    hr = WcaDoDeferredAction(L"StartIIS7ConfigTransaction", wzBackup, COST_IIS_TRANSACTIONS);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"StartIIS7ConfigTransaction"), wzBackup, COST_IIS_TRANSACTIONS);
     ExitOnFailure(hr, "Failed to schedule StartIIS7ConfigTransaction");
 
-    hr = WcaDoDeferredAction(L"RollbackIIS7ConfigTransaction", wzBackup, 0);   // rollback cost is irrelevant
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackIIS7ConfigTransaction"), wzBackup, 0);   // rollback cost is irrelevant
     ExitOnFailure(hr, "Failed to schedule RollbackIIS7ConfigTransaction");
 
-    hr = WcaDoDeferredAction(L"CommitIIS7ConfigTransaction", wzBackup, 0);  // commit is free
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CommitIIS7ConfigTransaction"), wzBackup, 0);  // commit is free
     ExitOnFailure(hr, "Failed to schedule StartIIS7ConfigTransaction");
 
 LExit:
