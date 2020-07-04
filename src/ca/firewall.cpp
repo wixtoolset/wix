@@ -150,16 +150,16 @@ static UINT SchedFirewallExceptions(
 
         if (WCA_TODO_INSTALL == todoSched)
         {
-            hr = WcaDoDeferredAction(L"WixRollbackFirewallExceptionsInstall", pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackFirewallExceptionsInstall"), pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
             ExitOnFailure(hr, "failed to schedule firewall install exceptions rollback");            
-            hr = WcaDoDeferredAction(L"WixExecFirewallExceptionsInstall", pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecFirewallExceptionsInstall"), pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
             ExitOnFailure(hr, "failed to schedule firewall install exceptions execution");
         }
         else
         {
-            hr = WcaDoDeferredAction(L"WixRollbackFirewallExceptionsUninstall", pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackFirewallExceptionsUninstall"), pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
             ExitOnFailure(hr, "failed to schedule firewall uninstall exceptions rollback");    
-            hr = WcaDoDeferredAction(L"WixExecFirewallExceptionsUninstall", pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecFirewallExceptionsUninstall"), pwzCustomActionData, cFirewallExceptions * COST_FIREWALL_EXCEPTION);
             ExitOnFailure(hr, "failed to schedule firewall uninstall exceptions execution");
         }
     }

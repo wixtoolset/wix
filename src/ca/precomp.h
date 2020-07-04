@@ -15,3 +15,5 @@
 
 #include "CustomMsiErrors.h"
 #include "cost.h"
+
+#include "caDecor.h"
