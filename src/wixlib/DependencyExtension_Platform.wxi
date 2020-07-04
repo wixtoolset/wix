@@ -3,23 +3,26 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caSuffix.wxi ?>
+    <?include caDecor.wxi ?>
+    
     <Fragment>
-        <CustomAction Id="WixDependencyRequire$(var.Suffix)" BinaryKey="DependencyCA$(var.Suffix)" DllEntry="WixDependencyRequire" Execute="immediate" Return="check" SuppressModularization="yes"/>
+        <CustomAction Id="$(var.Prefix)DependencyRequire$(var.Suffix)" BinaryKey="DependencyCA$(var.Suffix)" DllEntry="WixDependencyRequire" Execute="immediate" Return="check" SuppressModularization="yes"/>
         <InstallExecuteSequence>
-            <Custom Action="WixDependencyRequire$(var.Suffix)" Before="WixDependencyCheck$(var.Suffix)" Overridable="yes"><![CDATA[NOT DISABLEDEPENDENCYCHECK]]></Custom>
+            <Custom Action="$(var.Prefix)DependencyRequire$(var.Suffix)" Before="WixDependencyCheck$(var.Suffix)" Overridable="yes"><![CDATA[NOT DISABLEDEPENDENCYCHECK]]></Custom>
         </InstallExecuteSequence>
         <UIRef Id="WixDependencyErrors"/>
         <PropertyRef Id="DISABLEDEPENDENCYCHECK"/>
     </Fragment>
+    
     <Fragment>
-        <CustomAction Id="WixDependencyCheck$(var.Suffix)" BinaryKey="DependencyCA$(var.Suffix)" DllEntry="WixDependencyCheck" Execute="immediate" Return="check" SuppressModularization="yes"/>
+        <CustomAction Id="$(var.Prefix)DependencyCheck$(var.Suffix)" BinaryKey="DependencyCA$(var.Suffix)" DllEntry="WixDependencyCheck" Execute="immediate" Return="check" SuppressModularization="yes"/>
         <InstallExecuteSequence>
-            <Custom Action="WixDependencyCheck$(var.Suffix)" Before="InstallInitialize" Overridable="yes"><![CDATA[(REMOVE OR MsiPatchRemovalList) AND NOT (UPGRADINGPRODUCTCODE OR IGNOREDEPENDENCIES="ALL")]]></Custom>
+            <Custom Action="$(var.Prefix)DependencyCheck$(var.Suffix)" Before="InstallInitialize" Overridable="yes"><![CDATA[(REMOVE OR MsiPatchRemovalList) AND NOT (UPGRADINGPRODUCTCODE OR IGNOREDEPENDENCIES="ALL")]]></Custom>
         </InstallExecuteSequence>
         <UIRef Id="WixDependencyErrors"/>
         <PropertyRef Id="IGNOREDEPENDENCIES"/>
     </Fragment>
+    
     <Fragment>
         <Binary Id="DependencyCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))dependencyca.dll"/>
     </Fragment>

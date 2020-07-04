@@ -4,12 +4,15 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
-    <!-- <SuppressSpecificWarnings>1086</SuppressSpecificWarnings> -->
+    <SuppressSpecificWarnings>1086</SuppressSpecificWarnings>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\dependencyca.vcxproj" />
+    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=ARM" />
+    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x64" />
   </ItemGroup>
 
   <ItemGroup>

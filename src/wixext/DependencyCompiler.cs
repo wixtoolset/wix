@@ -362,17 +362,7 @@ namespace WixToolset.Dependency
 
                 if (PackageType.None == packageType)
                 {
-                    // Reference the Check custom action to check for dependencies on the current provider.
-                    if (Platform.ARM == this.Context.Platform)
-                    {
-                        // Ensure the ARM version of the CA is referenced.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyCheck_ARM");
-                    }
-                    else
-                    {
-                        // All other supported platforms use x86.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyCheck");
-                    }
+                    this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyCheck", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                     // Generate registry rows for the provider using binder properties.
                     var keyProvides = String.Concat(DependencyCommon.RegistryRoot, key);
@@ -578,16 +568,7 @@ namespace WixToolset.Dependency
 
         private void AddReferenceToWixDependencyRequire(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            if (Platform.ARM == this.Context.Platform)
-            {
-                // Ensure the ARM version of the CA is referenced.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyRequire", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
     }
 }
