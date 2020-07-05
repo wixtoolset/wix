@@ -354,12 +354,30 @@ HRESULT DAPI ThemeRegisterVariableCallbacks(
     );
 
 /********************************************************************
- ThemeLoadControls - creates the windows for all the theme controls.
+ ThemeCreateParentWindow - creates a parent window for the theme.
+
+*******************************************************************/
+HRESULT DAPI ThemeCreateParentWindow(
+    __in THEME* pTheme,
+    __in DWORD dwExStyle,
+    __in LPCWSTR szClassName,
+    __in LPCWSTR szWindowName,
+    __in DWORD dwStyle,
+    __in int x,
+    __in int y,
+    __in_opt HWND hwndParent,
+    __in_opt HINSTANCE hInstance,
+    __in_opt LPVOID lpParam,
+    __out_opt HWND* phWnd
+    );
+
+/********************************************************************
+ ThemeLoadControls - creates the windows for all the theme controls
+                     using the window created in ThemeCreateParentWindow.
 
 *******************************************************************/
 HRESULT DAPI ThemeLoadControls(
     __in THEME* pTheme,
-    __in HWND hwndParent,
     __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
     __in DWORD cAssignControlIds
     );

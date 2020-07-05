@@ -17,6 +17,7 @@
 #define ThmExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_THMUTIL, e, x, s, __VA_ARGS__)
 #define ThmExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_THMUTIL, g, x, s, __VA_ARGS__)
 
+// from CommCtrl.h
 #ifndef BS_COMMANDLINK
 #define BS_COMMANDLINK          0x0000000EL
 #endif
@@ -184,7 +185,6 @@ static HRESULT FindImageList(
 static HRESULT LoadControls(
     __in THEME* pTheme,
     __in_opt THEME_CONTROL* pParentControl,
-    __in HWND hwndParent,
     __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
     __in DWORD cAssignControlIds
     );
@@ -286,6 +286,11 @@ static BOOL OnButtonClicked(
     __in THEME* pTheme,
     __in HWND hWnd,
     __in const THEME_CONTROL* pControl
+    );
+static void OnNcCreate(
+    __in THEME* pTheme,
+    __in HWND hWnd,
+    __in LPARAM lParam
     );
 static HRESULT OnRichEditEnLink(
     __in LPARAM lParam,
@@ -553,14 +558,60 @@ LExit:
 }
 
 
+DAPI_(HRESULT) ThemeCreateParentWindow(
+    __in THEME* pTheme,
+    __in DWORD dwExStyle,
+    __in LPCWSTR szClassName,
+    __in LPCWSTR szWindowName,
+    __in DWORD dwStyle,
+    __in int x,
+    __in int y,
+    __in_opt HWND hwndParent,
+    __in_opt HINSTANCE hInstance,
+    __in_opt LPVOID lpParam,
+    __out_opt HWND* phWnd
+    )
+{
+    HRESULT hr = S_OK;
+    HWND hWnd = NULL;
+
+    if (pTheme->hwndParent)
+    {
+        ThmExitOnFailure(hr = E_INVALIDSTATE, "ThemeCreateParentWindow called after the theme was loaded.");
+    }
+
+    hWnd = ::CreateWindowExW(dwExStyle, szClassName, szWindowName, dwStyle, x, y, pTheme->nWidth, pTheme->nHeight, hwndParent, NULL, hInstance, lpParam);
+    ThmExitOnNullWithLastError(hWnd, hr, "Failed to create theme parent window.");
+    ThmExitOnNull(pTheme->hwndParent, hr, E_INVALIDSTATE, "Theme parent window is not set, make sure ThemeDefWindowProc is called for WM_NCCREATE.");
+    AssertSz(hWnd == pTheme->hwndParent, "Theme parent window does not equal newly created window.");
+
+    if (phWnd)
+    {
+        *phWnd = hWnd;
+    }
+
+LExit:
+    return hr;
+}
+
+
 DAPI_(HRESULT) ThemeLoadControls(
     __in THEME* pTheme,
-    __in HWND hwndParent,
     __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
     __in DWORD cAssignControlIds
     )
 {
-    return LoadControls(pTheme, NULL, hwndParent, rgAssignControlIds, cAssignControlIds);
+    HRESULT hr = S_OK;
+
+    if (!pTheme->hwndParent)
+    {
+        ThmExitOnFailure(hr = E_INVALIDSTATE, "ThemeLoadControls called before theme parent window created.");
+    }
+
+    hr = LoadControls(pTheme, NULL, rgAssignControlIds, cAssignControlIds);
+
+LExit:
+    return hr;
 }
 
 
@@ -735,6 +786,10 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
     {
         switch (uMsg)
         {
+        case WM_NCCREATE:
+            OnNcCreate(pTheme, hWnd, lParam);
+            break;
+
         case WM_NCHITTEST:
             if (pTheme->dwStyle & WS_POPUP)
             {
@@ -4107,6 +4162,15 @@ LExit:
     return fHandled;
 }
 
+static void OnNcCreate(
+    __in THEME* pTheme,
+    __in HWND hWnd,
+    __in LPARAM /*lParam*/
+    )
+{
+    pTheme->hwndParent = hWnd;
+}
+
 static HRESULT OnRichEditEnLink(
     __in LPARAM lParam,
     __in HWND hWndRichEdit,
@@ -4620,7 +4684,6 @@ static LRESULT CALLBACK PanelWndProc(
 static HRESULT LoadControls(
     __in THEME* pTheme,
     __in_opt THEME_CONTROL* pParentControl,
-    __in HWND hwndParent,
     __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
     __in DWORD cAssignControlIds
     )
@@ -4631,15 +4694,10 @@ static HRESULT LoadControls(
     BOOL fStartNewGroup = FALSE;
     DWORD cControls = 0;
     THEME_CONTROL* rgControls = NULL;
-
-    if (!pParentControl)
-    {
-        AssertSz(!pTheme->hwndParent, "Theme already loaded controls because it has a parent window.");
-        pTheme->hwndParent = hwndParent;
-    }
+    HWND hwndParent = pParentControl ? pParentControl->hWnd : pTheme->hwndParent;
 
     GetControls(pTheme, pParentControl, cControls, rgControls);
-    ::GetClientRect(pParentControl ? pParentControl->hWnd : pTheme->hwndParent, &rcParent);
+    ::GetClientRect(hwndParent, &rcParent);
 
     for (DWORD i = 0; i < cControls; ++i)
     {
@@ -4974,7 +5032,7 @@ static HRESULT LoadControls(
 
         if (pControl->cControls)
         {
-            hr = LoadControls(pTheme, pControl, pControl->hWnd, rgAssignControlIds, cAssignControlIds);
+            hr = LoadControls(pTheme, pControl, rgAssignControlIds, cAssignControlIds);
             ThmExitOnFailure(hr, "Failed to load child controls.");
         }
     }
