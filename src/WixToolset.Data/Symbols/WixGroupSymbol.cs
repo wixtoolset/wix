@@ -11,9 +11,9 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ParentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ParentType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ParentType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ChildId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ChildType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixGroupSymbolFields.ChildType), IntermediateFieldType.Number),
             },
             typeof(WixGroupSymbol));
     }
@@ -51,8 +51,8 @@ namespace WixToolset.Data.Symbols
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixGroupSymbolFields.ParentType], true);
-            set => this.Set((int)WixGroupSymbolFields.ParentType, value.ToString());
+            get => (ComplexReferenceParentType)this.Fields[(int)WixGroupSymbolFields.ParentType].AsNumber();
+            set => this.Set((int)WixGroupSymbolFields.ParentType, (int)value);
         }
 
         public string ChildId
@@ -63,8 +63,8 @@ namespace WixToolset.Data.Symbols
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixGroupSymbolFields.ChildType], true);
-            set => this.Set((int)WixGroupSymbolFields.ChildType, value.ToString());
+            get => (ComplexReferenceChildType)this.Fields[(int)WixGroupSymbolFields.ChildType].AsNumber();
+            set => this.Set((int)WixGroupSymbolFields.ChildType, (int)value);
         }
     }
 }

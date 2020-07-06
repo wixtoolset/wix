@@ -11,10 +11,10 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Parent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ParentAttributes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ParentAttributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ParentLanguage), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Child), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ChildAttributes), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.ChildAttributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixComplexReferenceSymbolFields.Attributes), IntermediateFieldType.Bool),
             },
             typeof(WixComplexReferenceSymbol));
@@ -55,8 +55,8 @@ namespace WixToolset.Data.Symbols
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixComplexReferenceSymbolFields.ParentAttributes], true);
-            set => this.Set((int)WixComplexReferenceSymbolFields.ParentAttributes, value.ToString());
+            get => (ComplexReferenceParentType)this.Fields[(int)WixComplexReferenceSymbolFields.ParentAttributes].AsNumber();
+            set => this.Set((int)WixComplexReferenceSymbolFields.ParentAttributes, (int)value);
         }
 
         public string ParentLanguage
@@ -73,8 +73,8 @@ namespace WixToolset.Data.Symbols
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixComplexReferenceSymbolFields.ChildAttributes], true);
-            set => this.Set((int)WixComplexReferenceSymbolFields.ChildAttributes, value.ToString());
+            get => (ComplexReferenceChildType)this.Fields[(int)WixComplexReferenceSymbolFields.ChildAttributes].AsNumber();
+            set => this.Set((int)WixComplexReferenceSymbolFields.ChildAttributes, (int)value);
         }
 
         public bool IsPrimary
