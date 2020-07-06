@@ -16,8 +16,6 @@ namespace WixToolset.Extensibility.Data
 
         IEnumerable<ICompilerExtension> Extensions { get; set; }
 
-        string OutputPath { get; set; }
-
         /// <summary>
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
         /// </summary>
