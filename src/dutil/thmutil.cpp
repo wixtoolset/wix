@@ -36,6 +36,7 @@
 
 const DWORD THEME_INVALID_ID = 0xFFFFFFFF;
 const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
+const DWORD GROW_FONT_INSTANCES = 3;
 const DWORD GROW_WINDOW_TEXT = 250;
 const LPCWSTR THEME_WC_HYPERLINK = L"ThemeHyperLink";
 const LPCWSTR THEME_WC_PANEL = L"ThemePanel";
@@ -177,6 +178,11 @@ static HRESULT StartBillboard(
     __in THEME* pTheme,
     __in DWORD dwControl
     );
+static HRESULT EnsureFontInstance(
+    __in THEME* pTheme,
+    __in THEME_FONT* pFont,
+    __out THEME_FONT_INSTANCE** ppFontInstance
+    );
 static HRESULT FindImageList(
     __in THEME* pTheme,
     __in_z LPCWSTR wzImageListName,
@@ -247,6 +253,9 @@ static DWORD CALLBACK RichEditStreamFromMemoryCallback(
     __in_bcount(cb) LPBYTE pbBuff,
     __in LONG cb,
     __in LONG *pcb
+    );
+static void FreeFontInstance(
+    __in THEME_FONT_INSTANCE* pFontInstance
     );
 static void FreeFont(
     __in THEME_FONT* pFont
@@ -365,11 +374,13 @@ static void ScaleTheme(
     __in int y
     );
 static void ScaleControls(
+    __in THEME* pTheme,
     __in DWORD cControls,
     __in THEME_CONTROL* rgControls,
     __in UINT nDpi
     );
 static void ScaleControl(
+    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in UINT nDpi
     );
@@ -1078,7 +1089,7 @@ DAPI_(HRESULT) ThemeShowPageEx(
             else
             {
                 hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPage->rgSavedVariables), pPage->cControlIndices, sizeof(THEME_SAVEDVARIABLE), pPage->cControlIndices);
-                ThmExitOnNull(pPage->rgSavedVariables, hr, E_OUTOFMEMORY, "Failed to allocate memory for saved variables.");
+                ThmExitOnFailure(hr, "Failed to allocate memory for saved variables.");
 
                 SecureZeroMemory(pPage->rgSavedVariables, MemSize(pPage->rgSavedVariables));
                 pPage->cSavedVariables = pPage->cControlIndices;
@@ -2017,7 +2028,6 @@ static HRESULT ParseFonts(
     IXMLDOMNode* pixn = NULL;
     BSTR bstrName = NULL;
     DWORD dwId = 0;
-    LOGFONTW lf = { };
     COLORREF crForeground = THEME_INVISIBLE_COLORREF;
     COLORREF crBackground = THEME_INVISIBLE_COLORREF;
     DWORD dwSystemForegroundColor = FALSE;
@@ -2037,8 +2047,6 @@ static HRESULT ParseFonts(
     pTheme->rgFonts = static_cast<THEME_FONT*>(MemAlloc(sizeof(THEME_FONT) * pTheme->cFonts, TRUE));
     ThmExitOnNull(pTheme->rgFonts, hr, E_OUTOFMEMORY, "Failed to allocate theme fonts.");
 
-    lf.lfQuality = CLEARTYPE_QUALITY;
-
     while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
     {
         hr = XmlGetAttributeNumber(pixn, L"Id", &dwId);
@@ -2054,6 +2062,15 @@ static HRESULT ParseFonts(
             ThmExitOnRootFailure(hr, "Invalid theme font id.");
         }
 
+        THEME_FONT* pFont = pTheme->rgFonts + dwId;
+        if (pFont->cFontInstances)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+            ThmExitOnRootFailure(hr, "Theme font id duplicated.");
+        }
+
+        pFont->lfQuality = CLEARTYPE_QUALITY;
+
         hr = XmlGetText(pixn, &bstrName);
         if (S_FALSE == hr)
         {
@@ -2061,28 +2078,28 @@ static HRESULT ParseFonts(
         }
         ThmExitOnFailure(hr, "Failed to get font name.");
 
-        hr = ::StringCchCopyW(lf.lfFaceName, countof(lf.lfFaceName), bstrName);
+        hr = StrAllocString(&pFont->sczFaceName, bstrName, 0);
         ThmExitOnFailure(hr, "Failed to copy font name.");
 
-        hr = XmlGetAttributeNumber(pixn, L"Height", reinterpret_cast<DWORD*>(&lf.lfHeight));
+        hr = XmlGetAttributeNumber(pixn, L"Height", reinterpret_cast<DWORD*>(&pFont->lfHeight));
         if (S_FALSE == hr)
         {
             hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
         }
         ThmExitOnFailure(hr, "Failed to find font height attribute.");
 
-        hr = XmlGetAttributeNumber(pixn, L"Weight", reinterpret_cast<DWORD*>(&lf.lfWeight));
+        hr = XmlGetAttributeNumber(pixn, L"Weight", reinterpret_cast<DWORD*>(&pFont->lfWeight));
         if (S_FALSE == hr)
         {
-            lf.lfWeight = FW_DONTCARE;
+            pFont->lfWeight = FW_DONTCARE;
             hr = S_OK;
         }
         ThmExitOnFailure(hr, "Failed to find font weight attribute.");
 
-        hr = XmlGetYesNoAttribute(pixn, L"Underline", reinterpret_cast<BOOL*>(&lf.lfUnderline));
+        hr = XmlGetYesNoAttribute(pixn, L"Underline", reinterpret_cast<BOOL*>(&pFont->lfUnderline));
         if (E_NOTFOUND == hr)
         {
-            lf.lfUnderline = FALSE;
+            pFont->lfUnderline = FALSE;
             hr = S_OK;
         }
         ThmExitOnFailure(hr, "Failed to find font underline attribute.");
@@ -2093,28 +2110,18 @@ static HRESULT ParseFonts(
         hr = GetFontColor(pixn, L"Background", &crBackground, &dwSystemBackgroundColor);
         ThmExitOnFailure(hr, "Failed to find font background color.");
 
-        THEME_FONT* pFont = pTheme->rgFonts + dwId;
-        if (pFont->hFont)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ThmExitOnRootFailure(hr, "Theme font id duplicated.");
-        }
-
-        pFont->hFont = ::CreateFontIndirectW(&lf);
-        ThmExitOnNullWithLastError(pFont->hFont, hr, "Failed to create font %u.", dwId);
-
         pFont->crForeground = crForeground;
         if (THEME_INVISIBLE_COLORREF != pFont->crForeground)
         {
             pFont->hForeground = dwSystemForegroundColor ? ::GetSysColorBrush(dwSystemForegroundColor) : ::CreateSolidBrush(pFont->crForeground);
-            ThmExitOnNullWithLastError(pFont->hForeground, hr, "Failed to create text foreground brush.");
+            ThmExitOnNull(pFont->hForeground, hr, E_OUTOFMEMORY, "Failed to create text foreground brush.");
         }
 
         pFont->crBackground = crBackground;
         if (THEME_INVISIBLE_COLORREF != pFont->crBackground)
         {
             pFont->hBackground = dwSystemBackgroundColor ? ::GetSysColorBrush(dwSystemBackgroundColor) : ::CreateSolidBrush(pFont->crBackground);
-            ThmExitOnNullWithLastError(pFont->hBackground, hr, "Failed to create text background brush.");
+            ThmExitOnNull(pFont->hBackground, hr, E_OUTOFMEMORY, "Failed to create text background brush.");
         }
 
         ReleaseNullBSTR(bstrName);
@@ -3577,6 +3584,50 @@ static HRESULT StopBillboard(
     return hr;
 }
 
+static HRESULT EnsureFontInstance(
+    __in THEME* pTheme,
+    __in THEME_FONT* pFont,
+    __out THEME_FONT_INSTANCE** ppFontInstance
+    )
+{
+    HRESULT hr = S_OK;
+    THEME_FONT_INSTANCE* pFontInstance = NULL;
+    LOGFONTW lf = { };
+
+    for (DWORD i = 0; i < pFont->cFontInstances; ++i)
+    {
+        pFontInstance = pFont->rgFontInstances + i;
+        if (pTheme->nDpi == pFontInstance->nDpi)
+        {
+            *ppFontInstance = pFontInstance;
+            ExitFunction();
+        }
+    }
+
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pFont->rgFontInstances), pFont->cFontInstances, sizeof(THEME_FONT_INSTANCE), GROW_FONT_INSTANCES);
+    ThmExitOnFailure(hr, "Failed to allocate memory for font instances.");
+
+    pFontInstance = pFont->rgFontInstances + pFont->cFontInstances;
+    pFontInstance->nDpi = pTheme->nDpi;
+
+    lf.lfHeight = DpiuScaleValue(pFont->lfHeight, pFontInstance->nDpi);
+    lf.lfWeight = pFont->lfWeight;
+    lf.lfUnderline = pFont->lfUnderline;
+    lf.lfQuality = pFont->lfQuality;
+
+    hr = ::StringCchCopyW(lf.lfFaceName, countof(lf.lfFaceName), pFont->sczFaceName);
+    ThmExitOnFailure(hr, "Failed to copy font name to create font.");
+
+    pFontInstance->hFont = ::CreateFontIndirectW(&lf);
+    ThmExitOnNull(pFontInstance->hFont, hr, E_OUTOFMEMORY, "Failed to create DPI specific font.");
+
+    ++pFont->cFontInstances;
+    *ppFontInstance = pFontInstance;
+
+LExit:
+    return hr;
+}
+
 
 static HRESULT FindImageList(
     __in THEME* pTheme,
@@ -3661,9 +3712,11 @@ static void DrawControlText(
     __in BOOL fDrawFocusRect
     )
 {
+    HRESULT hr = S_OK;
     WCHAR wzText[256] = { };
     DWORD cchText = 0;
     THEME_FONT* pFont = NULL;
+    THEME_FONT_INSTANCE* pFontInstance = NULL;
     HFONT hfPrev = NULL;
 
     if (0 == (cchText = ::GetWindowTextW(pdis->hwndItem, wzText, countof(wzText))))
@@ -3685,7 +3738,11 @@ static void DrawControlText(
         pFont = pTheme->rgFonts + pControl->dwFontId;
     }
 
-    hfPrev = SelectFont(pdis->hDC, pFont->hFont);
+    hr = EnsureFontInstance(pTheme, pFont, &pFontInstance);
+    if (SUCCEEDED(hr))
+    {
+        hfPrev = SelectFont(pdis->hDC, pFontInstance->hFont);
+    }
 
     ::DrawTextExW(pdis->hDC, wzText, cchText, &pdis->rcItem, DT_SINGLELINE | (fCentered ? (DT_CENTER | DT_VCENTER) : 0), NULL);
 
@@ -3694,7 +3751,10 @@ static void DrawControlText(
         ::DrawFocusRect(pdis->hDC, &pdis->rcItem);
     }
 
-    SelectFont(pdis->hDC, hfPrev);
+    if (hfPrev)
+    {
+        SelectFont(pdis->hDC, hfPrev);
+    }
 }
 
 
@@ -3939,6 +3999,18 @@ static void FreeTab(
 }
 
 
+static void FreeFontInstance(
+    __in THEME_FONT_INSTANCE* pFontInstance
+    )
+{
+    if (pFontInstance->hFont)
+    {
+        ::DeleteObject(pFontInstance->hFont);
+        pFontInstance->hFont = NULL;
+    }
+}
+
+
 static void FreeFont(
     __in THEME_FONT* pFont
     )
@@ -3957,11 +4029,13 @@ static void FreeFont(
             pFont->hForeground = NULL;
         }
 
-        if (pFont->hFont)
+        for (DWORD i = 0; i < pFont->cFontInstances; ++i)
         {
-            ::DeleteObject(pFont->hFont);
-            pFont->hFont = NULL;
+            FreeFontInstance(&(pFont->rgFontInstances[i]));
         }
+
+        ReleaseMem(pFont->rgFontInstances);
+        ReleaseStr(pFont->sczFaceName);
     }
 }
 
@@ -4784,6 +4858,7 @@ static HRESULT LoadControls(
     {
         THEME_CONTROL* pControl = rgControls + i;
         THEME_FONT* pControlFont = (pTheme->cFonts > pControl->dwFontId) ? pTheme->rgFonts + pControl->dwFontId : NULL;
+        THEME_FONT_INSTANCE* pControlFontInstance = NULL;
         LPCWSTR wzWindowClass = NULL;
         DWORD dwWindowBits = WS_CHILD;
         DWORD dwWindowExBits = 0;
@@ -5097,7 +5172,10 @@ static HRESULT LoadControls(
 
         if (pControlFont)
         {
-            ::SendMessageW(pControl->hWnd, WM_SETFONT, (WPARAM) pControlFont->hFont, FALSE);
+            hr = EnsureFontInstance(pTheme, pControlFont, &pControlFontInstance);
+            ThmExitOnFailure(hr, "Failed to get DPI specific font.");
+
+            ::SendMessageW(pControl->hWnd, WM_SETFONT, (WPARAM) pControlFontInstance->hFont, FALSE);
         }
 
         // Initialize the text on all "application" (non-page) controls, best effort only.
@@ -5379,12 +5457,13 @@ static void ScaleTheme(
     pTheme->nMinimumHeight = DpiuScaleValue(pTheme->nDefaultDpiMinimumHeight, pTheme->nDpi);
     pTheme->nMinimumWidth = DpiuScaleValue(pTheme->nDefaultDpiMinimumWidth, pTheme->nDpi);
 
-    ScaleControls(pTheme->cControls, pTheme->rgControls, pTheme->nDpi);
+    ScaleControls(pTheme, pTheme->cControls, pTheme->rgControls, pTheme->nDpi);
 
     ::SetWindowPos(pTheme->hwndParent, NULL, x, y, pTheme->nWidth, pTheme->nHeight, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
 static void ScaleControls(
+    __in THEME* pTheme,
     __in DWORD cControls,
     __in THEME_CONTROL* rgControls,
     __in UINT nDpi
@@ -5393,15 +5472,29 @@ static void ScaleControls(
     for (DWORD i = 0; i < cControls; ++i)
     {
         THEME_CONTROL* pControl = rgControls + i;
-        ScaleControl(pControl, nDpi);
+        ScaleControl(pTheme, pControl, nDpi);
     }
 }
 
 static void ScaleControl(
+    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in UINT nDpi
     )
 {
+    HRESULT hr = S_OK;
+    THEME_FONT* pControlFont = (pTheme->cFonts > pControl->dwFontId) ? pTheme->rgFonts + pControl->dwFontId : NULL;
+    THEME_FONT_INSTANCE* pControlFontInstance = NULL;
+
+    if (pControlFont)
+    {
+        hr = EnsureFontInstance(pTheme, pControlFont, &pControlFontInstance);
+        if (SUCCEEDED(hr) && pControl->hWnd)
+        {
+            ::SendMessageW(pControl->hWnd, WM_SETFONT, (WPARAM)pControlFontInstance->hFont, FALSE);
+        }
+    }
+
     pControl->nWidth = DpiuScaleValue(pControl->nDefaultDpiWidth, nDpi);
     pControl->nHeight = DpiuScaleValue(pControl->nDefaultDpiHeight, nDpi);
     pControl->nX = DpiuScaleValue(pControl->nDefaultDpiX, nDpi);
@@ -5409,7 +5502,7 @@ static void ScaleControl(
 
     if (pControl->cControls)
     {
-        ScaleControls(pControl->cControls, pControl->rgControls, nDpi);
+        ScaleControls(pTheme, pControl->cControls, pControl->rgControls, nDpi);
     }
 }
 
