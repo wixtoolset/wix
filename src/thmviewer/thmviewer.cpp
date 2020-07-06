@@ -100,8 +100,8 @@ int WINAPI wWinMain(
     hr = CreateMainWindowClass(hInstance, vpTheme, &atom);
     ExitOnFailure(hr, "Failed to create main window.");
 
-    hWnd = ::CreateWindowExW(0, reinterpret_cast<LPCWSTR>(atom), vpTheme->sczCaption, vpTheme->dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, vpTheme->nWidth, vpTheme->nHeight, HWND_DESKTOP, NULL, hInstance, NULL);
-    ExitOnNullWithLastError(hWnd, hr, "Failed to create window.");
+    hr = ThemeCreateParentWindow(vpTheme, 0, reinterpret_cast<LPCWSTR>(atom), vpTheme->sczCaption, vpTheme->dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, HWND_DESKTOP, hInstance, NULL, THEME_WINDOW_INITIAL_POSITION_DEFAULT, &hWnd);
+    ExitOnFailure(hr, "Failed to create window.");
 
     if (!sczThemeFile)
     {
@@ -353,11 +353,11 @@ static LRESULT CALLBACK MainWndProc(
 
     case WM_CREATE:
         {
-        HRESULT hr = ThemeLoadControls(vpTheme, hWnd, vrgInitControls, countof(vrgInitControls));
-        if (FAILED(hr))
-        {
-            return -1;
-        }
+            HRESULT hr = ThemeLoadControls(vpTheme, vrgInitControls, countof(vrgInitControls));
+            if (FAILED(hr))
+            {
+                return -1;
+            }
         }
         break;
 

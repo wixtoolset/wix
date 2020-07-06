@@ -110,8 +110,8 @@ static DWORD WINAPI DisplayThreadProc(
                 y = rc.bottom + 20;
             }
 
-            hWnd = ::CreateWindowExW(0, wc.lpszClassName, pTheme->sczCaption, pTheme->dwStyle, x, y, pTheme->nWidth, pTheme->nHeight, hwndParent, NULL, hInstance, pCurrentHandle);
-            ExitOnNullWithLastError(hWnd, hr, "Failed to create display window.");
+            hr = ThemeCreateParentWindow(pTheme, 0, wc.lpszClassName, pTheme->sczCaption, pTheme->dwStyle, x, y, hwndParent, hInstance, pCurrentHandle, THEME_WINDOW_INITIAL_POSITION_DEFAULT, &hWnd);
+            ExitOnFailure(hr, "Failed to create display window.");
 
             fCreateIfNecessary = FALSE;
         }
@@ -263,9 +263,10 @@ static LRESULT CALLBACK DisplayWndProc(
     {
     case WM_NCCREATE:
         {
-        LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
-        IncrementHandleTheme(reinterpret_cast<HANDLE_THEME*>(lpcs->lpCreateParams));
-        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(lpcs->lpCreateParams));
+            LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
+            pHandleTheme = reinterpret_cast<HANDLE_THEME*>(lpcs->lpCreateParams);
+            IncrementHandleTheme(pHandleTheme);
+            ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pHandleTheme));
         }
         break;
 
@@ -328,7 +329,7 @@ static BOOL DisplayOnCreate(
 {
     HRESULT hr = S_OK;
 
-    hr = ThemeLoadControls(pTheme, hWnd, NULL, 0);
+    hr = ThemeLoadControls(pTheme, NULL, 0);
     ExitOnFailure(hr, "Failed to load theme controls");
 
     // Pre-populate some control types with data.
