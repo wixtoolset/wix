@@ -2300,8 +2300,6 @@ private: // privates
         int x = CW_USEDEFAULT;
         int y = CW_USEDEFAULT;
         POINT ptCursor = { };
-        HMONITOR hMonitor = NULL;
-        MONITORINFO mi = { };
 
         // If the theme did not provide an icon, try using the icon from the bundle engine.
         if (!hIcon)
@@ -2344,20 +2342,12 @@ private: // privates
         // Center the window on the monitor with the mouse.
         if (::GetCursorPos(&ptCursor))
         {
-            hMonitor = ::MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST);
-            if (hMonitor)
-            {
-                mi.cbSize = sizeof(mi);
-                if (::GetMonitorInfoW(hMonitor, &mi))
-                {
-                    x = mi.rcWork.left + (mi.rcWork.right  - mi.rcWork.left - m_pTheme->nWidth) / 2;
-                    y = mi.rcWork.top  + (mi.rcWork.bottom - mi.rcWork.top  - m_pTheme->nHeight) / 2;
-                }
-            }
+            x = ptCursor.x;
+            y = ptCursor.y;
         }
 
-        m_hWnd = ::CreateWindowExW(0, wc.lpszClassName, m_pTheme->sczCaption, dwWindowStyle, x, y, m_pTheme->nWidth, m_pTheme->nHeight, HWND_DESKTOP, NULL, m_hModule, this);
-        ExitOnNullWithLastError(m_hWnd, hr, "Failed to create window.");
+        hr = ThemeCreateParentWindow(m_pTheme, 0, wc.lpszClassName, m_pTheme->sczCaption, dwWindowStyle, x, y, HWND_DESKTOP, m_hModule, this, THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES, &m_hWnd);
+        ExitOnFailure(hr, "Failed to create window.");
 
         hr = S_OK;
 
@@ -2601,7 +2591,7 @@ private: // privates
     // OnCreate - finishes loading the theme.
     //
     BOOL OnCreate(
-        __in HWND hWnd
+        __in HWND /*hWnd*/
         )
     {
         HRESULT hr = S_OK;
@@ -2612,7 +2602,7 @@ private: // privates
         BA_FUNCTIONS_ONTHEMELOADED_ARGS themeLoadedArgs = { };
         BA_FUNCTIONS_ONTHEMELOADED_RESULTS themeLoadedResults = { };
 
-        hr = ThemeLoadControls(m_pTheme, hWnd, vrgInitControls, countof(vrgInitControls));
+        hr = ThemeLoadControls(m_pTheme, vrgInitControls, countof(vrgInitControls));
         BalExitOnFailure(hr, "Failed to load theme controls.");
 
         C_ASSERT(COUNT_WIXSTDBA_PAGE == countof(vrgwzPageNames));
