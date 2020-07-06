@@ -385,7 +385,7 @@ static HRESULT SchedCreateDatabase(
     hr = SqlDatabaseExists(psd->wzServer, psd->wzInstance, psd->wzDatabase, psd->fUseIntegratedAuth, psd->scau.wzName, psd->scau.wzPassword, NULL);
     if (S_FALSE == hr)
     {
-        hr = WcaDoDeferredAction(L"RollbackCreateDatabase", pwzCustomActionData, COST_SQL_CREATEDB);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackCreateDatabase"), pwzCustomActionData, COST_SQL_CREATEDB);
         ExitOnFailure(hr, "Failed to schedule RollbackCreateDatabase action");
     }
 
@@ -444,7 +444,7 @@ static HRESULT SchedCreateDatabase(
     }
 
     // schedule the CreateDatabase action
-    hr = WcaDoDeferredAction(L"CreateDatabase", pwzCustomActionData, COST_SQL_CREATEDB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateDatabase"), pwzCustomActionData, COST_SQL_CREATEDB);
     ExitOnFailure(hr, "Failed to schedule CreateDatabase action");
 
 LExit:
@@ -491,7 +491,7 @@ HRESULT SchedDropDatabase(
     hr = WcaWriteStringToCaData(wzPassword, &pwzCustomActionData);
     ExitOnFailure(hr, "Failed to add user password to CustomActionData");
 
-    hr = WcaDoDeferredAction(L"DropDatabase", pwzCustomActionData, COST_SQL_DROPDB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"DropDatabase"), pwzCustomActionData, COST_SQL_DROPDB);
     ExitOnFailure(hr, "Failed to schedule DropDatabase action");
 
 LExit:

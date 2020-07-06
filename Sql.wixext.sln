@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2016
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlca", "src\ca\sqlca.vcxproj", "{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}"
 EndProject
@@ -20,6 +20,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|Any CPU.Build.0 = Debug|Win32
 		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|x86.ActiveCfg = Debug|Win32
 		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|x86.Build.0 = Debug|Win32
 		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Release|Any CPU.ActiveCfg = Release|Win32

@@ -654,7 +654,7 @@ static HRESULT ExecuteStrings(
                 {
                     Assert(pwzCustomActionData && *pwzCustomActionData && uiCost);
 
-                    hr = WcaDoDeferredAction(1 == iOldRollback ? L"RollbackExecuteSqlStrings" : L"ExecuteSqlStrings", pwzCustomActionData, uiCost);
+                    hr = WcaDoDeferredAction(1 == iOldRollback ? CUSTOM_ACTION_DECORATION(L"RollbackExecuteSqlStrings") : CUSTOM_ACTION_DECORATION(L"ExecuteSqlStrings"), pwzCustomActionData, uiCost);
                     ExitOnFailure(hr, "failed to schedule ExecuteSqlStrings action, rollback: %d", iOldRollback);
                     iOldRollback = iRollback;
 
@@ -714,7 +714,7 @@ static HRESULT ExecuteStrings(
     if (pwzCustomActionData && *pwzCustomActionData)
     {
         Assert(pwzCustomActionData && *pwzCustomActionData && uiCost);
-        hr = WcaDoDeferredAction(1 == iRollback ? L"RollbackExecuteSqlStrings" : L"ExecuteSqlStrings", pwzCustomActionData, uiCost);
+        hr = WcaDoDeferredAction(1 == iRollback ? CUSTOM_ACTION_DECORATION(L"RollbackExecuteSqlStrings") : CUSTOM_ACTION_DECORATION(L"ExecuteSqlStrings"), pwzCustomActionData, uiCost);
         ExitOnFailure(hr, "Failed to schedule ExecuteSqlStrings action");
 
         *pwzCustomActionData = L'\0';

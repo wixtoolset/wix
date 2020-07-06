@@ -24,3 +24,5 @@
 #include "sca.h"
 #include "scacost.h"
 #include "scasqlstr.h"
+
+#include "caDecor.h"

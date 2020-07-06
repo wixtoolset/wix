@@ -7,6 +7,7 @@ namespace WixToolset.Sql
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Sql.Symbols;
 
     /// <summary>
@@ -797,8 +798,8 @@ namespace WixToolset.Sql
 
         private void AddReferenceToInstallSqlData(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "InstallSqlData");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, "UninstallSqlData");
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallSqlData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "UninstallSqlData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
     }
 }
