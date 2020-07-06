@@ -73,6 +73,7 @@
     <ClCompile Include="dictutil.cpp" />
     <ClCompile Include="dirutil.cpp" />
     <ClCompile Include="dlutil.cpp" />
+    <ClCompile Include="dpiutil.cpp" />
     <ClCompile Include="dutil.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <DisableSpecificWarnings>4091;4458</DisableSpecificWarnings>
@@ -139,6 +140,7 @@
     <ClInclude Include="inc\dictutil.h" />
     <ClInclude Include="inc\dirutil.h" />
     <ClInclude Include="inc\dlutil.h" />
+    <ClInclude Include="inc\dpiutil.h" />
     <ClInclude Include="inc\dutil.h" />
     <ClInclude Include="inc\dutilsources.h" />
     <ClInclude Include="inc\eseutil.h" />

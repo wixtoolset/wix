@@ -255,6 +255,10 @@ struct THEME
     DWORD dwFontId;
     HANDLE hIcon;
     LPWSTR sczCaption;
+    int nDefaultDpiHeight;
+    int nDefaultDpiMinimumHeight;
+    int nDefaultDpiWidth;
+    int nDefaultDpiMinimumWidth;
     int nHeight;
     int nMinimumHeight;
     int nWidth;
@@ -282,6 +286,8 @@ struct THEME
     HWND hwndHover; // current hwnd hovered over
     DWORD dwCurrentPageId;
     HWND hwndTooltip;
+
+    UINT nDpi;
 
     // callback functions
     PFNTHM_EVALUATE_VARIABLE_CONDITION pfnEvaluateCondition;

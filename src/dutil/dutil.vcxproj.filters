@@ -60,6 +60,9 @@
     <ClCompile Include="dlutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dpiutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -230,7 +233,13 @@
     <ClInclude Include="inc\dlutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\dpiutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="inc\dutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\dutilsources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\eseutil.h">
@@ -285,6 +294,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\reswutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rmutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\rexutil.h">
@@ -342,9 +354,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\deputil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\dutilsources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
