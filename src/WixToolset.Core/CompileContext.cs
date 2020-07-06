@@ -23,8 +23,6 @@ namespace WixToolset.Core
 
         public IEnumerable<ICompilerExtension> Extensions { get; set; }
 
-        public string OutputPath { get; set; }
-
         public Platform Platform { get; set; }
 
         public XDocument Source { get; set; }

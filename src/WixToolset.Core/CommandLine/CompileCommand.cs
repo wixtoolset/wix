@@ -79,7 +79,6 @@ namespace WixToolset.Core.CommandLine
 
                 var compileContext = this.ServiceProvider.GetService<ICompileContext>();
                 compileContext.Extensions = this.ExtensionManager.GetServices<ICompilerExtension>();
-                compileContext.OutputPath = sourceFile.OutputPath;
                 compileContext.Platform = this.Platform;
                 compileContext.Source = result?.Document;
 

@@ -227,7 +227,6 @@ namespace WixToolset.Core.CommandLine
 
                 var context = this.ServiceProvider.GetService<ICompileContext>();
                 context.Extensions = this.ExtensionManager.GetServices<ICompilerExtension>();
-                context.OutputPath = sourceFile.OutputPath;
                 context.Platform = this.Platform;
                 context.Source = document;
                 context.CancellationToken = cancellationToken;
