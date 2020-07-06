@@ -2309,25 +2309,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, true))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                        name = null;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else if (null == shortName) // generate a short file name.
-                {
-                    shortName = this.Core.CreateShortName(name, true, true, node.Name.LocalName, componentId);
-                }
-            }
 
             if (!onInstall.HasValue && !onUninstall.HasValue)
             {
@@ -2352,8 +2333,9 @@ namespace WixToolset.Core
                 this.Core.AddSymbol(new RemoveFileSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
-                    FileName = this.GetMsiFilenameValue(shortName, name),
-                    DirProperty = directory ?? property ?? parentDirectory,
+                    FileName = name,
+                    ShortFileName = shortName,
+                    DirPropertyRef = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall,
                 });
@@ -2440,7 +2422,7 @@ namespace WixToolset.Core
                 this.Core.AddSymbol(new RemoveFileSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
-                    DirProperty = directory ?? property ?? parentDirectory,
+                    DirPropertyRef = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall
                 });
@@ -4293,24 +4275,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, false))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else if (null == shortName) // generate a short file name.
-                {
-                    shortName = this.Core.CreateShortName(name, true, false, node.Name.LocalName, componentId, directory);
-                }
-            }
 
             if ("Component" != parentElementLocalName && null != target)
             {
@@ -4319,7 +4283,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("sct", directory, LowercaseOrNull(name) ?? LowercaseOrNull(shortName));
+                id = this.Core.CreateIdentifier("sct", directory, LowercaseOrNull(name));
             }
 
             foreach (var child in node.Elements())

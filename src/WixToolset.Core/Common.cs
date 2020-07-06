@@ -188,7 +188,7 @@ namespace WixToolset.Core
         /// <param name="filename">Filename to verify.</param>
         /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
         /// <returns>True if the filename is a valid short filename</returns>
-        internal static bool IsValidShortFilename(string filename, bool allowWildcards)
+        public static bool IsValidShortFilename(string filename, bool allowWildcards)
         {
             if (String.IsNullOrEmpty(filename))
             {

@@ -286,6 +286,7 @@ namespace WixToolset.Core
         /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
         /// <param name="args">Any additional information to include in the hash for the generated short name.</param>
         /// <returns>The generated 8.3-compliant short file/directory name.</returns>
+        [Obsolete]
         public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
         {
             return this.parseHelper.CreateShortName(longName, keepExtension, allowWildcards, args);

@@ -75,16 +75,6 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            if (String.IsNullOrEmpty(shortName) && !name.Equals("SourceDir") && !this.IsValidShortFilename(name))
-            {
-                shortName = this.CreateShortName(name, false, false, "Directory", parentId);
-            }
-
-            if (String.IsNullOrEmpty(shortSourceName) && !String.IsNullOrEmpty(sourceName) && !this.IsValidShortFilename(sourceName))
-            {
-                shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
-            }
-
             // For anonymous directories, create the identifier. If this identifier already exists in the
             // active section, bail so we don't add duplicate anonymous directory symbols (which are legal
             // but bloat the intermediate and ultimately make the linker do "busy work").
@@ -243,7 +233,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (null == childId)
             {
-                throw new ArgumentNullException("childId");
+                throw new ArgumentNullException(nameof(childId));
             }
 
             section.AddSymbol(new WixGroupSymbol(sourceLineNumbers)
@@ -419,7 +409,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (null == attribute)
             {
-                throw new ArgumentNullException("attribute");
+                throw new ArgumentNullException(nameof(attribute));
             }
 
             var emptyRule = canBeEmpty ? EmptyRule.CanBeEmpty : EmptyRule.CanBeWhitespaceOnly;

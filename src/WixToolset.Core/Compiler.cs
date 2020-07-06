@@ -300,24 +300,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Given a possible short and long file name, create an msi filename value.
-        /// </summary>
-        /// <param name="shortName">The short file name.</param>
-        /// <param name="longName">Possibly the long file name.</param>
-        /// <returns>The value in the msi filename data type.</returns>
-        private string GetMsiFilenameValue(string shortName, string longName)
-        {
-            if (null != shortName && null != longName && !String.Equals(shortName, longName, StringComparison.OrdinalIgnoreCase))
-            {
-                return String.Concat(shortName, "|", longName);
-            }
-            else
-            {
-                return this.Core.IsValidShortFilename(longName, false) ? longName : shortName;
-            }
-        }
-
-        /// <summary>
         /// Adds a search property to the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Current source/line number of processing.</param>
@@ -3036,12 +3018,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationProperty", "DestinationDirectory"));
             }
 
-            // generate a short file name
-            if (null == destinationShortName && (null != destinationName && !this.Core.IsValidShortFilename(destinationName, false)))
-            {
-                destinationShortName = this.Core.CreateShortName(destinationName, true, false, node.Name.LocalName, componentId);
-            }
-
             if (null == id)
             {
                 id = this.Core.CreateIdentifier("cf", sourceFolder, sourceDirectory, sourceProperty, destinationDirectory, destinationProperty, destinationName);
@@ -3063,7 +3039,8 @@ namespace WixToolset.Core
                     {
                         ComponentRef = componentId,
                         SourceName  = sourceName,
-                        DestName= String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
+                        DestinationName = destinationName,
+                        DestinationShortName = destinationShortName,
                         SourceFolder = sourceDirectory ?? sourceProperty,
                         DestFolder = destinationDirectory ?? destinationProperty,
                         Delete = delete,
@@ -3108,7 +3085,8 @@ namespace WixToolset.Core
                     {
                         ComponentRef = componentId,
                         FileRef = fileId,
-                        DestinationName = String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
+                        DestinationName = destinationName,
+                        DestinationShortName = destinationShortName,
                         DestinationFolder = destinationDirectory ?? destinationProperty,
                     });
                 }
@@ -4184,16 +4162,12 @@ namespace WixToolset.Core
             {
                 if (String.IsNullOrEmpty(shortName))
                 {
-                    if (!name.Equals(".") && !name.Equals("SourceDir") && !this.Core.IsValidShortFilename(name, false))
-                    {
-                        shortName = this.Core.CreateShortName(name, false, false, "Directory", parentId);
-                    }
                 }
-                else if (name.Equals("."))
+                else if (name == ".")
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name", name));
                 }
-                else if (name.Equals(shortName))
+                else if (name.Equals(shortName, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "Name", "ShortName", name));
                 }
@@ -4210,16 +4184,12 @@ namespace WixToolset.Core
             {
                 if (String.IsNullOrEmpty(shortSourceName))
                 {
-                    if (!sourceName.Equals(".") && !this.Core.IsValidShortFilename(sourceName, false))
-                    {
-                        shortSourceName = this.Core.CreateShortName(sourceName, false, false, "Directory", parentId);
-                    }
                 }
-                else if (sourceName.Equals("."))
+                else if (sourceName == ".")
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortSourceName", "SourceName", sourceName));
                 }
-                else if (sourceName.Equals(shortSourceName))
+                else if (sourceName.Equals(shortSourceName, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "SourceName", "ShortSourceName", sourceName));
                 }
@@ -5463,7 +5433,6 @@ namespace WixToolset.Core
             var defaultSize = 0;
             string defaultVersion = null;
             string fontTitle = null;
-            var generatedShortFileName = false;
             var keyPath = YesNoType.NotSet;
             string name = null;
             var patchGroup = CompilerConstants.IntegerNotSet;
@@ -5686,16 +5655,22 @@ namespace WixToolset.Core
                 }
             }
 
-            // generate a short file name
-            if (null == shortName && (null != name && !this.Core.IsValidShortFilename(name, false)))
+            if (name == null)
             {
-                shortName = this.Core.CreateShortName(name, true, false, node.Name.LocalName, directoryId);
-                generatedShortFileName = true;
+                if (shortName == null)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                }
+                else
+                {
+                    name = shortName;
+                    shortName = null;
+                }
             }
 
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("fil", directoryId, name ?? shortName);
+                id = this.Core.CreateIdentifier("fil", directoryId, name);
             }
 
             if (null != defaultVersion && null != companionFile)
@@ -5811,11 +5786,11 @@ namespace WixToolset.Core
 
                 if (String.IsNullOrEmpty(source))
                 {
-                    source = name ?? shortName;
+                    source = name;
                 }
                 else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
                 {
-                    source = null == name ? Path.Combine(source, shortName) : Path.Combine(source, name);
+                    source = Path.Combine(source, name);
                 }
 
                 var attributes = FileSymbolAttributes.None;
@@ -5826,7 +5801,6 @@ namespace WixToolset.Core
                 attributes |= checksum ? FileSymbolAttributes.Checksum : 0;
                 attributes |= compressed.HasValue && compressed == true ? FileSymbolAttributes.Compressed : 0;
                 attributes |= compressed.HasValue && compressed == false ? FileSymbolAttributes.Uncompressed : 0;
-                attributes |= generatedShortFileName ? FileSymbolAttributes.GeneratedShortFileName : 0;
 
                 this.Core.AddSymbol(new FileSymbol(sourceLineNumbers, id)
                 {
@@ -5837,14 +5811,6 @@ namespace WixToolset.Core
                     Version = companionFile ?? defaultVersion,
                     Language = defaultLanguage,
                     Attributes = attributes,
-
-                    //ReadOnly = readOnly,
-                    //Hidden = hidden,
-                    //System = system,
-                    //Vital = vital,
-                    //Checksum = checksum,
-                    //Compressed = compressed,
-                    //GeneratedShortFileName = generatedShortFileName,
 
                     DirectoryRef = directoryId,
                     DiskId = (CompilerConstants.IntegerNotSet == diskId) ? null : (int?)diskId,
@@ -6454,28 +6420,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, false))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                        name = null;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else // generate a short file name.
-                {
-                    if (null == shortName)
-                    {
-                        shortName = this.Core.CreateShortName(name, true, false, node.Name.LocalName, componentId);
-                    }
-                }
-            }
 
             if (null == section)
             {
@@ -6493,7 +6437,8 @@ namespace WixToolset.Core
             {
                 this.Core.AddSymbol(new IniFileSymbol(sourceLineNumbers, id)
                 {
-                    FileName = this.GetMsiFilenameValue(shortName, name),
+                    FileName = name,
+                    ShortFileName = shortName,
                     DirProperty = directory,
                     Section = section,
                     Key = key,
@@ -6585,25 +6530,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, false))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                        name = null;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else if (null == shortName) // generate a short file name.
-                {
-                    shortName = this.Core.CreateShortName(name, true, false, node.Name.LocalName);
-                }
-            }
 
             if (null == section)
             {
@@ -6677,8 +6603,8 @@ namespace WixToolset.Core
             {
                 var symbol = this.Core.AddSymbol(new IniLocatorSymbol(sourceLineNumbers, id)
                 {
-                    SignatureRef = id.Id,
-                    FileName = this.GetMsiFilenameValue(shortName, name),
+                    FileName = name,
+                    ShortFileName = shortName,
                     Section = section,
                     Key = key,
                     Type = type

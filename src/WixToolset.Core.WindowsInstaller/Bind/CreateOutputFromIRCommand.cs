@@ -5,7 +5,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using System.Security.Cryptography;
+    using System.Text;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -97,6 +100,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddDirectorySymbol((DirectorySymbol)symbol);
                         break;
 
+                    case SymbolDefinitionType.DuplicateFile:
+                        this.AddDuplicateFileSymbol((DuplicateFileSymbol)symbol);
+                        break;
+
                     case SymbolDefinitionType.Environment:
                         this.AddEnvironmentSymbol((EnvironmentSymbol)symbol);
                         break;
@@ -115,6 +122,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     case SymbolDefinitionType.IniFile:
                         this.AddIniFileSymbol((IniFileSymbol)symbol);
+                        break;
+
+                    case SymbolDefinitionType.IniLocator:
+                        this.AddIniLocatorSymbol((IniLocatorSymbol)symbol);
                         break;
 
                     case SymbolDefinitionType.Media:
@@ -444,6 +455,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddDirectorySymbol(DirectorySymbol symbol)
         {
+            if (String.IsNullOrEmpty(symbol.ShortName) && !symbol.Name.Equals(".") && !symbol.Name.Equals("SourceDir") && !Common.IsValidShortFilename(symbol.Name, false))
+            {
+                symbol.ShortName = CreateShortName(symbol.Name, false, false, "Directory", symbol.ParentDirectoryRef);
+            }
+
+            if (String.IsNullOrEmpty(symbol.SourceShortName) && !String.IsNullOrEmpty(symbol.SourceName) && !Common.IsValidShortFilename(symbol.SourceName, false))
+            {
+                symbol.SourceShortName = CreateShortName(symbol.SourceName, false, false, "Directory", symbol.ParentDirectoryRef);
+            }
+
             var sourceName = GetMsiFilenameValue(symbol.SourceShortName, symbol.SourceName);
             var targetName = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
 
@@ -458,6 +479,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[0] = symbol.Id.Id;
             row[1] = symbol.ParentDirectoryRef;
             row[2] = defaultDir;
+        }
+
+        private void AddDuplicateFileSymbol(DuplicateFileSymbol symbol)
+        {
+            var name = symbol.DestinationName;
+            if (null == symbol.DestinationShortName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.DestinationShortName = CreateShortName(name, true, false, "CopyFile", symbol.ComponentRef, symbol.FileRef);
+            }
+
+            var row = this.CreateRow(symbol, "DuplicateFile");
+            row[0] = symbol.Id.Id;
+            row[1] = symbol.ComponentRef;
+            row[2] = symbol.FileRef;
+            row[3] = GetMsiFilenameValue(symbol.DestinationShortName, symbol.DestinationName);
+            row[4] = symbol.DestinationFolder;
         }
 
         private void AddEnvironmentSymbol(EnvironmentSymbol symbol)
@@ -525,10 +562,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddFileSymbol(FileSymbol symbol)
         {
+            var name = symbol.Name;
+            if (null == symbol.ShortName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.ShortName = CreateShortName(name, true, false, "File", symbol.DirectoryRef);
+            }
+
             var row = (FileRow)this.CreateRow(symbol, "File");
             row.File = symbol.Id.Id;
             row.Component = symbol.ComponentRef;
-            row.FileName = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
+            row.FileName = GetMsiFilenameValue(symbol.ShortName, name);
             row.FileSize = symbol.FileSize;
             row.Version = symbol.Version;
             row.Language = symbol.Language;
@@ -564,15 +607,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var tableName = (InifFileActionType.AddLine == symbol.Action || InifFileActionType.AddTag == symbol.Action || InifFileActionType.CreateLine == symbol.Action) ? "IniFile" : "RemoveIniFile";
 
+            var name = symbol.FileName;
+            if (null == symbol.ShortFileName  && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.ShortFileName = CreateShortName(name, true, false, "IniFile", symbol.ComponentRef);
+            }
+
             var row = this.CreateRow(symbol, tableName);
             row[0] = symbol.Id.Id;
-            row[1] = symbol.FileName;
+            row[1] = GetMsiFilenameValue(symbol.ShortFileName, name);
             row[2] = symbol.DirProperty;
             row[3] = symbol.Section;
             row[4] = symbol.Key;
             row[5] = symbol.Value;
             row[6] = symbol.Action;
             row[7] = symbol.ComponentRef;
+        }
+
+        private void AddIniLocatorSymbol(IniLocatorSymbol symbol)
+        {
+            var name = symbol.FileName;
+            if (null == symbol.ShortFileName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.ShortFileName = CreateShortName(name, true, false, "IniFileSearch");
+            }
+
+            var row = this.CreateRow(symbol, "IniLocator");
+            row[0] = symbol.Id.Id;
+            row[1] = GetMsiFilenameValue(symbol.ShortFileName, name);
+            row[2] = symbol.Section;
+            row[3] = symbol.Key;
+            row[4] = symbol.Field;
+            row[5] = symbol.Type;
         }
 
         private void AddMediaSymbol(MediaSymbol symbol)
@@ -653,11 +719,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddMoveFileSymbol(MoveFileSymbol symbol)
         {
+            var name = symbol.DestinationName;
+            if (null == symbol.DestinationShortName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.DestinationShortName = CreateShortName(name, true, false, "MoveFile", symbol.ComponentRef);
+            }
+
             var row = this.CreateRow(symbol, "MoveFile");
             row[0] = symbol.Id.Id;
             row[1] = symbol.ComponentRef;
             row[2] = symbol.SourceName;
-            row[3] = symbol.DestName;
+            row[3] = GetMsiFilenameValue(symbol.DestinationShortName, symbol.DestinationName);
             row[4] = symbol.SourceFolder;
             row[5] = symbol.DestFolder;
             row[6] = symbol.Delete ? WindowsInstallerConstants.MsidbMoveFileOptionsMove : 0;
@@ -677,14 +749,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddRemoveFileSymbol(RemoveFileSymbol symbol)
         {
+            var name = symbol.FileName;
+            if (null == symbol.ShortFileName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.ShortFileName = CreateShortName(name, true, false, "RemoveFile", symbol.ComponentRef);
+            }
+
             var installMode = symbol.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
             installMode |= symbol.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
 
             var row = this.CreateRow(symbol, "RemoveFile");
             row[0] = symbol.Id.Id;
             row[1] = symbol.ComponentRef;
-            row[2] = symbol.FileName;
-            row[3] = symbol.DirProperty;
+            row[2] = GetMsiFilenameValue(symbol.ShortFileName, symbol.FileName);
+            row[3] = symbol.DirPropertyRef;
             row[4] = installMode;
         }
 
@@ -821,10 +899,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddShortcutSymbol(ShortcutSymbol symbol)
         {
+            var name = symbol.Name;
+            if (null == symbol.ShortName && null != name && !Common.IsValidShortFilename(name, false))
+            {
+                symbol.ShortName = CreateShortName(name, true, false, "Shortcut", symbol.ComponentRef, symbol.DirectoryRef);
+            }
+
             var row = this.CreateRow(symbol, "Shortcut");
             row[0] = symbol.Id.Id;
             row[1] = symbol.DirectoryRef;
-            row[2] = GetMsiFilenameValue(symbol.ShortName, symbol.Name);
+            row[2] = GetMsiFilenameValue(symbol.ShortName, name);
             row[3] = symbol.ComponentRef;
             row[4] = symbol.Target;
             row[5] = symbol.Arguments;
@@ -1116,6 +1200,53 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 return shortName + "|" + longName;
             }
+        }
+
+        private static string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
+        {
+            longName = longName.ToLowerInvariant();
+
+            // collect all the data
+            var strings = new List<string>(1 + args.Length);
+            strings.Add(longName);
+            strings.AddRange(args);
+
+            // prepare for hashing
+            var stringData = String.Join("|", strings);
+            var data = Encoding.UTF8.GetBytes(stringData);
+
+            // hash the data
+            byte[] hash;
+            using (var sha1 = new SHA1CryptoServiceProvider())
+            {
+                hash = sha1.ComputeHash(data);
+            }
+
+            // generate the short file/directory name without an extension
+            var shortName = new StringBuilder(Convert.ToBase64String(hash));
+            shortName.Length = 8;
+            shortName.Replace('+', '-').Replace('/', '_');
+
+            if (keepExtension)
+            {
+                var extension = Path.GetExtension(longName);
+
+                if (4 < extension.Length)
+                {
+                    extension = extension.Substring(0, 4);
+                }
+
+                shortName.Append(extension);
+
+                // check the generated short name to ensure its still legal (the extension may not be legal)
+                if (!Common.IsValidShortFilename(shortName.ToString(), allowWildcards))
+                {
+                    // remove the extension (by truncating the generated file name back to the generated characters)
+                    shortName.Length -= extension.Length;
+                }
+            }
+
+            return shortName.ToString().ToLowerInvariant();
         }
     }
 }
