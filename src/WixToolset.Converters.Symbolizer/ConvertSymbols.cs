@@ -197,7 +197,20 @@ namespace WixToolset.Converters.Symbolizer
             case "DrLocator":
                 return DefaultSymbolFromRow(typeof(DrLocatorSymbol), row, columnZeroIsId: false);
             case "DuplicateFile":
-                return DefaultSymbolFromRow(typeof(DuplicateFileSymbol), row, columnZeroIsId: true);
+            {
+                var splitName = FieldAsString(row, 3)?.Split('|');
+
+                var symbol = new DuplicateFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                {
+                    ComponentRef = FieldAsString(row, 1),
+                    FileRef = FieldAsString(row, 2),
+                    DestinationName = splitName == null ? null : splitName.Length > 1 ? splitName[1] : splitName[0],
+                    DestinationShortName = splitName == null ? null : splitName.Length > 1 ? splitName[0] : null,
+                    DestinationFolder = FieldAsString(row, 4)
+                };
+
+                return symbol;
+            }
             case "Error":
                 return DefaultSymbolFromRow(typeof(ErrorSymbol), row, columnZeroIsId: false);
             case "Extension":
@@ -246,11 +259,13 @@ namespace WixToolset.Converters.Symbolizer
                 symbolAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed ? FileSymbolAttributes.Compressed : 0;
 
                 var id = FieldAsString(row, 0);
+                var splitName = FieldAsString(row, 2).Split('|');
 
                 var symbol = new FileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
                 {
                     ComponentRef = FieldAsString(row, 1),
-                    Name = FieldAsString(row, 2),
+                    Name = splitName.Length > 1 ? splitName[1] : splitName[0],
+                    ShortName = splitName.Length > 1 ? splitName[0] : null,
                     FileSize = FieldAsInt(row, 3),
                     Version = FieldAsString(row, 4),
                     Language = FieldAsString(row, 5),
@@ -278,7 +293,6 @@ namespace WixToolset.Converters.Symbolizer
                     symbol.DiskId = FieldAsNullableInt(wixFileRow, 5) ?? 0;
                     symbol.Source = new IntermediateFieldPathValue { Path = FieldAsString(wixFileRow, 6) };
                     symbol.PatchGroup = FieldAsInt(wixFileRow, 8);
-                    symbol.Attributes |= FieldAsInt(wixFileRow, 9) != 0 ? FileSymbolAttributes.GeneratedShortFileName : 0;
                     symbol.PatchAttributes = (PatchAttributeType)FieldAsInt(wixFileRow, 10);
                 }
 
@@ -288,8 +302,41 @@ namespace WixToolset.Converters.Symbolizer
                 return null;
             case "Icon":
                 return DefaultSymbolFromRow(typeof(IconSymbol), row, columnZeroIsId: true);
+            case "IniFile":
+            {
+                var splitName = FieldAsString(row, 1).Split('|');
+                var action = FieldAsInt(row, 6);
+
+                var symbol = new IniFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                {
+                    FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
+                    ShortFileName = splitName.Length > 1 ? splitName[0] : null,
+                    DirProperty = FieldAsString(row, 2),
+                    Section = FieldAsString(row, 3),
+                    Key = FieldAsString(row, 4),
+                    Value = FieldAsString(row, 5),
+                    Action = action == 3 ? InifFileActionType.AddTag : action == 1 ? InifFileActionType.CreateLine : InifFileActionType.AddLine,
+                    ComponentRef = FieldAsString(row, 7),
+                };
+
+                return symbol;
+            }
             case "IniLocator":
-                return DefaultSymbolFromRow(typeof(IniLocatorSymbol), row, columnZeroIsId: false);
+            {
+                var splitName = FieldAsString(row, 1).Split('|');
+
+                var symbol = new IniLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                {
+                    FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
+                    ShortFileName = splitName.Length > 1 ? splitName[0] : null,
+                    Section = FieldAsString(row, 2),
+                    Key = FieldAsString(row, 3),
+                    Field = FieldAsInt(row, 4),
+                    Type = FieldAsInt(row, 5),
+                };
+
+                return symbol;
+            }
             case "LockPermissions":
                 return DefaultSymbolFromRow(typeof(LockPermissionsSymbol), row, columnZeroIsId: false);
             case "Media":
@@ -423,12 +470,15 @@ namespace WixToolset.Converters.Symbolizer
             }
             case "RemoveFile":
             {
+                var splitName = FieldAsString(row, 2).Split('|');
                 var installMode = FieldAsInt(row, 4);
+
                 return new RemoveFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
                 {
                     ComponentRef = FieldAsString(row, 1),
-                    FileName = FieldAsString(row, 2),
-                    DirProperty = FieldAsString(row, 3),
+                    FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
+                    ShortFileName = splitName.Length > 1 ? splitName[0] : null,
+                    DirPropertyRef = FieldAsString(row, 3),
                     OnInstall = (installMode & WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall) == WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall ? (bool?)true : null,
                     OnUninstall = (installMode & WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove) == WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove ? (bool?)true : null
                 };

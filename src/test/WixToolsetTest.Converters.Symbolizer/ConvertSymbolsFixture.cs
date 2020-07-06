@@ -317,7 +317,7 @@ namespace WixToolsetTest.Converters.Symbolizer
                     fileSymbol.Source.Path,
                     null, // assembly processor arch
                     fileSymbol.PatchGroup,
-                    (fileSymbol.Attributes & FileSymbolAttributes.GeneratedShortFileName) != 0 ? 1 : 0,
+                    0,
                     (int)fileSymbol.PatchAttributes,
                     fileSymbol.RetainLengths,
                     fileSymbol.IgnoreOffsets,
