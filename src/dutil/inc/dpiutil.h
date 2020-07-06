@@ -14,6 +14,12 @@ extern "C" {
 #define USER_DEFAULT_SCREEN_DPI 96
 #endif
 
+typedef struct _DPIU_MONITOR_CONTEXT
+{
+    UINT nDpi;
+    MONITORINFOEXW mi;
+} DPIU_MONITOR_CONTEXT;
+
 typedef struct _DPIU_WINDOW_CONTEXT
 {
     UINT nDpi;
@@ -31,6 +37,15 @@ typedef UINT (APIENTRY *PFN_GETDPIFORWINDOW)(
 
 void DAPI DpiuInitialize();
 void DAPI DpiuUninitialize();
+
+/********************************************************************
+ DpiuGetMonitorContextFromPoint - get the DPI context of the monitor from the given point.
+
+*******************************************************************/
+HRESULT DAPI DpiuGetMonitorContextFromPoint(
+    __in const POINT* pt,
+    __out DPIU_MONITOR_CONTEXT** ppMonitorContext
+    );
 
 /********************************************************************
  DpiuGetWindowContext - get the DPI context of the given window.

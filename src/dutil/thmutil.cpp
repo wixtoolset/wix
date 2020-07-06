@@ -603,15 +603,42 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
     __in_opt HWND hwndParent,
     __in_opt HINSTANCE hInstance,
     __in_opt LPVOID lpParam,
+    __in THEME_WINDOW_INITIAL_POSITION initialPosition,
     __out_opt HWND* phWnd
     )
 {
     HRESULT hr = S_OK;
+    DPIU_MONITOR_CONTEXT* pMonitorContext = NULL;
+    POINT pt = { };
+    RECT* pMonitorRect = NULL;
     HWND hWnd = NULL;
 
     if (pTheme->hwndParent)
     {
         ThmExitOnFailure(hr = E_INVALIDSTATE, "ThemeCreateParentWindow called after the theme was loaded.");
+    }
+
+    if (THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES == initialPosition)
+    {
+        pt.x = x;
+        pt.y = y;
+        hr = DpiuGetMonitorContextFromPoint(&pt, &pMonitorContext);
+        if (SUCCEEDED(hr))
+        {
+            pMonitorRect = &pMonitorContext->mi.rcWork;
+            if (pMonitorContext->nDpi != pTheme->nDpi)
+            {
+                ScaleTheme(pTheme, pMonitorContext->nDpi, pMonitorRect->left, pMonitorRect->top);
+            }
+
+            x = pMonitorRect->left + (pMonitorRect->right - pMonitorRect->left - pTheme->nWidth) / 2;
+            y = pMonitorRect->top + (pMonitorRect->bottom - pMonitorRect->top - pTheme->nHeight) / 2;
+        }
+        else
+        {
+            x = CW_USEDEFAULT;
+            y = CW_USEDEFAULT;
+        }
     }
 
     hWnd = ::CreateWindowExW(dwExStyle, szClassName, szWindowName, dwStyle, x, y, pTheme->nWidth, pTheme->nHeight, hwndParent, NULL, hInstance, lpParam);
@@ -625,6 +652,8 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
     }
 
 LExit:
+    MemFree(pMonitorContext);
+
     return hr;
 }
 
@@ -5471,7 +5500,10 @@ static void ScaleTheme(
 
     ScaleControls(pTheme, pTheme->cControls, pTheme->rgControls, pTheme->nDpi);
 
-    ::SetWindowPos(pTheme->hwndParent, NULL, x, y, pTheme->nWidth, pTheme->nHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+    if (pTheme->hwndParent)
+    {
+        ::SetWindowPos(pTheme->hwndParent, NULL, x, y, pTheme->nWidth, pTheme->nHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+    }
 }
 
 static void ScaleControls(

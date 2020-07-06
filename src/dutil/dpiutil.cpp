@@ -62,6 +62,59 @@ DAPI_(void) DpiuUninitialize()
     vfDpiuInitialized = FALSE;
 }
 
+DAPI_(HRESULT) DpiuGetMonitorContextFromPoint(
+    __in const POINT* pt,
+    __out DPIU_MONITOR_CONTEXT** ppMonitorContext
+    )
+{
+    HRESULT hr = S_OK;
+    DPIU_MONITOR_CONTEXT* pMonitorContext = NULL;
+    HMONITOR hMonitor = NULL;
+    UINT dpiX = 0;
+    UINT dpiY = 0;
+    HDC hdc = NULL;
+
+    pMonitorContext = reinterpret_cast<DPIU_MONITOR_CONTEXT*>(MemAlloc(sizeof(DPIU_MONITOR_CONTEXT), TRUE));
+    DpiuExitOnNull(pMonitorContext, hr, E_OUTOFMEMORY, "Failed to allocate memory for DpiuMonitorContext.");
+
+    hMonitor = ::MonitorFromPoint(*pt, MONITOR_DEFAULTTONEAREST);
+    DpiuExitOnNull(hMonitor, hr, E_FAIL, "Failed to get monitor from point.");
+
+    pMonitorContext->mi.cbSize = sizeof(pMonitorContext->mi);
+    if (!::GetMonitorInfoW(hMonitor, &pMonitorContext->mi))
+    {
+        DpiuExitOnFailure(hr = E_OUTOFMEMORY, "Failed to get monitor info for point.");
+    }
+
+    if (vpfnGetDpiForMonitor)
+    {
+        hr = vpfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+        DpiuExitOnFailure(hr, "Failed to get DPI for monitor.");
+
+        pMonitorContext->nDpi = dpiX;
+    }
+    else
+    {
+        hdc = ::CreateDCW(L"DISPLAY", pMonitorContext->mi.szDevice, NULL, NULL);
+        DpiuExitOnNull(hdc, hr, E_OUTOFMEMORY, "Failed to get device context for monitor.");
+
+        pMonitorContext->nDpi = ::GetDeviceCaps(hdc, LOGPIXELSX);
+    }
+
+    *ppMonitorContext = pMonitorContext;
+    pMonitorContext = NULL;
+
+LExit:
+    if (hdc)
+    {
+        ::ReleaseDC(NULL, hdc);
+    }
+
+    MemFree(pMonitorContext);
+
+    return hr;
+}
+
 DAPI_(void) DpiuGetWindowContext(
     __in HWND hWnd,
     __in DPIU_WINDOW_CONTEXT* pWindowContext
