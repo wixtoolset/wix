@@ -10,7 +10,6 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.Reflection;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -45,16 +44,8 @@ namespace WixToolset.Core
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
 
-        private static readonly Regex AmbiguousFilename = new Regex(@"^.{6}\~\d", RegexOptions.Compiled);
-
-        private const string IllegalLongFilenameCharacters = @"[\\\?|><:/\*""]"; // illegal: \ ? | > < : / * "
-        private static readonly Regex IllegalLongFilename = new Regex(IllegalLongFilenameCharacters, RegexOptions.Compiled);
-
-        //public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
-
-
         // Built-in variables (from burn\engine\variable.cpp, "vrgBuiltInVariables", around line 113)
-        private static readonly List<String> BuiltinBundleVariables = new List<string>(
+        private static readonly List<string> BuiltinBundleVariables = new List<string>(
             new string[] {
                 "AdminToolsFolder",
                 "AppDataFolder",
@@ -221,7 +212,13 @@ namespace WixToolset.Core
         /// <returns>true if the filename is ambiguous; false otherwise.</returns>
         public static bool IsAmbiguousFilename(string filename)
         {
-            return String.IsNullOrEmpty(filename) ? false : CompilerCore.AmbiguousFilename.IsMatch(filename);
+            if (String.IsNullOrEmpty(filename))
+            {
+                return false;
+            }
+
+            var tilde = filename.IndexOf('~');
+            return (tilde > 0 && tilde < filename.Length) && Char.IsNumber(filename[tilde + 1]);
         }
 
         /// <summary>
@@ -273,9 +270,29 @@ namespace WixToolset.Core
         /// <param name="filename">Filename to make valid.</param>
         /// <param name="replace">Replacement string for invalid characters in filename.</param>
         /// <returns>Valid filename.</returns>
-        public static string MakeValidLongFileName(string filename, string replace)
+        public static string MakeValidLongFileName(string filename, char replace)
         {
-            return CompilerCore.IllegalLongFilename.Replace(filename, replace);
+            if (String.IsNullOrEmpty(filename))
+            {
+                return filename;
+            }
+
+            StringBuilder sb = null;
+
+            var found = filename.IndexOfAny(Common.IllegalLongFilenameCharacters);
+            while (found != -1)
+            {
+                if (sb == null)
+                {
+                    sb = new StringBuilder(filename);
+                }
+
+                sb[found] = replace;
+
+                found = (found + 1 < filename.Length) ? filename.IndexOfAny(Common.IllegalLongFilenameCharacters, found + 1) : -1;
+            }
+
+            return sb?.ToString() ?? filename;
         }
 
         /// <summary>
@@ -717,7 +734,7 @@ namespace WixToolset.Core
                 throw new ArgumentNullException("attribute");
             }
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             if (0 < value.Length)
             {
@@ -1037,16 +1054,6 @@ namespace WixToolset.Core
         internal WixActionSymbol ScheduleActionSymbol(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
         {
             return this.parseHelper.ScheduleActionSymbol(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
-        }
-
-        /// <summary>
-        /// Finds a compiler extension by namespace URI.
-        /// </summary>
-        /// <param name="ns">Namespace the extension supports.</param>
-        /// <returns>True if found compiler extension or false if nothing matches namespace URI.</returns>
-        private bool TryFindExtension(XNamespace ns, out ICompilerExtension extension)
-        {
-            return this.extensions.TryGetValue(ns, out extension);
         }
 
         private static string CreateValueList(ValueListKind kind, IEnumerable<string> values)

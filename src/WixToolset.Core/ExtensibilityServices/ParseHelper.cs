@@ -9,7 +9,6 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.IO;
     using System.Security.Cryptography;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -20,19 +19,6 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class ParseHelper : IParseHelper
     {
-        private const string LegalLongFilenameCharacters = @"[^\\\?|><:/\*""]";  // opposite of illegal above.
-        private static readonly Regex LegalLongFilename = new Regex(String.Concat("^", LegalLongFilenameCharacters, @"{1,259}$"), RegexOptions.Compiled);
-
-        private const string LegalRelativeLongFilenameCharacters = @"[^\?|><:/\*""]"; // (like legal long, but we allow '\') illegal: ? | > < : / * "
-        private static readonly Regex LegalRelativeLongFilename = new Regex(String.Concat("^", LegalRelativeLongFilenameCharacters, @"{1,259}$"), RegexOptions.Compiled);
-
-        private const string LegalWildcardLongFilenameCharacters = @"[^\\|><:/""]"; // illegal: \ | > < : / "
-        private static readonly Regex LegalWildcardLongFilename = new Regex(String.Concat("^", LegalWildcardLongFilenameCharacters, @"{1,259}$"));
-
-        private static readonly Regex LegalIdentifierWithAccess = new Regex(@"^((?<access>public|internal|protected|private)\s+)?(?<id>[_A-Za-z][0-9A-Za-z_\.]*)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
-        private static readonly Regex PutGuidHere = new Regex(@"PUT\-GUID\-(?:\d+\-)?HERE", RegexOptions.Singleline);
-
         public ParseHelper(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
@@ -119,7 +105,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     id = parentId;
 
                     var pathStartsAt = 0;
-                    if (inlineSyntax[0].EndsWith(":"))
+                    if (inlineSyntax[0].EndsWith(":", StringComparison.Ordinal))
                     {
                         // TODO: should overriding the parent identifier with a specific id be an error or a warning or just let it slide?
                         //if (null != parentId)
@@ -415,44 +401,34 @@ namespace WixToolset.Core.ExtensibilityServices
             var emptyRule = canBeEmpty ? EmptyRule.CanBeEmpty : EmptyRule.CanBeWhitespaceOnly;
             var value = this.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
 
-            if (String.IsNullOrEmpty(value) && canBeEmpty)
+            if (String.IsNullOrEmpty(value))
             {
-                return String.Empty;
-            }
-            else if (!String.IsNullOrEmpty(value))
-            {
-                // If the value starts and ends with braces or parenthesis, accept that and strip them off.
-                if ((value.StartsWith("{", StringComparison.Ordinal) && value.EndsWith("}", StringComparison.Ordinal))
-                    || (value.StartsWith("(", StringComparison.Ordinal) && value.EndsWith(")", StringComparison.Ordinal)))
+                if (canBeEmpty)
                 {
-                    value = value.Substring(1, value.Length - 2);
+                    return String.Empty;
                 }
-
-                if (generatable && "*".Equals(value, StringComparison.Ordinal))
+            }
+            else
+            {
+                if (generatable && value == "*")
                 {
                     return value;
                 }
 
-                if (ParseHelper.PutGuidHere.IsMatch(value))
+                if (Guid.TryParse(value, out var guid))
+                {
+                    return guid.ToString("B").ToUpperInvariant();
+                }
+
+                if (value.StartsWith("!(loc", StringComparison.Ordinal) || value.StartsWith("$(loc", StringComparison.Ordinal) || value.StartsWith("!(wix", StringComparison.Ordinal))
+                {
+                    return value;
+                }
+
+                if (value.StartsWith("PUT-GUID-", StringComparison.OrdinalIgnoreCase) ||
+                    value.StartsWith("{PUT-GUID-", StringComparison.OrdinalIgnoreCase))
                 {
                     this.Messaging.Write(ErrorMessages.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    return CompilerConstants.IllegalGuid;
-                }
-                else if (value.StartsWith("!(loc", StringComparison.Ordinal) || value.StartsWith("$(loc", StringComparison.Ordinal) || value.StartsWith("!(wix", StringComparison.Ordinal))
-                {
-                    return value;
-                }
-                else if (Guid.TryParse(value, out var guid))
-                {
-                    var uppercaseGuid = guid.ToString().ToUpperInvariant();
-
-                    // TODO: This used to be a pedantic error, what should it be now?
-                    //if (uppercaseGuid != value)
-                    //{
-                    //    this.Messaging.Write(WixErrors.GuidContainsLowercaseLetters(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    //}
-
-                    return String.Concat("{", uppercaseGuid, "}");
                 }
                 else
                 {
@@ -468,19 +444,45 @@ namespace WixToolset.Core.ExtensibilityServices
             var access = AccessModifier.Public;
             var value = Common.GetAttributeValue(this.Messaging, sourceLineNumbers, attribute, EmptyRule.CanBeEmpty);
 
-            var match = ParseHelper.LegalIdentifierWithAccess.Match(value);
-            if (!match.Success)
+            var separator = value.IndexOf(' ');
+            if (separator > 0)
             {
+                var prefix = value.Substring(0, separator);
+                switch (prefix)
+                {
+                    case "public":
+                    case "package":
+                        access = AccessModifier.Public;
+                        break;
+
+                    case "internal":
+                    case "library":
+                        access = AccessModifier.Internal;
+                        break;
+
+                    case "protected":
+                    case "file":
+                        access = AccessModifier.Protected;
+                        break;
+
+                    case "private":
+                    case "fragment":
+                        access = AccessModifier.Private;
+                        break;
+
+                    default:
+                        return null;
+                }
+
+                value = value.Substring(separator + 1).Trim();
+            }
+
+            if (!Common.IsIdentifier(value))
+            {
+                this.Messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 return null;
             }
-            else if (match.Groups["access"].Success)
-            {
-                access = (AccessModifier)Enum.Parse(typeof(AccessModifier), match.Groups["access"].Value, true);
-            }
-
-            value = match.Groups["id"].Value;
-
-            if (Common.IsIdentifier(value) && 72 < value.Length)
+            else if (72 < value.Length)
             {
                 this.Messaging.Write(WarningMessages.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
             }
@@ -520,7 +522,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (resultUsedToCreateReference && 1 == result.Length)
                 {
-                    if (value.EndsWith("\\"))
+                    if (value.EndsWith("\\", StringComparison.Ordinal))
                     {
                         if (!this.IsValidLongFilename(result[0], false, false))
                         {
@@ -547,7 +549,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     }
                 }
 
-                if (1 < result.Length && !value.EndsWith("\\"))
+                if (1 < result.Length && !value.EndsWith("\\", StringComparison.Ordinal))
                 {
                     this.Messaging.Write(WarningMessages.BackslashTerminateInlineDirectorySyntax(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
@@ -776,14 +778,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public bool IsValidLocIdentifier(string identifier)
         {
-            if (String.IsNullOrEmpty(identifier))
-            {
-                return false;
-            }
-
-            var match = Common.WixVariableRegex.Match(identifier);
-
-            return (match.Success && "loc" == match.Groups["namespace"].Value && 0 == match.Index && identifier.Length == match.Length);
+            return Common.TryParseWixVariable(identifier, 0, out var parsed) && parsed.Index == 0 && parsed.Length == identifier.Length && parsed.Namespace == "loc";
         }
 
         public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
@@ -792,29 +787,38 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 return false;
             }
+            else if (filename.Length > 259)
+            {
+                return false;
+            }
 
             // Check for a non-period character (all periods is not legal)
-            var nonPeriodFound = false;
+            var allPeriods = true;
             foreach (var character in filename)
             {
                 if ('.' != character)
                 {
-                    nonPeriodFound = true;
+                    allPeriods = false;
                     break;
                 }
             }
 
+            if (allPeriods)
+            {
+                return false;
+            }
+
             if (allowWildcards)
             {
-                return (nonPeriodFound && ParseHelper.LegalWildcardLongFilename.IsMatch(filename));
+                return filename.IndexOfAny(Common.IllegalWildcardLongFilenameCharacters) == -1;
             }
             else if (allowRelative)
             {
-                return (nonPeriodFound && ParseHelper.LegalRelativeLongFilename.IsMatch(filename));
+                return filename.IndexOfAny(Common.IllegalRelativeLongFilenameCharacters) == -1; 
             }
             else
             {
-                return (nonPeriodFound && ParseHelper.LegalLongFilename.IsMatch(filename));
+                return filename.IndexOfAny(Common.IllegalLongFilenameCharacters) == -1;
             }
         }
 

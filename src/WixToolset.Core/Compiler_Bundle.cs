@@ -236,7 +236,7 @@ namespace WixToolset.Core
             else
             {
                 // Ensure only allowable path characters are in "name" (and change spaces to underscores).
-                fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), "_");
+                fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), '_');
                 logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ":log");
             }
 

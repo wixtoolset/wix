@@ -9,7 +9,6 @@ namespace WixToolset.Core
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -102,18 +101,14 @@ namespace WixToolset.Core
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
         public static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
 
-        public static readonly Regex WixVariableRegex = new Regex(@"(\!|\$)\((?<namespace>loc|wix|bind|bindpath)\.(?<fullname>(?<name>[_A-Za-z][0-9A-Za-z_]+)(\.(?<scope>[_A-Za-z][0-9A-Za-z_\.]*))?)(\=(?<value>.+?))?\)", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        internal static readonly char[] IllegalLongFilenameCharacters = new[] { '\\', '/', '?', '*', '|', '>', '<', ':', '\"' }; // illegal: \ / ? | > < : / * "
+        internal static readonly char[] IllegalRelativeLongFilenameCharacters = new[] { '?', '*', '|', '>', '<', ':', '\"' }; // like illegal, but we allow '\' and '/'
+        internal static readonly char[] IllegalWildcardLongFilenameCharacters = new[] { '\\', '/', '|', '>', '<', ':', '\"' };   // like illegal: but we allow '*' and '?'
 
-        private static readonly Regex PropertySearch = new Regex(@"\[[#$!]?[a-zA-Z_][a-zA-Z0-9_\.]*]", RegexOptions.Singleline);
-        private static readonly Regex AddPrefix = new Regex(@"^[^a-zA-Z_]", RegexOptions.Compiled);
-        private static readonly Regex LegalIdentifierCharacters = new Regex(@"^[_A-Za-z][0-9A-Za-z_\.]*$", RegexOptions.Compiled);
-        private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}", RegexOptions.Compiled); // non 'words' and assorted valid characters
+        private static readonly char[] IllegalShortFilenameCharacters = new[] { '\\', '?', '|', '>', '<', ':', '/', '*', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
+        private static readonly char[] IllegalWildcardShortFilenameCharacters = new[] { '\\', '|', '>', '<', ':', '/', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
 
-        private const string LegalShortFilenameCharacters = @"[^\\\?|><:/\*""\+,;=\[\]\. ]"; // illegal: \ ? | > < : / * " + , ; = [ ] . (space)
-        private static readonly Regex LegalShortFilename = new Regex(String.Concat("^", LegalShortFilenameCharacters, @"{1,8}(\.", LegalShortFilenameCharacters, "{0,3})?$"), RegexOptions.Compiled);
 
-        private const string LegalWildcardShortFilenameCharacters = @"[^\\|><:/""\+,;=\[\]\. ]"; // illegal: \ | > < : / " + , ; = [ ] . (space)
-        private static readonly Regex LegalWildcardShortFilename = new Regex(String.Concat("^", LegalWildcardShortFilenameCharacters, @"{1,16}(\.", LegalWildcardShortFilenameCharacters, "{0,6})?$"));
 
         /// <summary>
         /// Gets a valid code page from the given web name or integer value.
@@ -197,79 +192,95 @@ namespace WixToolset.Core
 
             if (allowWildcards)
             {
-                if (Common.LegalWildcardShortFilename.IsMatch(filename))
+                var expectedDot = filename.IndexOfAny(IllegalWildcardShortFilenameCharacters);
+                if (expectedDot == -1)
                 {
-                    bool foundPeriod = false;
-                    int beforePeriod = 0;
-                    int afterPeriod = 0;
-
-                    // count the number of characters before and after the period
-                    // '*' is not counted because it may represent zero characters
-                    foreach (char character in filename)
+                }
+                else if (filename[expectedDot] != '.')
+                {
+                    return false;
+                }
+                else if (expectedDot < filename.Length)
+                {
+                    var extensionInvalids = filename.IndexOfAny(IllegalShortFilenameCharacters, expectedDot + 1);
+                    if (extensionInvalids != -1)
                     {
-                        if ('.' == character)
+                        return false;
+                    }
+                }
+
+                var foundPeriod = false;
+                var beforePeriod = 0;
+                var afterPeriod = 0;
+
+                // count the number of characters before and after the period
+                // '*' is not counted because it may represent zero characters
+                foreach (var character in filename)
+                {
+                    if ('.' == character)
+                    {
+                        foundPeriod = true;
+                    }
+                    else if ('*' != character)
+                    {
+                        if (foundPeriod)
                         {
-                            foundPeriod = true;
+                            afterPeriod++;
                         }
-                        else if ('*' != character)
+                        else
                         {
-                            if (foundPeriod)
-                            {
-                                afterPeriod++;
-                            }
-                            else
-                            {
-                                beforePeriod++;
-                            }
+                            beforePeriod++;
                         }
                     }
+                }
 
-                    if (8 >= beforePeriod && 3 >= afterPeriod)
-                    {
-                        return true;
-                    }
+                if (8 >= beforePeriod && 3 >= afterPeriod)
+                {
+                    return true;
                 }
 
                 return false;
             }
             else
             {
-                return Common.LegalShortFilename.IsMatch(filename);
+                if (filename.Length > 12)
+                {
+                    return false;
+                }
+
+                var expectedDot = filename.IndexOfAny(IllegalShortFilenameCharacters);
+                if (expectedDot == -1)
+                {
+                    return filename.Length < 9;
+                }
+                else if (expectedDot > 8 || filename[expectedDot] != '.')
+                {
+                    return false;
+                }
+
+                var validExtension = filename.IndexOfAny(IllegalShortFilenameCharacters, expectedDot + 1);
+                return validExtension == -1;
             }
         }
 
         /// <summary>
         /// Verifies if an identifier is a valid binder variable name.
         /// </summary>
-        /// <param name="name">Binder variable name to verify.</param>
+        /// <param name="variable">Binder variable name to verify.</param>
         /// <returns>True if the identifier is a valid binder variable name.</returns>
-        public static bool IsValidBinderVariable(string name)
+        public static bool IsValidBinderVariable(string variable)
         {
-            if (String.IsNullOrEmpty(name))
-            {
-                return false;
-            }
-
-            Match match = Common.WixVariableRegex.Match(name);
-
-            return (match.Success && ("bind" == match.Groups["namespace"].Value || "wix" == match.Groups["namespace"].Value) && 0 == match.Index && name.Length == match.Length);
+            return TryParseWixVariable(variable, 0, out var parsed) && parsed.Index == 0 && parsed.Length == variable.Length && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
         }
 
         /// <summary>
         /// Verifies if a string contains a valid binder variable name.
         /// </summary>
-        /// <param name="name">String to verify.</param>
+        /// <param name="verify">String to verify.</param>
         /// <returns>True if the string contains a valid binder variable name.</returns>
-        public static bool ContainsValidBinderVariable(string name)
+        public static bool ContainsValidBinderVariable(string verify)
         {
-            if (String.IsNullOrEmpty(name))
-            {
-                return false;
-            }
-
-            Match match = Common.WixVariableRegex.Match(name);
-
-            return match.Success && ("bind" == match.Groups["namespace"].Value || "wix" == match.Groups["namespace"].Value);
+            return TryParseWixVariable(verify, 0, out var parsed) && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
         }
 
         /// <summary>
@@ -281,7 +292,7 @@ namespace WixToolset.Core
         {
             if (!Common.IsValidBinderVariable(version))
             {
-                Version ver = null;
+                Version ver;
                 
                 try
                 {
@@ -344,16 +355,31 @@ namespace WixToolset.Core
         /// <returns>A version of the name that is a legal identifier.</returns>
         internal static string GetIdentifierFromName(string name)
         {
-            string result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
+            StringBuilder sb = null;
+            var offset = 0;
 
             // MSI identifiers must begin with an alphabetic character or an
             // underscore. Prefix all other values with an underscore.
-            if (AddPrefix.IsMatch(name))
+            if (!ValidIdentifierChar(name[0], true))
             {
-                result = String.Concat("_", result);
+                sb = new StringBuilder("_" + name);
+                offset = 1;
             }
 
-            return result;
+            for (var i = 0; i < name.Length; ++i)
+            {
+                if (!ValidIdentifierChar(name[i], false))
+                {
+                    if (sb == null)
+                    {
+                        sb = new StringBuilder(name);
+                    }
+
+                    sb[i + offset] = '_';
+                }
+            }
+
+            return sb?.ToString() ?? name;
         }
 
         /// <summary>
@@ -363,7 +389,28 @@ namespace WixToolset.Core
         /// <returns>True if a property is found in the string.</returns>
         internal static bool ContainsProperty(string possibleProperty)
         {
-            return PropertySearch.IsMatch(possibleProperty);
+            var start = possibleProperty.IndexOf('[');
+            if (start != -1 && start < possibleProperty.Length - 2)
+            {
+                var end = possibleProperty.IndexOf(']', start + 1);
+                if (end > start + 1)
+                {
+                    // Skip supported property modifiers.
+                    if (possibleProperty[start + 1] == '#' || possibleProperty[start + 1] == '$' || possibleProperty[start + 1] == '!')
+                    {
+                        ++start;
+                    }
+
+                    var id = possibleProperty.Substring(start + 1, end - 1);
+
+                    if (Common.IsIdentifier(id))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -436,7 +483,7 @@ namespace WixToolset.Core
         public static string[] GetNames(string value)
         {
             string[] names = new string[4];
-            int targetSeparator = value.IndexOf(":", StringComparison.Ordinal);
+            int targetSeparator = value.IndexOf(':');
 
             // split source and target
             string sourceName = null;
@@ -451,7 +498,7 @@ namespace WixToolset.Core
             string sourceLongName = null;
             if (null != sourceName)
             {
-                int sourceLongNameSeparator = sourceName.IndexOf("|", StringComparison.Ordinal);
+                int sourceLongNameSeparator = sourceName.IndexOf('|');
                 if (0 <= sourceLongNameSeparator)
                 {
                     sourceLongName = sourceName.Substring(sourceLongNameSeparator + 1);
@@ -460,7 +507,7 @@ namespace WixToolset.Core
             }
 
             // split the target short and long names
-            int targetLongNameSeparator = targetName.IndexOf("|", StringComparison.Ordinal);
+            int targetLongNameSeparator = targetName.IndexOf('|');
             string targetLongName = null;
             if (0 <= targetLongNameSeparator)
             {
@@ -555,7 +602,7 @@ namespace WixToolset.Core
         /// <returns>The attribute's value.</returns>
         internal static string GetAttributeValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule)
         {
-            string value = attribute.Value;
+            var value = attribute.Value;
 
             if ((emptyRule == EmptyRule.MustHaveNonWhitespaceCharacters && String.IsNullOrEmpty(value.Trim())) ||
                 (emptyRule == EmptyRule.CanBeWhitespaceOnly && String.IsNullOrEmpty(value)))
@@ -574,15 +621,20 @@ namespace WixToolset.Core
         /// <returns>true if the value is an identifier; false otherwise.</returns>
         public static bool IsIdentifier(string value)
         {
-            if (!String.IsNullOrEmpty(value))
+            if (String.IsNullOrEmpty(value))
             {
-                if (LegalIdentifierCharacters.IsMatch(value))
+                return false;
+            }
+
+            for (var i = 0; i < value.Length; ++i)
+            {
+                if (!ValidIdentifierChar(value[i], i == 0))
                 {
-                    return true;
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -698,6 +750,85 @@ namespace WixToolset.Core
             return text?.Value;
         }
 
+        internal static bool TryParseWixVariable(string value, int start, out ParsedWixVariable parsedVariable)
+        {
+            parsedVariable = null;
+
+            if (String.IsNullOrEmpty(value) || start >= value.Length)
+            {
+                return false;
+            }
+
+            var startWixVariable = value.IndexOf("!(", start, StringComparison.Ordinal);
+            if (startWixVariable == -1)
+            {
+                return false;
+            }
+
+            var firstDot = value.IndexOf('.', startWixVariable + 1);
+            if (firstDot == -1)
+            {
+                return false;
+            }
+
+            var ns = value.Substring(startWixVariable + 2, firstDot - startWixVariable - 2);
+            if (ns != "loc" && ns != "bind" && ns != "wix")
+            {
+                return false;
+            }
+
+            var closeParen = value.IndexOf(')', firstDot);
+            if (closeParen == -1)
+            {
+                return false;
+            }
+
+            string name;
+            string scope = null;
+            string defaultValue = null;
+
+            var secondDot = value.IndexOf('.', firstDot + 1, closeParen - firstDot);
+            var equalsDefaultValue = value.IndexOf('=', firstDot + 1, closeParen - firstDot);
+            var end = equalsDefaultValue == -1 ? closeParen : equalsDefaultValue;
+
+            if (secondDot == -1)
+            {
+                name = value.Substring(firstDot + 1, end - firstDot - 1);
+            }
+            else
+            {
+                name = value.Substring(firstDot + 1, secondDot - firstDot - 1);
+                scope = value.Substring(secondDot + 1, end - secondDot - 1);
+
+                if (!Common.IsIdentifier(scope))
+                {
+                    return false;
+                }
+            }
+
+            if (!Common.IsIdentifier(name))
+            {
+                return false;
+            }
+
+            if (equalsDefaultValue != -1 && equalsDefaultValue < closeParen)
+            {
+                defaultValue = value.Substring(equalsDefaultValue + 1, end - equalsDefaultValue - 1);
+            }
+
+            parsedVariable = new ParsedWixVariable
+            {
+                Index = startWixVariable,
+                Length = closeParen - startWixVariable + 1,
+                Namespace = ns,
+                Name = name,
+                Scope = scope,
+                DefaultValue = defaultValue
+            };
+
+            return true;
+        }
+
         /// <summary>
         /// Display an unexpected attribute error.
         /// </summary>
@@ -726,6 +857,12 @@ namespace WixToolset.Core
             {
                 messaging.Write(ErrorMessages.UnsupportedExtensionAttribute(sourceLineNumbers, extensionAttribute.Parent.Name.LocalName, extensionAttribute.Name.LocalName));
             }
+        }
+
+        private static bool ValidIdentifierChar(char c, bool firstChar)
+        {
+            return ('A' <= c && 'Z' >= c) || ('a' <= c && 'z' >= c) || '_' == c ||
+                   (!firstChar && (Char.IsDigit(c) || '.' == c));
         }
     }
 }

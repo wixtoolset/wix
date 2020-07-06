@@ -226,11 +226,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 value = value.Replace("$(", "$$(");
 
                                                 // escape things that look like wix variables
-                                                var matches = Common.WixVariableRegex.Matches(value);
-                                                for (var j = matches.Count - 1; 0 <= j; j--)
-                                                {
-                                                    value = value.Insert(matches[j].Index, "!");
-                                                }
+                                                // TODO: Evaluate this requirement.
+                                                //var matches = Common.WixVariableRegex.Matches(value);
+                                                //for (var j = matches.Count - 1; 0 <= j; j--)
+                                                //{
+                                                //    value = value.Insert(matches[j].Index, "!");
+                                                //}
 
                                                 row[i] = value;
                                                 break;

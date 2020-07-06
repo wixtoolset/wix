@@ -4182,30 +4182,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Show", showValue, "normal", "maximized", "minimized"));
                             break;
                         }
-                        //if (showValue.Length == 0)
-                        //{
-                        //    show = CompilerConstants.IllegalInteger;
-                        //}
-                        //else
-                        //{
-                        //    var showType = Wix.Shortcut.ParseShowType(showValue);
-                        //    switch (showType)
-                        //    {
-                        //    case Wix.Shortcut.ShowType.normal:
-                        //        show = 1;
-                        //        break;
-                        //    case Wix.Shortcut.ShowType.maximized:
-                        //        show = 3;
-                        //        break;
-                        //    case Wix.Shortcut.ShowType.minimized:
-                        //        show = 7;
-                        //        break;
-                        //    default:
-                        //        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Show", showValue, "normal", "maximized", "minimized"));
-                        //        show = CompilerConstants.IllegalInteger;
-                        //        break;
-                        //    }
-                        //}
                         break;
                     case "Target":
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -4325,11 +4301,11 @@ namespace WixToolset.Core
                 }
                 else if ("Component" == parentElementLocalName || "CreateFolder" == parentElementLocalName)
                 {
-                    target = String.Format(CultureInfo.InvariantCulture, "[{0}]", defaultTarget);
+                    target = "[" + defaultTarget + "]";
                 }
                 else if ("File" == parentElementLocalName)
                 {
-                    target = String.Format(CultureInfo.InvariantCulture, "[#{0}]", defaultTarget);
+                    target = "[#" + defaultTarget + "]";
                 }
 
                 this.Core.AddSymbol(new ShortcutSymbol(sourceLineNumbers, id)

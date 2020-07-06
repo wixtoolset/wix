@@ -69,11 +69,11 @@ namespace WixToolset.Core.Bind
             }
 
             // add specialization for ProductVersion fields
-            string keyProductVersion = "property.ProductVersion";
+            var keyProductVersion = "property.ProductVersion";
             if (this.VariableCache.TryGetValue(keyProductVersion, out var versionValue) && Version.TryParse(versionValue, out Version productVersion))
             {
                 // Don't add the variable if it already exists (developer defined a property with the same name).
-                string fieldKey = String.Concat(keyProductVersion, ".Major");
+                var fieldKey = String.Concat(keyProductVersion, ".Major");
                 if (!this.VariableCache.ContainsKey(fieldKey))
                 {
                     this.VariableCache[fieldKey] = productVersion.Major.ToString(CultureInfo.InvariantCulture);
@@ -115,68 +115,45 @@ namespace WixToolset.Core.Bind
 
         private static string ResolveDelayedVariables(SourceLineNumber sourceLineNumbers, string value, IDictionary<string, string> resolutionData)
         {
-            var matches = Common.WixVariableRegex.Matches(value);
+            var start = 0;
 
-            if (0 < matches.Count)
+            while (Common.TryParseWixVariable(value, start, out var parsed))
             {
-                var sb = new StringBuilder(value);
-
-                // notice how this code walks backward through the list
-                // because it modifies the string as we go through it
-                for (int i = matches.Count - 1; 0 <= i; i--)
+                if (parsed.Namespace == "bind")
                 {
-                    string variableNamespace = matches[i].Groups["namespace"].Value;
-                    string variableId = matches[i].Groups["fullname"].Value;
-                    string variableDefaultValue = null;
-                    string variableScope = null;
+                    var key = String.Concat(parsed.Name, ".", parsed.Scope);
 
-                    // get the default value if one was specified
-                    if (matches[i].Groups["value"].Success)
+                    if (!resolutionData.TryGetValue(key, out var resolvedValue))
                     {
-                        variableDefaultValue = matches[i].Groups["value"].Value;
+                        resolvedValue = parsed.DefaultValue;
                     }
 
-                    // get the scope if one was specified
-                    if (matches[i].Groups["scope"].Success)
+                    // insert the resolved value if it was found or display an error
+                    if (null != resolvedValue)
                     {
-                        variableScope = matches[i].Groups["scope"].Value;
-                        if ("bind" == variableNamespace)
+                        if (parsed.Index == 0 && parsed.Length == value.Length)
                         {
-                            variableId = matches[i].Groups["name"].Value;
+                            value = resolvedValue;
                         }
-                    }
+                        else
+                        {
+                            var sb = new StringBuilder(value);
+                            sb.Remove(parsed.Index, parsed.Length);
+                            sb.Insert(parsed.Index, resolvedValue);
+                            value = sb.ToString();
+                        }
 
-                    // check for an escape sequence of !! indicating the match is not a variable expression
-                    if (0 < matches[i].Index && '!' == sb[matches[i].Index - 1])
-                    {
-                        sb.Remove(matches[i].Index - 1, 1);
+                        start = parsed.Index;
                     }
                     else
                     {
-                        var key = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", variableId, variableScope).ToLower(CultureInfo.InvariantCulture);
-
-                        if (!resolutionData.TryGetValue(key, out var resolvedValue))
-                        {
-                            resolvedValue = variableDefaultValue;
-                        }
-
-                        if ("bind" == variableNamespace)
-                        {
-                            // insert the resolved value if it was found or display an error
-                            if (null != resolvedValue)
-                            {
-                                sb.Remove(matches[i].Index, matches[i].Length);
-                                sb.Insert(matches[i].Index, resolvedValue);
-                            }
-                            else
-                            {
-                                throw new WixException(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
-                            }
-                        }
+                        throw new WixException(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
                     }
                 }
-
-                value = sb.ToString();
+                else
+                {
+                    start = parsed.Index + parsed.Length;
+                }
             }
 
             return value;

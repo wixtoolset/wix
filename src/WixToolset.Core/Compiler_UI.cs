@@ -1740,7 +1740,7 @@ namespace WixToolset.Core
             {
                 // if we're not looking at a standard action or a formatted string then create a reference
                 // to the custom action.
-                if (!WindowsInstallerStandard.IsStandardAction(argument) && !Common.ContainsProperty(argument))
+                if (!WindowsInstallerStandard.IsStandardAction(argument) && !this.Core.ContainsProperty(argument))
                 {
                     this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.CustomAction, argument);
                 }

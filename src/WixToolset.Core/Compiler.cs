@@ -9,7 +9,6 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -26,8 +25,8 @@ namespace WixToolset.Core
         private const int MinValueOfMaxCabSizeForLargeFileSplitting = 20; // 20 MB
         private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        private const string DefaultComponentIdPlaceholderFormat = "WixComponentIdPlaceholder{0}";
-        private const string DefaultComponentIdPlaceholderWixVariableFormat = "!(wix.{0})";
+        private const string DefaultComponentIdPlaceholderPrefix = "WixComponentIdPlaceholder";
+        private const string DefaultComponentIdPlaceholderWixVariablePrefix = "!(wix.";
         // If these are true you know you are building a module or product
         // but if they are false you cannot not be sure they will not end
         // up a product or module.  Use these flags carefully.
@@ -342,16 +341,22 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(value))
             {
-                var regex = new Regex(@"\[(?<identifier>[a-zA-Z_][a-zA-Z0-9_\.]*)]", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
-                var matches = regex.Matches(value);
-
-                foreach (Match match in matches)
+                var start = value.IndexOf('[');
+                while (start != -1 && start < value.Length)
                 {
-                    var group = match.Groups["identifier"];
-                    if (group.Success)
+                    var end = value.IndexOf(']', start + 1);
+                    if (end == -1)
                     {
-                        this.Core.Write(WarningMessages.PropertyValueContainsPropertyReference(sourceLineNumbers, propertyId.Id, group.Value));
+                        break;
                     }
+
+                    var id = value.Substring(start + 1, end - 1);
+                    if (Common.IsIdentifier(id))
+                    {
+                        this.Core.Write(WarningMessages.PropertyValueContainsPropertyReference(sourceLineNumbers, propertyId.Id, id));
+                    }
+
+                    start = (end < value.Length) ? value.IndexOf('[', end + 1) : -1;
                 }
             }
 
@@ -2091,8 +2096,8 @@ namespace WixToolset.Core
             var encounteredODBCDataSource = false;
             var files = 0;
             var guid = "*";
-            var componentIdPlaceholder = String.Format(Compiler.DefaultComponentIdPlaceholderFormat, this.componentIdPlaceholdersResolver.VariableCount); // placeholder id for defaulting Component/@Id to keypath id.
-            var componentIdPlaceholderWixVariable = String.Format(Compiler.DefaultComponentIdPlaceholderWixVariableFormat, componentIdPlaceholder);
+            var componentIdPlaceholder = Compiler.DefaultComponentIdPlaceholderPrefix + this.componentIdPlaceholdersResolver.VariableCount; // placeholder id for defaulting Component/@Id to keypath id.
+            var componentIdPlaceholderWixVariable = Compiler.DefaultComponentIdPlaceholderWixVariablePrefix + componentIdPlaceholder + ")";
             var id = new Identifier(AccessModifier.Private, componentIdPlaceholderWixVariable);
             var keyFound = false;
             string keyPath = null;
@@ -4080,7 +4085,7 @@ namespace WixToolset.Core
                         break;
                     case "Name":
                         nameHasValue = true;
-                        if (attrib.Value.Equals("."))
+                        if (attrib.Value == ".")
                         {
                             name = attrib.Value;
                         }
@@ -4225,7 +4230,7 @@ namespace WixToolset.Core
                 defaultDir = String.Concat(defaultDir, ":", String.IsNullOrEmpty(shortSourceName) ? sourceName : String.Concat(shortSourceName, "|", sourceName));
             }
 
-            if ("TARGETDIR".Equals(id.Id) && !"SourceDir".Equals(defaultDir))
+            if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !"SourceDir".Equals(defaultDir, StringComparison.Ordinal))
             {
                 this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, defaultDir));
             }
@@ -7147,13 +7152,9 @@ namespace WixToolset.Core
                 else // external cabinet file
                 {
                     // external cabinet files must use 8.3 filenames
-                    if (!String.IsNullOrEmpty(cabinet) && !this.Core.IsValidShortFilename(cabinet, false))
+                    if (!String.IsNullOrEmpty(cabinet) && !this.Core.IsValidLongFilename(cabinet) && !Common.ContainsValidBinderVariable(cabinet))
                     {
-                        // WiX variables in the name will trip the "not a valid 8.3 name" switch, so let them through
-                        if (!Common.WixVariableRegex.Match(cabinet).Success)
-                        {
-                            this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
-                        }
+                        this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
                     }
                 }
             }
@@ -7286,12 +7287,12 @@ namespace WixToolset.Core
                         if (!this.Core.IsValidLocIdentifier(exampleCabinetName))
                         {
                             // The example name should not match the authored template since that would nullify the
-                            // reason for having multiple cabients. External cabinet files must also be valid file names.
-                            if (exampleCabinetName.Equals(authoredCabinetTemplateValue) || !this.Core.IsValidLongFilename(exampleCabinetName, false))
+                            // reason for having multiple cabinets. External cabinet files must also be valid file names.
+                            if (exampleCabinetName.Equals(authoredCabinetTemplateValue, StringComparison.OrdinalIgnoreCase) || !this.Core.IsValidLongFilename(exampleCabinetName, false))
                             {
                                 this.Core.Write(ErrorMessages.InvalidCabinetTemplate(sourceLineNumbers, cabinetTemplate));
                             }
-                            else if (!this.Core.IsValidShortFilename(exampleCabinetName, false) && !Common.WixVariableRegex.Match(exampleCabinetName).Success) // ignore short names with wix variables because it rarely works out.
+                            else if (!this.Core.IsValidLongFilename(exampleCabinetName) && !Common.ContainsValidBinderVariable(exampleCabinetName)) // ignore short names with wix variables because it rarely works out.
                             {
                                 this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
                             }
