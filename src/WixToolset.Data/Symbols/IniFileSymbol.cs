@@ -11,6 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(IniFileSymbolFields.FileName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IniFileSymbolFields.ShortFileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileSymbolFields.DirProperty), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileSymbolFields.Section), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileSymbolFields.Key), IntermediateFieldType.String),
@@ -27,6 +28,7 @@ namespace WixToolset.Data.Symbols
     public enum IniFileSymbolFields
     {
         FileName,
+        ShortFileName,
         DirProperty,
         Section,
         Key,
@@ -51,6 +53,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)IniFileSymbolFields.FileName];
             set => this.Set((int)IniFileSymbolFields.FileName, value);
+        }
+
+        public string ShortFileName
+        {
+            get => (string)this.Fields[(int)IniFileSymbolFields.ShortFileName];
+            set => this.Set((int)IniFileSymbolFields.ShortFileName, value);
         }
 
         public string DirProperty

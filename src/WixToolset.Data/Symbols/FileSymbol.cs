@@ -86,7 +86,6 @@ namespace WixToolset.Data.Symbols
         Compressed = 0x10,
         Uncompressed = 0x20,
         Checksum = 0x40,
-        GeneratedShortFileName = 0x80,
     }
 
     /// <summary>

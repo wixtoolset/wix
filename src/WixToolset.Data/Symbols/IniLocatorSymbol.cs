@@ -10,8 +10,8 @@ namespace WixToolset.Data
             SymbolDefinitionType.IniLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.SignatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.FileName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.ShortFileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.Section), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorSymbolFields.Field), IntermediateFieldType.Number),
@@ -25,8 +25,8 @@ namespace WixToolset.Data.Symbols
 {
     public enum IniLocatorSymbolFields
     {
-        SignatureRef,
         FileName,
+        ShortFileName,
         Section,
         Key,
         Field,
@@ -45,16 +45,16 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[IniLocatorSymbolFields index] => this.Fields[(int)index];
 
-        public string SignatureRef
-        {
-            get => (string)this.Fields[(int)IniLocatorSymbolFields.SignatureRef];
-            set => this.Set((int)IniLocatorSymbolFields.SignatureRef, value);
-        }
-
         public string FileName
         {
             get => (string)this.Fields[(int)IniLocatorSymbolFields.FileName];
             set => this.Set((int)IniLocatorSymbolFields.FileName, value);
+        }
+
+        public string ShortFileName
+        {
+            get => (string)this.Fields[(int)IniLocatorSymbolFields.ShortFileName];
+            set => this.Set((int)IniLocatorSymbolFields.ShortFileName, value);
         }
 
         public string Section

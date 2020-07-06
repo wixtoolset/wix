@@ -13,6 +13,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.FileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.DestinationName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.DestinationShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileSymbolFields.DestinationFolder), IntermediateFieldType.String),
             },
             typeof(DuplicateFileSymbol));
@@ -26,6 +27,7 @@ namespace WixToolset.Data.Symbols
         ComponentRef,
         FileRef,
         DestinationName,
+        DestinationShortName,
         DestinationFolder,
     }
 
@@ -57,6 +59,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)DuplicateFileSymbolFields.DestinationName];
             set => this.Set((int)DuplicateFileSymbolFields.DestinationName, value);
+        }
+
+        public string DestinationShortName
+        {
+            get => (string)this.Fields[(int)DuplicateFileSymbolFields.DestinationShortName];
+            set => this.Set((int)DuplicateFileSymbolFields.DestinationShortName, value);
         }
 
         public string DestinationFolder

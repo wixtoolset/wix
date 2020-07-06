@@ -12,7 +12,8 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.FileName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.DirProperty), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.ShortFileName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.DirPropertyRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.OnInstall), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(RemoveFileSymbolFields.OnUninstall), IntermediateFieldType.Bool),
             },
@@ -26,7 +27,8 @@ namespace WixToolset.Data.Symbols
     {
         ComponentRef,
         FileName,
-        DirProperty,
+        ShortFileName,
+        DirPropertyRef,
         OnInstall,
         OnUninstall,
     }
@@ -55,10 +57,16 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)RemoveFileSymbolFields.FileName, value);
         }
 
-        public string DirProperty
+        public string ShortFileName
         {
-            get => (string)this.Fields[(int)RemoveFileSymbolFields.DirProperty];
-            set => this.Set((int)RemoveFileSymbolFields.DirProperty, value);
+            get => (string)this.Fields[(int)RemoveFileSymbolFields.ShortFileName];
+            set => this.Set((int)RemoveFileSymbolFields.ShortFileName, value);
+        }
+
+        public string DirPropertyRef
+        {
+            get => (string)this.Fields[(int)RemoveFileSymbolFields.DirPropertyRef];
+            set => this.Set((int)RemoveFileSymbolFields.DirPropertyRef, value);
         }
 
         public bool? OnInstall

@@ -12,7 +12,8 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.SourceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestinationName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestinationShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.SourceFolder), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.DestFolder), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileSymbolFields.Delete), IntermediateFieldType.Bool),
@@ -27,7 +28,8 @@ namespace WixToolset.Data.Symbols
     {
         ComponentRef,
         SourceName,
-        DestName,
+        DestinationName,
+        DestinationShortName,
         SourceFolder,
         DestFolder,
         Delete,
@@ -57,10 +59,16 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)MoveFileSymbolFields.SourceName, value);
         }
 
-        public string DestName
+        public string DestinationName
         {
-            get => (string)this.Fields[(int)MoveFileSymbolFields.DestName];
-            set => this.Set((int)MoveFileSymbolFields.DestName, value);
+            get => (string)this.Fields[(int)MoveFileSymbolFields.DestinationName];
+            set => this.Set((int)MoveFileSymbolFields.DestinationName, value);
+        }
+
+        public string DestinationShortName
+        {
+            get => (string)this.Fields[(int)MoveFileSymbolFields.DestinationShortName];
+            set => this.Set((int)MoveFileSymbolFields.DestinationShortName, value);
         }
 
         public string SourceFolder
