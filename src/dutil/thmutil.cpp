@@ -367,11 +367,20 @@ static void ResizeControl(
     __in THEME_CONTROL* pControl,
     __in const RECT* prcParent
     );
-static void ScaleTheme(
+static void ScaleThemeFromWindow(
     __in THEME* pTheme,
     __in UINT nDpi,
     __in int x,
     __in int y
+    );
+static void ScaleTheme(
+    __in THEME* pTheme,
+    __in UINT nDpi,
+    __in int x,
+    __in int y,
+    __in DWORD dwStyle,
+    __in BOOL fMenu,
+    __in DWORD dwExStyle
     );
 static void ScaleControls(
     __in THEME* pTheme,
@@ -611,6 +620,7 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
     DPIU_MONITOR_CONTEXT* pMonitorContext = NULL;
     POINT pt = { };
     RECT* pMonitorRect = NULL;
+    HMENU hMenu = NULL;
     HWND hWnd = NULL;
 
     if (pTheme->hwndParent)
@@ -628,11 +638,11 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
             pMonitorRect = &pMonitorContext->mi.rcWork;
             if (pMonitorContext->nDpi != pTheme->nDpi)
             {
-                ScaleTheme(pTheme, pMonitorContext->nDpi, pMonitorRect->left, pMonitorRect->top);
+                ScaleTheme(pTheme, pMonitorContext->nDpi, pMonitorRect->left, pMonitorRect->top, dwStyle, NULL != hMenu, dwExStyle);
             }
 
-            x = pMonitorRect->left + (pMonitorRect->right - pMonitorRect->left - pTheme->nWidth) / 2;
-            y = pMonitorRect->top + (pMonitorRect->bottom - pMonitorRect->top - pTheme->nHeight) / 2;
+            x = pMonitorRect->left + (pMonitorRect->right - pMonitorRect->left - pTheme->nWindowWidth) / 2;
+            y = pMonitorRect->top + (pMonitorRect->bottom - pMonitorRect->top - pTheme->nWindowHeight) / 2;
         }
         else
         {
@@ -641,7 +651,7 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
         }
     }
 
-    hWnd = ::CreateWindowExW(dwExStyle, szClassName, szWindowName, dwStyle, x, y, pTheme->nWidth, pTheme->nHeight, hwndParent, NULL, hInstance, lpParam);
+    hWnd = ::CreateWindowExW(dwExStyle, szClassName, szWindowName, dwStyle, x, y, pTheme->nWindowWidth, pTheme->nWindowHeight, hwndParent, hMenu, hInstance, lpParam);
     ThmExitOnNullWithLastError(hWnd, hr, "Failed to create theme parent window.");
     ThmExitOnNull(pTheme->hwndParent, hr, E_INVALIDSTATE, "Theme parent window is not set, make sure ThemeDefWindowProc is called for WM_NCCREATE.");
     AssertSz(hWnd == pTheme->hwndParent, "Theme parent window does not equal newly created window.");
@@ -1909,7 +1919,7 @@ static HRESULT ParseWindow(
     }
     ThmExitOnFailure(hr, "Failed to get window Width attribute.");
 
-    pTheme->nWidth = pTheme->nDefaultDpiWidth = dwValue;
+    pTheme->nWidth = pTheme->nDefaultDpiWidth = pTheme->nWindowWidth = dwValue;
 
     hr = XmlGetAttributeNumber(pixn, L"Height", &dwValue);
     if (S_FALSE == hr)
@@ -1919,7 +1929,7 @@ static HRESULT ParseWindow(
     }
     ThmExitOnFailure(hr, "Failed to get window Height attribute.");
 
-    pTheme->nHeight = pTheme->nDefaultDpiHeight = dwValue;
+    pTheme->nHeight = pTheme->nDefaultDpiHeight = pTheme->nWindowHeight = dwValue;
 
     hr = XmlGetAttributeNumber(pixn, L"MinimumWidth", &dwValue);
     if (S_FALSE == hr)
@@ -4338,7 +4348,7 @@ static BOOL OnDpiChanged(
 
 
     pTheme->fForceResize = !pTheme->fAutoResize;
-    ScaleTheme(pTheme, nDpi, pRect->left, pRect->top);
+    ScaleThemeFromWindow(pTheme, nDpi, pRect->left, pRect->top);
 
 LExit:
     return !fIgnored;
@@ -4359,7 +4369,7 @@ static void OnNcCreate(
 
     if (windowContext.nDpi != pTheme->nDpi)
     {
-        ScaleTheme(pTheme, windowContext.nDpi, pCreateStruct->x, pCreateStruct->y);
+        ScaleTheme(pTheme, windowContext.nDpi, pCreateStruct->x, pCreateStruct->y, pCreateStruct->style, NULL != pCreateStruct->hMenu, pCreateStruct->dwExStyle);
     }
 }
 
@@ -5484,13 +5494,32 @@ static void ResizeControl(
     }
 }
 
-static void ScaleTheme(
+static void ScaleThemeFromWindow(
     __in THEME* pTheme,
     __in UINT nDpi,
     __in int x,
     __in int y
     )
 {
+    DWORD dwStyle = GetWindowStyle(pTheme->hwndParent);
+    BOOL fMenu = NULL != ::GetMenu(pTheme->hwndParent);
+    DWORD dwExStyle = GetWindowExStyle(pTheme->hwndParent);
+
+    ScaleTheme(pTheme, nDpi, x, y, dwStyle, fMenu, dwExStyle);
+}
+
+static void ScaleTheme(
+    __in THEME* pTheme,
+    __in UINT nDpi,
+    __in int x,
+    __in int y,
+    __in DWORD dwStyle,
+    __in BOOL fMenu,
+    __in DWORD dwExStyle
+    )
+{
+    RECT rect = { };
+
     pTheme->nDpi = nDpi;
 
     pTheme->nHeight = DpiuScaleValue(pTheme->nDefaultDpiHeight, pTheme->nDpi);
@@ -5498,11 +5527,19 @@ static void ScaleTheme(
     pTheme->nMinimumHeight = DpiuScaleValue(pTheme->nDefaultDpiMinimumHeight, pTheme->nDpi);
     pTheme->nMinimumWidth = DpiuScaleValue(pTheme->nDefaultDpiMinimumWidth, pTheme->nDpi);
 
+    rect.left = x;
+    rect.top = y;
+    rect.right = x + pTheme->nWidth;
+    rect.bottom = y + pTheme->nHeight;
+    DpiuAdjustWindowRect(&rect, dwStyle, fMenu, dwExStyle, pTheme->nDpi);
+    pTheme->nWindowWidth = rect.right - rect.left;
+    pTheme->nWindowHeight = rect.bottom - rect.top;
+
     ScaleControls(pTheme, pTheme->cControls, pTheme->rgControls, pTheme->nDpi);
 
     if (pTheme->hwndParent)
     {
-        ::SetWindowPos(pTheme->hwndParent, NULL, x, y, pTheme->nWidth, pTheme->nHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+        ::SetWindowPos(pTheme->hwndParent, NULL, x, y, pTheme->nWindowWidth, pTheme->nWindowHeight, SWP_NOACTIVATE | SWP_NOZORDER);
     }
 }
 

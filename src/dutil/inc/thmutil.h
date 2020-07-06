@@ -289,6 +289,8 @@ struct THEME
     int nMinimumHeight;
     int nWidth;
     int nMinimumWidth;
+    int nWindowHeight;
+    int nWindowWidth;
     int nSourceX;
     int nSourceY;
     UINT uStringId;

@@ -165,7 +165,7 @@
             </xs:attribute>
             <xs:attribute name="Height" type="xs:positiveInteger" use="required">
                 <xs:annotation>
-                    <xs:documentation>Height of the window.</xs:documentation>
+                    <xs:documentation>Height of the window's client area.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="HexStyle" type="xs:hexBinary">
@@ -219,7 +219,7 @@
             </xs:attribute>
             <xs:attribute name="Width" type="xs:positiveInteger" use="required">
                 <xs:annotation>
-                    <xs:documentation>Width of the window.</xs:documentation>
+                    <xs:documentation>Width of the window's client area.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>

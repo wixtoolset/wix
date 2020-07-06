@@ -15,6 +15,7 @@
 #define DpiuExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DPIUTIL, p, x, s, __VA_ARGS__)
 #define DpiuExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DPIUTIL, e, x, s, __VA_ARGS__)
 
+static PFN_ADJUSTWINDOWRECTEXFORDPI vpfnAdjustWindowRectExForDpi = NULL;
 static PFN_GETDPIFORMONITOR vpfnGetDpiForMonitor = NULL;
 static PFN_GETDPIFORWINDOW vpfnGetDpiForWindow = NULL;
 
@@ -37,6 +38,7 @@ DAPI_(void) DpiuInitialize()
     if (SUCCEEDED(hr))
     {
         // Ignore failures.
+        vpfnAdjustWindowRectExForDpi = reinterpret_cast<PFN_ADJUSTWINDOWRECTEXFORDPI>(::GetProcAddress(vhUser32Dll, "AdjustWindowRectExForDpi"));
         vpfnGetDpiForWindow = reinterpret_cast<PFN_GETDPIFORWINDOW>(::GetProcAddress(vhUser32Dll, "GetDpiForWindow"));
     }
 
@@ -57,9 +59,33 @@ DAPI_(void) DpiuUninitialize()
 
     vhShcoreDll = NULL;
     vhUser32Dll = NULL;
+    vpfnAdjustWindowRectExForDpi = NULL;
     vpfnGetDpiForMonitor = NULL;
     vpfnGetDpiForWindow = NULL;
     vfDpiuInitialized = FALSE;
+}
+
+DAPI_(void) DpiuAdjustWindowRect(
+    __in RECT* pWindowRect,
+    __in DWORD dwStyle,
+    __in BOOL fMenu,
+    __in DWORD dwExStyle,
+    __in UINT nDpi
+    )
+{
+    if (WS_SYSMENU & dwStyle)
+    {
+        dwStyle |= WS_CAPTION; // WS_CAPTION is required with WS_SYSMENU, AdjustWindowRect* won't work properly when it's not specified.
+    }
+
+    if (vpfnAdjustWindowRectExForDpi)
+    {
+        vpfnAdjustWindowRectExForDpi(pWindowRect, dwStyle, fMenu, dwExStyle, nDpi);
+    }
+    else
+    {
+        ::AdjustWindowRectEx(pWindowRect, dwStyle, fMenu, dwExStyle);
+    }
 }
 
 DAPI_(HRESULT) DpiuGetMonitorContextFromPoint(

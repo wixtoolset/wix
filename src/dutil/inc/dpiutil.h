@@ -25,6 +25,13 @@ typedef struct _DPIU_WINDOW_CONTEXT
     UINT nDpi;
 } DPIU_WINDOW_CONTEXT;
 
+typedef BOOL (APIENTRY* PFN_ADJUSTWINDOWRECTEXFORDPI)(
+    __in LPRECT lpRect,
+    __in DWORD dwStyle,
+    __in BOOL bMenu,
+    __in DWORD dwExStyle,
+    __in UINT dpi
+    );
 typedef HRESULT (APIENTRY *PFN_GETDPIFORMONITOR)(
     __in HMONITOR hmonitor,
     __in MONITOR_DPI_TYPE dpiType,
@@ -37,6 +44,20 @@ typedef UINT (APIENTRY *PFN_GETDPIFORWINDOW)(
 
 void DAPI DpiuInitialize();
 void DAPI DpiuUninitialize();
+
+/********************************************************************
+ DpiuAdjustWindowRect - calculate the required size of the window rectangle,
+                        based on the desired size of the client rectangle
+                        and the provided DPI.
+
+*******************************************************************/
+void DAPI DpiuAdjustWindowRect(
+    __in RECT* pWindowRect,
+    __in DWORD dwStyle,
+    __in BOOL fMenu,
+    __in DWORD dwExStyle,
+    __in UINT nDpi
+    );
 
 /********************************************************************
  DpiuGetMonitorContextFromPoint - get the DPI context of the monitor from the given point.
