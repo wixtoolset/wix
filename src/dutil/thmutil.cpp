@@ -3137,6 +3137,7 @@ static HRESULT ParseColumns(
     IXMLDOMNodeList* pixnl = NULL;
     IXMLDOMNode* pixnChild = NULL;
     BSTR bstrText = NULL;
+    DWORD dwValue = 0;
 
     hr = XmlSelectNodes(pixn, L"Column", &pixnl);
     ThmExitOnFailure(hr, "Failed to select child column nodes.");
@@ -3152,24 +3153,28 @@ static HRESULT ParseColumns(
         i = 0;
         while (S_OK == (hr = XmlNextElement(pixnl, &pixnChild, NULL)))
         {
+            THEME_COLUMN* pColumn = pControl->ptcColumns + i;
+
             hr = XmlGetText(pixnChild, &bstrText);
             ThmExitOnFailure(hr, "Failed to get inner text of column element.");
 
-            hr = XmlGetAttributeNumber(pixnChild, L"Width", reinterpret_cast<DWORD*>(&pControl->ptcColumns[i].nBaseWidth));
+            hr = XmlGetAttributeNumber(pixnChild, L"Width", &dwValue);
             if (S_FALSE == hr)
             {
-                pControl->ptcColumns[i].nBaseWidth = 100;
+                dwValue = 100;
             }
             ThmExitOnFailure(hr, "Failed to get column width attribute.");
 
-            hr = XmlGetYesNoAttribute(pixnChild, L"Expands", reinterpret_cast<BOOL*>(&pControl->ptcColumns[i].fExpands));
+            pColumn->nBaseWidth = pColumn->nDefaultDpiBaseWidth = dwValue;
+
+            hr = XmlGetYesNoAttribute(pixnChild, L"Expands", reinterpret_cast<BOOL*>(&pColumn->fExpands));
             if (E_NOTFOUND == hr)
             {
                 hr = S_OK;
             }
             ThmExitOnFailure(hr, "Failed to get expands attribute.");
 
-            hr = StrAllocString(&(pControl->ptcColumns[i].pszName), bstrText, 0);
+            hr = StrAllocString(&pColumn->pszName, bstrText, 0);
             ThmExitOnFailure(hr, "Failed to copy column name.");
 
             ++i;
@@ -5492,6 +5497,16 @@ static void ScaleControl(
         if (SUCCEEDED(hr) && pControl->hWnd)
         {
             ::SendMessageW(pControl->hWnd, WM_SETFONT, (WPARAM)pControlFontInstance->hFont, FALSE);
+        }
+    }
+
+    if (THEME_CONTROL_TYPE_LISTVIEW == pControl->type)
+    {
+        for (DWORD i = 0; i < pControl->cColumns; ++i)
+        {
+            THEME_COLUMN* pColumn = pControl->ptcColumns + i;
+
+            pColumn->nBaseWidth = DpiuScaleValue(pColumn->nDefaultDpiBaseWidth, nDpi);
         }
     }
 
