@@ -334,6 +334,13 @@ static void GetControlDimensions(
 static HRESULT SizeListViewColumns(
     __inout THEME_CONTROL* pControl
     );
+static LRESULT CALLBACK ControlGroupDefWindowProc(
+    __in_opt THEME* pTheme,
+    __in HWND hWnd,
+    __in UINT uMsg,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    );
 static LRESULT CALLBACK PanelWndProc(
     __in HWND hWnd,
     __in UINT uMsg,
@@ -860,7 +867,14 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
         switch (uMsg)
         {
         case WM_NCCREATE:
-            OnNcCreate(pTheme, hWnd, lParam);
+            if (pTheme->hwndParent)
+            {
+                AssertSz(FALSE, "WM_NCCREATE called multiple times");
+            }
+            else
+            {
+                OnNcCreate(pTheme, hWnd, lParam);
+            }
             break;
 
         case WM_NCHITTEST:
@@ -876,41 +890,6 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
                 return 0;
             }
             break;
-
-        case WM_DRAWITEM:
-            ThemeDrawControl(pTheme, reinterpret_cast<LPDRAWITEMSTRUCT>(lParam));
-            return TRUE;
-
-        case WM_CTLCOLORBTN: __fallthrough;
-        case WM_CTLCOLORSTATIC:
-            {
-            HBRUSH hBrush = NULL;
-            if (ThemeSetControlColor(pTheme, reinterpret_cast<HDC>(wParam), reinterpret_cast<HWND>(lParam), &hBrush))
-            {
-                return reinterpret_cast<LRESULT>(hBrush);
-            }
-            }
-            break;
-
-        case WM_SETCURSOR:
-            if (ThemeHoverControl(pTheme, hWnd, reinterpret_cast<HWND>(wParam)))
-            {
-                return TRUE;
-            }
-            break;
-
-        case WM_PAINT:
-            if (::GetUpdateRect(hWnd, NULL, FALSE))
-            {
-                PAINTSTRUCT ps;
-                ::BeginPaint(hWnd, &ps);
-                if (hWnd == pTheme->hwndParent)
-                {
-                    ThemeDrawBackground(pTheme, &ps);
-                }
-                ::EndPaint(hWnd, &ps);
-            }
-            return 0;
 
         case WM_SIZING:
             if (pTheme->fAutoResize)
@@ -952,70 +931,10 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
                 return 0;
             }
             break;
-
-        case WM_TIMER:
-            OnBillboardTimer(pTheme, hWnd, wParam);
-            break;
-
-        case WM_NOTIFY:
-            if (lParam)
-            {
-                LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
-                switch (pnmhdr->code)
-                {
-                // Tab/Shift+Tab support for rich-edit control.
-                case EN_MSGFILTER:
-                    {
-                    MSGFILTER* msgFilter = reinterpret_cast<MSGFILTER*>(lParam);
-                    if (WM_KEYDOWN == msgFilter->msg && VK_TAB == msgFilter->wParam)
-                    {
-                        BOOL fShift = 0x8000 & ::GetKeyState(VK_SHIFT);
-                        HWND hwndFocus = ::GetNextDlgTabItem(hWnd, msgFilter->nmhdr.hwndFrom, fShift);
-                        ::SetFocus(hwndFocus);
-                        return 1;
-                    }
-                    break;
-                    }
-
-                // Hyperlink clicks from rich-edit control.
-                case EN_LINK:
-                    return SUCCEEDED(OnRichEditEnLink(lParam, pnmhdr->hwndFrom, hWnd));
-
-                // Clicks on a hypertext/syslink control.
-                case NM_CLICK: __fallthrough;
-                case NM_RETURN:
-                    if (ControlIsType(pTheme, static_cast<DWORD>(pnmhdr->idFrom), THEME_CONTROL_TYPE_HYPERTEXT))
-                    {
-                        PNMLINK pnmlink = reinterpret_cast<PNMLINK>(lParam);
-                        LITEM litem = pnmlink->item;
-                        ShelExec(litem.szUrl, NULL, L"open", NULL, SW_SHOWDEFAULT, hWnd, NULL);
-                        return 1;
-                    }
-
-                    return 0;
-                }
-            }
-            break;
-
-        case WM_COMMAND:
-            switch (HIWORD(wParam))
-            {
-            case BN_CLICKED:
-                if (lParam)
-                {
-                    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, (HWND)lParam);
-                    if (pControl && OnButtonClicked(pTheme, hWnd, pControl))
-                    {
-                        return 0;
-                    }
-                }
-                break;
-            }
-            break;
         }
     }
 
-    return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+    return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
 }
 
 
@@ -4846,6 +4765,119 @@ LExit:
 }
 
 
+static LRESULT CALLBACK ControlGroupDefWindowProc(
+    __in_opt THEME* pTheme,
+    __in HWND hWnd,
+    __in UINT uMsg,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    )
+{
+    if (pTheme)
+    {
+        switch (uMsg)
+        {
+        case WM_DRAWITEM:
+            ThemeDrawControl(pTheme, reinterpret_cast<LPDRAWITEMSTRUCT>(lParam));
+            return TRUE;
+
+        case WM_CTLCOLORBTN: __fallthrough;
+        case WM_CTLCOLORSTATIC:
+        {
+            HBRUSH hBrush = NULL;
+            if (ThemeSetControlColor(pTheme, reinterpret_cast<HDC>(wParam), reinterpret_cast<HWND>(lParam), &hBrush))
+            {
+                return reinterpret_cast<LRESULT>(hBrush);
+            }
+        }
+        break;
+
+        case WM_SETCURSOR:
+            if (ThemeHoverControl(pTheme, hWnd, reinterpret_cast<HWND>(wParam)))
+            {
+                return TRUE;
+            }
+            break;
+
+        case WM_PAINT:
+            if (::GetUpdateRect(hWnd, NULL, FALSE))
+            {
+                PAINTSTRUCT ps;
+                ::BeginPaint(hWnd, &ps);
+                if (hWnd == pTheme->hwndParent)
+                {
+                    ThemeDrawBackground(pTheme, &ps);
+                }
+                ::EndPaint(hWnd, &ps);
+            }
+            return 0;
+
+        case WM_TIMER:
+            OnBillboardTimer(pTheme, hWnd, wParam);
+            break;
+
+        case WM_NOTIFY:
+            if (lParam)
+            {
+                LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
+                switch (pnmhdr->code)
+                {
+                    // Tab/Shift+Tab support for rich-edit control.
+                case EN_MSGFILTER:
+                {
+                    MSGFILTER* msgFilter = reinterpret_cast<MSGFILTER*>(lParam);
+                    if (WM_KEYDOWN == msgFilter->msg && VK_TAB == msgFilter->wParam)
+                    {
+                        BOOL fShift = 0x8000 & ::GetKeyState(VK_SHIFT);
+                        HWND hwndFocus = ::GetNextDlgTabItem(hWnd, msgFilter->nmhdr.hwndFrom, fShift);
+                        ::SetFocus(hwndFocus);
+                        return 1;
+                    }
+                    break;
+                }
+
+                // Hyperlink clicks from rich-edit control.
+                case EN_LINK:
+                    return SUCCEEDED(OnRichEditEnLink(lParam, pnmhdr->hwndFrom, hWnd));
+
+                    // Clicks on a hypertext/syslink control.
+                case NM_CLICK: __fallthrough;
+                case NM_RETURN:
+                    if (ControlIsType(pTheme, static_cast<DWORD>(pnmhdr->idFrom), THEME_CONTROL_TYPE_HYPERTEXT))
+                    {
+                        PNMLINK pnmlink = reinterpret_cast<PNMLINK>(lParam);
+                        LITEM litem = pnmlink->item;
+                        ShelExec(litem.szUrl, NULL, L"open", NULL, SW_SHOWDEFAULT, hWnd, NULL);
+                        return 1;
+                    }
+
+                    return 0;
+                }
+            }
+            break;
+
+        case WM_COMMAND:
+            switch (HIWORD(wParam))
+            {
+            case BN_CLICKED:
+                if (lParam)
+                {
+                    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, (HWND)lParam);
+                    if (pControl && OnButtonClicked(pTheme, hWnd, pControl))
+                    {
+                        return 0;
+                    }
+                }
+                break;
+            }
+            break;
+        }
+    }
+
+    return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+}
+
+
 static LRESULT CALLBACK PanelWndProc(
     __in HWND hWnd,
     __in UINT uMsg,
@@ -4861,7 +4893,8 @@ static LRESULT CALLBACK PanelWndProc(
     case WM_NCCREATE:
     {
         LPCREATESTRUCTW lpcs = reinterpret_cast<LPCREATESTRUCTW>(lParam);
-        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(lpcs->lpCreateParams));
+        pTheme = reinterpret_cast<THEME*>(lpcs->lpCreateParams);
+        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pTheme));
     }
     break;
 
@@ -4873,13 +4906,9 @@ static LRESULT CALLBACK PanelWndProc(
     case WM_NCHITTEST:
         return HTCLIENT;
         break;
-
-    case WM_DRAWITEM:
-        ThemeDrawControl(pTheme, reinterpret_cast<LPDRAWITEMSTRUCT>(lParam));
-        return TRUE;
     }
 
-    return ThemeDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
+    return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
 }
 
 
