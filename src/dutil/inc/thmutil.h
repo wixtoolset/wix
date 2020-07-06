@@ -143,6 +143,10 @@ struct THEME_CONTROL
     LPWSTR sczText;
     LPWSTR sczTooltip;
     LPWSTR sczNote; // optional text for command link
+    int nDefaultDpiX;
+    int nDefaultDpiY;
+    int nDefaultDpiHeight;
+    int nDefaultDpiWidth;
     int nX;
     int nY;
     int nHeight;
@@ -250,6 +254,7 @@ struct THEME
     WORD wId;
 
     BOOL fAutoResize;
+    BOOL fForceResize;
 
     DWORD dwStyle;
     DWORD dwFontId;
