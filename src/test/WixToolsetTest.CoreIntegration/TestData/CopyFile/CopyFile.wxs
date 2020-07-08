@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="CopyFileComp" Directory="INSTALLFOLDER">
+                <File Id="test.txt" Source="test.txt" />
+                <CopyFile Id="MoveText" Delete="yes" SourceName="*.txt" DestinationDirectory="OtherFolder"/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Directory Id="OtherFolder" Name="INSTALLFOLDER:\other" />
+    </Fragment>
+</Wix>
