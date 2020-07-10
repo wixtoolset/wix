@@ -13,9 +13,10 @@ STDMETHODIMP UtilSearchParseFromXml(
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     BSTR bstrNodeName = NULL;
+    LPWSTR scz = NULL;
 
     // Select Util search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"WixDetectSHA2Support", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundleExtension, L"WixWindowsFeatureSearch", &pixnNodes);
     ExitOnFailure(hr, "Failed to select Util search nodes.");
 
     // Get Util search node count.
@@ -46,9 +47,23 @@ STDMETHODIMP UtilSearchParseFromXml(
         ExitOnFailure(hr, "Failed to get @Id.");
 
         // Read type specific attributes.
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"WixDetectSHA2Support", -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"WixWindowsFeatureSearch", -1))
         {
-            pSearch->Type = UTIL_SEARCH_TYPE_DETECT_SHA2_SUPPORT;
+            pSearch->Type = UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH;
+
+            // @Type
+            hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
+            ExitOnFailure(hr, "Failed to get @Type.");
+
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"sha2CodeSigning", -1))
+            {
+                pSearch->WindowsFeatureSearch.type = UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING;
+            }
+            else
+            {
+                hr = E_INVALIDARG;
+                ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+            }
         }
         else
         {
@@ -62,6 +77,7 @@ STDMETHODIMP UtilSearchParseFromXml(
     }
 
 LExit:
+    ReleaseStr(scz);
     ReleaseBSTR(bstrNodeName);
     ReleaseObject(pixnNode);
     ReleaseObject(pixnNodes);
@@ -100,8 +116,15 @@ STDMETHODIMP UtilSearchExecute(
 
     switch (pSearch->Type)
     {
-    case UTIL_SEARCH_TYPE_DETECT_SHA2_SUPPORT:
-        hr = UtilPerformDetectSHA2Support(wzVariable, pSearch, pEngine);
+    case UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH:
+        switch (pSearch->WindowsFeatureSearch.type)
+        {
+        case UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING:
+            hr = UtilPerformDetectSHA2CodeSigning(wzVariable, pSearch, pEngine);
+            break;
+        default:
+            hr = E_UNEXPECTED;
+        }
         break;
     default:
         hr = E_UNEXPECTED;

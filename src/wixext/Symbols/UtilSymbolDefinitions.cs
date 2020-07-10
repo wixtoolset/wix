@@ -20,12 +20,12 @@ namespace WixToolset.Util
         User,
         UserGroup,
         WixCloseApplication,
-        WixDetectSHA2Support,
         WixFormatFiles,
         WixInternetShortcut,
         WixRemoveFolderEx,
         WixRestartResource,
         WixTouchFile,
+        WixWindowsFeatureSearch,
         XmlConfig,
         XmlFile,
     }
@@ -84,9 +84,6 @@ namespace WixToolset.Util
                 case UtilSymbolDefinitionType.WixCloseApplication:
                     return UtilSymbolDefinitions.WixCloseApplication;
 
-                case UtilSymbolDefinitionType.WixDetectSHA2Support:
-                    return UtilSymbolDefinitions.WixDetectSHA2Support;
-
                 case UtilSymbolDefinitionType.WixFormatFiles:
                     return UtilSymbolDefinitions.WixFormatFiles;
 
@@ -102,6 +99,9 @@ namespace WixToolset.Util
                 case UtilSymbolDefinitionType.WixTouchFile:
                     return UtilSymbolDefinitions.WixTouchFile;
 
+                case UtilSymbolDefinitionType.WixWindowsFeatureSearch:
+                    return UtilSymbolDefinitions.WixWindowsFeatureSearch;
+
                 case UtilSymbolDefinitionType.XmlConfig:
                     return UtilSymbolDefinitions.XmlConfig;
 
@@ -115,7 +115,7 @@ namespace WixToolset.Util
 
         static UtilSymbolDefinitions()
         {
-            WixDetectSHA2Support.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+            WixWindowsFeatureSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
         }
     }
 }

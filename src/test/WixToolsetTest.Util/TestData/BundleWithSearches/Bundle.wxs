@@ -1,11 +1,11 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
     <Bundle Name="!(loc.BundleName)" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
         <BootstrapperApplication SourceFile="fakeba.dll" />
 
         <util:RegistrySearchRef Id="RegistrySearchId" />
         <util:ProductSearchRef Id="ProductSearchId" />
         <util:FileSearchRef Id="FileSearchId" />
-        <util:DetectSHA2SupportRef Id="DetectSHA2SupportId" />
+        <util:WindowsFeatureSearchRef Id="DetectSHA2SupportId" />
 
         <Chain>
             <MsiPackage SourceFile="test.msi">
@@ -33,6 +33,6 @@
     </Fragment>
 
     <Fragment>
-        <util:DetectSHA2Support Id="DetectSHA2SupportId" Variable="IsSHA2Supported" />
+        <util:WindowsFeatureSearch Id="DetectSHA2SupportId" Variable="IsSHA2Supported" Feature="sha2CodeSigning" />
     </Fragment>
 </Wix>

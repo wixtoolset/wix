@@ -7,7 +7,13 @@
 enum UTIL_SEARCH_TYPE
 {
     UTIL_SEARCH_TYPE_NONE,
-    UTIL_SEARCH_TYPE_DETECT_SHA2_SUPPORT,
+    UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH,
+};
+
+enum UTIL_WINDOWS_FEATURE_SEARCH_TYPE
+{
+    UTIL_WINDOWS_FEATURE_SEARCH_TYPE_NONE,
+    UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING,
 };
 
 
@@ -18,6 +24,13 @@ typedef struct _UTIL_SEARCH
     LPWSTR sczId;
 
     UTIL_SEARCH_TYPE Type;
+    union
+    {
+        struct
+        {
+            UTIL_WINDOWS_FEATURE_SEARCH_TYPE type;
+        } WindowsFeatureSearch;
+    };
 } UTIL_SEARCH;
 
 typedef struct _UTIL_SEARCHES

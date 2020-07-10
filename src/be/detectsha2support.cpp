@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 // https://gist.github.com/navossoc/7572c7d82243e9f818989e2765e7793a
-HRESULT DetectSHA2Support(
+HRESULT DetectSHA2CodeSigning(
     __out BOOL* pfSupported
     )
 {
@@ -38,7 +38,7 @@ LExit:
     return hr;
 }
 
-HRESULT UtilPerformDetectSHA2Support(
+HRESULT UtilPerformDetectSHA2CodeSigning(
     __in LPCWSTR wzVariable,
     __in UTIL_SEARCH* /*pSearch*/,
     __in IBundleExtensionEngine* pEngine
@@ -47,8 +47,8 @@ HRESULT UtilPerformDetectSHA2Support(
     HRESULT hr = S_OK;
     BOOL fSupported = FALSE;
 
-    hr = DetectSHA2Support(&fSupported);
-    ExitOnFailure(hr, "DetectSHA2Support failed.");
+    hr = DetectSHA2CodeSigning(&fSupported);
+    ExitOnFailure(hr, "DetectSHA2CodeSigning failed.");
 
     hr = pEngine->SetVariableNumeric(wzVariable, fSupported ? 1 : 0);
     ExitOnFailure(hr, "Failed to set variable '%ls'", wzVariable);

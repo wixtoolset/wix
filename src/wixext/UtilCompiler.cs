@@ -235,8 +235,6 @@ namespace WixToolset.Util
                             break;
                         case "ComponentSearch":
                         case "ComponentSearchRef":
-                        case "DetectSHA2Support":
-                        case "DetectSHA2SupportRef":
                         case "DirectorySearch":
                         case "DirectorySearchRef":
                         case "FileSearch":
@@ -245,6 +243,8 @@ namespace WixToolset.Util
                         case "ProductSearchRef":
                         case "RegistrySearch":
                         case "RegistrySearchRef":
+                        case "WindowsFeatureSearch":
+                        case "WindowsFeatureSearchRef":
                             // These will eventually be supported under Module/Product, but are not yet.
                             if (parentElement.Name.LocalName == "Bundle" || parentElement.Name.LocalName == "Fragment")
                             {
@@ -257,12 +257,6 @@ namespace WixToolset.Util
                                         break;
                                     case "ComponentSearchRef":
                                         this.ParseComponentSearchRefElement(intermediate, section, element);
-                                        break;
-                                    case "DetectSHA2Support":
-                                        this.ParseDetectSHA2SupportElement(intermediate, section, element);
-                                        break;
-                                    case "DetectSHA2SupportRef":
-                                        this.ParseDetectSHA2SupportRefElement(intermediate, section, element);
                                         break;
                                     case "DirectorySearch":
                                         this.ParseDirectorySearchElement(intermediate, section, element);
@@ -287,6 +281,12 @@ namespace WixToolset.Util
                                         break;
                                     case "RegistrySearchRef":
                                         this.ParseWixSearchRefElement(intermediate, section, element);
+                                        break;
+                                    case "WindowsFeatureSearch":
+                                        this.ParseWindowsFeatureSearchElement(intermediate, section, element);
+                                        break;
+                                    case "WindowsFeatureSearchRef":
+                                        this.ParseWindowsFeatureSearchRefElement(intermediate, section, element);
                                         break;
                                 }
                             }
@@ -508,16 +508,17 @@ namespace WixToolset.Util
         }
 
         /// <summary>
-        /// Parses a DetectSHA2Support element.
+        /// Parses a WindowsFeatureSearch element.
         /// </summary>
         /// <param name="element">Element to parse.</param>
-        private void ParseDetectSHA2SupportElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        private void ParseWindowsFeatureSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string variable = null;
             string condition = null;
             string after = null;
+            string feature = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -530,6 +531,17 @@ namespace WixToolset.Util
                         case "Condition":
                         case "After":
                             this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
+                            break;
+                        case "Feature":
+                            feature = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (feature)
+                            {
+                                case "sha2CodeSigning":
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Feature", feature, "sha2CodeSigning"));
+                                    break;
+                            }
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -544,7 +556,12 @@ namespace WixToolset.Util
 
             if (id == null)
             {
-                id = this.ParseHelper.CreateIdentifier("wds2s", variable, condition, after);
+                id = this.ParseHelper.CreateIdentifier("wwfs", variable, condition, after);
+            }
+
+            if (feature == null)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Feature"));
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -559,15 +576,18 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddSymbol(new WixDetectSHA2SupportSymbol(sourceLineNumbers, id));
+                section.AddSymbol(new WixWindowsFeatureSearchSymbol(sourceLineNumbers, id)
+                {
+                    Type = feature,
+                });
             }
         }
 
         /// <summary>
-        /// Parses a DetectSHA2SupportRef element
+        /// Parses a WindowsFeatureSearchRef element
         /// </summary>
         /// <param name="element">Element to parse.</param>
-        private void ParseDetectSHA2SupportRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        private void ParseWindowsFeatureSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
 
@@ -579,7 +599,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.WixDetectSHA2Support, refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilSymbolDefinitions.WixWindowsFeatureSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);

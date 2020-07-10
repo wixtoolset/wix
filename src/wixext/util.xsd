@@ -174,30 +174,6 @@
       <xs:attribute name="Id" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
-  <xs:element name="DetectSHA2Support">
-    <xs:annotation>
-      <xs:documentation>Detects support for SHA2.</xs:documentation>
-      <xs:appinfo>
-        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
-        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attributeGroup ref="SearchCommonAttributes" />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DetectSHA2SupportRef">
-    <xs:annotation>
-      <xs:documentation>References a DetectSHA2Support.</xs:documentation>
-      <xs:appinfo>
-        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
-        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Id" type="xs:string" use="required" />
-    </xs:complexType>
-  </xs:element>
   <xs:element name="DirectorySearch">
     <xs:annotation>
       <xs:documentation>Describes a directory search.</xs:documentation>
@@ -1387,6 +1363,44 @@
           <xs:documentation>Indicates whether failure to create the user or add the user to a group fails the installation. The default value is "yes".</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="WindowsFeatureSearch">
+    <xs:annotation>
+      <xs:documentation>Detects the existence of a Windows feature.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="SearchCommonAttributes" />
+      <xs:attribute name="Feature" use="required">
+        <xs:annotation>
+          <xs:documentation>The feature to detect.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="sha2CodeSigning">
+              <xs:annotation>
+                <xs:documentation>The oldest OS with this feature is Win7 SP1 with KB3033929.</xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="WindowsFeatureSearchRef">
+    <xs:annotation>
+      <xs:documentation>References a WindowsFeatureSearch.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="Id" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
   <xs:element name="XmlFile">

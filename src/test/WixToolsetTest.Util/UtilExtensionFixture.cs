@@ -172,7 +172,7 @@ namespace WixToolsetTest.Util
                 var bundleExtensionDatas = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='Wix4UtilBundleExtension_X86']");
                 Assert.Equal(1, bundleExtensionDatas.Count);
                 Assert.Equal("<BundleExtension Id='Wix4UtilBundleExtension_X86'>" +
-                    "<WixDetectSHA2Support Id='DetectSHA2SupportId' />" +
+                    "<WixWindowsFeatureSearch Id='DetectSHA2SupportId' Type='sha2CodeSigning' />" +
                     "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
 
                 var utilSearches = extractResult.SelectManifestNodes("/burn:BurnManifest/*[self::burn:ExtensionSearch or self::burn:FileSearch or self::burn:MsiProductSearch or self::burn:RegistrySearch]");
