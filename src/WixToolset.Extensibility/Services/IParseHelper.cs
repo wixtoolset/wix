@@ -34,9 +34,19 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Create an identifier based on passed file name
         /// </summary>
-        /// <param name="name">File name to generate identifer from</param>
-        /// <returns></returns>
+        /// <param name="filename">File name to generate identifier from</param>
+        /// <returns>The new identifier.</returns>
         Identifier CreateIdentifierFromFilename(string filename);
+
+        /// <summary>
+        /// Append a suffix to the given name based on the current platform.
+        /// If the current platform is not in the supported platforms, then it returns null.
+        /// </summary>
+        /// <param name="name">The base name for the identifier.</param>
+        /// <param name="currentPlatform">The platform being compiled.</param>
+        /// <param name="supportedPlatforms">The platforms for which there are specialized implementations.</param>
+        /// <returns>The generated identifier value, or null if the current platform isn't supported.</returns>
+        string CreateIdentifierValueFromPlatform(string name, Platform currentPlatform, BurnPlatforms supportedPlatforms);
 
         /// <summary>
         /// Creates a symbol in the section.
