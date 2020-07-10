@@ -195,6 +195,9 @@ namespace WixToolset.Core
                         case "CustomTable":
                             this.ParseCustomTableElement(child);
                             break;
+                        case "CustomTableRef":
+                            this.ParseCustomTableRefElement(child);
+                            break;
                         case "Directory":
                             this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
                             break;

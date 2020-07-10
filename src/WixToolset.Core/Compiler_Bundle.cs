@@ -914,7 +914,6 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string customDataId = null;
-            var foundChild = false;
 
             foreach (var attrib in node.Attributes())
             {
@@ -924,6 +923,7 @@ namespace WixToolset.Core
                     {
                         case "Id":
                             customDataId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundleCustomData, customDataId);
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -943,7 +943,6 @@ namespace WixToolset.Core
 
             foreach (var child in node.Elements())
             {
-                foundChild = true;
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
                 {
                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
@@ -961,11 +960,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionElement(node, child);
                 }
-            }
-
-            if (!foundChild)
-            {
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName));
             }
         }
 

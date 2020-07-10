@@ -3612,6 +3612,7 @@ namespace WixToolset.Core
             string tableId = null;
             var unreal = false;
             var columns = new List<WixCustomTableColumnSymbol>();
+            var foundColumns = false;
 
             foreach (var attrib in node.Attributes())
             {
@@ -3653,6 +3654,8 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Column":
+                            foundColumns = true;
+
                             var column = this.ParseColumnElement(child, childSourceLineNumbers, tableId);
                             if (column != null)
                             {
@@ -3689,6 +3692,67 @@ namespace WixToolset.Core
                         ColumnNames = columnNames,
                         Unreal = unreal,
                     });
+                }
+                else if (!foundColumns)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Column"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a CustomTableRef element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        private void ParseCustomTableRefElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string tableId = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            tableId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixCustomTable, tableId);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == tableId)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    switch (child.Name.LocalName)
+                    {
+                        case "Row":
+                            this.ParseRowElement(child, childSourceLineNumbers, tableId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
                 }
             }
         }
@@ -6154,6 +6218,9 @@ namespace WixToolset.Core
                         break;
                     case "CustomTable":
                         this.ParseCustomTableElement(child);
+                        break;
+                    case "CustomTableRef":
+                        this.ParseCustomTableRefElement(child);
                         break;
                     case "Directory":
                         this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
