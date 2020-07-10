@@ -147,6 +147,41 @@ namespace WixToolset.Core.ExtensibilityServices
             return new Identifier(AccessModifier.Private, id);
         }
 
+        public string CreateIdentifierValueFromPlatform(string name, Platform currentPlatform, BurnPlatforms supportedPlatforms)
+        {
+            string suffix = null;
+
+            switch (currentPlatform)
+            {
+                case Platform.X86:
+                    if ((supportedPlatforms & BurnPlatforms.X64) == BurnPlatforms.X64)
+                    {
+                        suffix = "_X86";
+                    }
+                    break;
+                case Platform.X64:
+                    if ((supportedPlatforms & BurnPlatforms.X64) == BurnPlatforms.X64)
+                    {
+                        suffix = "_X64";
+                    }
+                    break;
+                case Platform.ARM:
+                    if ((supportedPlatforms & BurnPlatforms.ARM) == BurnPlatforms.ARM)
+                    {
+                        suffix = "_A32";
+                    }
+                    break;
+                case Platform.ARM64:
+                    if ((supportedPlatforms & BurnPlatforms.ARM64) == BurnPlatforms.ARM64)
+                    {
+                        suffix = "_A64";
+                    }
+                    break;
+            }
+
+            return suffix == null ? null : name + suffix;
+        }
+
         [Obsolete]
         public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
