@@ -4,7 +4,7 @@
 
 // constants
 
-#define UTIL_BUNDLE_EXTENSION_ID L"WixUtilBundleExtension"
+#define UTIL_BUNDLE_EXTENSION_ID BUNDLE_EXTENSION_DECORATION(L"UtilBundleExtension")
 
 
 // function declarations

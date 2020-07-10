@@ -85,7 +85,7 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4CreateInternetShortcuts_X64\t3073\tWix4UtilCA_X64\tWixCreateInternetShortcuts\t",
                 "CustomAction:Wix4RollbackInternetShortcuts_X64\t3329\tWix4UtilCA_X64\tWixRollbackInternetShortcuts\t",
                 "CustomAction:Wix4SchedInternetShortcuts_X64\t1\tWix4UtilCA_X64\tWixSchedInternetShortcuts\t",
-                "RemoveFile:wixshortcut\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tvtpzs3bw.lnk|WiX Toolset.lnk\tINSTALLFOLDER\t2",
+                "RemoveFile:wixshortcut\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tzf9nskwi.lnk|WiX Toolset.lnk\tINSTALLFOLDER\t2",
                 "Wix4InternetShortcut:wixshortcut\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tINSTALLFOLDER\tWiX Toolset.lnk\thttps://wixtoolset.org\t0\t\t0",
             }, results.OrderBy(s => s).ToArray());
         }
@@ -169,16 +169,16 @@ namespace WixToolsetTest.Util
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var bundleExtensionDatas = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='WixUtilBundleExtension']");
+                var bundleExtensionDatas = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='Wix4UtilBundleExtension_X86']");
                 Assert.Equal(1, bundleExtensionDatas.Count);
-                Assert.Equal("<BundleExtension Id='WixUtilBundleExtension'>" +
+                Assert.Equal("<BundleExtension Id='Wix4UtilBundleExtension_X86'>" +
                     "<WixDetectSHA2Support Id='DetectSHA2SupportId' />" +
                     "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
 
                 var utilSearches = extractResult.SelectManifestNodes("/burn:BurnManifest/*[self::burn:ExtensionSearch or self::burn:FileSearch or self::burn:MsiProductSearch or self::burn:RegistrySearch]");
                 Assert.Equal(4, utilSearches.Count);
                 Assert.Equal("<ExtensionSearch Id='DetectSHA2SupportId' Variable='IsSHA2Supported' " +
-                    "ExtensionId='WixUtilBundleExtension' />", utilSearches[0].GetTestXml());
+                    "ExtensionId='Wix4UtilBundleExtension_X86' />", utilSearches[0].GetTestXml());
                 Assert.Equal("<FileSearch Id='FileSearchId' Variable='FileSearchVariable' " +
                     $@"Path='%windir%\System32\mscoree.dll' Type='exists' />", utilSearches[1].GetTestXml());
                 Assert.Equal("<MsiProductSearch Id='ProductSearchId' Variable='ProductSearchVariable' Condition='1 &amp; 2 &lt; 3' " +

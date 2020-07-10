@@ -549,7 +549,13 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, UtilConstants.UtilBundleExtensionId);
+            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4UtilBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bundleExtensionId == null)
+            {
+                this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
+            }
+
+            this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -1498,10 +1504,9 @@ namespace WixToolset.Util
             section.AddSymbol(new RemoveFileSymbol(sourceLineNumbers, shortcutId)
             {
                 ComponentRef = componentId,
-                DirProperty = directoryId,
+                DirPropertyRef = directoryId,
                 OnUninstall = true,
-                // TODO: A better way?
-                FileName = this.ParseHelper.IsValidShortFilename(name, false) ? name : String.Concat(this.ParseHelper.CreateShortName(name, true, false, directoryId, name), "|", name),
+                FileName = name,
             });
         }
 

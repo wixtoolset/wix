@@ -31,6 +31,7 @@
 #include <bextutil.h>
 #include <BextBundleExtensionEngine.h>
 
+#include "beDecor.h"
 #include "utilsearch.h"
 #include "detectsha2support.h"
 #include "UtilBundleExtension.h"
