@@ -225,6 +225,15 @@ namespace WixToolset.Core.ExtensibilityServices
             return symbol.Id;
         }
 
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, string primaryKey)
+        {
+            section.AddSymbol(new WixSimpleReferenceSymbol(sourceLineNumbers)
+            {
+                Table = symbolName,
+                PrimaryKeys = primaryKey
+            });
+        }
+
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys)
         {
             section.AddSymbol(new WixSimpleReferenceSymbol(sourceLineNumbers)
@@ -232,6 +241,11 @@ namespace WixToolset.Core.ExtensibilityServices
                 Table = symbolName,
                 PrimaryKeys = String.Join("/", primaryKeys)
             });
+        }
+
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, string primaryKey)
+        {
+            this.CreateSimpleReference(section, sourceLineNumbers, symbolDefinition.Name, primaryKey);
         }
 
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, params string[] primaryKeys)
@@ -849,7 +863,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             else if (allowRelative)
             {
-                return filename.IndexOfAny(Common.IllegalRelativeLongFilenameCharacters) == -1; 
+                return filename.IndexOfAny(Common.IllegalRelativeLongFilenameCharacters) == -1;
             }
             else
             {

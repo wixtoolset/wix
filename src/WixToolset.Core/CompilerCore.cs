@@ -381,6 +381,26 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolName">The symbol name of the simple reference.</param>
+        /// <param name="primaryKey">The primary key of the simple reference.</param>
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string symbolName, string primaryKey)
+        {
+            if (!this.EncounteredError)
+            {
+                var id = String.Concat(symbolName, ":", primaryKey);
+
+                // If this simple reference hasn't been added to the active section already, add it.
+                if (this.activeSectionSimpleReferences.Add(id))
+                {
+                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, symbolName, primaryKey);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create a WixSimpleReferenceSymbol in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
         public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys)
         {
@@ -395,6 +415,17 @@ namespace WixToolset.Core
                     this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, symbolName, primaryKeys);
                 }
             }
+        }
+
+        /// <summary>
+        /// Create a WixSimpleReferenceSymbol in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
+        /// <param name="primaryKey">The primary key of the simple reference.</param>
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, string primaryKey)
+        {
+            this.CreateSimpleReference(sourceLineNumbers, symbolDefinition.Name, primaryKey);
         }
 
         /// <summary>
