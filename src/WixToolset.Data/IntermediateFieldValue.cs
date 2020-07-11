@@ -17,11 +17,11 @@ namespace WixToolset.Data
 
         public static explicit operator bool(IntermediateFieldValue value) => value.AsBool();
 
-        public static explicit operator bool? (IntermediateFieldValue value) => value.AsNullableBool();
+        public static explicit operator bool?(IntermediateFieldValue value) => value.AsNullableBool();
 
         public static explicit operator int(IntermediateFieldValue value) => value.AsNumber();
 
-        public static explicit operator int? (IntermediateFieldValue value) => value.AsNullableNumber();
+        public static explicit operator int?(IntermediateFieldValue value) => value.AsNullableNumber();
 
         public static explicit operator IntermediateFieldPathValue(IntermediateFieldValue value) => value.AsPath();
 

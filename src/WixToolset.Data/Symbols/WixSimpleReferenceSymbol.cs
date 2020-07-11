@@ -28,7 +28,7 @@ namespace WixToolset.Data.Symbols
         PrimaryKeys,
     }
 
-    [DebuggerDisplay("{SymbolicName}")]
+    [DebuggerDisplay("{SymbolicName,nq}")]
     public class WixSimpleReferenceSymbol : IntermediateSymbol
     {
         public WixSimpleReferenceSymbol() : base(SymbolDefinitions.WixSimpleReference, null, null)
@@ -57,6 +57,6 @@ namespace WixToolset.Data.Symbols
         /// Gets the symbolic name.
         /// </summary>
         /// <value>Symbolic name.</value>
-        public string SymbolicName => String.Concat(this.Table, ":", this.PrimaryKeys);
+        public string SymbolicName => String.Concat("Ref ",  this.Table, ":", this.PrimaryKeys);
     }
 }

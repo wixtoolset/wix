@@ -8,17 +8,7 @@ namespace WixToolset.Data
     {
         public static bool AsBool(this IntermediateFieldValue value)
         {
-            var result = value.AsNullableBool();
-            return result.HasValue && result.Value;
-        }
-
-        public static bool? AsNullableBool(this IntermediateFieldValue value)
-        {
-            if (value?.Data == null)
-            {
-                return null;
-            }
-            else if (value.Data is bool b)
+            if (value.Data is bool b)
             {
                 return b;
             }
@@ -45,25 +35,25 @@ namespace WixToolset.Data
             return (bool)value.Data;
         }
 
-        public static long AsLargeNumber(this IntermediateFieldValue value)
-        {
-            var result = value.AsNullableLargeNumber();
-            return result ?? 0;
-        }
-
-        public static long? AsNullableLargeNumber(this IntermediateFieldValue value)
+        public static bool? AsNullableBool(this IntermediateFieldValue value)
         {
             if (value?.Data == null)
             {
                 return null;
             }
+
+            return value.AsBool();
+        }
+
+        public static long AsLargeNumber(this IntermediateFieldValue value)
+        {
+            if (value.Data is long l)
+            {
+                return l;
+            }
             else if (value.Data is int n)
             {
                 return n;
-            }
-            else if (value.Data is long l)
-            {
-                return l;
             }
             else if (value.Data is bool b)
             {
@@ -84,19 +74,19 @@ namespace WixToolset.Data
             return (long)value.Data;
         }
 
-        public static int AsNumber(this IntermediateFieldValue value)
-        {
-            var result = value.AsNullableNumber();
-            return result ?? 0;
-        }
-
-        public static int? AsNullableNumber(this IntermediateFieldValue value)
+        public static long? AsNullableLargeNumber(this IntermediateFieldValue value)
         {
             if (value?.Data == null)
             {
                 return null;
             }
-            else if (value.Data is int n)
+
+            return value.AsLargeNumber();
+        }
+
+        public static int AsNumber(this IntermediateFieldValue value)
+        {
+            if (value.Data is int n)
             {
                 return n;
             }
@@ -121,6 +111,16 @@ namespace WixToolset.Data
             }
 
             return (int)value.Data;
+        }
+
+        public static int? AsNullableNumber(this IntermediateFieldValue value)
+        {
+            if (value?.Data == null)
+            {
+                return null;
+            }
+
+            return value.AsNumber();
         }
 
         public static IntermediateFieldPathValue AsPath(this IntermediateFieldValue value)
