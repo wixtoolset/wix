@@ -120,7 +120,7 @@ namespace WixToolset.Core
         private readonly IParseHelper parseHelper;
         private readonly Intermediate intermediate;
         private readonly IMessaging messaging;
-        private HashSet<string> activeSectionInlinedDirectoryIds;
+        private Dictionary<string, string> activeSectionCachedInlinedDirectoryIds;
         private HashSet<string> activeSectionSimpleReferences;
 
         /// <summary>
@@ -354,12 +354,13 @@ namespace WixToolset.Core
         /// Creates directories using the inline directory syntax.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="attribute">The attribute to parse.</param>
+        /// <param name="attribute">Attribute containing the inline syntax.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
+        /// <param name="inlineSyntax">Optional inline syntax to override attribute's value.</param>
         /// <returns>Identifier of the leaf directory created.</returns>
-        public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId)
+        public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId, string inlineSyntax = null)
         {
-            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, parentId, attribute, this.activeSectionInlinedDirectoryIds);
+            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, attribute, parentId, inlineSyntax, this.activeSectionCachedInlinedDirectoryIds);
         }
 
         /// <summary>
@@ -1001,6 +1002,16 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Adds inline directory syntax generated identifier.
+        /// </summary>
+        /// <param name="inlineSyntax">Inline directory syntax the identifier was generated.</param>
+        /// <param name="id">Generated identifier for inline syntax.</param>
+        internal void AddInlineDirectoryId(string inlineSyntax, string id)
+        {
+            this.activeSectionCachedInlinedDirectoryIds.Add(inlineSyntax, id);
+        }
+
+        /// <summary>
         /// Creates a new section and makes it the active section in the core.
         /// </summary>
         /// <param name="id">Unique identifier for the section.</param>
@@ -1011,7 +1022,7 @@ namespace WixToolset.Core
         {
             this.ActiveSection = this.CreateSection(id, type, codepage, compilationId);
 
-            this.activeSectionInlinedDirectoryIds = new HashSet<string>();
+            this.activeSectionCachedInlinedDirectoryIds = new Dictionary<string, string>();
             this.activeSectionSimpleReferences = new HashSet<string>();
 
             return this.ActiveSection;
@@ -1060,26 +1071,14 @@ namespace WixToolset.Core
         /// <param name="sourceName">Optional source name for the directory.</param>
         /// <param name="shortSourceName">Optional short source name for the directory.</param>
         /// <returns>Identifier for the newly created row.</returns>
-        internal Identifier CreateDirectoryRow(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
+        internal Identifier CreateDirectorySymbol(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            return this.parseHelper.CreateDirectorySymbol(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
+            return this.parseHelper.CreateDirectorySymbol(this.ActiveSection, sourceLineNumbers, id, parentId, name, shortName, sourceName, shortSourceName);
         }
 
         public void CreateWixSearchSymbol(SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after)
         {
             this.parseHelper.CreateWixSearchSymbol(this.ActiveSection, sourceLineNumbers, elementName, id, variable, condition, after, null);
-        }
-
-        /// <summary>
-        /// Gets the attribute value as inline directory syntax.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="attribute">Attribute containing the value to get.</param>
-        /// <param name="resultUsedToCreateReference">Flag indicates whether the inline directory syntax should be processed to create a directory row or to create a directory reference.</param>
-        /// <returns>Inline directory syntax split into array of strings or null if the syntax did not parse.</returns>
-        internal string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference = false)
-        {
-            return this.parseHelper.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, resultUsedToCreateReference);
         }
 
         internal WixActionSymbol ScheduleActionSymbol(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)

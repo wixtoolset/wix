@@ -9,6 +9,7 @@ namespace WixToolset.Core
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -25,8 +26,10 @@ namespace WixToolset.Core
         private const int MinValueOfMaxCabSizeForLargeFileSplitting = 20; // 20 MB
         private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        private const string DefaultComponentIdPlaceholderPrefix = "WixComponentIdPlaceholder";
-        private const string DefaultComponentIdPlaceholderWixVariablePrefix = "!(wix.";
+        private const char ComponentIdPlaceholderStart = (char)167;
+        private const char ComponentIdPlaceholderEnd = (char)167;
+        private Dictionary<string, string> componentIdPlaceholders;
+
         // If these are true you know you are building a module or product
         // but if they are false you cannot not be sure they will not end
         // up a product or module.  Use these flags carefully.
@@ -35,9 +38,6 @@ namespace WixToolset.Core
 
         private string activeName;
         private string activeLanguage;
-
-        // TODO: Implement this differently to not require the VariableResolver.
-        private VariableResolver componentIdPlaceholdersResolver;
 
         /// <summary>
         /// Type of RadioButton element in a group.
@@ -129,7 +129,7 @@ namespace WixToolset.Core
 
                 this.Core = new CompilerCore(target, this.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
-                this.componentIdPlaceholdersResolver = new VariableResolver(this.ServiceProvider);
+                this.componentIdPlaceholders = new Dictionary<string, string>();
 
                 // parse the document
                 var source = this.Context.Source;
@@ -247,7 +247,7 @@ namespace WixToolset.Core
 
         private void ResolveComponentIdPlaceholders(Intermediate target)
         {
-            if (0 < this.componentIdPlaceholdersResolver.VariableCount)
+            if (0 < this.componentIdPlaceholders.Count)
             {
                 foreach (var section in target.Sections)
                 {
@@ -255,15 +255,40 @@ namespace WixToolset.Core
                     {
                         foreach (var field in symbol.Fields)
                         {
-                            if (field?.Type == IntermediateFieldType.String)
+                            if (field != null && field.Type == IntermediateFieldType.String)
                             {
                                 var data = field.AsString();
                                 if (!String.IsNullOrEmpty(data))
                                 {
-                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(symbol.SourceLineNumbers, data, errorOnUnknown: false);
-                                    if (resolved.UpdatedValue)
+                                    var changed = false;
+                                    var start = data.IndexOf(ComponentIdPlaceholderStart);
+                                    while (start != -1)
                                     {
-                                        field.Set(resolved.Value);
+                                        var end = data.IndexOf(ComponentIdPlaceholderEnd, start + 1);
+                                        if (end == -1)
+                                        {
+                                            break;
+                                        }
+
+                                        var placeholderId = data.Substring(start, end - start + 1);
+                                        if (this.componentIdPlaceholders.TryGetValue(placeholderId, out var value))
+                                        {
+                                            var sb = new StringBuilder(data);
+                                            sb.Remove(start, end - start + 1);
+                                            sb.Insert(start, value);
+
+                                            data = sb.ToString();
+                                            changed = true;
+
+                                            end = start + value.Length;
+                                        }
+
+                                        start = data.IndexOf(ComponentIdPlaceholderStart, end);
+                                    }
+
+                                    if (changed)
+                                    {
+                                        field.Overwrite(data);
                                     }
                                 }
                             }
@@ -2096,9 +2121,8 @@ namespace WixToolset.Core
             var encounteredODBCDataSource = false;
             var files = 0;
             var guid = "*";
-            var componentIdPlaceholder = Compiler.DefaultComponentIdPlaceholderPrefix + this.componentIdPlaceholdersResolver.VariableCount; // placeholder id for defaulting Component/@Id to keypath id.
-            var componentIdPlaceholderWixVariable = Compiler.DefaultComponentIdPlaceholderWixVariablePrefix + componentIdPlaceholder + ")";
-            var id = new Identifier(AccessModifier.Private, componentIdPlaceholderWixVariable);
+            Identifier id = null;
+            string componentIdPlaceholder = null;
             var keyFound = false;
             string keyPath = null;
 
@@ -2251,6 +2275,13 @@ namespace WixToolset.Core
             {
                 //bits |= MsiInterop.MsidbComponentAttributes64bit;
                 win64 = true;
+            }
+
+            if (id == null)
+            {
+                // Placeholder id for defaulting Component/@Id to keypath id.
+                componentIdPlaceholder = String.Concat(Compiler.ComponentIdPlaceholderStart, this.componentIdPlaceholders.Count, Compiler.ComponentIdPlaceholderEnd);
+                id = new Identifier(AccessModifier.Private, componentIdPlaceholder);
             }
 
             if (null == directoryId)
@@ -2466,14 +2497,14 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ImplicitComponentKeyPath(sourceLineNumbers, id.Id));
             }
 
-            // if there isn't an @Id attribute value, replace the placeholder with the id of the keypath.
+            // If there isn't an @Id attribute value, replace the placeholder with the id of the keypath.
             // either an explicit KeyPath="yes" attribute must be specified or requirements for
             // generatable guid must be met.
-            if (componentIdPlaceholderWixVariable == id.Id)
+            if (componentIdPlaceholder == id.Id)
             {
                 if (isGeneratableGuidOk || keyFound && !String.IsNullOrEmpty(keyPath))
                 {
-                    this.componentIdPlaceholdersResolver.AddVariable(sourceLineNumbers, componentIdPlaceholder, keyPath, false);
+                    this.componentIdPlaceholders.Add(componentIdPlaceholder, keyPath);
 
                     id = new Identifier(AccessModifier.Private, keyPath);
                 }
@@ -2481,12 +2512,6 @@ namespace WixToolset.Core
                 {
                     this.Core.Write(ErrorMessages.CannotDefaultComponentId(sourceLineNumbers));
                 }
-            }
-
-            // If an id was not determined by now, we have to error.
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             // finally add the Component table row
@@ -4120,9 +4145,9 @@ namespace WixToolset.Core
             Identifier id = null;
             string componentGuidGenerationSeed = null;
             var fileSourceAttribSet = false;
-            var nameHasValue = false;
+            XAttribute nameAttribute = null;
             var name = "."; // default to parent directory.
-            string[] inlineSyntax = null;
+            string inlineSyntax = null;
             string shortName = null;
             string sourceName = null;
             string shortSourceName = null;
@@ -4148,15 +4173,8 @@ namespace WixToolset.Core
                         fileSourceAttribSet = true;
                         break;
                     case "Name":
-                        nameHasValue = true;
-                        if (attrib.Value == ".")
-                        {
-                            name = attrib.Value;
-                        }
-                        else
-                        {
-                            inlineSyntax = this.Core.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attrib);
-                        }
+                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        nameAttribute = attrib;
                         break;
                     case "ShortName":
                         shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
@@ -4185,37 +4203,7 @@ namespace WixToolset.Core
                 }
             }
 
-            // Create the directory rows for the inline.
-            if (null != inlineSyntax)
-            {
-                // Special case the single entry in the inline syntax since it is the most common case
-                // and needs no extra processing. It's just the name of the directory.
-                if (1 == inlineSyntax.Length)
-                {
-                    name = inlineSyntax[0];
-                }
-                else
-                {
-                    var pathStartsAt = 0;
-                    if (inlineSyntax[0].EndsWith(":"))
-                    {
-                        parentId = inlineSyntax[0].TrimEnd(':');
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, parentId);
-
-                        pathStartsAt = 1;
-                    }
-
-                    for (var i = pathStartsAt; i < inlineSyntax.Length - 1; ++i)
-                    {
-                        var inlineId = this.Core.CreateDirectoryRow(sourceLineNumbers, null, parentId, inlineSyntax[i]);
-                        parentId = inlineId.Id;
-                    }
-
-                    name = inlineSyntax[inlineSyntax.Length - 1];
-                }
-            }
-
-            if (!nameHasValue)
+            if (nameAttribute == null)
             {
                 if (!String.IsNullOrEmpty(shortName))
                 {
@@ -4264,6 +4252,39 @@ namespace WixToolset.Core
                 }
             }
 
+            // Create the directory rows for the inline.
+            if (nameAttribute != null)
+            {
+                var lastSlash = name.LastIndexOf('\\');
+                if (lastSlash > 0)
+                {
+                    inlineSyntax = name;
+                    name = inlineSyntax.Substring(lastSlash + 1);
+
+                    parentId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, nameAttribute, parentId, inlineSyntax.Substring(0, lastSlash));
+
+                    if (!this.Core.IsValidLongFilename(name, false, false))
+                    {
+                        this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, nameAttribute.Name.LocalName, nameAttribute.Value, name));
+                    }
+                }
+            }
+
+            if (null == id)
+            {
+                id = this.Core.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
+
+                if (!String.IsNullOrEmpty(inlineSyntax))
+                {
+                    this.Core.AddInlineDirectoryId(inlineSyntax, id.Id);
+                }
+            }
+
+            if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !("SourceDir".Equals(name, StringComparison.Ordinal) && shortName == null && shortSourceName == null && sourceName == null))
+            {
+                this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, name));
+            }
+
             // Update the file source path appropriately.
             if (fileSourceAttribSet)
             {
@@ -4280,23 +4301,6 @@ namespace WixToolset.Core
                 {
                     fileSource = String.Concat(fileSource, append, Path.DirectorySeparatorChar);
                 }
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
-            }
-
-            // Calculate the DefaultDir for the directory row.
-            var defaultDir = String.IsNullOrEmpty(shortName) ? name : String.Concat(shortName, "|", name);
-            if (!String.IsNullOrEmpty(sourceName))
-            {
-                defaultDir = String.Concat(defaultDir, ":", String.IsNullOrEmpty(shortSourceName) ? sourceName : String.Concat(shortSourceName, "|", sourceName));
-            }
-
-            if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !"SourceDir".Equals(defaultDir, StringComparison.Ordinal))
-            {
-                this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, defaultDir));
             }
 
             foreach (var child in node.Elements())

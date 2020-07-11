@@ -329,21 +329,22 @@ namespace WixToolset.Core
         /// <returns>The generated identifier.</returns>
         public static string GenerateIdentifier(string prefix, params string[] args)
         {
-            string stringData = String.Join("|", args);
-            byte[] data = Encoding.UTF8.GetBytes(stringData);
+            string base64;
 
-            // hash the data
-            byte[] hash;
-            using (SHA1 sha1 = new SHA1CryptoServiceProvider())
+            using (var sha1 = new SHA1CryptoServiceProvider())
             {
-                hash = sha1.ComputeHash(data);
+                var combined = String.Join("|", args);
+                var data = Encoding.UTF8.GetBytes(combined);
+                var hash = sha1.ComputeHash(data);
+                base64 = Convert.ToBase64String(hash);
             }
 
-            // Build up the identifier.
-            StringBuilder identifier = new StringBuilder(35, 35);
+            var identifier = new StringBuilder(32);
             identifier.Append(prefix);
-            identifier.Append(Convert.ToBase64String(hash).TrimEnd('='));
-            identifier.Replace('+', '.').Replace('/', '_');
+            identifier.Append(base64);
+            identifier.Length -= 1; // removes the trailing '=' from base64
+            identifier.Replace('+', '.');
+            identifier.Replace('/', '_');
 
             return identifier.ToString();
         }
