@@ -85,26 +85,23 @@ namespace WixToolset.Extensibility.Services
         /// <param name="id">Optional identifier for the new row.</param>
         /// <param name="parentId">Optional identifier for the parent row.</param>
         /// <param name="name">Long name of the directory.</param>
-        /// <param name="sectionInlinedDirectoryIds">Inline directory ids for the section.</param>
         /// <param name="shortName">Optional short name of the directory.</param>
         /// <param name="sourceName">Optional source name for the directory.</param>
         /// <param name="shortSourceName">Optional short source name for the directory.</param>
         /// <returns>Identifier for the newly created row.</returns>
-        Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
-
-        [Obsolete]
-        Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
+        Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null);
 
         /// <summary>
         /// Creates directories using the inline directory syntax.
         /// </summary>
         /// <param name="section">Section to add the new symbol to.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
+        /// <param name="attribute">Attribute containing the inline syntax.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
-        /// <param name="attribute">The attribute to parse.</param>
-        /// <param name="sectionInlinedDirectoryIds">Inline directory ids for the section.</param>
+        /// <param name="inlineSyntax">Optional inline syntax to override attribute's value.</param>
+        /// <param name="sectionCachedInlinedDirectoryIds">Mapping of inline directory syntax to ids for the section.</param>
         /// <returns>Identifier of the leaf directory created.</returns>
-        string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds);
+        string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId, string inlineSyntax, IDictionary<string, string> sectionCachedInlinedDirectoryIds);
 
         /// <summary>
         /// Creates a Registry symbol in the active section.
@@ -136,8 +133,24 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolName">The symbol name of the simple reference.</param>
+        /// <param name="primaryKey">The primary key of the simple reference.</param>
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, string primaryKey);
+
+        /// <summary>
+        /// Create a WixSimpleReference symbol in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
         void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, params string[] primaryKeys);
+
+        /// <summary>
+        /// Create a WixSimpleReference symbol in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
+        /// <param name="primaryKey">The primary key of the simple reference.</param>
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, string primaryKey);
 
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
@@ -263,15 +276,6 @@ namespace WixToolset.Extensibility.Services
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
-
-        /// <summary>
-        /// Gets the attribute value as inline directory syntax.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="attribute">Attribute containing the value to get.</param>
-        /// <param name="resultUsedToCreateReference">Flag indicates whether the inline directory syntax should be processed to create a directory row or to create a directory reference.</param>
-        /// <returns>Inline directory syntax split into array of strings or null if the syntax did not parse.</returns>
-        string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference);
 
         /// <summary>
         /// Get an integer attribute value and displays an error for an illegal integer value.
