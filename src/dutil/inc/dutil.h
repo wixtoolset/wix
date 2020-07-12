@@ -10,17 +10,6 @@
 #define DAPIV_(type) EXTERN_C type DAPIV
 
 
-// enums
-typedef enum REPORT_LEVEL
-{
-    REPORT_NONE,      // turns off report (only valid for XXXSetLevel())
-    REPORT_WARNING,   // written if want only warnings or reporting is on in general
-    REPORT_STANDARD,  // written if reporting is on
-    REPORT_VERBOSE,   // written only if verbose reporting is on
-    REPORT_DEBUG,     // reporting useful when debugging code
-    REPORT_ERROR,     // always gets reported, but can never be specified
-} REPORT_LEVEL;
-
 // asserts and traces
 typedef BOOL (DAPI *DUTIL_ASSERTDISPLAYFUNCTION)(__in_z LPCSTR sz);
 
@@ -29,7 +18,7 @@ typedef void (CALLBACK *DUTIL_CALLBACK_TRACEERROR)(
     __in int iLine,
     __in REPORT_LEVEL rl,
     __in UINT source,
-    __in HRESULT hr,
+    __in HRESULT hrError,
     __in_z __format_string LPCSTR szFormat,
     __in va_list args
     );

@@ -36,6 +36,8 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="DictUtilTest.cpp" />
     <ClCompile Include="DirUtilTests.cpp" />
+    <ClCompile Include="DUtilTests.cpp" />
+    <ClCompile Include="error.cpp" />
     <ClCompile Include="FileUtilTest.cpp" />
     <ClCompile Include="GuidUtilTest.cpp" />
     <ClCompile Include="IniUtilTest.cpp" />

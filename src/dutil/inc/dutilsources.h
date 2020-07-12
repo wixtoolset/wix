@@ -63,3 +63,13 @@ typedef enum DUTIL_SOURCE
 
     DUTIL_SOURCE_EXTERNAL = 256,
 } DUTIL_SOURCE;
+
+typedef enum REPORT_LEVEL
+{
+    REPORT_NONE,      // turns off report (only valid for XXXSetLevel())
+    REPORT_WARNING,   // written if want only warnings or reporting is on in general
+    REPORT_STANDARD,  // written if reporting is on
+    REPORT_VERBOSE,   // written only if verbose reporting is on
+    REPORT_DEBUG,     // reporting useful when debugging code
+    REPORT_ERROR,     // always gets reported, but can never be specified
+} REPORT_LEVEL;

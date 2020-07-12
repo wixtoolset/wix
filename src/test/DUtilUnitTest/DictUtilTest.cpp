@@ -22,6 +22,8 @@ namespace DutilTests
         [Fact]
         void DictUtilTest()
         {
+            DutilInitialize(&DutilTestTraceError);
+
             EmbeddedKeyTestHelper(DICT_FLAG_NONE, numIterations);
 
             EmbeddedKeyTestHelper(DICT_FLAG_CASEINSENSITIVE, numIterations);
@@ -29,6 +31,8 @@ namespace DutilTests
             StringListTestHelper(DICT_FLAG_NONE, numIterations);
 
             StringListTestHelper(DICT_FLAG_CASEINSENSITIVE, numIterations);
+
+            DutilUninitialize();
         }
 
     private:

@@ -17,6 +17,8 @@ namespace CfgTests
 		{
 			HRESULT hr = S_OK;
 
+			DutilInitialize(&DutilTestTraceError);
+
 			LPCWSTR uri = L"https://localhost/";
 			URI_PROTOCOL uriProtocol = URI_PROTOCOL::URI_PROTOCOL_UNKNOWN;
 			hr = UriProtocol(uri, &uriProtocol);
@@ -90,7 +92,7 @@ namespace CfgTests
 			Assert::Equal((int)URI_PROTOCOL::URI_PROTOCOL_FTP, (int)uriProtocol);
 
 		LExit:
-			;
+			DutilUninitialize();
 		}
 	};
 }

@@ -408,6 +408,12 @@ DAPIV_(void) Dutil_TraceErrorSource(
     ...
     )
 {
+    // if this is NOT an error report and we're not logging at this level, bail
+    if (REPORT_ERROR != rl && Dutil_rlCurrentTrace < rl)
+    {
+        return;
+    }
+
     if (DUTIL_SOURCE_UNKNOWN != source && vpfnTraceErrorCallback)
     {
         va_list args;

@@ -27,6 +27,8 @@ namespace DutilTests
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
 
+            DutilInitialize(&DutilTestTraceError);
+
             try
             {
                 hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&rgValues), cValues + 1, sizeof(ArrayValue), 5);
@@ -101,7 +103,7 @@ namespace DutilTests
             }
 
         LExit:
-            return;
+            DutilUninitialize();
         }
 
         [Fact]
@@ -110,6 +112,8 @@ namespace DutilTests
             HRESULT hr = S_OK;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -180,6 +184,7 @@ namespace DutilTests
             finally
             {
                 ReleaseMem(rgValues);
+                DutilUninitialize();
             }
         }
 
@@ -189,6 +194,8 @@ namespace DutilTests
             HRESULT hr = S_OK;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -252,6 +259,7 @@ namespace DutilTests
             finally
             {
                 ReleaseMem(rgValues);
+                DutilUninitialize();
             }
         }
 
@@ -261,6 +269,8 @@ namespace DutilTests
             HRESULT hr = S_OK;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -326,6 +336,7 @@ namespace DutilTests
             finally
             {
                 ReleaseMem(rgValues);
+                DutilUninitialize();
             }
         }
 
@@ -335,6 +346,8 @@ namespace DutilTests
             HRESULT hr = S_OK;
             ArrayValue *rgValues = NULL;
             DWORD cValues = 0;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -424,6 +437,7 @@ namespace DutilTests
             finally
             {
                 ReleaseMem(rgValues);
+                DutilUninitialize();
             }
         }
 

@@ -24,6 +24,12 @@
     <ClCompile Include="DirUtilTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DUtilTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="FileUtilTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +46,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PathUtilTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="precomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StrUtilTest.cpp">

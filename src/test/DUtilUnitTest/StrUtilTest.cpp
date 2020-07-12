@@ -86,6 +86,8 @@ namespace DutilTests
             HRESULT hr = S_OK;
             LPWSTR sczOutput = NULL;
 
+            DutilInitialize(&DutilTestTraceError);
+
             try
             {
                 hr = StrTrimWhitespace(&sczOutput, wzInput);
@@ -103,13 +105,15 @@ namespace DutilTests
             }
 
         LExit:
-            return;
+            DutilUninitialize();
         }
 
         void TestTrimAnsi(LPCSTR szInput, LPCSTR szExpectedResult)
         {
             HRESULT hr = S_OK;
             LPSTR sczOutput = NULL;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -128,13 +132,15 @@ namespace DutilTests
             }
 
         LExit:
-            return;
+            DutilUninitialize();
         }
 
         void TestStrAllocStringAnsi(LPCSTR szSource, DWORD cchSource, LPCWSTR wzExpectedResult)
         {
             HRESULT hr = S_OK;
             LPWSTR sczOutput = NULL;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -153,13 +159,15 @@ namespace DutilTests
             }
 
         LExit:
-            return;
+            DutilUninitialize();
         }
 
         void TestStrAnsiAllocString(LPWSTR wzSource, DWORD cchSource, LPCSTR szExpectedResult)
         {
             HRESULT hr = S_OK;
             LPSTR sczOutput = NULL;
+
+            DutilInitialize(&DutilTestTraceError);
 
             try
             {
@@ -178,7 +186,7 @@ namespace DutilTests
             }
 
         LExit:
-            return;
+            DutilUninitialize();
         }
     };
 }

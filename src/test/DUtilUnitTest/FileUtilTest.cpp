@@ -18,6 +18,8 @@ namespace DutilTests
             LPWSTR sczTempDir = NULL;
             LPWSTR sczFileDir = NULL;
 
+            DutilInitialize(&DutilTestTraceError);
+
             try
             {
                 hr = PathExpand(&sczTempDir, L"%TEMP%\\FileUtilTest\\", PATH_EXPAND_ENVIRONMENT);
@@ -43,6 +45,7 @@ namespace DutilTests
             {
                 ReleaseStr(sczTempDir);
                 ReleaseStr(sczFileDir);
+                DutilUninitialize();
             }
         }
 

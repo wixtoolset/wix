@@ -24,6 +24,8 @@ namespace DutilTests
             LPWSTR wzIniContents = L"           PlainValue             =       \t      Blah               \r\n;CommentHere\r\n[Section1]\r\n     ;Another Comment With = Equal Sign\r\nSection1ValueA=Foo\r\n\r\nSection1ValueB=Bar\r\n[Section2]\r\nSection2ValueA=Cha\r\nArray[0]=Arr\r\n";
             LPWSTR wzScriptContents = L"setf ~PlainValue Blah\r\n;CommentHere\r\n\r\nsetf ~Section1\\Section1ValueA Foo\r\n\r\nsetf ~Section1\\Section1ValueB Bar\r\nsetf ~Section2\\Section2ValueA Cha\r\nsetf ~Section2\\Array[0] Arr\r\n";
 
+            DutilInitialize(&DutilTestTraceError);
+
             try
             {
                 hr = PathExpand(&sczTempIniFilePath, L"%TEMP%\\IniUtilTest\\Test.ini", PATH_EXPAND_ENVIRONMENT);
@@ -58,6 +60,7 @@ namespace DutilTests
             {
                 ReleaseStr(sczTempIniFilePath);
                 ReleaseStr(sczTempIniFileDir);
+                DutilUninitialize();
             }
         }
 

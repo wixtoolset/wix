@@ -7,6 +7,7 @@
 #include <ShlObj.h>
 
 // Include error.h before dutil.h
+#include <dutilsources.h>
 #include "error.h"
 #include <dutil.h>
 
