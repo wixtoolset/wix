@@ -501,6 +501,8 @@ namespace WixToolset.Data
             return EnsureField(field, definition).Set(value);
         }
 
+        public static void Overwrite(this IntermediateField field, string value) => field.Value.Data = value;
+
         private static IntermediateField AssignFieldValue(IntermediateField field, object data)
         {
             field.Value = new IntermediateFieldValue
