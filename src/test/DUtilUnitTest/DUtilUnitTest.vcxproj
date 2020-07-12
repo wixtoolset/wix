@@ -2,7 +2,9 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\xunit.core.2.4.1\build\xunit.core.props" Condition="Exists('..\..\..\packages\xunit.core.2.4.1\build\xunit.core.props')" />
+  <Import Project="..\..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,17 +21,19 @@
     <RootNamespace>DUtilUnitTests</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>$(WixRoot)src\libs\dutil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>rpcrt4.lib;dutil.lib;Mpr.lib;Ws2_32.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalIncludeDirectories>..\..\dutil\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="CondUtilTest.cpp" />
     <ClCompile Include="DictUtilTest.cpp" />
     <ClCompile Include="DirUtilTests.cpp" />
     <ClCompile Include="FileUtilTest.cpp" />
@@ -38,36 +42,54 @@
     <ClCompile Include="MemUtilTest.cpp" />
     <ClCompile Include="MonUtilTest.cpp" />
     <ClCompile Include="PathUtilTest.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <!-- Warnings from NativeAssert.h from referencing netstandard dlls -->
+      <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="SceUtilTest.cpp" Condition=" Exists('$(SqlCESdkIncludePath)') " />
     <ClCompile Include="StrUtilTest.cpp" />
     <ClCompile Include="UriUtilTest.cpp" />
-    <ClCompile Include="VarHelpers.cpp" />
-    <ClCompile Include="VarUtilTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h" />
     <ClInclude Include="error.h" />
-    <ClInclude Include="VarHelpers.h" />
+    <ClInclude Include="NativeAssert.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <ResourceCompile Include="UnitTest.rc" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="xunit">
-      <HintPath>$(XunitPath)\xunit.dll</HintPath>
+    <Reference Include="System.Core" />
+    <Reference Include="xunit.abstractions">
+      <HintPath>..\..\..\packages\xunit.abstractions.2.0.3\lib\netstandard2.0\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert">
+      <HintPath>..\..\..\packages\xunit.assert.2.4.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.core">
+      <HintPath>..\..\..\packages\xunit.extensibility.core.2.4.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.execution.desktop">
+      <HintPath>..\..\..\packages\xunit.extensibility.execution.2.4.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.4.0.37\lib\net472\WixBuildTools.TestSupport.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\libs\dutil\dutil.vcxproj" />
-    <ProjectReference Include="..\..\WixCppCliTestTools\WixCppCliTestTools.vcxproj">
-      <Project>{95BABD97-FBDB-453A-AF8A-FA031A07B599}</Project>
-      <Name>WixCppCliTestTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WixTestTools\WixTestTools.csproj">
-      <Project>{55CB1042-647B-4347-9876-3EA607AF8DCE}</Project>
-      <Name>WixTestTools</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\dutil\dutil.vcxproj" />
   </ItemGroup>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\..\packages\xunit.core.2.4.1\build\xunit.core.targets" Condition="Exists('..\..\..\packages\xunit.core.2.4.1\build\xunit.core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\xunit.core.2.4.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\xunit.core.2.4.1\build\xunit.core.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\xunit.core.2.4.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\xunit.core.2.4.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
+  </Target>
 </Project>

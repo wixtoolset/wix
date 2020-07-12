@@ -18,9 +18,6 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CondUtilTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DictUtilTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,12 +48,6 @@
     <ClCompile Include="UriUtilTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VarHelpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VarUtilTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTest.rc">
@@ -70,7 +61,7 @@
     <ClInclude Include="error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VarHelpers.h">
+    <ClInclude Include="NativeAssert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

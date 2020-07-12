@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dutil", "src\dutil\dutil.vcxproj", "{1244E671-F108-4334-BA52-8A7517F26ECD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUtilUnitTest", "src\test\DUtilUnitTest\DUtilUnitTest.vcxproj", "{AB7EE608-E5FB-42A5-831F-0DEEEA141223}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -33,6 +35,16 @@ Global
 		{1244E671-F108-4334-BA52-8A7517F26ECD}.Release|x64.Build.0 = Release|x64
 		{1244E671-F108-4334-BA52-8A7517F26ECD}.Release|x86.ActiveCfg = Release|Win32
 		{1244E671-F108-4334-BA52-8A7517F26ECD}.Release|x86.Build.0 = Release|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Debug|ARM.ActiveCfg = Debug|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Debug|x64.ActiveCfg = Debug|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Debug|x86.ActiveCfg = Debug|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Debug|x86.Build.0 = Debug|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Release|ARM.ActiveCfg = Release|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Release|ARM64.ActiveCfg = Release|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Release|x64.ActiveCfg = Release|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Release|x86.ActiveCfg = Release|Win32
+		{AB7EE608-E5FB-42A5-831F-0DEEEA141223}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

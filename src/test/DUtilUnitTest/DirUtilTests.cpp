@@ -4,7 +4,7 @@
 
 using namespace System;
 using namespace Xunit;
-using namespace WixTest;
+using namespace WixBuildTools::TestSupport;
 
 namespace DutilTests
 {
@@ -32,7 +32,7 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to combine current directory: '{0}' with Guid: '{1}'", sczCurrentDir, sczGuid);
 
                 BOOL fExists = DirExists(sczFolder, NULL);
-                Assert::False(fExists);
+                Assert::False(fExists == TRUE);
 
                 hr = PathConcat(sczFolder, L"foo", &sczSubFolder);
                 NativeAssert::Succeeded(hr, "Failed to combine folder: '%ls' with subfolder: 'foo'", sczFolder);

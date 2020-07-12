@@ -2,7 +2,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
-namespace WixTest {
+namespace WixBuildTools {
+namespace TestSupport {
 
     using namespace System;
     using namespace System::Collections::Generic;
@@ -80,4 +81,5 @@ namespace WixTest {
             return wz ? gcnew String(wz) : nullptr;
         }
     };
+}
 }

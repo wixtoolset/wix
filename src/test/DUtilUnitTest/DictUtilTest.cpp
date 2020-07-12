@@ -4,7 +4,7 @@
 
 using namespace System;
 using namespace Xunit;
-using namespace WixTest;
+using namespace WixBuildTools::TestSupport;
 
 const DWORD numIterations = 100000;
 
