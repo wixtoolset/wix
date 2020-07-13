@@ -39,6 +39,10 @@
     <Content Include="TestData\EventManifest\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\EventManifest\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\EventManifest\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Queries\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Queries\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Queries\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Queries\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

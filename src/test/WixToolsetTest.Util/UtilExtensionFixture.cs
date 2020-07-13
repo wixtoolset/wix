@@ -133,6 +133,24 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildWithQueries()
+        {
+            var folder = TestData.Get(@"TestData\Queries");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction");
+            Assert.Equal(new[]
+            {
+                "Binary:Wix4UtilCA_A64\t[Binary data]",
+                "CustomAction:Wix4BroadcastEnvironmentChange_A64\t65\tWix4UtilCA_A64\tWixBroadcastEnvironmentChange\t",
+                "CustomAction:Wix4BroadcastSettingChange_A64\t65\tWix4UtilCA_A64\tWixBroadcastSettingChange\t",
+                "CustomAction:Wix4CheckRebootRequired_A64\t65\tWix4UtilCA_A64\tWixCheckRebootRequired\t",
+                "CustomAction:Wix4QueryOsDriverInfo_A64\t257\tWix4UtilCA_A64\tWixQueryOsDriverInfo\t",
+                "CustomAction:Wix4QueryOsInfo_A64\t257\tWix4UtilCA_A64\tWixQueryOsInfo\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildBundleWithSearches()
         {
             var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");

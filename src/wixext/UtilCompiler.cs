@@ -233,6 +233,19 @@ namespace WixToolset.Util
                         case "User":
                             this.ParseUserElement(intermediate, section, element, null);
                             break;
+                        case "BroadcastEnvironmentChange":
+                        case "BroadcastSettingChange":
+                        case "CheckRebootRequired":
+                        case "ExitEarlyWithSuccess":
+                        case "FailWhenDeferred":
+                        case "QueryWindowsDirectories":
+                        case "QueryWindowsDriverInfo":
+                        case "QueryWindowsSuiteInfo":
+                        case "QueryWindowsWellKnownSIDs":
+                        case "WaitForEvent":
+                        case "WaitForEventDeferred":
+                            this.AddCustomActionReference(intermediate, section, element, parentElement);
+                            break;
                         case "ComponentSearch":
                         case "ComponentSearchRef":
                         case "DirectorySearch":
@@ -340,12 +353,84 @@ namespace WixToolset.Util
                             break;
                     }
                     break;
+                case "UI":
+                    switch (element.Name.LocalName)
+                    {
+                        case "BroadcastEnvironmentChange":
+                        case "BroadcastSettingChange":
+                        case "CheckRebootRequired":
+                        case "ExitEarlyWithSuccess":
+                        case "FailWhenDeferred":
+                        case "QueryWindowsDirectories":
+                        case "QueryWindowsDriverInfo":
+                        case "QueryWindowsSuiteInfo":
+                        case "QueryWindowsWellKnownSIDs":
+                        case "WaitForEvent":
+                        case "WaitForEventDeferred":
+                            this.AddCustomActionReference(intermediate, section, element, parentElement);
+                            break;
+                    }
+                    break;
                 default:
                     this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
 
             return possibleKeyPath;
+        }
+
+        private void AddCustomActionReference(Intermediate intermediate, IntermediateSection section, XElement element, XElement parentElement)
+        {
+            // These elements are not supported for bundles.
+            if (parentElement.Name.LocalName == "Bundle")
+            {
+                this.ParseHelper.UnexpectedElement(parentElement, element);
+                return;
+            }
+
+            var customAction = element.Name.LocalName;
+            switch (element.Name.LocalName)
+            {
+                case "BroadcastEnvironmentChange":
+                case "BroadcastSettingChange":
+                case "CheckRebootRequired":
+                case "ExitEarlyWithSuccess":
+                case "FailWhenDeferred":
+                case "WaitForEvent":
+                case "WaitForEventDeferred":
+                    //default: customAction = element.Name.LocalName;
+                    break;
+                case "QueryWindowsDirectories":
+                    customAction = "QueryOsDirs";
+                    break;
+                case "QueryWindowsDriverInfo":
+                    customAction = "QueryOsDriverInfo";
+                    break;
+                case "QueryWindowsSuiteInfo":
+                    customAction = "QueryOsInfo";
+                    break;
+                case "QueryWindowsWellKnownSIDs":
+                    customAction = "QueryOsWellKnownSID";
+                    break;
+            }
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    // no attributes today
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, customAction, this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>

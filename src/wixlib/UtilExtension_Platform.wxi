@@ -300,6 +300,54 @@
     </Fragment>
 
     <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryOsInfo$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
+
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
+    </Fragment>
+    
+    <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryOsDirs$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
+
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
+    </Fragment>
+
+    <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsWellKnownSID" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
+
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
+    </Fragment>
+    
+    <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
+
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
+    </Fragment>
+
+    <Fragment>
         <Binary Id="$(var.Prefix)UtilCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))utilca.dll" />
     </Fragment>
 </Include>

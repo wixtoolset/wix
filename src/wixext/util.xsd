@@ -1586,6 +1586,127 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:element name="BroadcastEnvironmentChange">
+    <xs:annotation>
+      <xs:documentation>Schedules the BroadcastEnvironmentChange custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="BroadcastSettingChange">
+    <xs:annotation>
+      <xs:documentation>Schedules the BroadcastSettingChange custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="CheckRebootRequired">
+    <xs:annotation>
+      <xs:documentation>Schedules the CheckRebootRequired custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ExitEarlyWithSuccess">
+    <xs:annotation>
+      <xs:documentation>Schedules the ExitEarlyWithSuccess custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="FailWhenDeferred">
+    <xs:annotation>
+      <xs:documentation>Schedules the FailWhenDeferred custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  <xs:element name="WaitForEvent">
+    <xs:annotation>
+      <xs:documentation>Schedules the WaitForEvent custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="WaitForEventDeferred">
+    <xs:annotation>
+      <xs:documentation>Schedules the WaitForEventDeferred custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="QueryWindowsDirectories">
+    <xs:annotation>
+      <xs:documentation>Schedules the QueryOsDirs custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="QueryWindowsDriverInfo">
+    <xs:annotation>
+      <xs:documentation>Schedules the QueryOsDriverInfo custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="QueryWindowsSuiteInfo">
+    <xs:annotation>
+      <xs:documentation>Schedules the QueryOsInfo custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="QueryWindowsWellKnownSIDs">
+    <xs:annotation>
+      <xs:documentation>Schedules the QueryOsWellKnownSID custom action for the current platform.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Product" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+
   <xs:attributeGroup name="SearchCommonAttributes">
     <xs:attribute name="Id" type="xs:string">
       <xs:annotation>
