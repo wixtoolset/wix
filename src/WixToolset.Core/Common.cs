@@ -202,7 +202,7 @@ namespace WixToolset.Core
                 }
                 else if (expectedDot < filename.Length)
                 {
-                    var extensionInvalids = filename.IndexOfAny(IllegalShortFilenameCharacters, expectedDot + 1);
+                    var extensionInvalids = filename.IndexOfAny(IllegalWildcardShortFilenameCharacters, expectedDot + 1);
                     if (extensionInvalids != -1)
                     {
                         return false;
