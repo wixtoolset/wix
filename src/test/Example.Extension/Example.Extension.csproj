@@ -3,15 +3,18 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
-    <CompileWixlibExePath>$(OutputPath)net472\CompileCoreTestExtensionWixlib.exe</CompileWixlibExePath>
+    <CompileWixlibDllPath>$(OutputPath)netcoreapp2.1\CompileCoreTestExtensionWixlib.dll</CompileWixlibDllPath>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Try to hack around VS up-to-date detection -->
-    <Content Include="$(CompileWixlibExePath)" CopyToOutputDirectory="PreserveNewest">
+    <Content Include="$(CompileWixlibDllPath)" CopyToOutputDirectory="PreserveNewest">
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="Data\example.wxs" CopyToOutputDirectory="PreserveNewest">
       <Visible>false</Visible>
     </Content>
     <ExtensionWxs Include="Data\example.wxs" />
@@ -22,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj" />
   </ItemGroup>
 
   <Target Name="SetExtensionWixlib">
@@ -37,7 +38,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="ResolveProjectReferences;SetExtensionWixlib" Inputs="@(ExtensionWxs);$(CompileWixlibExePath)" Outputs="$(WixlibPath)">
-    <Exec Command='$(CompileWixlibExePath) "$(IntermediateOutputPath)\" "$(WixlibPath)" "@(ExtensionWxs)"' />
+  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="ResolveProjectReferences;SetExtensionWixlib" Inputs="@(ExtensionWxs);$(CompileWixlibDllPath)" Outputs="$(WixlibPath)">
+    <Exec Command='dotnet $(CompileWixlibDllPath) "$(IntermediateOutputPath) " "$(WixlibPath)" "@(ExtensionWxs)"' />
   </Target>
 </Project>
