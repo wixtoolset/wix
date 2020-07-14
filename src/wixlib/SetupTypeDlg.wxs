@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -7,20 +6,20 @@
         <UI>
             <Dialog Id="SetupTypeDlg" Width="370" Height="270" Title="!(loc.SetupTypeDlg_Title)">
                 <Control Id="TypicalButton" Type="PushButton" X="40" Y="65" Width="80" Height="17" ToolTip="!(loc.SetupTypeDlgTypicalButtonTooltip)" Default="yes" Text="!(loc.SetupTypeDlgTypicalButton)">
-                    <Publish Property="WixUI_InstallMode" Value="InstallTypical">1</Publish>
-                    <Publish Event="SetInstallLevel" Value="3">1</Publish>
+                    <Publish Property="WixUI_InstallMode" Value="InstallTypical" />
+                    <Publish Event="SetInstallLevel" Value="3" />
                 </Control>
                 <Control Id="CustomButton" Type="PushButton" X="40" Y="118" Width="80" Height="17" ToolTip="!(loc.SetupTypeDlgCustomButtonTooltip)" Text="!(loc.SetupTypeDlgCustomButton)">
-                    <Publish Property="WixUI_InstallMode" Value="InstallCustom">1</Publish>
+                    <Publish Property="WixUI_InstallMode" Value="InstallCustom" />
                 </Control>
                 <Control Id="CompleteButton" Type="PushButton" X="40" Y="171" Width="80" Height="17" ToolTip="!(loc.SetupTypeDlgCompleteButtonTooltip)" Text="!(loc.SetupTypeDlgCompleteButton)">
-                    <Publish Property="WixUI_InstallMode" Value="InstallComplete">1</Publish>
-                    <Publish Event="SetInstallLevel" Value="1000">1</Publish>
+                    <Publish Property="WixUI_InstallMode" Value="InstallComplete" />
+                    <Publish Event="SetInstallLevel" Value="1000" />
                 </Control>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUINext)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
                 <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.SetupTypeDlgBannerBitmap)" />
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />

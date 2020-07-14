@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -11,33 +10,27 @@
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
                 <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="130" Y="207" Width="226" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.WelcomeEulaDlgLicenseAcceptedCheckBox)" />
                 <Control Id="Print" Type="PushButton" X="88" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)">
-                    <Publish Event="DoAction" Value="WixUIPrintEula">1</Publish>
+                    <Publish Event="DoAction" Value="WixUIPrintEula" />
                 </Control>
                 <Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUIBack)" />
-                <Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.WelcomeEulaDlgInstall)" Hidden="yes">
-                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1</Publish>
-                    <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-                    <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-                    <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-                    <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-                    <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-                    <Condition Action="disable"><![CDATA[LicenseAccepted <> "1"]]></Condition>
-                    <Condition Action="enable">LicenseAccepted = "1"</Condition>
-                    <Condition Action="show">ALLUSERS</Condition>
+                <Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.WelcomeEulaDlgInstall)" Hidden="yes" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;" ShowCondition="ALLUSERS">
+                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Condition="!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1" />
+                    <Publish Event="EndDialog" Value="Return" Condition="OutOfDiskSpace &lt;&gt; 1" />
+                    <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" />
+                    <Publish Event="EndDialog" Value="Return" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" />
+                    <Publish Event="EnableRollback" Value="False" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" />
+                    <Publish Event="SpawnDialog" Value="OutOfDiskDlg" Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" />
                 </Control>
-                <Control Id="InstallNoShield" Type="PushButton" ElevationShield="no" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.WelcomeEulaDlgInstall)" Hidden="yes">
-                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1</Publish>
-                    <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-                    <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-                    <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-                    <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-                    <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-                    <Condition Action="disable"><![CDATA[LicenseAccepted <> "1"]]></Condition>
-                    <Condition Action="enable">LicenseAccepted = "1"</Condition>
-                    <Condition Action="show">NOT ALLUSERS</Condition>
+                <Control Id="InstallNoShield" Type="PushButton" ElevationShield="no" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.WelcomeEulaDlgInstall)" Hidden="yes" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;" ShowCondition="NOT ALLUSERS">
+                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Condition="!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1" />
+                    <Publish Event="EndDialog" Value="Return" Condition="OutOfDiskSpace &lt;&gt; 1" />
+                    <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST=&quot;P&quot; OR NOT PROMPTROLLBACKCOST)" />
+                    <Publish Event="EndDialog" Value="Return" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" />
+                    <Publish Event="EnableRollback" Value="False" Condition="OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST=&quot;D&quot;" />
+                    <Publish Event="SpawnDialog" Value="OutOfDiskDlg" Condition="(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST=&quot;F&quot;)" />
                 </Control>
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
                 <Control Id="LicenseText" Type="ScrollableText" X="130" Y="36" Width="226" Height="162" Sunken="yes" TabSkip="no">
                     <Text SourceFile="!(wix.WixUILicenseRtf=$(var.licenseRtf))" />
@@ -46,7 +39,7 @@
         </UI>
 
         <InstallUISequence>
-            <Show Dialog="WelcomeEulaDlg" Before="ProgressDlg" Overridable="yes">NOT Installed</Show>
+            <Show Dialog="WelcomeEulaDlg" Before="ProgressDlg" Overridable="yes" Condition="NOT Installed" />
         </InstallUISequence>
     </Fragment>
 </Wix>

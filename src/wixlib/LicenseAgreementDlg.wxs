@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -13,16 +12,14 @@
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.LicenseAgreementDlgTitle)" />
                 <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="207" Width="330" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.LicenseAgreementDlgLicenseAcceptedCheckBox)" />
                 <Control Id="Print" Type="PushButton" X="112" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)">
-                    <Publish Event="DoAction" Value="WixUIPrintEula">1</Publish>
+                    <Publish Event="DoAction" Value="WixUIPrintEula" />
                 </Control>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
-                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1</Publish>
-                    <Condition Action="disable"><![CDATA[LicenseAccepted <> "1"]]></Condition>
-                    <Condition Action="enable">LicenseAccepted = "1"</Condition>
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;">
+                    <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Condition="!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1" />
                 </Control>
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
                 <Control Id="LicenseText" Type="ScrollableText" X="20" Y="60" Width="330" Height="140" Sunken="yes" TabSkip="no">
                     <Text SourceFile="!(wix.WixUILicenseRtf=$(var.licenseRtf))" />

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -8,11 +7,11 @@
             <Property Id="WixUIRMOption" Value="UseRM" />
             <Dialog Id="MsiRMFilesInUse" Width="370" Height="270" Title="!(loc.MsiRMFilesInUse_Title)" KeepModeless="yes">
                 <Control Id="OK" Type="PushButton" X="240" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUIOK)">
-                    <Publish Event="EndDialog" Value="Return">1</Publish>
-                    <Publish Event="RMShutdownAndRestart" Value="0">WixUIRMOption~="UseRM"</Publish>
+                    <Publish Event="EndDialog" Value="Return" />
+                    <Publish Event="RMShutdownAndRestart" Value="0" Condition="WixUIRMOption~=&quot;UseRM&quot;" />
                 </Control>
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="EndDialog" Value="Exit">1</Publish>
+                    <Publish Event="EndDialog" Value="Exit" />
                 </Control>
 
                 <Control Id="ShutdownOption" Type="RadioButtonGroup" X="26" Y="190" Width="305" Height="45" Property="WixUIRMOption">

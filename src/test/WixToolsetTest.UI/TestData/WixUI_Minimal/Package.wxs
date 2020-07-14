@@ -1,29 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="*" Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Product Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
 
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate />
 
-    <Feature Id="ProductFeature" Title="MsiPackage">
-      <ComponentGroupRef Id="ProductComponents" />
-    </Feature>
+        <Feature Id="ProductFeature" Title="MsiPackage">
+            <ComponentGroupRef Id="ProductComponents" />
+        </Feature>
 
-    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-       <Component>
-         <File Source="example.txt" />
-       </Component>
-    </ComponentGroup>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt" />
+            </Component>
+        </ComponentGroup>
 
-    <UIRef Id="WixUI_Minimal" />
-  </Product>
+        <UIRef Id="WixUI_Minimal" />
+    </Product>
 
-  <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
-      </Directory>
-    </Directory>
-  </Fragment>
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+            </Directory>
+        </Directory>
+    </Fragment>
 </Wix>

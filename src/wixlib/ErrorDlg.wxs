@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -8,26 +7,26 @@
             <Dialog Id="ErrorDlg" Width="270" Height="105" Title="!(loc.ErrorDlg_Title)" ErrorDialog="yes">
                 <Control Id="ErrorText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" NoPrefix="yes" Text="!(loc.ErrorDlgErrorText)" />
                 <Control Id="Y" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIYes)">
-                    <Publish Event="EndDialog" Value="ErrorYes">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorYes" />
                 </Control>
                 <Control Id="A" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="EndDialog" Value="ErrorAbort">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorAbort" />
                 </Control>
                 <Control Id="C" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUICancel)">
-                    <Publish Event="EndDialog" Value="ErrorCancel">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorCancel" />
                 </Control>
                 <Control Id="ErrorIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
                 <Control Id="I" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIIgnore)">
-                    <Publish Event="EndDialog" Value="ErrorIgnore">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorIgnore" />
                 </Control>
                 <Control Id="N" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUINo)">
-                    <Publish Event="EndDialog" Value="ErrorNo">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorNo" />
                 </Control>
                 <Control Id="O" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
-                    <Publish Event="EndDialog" Value="ErrorOk">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorOk" />
                 </Control>
                 <Control Id="R" Type="PushButton" X="100" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIRetry)">
-                    <Publish Event="EndDialog" Value="ErrorRetry">1</Publish>
+                    <Publish Event="EndDialog" Value="ErrorRetry" />
                 </Control>
             </Dialog>
 
