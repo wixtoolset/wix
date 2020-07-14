@@ -25,10 +25,10 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="WiX Toolset v4.0\" />
+        <Directory Id="INSTALLFOLDER" Name="WiX Toolset v4.0" />
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ShortcutFolder" Name="WiX Toolset\" />
+        <Directory Id="ShortcutFolder" Name="WiX Toolset" />
       </Directory>
     </Directory>
   </Fragment>
