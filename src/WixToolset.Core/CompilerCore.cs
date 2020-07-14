@@ -238,7 +238,7 @@ namespace WixToolset.Core
         /// <returns>True if the identifier is a valid loc identifier.</returns>
         public bool IsValidLocIdentifier(string identifier)
         {
-            return this.parseHelper.IsValidIdentifier(identifier);
+            return this.parseHelper.IsValidLocIdentifier(identifier);
         }
 
         /// <summary>
@@ -770,7 +770,7 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                if (!this.IsValidShortFilename(value, allowWildcards) && !this.IsValidLocIdentifier(value))
+                if (!this.IsValidShortFilename(value, allowWildcards) && !Common.ContainsValidBinderVariable(value))
                 {
                     this.Write(ErrorMessages.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
