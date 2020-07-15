@@ -23,7 +23,5 @@
 #include <regutil.h>
 #include <uriutil.h>
 
-#include "NativeAssert.h"
-
 #pragma managed
 #include <vcclr.h>
