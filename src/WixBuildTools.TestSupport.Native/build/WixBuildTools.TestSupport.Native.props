@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <RepoRootDir Condition=" '$(RepoRootDir)' == '' ">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), version.json))</RepoRootDir>
+  </PropertyGroup>
+  <Import Project="$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.props" Condition="Exists('$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.props')" />
+  <Import Project="$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props" Condition="Exists('$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" />
+  <PropertyGroup>
+    <PlatformToolset>v142</PlatformToolset>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="xunit.abstractions">
+      <HintPath>$(RepoRootDir)\packages\xunit.abstractions.2.0.3\lib\netstandard2.0\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert">
+      <HintPath>$(RepoRootDir)\packages\xunit.assert.2.4.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.core">
+      <HintPath>$(RepoRootDir)\packages\xunit.extensibility.core.2.4.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.execution.desktop">
+      <HintPath>$(RepoRootDir)\packages\xunit.extensibility.execution.2.4.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
