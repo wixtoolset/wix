@@ -2,7 +2,10 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props')" />
+  <Import Project="..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props')" />
+  <Import Project="..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -22,19 +25,25 @@
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>$(WixRoot)src\libs\dutil\inc;$(WixRoot)src\burn\inc;$(WixRoot)src\burn\engine;$(WixRoot)src\libs\deputil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;dutil.lib;deputil.lib;engine.lib;gdiplus.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalIncludeDirectories>..\..\engine</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;gdiplus.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="CacheTest.cpp" />
     <ClCompile Include="ElevationTest.cpp" />
     <ClCompile Include="ManifestHelpers.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <!-- Warnings from referencing netstandard dlls -->
+      <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="RegistrationTest.cpp" />
     <ClCompile Include="SearchTest.cpp" />
-    <ClCompile Include="CacheTest.cpp" />
     <ClCompile Include="VariableHelpers.cpp" />
     <ClCompile Include="VariableTest.cpp" />
   </ItemGroup>
@@ -47,14 +56,31 @@
     <ClInclude Include="VariableHelpers.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <ResourceCompile Include="BurnUnitTest.rc" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <ProjectReference Include="..\..\WixTestTools\WixTestTools.csproj" />
-    <Reference Include="xunit, Version=1.9.2.1705, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>$(XunitPath)\xunit.dll</HintPath>
+    <Reference Include="System.Core" />
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.4.0.40\lib\net472\WixBuildTools.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport.Native">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\lib\net472\WixBuildTools.TestSupport.Native.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\engine\engine.vcxproj" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props'))" />
+  </Target>
 </Project>

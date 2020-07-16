@@ -20,7 +20,11 @@ namespace Bootstrapper
     public ref class VariableTest : BurnUnitTest
     {
     public:
-        [NamedFact]
+        VariableTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
+        {
+        }
+
+        [Fact]
         void VariablesBasicTest()
         {
             HRESULT hr = S_OK;
@@ -48,19 +52,19 @@ namespace Bootstrapper
                 VariableSetStringHelper(&variables, L"OVERWRITTEN_NUMBER", L"NEW");
 
                 // get and verify variable values
-                Assert::Equal(gcnew String(L"VAL1"), VariableGetStringHelper(&variables, L"PROP1"));
+                Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables, L"PROP1"));
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables, L"PROP2"));
-                Assert::Equal(gcnew String(L"2"), VariableGetStringHelper(&variables, L"PROP2"));
-                Assert::Equal(gcnew String(L"VAL3"), VariableGetStringHelper(&variables, L"PROP3"));
-                Assert::Equal(gcnew String(L"VAL4"), VariableGetStringHelper(&variables, L"PROP4"));
-                Assert::Equal(gcnew String(L"VAL5"), VariableGetStringHelper(&variables, L"PROP5"));
-                Assert::Equal(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
+                Assert::Equal<String^>(gcnew String(L"2"), VariableGetStringHelper(&variables, L"PROP2"));
+                Assert::Equal<String^>(gcnew String(L"VAL3"), VariableGetStringHelper(&variables, L"PROP3"));
+                Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables, L"PROP4"));
+                Assert::Equal<String^>(gcnew String(L"VAL5"), VariableGetStringHelper(&variables, L"PROP5"));
+                Assert::Equal<String^>(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
                 Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
                 Assert::Equal(MAKEQWORDVERSION(1,1,0,0), VariableGetVersionHelper(&variables, L"PROP8"));
-                Assert::Equal(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
 
                 Assert::Equal(42ll, VariableGetNumericHelper(&variables, L"OVERWRITTEN_STRING"));
-                Assert::Equal(gcnew String(L"NEW"), VariableGetStringHelper(&variables, L"OVERWRITTEN_NUMBER"));
+                Assert::Equal<String^>(gcnew String(L"NEW"), VariableGetStringHelper(&variables, L"OVERWRITTEN_NUMBER"));
             }
             finally
             {
@@ -68,7 +72,7 @@ namespace Bootstrapper
             }
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesParseXmlTest()
         {
             HRESULT hr = S_OK;
@@ -101,7 +105,7 @@ namespace Bootstrapper
                 Assert::Equal((int)BURN_VARIANT_TYPE_NONE, VariableGetTypeHelper(&variables, L"Var4"));
 
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Var1"));
-                Assert::Equal(gcnew String(L"String value."), VariableGetStringHelper(&variables, L"Var2"));
+                Assert::Equal<String^>(gcnew String(L"String value."), VariableGetStringHelper(&variables, L"Var2"));
                 Assert::Equal(MAKEQWORDVERSION(1,2,3,4), VariableGetVersionHelper(&variables, L"Var3"));
             }
             finally
@@ -111,7 +115,7 @@ namespace Bootstrapper
             }
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesFormatTest()
         {
             HRESULT hr = S_OK;
@@ -129,21 +133,21 @@ namespace Bootstrapper
                 VariableSetNumericHelper(&variables, L"PROP3", 3);
 
                 // test string formatting
-                Assert::Equal(gcnew String(L"NOPROP"), VariableFormatStringHelper(&variables, L"NOPROP"));
-                Assert::Equal(gcnew String(L"VAL1"), VariableFormatStringHelper(&variables, L"[PROP1]"));
-                Assert::Equal(gcnew String(L" VAL1 "), VariableFormatStringHelper(&variables, L" [PROP1] "));
-                Assert::Equal(gcnew String(L"PRE VAL1"), VariableFormatStringHelper(&variables, L"PRE [PROP1]"));
-                Assert::Equal(gcnew String(L"VAL1 POST"), VariableFormatStringHelper(&variables, L"[PROP1] POST"));
-                Assert::Equal(gcnew String(L"PRE VAL1 POST"), VariableFormatStringHelper(&variables, L"PRE [PROP1] POST"));
-                Assert::Equal(gcnew String(L"VAL1 MID VAL2"), VariableFormatStringHelper(&variables, L"[PROP1] MID [PROP2]"));
-                Assert::Equal(gcnew String(L""), VariableFormatStringHelper(&variables, L"[NONE]"));
-                Assert::Equal(gcnew String(L""), VariableFormatStringHelper(&variables, L"[prop1]"));
-                Assert::Equal(gcnew String(L"["), VariableFormatStringHelper(&variables, L"[\\[]"));
-                Assert::Equal(gcnew String(L"]"), VariableFormatStringHelper(&variables, L"[\\]]"));
-                Assert::Equal(gcnew String(L"[]"), VariableFormatStringHelper(&variables, L"[]"));
-                Assert::Equal(gcnew String(L"[NONE"), VariableFormatStringHelper(&variables, L"[NONE"));
-                Assert::Equal(gcnew String(L"VAL2"), VariableGetFormattedHelper(&variables, L"PROP2"));
-                Assert::Equal(gcnew String(L"3"), VariableGetFormattedHelper(&variables, L"PROP3"));
+                Assert::Equal<String^>(gcnew String(L"NOPROP"), VariableFormatStringHelper(&variables, L"NOPROP"));
+                Assert::Equal<String^>(gcnew String(L"VAL1"), VariableFormatStringHelper(&variables, L"[PROP1]"));
+                Assert::Equal<String^>(gcnew String(L" VAL1 "), VariableFormatStringHelper(&variables, L" [PROP1] "));
+                Assert::Equal<String^>(gcnew String(L"PRE VAL1"), VariableFormatStringHelper(&variables, L"PRE [PROP1]"));
+                Assert::Equal<String^>(gcnew String(L"VAL1 POST"), VariableFormatStringHelper(&variables, L"[PROP1] POST"));
+                Assert::Equal<String^>(gcnew String(L"PRE VAL1 POST"), VariableFormatStringHelper(&variables, L"PRE [PROP1] POST"));
+                Assert::Equal<String^>(gcnew String(L"VAL1 MID VAL2"), VariableFormatStringHelper(&variables, L"[PROP1] MID [PROP2]"));
+                Assert::Equal<String^>(gcnew String(L""), VariableFormatStringHelper(&variables, L"[NONE]"));
+                Assert::Equal<String^>(gcnew String(L""), VariableFormatStringHelper(&variables, L"[prop1]"));
+                Assert::Equal<String^>(gcnew String(L"["), VariableFormatStringHelper(&variables, L"[\\[]"));
+                Assert::Equal<String^>(gcnew String(L"]"), VariableFormatStringHelper(&variables, L"[\\]]"));
+                Assert::Equal<String^>(gcnew String(L"[]"), VariableFormatStringHelper(&variables, L"[]"));
+                Assert::Equal<String^>(gcnew String(L"[NONE"), VariableFormatStringHelper(&variables, L"[NONE"));
+                Assert::Equal<String^>(gcnew String(L"VAL2"), VariableGetFormattedHelper(&variables, L"PROP2"));
+                Assert::Equal<String^>(gcnew String(L"3"), VariableGetFormattedHelper(&variables, L"PROP3"));
 
                 hr = VariableFormatString(&variables, L"PRE [PROP1] POST", &scz, &cch);
                 TestThrowOnFailure(hr, L"Failed to format string");
@@ -162,16 +166,16 @@ namespace Bootstrapper
             }
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesEscapeTest()
         {
             // test string escaping
-            Assert::Equal(gcnew String(L"[\\[]"), VariableEscapeStringHelper(L"["));
-            Assert::Equal(gcnew String(L"[\\]]"), VariableEscapeStringHelper(L"]"));
-            Assert::Equal(gcnew String(L" [\\[]TEXT[\\]] "), VariableEscapeStringHelper(L" [TEXT] "));
+            Assert::Equal<String^>(gcnew String(L"[\\[]"), VariableEscapeStringHelper(L"["));
+            Assert::Equal<String^>(gcnew String(L"[\\]]"), VariableEscapeStringHelper(L"]"));
+            Assert::Equal<String^>(gcnew String(L" [\\[]TEXT[\\]] "), VariableEscapeStringHelper(L" [TEXT] "));
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesConditionTest()
         {
             HRESULT hr = S_OK;
@@ -346,7 +350,7 @@ namespace Bootstrapper
             }
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesSerializationTest()
         {
             HRESULT hr = S_OK;
@@ -376,10 +380,10 @@ namespace Bootstrapper
                 hr = VariableDeserialize(&variables2, FALSE, pbBuffer, cbBuffer, &iBuffer);
                 TestThrowOnFailure(hr, L"Failed to deserialize variables.");
 
-                Assert::Equal(gcnew String(L"VAL1"), VariableGetStringHelper(&variables2, L"PROP1"));
+                Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables2, L"PROP1"));
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables2, L"PROP2"));
                 Assert::Equal(MAKEQWORDVERSION(1,1,1,1), VariableGetVersionHelper(&variables2, L"PROP3"));
-                Assert::Equal(gcnew String(L"VAL4"), VariableGetStringHelper(&variables2, L"PROP4"));
+                Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables2, L"PROP4"));
             }
             finally
             {
@@ -389,7 +393,7 @@ namespace Bootstrapper
             }
         }
 
-        [NamedFact]
+        [Fact]
         void VariablesBuiltInTest()
         {
             HRESULT hr = S_OK;
@@ -436,29 +440,29 @@ namespace Bootstrapper
                 VariableGetNumericHelper(&variables, L"UserLanguageID");
 
                 // known folders
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData) + "\\", VariableGetStringHelper(&variables, L"AppDataFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::CommonApplicationData) + "\\", VariableGetStringHelper(&variables, L"CommonAppDataFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData) + "\\", VariableGetStringHelper(&variables, L"AppDataFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonApplicationData) + "\\", VariableGetStringHelper(&variables, L"CommonAppDataFolder"));
 
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::ProgramFiles) + "\\", VariableGetStringHelper(&variables, L"ProgramFilesFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::DesktopDirectory) + "\\", VariableGetStringHelper(&variables, L"DesktopFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::Favorites) + "\\", VariableGetStringHelper(&variables, L"FavoritesFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::ProgramFiles) + "\\", VariableGetStringHelper(&variables, L"ProgramFilesFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::DesktopDirectory) + "\\", VariableGetStringHelper(&variables, L"DesktopFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Favorites) + "\\", VariableGetStringHelper(&variables, L"FavoritesFolder"));
                 VariableGetStringHelper(&variables, L"FontsFolder");
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData) + "\\", VariableGetStringHelper(&variables, L"LocalAppDataFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::Personal) + "\\", VariableGetStringHelper(&variables, L"PersonalFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::Programs) + "\\", VariableGetStringHelper(&variables, L"ProgramMenuFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::SendTo) + "\\", VariableGetStringHelper(&variables, L"SendToFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::StartMenu) + "\\", VariableGetStringHelper(&variables, L"StartMenuFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::Startup) + "\\", VariableGetStringHelper(&variables, L"StartupFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData) + "\\", VariableGetStringHelper(&variables, L"LocalAppDataFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Personal) + "\\", VariableGetStringHelper(&variables, L"PersonalFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Programs) + "\\", VariableGetStringHelper(&variables, L"ProgramMenuFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::SendTo) + "\\", VariableGetStringHelper(&variables, L"SendToFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::StartMenu) + "\\", VariableGetStringHelper(&variables, L"StartMenuFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Startup) + "\\", VariableGetStringHelper(&variables, L"StartupFolder"));
                 VariableGetStringHelper(&variables, L"SystemFolder");
                 VariableGetStringHelper(&variables, L"WindowsFolder");
                 VariableGetStringHelper(&variables, L"WindowsVolume");
 
-                Assert::Equal(System::IO::Path::GetTempPath(), System::IO::Path::GetFullPath(VariableGetStringHelper(&variables, L"TempFolder")));
+                Assert::Equal<String^>(System::IO::Path::GetTempPath(), System::IO::Path::GetFullPath(VariableGetStringHelper(&variables, L"TempFolder")));
 
                 VariableGetStringHelper(&variables, L"AdminToolsFolder");
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::CommonProgramFiles) + "\\", VariableGetStringHelper(&variables, L"CommonFilesFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::MyPictures) + "\\", VariableGetStringHelper(&variables, L"MyPicturesFolder"));
-                Assert::Equal(Environment::GetFolderPath(Environment::SpecialFolder::Templates) + "\\", VariableGetStringHelper(&variables, L"TemplateFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonProgramFiles) + "\\", VariableGetStringHelper(&variables, L"CommonFilesFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::MyPictures) + "\\", VariableGetStringHelper(&variables, L"MyPicturesFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Templates) + "\\", VariableGetStringHelper(&variables, L"TemplateFolder"));
 
                 if (Environment::Is64BitOperatingSystem)
                 {

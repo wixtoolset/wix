@@ -13,13 +13,16 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
-    using namespace WixTest;
     using namespace Xunit;
 
     public ref class ManifestTest : BurnUnitTest
     {
     public:
-        [NamedFact]
+        ManifestTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
+        {
+        }
+
+        [Fact]
         void ManifestLoadXmlTest()
         {
             HRESULT hr = S_OK;

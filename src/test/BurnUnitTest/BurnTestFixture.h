@@ -13,8 +13,9 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
+    using namespace WixBuildTools::TestSupport;
 
-    public ref class BurnTestFixture
+    public ref class BurnTestFixture : IDisposable
     {
     public:
         BurnTestFixture()
@@ -26,13 +27,40 @@ namespace Bootstrapper
             TestThrowOnFailure(hr, L"Failed to initialize Regutil.");
 
             PlatformInitialize();
+
+            this->testDirectory = WixBuildTools::TestSupport::TestData::Get();
+
+            LogInitialize(::GetModuleHandleW(NULL));
+
+            hr = LogOpen(NULL, L"BurnUnitTest", NULL, L"txt", FALSE, FALSE, NULL);
+            TestThrowOnFailure(hr, L"Failed to open log.");
         }
 
         ~BurnTestFixture()
         {
             XmlUninitialize();
             RegUninitialize();
+            LogUninitialize(FALSE);
         }
+
+        property String^ DataDirectory
+        {
+            String^ get()
+            {
+                return this->testDirectory;
+            }
+        }
+
+        property String^ TestDirectory
+        {
+            String^ get()
+            {
+                return this->testDirectory;
+            }
+        }
+
+    private:
+        String^ testDirectory;
     };
 }
 }

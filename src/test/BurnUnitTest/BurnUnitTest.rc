@@ -4,4 +4,3 @@
 #define VER_ORIGINAL_FILENAME "BurnUnitTest.dll"
 #define VER_INTERNAL_NAME "setup"
 #define VER_FILE_DESCRIPTION "WiX Toolset Bootstrapper unit tests"
-#include "wix.rc"

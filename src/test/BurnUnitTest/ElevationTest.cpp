@@ -39,13 +39,16 @@ namespace Bootstrapper
     using namespace System;
     using namespace System::IO;
     using namespace System::Threading;
-    using namespace WixTest;
     using namespace Xunit;
 
     public ref class ElevationTest : BurnUnitTest
     {
     public:
-        [NamedFact]
+        ElevationTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
+        {
+        }
+
+        [Fact]
         void ElevateTest()
         {
             HRESULT hr = S_OK;

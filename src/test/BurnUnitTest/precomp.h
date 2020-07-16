@@ -30,22 +30,23 @@
 #include <dictutil.h>
 #include <deputil.h>
 
-#include <wixver.h>
-
 #include "BootstrapperEngine.h"
 #include "BootstrapperApplication.h"
+#include "BundleExtensionEngine.h"
+#include "BundleExtension.h"
 
 #include "platform.h"
 #include "variant.h"
 #include "variable.h"
 #include "condition.h"
-#include "search.h"
 #include "section.h"
 #include "approvedexe.h"
 #include "container.h"
 #include "catalog.h"
 #include "payload.h"
 #include "cabextract.h"
+#include "burnextension.h"
+#include "search.h"
 #include "userexperience.h"
 #include "package.h"
 #include "update.h"

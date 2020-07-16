@@ -13,40 +13,33 @@ namespace Test
 namespace Bootstrapper
 {
     using namespace System;
-    using namespace WixTest;
     using namespace Xunit;
 
-    public ref class BurnUnitTest : WixTestBase, IUseFixture<BurnTestFixture^>
+    [CollectionDefinition("Burn")]
+    public ref class BurnCollectionDefinition : ICollectionFixture<BurnTestFixture^>
+    {
+
+    };
+
+    [Collection("Burn")]
+    public ref class BurnUnitTest
     {
     public:
-        BurnUnitTest()
+        BurnUnitTest(BurnTestFixture^ fixture)
         {
+            this->testContext = fixture;
         }
 
-        virtual void TestInitialize() override
+        property BurnTestFixture^ TestContext
         {
-            WixTestBase::TestInitialize();
-
-            HRESULT hr = S_OK;
-
-            LogInitialize(::GetModuleHandleW(NULL));
-
-            hr = LogOpen(NULL, L"BurnUnitTest", NULL, L"txt", FALSE, FALSE, NULL);
-            TestThrowOnFailure(hr, L"Failed to open log.");
+            BurnTestFixture^ get()
+            {
+                return this->testContext;
+            }
         }
 
-        virtual void TestUninitialize() override
-        {
-            LogUninitialize(FALSE);
-
-            WixTestBase::TestUninitialize();
-        }
-
-        virtual void SetFixture(BurnTestFixture^ fixture)
-        {
-            // Don't care about the fixture, just need it to be created and disposed.
-            UNREFERENCED_PARAMETER(fixture);
-        }
+    private:
+        BurnTestFixture^ testContext;
     }; 
 }
 }
