@@ -788,9 +788,9 @@ namespace WixToolset.Core
             string scope = null;
             string defaultValue = null;
 
-            var secondDot = value.IndexOf('.', firstDot + 1, closeParen - firstDot);
             var equalsDefaultValue = value.IndexOf('=', firstDot + 1, closeParen - firstDot);
             var end = equalsDefaultValue == -1 ? closeParen : equalsDefaultValue;
+            var secondDot = value.IndexOf('.', firstDot + 1, end - firstDot);
 
             if (secondDot == -1)
             {
@@ -814,7 +814,7 @@ namespace WixToolset.Core
 
             if (equalsDefaultValue != -1 && equalsDefaultValue < closeParen)
             {
-                defaultValue = value.Substring(equalsDefaultValue + 1, end - equalsDefaultValue - 1);
+                defaultValue = value.Substring(equalsDefaultValue + 1, closeParen - equalsDefaultValue - 1);
             }
 
             parsedVariable = new ParsedWixVariable
