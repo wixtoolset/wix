@@ -6,22 +6,12 @@
 
 // internal function declarations
 
-static HRESULT BVariantEncryptNumeric(
-    __in BURN_VARIANT* pVariant,
-    __in BOOL fEncrypt
-    );
-
 static HRESULT BVariantEncryptString(
     __in BURN_VARIANT* pVariant,
     __in BOOL fEncrypt
     );
 
-static HRESULT BVariantEncryptVersion(
-    __in BURN_VARIANT* pVariant,
-    __in BOOL fEncrypt
-    );
-
-static HRESULT BVariantRetrieveDecryptedNumeric(
+static void BVariantRetrieveNumeric(
     __in BURN_VARIANT* pVariant,
     __out LONGLONG* pllValue
     );
@@ -31,7 +21,7 @@ static HRESULT BVariantRetrieveDecryptedString(
     __out LPWSTR* psczValue
     );
 
-static HRESULT BVariantRetrieveDecryptedVersion(
+static void BVariantRetrieveVersion(
     __in BURN_VARIANT* pVariant,
     __out DWORD64* pqwValue
     );
@@ -61,7 +51,7 @@ extern "C" HRESULT BVariantGetNumeric(
     switch (pVariant->Type)
     {
     case BURN_VARIANT_TYPE_NUMERIC:
-        BVariantRetrieveDecryptedNumeric(pVariant, pllValue);
+        BVariantRetrieveNumeric(pVariant, pllValue);
         break;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, &sczValue);
@@ -76,7 +66,7 @@ extern "C" HRESULT BVariantGetNumeric(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        BVariantRetrieveDecryptedVersion(pVariant, (DWORD64*)pllValue);
+        BVariantRetrieveVersion(pVariant, (DWORD64*)pllValue);
         break;
     default:
         hr = E_INVALIDARG;
@@ -99,7 +89,7 @@ extern "C" HRESULT BVariantGetString(
     switch (pVariant->Type)
     {
     case BURN_VARIANT_TYPE_NUMERIC:
-        hr = BVariantRetrieveDecryptedNumeric(pVariant, &llValue);
+        BVariantRetrieveNumeric(pVariant, &llValue);
         if (SUCCEEDED(hr))
         {
             hr = StrAllocFormattedSecure(psczValue, L"%I64d", llValue);
@@ -111,7 +101,7 @@ extern "C" HRESULT BVariantGetString(
         hr = BVariantRetrieveDecryptedString(pVariant, psczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantRetrieveDecryptedVersion(pVariant, &qwValue);
+        BVariantRetrieveVersion(pVariant, &qwValue);
         if (SUCCEEDED(hr))
         {
             hr = StrAllocFormattedSecure(psczValue, L"%hu.%hu.%hu.%hu",
@@ -144,7 +134,7 @@ extern "C" HRESULT BVariantGetVersion(
     switch (pVariant->Type)
     {
     case BURN_VARIANT_TYPE_NUMERIC:
-        BVariantRetrieveDecryptedNumeric(pVariant, (LONGLONG*)pqwValue);
+        BVariantRetrieveNumeric(pVariant, (LONGLONG*)pqwValue);
         break;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, &sczValue);
@@ -159,7 +149,7 @@ extern "C" HRESULT BVariantGetVersion(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        BVariantRetrieveDecryptedVersion(pVariant, pqwValue);
+        BVariantRetrieveVersion(pVariant, pqwValue);
         break;
     default:
         hr = E_INVALIDARG;
@@ -175,7 +165,7 @@ extern "C" HRESULT BVariantSetNumeric(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fEncryptValue = pVariant->fEncryptValue;
+    BOOL fEncrypt = pVariant->fEncryptString;
 
     if (BURN_VARIANT_TYPE_STRING == pVariant->Type)
     {
@@ -184,7 +174,7 @@ extern "C" HRESULT BVariantSetNumeric(
     memset(pVariant, 0, sizeof(BURN_VARIANT));
     pVariant->llValue = llValue;
     pVariant->Type = BURN_VARIANT_TYPE_NUMERIC;
-    BVariantSetEncryption(pVariant, fEncryptValue);
+    BVariantSetEncryption(pVariant, fEncrypt);
 
     return hr;
 }
@@ -196,7 +186,7 @@ extern "C" HRESULT BVariantSetString(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fEncryptValue = pVariant->fEncryptValue;
+    BOOL fEncrypt = pVariant->fEncryptString;
 
     if (!wzValue) // if we're nulling out the string, make the variable NONE.
     {
@@ -211,7 +201,7 @@ extern "C" HRESULT BVariantSetString(
         else
         {
             // We're about to copy an unencrypted value.
-            pVariant->fEncryptValue = FALSE;
+            pVariant->fEncryptString = FALSE;
         }
 
         hr = StrAllocStringSecure(&pVariant->sczValue, wzValue, cchValue);
@@ -221,7 +211,7 @@ extern "C" HRESULT BVariantSetString(
     }
 
 LExit:
-    BVariantSetEncryption(pVariant, fEncryptValue);
+    BVariantSetEncryption(pVariant, fEncrypt);
     return hr;
 }
 
@@ -231,7 +221,7 @@ extern "C" HRESULT BVariantSetVersion(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fEncryptValue = pVariant->fEncryptValue;
+    BOOL fEncryptValue = pVariant->fEncryptString;
 
     if (BURN_VARIANT_TYPE_STRING == pVariant->Type)
     {
@@ -254,7 +244,7 @@ extern "C" HRESULT BVariantSetValue(
     LONGLONG llValue = 0;
     LPWSTR sczValue = NULL;
     DWORD64 qwValue = 0;
-    BOOL fEncrypt = pVariant->fEncryptValue;
+    BOOL fEncrypt = pVariant->fEncryptString;
 
     switch (pValue->Type)
     {
@@ -341,7 +331,7 @@ extern "C" HRESULT BVariantCopy(
     }
     ExitOnFailure(hr, "Failed to copy variant.");
 
-    hr = BVariantSetEncryption(pTarget, pSource->fEncryptValue);
+    hr = BVariantSetEncryption(pTarget, pSource->fEncryptString);
 
 LExit:
     return hr;
@@ -354,7 +344,7 @@ extern "C" HRESULT BVariantChangeType(
 {
     HRESULT hr = S_OK;
     BURN_VARIANT variant = { };
-    BOOL fEncryptValue = pVariant->fEncryptValue;
+    BOOL fEncrypt = pVariant->fEncryptString;
 
     if (pVariant->Type == type)
     {
@@ -384,7 +374,7 @@ extern "C" HRESULT BVariantChangeType(
     BVariantUninitialize(pVariant);
     memcpy_s(pVariant, sizeof(BURN_VARIANT), &variant, sizeof(BURN_VARIANT));
     SecureZeroMemory(&variant, sizeof(BURN_VARIANT));
-    BVariantSetEncryption(pVariant, fEncryptValue);
+    BVariantSetEncryption(pVariant, fEncrypt);
 
 LExit:
     return hr;
@@ -397,7 +387,7 @@ extern "C" HRESULT BVariantSetEncryption(
 {
     HRESULT hr = S_OK;
 
-    if (pVariant->fEncryptValue == fEncrypt)
+    if (pVariant->fEncryptString == fEncrypt)
     {
         // The requested encryption state is already applied.
         ExitFunction();
@@ -406,44 +396,20 @@ extern "C" HRESULT BVariantSetEncryption(
     switch (pVariant->Type)
     {
     case BURN_VARIANT_TYPE_NONE:
-        hr = S_OK;
-        break;
     case BURN_VARIANT_TYPE_NUMERIC:
-        hr = BVariantEncryptNumeric(pVariant, fEncrypt);
+    case BURN_VARIANT_TYPE_VERSION:
+        hr = S_OK;
         break;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantEncryptString(pVariant, fEncrypt);
-        break;
-    case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantEncryptVersion(pVariant, fEncrypt);
         break;
     default:
         hr = E_INVALIDARG;
     }
     ExitOnFailure(hr, "Failed to set the variant's encryption state");
-    pVariant->fEncryptValue = fEncrypt;
+    pVariant->fEncryptString = fEncrypt;
 
 LExit:
-    return hr;
-}
-
-static HRESULT BVariantEncryptNumeric(
-    __in BURN_VARIANT* pVariant,
-    __in BOOL fEncrypt
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (fEncrypt)
-    {
-        hr = CrypEncryptMemory(&pVariant->llValue, sizeof(pVariant->encryptionPadding), VARIANT_ENCRYPTION_SCOPE);
-    }
-    else
-    {
-        hr = CrypDecryptMemory(&pVariant->llValue, sizeof(pVariant->encryptionPadding), VARIANT_ENCRYPTION_SCOPE);
-    }
-
-//LExit:
     return hr;
 }
 
@@ -496,50 +462,14 @@ LExit:
     return hr;
 }
 
-static HRESULT BVariantEncryptVersion(
-    __in BURN_VARIANT* pVariant,
-    __in BOOL fEncrypt
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (fEncrypt)
-    {
-        hr = CrypEncryptMemory(&pVariant->qwValue, sizeof(pVariant->encryptionPadding), VARIANT_ENCRYPTION_SCOPE);
-    }
-    else
-    {
-        hr = CrypDecryptMemory(&pVariant->qwValue, sizeof(pVariant->encryptionPadding), VARIANT_ENCRYPTION_SCOPE);
-    }
-
-//LExit:
-    return hr;
-}
-
-// The contents of pllValue may be sensitive, should keep encrypted and SecureZeroMemory.
-static HRESULT BVariantRetrieveDecryptedNumeric(
+static void BVariantRetrieveNumeric(
     __in BURN_VARIANT* pVariant,
     __out LONGLONG* pllValue
     )
 {
-    HRESULT hr = S_OK;
-
     Assert(NULL != pllValue);
-    if (pVariant->fEncryptValue)
-    {
-        hr = BVariantEncryptNumeric(pVariant, FALSE);
-        ExitOnFailure(hr, "Failed to decrypt numeric");
-    }
 
     *pllValue = pVariant->llValue;
-
-    if (pVariant->fEncryptValue)
-    {
-        hr = BVariantEncryptNumeric(pVariant, TRUE);
-    }
-
-LExit:
-    return hr;
 }
 
 // The contents of psczValue may be sensitive, should keep encrypted and SecureZeroFree.
@@ -550,13 +480,13 @@ static HRESULT BVariantRetrieveDecryptedString(
 {
     HRESULT hr = S_OK;
 
-    if (NULL == pVariant->sczValue)
+    if (!pVariant->sczValue)
     {
         *psczValue = NULL;
         ExitFunction();
     }
 
-    if (pVariant->fEncryptValue)
+    if (pVariant->fEncryptString)
     {
         hr = BVariantEncryptString(pVariant, FALSE);
         ExitOnFailure(hr, "Failed to decrypt string");
@@ -565,7 +495,7 @@ static HRESULT BVariantRetrieveDecryptedString(
     hr = StrAllocStringSecure(psczValue, pVariant->sczValue, 0);
     ExitOnFailure(hr, "Failed to copy value.");
 
-    if (pVariant->fEncryptValue)
+    if (pVariant->fEncryptString)
     {
         hr = BVariantEncryptString(pVariant, TRUE);
     }
@@ -574,28 +504,12 @@ LExit:
     return hr;
 }
 
-// The contents of pqwValue may be sensitive, should keep encrypted and SecureZeroMemory.
-static HRESULT BVariantRetrieveDecryptedVersion(
+static void BVariantRetrieveVersion(
     __in BURN_VARIANT* pVariant,
     __out DWORD64* pqwValue
     )
 {
-    HRESULT hr = S_OK;
-
     Assert(NULL != pqwValue);
-    if (pVariant->fEncryptValue)
-    {
-        hr = BVariantEncryptVersion(pVariant, FALSE);
-        ExitOnFailure(hr, "Failed to decrypt version");
-    }
 
     *pqwValue = pVariant->qwValue;
-
-    if (pVariant->fEncryptValue)
-    {
-        hr = BVariantEncryptVersion(pVariant, TRUE);
-    }
-
-LExit:
-    return hr;
 }

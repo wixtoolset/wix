@@ -77,7 +77,7 @@ namespace Bootstrapper
                 hr = BVariantSetEncryption(pActualValue, TRUE);
                 NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
 
-                NativeAssert::True(pActualValue->fEncryptValue);
+                NativeAssert::True(pActualValue->fEncryptString);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Bootstrapper
                 hr = BVariantSetEncryption(pActualValue, TRUE);
                 NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
 
-                NativeAssert::True(pActualValue->fEncryptValue);
+                NativeAssert::True(pActualValue->fEncryptString);
             }
         }
 
@@ -115,7 +115,7 @@ namespace Bootstrapper
                 hr = BVariantSetEncryption(pActualValue, TRUE);
                 NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
 
-                NativeAssert::True(pActualValue->fEncryptValue);
+                NativeAssert::True(pActualValue->fEncryptString);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Bootstrapper
                 hr = BVariantSetEncryption(pActualValue, TRUE);
                 NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
 
-                NativeAssert::True(pActualValue->fEncryptValue);
+                NativeAssert::True(pActualValue->fEncryptString);
             }
         }
 

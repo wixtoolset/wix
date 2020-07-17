@@ -27,10 +27,9 @@ typedef struct _BURN_VARIANT
         LONGLONG llValue;
         DWORD64 qwValue;
         LPWSTR sczValue;
-        BYTE encryptionPadding[CRYP_ENCRYPT_MEMORY_SIZE];
     };
     BURN_VARIANT_TYPE Type;
-    BOOL fEncryptValue;
+    BOOL fEncryptString;
 } BURN_VARIANT;
 
 
