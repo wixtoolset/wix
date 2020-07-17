@@ -13,7 +13,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildWithDefaultValue()
         {
-            var folder = TestData.Get(@"TestData\BindVariables");
+            var folder = TestData.Get(@"TestData", "BindVariables");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -32,6 +32,36 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
+            }
+        }
+
+        [Fact]
+        public void CannotBuildWixlibWithBinariesFromMissingNamedBindPaths()
+        {
+            var folder = TestData.Get(@"TestData", "WixlibWithBinaries");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-bf",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    // Use names that aren't excluded in default .gitignores.
+                    "-bindpath", $"AlphaBits={Path.Combine(folder, "data", "alpha")}",
+                    "-bindpath", $"PowerBits={Path.Combine(folder, "data", "powerpc")}",
+                    "-bindpath", $"{Path.Combine(folder, "data", "alpha")}",
+                    "-bindpath", $"{Path.Combine(folder, "data", "powerpc")}",
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                Assert.Equal(103, result.ExitCode);
             }
         }
     }

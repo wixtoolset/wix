@@ -115,13 +115,14 @@ namespace WixToolset.Core.Bind
             }
             else // not a rooted path so let's try applying all the different source resolution options.
             {
-                string bindName = null;
+                var bindName = String.Empty;
                 var path = source;
-                string pathWithoutSourceDir = null;
+                var pathWithoutSourceDir = String.Empty;
 
                 if (source.StartsWith(BindPathOpenString, StringComparison.Ordinal))
                 {
-                    int closeParen = source.IndexOf(')', BindPathOpenString.Length);
+                    var closeParen = source.IndexOf(')', BindPathOpenString.Length);
+
                     if (-1 != closeParen)
                     {
                         bindName = source.Substring(BindPathOpenString.Length, closeParen - BindPathOpenString.Length);
@@ -138,42 +139,47 @@ namespace WixToolset.Core.Bind
 
                 foreach (var bindPath in bindPaths)
                 {
-                    if (!String.IsNullOrEmpty(bindName) && !String.IsNullOrEmpty(bindPath.Name))
+                    if (String.IsNullOrEmpty(bindName))
                     {
-                        if (String.Equals(bindName, bindPath.Name, StringComparison.OrdinalIgnoreCase) && String.IsNullOrEmpty(resolved))
+                        if (String.IsNullOrEmpty(bindPath.Name))
                         {
-                            var filePath = Path.Combine(bindPath.Path, path);
-
-                            checkedPaths.Add(filePath);
-                            if (CheckFileExists(filePath))
+                            if (!String.IsNullOrEmpty(pathWithoutSourceDir))
                             {
-                                resolved = filePath;
+                                var filePath = Path.Combine(bindPath.Path, pathWithoutSourceDir);
+
+                                checkedPaths.Add(filePath);
+                                if (CheckFileExists(filePath))
+                                {
+                                    resolved = filePath;
+                                }
+                            }
+
+                            if (String.IsNullOrEmpty(resolved))
+                            {
+                                var filePath = Path.Combine(bindPath.Path, path);
+
+                                checkedPaths.Add(filePath);
+                                if (CheckFileExists(filePath))
+                                {
+                                    resolved = filePath;
+                                }
                             }
                         }
                     }
-                    else
+                    else if (bindName.Equals(bindPath.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!String.IsNullOrEmpty(pathWithoutSourceDir))
+                        var filePath = Path.Combine(bindPath.Path, path);
+
+                        checkedPaths.Add(filePath);
+                        if (CheckFileExists(filePath))
                         {
-                            var filePath = Path.Combine(bindPath.Path, pathWithoutSourceDir);
-
-                            checkedPaths.Add(filePath);
-                            if (CheckFileExists(filePath))
-                            {
-                                resolved = filePath;
-                            }
+                            resolved = filePath;
                         }
+                    }
 
-                        if (String.IsNullOrEmpty(resolved))
-                        {
-                            var filePath = Path.Combine(bindPath.Path, path);
-
-                            checkedPaths.Add(filePath);
-                            if (CheckFileExists(filePath))
-                            {
-                                resolved = filePath;
-                            }
-                        }
+                    if (!String.IsNullOrEmpty(resolved))
+                    {
+                        break;
                     }
                 }
             }
