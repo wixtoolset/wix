@@ -46,6 +46,7 @@
     <ClCompile Include="SearchTest.cpp" />
     <ClCompile Include="VariableHelpers.cpp" />
     <ClCompile Include="VariableTest.cpp" />
+    <ClCompile Include="VariantTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BurnTestException.h" />

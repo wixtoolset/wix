@@ -26,6 +26,9 @@ namespace Bootstrapper
             hr = RegInitialize();
             TestThrowOnFailure(hr, L"Failed to initialize Regutil.");
 
+            hr = CrypInitialize();
+            TestThrowOnFailure(hr, L"Failed to initialize Cryputil.");
+
             PlatformInitialize();
 
             this->testDirectory = WixBuildTools::TestSupport::TestData::Get();
@@ -38,6 +41,7 @@ namespace Bootstrapper
 
         ~BurnTestFixture()
         {
+            CrypUninitialize();
             XmlUninitialize();
             RegUninitialize();
             LogUninitialize(FALSE);

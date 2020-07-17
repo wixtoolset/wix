@@ -18,6 +18,9 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CacheTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ElevationTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -25,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ManifestTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="precomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RegistrationTest.cpp">
@@ -39,10 +45,7 @@
     <ClCompile Include="VariableTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CacheTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(WixRoot)src\common\precomp.cpp">
+    <ClCompile Include="VariantTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
