@@ -84,7 +84,7 @@ namespace WixToolsetTest.Converters
                 var settingsFile = Path.Combine(folder, "wixcop.settings.xml");
 
                 var result = RunConversion(targetFile, settingsFile: settingsFile);
-                Assert.Equal(2, result.ExitCode);
+                Assert.Equal(7, result.ExitCode);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
@@ -108,7 +108,7 @@ namespace WixToolsetTest.Converters
                 File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
 
                 var result = RunConversion(targetFile);
-                Assert.Equal(2, result.ExitCode);
+                Assert.Equal(10, result.ExitCode);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
@@ -133,7 +133,7 @@ namespace WixToolsetTest.Converters
 
                 var result = RunConversion(targetFile);
 
-                Assert.Equal(2, result.ExitCode);
+                Assert.Equal(10, result.ExitCode);
                 Assert.Single(result.Messages.Where(message => message.ToString().EndsWith("(QtExecCmdTimeoutAmbiguous)")));
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
@@ -142,7 +142,7 @@ namespace WixToolsetTest.Converters
 
                 // still fails because QtExecCmdTimeoutAmbiguous is unfixable
                 var result2 = RunConversion(targetFile);
-                Assert.Equal(2, result2.ExitCode);
+                Assert.Equal(1, result2.ExitCode);
             }
         }
 
@@ -153,7 +153,7 @@ namespace WixToolsetTest.Converters
             var exitCode = WixRunner.Execute(new[]
             {
                     "convert",
-                    fixErrors ? "-f" : null,
+                    fixErrors ? null : "--dry-run",
                     String.IsNullOrEmpty(settingsFile) ? null : "-set1" + settingsFile,
                     targetFile
                 }, serviceProvider, out var messages);

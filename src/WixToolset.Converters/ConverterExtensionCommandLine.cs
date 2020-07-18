@@ -21,8 +21,11 @@ namespace WixToolset.Converters
 
         private IWixToolsetServiceProvider ServiceProvider { get; }
 
-        // TODO: Do something with CommandLineSwitches
-        public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => base.CommandLineSwitches;
+        public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        {
+            new ExtensionCommandLineSwitch { Switch = "convert", Description = "Convert v3 source code to v4 source code." },
+            new ExtensionCommandLineSwitch { Switch = "format", Description = "Ensures consistent formatting of source code." },
+        };
 
         public override bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {
@@ -31,6 +34,10 @@ namespace WixToolset.Converters
             if ("convert".Equals(argument, StringComparison.OrdinalIgnoreCase))
             {
                 command = new ConvertCommand(this.ServiceProvider);
+            }
+            else if ("format".Equals(argument, StringComparison.OrdinalIgnoreCase))
+            {
+                command = new FormatCommand(this.ServiceProvider);
             }
 
             return command != null;

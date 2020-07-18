@@ -7,11 +7,11 @@ namespace WixToolset.Converters
     using System.Threading.Tasks;
     using WixToolset.Extensibility.Services;
 
-    internal class ConvertCommand : FixupCommandBase
+    internal class FormatCommand : FixupCommandBase
     {
-        private const string SettingsFileDefault = "wix.convert.settings.xml";
+        private const string SettingsFileDefault = "wix.format.settings.xml";
 
-        public ConvertCommand(IWixToolsetServiceProvider serviceProvider)
+        public FormatCommand(IWixToolsetServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
@@ -36,14 +36,14 @@ namespace WixToolset.Converters
 
             int Inspector(string file, bool fix)
             {
-                return converter.ConvertFile(file, fix);
+                return converter.FormatFile(file, fix);
             }
         }
 
         private static void DisplayHelp()
         {
             Console.WriteLine();
-            Console.WriteLine("Usage: wix convert [options] sourceFile [sourceFile ...]");
+            Console.WriteLine("Usage: wix format [options] sourceFile [sourceFile ...]");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  -h|--help         Show command line help.");

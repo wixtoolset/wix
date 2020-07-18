@@ -19,6 +19,12 @@ namespace WixToolset.Converters
     /// </summary>
     public class WixConverter
     {
+        private enum ConvertOperation
+        {
+            Convert,
+            Format,
+        }
+
         private static readonly Regex AddPrefix = new Regex(@"^[^a-zA-Z_]", RegexOptions.Compiled);
         private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}", RegexOptions.Compiled); // non 'words' and assorted valid characters
 
@@ -107,18 +113,6 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/2006/WixUnit", "http://wixtoolset.org/schemas/v4/wixunit" },
         };
 
-        private readonly static SortedSet<string> Wix3Namespaces = new SortedSet<string>
-        {
-            "http://schemas.microsoft.com/wix/2006/wi",
-            "http://schemas.microsoft.com/wix/2006/localization",
-        };
-
-        private readonly static SortedSet<string> Wix4Namespaces = new SortedSet<string>
-        {
-            "http://wixtoolset.org/schemas/v4/wxs",
-            "http://wixtoolset.org/schemas/v4/wxl",
-        };
-
         private readonly Dictionary<XName, Action<XElement>> ConvertElementMapping;
 
         /// <summary>
@@ -193,6 +187,8 @@ namespace WixToolset.Converters
 
         private int IndentationAmount { get; set; }
 
+        private ConvertOperation Operation { get; set; }
+
         private string SourceFile { get; set; }
 
         private int SourceVersion { get; set; }
@@ -205,22 +201,11 @@ namespace WixToolset.Converters
         /// <returns>The number of errors found.</returns>
         public int ConvertFile(string sourceFile, bool saveConvertedFile)
         {
-            XDocument document;
+            var document = this.OpenSourceFile(sourceFile);
 
-            // Set the instance info.
-            this.Errors = 0;
-            this.SourceFile = sourceFile;
-            this.SourceVersion = 0;
-
-            try
+            if (document is null)
             {
-                document = XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-            }
-            catch (XmlException e)
-            {
-                this.OnError(ConverterTestType.XmlException, null, "The xml is invalid.  Detail: '{0}'", e.Message);
-
-                return this.Errors;
+                return 1;
             }
 
             this.ConvertDocument(document);
@@ -228,17 +213,7 @@ namespace WixToolset.Converters
             // Fix errors if requested and necessary.
             if (saveConvertedFile && 0 < this.Errors)
             {
-                try
-                {
-                    using (var writer = XmlWriter.Create(this.SourceFile, new XmlWriterSettings { OmitXmlDeclaration = true }))
-                    {
-                        document.Save(writer);
-                    }
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    this.OnError(ConverterTestType.UnauthorizedAccessException, null, "Could not write to file.");
-                }
+                this.SaveDocument(document);
             }
 
             return this.Errors;
@@ -251,13 +226,13 @@ namespace WixToolset.Converters
         /// <returns>The number of errors found.</returns>
         public int ConvertDocument(XDocument document)
         {
+            // Reset the instance info.
             this.Errors = 0;
             this.SourceVersion = 0;
-
-            var declaration = document.Declaration;
+            this.Operation = ConvertOperation.Convert;
 
             // Remove the declaration.
-            if (null != declaration)
+            if (null != document.Declaration)
             {
                 if (this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
                 {
@@ -271,6 +246,92 @@ namespace WixToolset.Converters
             this.ConvertNodes(document.Nodes(), 0);
 
             return this.Errors;
+        }
+
+        /// <summary>
+        /// Format a file.
+        /// </summary>
+        /// <param name="sourceFile">The file to format.</param>
+        /// <param name="saveConvertedFile">Option to save the format errors that are found.</param>
+        /// <returns>The number of errors found.</returns>
+        public int FormatFile(string sourceFile, bool saveConvertedFile)
+        {
+            var document = this.OpenSourceFile(sourceFile);
+
+            if (document is null)
+            {
+                return 1;
+            }
+
+            this.FormatDocument(document);
+
+            // Fix errors if requested and necessary.
+            if (saveConvertedFile && 0 < this.Errors)
+            {
+                this.SaveDocument(document);
+            }
+
+            return this.Errors;
+        }
+
+        /// <summary>
+        /// Format a document.
+        /// </summary>
+        /// <param name="document">The document to format.</param>
+        /// <returns>The number of errors found.</returns>
+        public int FormatDocument(XDocument document)
+        {
+            // Reset the instance info.
+            this.Errors = 0;
+            this.SourceVersion = 0;
+            this.Operation = ConvertOperation.Format;
+
+            // Remove the declaration.
+            if (null != document.Declaration)
+            {
+                if (this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
+                {
+                    document.Declaration = null;
+                }
+            }
+
+            TrimLeadingText(document);
+
+            // Start converting the nodes at the top.
+            this.ConvertNodes(document.Nodes(), 0);
+
+            return this.Errors;
+        }
+
+        private XDocument OpenSourceFile(string sourceFile)
+        {
+            this.SourceFile = sourceFile;
+
+            try
+            {
+                return XDocument.Load(this.SourceFile, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+            }
+            catch (XmlException e)
+            {
+                this.OnError(ConverterTestType.XmlException, null, "The xml is invalid.  Detail: '{0}'", e.Message);
+            }
+
+            return null;
+        }
+
+        private void SaveDocument(XDocument document)
+        {
+            try
+            {
+                using (var writer = XmlWriter.Create(this.SourceFile, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                {
+                    document.Save(writer);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                this.OnError(ConverterTestType.UnauthorizedAccessException, null, "Could not write to file.");
+            }
         }
 
         private void ConvertNodes(IEnumerable<XNode> nodes, int level)
@@ -901,7 +962,10 @@ namespace WixToolset.Converters
         /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
         private bool OnError(ConverterTestType converterTestType, XObject node, string message, params object[] args)
         {
-            if (this.IgnoreErrors.Contains(converterTestType)) // ignore the error
+            // Ignore the error if explicitly ignored or outside the range of the current operation.
+            if (this.IgnoreErrors.Contains(converterTestType) ||
+                (this.Operation == ConvertOperation.Convert && converterTestType < ConverterTestType.DeclarationPresent) ||
+                (this.Operation == ConvertOperation.Format && converterTestType > ConverterTestType.DeclarationPresent))
             {
                 return false;
             }
@@ -909,7 +973,7 @@ namespace WixToolset.Converters
             // Increase the error count.
             this.Errors++;
 
-            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wixcop.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
+            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wix.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
             var warning = this.ErrorsAsWarnings.Contains(converterTestType);
             var display = String.Format(CultureInfo.CurrentCulture, message, args);
 
@@ -1050,39 +1114,19 @@ namespace WixToolset.Converters
             UnauthorizedAccessException,
 
             /// <summary>
-            /// Displayed when the encoding attribute in the XML declaration is not 'UTF-8'.
-            /// </summary>
-            DeclarationEncodingWrong,
-
-            /// <summary>
-            /// Displayed when the XML declaration is missing from the source file.
-            /// </summary>
-            DeclarationMissing,
-
-            /// <summary>
-            /// Displayed when the whitespace preceding a CDATA node is wrong.
-            /// </summary>
-            WhitespacePrecedingCDATAWrong,
-
-            /// <summary>
             /// Displayed when the whitespace preceding a node is wrong.
             /// </summary>
             WhitespacePrecedingNodeWrong,
 
             /// <summary>
-            /// Displayed when an element is not empty as it should be.
-            /// </summary>
-            NotEmptyElement,
-
-            /// <summary>
-            /// Displayed when the whitespace following a CDATA node is wrong.
-            /// </summary>
-            WhitespaceFollowingCDATAWrong,
-
-            /// <summary>
             /// Displayed when the whitespace preceding an end element is wrong.
             /// </summary>
             WhitespacePrecedingEndElementWrong,
+
+            /// <summary>
+            /// Displayed when the XML declaration is present in the source file.
+            /// </summary>
+            DeclarationPresent,
 
             /// <summary>
             /// Displayed when the xmlns attribute is missing from the document element.
@@ -1153,11 +1197,6 @@ namespace WixToolset.Converters
             /// Explicit auto-GUID unnecessary.
             /// </summary>
             AutoGuidUnnecessary,
-
-            /// <summary>
-            /// Displayed when the XML declaration is present in the source file.
-            /// </summary>
-            DeclarationPresent,
 
             /// <summary>
             /// The Feature Absent attribute renamed to AllowAbsent.
