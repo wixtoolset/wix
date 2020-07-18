@@ -693,7 +693,8 @@ namespace WixToolset.Converters
             this.ConvertInnerTextToAttribute(element, "Condition");
 
             var xCondition = element.Attribute("Condition");
-            if (xCondition?.Value == "1")
+            if (xCondition?.Value == "1" &&
+                this.OnError(ConverterTestType.PublishConditionOneUnnecessary, element, "Adding Condition='1' on {0} elements is no longer necessary. Remove the Condition attribute.", xCondition.Name.LocalName))
             {
                 xCondition.Remove();
             }
@@ -1207,6 +1208,11 @@ namespace WixToolset.Converters
             /// The Feature AllowAdvertise attribute value deprecated.
             /// </summary>
             FeatureAllowAdvertiseValueDeprecated,
+
+            /// <summary>
+            /// The Condition='1' attribute is unnecessary on Publish elements.
+            /// </summary>
+            PublishConditionOneUnnecessary
         }
     }
 }
