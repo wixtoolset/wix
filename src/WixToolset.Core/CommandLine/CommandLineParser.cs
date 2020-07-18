@@ -27,7 +27,7 @@ namespace WixToolset.Core.CommandLine
 
         public bool IsSwitch(string arg)
         {
-            return !String.IsNullOrEmpty(arg) && ('/' == arg[0] || '-' == arg[0]);
+            return !String.IsNullOrEmpty(arg) && '-' == arg[0];
         }
 
         public string GetArgumentAsFilePathOrError(string argument, string fileType)
@@ -74,7 +74,7 @@ namespace WixToolset.Core.CommandLine
 
         public string GetNextArgumentAsDirectoryOrError(string commandLineSwitch)
         {
-            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, arg, out var directory))
             {
                 return directory;
             }
@@ -85,7 +85,7 @@ namespace WixToolset.Core.CommandLine
 
         public bool GetNextArgumentAsDirectoryOrError(string commandLineSwitch, IList<string> directories)
         {
-            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, arg, out var directory))
             {
                 directories.Add(directory);
                 return true;
@@ -124,7 +124,14 @@ namespace WixToolset.Core.CommandLine
 
         public bool TryGetNextSwitchOrArgument(out string arg)
         {
-            return TryDequeue(this.RemainingArguments, out arg);
+            if (this.RemainingArguments.Count > 0)
+            {
+                arg = this.RemainingArguments.Dequeue();
+                return true;
+            }
+
+            arg = null;
+            return false;
         }
 
         private bool TryGetNextNonSwitchArgumentOrError(out string arg)
@@ -139,24 +146,7 @@ namespace WixToolset.Core.CommandLine
             return result;
         }
 
-        private static bool IsValidArg(string arg)
-        {
-            return !(String.IsNullOrEmpty(arg) || '/' == arg[0] || '-' == arg[0]);
-        }
-
-        private static bool TryDequeue(Queue<string> q, out string arg)
-        {
-            if (q.Count > 0)
-            {
-                arg = q.Dequeue();
-                return true;
-            }
-
-            arg = null;
-            return false;
-        }
-
-        private bool TryGetDirectory(string commandlineSwitch, IMessaging messageHandler, string arg, out string directory)
+        private bool TryGetDirectory(string commandlineSwitch, string arg, out string directory)
         {
             directory = null;
 
@@ -174,7 +164,7 @@ namespace WixToolset.Core.CommandLine
         {
             path = null;
 
-            if (!IsValidArg(arg))
+            if (String.IsNullOrEmpty(arg) || '-' == arg[0])
             {
                 this.Messaging.Write(ErrorMessages.FilePathRequired(commandlineSwitch));
             }

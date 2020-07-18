@@ -2,10 +2,7 @@
 
 namespace WixToolset.Core.ExtensibilityServices
 {
-    using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
@@ -13,8 +10,8 @@ namespace WixToolset.Core.ExtensibilityServices
     internal class Messaging : IMessaging
     {
         private IMessageListener listener;
-        private HashSet<int> suppressedWarnings = new HashSet<int>();
-        private HashSet<int> warningsAsErrors = new HashSet<int>();
+        private readonly HashSet<int> suppressedWarnings = new HashSet<int>();
+        private readonly HashSet<int> warningsAsErrors = new HashSet<int>();
 
         public bool EncounteredError { get; private set; }
 
@@ -26,20 +23,11 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public bool WarningsAsError { get; set; }
 
-        public void ElevateWarningMessage(int warningNumber)
-        {
-            this.warningsAsErrors.Add(warningNumber);
-        }
+        public void ElevateWarningMessage(int warningNumber) => this.warningsAsErrors.Add(warningNumber);
 
-        public void SetListener(IMessageListener listener)
-        {
-            this.listener = listener;
-        }
+        public void SetListener(IMessageListener listener) => this.listener = listener;
 
-        public void SuppressWarningMessage(int warningNumber)
-        {
-            this.suppressedWarnings.Add(warningNumber);
-        }
+        public void SuppressWarningMessage(int warningNumber) => this.suppressedWarnings.Add(warningNumber);
 
         public void Write(Message message)
         {

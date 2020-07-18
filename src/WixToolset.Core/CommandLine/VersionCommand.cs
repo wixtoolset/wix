@@ -16,8 +16,7 @@ namespace WixToolset.Core.CommandLine
 
         public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("wix version {0}", ThisAssembly.AssemblyInformationalVersion);
-            Console.WriteLine();
+            Console.WriteLine(ThisAssembly.AssemblyInformationalVersion);
 
             return Task.FromResult(0);
         }

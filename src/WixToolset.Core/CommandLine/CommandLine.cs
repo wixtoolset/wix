@@ -118,7 +118,7 @@ namespace WixToolset.Core.CommandLine
                 extension.PostParse();
             }
 
-            return command ?? new HelpCommand();
+            return command ?? new HelpCommand(extensions);
         }
 
         private bool TryParseCommand(string arg, ICommandLineParser parser, IEnumerable<IExtensionCommandLine> extensions, out ICommandLineCommand command)
@@ -134,7 +134,7 @@ namespace WixToolset.Core.CommandLine
                     case "h":
                     case "help":
                     case "-help":
-                        command = new HelpCommand();
+                        command = new HelpCommand(extensions);
                         break;
 
                     case "version":

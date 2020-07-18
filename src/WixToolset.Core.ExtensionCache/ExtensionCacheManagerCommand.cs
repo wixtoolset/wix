@@ -96,12 +96,15 @@ namespace WixToolset.Core.ExtensionCache
             switch (parameter.ToLowerInvariant())
             {
                 case "?":
+                case "h":
+                case "-help":
                     this.ShowHelp = true;
                     this.ShowLogo = true;
                     this.StopParsing = true;
                     return true;
 
                 case "nologo":
+                case "-nologo":
                     this.ShowLogo = false;
                     return true;
 
@@ -158,13 +161,21 @@ namespace WixToolset.Core.ExtensionCache
 
         private static void DisplayHelp()
         {
-            Console.WriteLine(" usage:  wix.exe extension add|remove|list [extensionRef]");
             Console.WriteLine();
-            Console.WriteLine("   -g       add/remove the extension for the current user");
-            Console.WriteLine("   -nologo  suppress displaying the logo information");
-            Console.WriteLine("   -?       this help information");
+            Console.WriteLine("Usage: wix extension add|remove|list [extensionRef]");
             Console.WriteLine();
-            Console.WriteLine("   extensionRef format: extensionId/version (the version is optional)");
+            Console.WriteLine("Options:");
+            Console.WriteLine("  -h|--help         Show command line help.");
+            Console.WriteLine("  -g|--global       Add/remove the extension for the current user.");
+            Console.WriteLine("  --nologo          Suppress displaying the logo information.");
+            Console.WriteLine();
+            Console.WriteLine("Commands:");
+            Console.WriteLine();
+            Console.WriteLine("  add               Add extension to the cache.");
+            Console.WriteLine("  list              List extensions in the cache.");
+            Console.WriteLine("  remove            Remove extension from the cache.");
+            Console.WriteLine();
+            Console.WriteLine("  extensionRef format: extensionId/version (the version is optional)");
         }
     }
 }
