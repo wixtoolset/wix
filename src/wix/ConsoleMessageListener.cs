@@ -4,7 +4,6 @@ namespace WixToolset.Tools.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Globalization;
     using System.Text;
     using System.Threading;
@@ -40,10 +39,8 @@ namespace WixToolset.Tools.Core
             output.WriteLine("{0} : {1} {2}{3:0000}: {4}", filename, type, this.Prefix, message.Id, message.ToString());
 
             var fileNames = GetFileNames(message.SourceLineNumbers);
-            if (fileNames.Any())
+            if (fileNames.Count > 1)
             {
-                output.WriteLine("Source trace:");
-
                 foreach (var fileName in fileNames)
                 {
                     output.WriteLine("Source trace: {0}", fileName);
@@ -51,10 +48,7 @@ namespace WixToolset.Tools.Core
             }
         }
 
-        public void Write(string message)
-        {
-            Console.Out.WriteLine(message);
-        }
+        public void Write(string message) => Console.Out.WriteLine(message);
 
         public MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel) => defaultMessageLevel;
 
