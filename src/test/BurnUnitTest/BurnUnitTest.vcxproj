@@ -4,7 +4,6 @@
 
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props')" />
-  <Import Project="..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props')" />
   <Import Project="..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,7 +27,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\..\engine</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\..\engine;..\..\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
     <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;gdiplus.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
   <ItemGroup>
@@ -81,7 +80,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.props'))" />
     <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.40\build\WixBuildTools.TestSupport.Native.targets'))" />
-    <Error Condition="!Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.16\build\WixToolset.BootstrapperCore.Native.props'))" />
     <Error Condition="!Exists('..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.DUtil.4.0.45\build\WixToolset.DUtil.props'))" />
   </Target>
 </Project>

@@ -6,6 +6,7 @@ nuget restore || exit /b
 msbuild -p:Configuration=Release;Platform=x86 || exit /b
 
 msbuild -p:Configuration=Release -t:Pack src\stub\stub.vcxproj || exit /b
+msbuild -p:Configuration=Release -t:Pack src\WixToolset.BootstrapperCore.Native\WixToolset.BootstrapperCore.Native.proj || exit /b
 
 @popd
 @endlocal
