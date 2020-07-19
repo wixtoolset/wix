@@ -174,7 +174,7 @@ namespace WixToolset.Data
 
             Directory.CreateDirectory(folder);
 
-            entry.ExtractToFile(outputPath);
+            entry.ExtractToFile(outputPath, overwrite: true);
         }
 
         /// <summary>
