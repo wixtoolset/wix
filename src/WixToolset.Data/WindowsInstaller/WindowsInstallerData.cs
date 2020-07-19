@@ -18,6 +18,12 @@ namespace WixToolset.Data.WindowsInstaller
 
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
         private const string WixOutputStreamName = "wix-wid.xml";
+        private static readonly XmlWriterSettings WriterSettings = new XmlWriterSettings
+        {
+            CheckCharacters = false,
+            CloseOutput = false,
+            OmitXmlDeclaration = true,
+        };
 
         /// <summary>
         /// Creates a new empty output object.
@@ -83,7 +89,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="wixout">Container to save to.</param>
         public void Save(WixOutput wixout)
         {
-            using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName)))
+            using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName), WriterSettings))
             {
                 this.Save(writer);
             }
