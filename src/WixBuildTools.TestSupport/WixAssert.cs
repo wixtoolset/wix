@@ -7,7 +7,7 @@ namespace WixBuildTools.TestSupport
 
     public class WixAssert : Assert
     {
-        public static void AssertEqualLineByLine(string[] expectedLines, string[] actualLines)
+        public static void CompareLineByLine(string[] expectedLines, string[] actualLines)
         {
             for (var i = 0; i < expectedLines.Length; ++i)
             {
