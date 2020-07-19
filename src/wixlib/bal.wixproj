@@ -11,6 +11,7 @@
     <BindInputPaths Include="..\wixstdba\Resources\" />
     <BindInputPaths Include="$(OutputPath)netcoreapp3.0" />
     <BindInputPaths Include="$(OutputPath)" />
+    <BindInputPaths Include="$(OutputPath)Win32" BindName='x86' />
   </ItemGroup>
 
   <ItemGroup>
