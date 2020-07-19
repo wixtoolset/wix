@@ -649,6 +649,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier previousId = null;
             var previousType = ComplexReferenceChildType.Unknown;
+            var dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
 
             // The BootstrapperApplication element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
             var id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
@@ -656,6 +657,40 @@ namespace WixToolset.Core
             {
                 previousId = id;
                 previousType = ComplexReferenceChildType.Payload;
+            }
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "DpiAwareness":
+                            var dpiAwarenessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (dpiAwarenessValue)
+                            {
+                                case "gdiScaled":
+                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.GdiScaled;
+                                    break;
+                                case "perMonitor":
+                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitor;
+                                    break;
+                                case "perMonitorV2":
+                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
+                                    break;
+                                case "system":
+                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.System;
+                                    break;
+                                case "unaware":
+                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.Unaware;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "DpiAwareness", dpiAwarenessValue, "gdiScaled", "perMonitor", "perMonitorV2", "system", "unaware"));
+                                    break;
+                            }
+                            break;
+                    }
+                }
             }
 
             foreach (var child in node.Elements())
@@ -702,7 +737,10 @@ namespace WixToolset.Core
 
                 if (null != id)
                 {
-                    this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id)
+                    {
+                        DpiAwareness = dpiAwareness,
+                    });
                 }
             }
         }
@@ -1324,6 +1362,12 @@ namespace WixToolset.Core
                         break;
                     case "EnableSignatureVerification":
                         enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DpiAwareness":
+                        if (node.Name.LocalName != "BootstrapperApplication")
+                        {
+                            this.Core.UnexpectedAttribute(node, attrib);
+                        }
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);

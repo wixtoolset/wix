@@ -107,6 +107,8 @@ namespace WixToolset.Core.Burn.Bundles
             const string asmv3Namespace = "urn:schemas-microsoft-com:asm.v3";
             const string compatv1Namespace = "urn:schemas-microsoft-com:compatibility.v1";
             const string ws2005Namespace = "http://schemas.microsoft.com/SMI/2005/WindowsSettings";
+            const string ws2016Namespace = "http://schemas.microsoft.com/SMI/2016/WindowsSettings";
+            const string ws2017Namespace = "http://schemas.microsoft.com/SMI/2017/WindowsSettings";
 
             var bundleFileName = Path.GetFileName(outputPath);
             var bundleAssemblyVersion = windowsAssemblyVersion.ToString();
@@ -181,13 +183,56 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteEndElement(); // </security>
                 writer.WriteEndElement(); // </trustInfo>
 
-                writer.WriteStartElement("application", asmv3Namespace);
-                writer.WriteStartElement("windowsSettings");
-                writer.WriteStartElement("dpiAware", ws2005Namespace);
-                writer.WriteString("true");
-                writer.WriteEndElement(); // </application>
-                writer.WriteEndElement(); // </windowSettings>
-                writer.WriteEndElement(); // </dpiAware>
+                if (bootstrapperApplicationSymbol.DpiAwareness != WixBootstrapperApplicationDpiAwarenessType.Unaware)
+                {
+                    string dpiAwareValue = null;
+                    string dpiAwarenessValue = null;
+                    string gdiScalingValue = null;
+
+                    switch(bootstrapperApplicationSymbol.DpiAwareness)
+                    {
+                        case WixBootstrapperApplicationDpiAwarenessType.GdiScaled:
+                            gdiScalingValue = "true";
+                            break;
+                        case WixBootstrapperApplicationDpiAwarenessType.PerMonitor:
+                            dpiAwareValue = "true/pm";
+                            break;
+                        case WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2:
+                            dpiAwareValue = "true/pm";
+                            dpiAwarenessValue = "PerMonitorV2, PerMonitor";
+                            break;
+                        case WixBootstrapperApplicationDpiAwarenessType.System:
+                            dpiAwareValue = "true";
+                            break;
+                    }
+
+                    writer.WriteStartElement("application", asmv3Namespace);
+                    writer.WriteStartElement("windowsSettings");
+
+                    if (dpiAwareValue != null)
+                    {
+                        writer.WriteStartElement("dpiAware", ws2005Namespace);
+                        writer.WriteString(dpiAwareValue);
+                        writer.WriteEndElement();
+                    }
+
+                    if (dpiAwarenessValue != null)
+                    {
+                        writer.WriteStartElement("dpiAwareness", ws2016Namespace);
+                        writer.WriteString(dpiAwarenessValue);
+                        writer.WriteEndElement();
+                    }
+
+                    if (gdiScalingValue != null)
+                    {
+                        writer.WriteStartElement("gdiScaling", ws2017Namespace);
+                        writer.WriteString(gdiScalingValue);
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement(); // </windowSettings>
+                    writer.WriteEndElement(); // </application>
+                }
 
                 writer.WriteEndDocument(); // </assembly>
                 writer.Close();
