@@ -33,6 +33,7 @@
     <TargetName>burn</TargetName>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <GenerateManifest>false</GenerateManifest>
     <Description>Native component of WixToolset.Burn</Description>
     <!-- NBGV properties -->
     <AssemblyLanguage>1033</AssemblyLanguage>
@@ -77,9 +78,6 @@
       <!-- Workaround for VS2015 behavior change that omits the .wixburn section. -->
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="stub.manifest" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="stub.rc" />
