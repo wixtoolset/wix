@@ -39,6 +39,7 @@ namespace WixToolset.Converters
         private static readonly XName AdvertiseExecuteSequenceElementName = WixNamespace + "AdvertiseExecuteSequence";
         private static readonly XName InstallExecuteSequenceElementName = WixNamespace + "InstallExecuteSequence";
         private static readonly XName InstallUISequenceSequenceElementName = WixNamespace + "InstallUISequence";
+        private static readonly XName BootstrapperApplicationElementName = WixNamespace + "BootstrapperApplication";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
@@ -130,6 +131,7 @@ namespace WixToolset.Converters
                 { WixConverter.AdvertiseExecuteSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
+                { WixConverter.BootstrapperApplicationElementName, this.ConvertBootstrapperApplicationElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
@@ -439,6 +441,15 @@ namespace WixToolset.Converters
             if (this.ConvertElementMapping.TryGetValue(element.Name, out var convert))
             {
                 convert(element);
+            }
+        }
+
+        private void ConvertBootstrapperApplicationElement(XElement element)
+        {
+            if (this.SourceVersion < 4 && null == element.Attribute("DpiAwareness") &&
+                this.OnError(ConverterTestType.AssignBootstrapperApplicationDpiAwareness, element, "The BootstrapperApplication DpiAwareness attribute is being set to 'unaware' to ensure it remains the same as the v3 default"))
+            {
+                element.Add(new XAttribute("DpiAwareness", "unaware"));
             }
         }
 
@@ -1212,7 +1223,12 @@ namespace WixToolset.Converters
             /// <summary>
             /// The Condition='1' attribute is unnecessary on Publish elements.
             /// </summary>
-            PublishConditionOneUnnecessary
+            PublishConditionOneUnnecessary,
+
+            /// <summary>
+            /// DpiAwareness is new and is defaulted to 'perMonitorV2' which is a change in behavior.
+            /// </summary>
+            AssignBootstrapperApplicationDpiAwareness,
         }
     }
 }
