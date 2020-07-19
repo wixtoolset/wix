@@ -20,7 +20,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "Binary", "CustomAction", "Wix4FileShare", "Wix4FileSharePermissions");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_X86\t[Binary data]",
                 "CustomAction:Wix4ConfigureSmbInstall_X86\t1\tWix4UtilCA_X86\tConfigureSmbInstall\t",
@@ -41,7 +41,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4FileShare", "Wix4FileSharePermissions");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_X64\t[Binary data]",
                 "CustomAction:Wix4ConfigureSmbInstall_X64\t1\tWix4UtilCA_X64\tConfigureSmbInstall\t",
@@ -62,7 +62,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4CloseApplication");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_A64\t[Binary data]",
                 "CustomAction:Wix4CheckRebootRequired_A64\t65\tWix4UtilCA_A64\tWixCheckRebootRequired\t",
@@ -79,7 +79,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveFile", "Wix4InternetShortcut");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_X64\t[Binary data]",
                 "CustomAction:Wix4CreateInternetShortcuts_X64\t3073\tWix4UtilCA_X64\tWixCreateInternetShortcuts\t",
@@ -97,12 +97,12 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildX64, "Wix4SecureObject");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Wix4SecureObject:ExampleRegistryKey\tRegistry\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
                 "Wix4SecureObject:filF5_pLhBuF5b4N9XEo52g_hUM5Lo\tFile\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
                 "Wix4SecureObject:INSTALLFOLDER\tCreateFolder\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
-                "Wix4SecureObject:regO7jgNdgqG_TfURLgXPo2jRcxzx8\tRegistry\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "Wix4SecureObject:regL6DnQ9yJpDJH5OdcVji4YXsdX2c\tRegistry\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
                 "Wix4SecureObject:testsvc\tServiceInstall\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
             }, results.OrderBy(s => s).ToArray());
         }
@@ -114,7 +114,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4EventManifest", "Wix4XmlFile");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_A64\t[Binary data]",
                 "CustomAction:Wix4ConfigureEventManifestRegister_A64\t1\tWix4UtilCA_A64\tConfigureEventManifestRegister\t",
@@ -139,7 +139,7 @@ namespace WixToolsetTest.Util
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_A64\t[Binary data]",
                 "CustomAction:Wix4BroadcastEnvironmentChange_A64\t65\tWix4UtilCA_A64\tWixBroadcastEnvironmentChange\t",
