@@ -475,7 +475,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleSymbol, uxContainer, containers);
+                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationSymbol, bundleSymbol, uxContainer, containers);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);

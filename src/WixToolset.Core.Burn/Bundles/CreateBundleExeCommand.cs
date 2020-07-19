@@ -6,20 +6,24 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
+    using System.Text;
+    using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
+    using WixToolset.Dtf.Resources;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CreateBundleExeCommand
     {
-        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
+        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.IntermediateFolder = intermediateFolder;
             this.OutputPath = outputPath;
+            this.BootstrapperApplicationSymbol = bootstrapperApplicationSymbol;
             this.BundleSymbol = bundleSymbol;
             this.UXContainer = uxContainer;
             this.Containers = containers;
@@ -34,6 +38,8 @@ namespace WixToolset.Core.Burn.Bundles
         private string IntermediateFolder { get; }
 
         private string OutputPath { get; }
+
+        private WixBootstrapperApplicationSymbol BootstrapperApplicationSymbol { get; }
 
         private WixBundleSymbol BundleSymbol { get; }
 
@@ -64,7 +70,11 @@ namespace WixToolset.Core.Burn.Bundles
             File.Copy(stubFile, bundleTempPath, true);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
-            this.UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol);
+            var windowsAssemblyVersion = GetWindowsAssemblyVersion(this.BundleSymbol);
+
+            var applicationManifestData = GenerateApplicationManifest(this.BundleSymbol, this.BootstrapperApplicationSymbol, this.OutputPath, windowsAssemblyVersion);
+
+            UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol, windowsAssemblyVersion, applicationManifestData);
 
             // Update the .wixburn section to point to at the UX and attached container(s) then attach the containers
             // if they should be attached.
@@ -91,16 +101,105 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo)
+        private static byte[] GenerateApplicationManifest(WixBundleSymbol bundleSymbol, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, string outputPath, Version windowsAssemblyVersion)
         {
-            var resources = new Dtf.Resources.ResourceCollection();
-            var version = new Dtf.Resources.VersionResource("#1", 1033);
+            const string asmv1Namespace = "urn:schemas-microsoft-com:asm.v1";
+            const string asmv3Namespace = "urn:schemas-microsoft-com:asm.v3";
+            const string compatv1Namespace = "urn:schemas-microsoft-com:compatibility.v1";
+            const string ws2005Namespace = "http://schemas.microsoft.com/SMI/2005/WindowsSettings";
 
-            version.Load(bundleTempPath);
-            resources.Add(version);
+            var bundleFileName = Path.GetFileName(outputPath);
+            var bundleAssemblyVersion = windowsAssemblyVersion.ToString();
+            var bundlePlatform = bundleSymbol.Platform.ToString().ToLower();
+            var bundleDescription = bundleSymbol.Name;
 
+            using (var memoryStream = new MemoryStream())
+            using (var writer = new XmlTextWriter(memoryStream, Encoding.UTF8))
+            {
+                writer.WriteStartDocument();
+
+                writer.WriteStartElement("assembly", asmv1Namespace);
+                writer.WriteAttributeString("manifestVersion", "1.0");
+
+                writer.WriteStartElement("assemblyIdentity");
+                writer.WriteAttributeString("name", bundleFileName);
+                writer.WriteAttributeString("version", bundleAssemblyVersion);
+                writer.WriteAttributeString("processorArchitecture", bundlePlatform);
+                writer.WriteAttributeString("type", "win32");
+                writer.WriteEndElement(); // </assemblyIdentity>
+
+                if (!String.IsNullOrEmpty(bundleDescription))
+                {
+                    writer.WriteStartElement("description");
+                    writer.WriteString(bundleDescription);
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteStartElement("dependency");
+                writer.WriteStartElement("dependentAssembly");
+                writer.WriteStartElement("assemblyIdentity");
+                writer.WriteAttributeString("name", "Microsoft.Windows.Common-Controls");
+                writer.WriteAttributeString("version", "6.0.0.0");
+                writer.WriteAttributeString("processorArchitecture", bundlePlatform);
+                writer.WriteAttributeString("publicKeyToken", "6595b64144ccf1df");
+                writer.WriteAttributeString("language", "*");
+                writer.WriteAttributeString("type", "win32");
+                writer.WriteEndElement(); // </assemblyIdentity>
+                writer.WriteEndElement(); // </dependentAssembly>
+                writer.WriteEndElement(); // </dependency>
+
+                writer.WriteStartElement("compatibility", compatv1Namespace);
+                writer.WriteStartElement("application");
+
+                writer.WriteStartElement("supportedOS");
+                writer.WriteAttributeString("Id", "{e2011457-1546-43c5-a5fe-008deee3d3f0}"); // Windows Vista
+                writer.WriteEndElement();
+                writer.WriteStartElement("supportedOS");
+                writer.WriteAttributeString("Id", "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"); // Windows 7
+                writer.WriteEndElement();
+                writer.WriteStartElement("supportedOS");
+                writer.WriteAttributeString("Id", "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"); // Windows 8
+                writer.WriteEndElement();
+                writer.WriteStartElement("supportedOS");
+                writer.WriteAttributeString("Id", "{1f676c76-80e1-4239-95bb-83d0f6d0da78}"); // Windows 8.1
+                writer.WriteEndElement();
+                writer.WriteStartElement("supportedOS");
+                writer.WriteAttributeString("Id", "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"); // Windows 10
+                writer.WriteEndElement();
+
+                writer.WriteEndElement(); // </application>
+                writer.WriteEndElement(); // </compatibility>
+
+                writer.WriteStartElement("trustInfo", asmv3Namespace);
+                writer.WriteStartElement("security");
+                writer.WriteStartElement("requestedPrivileges");
+                writer.WriteStartElement("requestedExecutionLevel");
+                writer.WriteAttributeString("level", "asInvoker");
+                writer.WriteAttributeString("uiAccess", "false");
+                writer.WriteEndElement(); // </requestedExecutionLevel>
+                writer.WriteEndElement(); // </requestedPrivileges>
+                writer.WriteEndElement(); // </security>
+                writer.WriteEndElement(); // </trustInfo>
+
+                writer.WriteStartElement("application", asmv3Namespace);
+                writer.WriteStartElement("windowsSettings");
+                writer.WriteStartElement("dpiAware", ws2005Namespace);
+                writer.WriteString("true");
+                writer.WriteEndElement(); // </application>
+                writer.WriteEndElement(); // </windowSettings>
+                writer.WriteEndElement(); // </dpiAware>
+
+                writer.WriteEndDocument(); // </assembly>
+                writer.Close();
+
+                return memoryStream.ToArray();
+            }
+        }
+
+        private static Version GetWindowsAssemblyVersion(WixBundleSymbol bundleSymbol)
+        {
             // Ensure the bundle info provides a full four part version.
-            var fourPartVersion = new Version(bundleInfo.Version);
+            var fourPartVersion = new Version(bundleSymbol.Version);
             var major = (fourPartVersion.Major < 0) ? 0 : fourPartVersion.Major;
             var minor = (fourPartVersion.Minor < 0) ? 0 : fourPartVersion.Minor;
             var build = (fourPartVersion.Build < 0) ? 0 : fourPartVersion.Build;
@@ -108,14 +207,25 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (UInt16.MaxValue < major || UInt16.MaxValue < minor || UInt16.MaxValue < build || UInt16.MaxValue < revision)
             {
-                throw new WixException(ErrorMessages.InvalidModuleOrBundleVersion(bundleInfo.SourceLineNumbers, "Bundle", bundleInfo.Version));
+                throw new WixException(ErrorMessages.InvalidModuleOrBundleVersion(bundleSymbol.SourceLineNumbers, "Bundle", bundleSymbol.Version));
             }
 
-            fourPartVersion = new Version(major, minor, build, revision);
-            version.FileVersion = fourPartVersion;
-            version.ProductVersion = fourPartVersion;
+            return new Version(major, minor, build, revision);
+        }
 
-            var strings = version[1033] ?? version.Add(1033);
+        private static void UpdateBurnResources(string bundleTempPath, string outputPath, WixBundleSymbol bundleInfo, Version windowsAssemblyVersion, byte[] applicationManifestData)
+        {
+            const int burnLocale = 1033;
+            var resources = new Dtf.Resources.ResourceCollection();
+            var version = new Dtf.Resources.VersionResource("#1", burnLocale);
+
+            version.Load(bundleTempPath);
+            resources.Add(version);
+
+            version.FileVersion = windowsAssemblyVersion;
+            version.ProductVersion = windowsAssemblyVersion;
+
+            var strings = version[burnLocale] ?? version.Add(burnLocale);
             strings["LegalCopyright"] = bundleInfo.Copyright;
             strings["OriginalFilename"] = Path.GetFileName(outputPath);
             strings["FileVersion"] = bundleInfo.Version;    // string versions do not have to be four parts.
@@ -138,7 +248,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (!String.IsNullOrEmpty(bundleInfo.IconSourceFile))
             {
-                var iconGroup = new Dtf.Resources.GroupIconResource("#1", 1033);
+                var iconGroup = new Dtf.Resources.GroupIconResource("#1", burnLocale);
                 iconGroup.ReadFromFile(bundleInfo.IconSourceFile);
                 resources.Add(iconGroup);
 
@@ -150,10 +260,13 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (!String.IsNullOrEmpty(bundleInfo.SplashScreenSourceFile))
             {
-                var bitmap = new Dtf.Resources.BitmapResource("#1", 1033);
+                var bitmap = new Dtf.Resources.BitmapResource("#1", burnLocale);
                 bitmap.ReadFromFile(bundleInfo.SplashScreenSourceFile);
                 resources.Add(bitmap);
             }
+
+            var manifestResource = new Resource(ResourceType.Manifest, "#1", burnLocale, applicationManifestData);
+            resources.Add(manifestResource);
 
             resources.Save(bundleTempPath);
         }
