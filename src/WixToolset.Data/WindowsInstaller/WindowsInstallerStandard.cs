@@ -11,38 +11,7 @@ namespace WixToolset.Data.WindowsInstaller
     {
         private static readonly Dictionary<string, WixActionSymbol> standardActionsById;
         private static readonly HashSet<string> standardActionNames;
-
-        private static readonly HashSet<string> standardDirectories = new HashSet<string>
-        {
-            "TARGETDIR",
-            "AdminToolsFolder",
-            "AppDataFolder",
-            "CommonAppDataFolder",
-            "CommonFilesFolder",
-            "DesktopFolder",
-            "FavoritesFolder",
-            "FontsFolder",
-            "LocalAppDataFolder",
-            "MyPicturesFolder",
-            "PersonalFolder",
-            "ProgramFilesFolder",
-            "ProgramMenuFolder",
-            "SendToFolder",
-            "StartMenuFolder",
-            "StartupFolder",
-            "System16Folder",
-            "SystemFolder",
-            "TempFolder",
-            "TemplateFolder",
-            "WindowsFolder",
-            "CommonFiles64Folder",
-            "ProgramFiles64Folder",
-            "System64Folder",
-            "NetHoodFolder",
-            "PrintHoodFolder",
-            "RecentFolder",
-            "WindowsVolume",
-        };
+        private static readonly Dictionary<string, DirectorySymbol> standardDirectoriesById;
 
         /// <summary>
         /// References:
@@ -395,8 +364,44 @@ namespace WixToolset.Data.WindowsInstaller
                 new WixActionSymbol(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/WriteRegistryValues")) { Action="WriteRegistryValues", Sequence=5000, SequenceTable=SequenceTable.InstallExecuteSequence, Overridable = true },
             };
 
+            var standardDirectories = new[]
+            {
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "TARGETDIR")) { Name = "SourceDir" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "AdminToolsFolder")) { Name = "Admin" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "AppDataFolder")) { Name = "AppData" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "CommonAppDataFolder")) { Name = "CommApp" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "CommonFilesFolder")) { Name = "CFiles" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "CommonFiles64Folder")) { Name = "CFiles64" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "CommonFiles6432Folder")) { Name = "." },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "DesktopFolder")) { Name = "Desktop" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "FavoritesFolder")) { Name = "Favs" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "FontsFolder")) { Name = "Fonts" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "LocalAppDataFolder")) { Name = "LocalApp" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "MyPicturesFolder")) { Name = "Pictures" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "NetHoodFolder")) { Name = "NetHood" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "PersonalFolder")) { Name = "Personal" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "PrintHoodFolder")) { Name = "Printers" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "ProgramFilesFolder")) { Name = "PFiles" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "ProgramFiles64Folder")) { Name = "PFiles64" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "ProgramFiles6432Folder")) { Name = "." },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "ProgramMenuFolder")) { Name = "PMenu" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "RecentFolder")) { Name = "Recent" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "SendToFolder")) { Name = "SendTo" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "StartMenuFolder")) { Name = "StrtMenu" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "StartupFolder")) { Name = "StartUp" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "SystemFolder")) { Name = "System" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "System16Folder")) { Name = "System16" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "System64Folder")) { Name = "System64" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "System6432Folder")) { Name = "." },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "TempFolder")) { Name = "Temp" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "TemplateFolder")) { Name = "Template" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "WindowsFolder")) { Name = "Windows" },
+                new DirectorySymbol(null, new Identifier(AccessModifier.Public, "WindowsVolume")) { Name = "WinVol" },
+            };
+
             standardActionNames = new HashSet<string>(standardActions.Select(a => a.Action));
             standardActionsById = standardActions.ToDictionary(a => a.Id.Id);
+            standardDirectoriesById = standardDirectories.ToDictionary(d => d.Id.Id);
         }
 
         /// <summary>
@@ -412,11 +417,16 @@ namespace WixToolset.Data.WindowsInstaller
         public static IEnumerable<WixActionSymbol> StandardActions() => standardActionsById.Values;
 
         /// <summary>
+        /// Standard directories.
+        /// </summary>
+        public static IEnumerable<DirectorySymbol> StandardDirectories() => standardDirectoriesById.Values;
+
+        /// <summary>
         /// Find out if a directory is a standard directory.
         /// </summary>
-        /// <param name="directoryName">Name of the directory.</param>
+        /// <param name="directoryId">Name of the directory.</param>
         /// <returns>true if the directory is standard, false otherwise.</returns>
-        public static bool IsStandardDirectory(string directoryName) => standardDirectories.Contains(directoryName);
+        public static bool IsStandardDirectory(string directoryId) => standardDirectoriesById.ContainsKey(directoryId);
 
         /// <summary>
         /// Find out if a property is a standard property.
@@ -434,5 +444,10 @@ namespace WixToolset.Data.WindowsInstaller
         /// Try to get standard action by sequence and action name.
         /// </summary>
         public static bool TryGetStandardAction(string sequenceName, string actioname, out WixActionSymbol standardAction) => standardActionsById.TryGetValue(String.Concat(sequenceName, "/", actioname), out standardAction);
+
+        /// <summary>
+        /// Try to get standard directory symbol by id.
+        /// </summary>
+        public static bool TryGetStandardDirectory(string directoryId, out DirectorySymbol symbol) => standardDirectoriesById.TryGetValue(directoryId, out symbol);
     }
 }
