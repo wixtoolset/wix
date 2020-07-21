@@ -365,14 +365,15 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Directory" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Directory:DUPLICATENAMEANDSHORTNAME\tINSTALLFOLDER\tduplicat",
-                    "Directory:INSTALLFOLDER\tProgramFilesFolder\toekcr5lq|MsiPackage",
+                    "Directory:INSTALLFOLDER\tProgramFiles6432Folder\t1egc1laj|MsiPackage",
                     "Directory:NAMEANDSHORTNAME\tINSTALLFOLDER\tSHORTNAM|NameAndShortName",
                     "Directory:NAMEANDSHORTSOURCENAME\tINSTALLFOLDER\tNAMEASSN|NameAndShortSourceName",
                     "Directory:NAMEWITHSHORTVALUE\tINSTALLFOLDER\tSHORTVAL",
-                    "Directory:ProgramFilesFolder\tTARGETDIR\t.",
+                    "Directory:ProgramFiles6432Folder\tProgramFilesFolder\t.",
+                    "Directory:ProgramFilesFolder\tTARGETDIR\tPFiles",
                     "Directory:SHORTNAMEANDLONGSOURCENAME\tINSTALLFOLDER\tSHNALSNM:6ukthv5q|ShortNameAndLongSourceName",
                     "Directory:SHORTNAMEONLY\tINSTALLFOLDER\tSHORTONL",
                     "Directory:SOURCENAME\tINSTALLFOLDER\ts2s5bq-i|NameAndSourceName:dhnqygng|SourceNameWithName",

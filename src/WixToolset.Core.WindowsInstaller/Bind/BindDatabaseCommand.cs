@@ -133,6 +133,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             bool compressed;
             bool longNames;
             int installerVersion;
+            Platform platform;
             string modularizationSuffix;
             {
                 var command = new BindSummaryInfoCommand(section);
@@ -141,6 +142,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 compressed = command.Compressed;
                 longNames = command.LongNames;
                 installerVersion = command.InstallerVersion;
+                platform = command.Platform;
                 modularizationSuffix = command.ModularizationSuffix;
             }
 
@@ -190,6 +192,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Sequence all the actions.
             {
                 var command = new SequenceActionsCommand(this.Messaging, section);
+                command.Execute();
+            }
+
+            {
+                var command = new AddRequiredStandardDirectories(section, platform);
                 command.Execute();
             }
 
@@ -332,7 +339,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Set generated component guids.
             {
-                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section);
+                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section, platform);
                 command.Execute();
             }
 

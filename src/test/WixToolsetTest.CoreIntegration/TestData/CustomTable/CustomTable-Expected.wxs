@@ -15,11 +15,13 @@
       </Row>
     </CustomTable>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="oekcr5lq">
-          <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
-            <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
-          </Component>
+      <Directory Id="ProgramFilesFolder" Name="PFiles">
+        <Directory Id="ProgramFiles6432Folder">
+          <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="1egc1laj">
+            <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
+              <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\PFiles\\MsiPackage\test.txt" />
+            </Component>
+          </Directory>
         </Directory>
       </Directory>
     </Directory>

@@ -16,12 +16,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class CalculateComponentGuids
     {
-        internal CalculateComponentGuids(IMessaging messaging, IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section)
+        internal CalculateComponentGuids(IMessaging messaging, IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section, Platform platform)
         {
             this.Messaging = messaging;
             this.BackendHelper = helper;
             this.PathResolver = pathResolver;
             this.Section = section;
+            this.Platform = platform;
         }
 
         private IMessaging Messaging { get; }
@@ -31,6 +32,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IPathResolver PathResolver { get; }
 
         private IntermediateSection Section { get; }
+
+        private Platform Platform { get; }
 
         public void Execute()
         {
@@ -42,7 +45,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Find components with generatable guids.
             foreach (var componentSymbol in this.Section.Symbols.OfType<ComponentSymbol>())
             {
-                // Skip components that do not specify generate guid.
+                // Skip components that do not specify generate guid. 
                 if (componentSymbol.ComponentId != "*")
                 {
                     continue;
@@ -135,7 +138,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (fileRow.Id.Id == componentSymbol.KeyPath)
                         {
                             // calculate the key file's canonical target path
-                            string directoryPath = this.PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentSymbol.DirectoryRef, true);
+                            string directoryPath = this.PathResolver.GetCanonicalDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentSymbol.DirectoryRef, this.Platform);
                             string fileName = Common.GetName(fileRow.Name, false, true).ToLowerInvariant();
                             path = Path.Combine(directoryPath, fileName);
 

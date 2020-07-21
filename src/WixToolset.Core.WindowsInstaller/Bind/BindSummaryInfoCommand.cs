@@ -32,6 +32,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public int InstallerVersion { get; private set; }
 
+        public Platform Platform { get; private set; }
+
         /// <summary>
         /// Modularization guid, or null if the output is not a module.
         /// </summary>
@@ -66,6 +68,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             summaryInformationSymbol.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationSymbol.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
                         }
                         break;
+                    case SummaryInformationType.PlatformAndLanguage:
+                        this.Platform = GetPlatformFromSummaryInformation(summaryInformationSymbol.Value);
+                        break;
+
                     case SummaryInformationType.PackageCode: // PID_REVNUMBER
                         var packageCode = summaryInformationSymbol.Value;
 
@@ -135,6 +141,31 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     PropertyId = SummaryInformationType.CreatingApplication,
                     Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString()),
                 });
+            }
+        }
+
+        private static Platform GetPlatformFromSummaryInformation(string value)
+        {
+            var separatorIndex = value.IndexOf(';');
+            var platformValue = separatorIndex > 0 ? value.Substring(0, separatorIndex) : value;
+
+            switch (platformValue)
+            {
+                case "x64":
+                    return Platform.X64;
+
+                case "Arm":
+                    return Platform.ARM;
+
+                case "Arm64":
+                    return Platform.ARM64;
+
+                case "Intel64":
+                    return Platform.IA64;
+
+                case "Intel":
+                default:
+                    return Platform.X86;
             }
         }
     }

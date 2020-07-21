@@ -4279,8 +4279,7 @@ namespace WixToolset.Core
                     this.Core.AddInlineDirectoryId(inlineSyntax, id.Id);
                 }
             }
-
-            if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !("SourceDir".Equals(name, StringComparison.Ordinal) && shortName == null && shortSourceName == null && sourceName == null))
+            else if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !("SourceDir".Equals(name, StringComparison.Ordinal) && shortName == null && shortSourceName == null && sourceName == null))
             {
                 this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, name));
             }

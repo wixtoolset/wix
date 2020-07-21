@@ -36,6 +36,7 @@
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CopyFile\CopyFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomAction\SimpleCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\CustomActionCycle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable-Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -48,6 +49,7 @@
     <Content Include="TestData\CustomTable\LocalizedCustomTable.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Directory\Empty.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\EnsureTable\EnsureTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Environment\Environment.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ErrorsInUI\data\test.txt" CopyToOutputDirectory="PreserveNewest" />

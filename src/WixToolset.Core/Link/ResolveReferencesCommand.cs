@@ -72,26 +72,21 @@ namespace WixToolset.Core.Link
                     continue;
                 }
 
-                if (!this.symbolsWithSections.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbolWithSection))
-                {
-                    this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName));
-                }
-                else // see if the symbol (and any of its duplicates) are appropriately accessible.
+                // See if the symbol (and any of its duplicates) are appropriately accessible.
+                if (this.symbolsWithSections.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbolWithSection))
                 {
                     var accessible = this.DetermineAccessibleSymbols(section, symbolWithSection);
-                    if (!accessible.Any())
-                    {
-                        this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbolWithSection.Access));
-                    }
-                    else if (1 == accessible.Count)
+                    if (accessible.Count == 1)
                     {
                         var accessibleSymbol = accessible[0];
-                        this.referencedSymbols.Add(accessibleSymbol);
-
-                        if (null != accessibleSymbol.Section)
+                        if (this.referencedSymbols.Add(accessibleSymbol) && null != accessibleSymbol.Section)
                         {
                             this.RecursivelyResolveReferences(accessibleSymbol.Section);
                         }
+                    }
+                    else if (accessible.Count == 0)
+                    {
+                        this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbolWithSection.Access));
                     }
                     else // display errors for the duplicate symbols.
                     {
@@ -112,6 +107,10 @@ namespace WixToolset.Core.Link
                             this.Messaging.Write(ErrorMessages.DuplicateSymbol2(accessibleDuplicate.Symbol.SourceLineNumbers));
                         }
                     }
+                }
+                else
+                {
+                    this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName));
                 }
             }
         }

@@ -34,25 +34,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var requiredActionSymbols = new Dictionary<string, WixActionSymbol>();
 
-            // Get the standard actions required based on symbols in the section.
-            var overridableActionSymbols = this.GetRequiredStandardActions();
-
             // Index all the action symbols and look for collisions.
             foreach (var actionSymbol in this.Section.Symbols.OfType<WixActionSymbol>())
             {
                 if (actionSymbol.Overridable) // overridable action
                 {
-                    if (overridableActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol))
+                    if (requiredActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol))
                     {
-                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
-                        if (null != collidingActionSymbol.SourceLineNumbers)
+                        if (collidingActionSymbol.Overridable)
                         {
-                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionSymbol.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                            if (null != collidingActionSymbol.SourceLineNumbers)
+                            {
+                                this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionSymbol.SourceLineNumbers));
+                            }
                         }
                     }
                     else
                     {
-                        overridableActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
+                        requiredActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
                     }
                 }
                 else // unsequenced or sequenced action.
@@ -71,7 +71,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (requiredActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol))
+                    if (requiredActionSymbols.TryGetValue(actionSymbol.Id.Id, out var collidingActionSymbol) && !collidingActionSymbol.Overridable)
                     {
                         this.Messaging.Write(ErrorMessages.ActionCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                         if (null != collidingActionSymbol.SourceLineNumbers)
@@ -81,13 +81,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        requiredActionSymbols.Add(actionSymbol.Id.Id, actionSymbol);
+                        requiredActionSymbols[actionSymbol.Id.Id] = actionSymbol;
                     }
                 }
             }
 
+            // Get the standard actions required based on symbols in the section.
+            var requiredStandardActions = this.GetRequiredStandardActions();
+
             // Add the overridable action symbols that are not overridden to the required action symbols.
-            foreach (var actionSymbol in overridableActionSymbols.Values)
+            foreach (var actionSymbol in requiredStandardActions.Values)
             {
                 if (!requiredActionSymbols.ContainsKey(actionSymbol.Id.Id))
                 {
@@ -555,17 +558,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return set;
-        }
-
-        private IEnumerable<WixActionSymbol> GetActions(SequenceTable sequence, string[] actionNames)
-        {
-            foreach (var action in WindowsInstallerStandard.StandardActions())
-            {
-                if (action.SequenceTable == sequence && actionNames.Contains(action.Action))
-                {
-                    yield return action;
-                }
-            }
         }
 
         /// <summary>

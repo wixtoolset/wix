@@ -12,7 +12,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class PathResolver : IPathResolver
     {
-        public string GetDirectoryPath(Dictionary<string, IResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, bool canonicalize)
+        public string GetCanonicalDirectoryPath(Dictionary<string, IResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, Platform platform)
         {
             if (!directories.TryGetValue(directory, out var resolvedDirectory))
             {
@@ -25,19 +25,13 @@ namespace WixToolset.Core.ExtensibilityServices
                 {
                     resolvedDirectory.Path = componentIdGenSeeds[directory];
                 }
-                else if (canonicalize && WindowsInstallerStandard.IsStandardDirectory(directory))
+                else if (WindowsInstallerStandard.IsStandardDirectory(directory))
                 {
-                    // when canonicalization is on, standard directories are treated equally
-                    resolvedDirectory.Path = directory;
+                    resolvedDirectory.Path = WindowsInstallerStandard.GetPlatformSpecificDirectoryId(directory, platform);
                 }
                 else
                 {
-                    string name = resolvedDirectory.Name;
-
-                    if (canonicalize)
-                    {
-                        name = name?.ToLowerInvariant();
-                    }
+                    var name = resolvedDirectory.Name?.ToLowerInvariant();
 
                     if (String.IsNullOrEmpty(resolvedDirectory.DirectoryParent))
                     {
@@ -45,7 +39,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     }
                     else
                     {
-                        var parentPath = this.GetDirectoryPath(directories, componentIdGenSeeds, resolvedDirectory.DirectoryParent, canonicalize);
+                        var parentPath = this.GetCanonicalDirectoryPath(directories, componentIdGenSeeds, resolvedDirectory.DirectoryParent, platform);
 
                         if (null != resolvedDirectory.Name)
                         {
@@ -55,6 +49,39 @@ namespace WixToolset.Core.ExtensibilityServices
                         {
                             resolvedDirectory.Path = parentPath;
                         }
+                    }
+                }
+            }
+
+            return resolvedDirectory.Path;
+        }
+
+        public string GetDirectoryPath(Dictionary<string, IResolvedDirectory> directories, string directory)
+        {
+            if (!directories.TryGetValue(directory, out var resolvedDirectory))
+            {
+                throw new WixException(ErrorMessages.ExpectedDirectory(directory));
+            }
+
+            if (null == resolvedDirectory.Path)
+            {
+                var name = resolvedDirectory.Name;
+
+                if (String.IsNullOrEmpty(resolvedDirectory.DirectoryParent))
+                {
+                    resolvedDirectory.Path = name;
+                }
+                else
+                {
+                    var parentPath = this.GetDirectoryPath(directories, resolvedDirectory.DirectoryParent);
+
+                    if (null != resolvedDirectory.Name)
+                    {
+                        resolvedDirectory.Path = Path.Combine(parentPath, name);
+                    }
+                    else
+                    {
+                        resolvedDirectory.Path = parentPath;
                     }
                 }
             }
@@ -75,7 +102,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 // Get the relative path of where we want the file to be layed out as specified
                 // in the Directory table.
-                var directoryPath = this.GetDirectoryPath(directories, null, directoryId, false);
+                var directoryPath = this.GetDirectoryPath(directories, directoryId);
                 fileSourcePath = Path.Combine(directoryPath, fileSourcePath);
             }
 

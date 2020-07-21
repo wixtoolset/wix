@@ -149,13 +149,12 @@ namespace WixToolset.Core
                     throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                 }
 
-                // Add the missing standard action symbols.
-                this.LoadStandardActions(find.EntrySection, find.SymbolsByName);
+                // Add the missing standard action and directory symbols.
+                this.LoadStandardSymbols(find.SymbolsByName);
 
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
                 var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
-
                 resolve.Execute();
 
                 if (this.Messaging.EncounteredError)
@@ -732,16 +731,27 @@ namespace WixToolset.Core
 #endif
 
         /// <summary>
-        /// Load the standard action symbols.
+        /// Load the standard action and directory symbols.
         /// </summary>
         /// <param name="symbolsByName">Collection of symbols.</param>
-        private void LoadStandardActions(IntermediateSection section, IDictionary<string, SymbolWithSection> symbolsByName)
+        private void LoadStandardSymbols(IDictionary<string, SymbolWithSection> symbolsByName)
         {
             foreach (var actionSymbol in WindowsInstallerStandard.StandardActions())
             {
-                var symbolWithSection = new SymbolWithSection(section, actionSymbol);
+                var symbolWithSection = new SymbolWithSection(null, actionSymbol);
 
                 // If the action's symbol has not already been defined (i.e. overriden by the user), add it now.
+                if (!symbolsByName.ContainsKey(symbolWithSection.Name))
+                {
+                    symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
+                }
+            }
+
+            foreach (var directorySymbol in WindowsInstallerStandard.StandardDirectories())
+            {
+                var symbolWithSection = new SymbolWithSection(null, directorySymbol);
+
+                // If the directory's symbol has not already been defined (i.e. overriden by the user), add it now.
                 if (!symbolsByName.ContainsKey(symbolWithSection.Name))
                 {
                     symbolsByName.Add(symbolWithSection.Name, symbolWithSection);
