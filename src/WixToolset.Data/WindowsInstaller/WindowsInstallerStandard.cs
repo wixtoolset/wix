@@ -422,6 +422,31 @@ namespace WixToolset.Data.WindowsInstaller
         public static IEnumerable<DirectorySymbol> StandardDirectories() => standardDirectoriesById.Values;
 
         /// <summary>
+        /// Gets the platform specific directory id for a directory. Most directories are not platform
+        /// specific and return themselves.
+        /// </summary>
+        /// <param name="directoryId">Directory id to get platform specific.</param>
+        /// <param name="platform">Platform to use.</param>
+        /// <returns>Platform specific directory id.</returns>
+        public static string GetPlatformSpecificDirectoryId(string directoryId, Platform platform)
+        {
+            switch (directoryId)
+            {
+                case "CommonFiles6432Folder":
+                    return platform == Platform.X86 || platform == Platform.ARM ? "CommonFilesFolder" : "CommonFiles64Folder";
+
+                case "ProgramFiles6432Folder":
+                    return platform == Platform.X86 || platform == Platform.ARM ? "ProgramFilesFolder" : "ProgramFiles64Folder";
+
+                case "System6432Folder":
+                    return platform == Platform.X86 || platform == Platform.ARM ? "SystemFolder" : "System64Folder";
+
+                default:
+                    return directoryId;
+            }
+        }
+
+        /// <summary>
         /// Find out if a directory is a standard directory.
         /// </summary>
         /// <param name="directoryId">Name of the directory.</param>
