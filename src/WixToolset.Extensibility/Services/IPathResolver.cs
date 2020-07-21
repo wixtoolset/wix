@@ -3,19 +3,27 @@
 namespace WixToolset.Extensibility.Services
 {
     using System.Collections.Generic;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
     public interface IPathResolver
     {
         /// <summary>
-        /// Get the source path of a directory.
+        /// Get the canonical source path of a directory.
         /// </summary>
         /// <param name="directories">All cached directories.</param>
         /// <param name="componentIdGenSeeds">Hash table of Component GUID generation seeds indexed by directory id.</param>
         /// <param name="directory">Directory identifier.</param>
-        /// <param name="canonicalize">Canonicalize the path for standard directories.</param>
         /// <returns>Source path of a directory.</returns>
-        string GetDirectoryPath(Dictionary<string, IResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, bool canonicalize);
+        string GetCanonicalDirectoryPath(Dictionary<string, IResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, Platform platform);
+
+        /// <summary>
+        /// Get the source path of a directory.
+        /// </summary>
+        /// <param name="directories">All cached directories.</param>
+        /// <param name="directory">Directory identifier.</param>
+        /// <returns>Source path of a directory.</returns>
+        string GetDirectoryPath(Dictionary<string, IResolvedDirectory> directories, string directory);
 
         /// <summary>
         /// Gets the source path of a file.
