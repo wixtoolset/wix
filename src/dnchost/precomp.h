@@ -24,6 +24,7 @@
 #define NETHOST_USE_AS_STATIC
 #include <nethost.h>
 #include <hostfxr.h>
+#include <coreclr_delegates.h>
 
 #include "coreclrhost.h"
 #include "dncutil.h"

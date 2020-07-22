@@ -14,6 +14,8 @@ struct HOSTFXR_STATE
     hostfxr_get_runtime_properties_fn pfnHostfxrGetRuntimeProperties;
     hostfxr_set_error_writer_fn pfnHostfxrSetErrorWriter;
     hostfxr_close_fn pfnHostfxrClose;
+    hostfxr_get_runtime_delegate_fn pfnHostfxrGetRuntimeDelegate;
+    get_function_pointer_fn pfnGetFunctionPointer;
     coreclr_initialize_ptr pfnCoreclrInitialize;
     coreclr_create_delegate_ptr pfnCoreclrCreateDelegate;
     void* pClrHandle;

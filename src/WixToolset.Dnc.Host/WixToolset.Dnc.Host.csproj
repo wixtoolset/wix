@@ -24,7 +24,10 @@
       <Line Include='#define DNC_ASSEMBLY_FILE_NAME L"$(AssemblyName).dll"' />
       <Line Include='#define DNC_ASSEMBLY_FULL_NAME "%(AssemblyIdentity.Identity)"' />
       <Line Include='#define DNC_ENTRY_TYPE "$(RootNamespace).BootstrapperApplicationFactory"' />
+      <Line Include='#define DNC_ENTRY_TYPEW L"$(RootNamespace).BootstrapperApplicationFactory,$(AssemblyName)"' />
       <Line Include='#define DNC_STATIC_ENTRY_METHOD "CreateBAFactory"' />
+      <Line Include='#define DNC_STATIC_ENTRY_METHODW L"CreateBAFactory"' />
+      <Line Include='#define DNC_STATIC_ENTRY_DELEGATEW L"$(RootNamespace).StaticEntryDelegate,$(AssemblyName)"' />
     </ItemGroup>
     <Message Importance="normal" Text="Generating identity definitions into @(HeaderPath->'%(FullPath)')" />
     <WriteLinesToFile File="@(HeaderPath)" Lines="@(Line)" Overwrite="True" />

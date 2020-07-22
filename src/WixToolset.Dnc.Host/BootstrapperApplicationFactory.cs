@@ -7,6 +7,8 @@ namespace WixToolset.Dnc.Host
     using System.Reflection;
     using System.Runtime.InteropServices;
 
+    delegate IBootstrapperApplicationFactory StaticEntryDelegate([MarshalAs(UnmanagedType.LPWStr)] string baFactoryAssemblyName, [MarshalAs(UnmanagedType.LPWStr)] string baFactoryAssemblyPath);
+
     /// <summary>
     /// Entry point for the .NET Core host to create and return the BA to the engine.
     /// Reflection is used instead of referencing WixToolset.Mba.Core directly to avoid requiring it in the AssemblyLoadContext.

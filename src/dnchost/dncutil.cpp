@@ -3,7 +3,9 @@
 #include "precomp.h"
 
 // https://github.com/dotnet/runtime/blob/master/src/installer/corehost/error_codes.h
+#define InvalidArgFailure 0x80008081
 #define HostApiBufferTooSmall 0x80008098
+#define HostApiUnsupportedVersion 0x800080a2
 
 // internal function declarations
 
@@ -21,6 +23,10 @@ static HRESULT InitializeHostfxr(
     __in LPCWSTR wzRuntimeConfigPath
     );
 static HRESULT InitializeCoreClr(
+    __in HOSTFXR_STATE* pState,
+    __in LPCWSTR wzNativeHostPath
+    );
+static HRESULT InitializeCoreClrPre5(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzNativeHostPath
     );
@@ -75,14 +81,28 @@ HRESULT DnchostCreateFactory(
     HRESULT hr = S_OK;
     PFNCREATEBAFACTORY pfnCreateBAFactory = NULL;
 
-    hr = pState->pfnCoreclrCreateDelegate(
-        pState->pClrHandle,
-        pState->dwDomainId,
-        DNC_ASSEMBLY_FULL_NAME,
-        DNC_ENTRY_TYPE,
-        DNC_STATIC_ENTRY_METHOD,
-        reinterpret_cast<void**>(&pfnCreateBAFactory));
-    BalExitOnFailure(hr, "Failed to create delegate in app domain.");
+    if (pState->pfnGetFunctionPointer)
+    {
+        hr = pState->pfnGetFunctionPointer(
+            DNC_ENTRY_TYPEW,
+            DNC_STATIC_ENTRY_METHODW,
+            DNC_STATIC_ENTRY_DELEGATEW,
+            NULL,
+            NULL,
+            reinterpret_cast<void**>(&pfnCreateBAFactory));
+        BalExitOnFailure(hr, "Failed to create delegate through GetFunctionPointer.");
+    }
+    else
+    {
+        hr = pState->pfnCoreclrCreateDelegate(
+            pState->pClrHandle,
+            pState->dwDomainId,
+            DNC_ASSEMBLY_FULL_NAME,
+            DNC_ENTRY_TYPE,
+            DNC_STATIC_ENTRY_METHOD,
+            reinterpret_cast<void**>(&pfnCreateBAFactory));
+        BalExitOnFailure(hr, "Failed to create delegate in app domain.");
+    }
 
     *ppAppFactory = pfnCreateBAFactory(wzBaFactoryAssemblyName, wzBaFactoryAssemblyPath);
 
@@ -149,6 +169,9 @@ static HRESULT LoadHostfxr(
     pState->pfnHostfxrClose = reinterpret_cast<hostfxr_close_fn>(::GetProcAddress(hHostfxr, "hostfxr_close"));
     BalExitOnNullWithLastError(pState->pfnHostfxrClose, hr, "Failed to get procedure address for hostfxr_close.");
 
+    pState->pfnHostfxrGetRuntimeDelegate = reinterpret_cast<hostfxr_get_runtime_delegate_fn>(::GetProcAddress(hHostfxr, "hostfxr_get_runtime_delegate"));
+    BalExitOnNullWithLastError(pState->pfnHostfxrGetRuntimeDelegate, hr, "Failed to get procedure address for hostfxr_get_runtime_delegate.");
+
 LExit:
     // Never unload the module since it isn't meant to be unloaded.
 
@@ -189,6 +212,28 @@ LExit:
 }
 
 static HRESULT InitializeCoreClr(
+    __in HOSTFXR_STATE* pState,
+    __in LPCWSTR wzNativeHostPath
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = pState->pfnHostfxrGetRuntimeDelegate(pState->hostContextHandle, hdt_get_function_pointer, reinterpret_cast<void**>(&pState->pfnGetFunctionPointer));
+    if (InvalidArgFailure == hr || // old versions of hostfxr don't allow calling GetRuntimeDelegate from InitializeForApp.
+        HostApiUnsupportedVersion == hr) // hdt_get_function_pointer was added in .NET 5.
+    {
+        hr = InitializeCoreClrPre5(pState, wzNativeHostPath);
+    }
+    else
+    {
+        ExitOnFailure(hr, "HostfxrGetRuntimeDelegate failed");
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT InitializeCoreClrPre5(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzNativeHostPath
     )
