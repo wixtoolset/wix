@@ -40,7 +40,6 @@
 
     <Fragment>
         <PayloadGroup Id='Dnc'>
-            <Payload Compressed='yes' SourceFile='nethost.dll' />
             <Payload Compressed='yes' SourceFile='WixToolset.Dnc.Host.dll' />
             <Payload Compressed='yes' SourceFile='wixstdba.dll' Name='dncpreq.dll' />
         </PayloadGroup>

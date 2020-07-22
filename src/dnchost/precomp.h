@@ -21,9 +21,10 @@
 #include <balutil.h>
 
 #include <WixToolset.Dnc.Host.h>
+#define NETHOST_USE_AS_STATIC
 #include <nethost.h>
+#include <hostfxr.h>
 
 #include "coreclrhost.h"
-#include "hostfxr.h"
 #include "dncutil.h"
 #include "dnchost.h"
