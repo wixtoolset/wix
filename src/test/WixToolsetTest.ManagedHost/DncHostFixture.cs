@@ -9,28 +9,15 @@ namespace WixToolsetTest.ManagedHost
 
     public class DncHostFixture
     {
+        static readonly string bundleBasePath = TestData.Get("..", "examples");
+
         [Fact]
         public void CanLoadFDDEarliestCoreMBA()
         {
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FDDEarliestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\EarliestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "FrameworkDependentBundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "EarliestCoreBundleFDD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -48,23 +35,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "SCDEarliestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\EarliestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "SelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "EarliestCoreBundleSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -82,23 +53,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "TrimmedSCDEarliestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\EarliestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "TrimmedSelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedTrimmedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "EarliestCoreBundleTrimmedSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -116,23 +71,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "SCDEarliestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\EarliestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "SelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "EarliestCoreBundleSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
@@ -155,22 +94,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FDDLatestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\LatestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "FrameworkDependentBundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleFDD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -188,22 +112,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FDDLatestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\LatestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "FrameworkDependentBundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleFDD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
@@ -226,23 +135,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "SCDLatestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\LatestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "SelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -260,23 +153,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "TrimmedSCDLatestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\LatestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "TrimmedSelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedTrimmedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleTrimmedSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -294,23 +171,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "SCDLatestCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\LatestCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "SelfContainedBundle.wxs"),
-                    Path.Combine(bundleSourceFolder, "HarvestedSCD.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "LatestCoreBundleSCD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
@@ -333,22 +194,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FDDWPFCoreMBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\WPFCoreMBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "FrameworkDependentBundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "WPFCoreBundleFDD.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);

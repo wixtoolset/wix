@@ -9,7 +9,7 @@
             <Payload SourceFile="Example.FullFramework2MBA\net20\win-x86\WixToolset.Mba.Host.config" />
         </BootstrapperApplicationRef>
         <Chain>
-            <PackageGroupRef Id="NetFx462RedistAsPrereq" />
+            <ExePackage SourceFile="c:\windows\system32\kernel32.dll" bal:PrereqPackage="yes" />
         </Chain>
     </Bundle>
 </Wix>

@@ -9,29 +9,15 @@ namespace WixToolsetTest.ManagedHost
 
     public class MbaHostFixture
     {
+        static readonly string bundleBasePath = TestData.Get("..", "examples");
+
         [Fact]
         public void CanLoadFullFramework2MBA()
         {
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FullFramework2MBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\FullFramework2MBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "FullFramework2Bundle.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -49,23 +35,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FullFramework4MBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\FullFramework4MBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "FullFramework4Bundle.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunShutdownEngine(bundleFile, baseFolder);
@@ -83,23 +53,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FullFramework2MBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\FullFramework2MBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "FullFramework2Bundle.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
@@ -121,23 +75,7 @@ namespace WixToolsetTest.ManagedHost
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var binFolder = Path.Combine(baseFolder, "bin");
-                var bundleFile = Path.Combine(binFolder, "FullFramework4MBA.exe");
-                var baSourceFolder = TestData.Get(@"..\examples");
-                var bundleSourceFolder = TestData.Get(@"TestData\FullFramework4MBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-bindpath", baSourceFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
+                var bundleFile = TestData.Get(bundleBasePath, "FullFramework4Bundle.exe");
                 var testEngine = new TestEngine();
 
                 var result = testEngine.RunReloadEngine(bundleFile, baseFolder);
