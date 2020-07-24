@@ -28,7 +28,8 @@ namespace WixToolset.Core
         public static void DisplayToolHeader()
         {
             var assembly = Assembly.GetCallingAssembly();
-            Console.WriteLine(WixDistribution.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [FileVersion]\r\n[AssemblyCopyright]", assembly));
+            Console.WriteLine(WixDistribution.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [FileVersion]", assembly));
+            Console.WriteLine(WixDistribution.ReplacePlaceholders("[AssemblyCopyright]", assembly));
         }
 
         /// <summary>
@@ -37,7 +38,8 @@ namespace WixToolset.Core
         public static void DisplayToolFooter()
         {
             var assembly = Assembly.GetCallingAssembly();
-            Console.Write(WixDistribution.ReplacePlaceholders("\r\nFor more information see: [SupportUrl]", assembly));
+            Console.WriteLine();
+            Console.WriteLine(WixDistribution.ReplacePlaceholders("For more information see: [SupportUrl]", assembly));
         }
     }
 }
