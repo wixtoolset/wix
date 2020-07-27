@@ -16,12 +16,16 @@
         </ComponentGroup>
 
         <UIRef Id="WixUI_Advanced" />
+        <Property Id="ApplicationFolderName" Value="MyProgram"/>
+        <Property Id="WixAppFolder" Value="WixPerMachineFolder"/>
     </Product>
 
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+                <Directory Id="INSTALLFOLDER" Name="MsiPackage">
+                    <Directory Id="APPLICATIONFOLDER" Name="." />
+                </Directory>
             </Directory>
         </Directory>
     </Fragment>

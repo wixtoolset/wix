@@ -10,7 +10,7 @@ namespace WixToolsetTest.UI
 
     public class UIExtensionFixture
     {
-        [Fact(Skip = "WixUI_Advanced is missing because it can't currently compile in v4")]
+        [Fact]
         public void CanBuildUsingWixUIAdvanced()
         {
             var folder = TestData.Get(@"TestData\WixUI_Advanced");
