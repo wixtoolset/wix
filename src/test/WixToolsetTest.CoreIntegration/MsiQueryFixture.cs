@@ -41,7 +41,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppId" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "AppId:{D6040299-B15C-4C94-AE26-0C9B60D14C35}\t\t\t\t\t\t",
                 }, results);
@@ -74,7 +74,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "CompLocator" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "AppSearch:SAMPLECOMPFOUND\tSampleCompSearch",
                     "CompLocator:SampleCompSearch\t{4D9A0D20-D0CC-40DE-B580-EAD38B985217}\t1",
@@ -108,7 +108,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "AppSearch:SAMPLEDIRFOUND\tSampleDirSearch",
                     "DrLocator:SampleDirSearch\t\tC:\\SampleDir\t",
@@ -142,7 +142,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator", "IniLocator" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "AppSearch:SAMPLEFILEFOUND\tSampleFileSearch",
                     "DrLocator:SampleFileSearch\tSampleIniFileSearch\t\t",
@@ -177,7 +177,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "RegLocator" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "AppSearch:SAMPLEREGFOUND\tSampleRegSearch",
                     "RegLocator:SampleRegSearch\t2\tSampleReg\t\t2",
@@ -213,7 +213,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Class" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Class:{3FAED4CC-C473-4B8A-BE8B-303871377A4A}\tLocalServer32\tClassComp\t\tFakeClass3FAE\t\t\tSampleIcon\t0\t\t\tProductFeature\t",
                 }, results);
@@ -246,7 +246,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Class", "ProgId", "Registry" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Class:{F12A6F69-117F-471F-AE73-F8E74218F498}\tLocalServer32\tProgIdComp\t73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D\tFakeClassF12A\t\t\t\t\t\t\tProductFeature\t",
                     "ProgId:73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D\t\t{F12A6F69-117F-471F-AE73-F8E74218F498}\tFakeClassF12A\t\t",
@@ -283,14 +283,17 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
 
-                var results = Query.QueryDatabase(msiPath, new[] { "CheckBox", "Control", "InstallUISequence" });
-                Assert.Equal(new[]
+                var results = Query.QueryDatabase(msiPath, new[] { "CheckBox", "Control", "ControlCondition", "InstallUISequence" });
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CheckBox:WIXUI_EXITDIALOGOPTIONALCHECKBOX\t1",
-                    "Control:FirstDialog\tHeader\tText\t0\t13\t90\t13\t3\tFirstDialogHeader\tTitle\t\t",
-                    "Control:FirstDialog\tTitle\tText\t0\t0\t90\t13\t3\tFirstDialogTitle\tHeader\t\t",
-                    "Control:SecondDialog\tOptionalCheckBox\tCheckBox\t0\t13\t100\t40\t2\t[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]\tTitle\t\t",
-                    "Control:SecondDialog\tTitle\tText\t0\t0\t90\t13\t3\tSecondDialogTitle\tOptionalCheckBox\t\t",
+                    "Control:FirstDialog\tHeader\tText\t0\t13\t90\t13\t3\t\tFirstDialogHeader\tTitle\t",
+                    "Control:FirstDialog\tTitle\tText\t0\t0\t90\t13\t3\t\tFirstDialogTitle\tHeader\t",
+                    "Control:SecondDialog\tOptionalCheckBox\tCheckBox\t0\t13\t100\t40\t2\tWIXUI_EXITDIALOGOPTIONALCHECKBOX\t[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]\tTitle\tOptional checkbox|Check this box for fun",
+                    "Control:SecondDialog\tTitle\tText\t0\t0\t90\t13\t3\t\tSecondDialogTitle\tOptionalCheckBox\t",
+                    "ControlCondition:FirstDialog\tHeader\tDisable\tInstalled",
+                    "ControlCondition:FirstDialog\tHeader\tHide\tInstalled",
+                    "ControlCondition:SecondDialog\tOptionalCheckBox\tShow\tWIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed",
                     "InstallUISequence:CostFinalize\t\t1000",
                     "InstallUISequence:CostInitialize\t\t800",
                     "InstallUISequence:ExecuteAction\t\t1300",
@@ -331,7 +334,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "CreateFolder" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "CreateFolder:INSTALLFOLDER\tNullKeypathComponent",
                 }, results);
@@ -409,7 +412,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Environment" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Environment:PATH\t=-*PATH\t[INSTALLFOLDER]; ;[~]\tWixEnvironmentTest",
                     "Environment:WixEnvironmentTest1\t=-WixEnvTest1\t\tWixEnvironmentTest",
@@ -478,7 +481,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Feature" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Feature:ChildFeature\tParentFeature\tChildFeatureTitle\t\t2\t1\t\t0",
                     "Feature:ParentFeature\t\tParentFeatureTitle\t\t2\t1\t\t0",
@@ -513,7 +516,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Font" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Font:test.txt\tFakeFont",
                 }, results);
@@ -546,7 +549,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Font" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Font:TrueTypeFontFile\t",
                 }, results);
@@ -579,7 +582,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "InstallExecuteSequence" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "InstallExecuteSequence:CostFinalize\t\t1000",
                     "InstallExecuteSequence:CostInitialize\t\t800",
@@ -630,7 +633,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "LockPermissions" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "LockPermissions:INSTALLFOLDER\tCreateFolder\t\tAdministrator\t0",
                 }, results);
@@ -664,7 +667,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "MsiAssembly", "MsiAssemblyName" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "MsiAssembly:test.txt\tProductFeature\ttest.dll.manifest\t\t1",
                     "MsiAssemblyName:test.txt\tname\tMyApplication.app",
@@ -699,7 +702,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "MsiShortcutProperty", "Shortcut" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "MsiShortcutProperty:scp4GOCIx4Eskci4nBG1MV_vSUOZt4\tTheShortcut\tCustomShortcutKey\tCustomShortcutValue",
                     "Shortcut:TheShortcut\tINSTALLFOLDER\td\tShortcutComp\t[#filcV1yrx0x8wJWj4qMzcH21jwkPko]\t\t\t\t\t\t\t\t\t\t\t",
@@ -733,7 +736,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "ReserveCost" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "ReserveCost:TestCost\tReserveCostComp\tINSTALLFOLDER\t100\t200",
                 }, results);
@@ -766,7 +769,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall", "ServiceControl" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "ServiceControl:SampleService\tSampleService\t161\t\t1\ttest.txt",
                     "ServiceInstall:SampleService\tSampleService\t\t16\t4\t0\t\t\t\t\t\ttest.txt\t",
@@ -800,7 +803,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "TextStyle" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "TextStyle:FirstTextStyle\tArial\t2\t\t",
                 }, results);
@@ -834,7 +837,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "TextStyle" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "TextStyle:CustomFont\tTahoma\t8\t\t",
                 }, results);
@@ -866,7 +869,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "TypeLib" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "TypeLib:{765BE8EE-BD7F-491E-90D2-C5A972462B50}\t0\tTypeLibComp\t\t\t\tProductFeature\t",
                 }, results);
@@ -898,7 +901,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Upgrade" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Upgrade:{01120000-00E0-0000-0000-0000000FF1CE}\t12.0.0\t13.0.0\t\t260\t\tBLAHBLAHBLAH",
                 }, results);
@@ -931,7 +934,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Upgrade" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
                     "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
@@ -940,12 +943,12 @@ namespace WixToolsetTest.CoreIntegration
 
                 var prefix = "Property:SecureCustomProperties\t";
                 var secureProperties = Query.QueryDatabase(msiPath, new[] { "Property" }).Where(p => p.StartsWith(prefix)).Single();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "RELPRODFOUND",
                     "WIX_DOWNGRADE_DETECTED",
                     "WIX_UPGRADE_DETECTED",
-                }, secureProperties.Substring(prefix.Length).Split(';').OrderBy(p => p));
+                }, secureProperties.Substring(prefix.Length).Split(';').OrderBy(p => p).ToArray());
             }
         }
 
@@ -983,13 +986,13 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Null(data.Tables["File"]);
 
                 var results = Query.QueryDatabase(msiPath, new[] { "File" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "File:filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent.243FB739_4D05_472F_9CFB_EF6B1017B6DE\ttest.txt\t17\t\t\t512\t0"
                 }, results);
 
                 var files = Query.GetCabinetFiles(cabPath);
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
                 }, files.Select(f => f.Name).ToArray());

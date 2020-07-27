@@ -2,11 +2,13 @@
 
 namespace WixToolset.Core
 {
+    using System.Diagnostics;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Bind path representation.
     /// </summary>
+    [DebuggerDisplay("Name={Name,nq} Path={Path,nq}")]
     internal class BindPath : IBindPath
     {
         public string Name { get; set; }

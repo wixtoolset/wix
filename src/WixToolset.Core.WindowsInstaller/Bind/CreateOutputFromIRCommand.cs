@@ -349,9 +349,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = symbol.Width;
             row[6] = symbol.Height;
             row[7] = attributes;
-            row[8] = text;
-            row[9] = symbol.NextControlRef;
-            row[10] = symbol.Help;
+            row[8] = symbol.Property;
+            row[9] = text;
+            row[10] = symbol.NextControlRef;
+            row[11] = symbol.Help;
         }
 
         private void AddControlEventSymbol(ControlEventSymbol symbol)

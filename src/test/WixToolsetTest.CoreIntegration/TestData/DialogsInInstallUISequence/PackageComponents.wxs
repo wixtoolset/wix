@@ -10,6 +10,7 @@
             <Dialog Id="SecondDialog" Width="100" Height="100">
                 <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="SecondDialogTitle" />
                 <Control Id="OptionalCheckBox" Type="CheckBox" X="0" Y="13" Width="100" Height="40" Hidden="yes" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]"
+                         ToolTip="Optional checkbox" Help="Check this box for fun"
                          ShowCondition="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed" />
             </Dialog>
 
