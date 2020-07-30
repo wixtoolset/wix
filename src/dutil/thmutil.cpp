@@ -3799,7 +3799,7 @@ static HRESULT DrawProgressBar(
     }
 
     // Draw the right side of the progress bar.
-    ::StretchBlt(pdis->hDC, pdis->rcItem.right - 1, 0, 1, dwHeight, hdcMem, nSourceX, nSourceY, 1, dwSourceHeight, SRCCOPY);
+    ::StretchBlt(pdis->hDC, pdis->rcItem.right - 1, 0, 1, dwHeight, hdcMem, nSourceX + 3, nSourceY, 1, dwSourceHeight, SRCCOPY);
 
     ::SelectObject(hdcMem, hDefaultBitmap);
     ::DeleteDC(hdcMem);
