@@ -47,6 +47,7 @@ static ULONG_PTR vgdiToken = 0;
 static ULONG_PTR vgdiHookToken = 0;
 static HMODULE vhHyperlinkRegisteredModule = NULL;
 static HMODULE vhPanelRegisteredModule = NULL;
+static HMODULE vhModuleMsftEdit = NULL;
 static HMODULE vhModuleRichEd = NULL;
 static HCURSOR vhCursorHand = NULL;
 
@@ -454,6 +455,12 @@ LExit:
 
 DAPI_(void) ThemeUninitialize()
 {
+    if (vhModuleMsftEdit)
+    {
+        ::FreeLibrary(vhModuleMsftEdit);
+        vhModuleMsftEdit = NULL;
+    }
+
     if (vhModuleRichEd)
     {
         ::FreeLibrary(vhModuleRichEd);
@@ -5049,12 +5056,17 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_RICHEDIT:
-            if (!vhModuleRichEd)
+            if (!vhModuleMsftEdit && !vhModuleRichEd)
             {
-                hr = LoadSystemLibrary(L"Riched20.dll", &vhModuleRichEd);
-                ThmExitOnFailure(hr, "Failed to load Rich Edit control library.");
+                hr = LoadSystemLibrary(L"Msftedit.dll", &vhModuleMsftEdit);
+                if (FAILED(hr))
+                {
+                    hr = LoadSystemLibrary(L"Riched20.dll", &vhModuleRichEd);
+                    ThmExitOnFailure(hr, "Failed to load Rich Edit control library.");
+                }
             }
-            wzWindowClass = RICHEDIT_CLASSW;
+
+            wzWindowClass = vhModuleMsftEdit ? MSFTEDIT_CLASS : RICHEDIT_CLASSW;
             dwWindowBits |= ES_AUTOVSCROLL | ES_MULTILINE | WS_VSCROLL | ES_READONLY;
             break;
 
