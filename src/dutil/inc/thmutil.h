@@ -36,6 +36,7 @@ typedef HRESULT(CALLBACK *PFNTHM_GET_VARIABLE_STRING)(
 typedef HRESULT(CALLBACK *PFNTHM_SET_VARIABLE_STRING)(
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue,
+    __in BOOL fFormatted,
     __in_opt LPVOID pvContext
     );
 

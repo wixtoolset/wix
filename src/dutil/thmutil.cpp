@@ -1020,7 +1020,7 @@ DAPI_(HRESULT) ThemeShowPageEx(
                         pSavedVariable = pPage->rgSavedVariables + v;
                         if (pSavedVariable->wzName)
                         {
-                            pTheme->pfnSetStringVariable(pSavedVariable->wzName, pSavedVariable->sczValue, pTheme->pvVariableContext);
+                            pTheme->pfnSetStringVariable(pSavedVariable->wzName, pSavedVariable->sczValue, FALSE, pTheme->pvVariableContext);
                         }
                     }
                 }
@@ -4128,7 +4128,7 @@ static void OnBrowseDirectory(
         }
         else if (pTheme->pfnSetStringVariable)
         {
-            hr = pTheme->pfnSetStringVariable(pAction->BrowseDirectory.sczVariableName, wzPath, pTheme->pvVariableContext);
+            hr = pTheme->pfnSetStringVariable(pAction->BrowseDirectory.sczVariableName, wzPath, FALSE, pTheme->pvVariableContext);
             ThmExitOnFailure(hr, "Failed to set variable: %ls", pAction->BrowseDirectory.sczVariableName);
         }
         else if (pTargetControl)
@@ -4233,7 +4233,7 @@ static BOOL OnButtonClicked(
         case THEME_CONTROL_TYPE_RADIOBUTTON:
             if (pTheme->pfnSetStringVariable && pControl->sczVariable && *pControl->sczVariable && ThemeIsControlChecked(pTheme, pControl->wId))
             {
-                pTheme->pfnSetStringVariable(pControl->sczVariable, pControl->sczValue, pTheme->pvVariableContext);
+                pTheme->pfnSetStringVariable(pControl->sczVariable, pControl->sczValue, FALSE, pTheme->pvVariableContext);
                 fRefresh = TRUE;
             }
             break;
@@ -4459,6 +4459,7 @@ static HRESULT ShowControl(
     HRESULT hr = S_OK;
     DWORD iPageControl = 0;
     HWND hwndFocus = NULL;
+    LPWSTR sczFormatString = NULL;
     LPWSTR sczText = NULL;
     THEME_SAVEDVARIABLE* pSavedVariable = NULL;
     BOOL fHide = SW_HIDE == nCmdShow;
@@ -4471,7 +4472,7 @@ static HRESULT ShowControl(
         hr = ThemeGetTextControl(pTheme, pControl->wId, &sczText);
         ThmExitOnFailure(hr, "Failed to get the text for control: %ls", pControl->sczName);
 
-        hr = pTheme->pfnSetStringVariable(pControl->sczName, sczText, pTheme->pvVariableContext);
+        hr = pTheme->pfnSetStringVariable(pControl->sczName, sczText, FALSE, pTheme->pvVariableContext);
         ThmExitOnFailure(hr, "Failed to set the variable '%ls' to '%ls'", pControl->sczName, sczText);
     }
 
@@ -4621,17 +4622,13 @@ static HRESULT ShowControl(
 
             // If this is an editbox control,
             // try to set its default state to the state of a matching named variable.
-            if (pTheme->pfnGetStringVariable && THEME_CONTROL_TYPE_EDITBOX == pControl->type)
+            if (pTheme->pfnFormatString && THEME_CONTROL_TYPE_EDITBOX == pControl->type)
             {
-                hr = pTheme->pfnGetStringVariable(pControl->sczName, &sczText, pTheme->pvVariableContext);
-                if (E_NOTFOUND == hr)
-                {
-                    ReleaseNullStr(sczText);
-                }
-                else
-                {
-                    ThmExitOnFailure(hr, "Failed to get string variable: %ls", pControl->sczName);
-                }
+                hr = StrAllocFormatted(&sczFormatString, L"[%ls]", pControl->sczName);
+                ThmExitOnFailure(hr, "Failed to create format string: '%ls'", pControl->sczName);
+
+                hr = pTheme->pfnFormatString(sczFormatString, &sczText, pTheme->pvVariableContext);
+                ThmExitOnFailure(hr, "Failed to format string: '%ls'", sczFormatString);
 
                 if (THEME_SHOW_PAGE_REASON_REFRESH != reason && pPage && pControl->wPageId)
                 {
@@ -4722,6 +4719,7 @@ static HRESULT ShowControl(
     }
 
 LExit:
+    ReleaseStr(sczFormatString);
     ReleaseStr(sczText);
 
     return hr;
