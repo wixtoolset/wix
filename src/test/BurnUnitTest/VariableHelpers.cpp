@@ -17,11 +17,11 @@ namespace Test
 {
 namespace Bootstrapper
 {
-    void VariableSetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LPCWSTR wzValue)
+    void VariableSetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LPCWSTR wzValue, BOOL fFormatted)
     {
         HRESULT hr = S_OK;
 
-        hr = VariableSetString(pVariables, wzVariable, wzValue, FALSE);
+        hr = VariableSetString(pVariables, wzVariable, wzValue, FALSE, fFormatted);
         TestThrowOnFailure2(hr, L"Failed to set %s to: %s", wzVariable, wzValue);
     }
 

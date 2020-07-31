@@ -245,31 +245,6 @@ LExit:
     return hr;
 }
 
-static HRESULT BEEngineSetVariableLiteralString(
-    __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in const BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_RESULTS* /*pResults*/
-    )
-{
-    HRESULT hr = S_OK;
-    LPCWSTR wzVariable = pArgs->wzVariable;
-    LPCWSTR wzValue = pArgs->wzValue;
-
-    if (wzVariable && *wzVariable)
-    {
-        hr = VariableSetLiteralString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE);
-        ExitOnFailure(hr, "Failed to set literal string variable.");
-    }
-    else
-    {
-        hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Bundle Extension did not provide variable name.");
-    }
-
-LExit:
-    return hr;
-}
-
 static HRESULT BEEngineSetVariableNumeric(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
     __in const BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS* pArgs,
@@ -307,7 +282,7 @@ static HRESULT BEEngineSetVariableString(
 
     if (wzVariable && *wzVariable)
     {
-        hr = VariableSetString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE);
+        hr = VariableSetString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE, pArgs->fFormatted);
         ExitOnFailure(hr, "Failed to set string variable.");
     }
     else
@@ -382,9 +357,6 @@ HRESULT WINAPI EngineForExtensionProc(
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_LOG:
         hr = BEEngineLog(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_LOG_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_LOG_RESULTS*>(pvResults));
-        break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLELITERALSTRING:
-        hr = BEEngineSetVariableLiteralString(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_RESULTS*>(pvResults));
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC:
         hr = BEEngineSetVariableNumeric(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS*>(pvResults));

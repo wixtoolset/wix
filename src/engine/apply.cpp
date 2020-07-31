@@ -272,7 +272,7 @@ extern "C" HRESULT ApplySetVariables(
 {
     HRESULT hr = S_OK;
 
-    hr = VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, NULL, TRUE);
+    hr = VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, NULL, TRUE, FALSE);
     ExitOnFailure(hr, "Failed to set the bundle forced restart package built-in variable.");
 
 LExit:
@@ -2493,7 +2493,7 @@ static HRESULT ExecutePackageComplete(
     if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
     {
         // Best effort to set the forced restart package variable.
-        VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, pPackage->sczId, TRUE);
+        VariableSetString(pVariables, BURN_BUNDLE_FORCED_RESTART_PACKAGE, pPackage->sczId, TRUE, FALSE);
     }
 
     // If we're retrying, leave a message in the log file and say everything is okay.

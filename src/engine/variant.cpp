@@ -32,7 +32,8 @@ extern "C" void BVariantUninitialize(
     __in BURN_VARIANT* pVariant
     )
 {
-    if (BURN_VARIANT_TYPE_STRING == pVariant->Type)
+    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
+        BURN_VARIANT_TYPE_STRING == pVariant->Type)
     {
         StrSecureZeroFreeString(pVariant->sczValue);
     }
@@ -53,6 +54,7 @@ extern "C" HRESULT BVariantGetNumeric(
     case BURN_VARIANT_TYPE_NUMERIC:
         BVariantRetrieveNumeric(pVariant, pllValue);
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, &sczValue);
         if (SUCCEEDED(hr))
@@ -97,6 +99,7 @@ extern "C" HRESULT BVariantGetString(
         }
         SecureZeroMemory(&llValue, sizeof(llValue));
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, psczValue);
         break;
@@ -136,6 +139,7 @@ extern "C" HRESULT BVariantGetVersion(
     case BURN_VARIANT_TYPE_NUMERIC:
         BVariantRetrieveNumeric(pVariant, (LONGLONG*)pqwValue);
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, &sczValue);
         if (SUCCEEDED(hr))
@@ -167,7 +171,8 @@ extern "C" HRESULT BVariantSetNumeric(
     HRESULT hr = S_OK;
     BOOL fEncrypt = pVariant->fEncryptString;
 
-    if (BURN_VARIANT_TYPE_STRING == pVariant->Type)
+    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
+        BURN_VARIANT_TYPE_STRING == pVariant->Type)
     {
         StrSecureZeroFreeString(pVariant->sczValue);
     }
@@ -182,7 +187,8 @@ extern "C" HRESULT BVariantSetNumeric(
 extern "C" HRESULT BVariantSetString(
     __in BURN_VARIANT* pVariant,
     __in_z_opt LPCWSTR wzValue,
-    __in DWORD_PTR cchValue
+    __in DWORD_PTR cchValue,
+    __in BOOL fFormatted
     )
 {
     HRESULT hr = S_OK;
@@ -194,7 +200,8 @@ extern "C" HRESULT BVariantSetString(
     }
     else // assign the value.
     {
-        if (BURN_VARIANT_TYPE_STRING != pVariant->Type)
+        if (BURN_VARIANT_TYPE_FORMATTED != pVariant->Type &&
+            BURN_VARIANT_TYPE_STRING != pVariant->Type)
         {
             memset(pVariant, 0, sizeof(BURN_VARIANT));
         }
@@ -207,7 +214,7 @@ extern "C" HRESULT BVariantSetString(
         hr = StrAllocStringSecure(&pVariant->sczValue, wzValue, cchValue);
         ExitOnFailure(hr, "Failed to copy string.");
 
-        pVariant->Type = BURN_VARIANT_TYPE_STRING;
+        pVariant->Type = fFormatted ? BURN_VARIANT_TYPE_FORMATTED : BURN_VARIANT_TYPE_STRING;
     }
 
 LExit:
@@ -223,7 +230,8 @@ extern "C" HRESULT BVariantSetVersion(
     HRESULT hr = S_OK;
     BOOL fEncryptValue = pVariant->fEncryptString;
 
-    if (BURN_VARIANT_TYPE_STRING == pVariant->Type)
+    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
+        BURN_VARIANT_TYPE_STRING == pVariant->Type)
     {
         StrSecureZeroFreeString(pVariant->sczValue);
     }
@@ -259,11 +267,12 @@ extern "C" HRESULT BVariantSetValue(
         }
         SecureZeroMemory(&llValue, sizeof(llValue));
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantGetString(pValue, &sczValue);
         if (SUCCEEDED(hr))
         {
-            hr = BVariantSetString(pVariant, sczValue, 0);
+            hr = BVariantSetString(pVariant, sczValue, 0, BURN_VARIANT_TYPE_FORMATTED == pValue->Type);
         }
         StrSecureZeroFreeString(sczValue);
         break;
@@ -310,11 +319,12 @@ extern "C" HRESULT BVariantCopy(
         }
         SecureZeroMemory(&llValue, sizeof(llValue));
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantGetString(pSource, &sczValue);
         if (SUCCEEDED(hr))
         {
-            hr = BVariantSetString(pTarget, sczValue, 0);
+            hr = BVariantSetString(pTarget, sczValue, 0, BURN_VARIANT_TYPE_FORMATTED == pSource->Type);
         }
         StrSecureZeroFreeString(sczValue);
         break;
@@ -350,6 +360,12 @@ extern "C" HRESULT BVariantChangeType(
     {
         ExitFunction(); // variant already is of the requested type
     }
+    else if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type && BURN_VARIANT_TYPE_STRING == type ||
+             BURN_VARIANT_TYPE_STRING == pVariant->Type && BURN_VARIANT_TYPE_FORMATTED == type)
+    {
+        pVariant->Type = type;
+        ExitFunction();
+    }
 
     switch (type)
     {
@@ -359,6 +375,7 @@ extern "C" HRESULT BVariantChangeType(
     case BURN_VARIANT_TYPE_NUMERIC:
         hr = BVariantGetNumeric(pVariant, &variant.llValue);
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantGetString(pVariant, &variant.sczValue);
         break;
@@ -400,6 +417,7 @@ extern "C" HRESULT BVariantSetEncryption(
     case BURN_VARIANT_TYPE_VERSION:
         hr = S_OK;
         break;
+    case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantEncryptString(pVariant, fEncrypt);
         break;

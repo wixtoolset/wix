@@ -113,13 +113,13 @@ extern "C" HRESULT CoreInitialize(
 
     if (sczSourceProcessPath)
     {
-        hr = VariableSetLiteralString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, sczSourceProcessPath, TRUE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, sczSourceProcessPath, TRUE, FALSE);
         ExitOnFailure(hr, "Failed to set source process path variable.");
 
         hr = PathGetDirectory(sczSourceProcessPath, &sczSourceProcessFolder);
         ExitOnFailure(hr, "Failed to get source process folder from path.");
 
-        hr = VariableSetLiteralString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, sczSourceProcessFolder, TRUE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, sczSourceProcessFolder, TRUE, FALSE);
         ExitOnFailure(hr, "Failed to set source process folder variable.");
     }
 
@@ -127,7 +127,7 @@ extern "C" HRESULT CoreInitialize(
     // Needs to be done after ManifestLoadXmlFromBuffer.
     if (sczOriginalSource)
     {
-        hr = VariableSetLiteralString(&pEngineState->variables, BURN_BUNDLE_ORIGINAL_SOURCE, sczOriginalSource, FALSE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_ORIGINAL_SOURCE, sczOriginalSource, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set original source variable.");
     }
 
@@ -258,7 +258,7 @@ extern "C" HRESULT CoreDetect(
     }
     else
     {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_INSTALLED, NULL, TRUE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_INSTALLED, NULL, TRUE, FALSE);
         ExitOnFailure(hr, "Failed to unset the bundle installed built-in variable.");
     }
 

@@ -35,21 +35,22 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
                 // set variables
-                VariableSetStringHelper(&variables, L"PROP1", L"VAL1");
+                VariableSetStringHelper(&variables, L"PROP1", L"VAL1", FALSE);
                 VariableSetNumericHelper(&variables, L"PROP2", 2);
-                VariableSetStringHelper(&variables, L"PROP5", L"VAL5");
-                VariableSetStringHelper(&variables, L"PROP3", L"VAL3");
-                VariableSetStringHelper(&variables, L"PROP4", L"VAL4");
-                VariableSetStringHelper(&variables, L"PROP6", L"VAL6");
-                VariableSetStringHelper(&variables, L"PROP7", L"7");
+                VariableSetStringHelper(&variables, L"PROP5", L"VAL5", FALSE);
+                VariableSetStringHelper(&variables, L"PROP3", L"VAL3", FALSE);
+                VariableSetStringHelper(&variables, L"PROP4", L"VAL4", FALSE);
+                VariableSetStringHelper(&variables, L"PROP6", L"VAL6", FALSE);
+                VariableSetStringHelper(&variables, L"PROP7", L"7", FALSE);
                 VariableSetVersionHelper(&variables, L"PROP8", MAKEQWORDVERSION(1,1,0,0));
+                VariableSetStringHelper(&variables, L"PROP9", L"[VAL9]", TRUE);
 
                 // set overwritten variables
-                VariableSetStringHelper(&variables, L"OVERWRITTEN_STRING", L"ORIGINAL");
+                VariableSetStringHelper(&variables, L"OVERWRITTEN_STRING", L"ORIGINAL", FALSE);
                 VariableSetNumericHelper(&variables, L"OVERWRITTEN_STRING", 42);
 
                 VariableSetNumericHelper(&variables, L"OVERWRITTEN_NUMBER", 5);
-                VariableSetStringHelper(&variables, L"OVERWRITTEN_NUMBER", L"NEW");
+                VariableSetStringHelper(&variables, L"OVERWRITTEN_NUMBER", L"NEW", FALSE);
 
                 // get and verify variable values
                 Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables, L"PROP1"));
@@ -62,6 +63,7 @@ namespace Bootstrapper
                 Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
                 Assert::Equal(MAKEQWORDVERSION(1,1,0,0), VariableGetVersionHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"[VAL9]"), VariableGetStringHelper(&variables, L"PROP9"));
 
                 Assert::Equal(42ll, VariableGetNumericHelper(&variables, L"OVERWRITTEN_STRING"));
                 Assert::Equal<String^>(gcnew String(L"NEW"), VariableGetStringHelper(&variables, L"OVERWRITTEN_NUMBER"));
@@ -87,6 +89,7 @@ namespace Bootstrapper
                     L"    <Variable Id='Var3' Type='version' Value='1.2.3.4' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var4' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var5' Type='string' Value='' Hidden='no' Persisted='no' />"
+                    L"    <Variable Id='Var6' Type='formatted' Value='[Formatted]' Hidden='no' Persisted='no' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);
@@ -103,10 +106,12 @@ namespace Bootstrapper
                 Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables, L"Var2"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_VERSION, VariableGetTypeHelper(&variables, L"Var3"));
                 Assert::Equal((int)BURN_VARIANT_TYPE_NONE, VariableGetTypeHelper(&variables, L"Var4"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_FORMATTED, VariableGetTypeHelper(&variables, L"Var6"));
 
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Var1"));
                 Assert::Equal<String^>(gcnew String(L"String value."), VariableGetStringHelper(&variables, L"Var2"));
                 Assert::Equal(MAKEQWORDVERSION(1,2,3,4), VariableGetVersionHelper(&variables, L"Var3"));
+                Assert::Equal<String^>(gcnew String(L"[Formatted]"), VariableGetStringHelper(&variables, L"Var6"));
             }
             finally
             {
@@ -128,9 +133,13 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
                 // set variables
-                VariableSetStringHelper(&variables, L"PROP1", L"VAL1");
-                VariableSetStringHelper(&variables, L"PROP2", L"VAL2");
+                VariableSetStringHelper(&variables, L"PROP1", L"VAL1", FALSE);
+                VariableSetStringHelper(&variables, L"PROP2", L"VAL2", FALSE);
                 VariableSetNumericHelper(&variables, L"PROP3", 3);
+                VariableSetStringHelper(&variables, L"PROP4", L"[PROP1]", FALSE);
+                VariableSetStringHelper(&variables, L"PROP5", L"[PROP2]", FALSE);
+                VariableSetStringHelper(&variables, L"PROP6", L"[PROP4]", TRUE);
+                VariableSetStringHelper(&variables, L"PROP7", L"[PROP5]", TRUE);
 
                 // test string formatting
                 Assert::Equal<String^>(gcnew String(L"NOPROP"), VariableFormatStringHelper(&variables, L"NOPROP"));
@@ -148,6 +157,10 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"[NONE"), VariableFormatStringHelper(&variables, L"[NONE"));
                 Assert::Equal<String^>(gcnew String(L"VAL2"), VariableGetFormattedHelper(&variables, L"PROP2"));
                 Assert::Equal<String^>(gcnew String(L"3"), VariableGetFormattedHelper(&variables, L"PROP3"));
+                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP4"));
+                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP5"));
+                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP6"));
+                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP7"));
 
                 hr = VariableFormatString(&variables, L"PRE [PROP1] POST", &scz, &cch);
                 TestThrowOnFailure(hr, L"Failed to format string");
@@ -186,15 +199,15 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
                 // set variables
-                VariableSetStringHelper(&variables, L"PROP1", L"VAL1");
-                VariableSetStringHelper(&variables, L"PROP2", L"VAL2");
-                VariableSetStringHelper(&variables, L"PROP3", L"VAL3");
-                VariableSetStringHelper(&variables, L"PROP4", L"BEGIN MID END");
+                VariableSetStringHelper(&variables, L"PROP1", L"VAL1", FALSE);
+                VariableSetStringHelper(&variables, L"PROP2", L"VAL2", FALSE);
+                VariableSetStringHelper(&variables, L"PROP3", L"VAL3", FALSE);
+                VariableSetStringHelper(&variables, L"PROP4", L"BEGIN MID END", FALSE);
                 VariableSetNumericHelper(&variables, L"PROP5", 5);
                 VariableSetNumericHelper(&variables, L"PROP6", 6);
-                VariableSetStringHelper(&variables, L"PROP7", L"");
+                VariableSetStringHelper(&variables, L"PROP7", L"", FALSE);
                 VariableSetNumericHelper(&variables, L"PROP8", 0);
-                VariableSetStringHelper(&variables, L"_PROP9", L"VAL9");
+                VariableSetStringHelper(&variables, L"_PROP9", L"VAL9", FALSE);
                 VariableSetNumericHelper(&variables, L"PROP10", -10);
                 VariableSetNumericHelper(&variables, L"PROP11", 9223372036854775807ll);
                 VariableSetNumericHelper(&variables, L"PROP12", -9223372036854775808ll);
@@ -208,7 +221,11 @@ namespace Bootstrapper
                 VariableSetVersionHelper(&variables, L"PROP20", MAKEQWORDVERSION(1,1,1,1));
                 VariableSetNumericHelper(&variables, L"vPROP21", 1);
                 VariableSetVersionHelper(&variables, L"PROP22", MAKEQWORDVERSION(65535,65535,65535,65535));
-                VariableSetStringHelper(&variables, L"PROP23", L"1.1.1");
+                VariableSetStringHelper(&variables, L"PROP23", L"1.1.1", FALSE);
+                VariableSetStringHelper(&variables, L"PROP24", L"[PROP1]", TRUE);
+                VariableSetStringHelper(&variables, L"PROP25", L"[PROP7]", TRUE);
+                VariableSetStringHelper(&variables, L"PROP26", L"[PROP8]", TRUE);
+                VariableSetStringHelper(&variables, L"PROP27", L"[PROP16]", TRUE);
 
                 // test conditions
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP1"));
@@ -218,6 +235,10 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"_PROP9"));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP16"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP17"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP24"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP25"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP26"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP27"));
 
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP1 = \"VAL1\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"NONE = \"NOT\""));
@@ -365,10 +386,11 @@ namespace Bootstrapper
                 hr = VariableInitialize(&variables1);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
-                VariableSetStringHelper(&variables1, L"PROP1", L"VAL1");
+                VariableSetStringHelper(&variables1, L"PROP1", L"VAL1", FALSE);
                 VariableSetNumericHelper(&variables1, L"PROP2", 2);
                 VariableSetVersionHelper(&variables1, L"PROP3", MAKEQWORDVERSION(1,1,1,1));
-                VariableSetStringHelper(&variables1, L"PROP4", L"VAL4");
+                VariableSetStringHelper(&variables1, L"PROP4", L"VAL4", FALSE);
+                VariableSetStringHelper(&variables1, L"PROP5", L"[PROP1]", TRUE);
 
                 hr = VariableSerialize(&variables1, FALSE, &pbBuffer, &cbBuffer);
                 TestThrowOnFailure(hr, L"Failed to serialize variables.");
@@ -384,6 +406,13 @@ namespace Bootstrapper
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables2, L"PROP2"));
                 Assert::Equal(MAKEQWORDVERSION(1,1,1,1), VariableGetVersionHelper(&variables2, L"PROP3"));
                 Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables2, L"PROP4"));
+                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetStringHelper(&variables2, L"PROP5"));
+
+                Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"PROP1"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables2, L"PROP2"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_VERSION, VariableGetTypeHelper(&variables2, L"PROP3"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_STRING, VariableGetTypeHelper(&variables2, L"PROP4"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_FORMATTED, VariableGetTypeHelper(&variables2, L"PROP5"));
             }
             finally
             {
@@ -420,7 +449,7 @@ namespace Bootstrapper
                 }
 
                 // attempt to set a built-in property
-                hr = VariableSetString(&variables, L"VersionNT", L"VAL", FALSE);
+                hr = VariableSetString(&variables, L"VersionNT", L"VAL", FALSE, FALSE);
                 Assert::Equal(E_INVALIDARG, hr);
                 Assert::False(EvaluateConditionHelper(&variables, L"VersionNT = \"VAL\""));
 

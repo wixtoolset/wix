@@ -592,7 +592,7 @@ static HRESULT BAEngineSetVariableString(
 
     if (wzVariable && *wzVariable)
     {
-        hr = VariableSetString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE);
+        hr = VariableSetString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE, pArgs->fFormatted);
         ExitOnFailure(hr, "Failed to set string variable.");
     }
     else

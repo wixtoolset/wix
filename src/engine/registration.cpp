@@ -426,14 +426,14 @@ extern "C" HRESULT RegistrationSetVariables(
 
     if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
     {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_ACTIVE_PARENT, pRegistration->sczActiveParent, TRUE);
+        hr = VariableSetString(pVariables, BURN_BUNDLE_ACTIVE_PARENT, pRegistration->sczActiveParent, TRUE, FALSE);
         ExitOnFailure(hr, "Failed to overwrite the bundle active parent built-in variable.");
     }
 
-    hr = VariableSetString(pVariables, BURN_BUNDLE_PROVIDER_KEY, pRegistration->sczProviderKey, TRUE);
+    hr = VariableSetString(pVariables, BURN_BUNDLE_PROVIDER_KEY, pRegistration->sczProviderKey, TRUE, FALSE);
     ExitOnFailure(hr, "Failed to overwrite the bundle provider key built-in variable.");
 
-    hr = VariableSetString(pVariables, BURN_BUNDLE_TAG, pRegistration->sczTag, TRUE);
+    hr = VariableSetString(pVariables, BURN_BUNDLE_TAG, pRegistration->sczTag, TRUE, FALSE);
     ExitOnFailure(hr, "Failed to overwrite the bundle tag built-in variable.");
 
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->qwVersion, TRUE);
@@ -1129,7 +1129,7 @@ static HRESULT GetBundleManufacturer(
     hr = VariableGetString(pVariables, BURN_BUNDLE_MANUFACTURER, psczBundleManufacturer);
     if (E_NOTFOUND == hr)
     {
-        hr = VariableSetLiteralString(pVariables, BURN_BUNDLE_MANUFACTURER, pRegistration->sczPublisher, FALSE);
+        hr = VariableSetString(pVariables, BURN_BUNDLE_MANUFACTURER, pRegistration->sczPublisher, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set bundle manufacturer.");
 
         hr = StrAllocString(psczBundleManufacturer, pRegistration->sczPublisher, 0);
@@ -1151,7 +1151,7 @@ static HRESULT GetBundleName(
     hr = VariableGetString(pVariables, BURN_BUNDLE_NAME, psczBundleName);
     if (E_NOTFOUND == hr)
     {
-        hr = VariableSetLiteralString(pVariables, BURN_BUNDLE_NAME, pRegistration->sczDisplayName, FALSE);
+        hr = VariableSetString(pVariables, BURN_BUNDLE_NAME, pRegistration->sczDisplayName, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set bundle name.");
 
         hr = StrAllocString(psczBundleName, pRegistration->sczDisplayName, 0);

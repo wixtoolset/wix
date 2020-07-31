@@ -83,7 +83,6 @@ static HRESULT SetVariableValue(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
     __in BURN_VARIANT* pVariant,
-    __in BOOL fLiteral,
     __in SET_VARIABLE setBuiltin,
     __in BOOL fLog
     );
@@ -335,14 +334,22 @@ extern "C" HRESULT VariablesParseFromXml(
         {
             ExitOnFailure(hr, "Failed to get @Value.");
 
-            hr = BVariantSetString(&value, scz, 0);
+            hr = BVariantSetString(&value, scz, 0, FALSE);
             ExitOnFailure(hr, "Failed to set variant value.");
 
             // @Type
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+            {
+                if (!fHidden)
+                {
+                    LogStringLine(REPORT_STANDARD, "Initializing formatted variable '%ls' to value '%ls'", sczId, value.sczValue);
+                }
+                valueType = BURN_VARIANT_TYPE_FORMATTED;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
             {
                 if (!fHidden)
                 {
@@ -637,10 +644,7 @@ extern "C" HRESULT VariableGetFormatted(
     }
     ExitOnFailure(hr, "Failed to get variable: %ls", wzVariable);
 
-    // Strings need to get expanded unless they're built-in or literal because they're guaranteed not to have embedded variables.
-    if (BURN_VARIANT_TYPE_STRING == pVariable->Value.Type &&
-        BURN_VARIABLE_INTERNAL_TYPE_NORMAL == pVariable->internalType &&
-        !pVariable->fLiteral)
+    if (BURN_VARIANT_TYPE_FORMATTED == pVariable->Value.Type)
     {
         hr = BVariantGetString(&pVariable->Value, &scz);
         ExitOnFailure(hr, "Failed to get unformatted string.");
@@ -674,39 +678,24 @@ extern "C" HRESULT VariableSetNumeric(
     variant.llValue = llValue;
     variant.Type = BURN_VARIANT_TYPE_NUMERIC;
 
-    return SetVariableValue(pVariables, wzVariable, &variant, FALSE, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
-}
-
-extern "C" HRESULT VariableSetLiteralString(
-    __in BURN_VARIABLES* pVariables,
-    __in_z LPCWSTR wzVariable,
-    __in_z_opt LPCWSTR wzValue,
-    __in BOOL fOverwriteBuiltIn
-    )
-{
-    BURN_VARIANT variant = { };
-
-    // We're not going to encrypt this value, so can access the value directly.
-    variant.sczValue = (LPWSTR)wzValue;
-    variant.Type = BURN_VARIANT_TYPE_STRING;
-
-    return SetVariableValue(pVariables, wzVariable, &variant, TRUE, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
+    return SetVariableValue(pVariables, wzVariable, &variant, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
 extern "C" HRESULT VariableSetString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue,
-    __in BOOL fOverwriteBuiltIn
+    __in BOOL fOverwriteBuiltIn,
+    __in BOOL fFormatted
     )
 {
     BURN_VARIANT variant = { };
 
     // We're not going to encrypt this value, so can access the value directly.
     variant.sczValue = (LPWSTR)wzValue;
-    variant.Type = BURN_VARIANT_TYPE_STRING;
+    variant.Type = fFormatted ? BURN_VARIANT_TYPE_FORMATTED : BURN_VARIANT_TYPE_STRING;
 
-    return SetVariableValue(pVariables, wzVariable, &variant, FALSE, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
+    return SetVariableValue(pVariables, wzVariable, &variant, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
 extern "C" HRESULT VariableSetVersion(
@@ -722,16 +711,7 @@ extern "C" HRESULT VariableSetVersion(
     variant.qwValue = qwValue;
     variant.Type = BURN_VARIANT_TYPE_VERSION;
 
-    return SetVariableValue(pVariables, wzVariable, &variant, FALSE, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
-}
-
-extern "C" HRESULT VariableSetLiteralVariant(
-    __in BURN_VARIABLES* pVariables,
-    __in_z LPCWSTR wzVariable,
-    __in BURN_VARIANT* pVariant
-    )
-{
-    return SetVariableValue(pVariables, wzVariable, pVariant, TRUE, SET_VARIABLE_NOT_BUILTIN, TRUE);
+    return SetVariableValue(pVariables, wzVariable, &variant, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
 extern "C" HRESULT VariableSetVariant(
@@ -740,7 +720,7 @@ extern "C" HRESULT VariableSetVariant(
     __in BURN_VARIANT * pVariant
     )
 {
-    return SetVariableValue(pVariables, wzVariable, pVariant, FALSE, SET_VARIABLE_NOT_BUILTIN, TRUE);
+    return SetVariableValue(pVariables, wzVariable, pVariant, SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
 // The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree
@@ -888,6 +868,7 @@ extern "C" HRESULT VariableSerialize(
 
             SecureZeroMemory(&qw, sizeof(qw));
             break;
+        case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
         case BURN_VARIANT_TYPE_STRING:
             hr = BVariantGetString(&pVariable->Value, &scz);
             ExitOnFailure(hr, "Failed to get string.");
@@ -901,10 +882,6 @@ extern "C" HRESULT VariableSerialize(
             hr = E_INVALIDARG;
             ExitOnFailure(hr, "Unsupported variable type.");
         }
-
-        // Write literal flag.
-        hr = BuffWriteNumber(ppbBuffer, piBuffer, (DWORD)pVariable->fLiteral);
-        ExitOnFailure(hr, "Failed to write literal flag.");
     }
 
 LExit:
@@ -928,7 +905,6 @@ extern "C" HRESULT VariableDeserialize(
     DWORD cVariables = 0;
     LPWSTR sczName = NULL;
     BOOL fIncluded = FALSE;
-    BOOL fLiteral = FALSE;
     BURN_VARIANT value = { };
     LPWSTR scz = NULL;
     DWORD64 qw = 0;
@@ -982,11 +958,12 @@ extern "C" HRESULT VariableDeserialize(
 
             SecureZeroMemory(&qw, sizeof(qw));
             break;
+        case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
         case BURN_VARIANT_TYPE_STRING:
             hr = BuffReadString(pbBuffer, cbBuffer, piBuffer, &scz);
             ExitOnFailure(hr, "Failed to read variable value as string.");
 
-            hr = BVariantSetString(&value, scz, NULL);
+            hr = BVariantSetString(&value, scz, NULL, BURN_VARIANT_TYPE_FORMATTED == value.Type);
             ExitOnFailure(hr, "Failed to set variable value.");
 
             ReleaseNullStrSecure(scz);
@@ -996,12 +973,8 @@ extern "C" HRESULT VariableDeserialize(
             ExitOnFailure(hr, "Unsupported variable type.");
         }
 
-        // Read variable literal flag.
-        hr = BuffReadNumber(pbBuffer, cbBuffer, piBuffer, (DWORD*)&fLiteral);
-        ExitOnFailure(hr, "Failed to read variable literal flag.");
-
         // Set variable.
-        hr = SetVariableValue(pVariables, sczName, &value, fLiteral, fWasPersisted ? SET_VARIABLE_OVERRIDE_PERSISTED_BUILTINS : SET_VARIABLE_ANY, FALSE);
+        hr = SetVariableValue(pVariables, sczName, &value, fWasPersisted ? SET_VARIABLE_OVERRIDE_PERSISTED_BUILTINS : SET_VARIABLE_ANY, FALSE);
         ExitOnFailure(hr, "Failed to set variable.");
 
         // Clean up.
@@ -1525,7 +1498,6 @@ static HRESULT SetVariableValue(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
     __in BURN_VARIANT* pVariant,
-    __in BOOL fLiteral,
     __in SET_VARIABLE setBuiltin,
     __in BOOL fLog
     )
@@ -1587,6 +1559,7 @@ static HRESULT SetVariableValue(
                 LogStringLine(REPORT_STANDARD, "Setting numeric variable '%ls' to value %lld", wzVariable, pVariant->llValue);
                 break;
 
+            case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
             case BURN_VARIANT_TYPE_STRING:
                 if (!pVariant->sczValue)
                 {
@@ -1594,7 +1567,7 @@ static HRESULT SetVariableValue(
                 }
                 else
                 {
-                    LogStringLine(REPORT_STANDARD, "Setting string variable '%ls' to value '%ls'", wzVariable, pVariant->sczValue);
+                    LogStringLine(REPORT_STANDARD, "Setting %ls variable '%ls' to value '%ls'", BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ? L"formatted" : L"string", wzVariable, pVariant->sczValue);
                 }
                 break;
 
@@ -1612,9 +1585,6 @@ static HRESULT SetVariableValue(
     // Update variable value.
     hr = BVariantSetValue(&pVariables->rgVariables[iVariable].Value, pVariant);
     ExitOnFailure(hr, "Failed to set value of variable: %ls", wzVariable);
-
-    // Update variable literal flag.
-    pVariables->rgVariables[iVariable].fLiteral = fLiteral;
 
 LExit:
     ::LeaveCriticalSection(&pVariables->csAccess);
@@ -1827,7 +1797,7 @@ static HRESULT InitializeVariableComputerName(
     }
 
     // set value
-    hr = BVariantSetString(pValue, wzComputerName, 0);
+    hr = BVariantSetString(pValue, wzComputerName, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -1875,7 +1845,7 @@ static HRESULT InitializeVariableCsidlFolder(
     ExitOnRootFailure(hr, "Failed to get shell folder.");
 
     // set value
-    hr = BVariantSetString(pValue, sczPath, 0);
+    hr = BVariantSetString(pValue, sczPath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -1901,7 +1871,7 @@ static HRESULT InitializeVariableTempFolder(
     }
 
     // set value
-    hr = BVariantSetString(pValue, wzPath, 0);
+    hr = BVariantSetString(pValue, wzPath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -1972,7 +1942,7 @@ static HRESULT InitializeVariableSystemFolder(
     }
 
     // set value
-    hr = BVariantSetString(pValue, wzSystemFolder, 0);
+    hr = BVariantSetString(pValue, wzSystemFolder, 0, FALSE);
     ExitOnFailure(hr, "Failed to set system folder variant value.");
 
 LExit:
@@ -2003,7 +1973,7 @@ static HRESULT InitializeVariableWindowsVolumeFolder(
     }
 
     // set value
-    hr = BVariantSetString(pValue, wzVolumePath, 0);
+    hr = BVariantSetString(pValue, wzVolumePath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2130,7 +2100,7 @@ static HRESULT InitializeVariableString(
     LPCWSTR wzValue = (LPCWSTR)dwpData;
 
     // set value
-    hr = BVariantSetString(pValue, wzValue, 0);
+    hr = BVariantSetString(pValue, wzValue, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2176,7 +2146,7 @@ static HRESULT InitializeVariableRegistryFolder(
     ExitOnFailure(hr, "Failed to get 64-bit folder.");
 
     // set value
-    hr = BVariantSetString(pValue, sczPath, 0);
+    hr = BVariantSetString(pValue, sczPath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2212,7 +2182,7 @@ static HRESULT InitializeVariable6432Folder(
     }
 
     // set value
-    hr = BVariantSetString(pValue, sczPath, 0);
+    hr = BVariantSetString(pValue, sczPath, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2249,7 +2219,7 @@ static HRESULT InitializeVariableDate(
     }
 
     // set value
-    hr = BVariantSetString(pValue, sczDate, cchDate);
+    hr = BVariantSetString(pValue, sczDate, cchDate, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2266,7 +2236,7 @@ static HRESULT InitializeVariableInstallerName(
     HRESULT hr = S_OK;
 
     // set value
-    hr = BVariantSetString(pValue, L"WiX Burn", 0);
+    hr = BVariantSetString(pValue, L"WiX Burn", 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2285,7 +2255,7 @@ static HRESULT InitializeVariableInstallerVersion(
     ExitOnFailure(hr, "Failed to copy the engine version.");
 
     // set value
-    hr = BVariantSetString(pValue, sczVersion, 0);
+    hr = BVariantSetString(pValue, sczVersion, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
@@ -2325,7 +2295,7 @@ static HRESULT InitializeVariableLogonUser(
     }
 
     // set value
-    hr = BVariantSetString(pValue, wzUserName, 0);
+    hr = BVariantSetString(pValue, wzUserName, 0, FALSE);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:

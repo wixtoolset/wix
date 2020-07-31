@@ -439,6 +439,13 @@ static HRESULT ParseValue(
         {
             ExitOnRootFailure(hr, "Failed to find variable.");
         }
+
+        if (BURN_VARIANT_TYPE_FORMATTED == pValue->Type)
+        {
+            // TODO: actually format the value?
+            hr = BVariantChangeType(pValue, BURN_VARIANT_TYPE_STRING);
+            ExitOnRootFailure(hr, "Failed to change variable '%ls' type for condition '%ls'", pContext->NextSymbol.Value.sczValue, pContext->wzCondition);
+        }
         break;
 
     case BURN_SYMBOL_TYPE_NUMBER: __fallthrough;
@@ -642,7 +649,7 @@ static HRESULT NextSymbol(
         ++n; // terminating '"'
 
         pContext->NextSymbol.Type = BURN_SYMBOL_TYPE_LITERAL;
-        hr = BVariantSetString(&pContext->NextSymbol.Value, &pContext->wzRead[1], n - 2);
+        hr = BVariantSetString(&pContext->NextSymbol.Value, &pContext->wzRead[1], n - 2, FALSE);
         ExitOnFailure(hr, "Failed to set symbol value.");
         break;
     default:
@@ -746,7 +753,7 @@ static HRESULT NextSymbol(
                 {
                     // identifier
                     pContext->NextSymbol.Type = BURN_SYMBOL_TYPE_IDENTIFIER;
-                    hr = BVariantSetString(&pContext->NextSymbol.Value, pContext->wzRead, n);
+                    hr = BVariantSetString(&pContext->NextSymbol.Value, pContext->wzRead, n, FALSE);
                     ExitOnFailure(hr, "Failed to set symbol value.");
                 }
             }

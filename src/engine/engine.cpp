@@ -538,7 +538,7 @@ static HRESULT RunNormal(
     // If a layout directory was specified on the command-line, set it as a well-known variable.
     if (pEngineState->command.wzLayoutDirectory && *pEngineState->command.wzLayoutDirectory)
     {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_LAYOUT_DIRECTORY, pEngineState->command.wzLayoutDirectory, FALSE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_LAYOUT_DIRECTORY, pEngineState->command.wzLayoutDirectory, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set layout directory variable to value provided from command-line.");
     }
 

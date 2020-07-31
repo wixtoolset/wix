@@ -66,8 +66,8 @@ namespace Bootstrapper
                 pin_ptr<const WCHAR> wzDirectory1 = PtrToStringChars(this->TestContext->TestDirectory);
                 pin_ptr<const WCHAR> wzDirectory2 = PtrToStringChars(System::IO::Path::Combine(this->TestContext->TestDirectory, gcnew String(L"none")));
 
-                VariableSetStringHelper(&variables, L"Directory1", wzDirectory1);
-                VariableSetStringHelper(&variables, L"Directory2", wzDirectory2);
+                VariableSetStringHelper(&variables, L"Directory1", wzDirectory1, FALSE);
+                VariableSetStringHelper(&variables, L"Directory2", wzDirectory2, FALSE);
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
@@ -117,8 +117,8 @@ namespace Bootstrapper
                 hr = FileVersion(wzFile2, &uliVersion.HighPart, &uliVersion.LowPart);
                 TestThrowOnFailure(hr, L"Failed to get DLL version.");
 
-                VariableSetStringHelper(&variables, L"File1", wzFile1);
-                VariableSetStringHelper(&variables, L"File2", wzFile2);
+                VariableSetStringHelper(&variables, L"File1", wzFile1, FALSE);
+                VariableSetStringHelper(&variables, L"File2", wzFile2, FALSE);
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
@@ -191,8 +191,8 @@ namespace Bootstrapper
                     Assert::True(SUCCEEDED(hr));
                 }
 
-                VariableSetStringHelper(&variables, L"MyKey", L"SOFTWARE\\Microsoft\\WiX_Burn_UnitTest\\Value");
-                VariableSetStringHelper(&variables, L"MyValue", L"String");
+                VariableSetStringHelper(&variables, L"MyKey", L"SOFTWARE\\Microsoft\\WiX_Burn_UnitTest\\Value", FALSE);
+                VariableSetStringHelper(&variables, L"MyValue", L"String", FALSE);
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
@@ -219,8 +219,9 @@ namespace Bootstrapper
                     L"    <RegistrySearch Id='Search21' Type='value' Root='HKCU' Key='SOFTWARE\\Classes\\CLSID\\WiX_Burn_UnitTest\\Bitness' Value='TestStringSpecificToBitness' Variable='Variable21' VariableType='string' Win64='no' />"
                     L"    <RegistrySearch Id='Search22' Type='value' Root='HKCU' Key='SOFTWARE\\Classes\\CLSID\\WiX_Burn_UnitTest\\Bitness' Value='TestStringSpecificToBitness' Variable='Variable22' VariableType='string' Win64='yes' />"
                     L"    <RegistrySearch Id='Search23' Type='exists' Root='HKU' Key='.DEFAULT\\Environment' Variable='Variable23' />"
-                    L"    <RegistrySearch Id='Search23' Type='exists' Root='HKU' Key='.DEFAULT\\System\\NetworkServiceSidSubkeyDoesNotExist' Variable='Variable24' />"
-                    L"    <RegistrySearch Id='Search24' Type='value' Root='HKCR' Key='.msi' Variable='Variable25' VariableType='string' />"
+                    L"    <RegistrySearch Id='Search24' Type='exists' Root='HKU' Key='.DEFAULT\\System\\NetworkServiceSidSubkeyDoesNotExist' Variable='Variable24' />"
+                    L"    <RegistrySearch Id='Search25' Type='value' Root='HKCR' Key='.msi' Variable='Variable25' VariableType='string' />"
+                    L"    <RegistrySearch Id='Search26' Type='value' Root='HKCR' Key='.msi' Variable='Variable26' VariableType='formatted' />"
                     L"</Bundle>";
 
                 // load XML document
@@ -263,6 +264,7 @@ namespace Bootstrapper
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable23"));
                 Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable24"));
                 Assert::Equal<String^>(gcnew String(L"Msi.Package"), VariableGetStringHelper(&variables, L"Variable25"));
+                Assert::Equal<String^>(gcnew String(L"Msi.Package"), VariableGetStringHelper(&variables, L"Variable26"));
             }
             finally
             {
@@ -517,6 +519,75 @@ namespace Bootstrapper
                 // execute searches
                 hr = SearchesExecute(&searches, &variables);
                 TestThrowOnFailure(hr, L"Failed to execute searches.");
+            }
+            finally
+            {
+                ReleaseObject(pixeBundle);
+                VariablesUninitialize(&variables);
+                SearchesUninitialize(&searches);
+            }
+        }
+
+        [Fact]
+        void SetVariableSearchTest()
+        {
+            HRESULT hr = S_OK;
+            IXMLDOMElement* pixeBundle = NULL;
+            BURN_VARIABLES variables = { };
+            BURN_SEARCHES searches = { };
+            BURN_EXTENSIONS burnExtensions = { };
+            try
+            {
+                LPCWSTR wzDocument =
+                    L"<Bundle>"
+                    L"    <SetVariable Id='Search1' Type='string' Value='VAL1' Variable='PROP1' />"
+                    L"    <SetVariable Id='Search2' Type='numeric' Value='2' Variable='PROP2' />"
+                    L"    <SetVariable Id='Search3' Type='string' Value='VAL3' Variable='PROP3' />"
+                    L"    <SetVariable Id='Search4' Type='string' Value='VAL4' Variable='PROP4' />"
+                    L"    <SetVariable Id='Search5' Type='string' Value='VAL5' Variable='PROP5' />"
+                    L"    <SetVariable Id='Search6' Type='string' Value='VAL6' Variable='PROP6' />"
+                    L"    <SetVariable Id='Search7' Type='string' Value='7' Variable='PROP7' />"
+                    L"    <SetVariable Id='Search8' Type='version' Value='1.1.0.0' Variable='PROP8' />"
+                    L"    <SetVariable Id='Search9' Type='formatted' Value='[VAL9]' Variable='PROP9' />"
+                    L"    <SetVariable Id='Search10' Type='numeric' Value='42' Variable='OVERWRITTEN_STRING' />"
+                    L"    <SetVariable Id='Search11' Type='string' Value='NEW' Variable='OVERWRITTEN_NUMBER' />"
+                    L"    <SetVariable Id='Search12' Variable='REMOVED_NUMBER' />"
+                    L"</Bundle>";
+
+                hr = VariableInitialize(&variables);
+                TestThrowOnFailure(hr, L"Failed to initialize variables.");
+
+                // set variables
+                VariableSetStringHelper(&variables, L"OVERWRITTEN_STRING", L"ORIGINAL", FALSE);
+                VariableSetNumericHelper(&variables, L"OVERWRITTEN_NUMBER", 5);
+                VariableSetNumericHelper(&variables, L"REMOVED_NUMBER", 22);
+
+                // load XML document
+                LoadBundleXmlHelper(wzDocument, &pixeBundle);
+
+                hr = SearchesParseFromXml(&searches, &burnExtensions, pixeBundle);
+                TestThrowOnFailure(hr, L"Failed to parse searches from XML.");
+
+                // execute searches
+                hr = SearchesExecute(&searches, &variables);
+                TestThrowOnFailure(hr, L"Failed to execute searches.");
+
+                // check variable values
+                Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables, L"PROP1"));
+                Assert::Equal(2ll, VariableGetNumericHelper(&variables, L"PROP2"));
+                Assert::Equal<String^>(gcnew String(L"2"), VariableGetStringHelper(&variables, L"PROP2"));
+                Assert::Equal<String^>(gcnew String(L"VAL3"), VariableGetStringHelper(&variables, L"PROP3"));
+                Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables, L"PROP4"));
+                Assert::Equal<String^>(gcnew String(L"VAL5"), VariableGetStringHelper(&variables, L"PROP5"));
+                Assert::Equal<String^>(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
+                Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
+                Assert::Equal(MAKEQWORDVERSION(1, 1, 0, 0), VariableGetVersionHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"[VAL9]"), VariableGetStringHelper(&variables, L"PROP9"));
+
+                Assert::Equal(42ll, VariableGetNumericHelper(&variables, L"OVERWRITTEN_STRING"));
+                Assert::Equal<String^>(gcnew String(L"NEW"), VariableGetStringHelper(&variables, L"OVERWRITTEN_NUMBER"));
+                Assert::Equal((int)BURN_VARIANT_TYPE_NONE, VariableGetTypeHelper(&variables, L"REMOVED_NUMBER"));
             }
             finally
             {

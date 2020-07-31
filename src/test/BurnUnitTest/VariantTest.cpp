@@ -25,9 +25,9 @@ namespace Bootstrapper
         [Fact]
         void VariantBasicTest()
         {
-            BURN_VARIANT expectedVariants[8];
-            BURN_VARIANT actualVariants[8];
-            for (DWORD i = 0; i < 8; i++)
+            BURN_VARIANT expectedVariants[10];
+            BURN_VARIANT actualVariants[10];
+            for (DWORD i = 0; i < 10; i++)
             {
                 BVariantUninitialize(expectedVariants + i);
                 BVariantUninitialize(actualVariants + i);
@@ -43,6 +43,8 @@ namespace Bootstrapper
                 InitVersionValue(expectedVariants + 5, MAKEQWORDVERSION(1, 1, 1, 0), TRUE, L"PROP6", actualVariants + 5);
                 InitStringValue(expectedVariants + 6, L"7", TRUE, L"PROP7", actualVariants + 6);
                 InitNumericValue(expectedVariants + 7, 11, TRUE, L"PROP8", actualVariants + 7);
+                InitFormattedValue(expectedVariants + 8, L"VAL9", FALSE, L"PROP9", actualVariants + 8);
+                InitFormattedValue(expectedVariants + 9, L"VAL10", TRUE, L"PROP10", actualVariants + 9);
 
                 VerifyNumericValue(expectedVariants + 0, actualVariants + 0);
                 VerifyStringValue(expectedVariants + 1, actualVariants + 1);
@@ -52,10 +54,12 @@ namespace Bootstrapper
                 VerifyVersionValue(expectedVariants + 5, actualVariants + 5);
                 VerifyStringValue(expectedVariants + 6, actualVariants + 6);
                 VerifyNumericValue(expectedVariants + 7, actualVariants + 7);
+                VerifyFormattedValue(expectedVariants + 8, actualVariants + 8);
+                VerifyFormattedValue(expectedVariants + 9, actualVariants + 9);
             }
             finally
             {
-                for (DWORD i = 0; i < 8; i++)
+                for (DWORD i = 0; i < 10; i++)
                 {
                     BVariantUninitialize(expectedVariants + i);
                     BVariantUninitialize(actualVariants + i);
@@ -64,6 +68,26 @@ namespace Bootstrapper
         }
 
     private:
+        void InitFormattedValue(BURN_VARIANT* pValue, LPWSTR wzValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        {
+            HRESULT hr = S_OK;
+            pValue->Type = BURN_VARIANT_TYPE_FORMATTED;
+
+            hr = StrAllocString(&pValue->sczValue, wzValue, 0);
+            NativeAssert::Succeeded(hr, "Failed to alloc string: {0}", wzValue);
+
+            hr = BVariantCopy(pValue, pActualValue);
+            NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
+
+            if (fHidden)
+            {
+                hr = BVariantSetEncryption(pActualValue, TRUE);
+                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
+
+                NativeAssert::True(pActualValue->fEncryptString);
+            }
+        }
+
         void InitNoneValue(BURN_VARIANT* pValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
@@ -137,6 +161,26 @@ namespace Bootstrapper
             }
         }
 
+        void VerifyFormattedValue(BURN_VARIANT* pExpectedValue, BURN_VARIANT* pActualValue)
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczValue = NULL;
+            NativeAssert::Equal<DWORD>(BURN_VARIANT_TYPE_FORMATTED, pExpectedValue->Type);
+            NativeAssert::Equal<DWORD>(BURN_VARIANT_TYPE_FORMATTED, pActualValue->Type);
+
+            try
+            {
+                hr = BVariantGetString(pActualValue, &sczValue);
+                NativeAssert::Succeeded(hr, "Failed to get string value");
+
+                NativeAssert::StringEqual(pExpectedValue->sczValue, sczValue);
+            }
+            finally
+            {
+                ReleaseStr(sczValue);
+            }
+        }
+
         void VerifyNumericValue(BURN_VARIANT* pExpectedValue, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
@@ -167,7 +211,7 @@ namespace Bootstrapper
             try
             {
                 hr = BVariantGetString(pActualValue, &sczValue);
-                NativeAssert::Succeeded(hr, "Failed to get numeric value");
+                NativeAssert::Succeeded(hr, "Failed to get string value");
 
                 NativeAssert::StringEqual(pExpectedValue->sczValue, sczValue);
             }
@@ -185,7 +229,7 @@ namespace Bootstrapper
             NativeAssert::Equal<DWORD>(BURN_VARIANT_TYPE_VERSION, pActualValue->Type);
 
             hr = BVariantGetVersion(pActualValue, &qwValue);
-            NativeAssert::Succeeded(hr, "Failed to get numeric value");
+            NativeAssert::Succeeded(hr, "Failed to get version value");
 
             NativeAssert::Equal<DWORD64>(pExpectedValue->qwValue, qwValue);
         }

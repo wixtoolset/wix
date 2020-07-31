@@ -239,7 +239,11 @@ extern "C" HRESULT SearchesParseFromXml(
                 hr = XmlGetAttributeEx(pixnNode, L"VariableType", &scz);
                 ExitOnFailure(hr, "Failed to get @VariableType.");
 
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+                {
+                    pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_FORMATTED;
+                }
+                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
                 {
                     pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_NUMERIC;
                 }
@@ -403,14 +407,18 @@ extern "C" HRESULT SearchesParseFromXml(
             {
                 ExitOnFailure(hr, "Failed to get @Value.");
 
-                hr = BVariantSetString(&pSearch->SetVariable.value, scz, 0);
+                hr = BVariantSetString(&pSearch->SetVariable.value, scz, 0, FALSE);
                 ExitOnFailure(hr, "Failed to set variant value.");
 
                 // @Type
                 hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
                 ExitOnFailure(hr, "Failed to get @Type.");
 
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+                {
+                    valueType = BURN_VARIANT_TYPE_FORMATTED;
+                }
+                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
                 {
                     valueType = BURN_VARIANT_TYPE_NUMERIC;
                 }
@@ -673,7 +681,7 @@ static HRESULT DirectorySearchPath(
     }
     else if (dwAttributes & FILE_ATTRIBUTE_DIRECTORY)
     {
-        hr = VariableSetLiteralString(pVariables, pSearch->sczVariable, sczPath, FALSE);
+        hr = VariableSetString(pVariables, pSearch->sczVariable, sczPath, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set directory search path variable.");
     }
     else // must have found a file.
@@ -793,7 +801,7 @@ static HRESULT FileSearchPath(
     }
     else // found our file.
     {
-        hr = VariableSetLiteralString(pVariables, pSearch->sczVariable, sczPath, FALSE);
+        hr = VariableSetString(pVariables, pSearch->sczVariable, sczPath, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set variable to file search path.");
     }
 
@@ -933,7 +941,7 @@ static HRESULT RegistrySearchValue(
     {
         // What if there is a hidden variable in sczKey?
         LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", sczKey);
-        hr = VariableSetLiteralVariant(pVariables, pSearch->sczVariable, &value);
+        hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
         ExitOnFailure(hr, "Failed to clear variable.");
         ExitFunction1(hr = S_OK);
     }
@@ -945,7 +953,7 @@ static HRESULT RegistrySearchValue(
     {
         // What if there is a hidden variable in sczKey or sczValue?
         LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", sczKey, sczValue);
-        hr = VariableSetLiteralVariant(pVariables, pSearch->sczVariable, &value);
+        hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
         ExitOnFailure(hr, "Failed to clear variable.");
         ExitFunction1(hr = S_OK);
     }
@@ -995,7 +1003,7 @@ static HRESULT RegistrySearchValue(
         }
         __fallthrough;
     case REG_SZ:
-        hr = BVariantSetString(&value, (LPCWSTR)pData, 0);
+        hr = BVariantSetString(&value, (LPCWSTR)pData, 0, FALSE);
         break;
     default:
         ExitOnFailure(hr = E_NOTIMPL, "Unsupported registry key value type. Type = '%u'", dwType);
@@ -1006,8 +1014,8 @@ static HRESULT RegistrySearchValue(
     hr = BVariantChangeType(&value, pSearch->RegistrySearch.VariableType);
     ExitOnFailure(hr, "Failed to change value type.");
 
-    // Set variable as a literal.
-    hr = VariableSetLiteralVariant(pVariables, pSearch->sczVariable, &value);
+    // Set variable.
+    hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:
@@ -1077,7 +1085,7 @@ static HRESULT MsiComponentSearch(
     case BURN_MSI_COMPONENT_SEARCH_TYPE_KEYPATH:
         if (INSTALLSTATE_ABSENT == is || INSTALLSTATE_LOCAL == is || INSTALLSTATE_SOURCE == is)
         {
-            hr = VariableSetLiteralString(pVariables, pSearch->sczVariable, sczPath, FALSE);
+            hr = VariableSetString(pVariables, pSearch->sczVariable, sczPath, FALSE, FALSE);
         }
         break;
     case BURN_MSI_COMPONENT_SEARCH_TYPE_STATE:
@@ -1093,7 +1101,7 @@ static HRESULT MsiComponentSearch(
                 wz[1] = L'\0';
             }
 
-            hr = VariableSetLiteralString(pVariables, pSearch->sczVariable, sczPath, FALSE);
+            hr = VariableSetString(pVariables, pSearch->sczVariable, sczPath, FALSE, FALSE);
         }
         break;
     }
@@ -1234,8 +1242,8 @@ static HRESULT MsiProductSearch(
     hr = BVariantChangeType(&value, type);
     ExitOnFailure(hr, "Failed to change value type.");
 
-    // Set variable as a literal.
-    hr = VariableSetLiteralVariant(pVariables, pSearch->sczVariable, &value);
+    // Set variable.
+    hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:

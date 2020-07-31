@@ -488,7 +488,7 @@ extern "C" HRESULT MspEngineExecutePackage(
 
             // TODO: Figure out if this makes sense -- the variable is set to the last patch's path only
             // Best effort to set the execute package cache folder variable.
-            VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE);
+            VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
             hr = PathConcat(sczCachedDirectory, pMspPackage->rgPayloads[0].pPayload->sczFilePath, &sczMspPath);
             ExitOnFailure(hr, "Failed to build MSP path.");
@@ -609,8 +609,8 @@ LExit:
     }
 
     // Best effort to clear the execute package cache folder and action variables.
-    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE);
-    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE);
+    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
+    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, NULL, TRUE, FALSE);
 
     return hr;
 }

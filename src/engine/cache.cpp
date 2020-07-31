@@ -157,7 +157,7 @@ extern "C" HRESULT CacheInitialize(
             hr = VariableGetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, &sczOriginalSource);
             if (E_NOTFOUND == hr)
             {
-                hr = VariableSetLiteralString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, wzSourceProcessPath, FALSE);
+                hr = VariableSetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, wzSourceProcessPath, FALSE, FALSE);
                 ExitOnFailure(hr, "Failed to set original source variable.");
 
                 hr = StrAllocString(&sczOriginalSource, wzSourceProcessPath, 0);
@@ -170,7 +170,7 @@ extern "C" HRESULT CacheInitialize(
                 hr = PathGetDirectory(sczOriginalSource, &sczOriginalSourceFolder);
                 ExitOnFailure(hr, "Failed to get directory from original source path.");
 
-                hr = VariableSetLiteralString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER, sczOriginalSourceFolder, FALSE);
+                hr = VariableSetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER, sczOriginalSourceFolder, FALSE, FALSE);
                 ExitOnFailure(hr, "Failed to set original source directory variable.");
             }
         }
@@ -549,7 +549,7 @@ extern "C" HRESULT CacheSetLastUsedSource(
 
         if (CSTR_EQUAL != nCompare)
         {
-            hr = VariableSetLiteralString(pVariables, BURN_BUNDLE_LAST_USED_SOURCE, sczSourceFolder, FALSE);
+            hr = VariableSetString(pVariables, BURN_BUNDLE_LAST_USED_SOURCE, sczSourceFolder, FALSE, FALSE);
             ExitOnFailure(hr, "Failed to set last source.");
         }
     }

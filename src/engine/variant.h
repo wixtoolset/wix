@@ -12,8 +12,9 @@ extern "C" {
 enum BURN_VARIANT_TYPE
 {
     BURN_VARIANT_TYPE_NONE,
+    BURN_VARIANT_TYPE_FORMATTED,
     BURN_VARIANT_TYPE_NUMERIC,
-    BURN_VARIANT_TYPE_STRING,
+    BURN_VARIANT_TYPE_STRING, // when formatting this value should be used as is (don't continue recursively formatting).
     BURN_VARIANT_TYPE_VERSION,
 };
 
@@ -57,7 +58,8 @@ HRESULT BVariantSetNumeric(
 HRESULT BVariantSetString(
     __in BURN_VARIANT* pVariant,
     __in_z_opt LPCWSTR wzValue,
-    __in DWORD_PTR cchValue
+    __in DWORD_PTR cchValue,
+    __in BOOL fFormatted
     );
 HRESULT BVariantSetVersion(
     __in BURN_VARIANT* pVariant,

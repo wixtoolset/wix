@@ -310,7 +310,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
         ExitOnFailure(hr, "Failed to get cached path for package: %ls", pExecuteAction->msuPackage.pPackage->sczId);
 
         // Best effort to set the execute package cache folder variable.
-        VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE);
+        VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
         hr = PathConcat(sczCachedDirectory, pExecuteAction->msuPackage.pPackage->rgPayloads[0].pPayload->sczFilePath, &sczMsuPath);
         ExitOnFailure(hr, "Failed to build MSU path.");
@@ -419,7 +419,7 @@ LExit:
     }
 
     // Best effort to clear the execute package cache folder variable.
-    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE);
+    VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
 
     return hr;
 }
