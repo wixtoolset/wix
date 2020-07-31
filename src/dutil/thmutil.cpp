@@ -660,6 +660,7 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
         }
         else
         {
+            hr = S_OK;
             x = CW_USEDEFAULT;
             y = CW_USEDEFAULT;
         }
@@ -4682,6 +4683,8 @@ static HRESULT ShowControl(
 
                 ++iPageControl;
             }
+
+            hr = S_OK;
 
             Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczText, -1, pControl->sczValue, -1));
         }
