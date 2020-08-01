@@ -391,7 +391,8 @@ public: // IBootstrapperEngine
 
     virtual STDMETHODIMP SetVariableString(
         __in_z LPCWSTR wzVariable,
-        __in_z_opt LPCWSTR wzValue
+        __in_z_opt LPCWSTR wzValue,
+        __in BOOL fFormatted
         )
     {
         BAENGINE_SETVARIABLESTRING_ARGS args = { };
@@ -400,6 +401,7 @@ public: // IBootstrapperEngine
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
         args.wzValue = wzValue;
+        args.fFormatted = fFormatted;
 
         results.cbSize = sizeof(results);
 

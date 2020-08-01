@@ -106,7 +106,8 @@ namespace WixToolset.Mba.Core
 
         void SetVariableString(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
-                                              IntPtr wzValue
+                                              IntPtr wzValue,
+            [MarshalAs(UnmanagedType.Bool)]   bool fFormatted
             );
 
         void SetVariableVersion(

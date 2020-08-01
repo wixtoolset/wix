@@ -72,6 +72,16 @@ DAPIV_(HRESULT) BextLog(
     );
 
 /*******************************************************************
+ BextLogArgs - logs a message with the engine.
+
+********************************************************************/
+DAPI_(HRESULT) BextLogArgs(
+    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
+
+/*******************************************************************
  BextLogError - logs an error message with the engine.
 
 ********************************************************************/
@@ -79,6 +89,16 @@ DAPIV_(HRESULT) BextLogError(
     __in HRESULT hr,
     __in_z __format_string LPCSTR szFormat,
     ...
+    );
+
+/*******************************************************************
+ BextLogErrorArgs - logs an error message with the engine.
+
+********************************************************************/
+DAPI_(HRESULT) BextLogErrorArgs(
+    __in HRESULT hr,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
     );
 
 #ifdef __cplusplus

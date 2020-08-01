@@ -119,6 +119,29 @@ DAPIV_(HRESULT) BextLog(
 {
     HRESULT hr = S_OK;
     va_list args;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BextInitialize() must be called first.");
+    }
+
+    va_start(args, szFormat);
+    hr = BextLogArgs(level, szFormat, args);
+    va_end(args);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BextLogArgs(
+    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
     LPSTR sczFormattedAnsi = NULL;
     LPWSTR sczMessage = NULL;
 
@@ -128,9 +151,7 @@ DAPIV_(HRESULT) BextLog(
         ExitOnRootFailure(hr, "BextInitialize() must be called first.");
     }
 
-    va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&sczFormattedAnsi, szFormat, args);
-    va_end(args);
     ExitOnFailure(hr, "Failed to format log string.");
 
     hr = StrAllocStringAnsi(&sczMessage, sczFormattedAnsi, 0, CP_UTF8);
@@ -153,6 +174,29 @@ DAPIV_(HRESULT) BextLogError(
 {
     HRESULT hr = S_OK;
     va_list args;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BextInitialize() must be called first.");
+    }
+
+    va_start(args, szFormat);
+    hr = BextLogErrorArgs(hrError, szFormat, args);
+    va_end(args);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BextLogErrorArgs(
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
     LPSTR sczFormattedAnsi = NULL;
     LPWSTR sczMessage = NULL;
 
@@ -162,9 +206,7 @@ DAPIV_(HRESULT) BextLogError(
         ExitOnRootFailure(hr, "BextInitialize() must be called first.");
     }
 
-    va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&sczFormattedAnsi, szFormat, args);
-    va_end(args);
     ExitOnFailure(hr, "Failed to format error log string.");
 
     hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x: %S", hrError, sczFormattedAnsi);

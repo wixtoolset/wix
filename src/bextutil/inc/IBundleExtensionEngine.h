@@ -42,11 +42,6 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
         __in_z LPCWSTR wzMessage
         ) = 0;
 
-    STDMETHOD(SetVariableLiteralString)(
-        __in_z LPCWSTR wzVariable,
-        __in_z_opt LPCWSTR wzValue
-        ) = 0;
-
     STDMETHOD(SetVariableNumeric)(
         __in_z LPCWSTR wzVariable,
         __in LONGLONG llValue
@@ -54,7 +49,8 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
 
     STDMETHOD(SetVariableString)(
         __in_z LPCWSTR wzVariable,
-        __in_z_opt LPCWSTR wzValue
+        __in_z_opt LPCWSTR wzValue,
+        __in BOOL fFormatted
         ) = 0;
 
     STDMETHOD(SetVariableVersion)(

@@ -225,7 +225,8 @@ LExit:
 
 DAPI_(HRESULT) BalSetStringVariable(
     __in_z LPCWSTR wzVariable,
-    __in_z_opt LPCWSTR wzValue
+    __in_z_opt LPCWSTR wzValue,
+    __in BOOL fFormatted
     )
 {
     HRESULT hr = S_OK;
@@ -236,7 +237,7 @@ DAPI_(HRESULT) BalSetStringVariable(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
-    hr = vpEngine->SetVariableString(wzVariable, wzValue);
+    hr = vpEngine->SetVariableString(wzVariable, wzValue, fFormatted);
 
 LExit:
     return hr;

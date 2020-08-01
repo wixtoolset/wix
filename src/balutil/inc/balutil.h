@@ -131,7 +131,8 @@ BalSetStringVariable - sets a string variable in the engine.
 ********************************************************************/
 DAPI_(HRESULT) BalSetStringVariable(
     __in_z LPCWSTR wzVariable,
-    __in_z_opt LPCWSTR wzValue
+    __in_z_opt LPCWSTR wzValue,
+    __in BOOL fFormatted
     );
 
 /*******************************************************************

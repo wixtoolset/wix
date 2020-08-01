@@ -79,7 +79,7 @@ namespace WixToolset.Mba.Core
                     IntPtr pValue = Marshal.SecureStringToCoTaskMemUnicode(value);
                     try
                     {
-                        this.engine.SetVariableString(name, pValue);
+                        this.engine.SetVariableString(name, pValue, true);
                     }
                     finally
                     {
@@ -115,7 +115,7 @@ namespace WixToolset.Mba.Core
                     IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
                     try
                     {
-                        this.engine.SetVariableString(name, pValue);
+                        this.engine.SetVariableString(name, pValue, true);
                     }
                     finally
                     {

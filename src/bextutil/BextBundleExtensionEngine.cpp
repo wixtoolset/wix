@@ -225,23 +225,6 @@ public: // IBundleExtensionEngine
         return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_LOG, &args, &results, m_pvBundleExtensionEngineProcContext);
     }
 
-    virtual STDMETHODIMP SetVariableLiteralString(
-        __in_z LPCWSTR wzVariable,
-        __in_z_opt LPCWSTR wzValue
-        )
-    {
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLELITERALSTRING_RESULTS results = { };
-
-        args.cbSize = sizeof(args);
-        args.wzVariable = wzVariable;
-        args.wzValue = wzValue;
-
-        results.cbSize = sizeof(results);
-
-        return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLELITERALSTRING, &args, &results, m_pvBundleExtensionEngineProcContext);
-    }
-
     virtual STDMETHODIMP SetVariableNumeric(
         __in_z LPCWSTR wzVariable,
         __in LONGLONG llValue
@@ -261,7 +244,8 @@ public: // IBundleExtensionEngine
 
     virtual STDMETHODIMP SetVariableString(
         __in_z LPCWSTR wzVariable,
-        __in_z_opt LPCWSTR wzValue
+        __in_z_opt LPCWSTR wzValue,
+        __in BOOL fFormatted
         )
     {
         BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS args = { };
@@ -270,6 +254,7 @@ public: // IBundleExtensionEngine
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
         args.wzValue = wzValue;
+        args.fFormatted = fFormatted;
 
         results.cbSize = sizeof(results);
 
