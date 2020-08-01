@@ -2,8 +2,6 @@
 
 #include "precomp.h"
 
-using namespace Gdiplus;
-
 #define BURN_SPLASHSCREEN_CLASS_WINDOW L"WixBurnSplashScreen"
 #define IDB_SPLASHSCREEN 1
 
@@ -11,14 +9,16 @@ using namespace Gdiplus;
 
 struct SPLASHSCREEN_INFO
 {
-    Bitmap* pBitmap;
-    Point pt;
-    Size size;
+    HBITMAP hBitmap;
+    SIZE defaultDpiSize;
+    SIZE size;
+    UINT nDpi;
+    HWND hWnd;
 };
 
 struct SPLASHSCREEN_CONTEXT
 {
-    HANDLE hIntializedEvent;
+    HANDLE hInitializedEvent;
     HINSTANCE hInstance;
     LPCWSTR wzCaption;
 
@@ -36,13 +36,28 @@ static LRESULT CALLBACK WndProc(
     __in WPARAM wParam,
     __in LPARAM lParam
     );
-static void OnPaint(
-    __in HDC hdc,
+static HRESULT LoadSplashScreen(
+    __in SPLASHSCREEN_CONTEXT* pContext,
     __in SPLASHSCREEN_INFO* pSplashScreen
     );
-static HRESULT LoadSplashScreen(
-    __in HMODULE hInstance,
-    __in SPLASHSCREEN_INFO* pSplashScreen
+static BOOL OnDpiChanged(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    );
+static void OnEraseBkgnd(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in WPARAM wParam
+    );
+static void OnNcCreate(
+    __in HWND hWnd,
+    __in LPARAM lParam
+    );
+static void ScaleSplashScreen(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in UINT nDpi,
+    __in int x,
+    __in int y
     );
 
 
@@ -63,7 +78,7 @@ extern "C" void SplashScreenCreate(
     ExitOnNullWithLastError(rgSplashScreenEvents[0], hr, "Failed to create modal event.");
 
     // create splash screen thread.
-    context.hIntializedEvent = rgSplashScreenEvents[0];
+    context.hInitializedEvent = rgSplashScreenEvents[0];
     context.hInstance = hInstance;
     context.wzCaption = wzCaption;
     context.pHwnd = pHwnd;
@@ -115,30 +130,17 @@ static DWORD WINAPI ThreadProc(
     )
 {
     HRESULT hr = S_OK;
-
-    ULONG_PTR token = 0;
-    GdiplusStartupInput input;
-    GdiplusStartupOutput output = { };
-
     SPLASHSCREEN_CONTEXT* pContext = static_cast<SPLASHSCREEN_CONTEXT*>(pvContext);
-    SPLASHSCREEN_INFO splashScreen = { };
+
+    SPLASHSCREEN_INFO splashScreenInfo = { };
 
     WNDCLASSW wc = { };
     BOOL fRegistered = TRUE;
-    HWND hWnd = NULL;
 
     BOOL fRet = FALSE;
     MSG msg = { };
 
-    input.GdiplusVersion = 1;
-
-    hr = GdipInitialize(&input, &token, &output);
-    ExitOnFailure(hr, "Failed to initialize GDI+.");
-
-    hr = LoadSplashScreen(pContext->hInstance, &splashScreen);
-    ExitOnFailure(hr, "Failed to load splash screen.");
-
-    // Register the window class and create the window.
+    // Register the window class.
     wc.lpfnWndProc = WndProc;
     wc.hInstance = pContext->hInstance;
     wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
@@ -150,12 +152,12 @@ static DWORD WINAPI ThreadProc(
 
     fRegistered = TRUE;
 
-    hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, pContext->wzCaption, WS_POPUP | WS_VISIBLE, splashScreen.pt.X, splashScreen.pt.Y, splashScreen.size.Width, splashScreen.size.Height, HWND_DESKTOP, NULL, pContext->hInstance, &splashScreen);
-    ExitOnNullWithLastError(hWnd, hr, "Failed to create window.");
+    hr = LoadSplashScreen(pContext, &splashScreenInfo);
+    ExitOnFailure(hr, "Failed to load splash screen.");
 
     // Return the splash screen window and free the main thread waiting for us to be initialized.
-    *pContext->pHwnd = hWnd;
-    ::SetEvent(pContext->hIntializedEvent);
+    *pContext->pHwnd = splashScreenInfo.hWnd;
+    ::SetEvent(pContext->hInitializedEvent);
 
     // Pump messages until the bootstrapper application destroys the window.
     while (0 != (fRet = ::GetMessageW(&msg, NULL, 0, 0)))
@@ -165,7 +167,7 @@ static DWORD WINAPI ThreadProc(
             hr = E_UNEXPECTED;
             ExitOnFailure(hr, "Unexpected return value from message pump.");
         }
-        else if (!::IsDialogMessageW(hWnd, &msg))
+        else if (!::IsDialogMessageW(splashScreenInfo.hWnd, &msg))
         {
             ::TranslateMessage(&msg);
             ::DispatchMessageW(&msg);
@@ -178,14 +180,9 @@ LExit:
         ::UnregisterClassW(BURN_SPLASHSCREEN_CLASS_WINDOW, pContext->hInstance);
     }
 
-    if (splashScreen.pBitmap)
+    if (splashScreenInfo.hBitmap)
     {
-        delete splashScreen.pBitmap;
-    }
-
-    if (token)
-    {
-        GdipUninitialize(token);
+        ::DeleteObject(splashScreenInfo.hBitmap);
     }
 
     return hr;
@@ -204,113 +201,155 @@ static LRESULT CALLBACK WndProc(
     switch (uMsg)
     {
     case WM_NCCREATE:
-        {
-        LPCREATESTRUCTW lpcs = reinterpret_cast<LPCREATESTRUCTW>(lParam);
-        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(lpcs->lpCreateParams));
-        }
+        OnNcCreate(hWnd, lParam);
         break;
 
     case WM_NCDESTROY:
         lres = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
         ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
+        ::PostQuitMessage(0);
         return lres;
 
     case WM_NCHITTEST:
         return HTCAPTION; // allow window to be moved by grabbing any pixel.
 
-    case WM_DESTROY:
-        ::PostQuitMessage(0);
-        return 0;
+    case WM_DPICHANGED:
+        if (OnDpiChanged(pSplashScreen, wParam, lParam))
+        {
+            return 0;
+        }
+        break;
 
     case WM_ERASEBKGND:
-        // The splash screen image will be repainted in its entirety.
+        OnEraseBkgnd(pSplashScreen, wParam);
         return 1;
-
-    case WM_PAINT:
-        {
-        PAINTSTRUCT ps = { };
-
-        HDC hdc = BeginPaint(hWnd, &ps);
-        OnPaint(hdc, pSplashScreen);
-        EndPaint(hWnd, &ps);
-        }
-        return 0;
     }
 
     return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-static void OnPaint(
-    __in HDC hdc,
-    __in SPLASHSCREEN_INFO* pSplashScreen
-    )
-{
-    // Use high-quality bicubuc stretching from GDI+ which looks better than GDI.
-    Graphics graphics(hdc);
-    graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
-
-    Rect dst(0, 0, pSplashScreen->size.Width, pSplashScreen->size.Height);
-    Status status = graphics.DrawImage(pSplashScreen->pBitmap, dst);
-
-#if DEBUG
-    HRESULT hr = GdipHresultFromStatus(status);
-    TraceError(hr, "Failed to draw splash screen bitmap.");
-#else
-    UNREFERENCED_PARAMETER(status);
-#endif
-}
-
 static HRESULT LoadSplashScreen(
-    __in HMODULE hInstance,
+    __in SPLASHSCREEN_CONTEXT* pContext,
     __in SPLASHSCREEN_INFO* pSplashScreen
     )
 {
     HRESULT hr = S_OK;
-    POINT ptCursor = { };
-    HMONITOR hMonitor = NULL;
-    MONITORINFOEXW mi;
-    HDC hdc = NULL;
-    UINT dpiX = 0;
-    UINT dpiY = 0;
+    BITMAP bmp = { };
+    POINT pt = { };
+    int x = 0;
+    int y = 0;
+    DPIU_MONITOR_CONTEXT* pMonitorContext = NULL;
+    RECT* pMonitorRect = NULL;
 
-    pSplashScreen->pBitmap = Bitmap::FromResource(hInstance, MAKEINTRESOURCEW(IDB_SPLASHSCREEN));
-    ExitOnNull(pSplashScreen->pBitmap, hr, E_INVALIDDATA, "Failed to find the splash screen bitmap.");
-    ExitOnGdipFailure(pSplashScreen->pBitmap->GetLastStatus(), hr, "Failed to load the splash screen bitmap.");
+    pSplashScreen->nDpi = USER_DEFAULT_SCREEN_DPI;
+    pSplashScreen->hBitmap = ::LoadBitmapW(pContext->hInstance, MAKEINTRESOURCEW(IDB_SPLASHSCREEN));
+    ExitOnNullWithLastError(pSplashScreen->hBitmap, hr, "Failed to load splash screen bitmap.");
 
-    pSplashScreen->pt.X = CW_USEDEFAULT;
-    pSplashScreen->pt.Y = CW_USEDEFAULT;
-    pSplashScreen->size.Width = pSplashScreen->pBitmap->GetWidth();
-    pSplashScreen->size.Height = pSplashScreen->pBitmap->GetHeight();
+    ::GetObject(pSplashScreen->hBitmap, sizeof(bmp), static_cast<void*>(&bmp));
+    pSplashScreen->defaultDpiSize.cx = pSplashScreen->size.cx = bmp.bmWidth;
+    pSplashScreen->defaultDpiSize.cy = pSplashScreen->size.cy = bmp.bmHeight;
 
-    // Stretch and center the window on the monitor with the mouse.
-    if (::GetCursorPos(&ptCursor))
+    // Try to default to the monitor with the mouse, otherwise default to the primary monitor.
+    if (!::GetCursorPos(&pt))
     {
-        hMonitor = ::MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST);
-        if (hMonitor)
-        {
-            ZeroMemory(&mi, sizeof(mi));
-            mi.cbSize = sizeof(mi);
-
-            if (::GetMonitorInfoW(hMonitor, &mi))
-            {
-                hdc = ::CreateDCW(L"DISPLAY", mi.szDevice, NULL, NULL);
-                if (hdc)
-                {
-                    dpiX = ::GetDeviceCaps(hdc, LOGPIXELSX);
-                    dpiY = ::GetDeviceCaps(hdc, LOGPIXELSY);
-
-                    pSplashScreen->size.Width = pSplashScreen->size.Width * dpiX / 96;
-                    pSplashScreen->size.Height = pSplashScreen->size.Height * dpiY / 96;
-
-                    ::ReleaseDC(NULL, hdc);
-                }
-
-                pSplashScreen->pt.X = mi.rcWork.left + (mi.rcWork.right  - mi.rcWork.left - pSplashScreen->size.Width) / 2;
-                pSplashScreen->pt.Y = mi.rcWork.top  + (mi.rcWork.bottom - mi.rcWork.top  - pSplashScreen->size.Height) / 2;
-            }
-        }
+        pt.x = 0;
+        pt.y = 0;
     }
 
+    // Try to center the window on the chosen monitor.
+    hr = DpiuGetMonitorContextFromPoint(&pt, &pMonitorContext);
+    if (SUCCEEDED(hr))
+    {
+        pMonitorRect = &pMonitorContext->mi.rcWork;
+        if (pMonitorContext->nDpi != pSplashScreen->nDpi)
+        {
+            ScaleSplashScreen(pSplashScreen, pMonitorContext->nDpi, pMonitorRect->left, pMonitorRect->top);
+        }
+
+        x = pMonitorRect->left + (pMonitorRect->right - pMonitorRect->left - pSplashScreen->size.cx) / 2;
+        y = pMonitorRect->top + (pMonitorRect->bottom - pMonitorRect->top - pSplashScreen->size.cy) / 2;
+    }
+    else
+    {
+        hr = S_OK;
+        x = CW_USEDEFAULT;
+        y = CW_USEDEFAULT;
+    }
+
+    pSplashScreen->hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, BURN_SPLASHSCREEN_CLASS_WINDOW, pContext->wzCaption, WS_POPUP | WS_VISIBLE, x, y, pSplashScreen->size.cx, pSplashScreen->size.cy, HWND_DESKTOP, NULL, pContext->hInstance, pSplashScreen);
+    ExitOnNullWithLastError(pSplashScreen->hWnd, hr, "Failed to create window.");
+
 LExit:
+    MemFree(pMonitorContext);
+
     return hr;
+}
+
+static BOOL OnDpiChanged(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    )
+{
+    UINT nDpi = HIWORD(wParam);
+    RECT* pRect = reinterpret_cast<RECT*>(lParam);
+    BOOL fDpiChanged = pSplashScreen->nDpi != nDpi;
+
+    if (fDpiChanged)
+    {
+        ScaleSplashScreen(pSplashScreen, nDpi, pRect->left, pRect->top);
+    }
+
+    return fDpiChanged;
+}
+
+static void OnEraseBkgnd(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in WPARAM wParam
+    )
+{
+    HDC hdc = reinterpret_cast<HDC>(wParam);
+    HDC hdcMem = ::CreateCompatibleDC(hdc);
+    HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pSplashScreen->hBitmap));
+    ::StretchBlt(hdc, 0, 0, pSplashScreen->size.cx, pSplashScreen->size.cy, hdcMem, 0, 0, pSplashScreen->defaultDpiSize.cx, pSplashScreen->defaultDpiSize.cy, SRCCOPY);
+    ::SelectObject(hdcMem, hDefaultBitmap);
+    ::DeleteDC(hdcMem);
+}
+
+static void OnNcCreate(
+    __in HWND hWnd,
+    __in LPARAM lParam
+    )
+{
+    DPIU_WINDOW_CONTEXT windowContext = { };
+    CREATESTRUCTW* pCreateStruct = reinterpret_cast<CREATESTRUCTW*>(lParam);
+    SPLASHSCREEN_INFO* pSplashScreen = reinterpret_cast<SPLASHSCREEN_INFO*>(pCreateStruct->lpCreateParams);
+
+    ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pSplashScreen));
+    pSplashScreen->hWnd = hWnd;
+
+    DpiuGetWindowContext(pSplashScreen->hWnd, &windowContext);
+
+    if (windowContext.nDpi != pSplashScreen->nDpi)
+    {
+        ScaleSplashScreen(pSplashScreen, windowContext.nDpi, pCreateStruct->x, pCreateStruct->y);
+    }
+}
+
+static void ScaleSplashScreen(
+    __in SPLASHSCREEN_INFO* pSplashScreen,
+    __in UINT nDpi,
+    __in int x,
+    __in int y
+    )
+{
+    pSplashScreen->nDpi = nDpi;
+
+    pSplashScreen->size.cx = DpiuScaleValue(pSplashScreen->defaultDpiSize.cx, pSplashScreen->nDpi);
+    pSplashScreen->size.cy = DpiuScaleValue(pSplashScreen->defaultDpiSize.cy, pSplashScreen->nDpi);
+
+    if (pSplashScreen->hWnd)
+    {
+        ::SetWindowPos(pSplashScreen->hWnd, NULL, x, y, pSplashScreen->size.cx, pSplashScreen->size.cy, SWP_NOACTIVATE | SWP_NOZORDER);
+    }
 }

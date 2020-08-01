@@ -6,11 +6,6 @@
 #include <aclapi.h>
 #include <Bits.h>
 
-#pragma warning(push)
-#pragma warning(disable:4458) // declaration of 'xxx' hides class member
-#include <gdiplus.h>
-#pragma warning(pop)
-
 #include <math.h>
 #include <msiquery.h>
 #include <sddl.h>
@@ -37,7 +32,6 @@
 #include <cryputil.h>
 #include <dirutil.h>
 #include <fileutil.h>
-#include <gdiputil.h>
 #include <guidutil.h>
 #include <logutil.h>
 #include <memutil.h>
@@ -60,6 +54,7 @@
 #include <dlutil.h>
 #include <atomutil.h>
 #include <apuputil.h>
+#include <dpiutil.h>
 
 #include "..\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h"
 #include "..\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h"

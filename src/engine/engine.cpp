@@ -89,6 +89,7 @@ extern "C" HRESULT EngineRun(
     BOOL fComInitialized = FALSE;
     BOOL fLogInitialized = FALSE;
     BOOL fCrypInitialized = FALSE;
+    BOOL fDpiuInitialized = FALSE;
     BOOL fRegInitialized = FALSE;
     BOOL fWiuInitialized = FALSE;
     BOOL fXmlInitialized = FALSE;
@@ -131,6 +132,9 @@ extern "C" HRESULT EngineRun(
     hr = CrypInitialize();
     ExitOnFailure(hr, "Failed to initialize Cryputil.");
     fCrypInitialized = TRUE;
+
+    DpiuInitialize();
+    fDpiuInitialized = TRUE;
 
     hr = RegInitialize();
     ExitOnFailure(hr, "Failed to initialize Regutil.");
@@ -239,6 +243,11 @@ LExit:
     if (fRegInitialized)
     {
         RegUninitialize();
+    }
+
+    if (fDpiuInitialized)
+    {
+        DpiuUninitialize();
     }
 
     if (fCrypInitialized)
