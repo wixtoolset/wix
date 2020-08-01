@@ -18,10 +18,6 @@ namespace WixToolset.Mba.Core
         private static readonly string normalizeVersionFormatString = "{0} must be less than or equal to " + UInt16.MaxValue;
 
         private IBootstrapperEngine engine;
-        private Variables<long> numericVariables;
-        private Variables<SecureString> secureStringVariables;
-        private Variables<string> stringVariables;
-        private Variables<Version> versionVariables;
 
         /// <summary>
         /// Creates a new instance of the <see cref="Engine"/> container class.
@@ -30,135 +26,6 @@ namespace WixToolset.Mba.Core
         internal Engine(IBootstrapperEngine engine)
         {
             this.engine = engine;
-
-            // Wrap the calls to get and set numeric variables.
-            this.numericVariables = new Variables<long>(
-                delegate(string name)
-                {
-                    long value;
-                    int ret = this.engine.GetVariableNumeric(name, out value);
-                    if (NativeMethods.S_OK != ret)
-                    {
-                        throw new Win32Exception(ret);
-                    }
-
-                    return value;
-                },
-                delegate(string name, long value)
-                {
-                    this.engine.SetVariableNumeric(name, value);
-                },
-                delegate(string name)
-                {
-                    long value;
-                    int ret = this.engine.GetVariableNumeric(name, out value);
-
-                    return NativeMethods.E_NOTFOUND != ret;
-                }
-            );
-
-            // Wrap the calls to get and set string variables using SecureStrings.
-            this.secureStringVariables = new Variables<SecureString>(
-                delegate(string name)
-                {
-                    var pUniString = this.getStringVariable(name, out var length);
-                    try
-                    {
-                        return this.convertToSecureString(pUniString, length);
-                    }
-                    finally
-                    {
-                        if (IntPtr.Zero != pUniString)
-                        {
-                            Marshal.FreeCoTaskMem(pUniString);
-                        }
-                    }
-                },
-                delegate(string name, SecureString value)
-                {
-                    IntPtr pValue = Marshal.SecureStringToCoTaskMemUnicode(value);
-                    try
-                    {
-                        this.engine.SetVariableString(name, pValue, true);
-                    }
-                    finally
-                    {
-                        Marshal.FreeCoTaskMem(pValue);
-                    }
-                },
-                delegate(string name)
-                {
-                    return this.containsVariable(name);
-                }
-            );
-
-            // Wrap the calls to get and set string variables.
-            this.stringVariables = new Variables<string>(
-                delegate(string name)
-                {
-                    int length;
-                    IntPtr pUniString = this.getStringVariable(name, out length);
-                    try
-                    {
-                        return Marshal.PtrToStringUni(pUniString, length);
-                    }
-                    finally
-                    {
-                        if (IntPtr.Zero != pUniString)
-                        {
-                            Marshal.FreeCoTaskMem(pUniString);
-                        }
-                    }
-                },
-                delegate(string name, string value)
-                {
-                    IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
-                    try
-                    {
-                        this.engine.SetVariableString(name, pValue, true);
-                    }
-                    finally
-                    {
-                        Marshal.FreeCoTaskMem(pValue);
-                    }
-                },
-                delegate(string name)
-                {
-                    return this.containsVariable(name);
-                }
-            );
-
-            // Wrap the calls to get and set version variables.
-            this.versionVariables = new Variables<Version>(
-                delegate(string name)
-                {
-                    long value;
-                    int ret = this.engine.GetVariableVersion(name, out value);
-                    if (NativeMethods.S_OK != ret)
-                    {
-                        throw new Win32Exception(ret);
-                    }
-
-                    return LongToVersion(value);
-                },
-                delegate(string name, Version value)
-                {
-                    long version = VersionToLong(value);
-                    this.engine.SetVariableVersion(name, version);
-                },
-                delegate(string name)
-                {
-                    long value;
-                    int ret = this.engine.GetVariableVersion(name, out value);
-
-                    return NativeMethods.E_NOTFOUND != ret;
-                }
-            );
-        }
-
-        public IVariables<long> NumericVariables
-        {
-            get { return this.numericVariables; }
         }
 
         public int PackageCount
@@ -172,21 +39,6 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public IVariables<SecureString> SecureStringVariables
-        {
-            get { return this.secureStringVariables; }
-        }
-
-        public IVariables<string> StringVariables
-        {
-            get { return this.stringVariables; }
-        }
-
-        public IVariables<Version> VersionVariables
-        {
-            get { return this.versionVariables; }
-        }
-
         public void Apply(IntPtr hwndParent)
         {
             this.engine.Apply(hwndParent);
@@ -195,6 +47,13 @@ namespace WixToolset.Mba.Core
         public void CloseSplashScreen()
         {
             this.engine.CloseSplashScreen();
+        }
+
+        public bool ContainsVariable(string name)
+        {
+            int capacity = 0;
+            int ret = this.engine.GetVariableString(name, IntPtr.Zero, ref capacity);
+            return NativeMethods.E_NOTFOUND != ret;
         }
 
         public void Detect()
@@ -275,6 +134,61 @@ namespace WixToolset.Mba.Core
             return sb.ToString();
         }
 
+        public long GetVariableNumeric(string name)
+        {
+            int ret = this.engine.GetVariableNumeric(name, out long value);
+            if (NativeMethods.S_OK != ret)
+            {
+                throw new Win32Exception(ret);
+            }
+
+            return value;
+        }
+
+        public SecureString GetVariableSecureString(string name)
+        {
+            var pUniString = this.getStringVariable(name, out var length);
+            try
+            {
+                return this.convertToSecureString(pUniString, length);
+            }
+            finally
+            {
+                if (IntPtr.Zero != pUniString)
+                {
+                    Marshal.FreeCoTaskMem(pUniString);
+                }
+            }
+        }
+
+        public string GetVariableString(string name)
+        {
+            int length;
+            IntPtr pUniString = this.getStringVariable(name, out length);
+            try
+            {
+                return Marshal.PtrToStringUni(pUniString, length);
+            }
+            finally
+            {
+                if (IntPtr.Zero != pUniString)
+                {
+                    Marshal.FreeCoTaskMem(pUniString);
+                }
+            }
+        }
+
+        public Version GetVariableVersion(string name)
+        {
+            int ret = this.engine.GetVariableVersion(name, out long value);
+            if (NativeMethods.S_OK != ret)
+            {
+                throw new Win32Exception(ret);
+            }
+
+            return LongToVersion(value);
+        }
+
         public void LaunchApprovedExe(IntPtr hwndParent, string approvedExeForElevationId, string arguments)
         {
             this.LaunchApprovedExe(hwndParent, approvedExeForElevationId, arguments, 0);
@@ -310,6 +224,43 @@ namespace WixToolset.Mba.Core
             this.engine.SetDownloadSource(packageOrContainerId, payloadId, url, user, password);
         }
 
+        public void SetVariable(string name, long value)
+        {
+            this.engine.SetVariableNumeric(name, value);
+        }
+
+        public void SetVariable(string name, SecureString value, bool formatted)
+        {
+            IntPtr pValue = Marshal.SecureStringToCoTaskMemUnicode(value);
+            try
+            {
+                this.engine.SetVariableString(name, pValue, formatted);
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(pValue);
+            }
+        }
+
+        public void SetVariable(string name, string value, bool formatted)
+        {
+            IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
+            try
+            {
+                this.engine.SetVariableString(name, pValue, formatted);
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(pValue);
+            }
+        }
+
+        public void SetVariable(string name, Version value)
+        {
+            long version = VersionToLong(value);
+            this.engine.SetVariableVersion(name, version);
+        }
+
         public int SendEmbeddedError(int errorCode, string message, int uiHint)
         {
             int result = 0;
@@ -327,49 +278,6 @@ namespace WixToolset.Mba.Core
         public void Quit(int exitCode)
         {
             this.engine.Quit(exitCode);
-        }
-
-        internal sealed class Variables<T> : IVariables<T>
-        {
-            // .NET 2.0 does not support Func<T, TResult> or Action<T1, T2>.
-            internal delegate T Getter(string name);
-            internal delegate void Setter(string name, T value);
-
-            private Getter getter;
-            private Setter setter;
-            private Predicate<string> contains;
-
-            internal Variables(Getter getter, Setter setter, Predicate<string> contains)
-            {
-                this.getter = getter;
-                this.setter = setter;
-                this.contains = contains;
-            }
-
-            public T this[string name]
-            {
-                get { return this.getter(name); }
-                set { this.setter(name, value); }
-            }
-
-            public bool Contains(string name)
-            {
-                return this.contains(name);
-            }
-        }
-
-        /// <summary>
-        /// Gets whether the variable given by <paramref name="name"/> exists.
-        /// </summary>
-        /// <param name="name">The name of the variable to check.</param>
-        /// <returns>True if the variable given by <paramref name="name"/> exists; otherwise, false.</returns>
-        internal bool containsVariable(string name)
-        {
-            int capacity = 0;
-            IntPtr pValue = IntPtr.Zero;
-            int ret = this.engine.GetVariableString(name, pValue, ref capacity);
-
-            return NativeMethods.E_NOTFOUND != ret;
         }
 
         /// <summary>

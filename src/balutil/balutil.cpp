@@ -167,7 +167,7 @@ LExit:
 }
 
 
-DAPI_(BOOL) BalStringVariableExists(
+DAPI_(BOOL) BalVariableExists(
     __in_z LPCWSTR wzVariable
     )
 {
@@ -183,7 +183,7 @@ DAPI_(BOOL) BalStringVariableExists(
     hr = vpEngine->GetVariableString(wzVariable, NULL, &cch);
 
 LExit:
-    return E_MOREDATA == hr; // string exists only if there are more than zero characters in the variable.
+    return E_NOTFOUND != hr;
 }
 
 

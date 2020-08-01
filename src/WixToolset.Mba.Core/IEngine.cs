@@ -9,36 +9,9 @@ namespace WixToolset.Mba.Core
     public interface IEngine
     {
         /// <summary>
-        /// Gets or sets numeric variables for the engine.
-        /// </summary>
-        IVariables<long> NumericVariables { get; }
-
-        /// <summary>
         /// Gets the number of packages in the bundle.
         /// </summary>
         int PackageCount { get; }
-
-        /// <summary>
-        /// Gets or sets string variables for the engine using SecureStrings.
-        /// </summary>
-        IVariables<SecureString> SecureStringVariables { get; }
-
-        /// <summary>
-        /// Gets or sets string variables for the engine.
-        /// </summary>
-        IVariables<string> StringVariables { get; }
-
-        /// <summary>
-        /// Gets or sets <see cref="Version"/> variables for the engine.
-        /// 
-        /// The <see cref="Version"/> class can keep track of when the build and revision fields are undefined, but the engine can't.
-        /// Therefore, the build and revision fields must be defined when setting a <see cref="Version"/> variable.
-        /// Use the NormalizeVersion method to make sure the engine can accept the Version.
-        /// 
-        /// To keep track of versions without build or revision fields, use StringVariables instead.
-        /// </summary>
-        /// <exception cref="OverflowException">The given <see cref="Version"/> was invalid.</exception>
-        IVariables<Version> VersionVariables { get; }
 
         /// <summary>
         /// Install the packages.
@@ -51,6 +24,13 @@ namespace WixToolset.Mba.Core
         /// never was opened.
         /// </summary>
         void CloseSplashScreen();
+
+        /// <summary>
+        /// Checks if a variable exists in the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <returns>Whether the variable exists.</returns>
+        bool ContainsVariable(string name);
 
         /// <summary>
         /// Determine if all installation conditions are fulfilled.
@@ -93,6 +73,30 @@ namespace WixToolset.Mba.Core
         /// <returns>The formatted string.</returns>
         /// <exception cref="Win32Exception">A Win32 error occurred.</exception>
         string FormatString(string format);
+
+        /// <summary>
+        /// Gets numeric variables for the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        long GetVariableNumeric(string name);
+
+        /// <summary>
+        /// Gets string variables for the engine using SecureStrings.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        SecureString GetVariableSecureString(string name);
+
+        /// <summary>
+        /// Gets string variables for the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        string GetVariableString(string name);
+
+        /// <summary>
+        /// Gets <see cref="Version"/> variables for the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        Version GetVariableVersion(string name);
 
         /// <summary>
         /// Launches a preapproved executable elevated.  As long as the engine already elevated, there will be no UAC prompt.
@@ -151,6 +155,43 @@ namespace WixToolset.Mba.Core
         /// <param name="user">The user name for proxy authentication.</param>
         /// <param name="password">The password for proxy authentication.</param>
         void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password);
+
+        /// <summary>
+        /// Sets numeric variables for the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="value">The value to set.</param>
+        void SetVariable(string name, long value);
+
+        /// <summary>
+        /// Sets string variables for the engine using SecureStrings.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="formatted">False if the value is a literal string.</param>
+        void SetVariable(string name, SecureString value, bool formatted);
+
+        /// <summary>
+        /// Sets string variables for the engine.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="formatted">False if the value is a literal string.</param>
+        void SetVariable(string name, string value, bool formatted);
+
+        /// <summary>
+        /// Sets <see cref="Version"/> variables for the engine.
+        /// 
+        /// The <see cref="Version"/> class can keep track of when the build and revision fields are undefined, but the engine can't.
+        /// Therefore, the build and revision fields must be defined when setting a <see cref="Version"/> variable.
+        /// Use the NormalizeVersion method to make sure the engine can accept the Version.
+        /// 
+        /// To keep track of versions without build or revision fields, use StringVariables instead.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="value">The value to set.</param>
+        /// <exception cref="OverflowException">The given <see cref="Version"/> was invalid.</exception>
+        void SetVariable(string name, Version value);
 
         /// <summary>
         /// Sends error message when embedded.

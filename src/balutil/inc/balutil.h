@@ -108,10 +108,10 @@ DAPI_(HRESULT) BalSetNumericVariable(
     );
 
 /*******************************************************************
-BalStringVariableExists - checks if a string variable exists in the engine.
+BalVariableExists - checks if a variable exists in the engine.
 
 ********************************************************************/
-DAPI_(BOOL) BalStringVariableExists(
+DAPI_(BOOL) BalVariableExists(
     __in_z LPCWSTR wzVariable
     );
 
