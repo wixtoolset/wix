@@ -21,12 +21,23 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixBundleVariableSymbolFields
     {
         Value,
         Type,
         Hidden,
         Persisted,
+    }
+
+    public enum WixBundleVariableType
+    {
+        Unknown,
+        Formatted,
+        Numeric,
+        String,
+        Version,
     }
 
     public class WixBundleVariableSymbol : IntermediateSymbol
@@ -47,10 +58,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleVariableSymbolFields.Value, value);
         }
 
-        public string Type
+        public WixBundleVariableType Type
         {
-            get => (string)this.Fields[(int)WixBundleVariableSymbolFields.Type];
-            set => this.Set((int)WixBundleVariableSymbolFields.Type, value);
+            get => Enum.TryParse((string)this.Fields[(int)WixBundleVariableSymbolFields.Type], true, out WixBundleVariableType value) ? value : WixBundleVariableType.Unknown;
+            set => this.Set((int)WixBundleVariableSymbolFields.Type, value.ToString().ToLowerInvariant());
         }
 
         public bool Hidden

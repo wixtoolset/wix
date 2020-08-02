@@ -19,6 +19,8 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixSetVariableSymbolFields
     {
         Value,
@@ -43,10 +45,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixSetVariableSymbolFields.Value, value);
         }
 
-        public string Type
+        public WixBundleVariableType Type
         {
-            get => (string)this.Fields[(int)WixSetVariableSymbolFields.Type];
-            set => this.Set((int)WixSetVariableSymbolFields.Type, value);
+            get => Enum.TryParse((string)this.Fields[(int)WixSetVariableSymbolFields.Type], true, out WixBundleVariableType value) ? value : WixBundleVariableType.Unknown;
+            set => this.Set((int)WixSetVariableSymbolFields.Type, value.ToString().ToLowerInvariant());
         }
     }
 }
