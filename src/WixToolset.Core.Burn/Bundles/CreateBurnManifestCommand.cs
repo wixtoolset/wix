@@ -131,10 +131,25 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     writer.WriteStartElement("Variable");
                     writer.WriteAttributeString("Id", variable.Id.Id);
-                    if (null != variable.Type)
+                    if (variable.Type != WixBundleVariableType.Unknown)
                     {
                         writer.WriteAttributeString("Value", variable.Value);
-                        writer.WriteAttributeString("Type", variable.Type);
+
+                        switch (variable.Type)
+                        {
+                            case WixBundleVariableType.Formatted:
+                                writer.WriteAttributeString("Type", "formatted");
+                                break;
+                            case WixBundleVariableType.Numeric:
+                                writer.WriteAttributeString("Type", "numeric");
+                                break;
+                            case WixBundleVariableType.String:
+                                writer.WriteAttributeString("Type", "string");
+                                break;
+                            case WixBundleVariableType.Version:
+                                writer.WriteAttributeString("Type", "version");
+                                break;
+                        }
                     }
                     writer.WriteAttributeString("Hidden", variable.Hidden ? "yes" : "no");
                     writer.WriteAttributeString("Persisted", variable.Persisted ? "yes" : "no");

@@ -32,5 +32,28 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
             }
         }
+
+        [Fact]
+        public void BundleVariableWithBadTypeIsRejected()
+        {
+            var folder = TestData.Get(@"TestData\BadInput");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleVariable.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                Assert.Equal(21, result.ExitCode);
+            }
+        }
     }
 }

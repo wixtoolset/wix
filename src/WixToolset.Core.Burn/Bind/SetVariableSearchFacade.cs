@@ -21,10 +21,25 @@ namespace WixToolset.Core.Burn
 
             base.WriteXml(writer);
 
-            if (this.SetVariableSymbol.Type != null)
+            if (this.SetVariableSymbol.Type != WixBundleVariableType.Unknown)
             {
                 writer.WriteAttributeString("Value", this.SetVariableSymbol.Value);
-                writer.WriteAttributeString("Type", this.SetVariableSymbol.Type);
+
+                switch (this.SetVariableSymbol.Type)
+                {
+                    case WixBundleVariableType.Formatted:
+                        writer.WriteAttributeString("Type", "formatted");
+                        break;
+                    case WixBundleVariableType.Numeric:
+                        writer.WriteAttributeString("Type", "numeric");
+                        break;
+                    case WixBundleVariableType.String:
+                        writer.WriteAttributeString("Type", "string");
+                        break;
+                    case WixBundleVariableType.Version:
+                        writer.WriteAttributeString("Type", "version");
+                        break;
+                }
             }
 
             writer.WriteEndElement();

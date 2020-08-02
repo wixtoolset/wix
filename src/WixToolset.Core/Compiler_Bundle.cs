@@ -2141,7 +2141,7 @@ namespace WixToolset.Core
                         case "":
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "always", "yes", "no"));
                             break;
                         }
                         break;
@@ -3043,7 +3043,7 @@ namespace WixToolset.Core
             string condition = null;
             string after = null;
             string value = null;
-            string type = null;
+            string typeValue = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -3067,7 +3067,7 @@ namespace WixToolset.Core
                             value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Type":
-                            type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
 
                         default:
@@ -3081,13 +3081,13 @@ namespace WixToolset.Core
                 }
             }
 
-            type = this.ValidateVariableTypeWithValue(sourceLineNumbers, type, value);
+            var type = this.ValidateVariableTypeWithValue(sourceLineNumbers, node, typeValue, value);
 
             this.Core.ParseForExtensionElements(node);
 
             if (id == null)
             {
-                id = this.Core.CreateIdentifier("sbv", variable, condition, after, value, type);
+                id = this.Core.CreateIdentifier("sbv", variable, condition, after, value, type.ToString());
             }
 
             this.Core.CreateWixSearchSymbol(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
@@ -3113,7 +3113,7 @@ namespace WixToolset.Core
             string name = null;
             var persisted = false;
             string value = null;
-            string type = null;
+            string typeValue = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -3140,7 +3140,7 @@ namespace WixToolset.Core
                         value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         break;
                     case "Type":
-                        type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3162,7 +3162,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
             }
 
-            type = this.ValidateVariableTypeWithValue(sourceLineNumbers, type, value);
+            var type = this.ValidateVariableTypeWithValue(sourceLineNumbers, node, typeValue, value);
 
             this.Core.ParseForExtensionElements(node);
 
@@ -3178,46 +3178,67 @@ namespace WixToolset.Core
             }
         }
 
-        private string ValidateVariableTypeWithValue(SourceLineNumber sourceLineNumbers, string type, string value)
+        private WixBundleVariableType ValidateVariableTypeWithValue(SourceLineNumber sourceLineNumbers, XElement node, string typeValue, string value)
         {
-            var newType = type;
-            if (newType == null && value != null)
+            WixBundleVariableType type;
+            switch (typeValue)
             {
-                // Infer the type from the current value...
-                if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+                case "formatted":
+                    type = WixBundleVariableType.Formatted;
+                    break;
+                case "numeric":
+                    type = WixBundleVariableType.Numeric;
+                    break;
+                case "string":
+                    type = WixBundleVariableType.String;
+                    break;
+                case "version":
+                    type = WixBundleVariableType.Version;
+                    break;
+                case null:
+                    type = WixBundleVariableType.Unknown;
+                    break;
+                default:
+                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "formatted", "numeric", "string", "version"));
+                    return WixBundleVariableType.Unknown;
+            }
+
+            if (type != WixBundleVariableType.Unknown)
+            {
+                if (value == null)
                 {
-                    // Version constructor does not support simple "v#" syntax so check to see if the value is
-                    // non-negative real quick.
-                    if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var _))
-                    {
-                        newType = "version";
-                    }
-                    else if (Version.TryParse(value.Substring(1), out var _))
-                    {
-                        newType = "version";
-                    }
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
                 }
 
-                // Not a version, check for numeric.
-                if (newType == null)
+                return type;
+            }
+            else if (value == null)
+            {
+                return type;
+            }
+
+            // Infer the type from the current value...
+            if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+            {
+                // Version constructor does not support simple "v#" syntax so check to see if the value is
+                // non-negative real quick.
+                if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var _))
                 {
-                    if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var _))
-                    {
-                        newType = "numeric";
-                    }
-                    else
-                    {
-                        newType = "string";
-                    }
+                    return WixBundleVariableType.Version;
+                }
+                else if (Version.TryParse(value.Substring(1), out var _))
+                {
+                    return WixBundleVariableType.Version;
                 }
             }
 
-            if (value == null && newType != null)
+            // Not a version, check for numeric.
+            if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var _))
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
+                return WixBundleVariableType.Numeric;
             }
 
-            return newType;
+            return WixBundleVariableType.String;
         }
 
         private class RemotePayload

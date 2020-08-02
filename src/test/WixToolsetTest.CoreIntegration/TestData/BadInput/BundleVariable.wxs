@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ex="http://www.example.com/scheams/v1/wxs">
+    <Fragment>
+        <Variable Name="BadType" Type="doesnotexist" Value="dne" />
+    </Fragment>
+</Wix>
