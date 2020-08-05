@@ -73,6 +73,7 @@ namespace WixToolset.Converters
         private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
         private static readonly XName TextElementName = WixNamespace + "Text";
         private static readonly XName UITextElementName = WixNamespace + "UIText";
+        private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName UtilXmlConfigElementName = WixUtilNamespace + "XmlConfig";
@@ -162,6 +163,7 @@ namespace WixToolset.Converters
                 { WixConverter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
                 { WixConverter.TextElementName, this.ConvertTextElement },
                 { WixConverter.UITextElementName, this.ConvertUITextElement },
+                { WixConverter.VariableElementName, this.ConvertVariableElement },
                 { WixConverter.UtilCloseApplicationElementName, this.ConvertUtilCloseApplicationElementName },
                 { WixConverter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
                 { WixConverter.UtilXmlConfigElementName, this.ConvertUtilXmlConfigElement },
@@ -814,6 +816,28 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertVariableElement(XElement xVariable)
+        {
+            var xType = xVariable.Attribute("Type");
+            var xValue = xVariable.Attribute("Value");
+            if (this.SourceVersion < 4)
+            {
+                if (xType == null)
+                {
+                    if (WasImplicitlyStringTyped(xValue?.Value) &&
+                        this.OnError(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
+                    {
+                        xVariable.Add(new XAttribute("Type", "formatted"));
+                    }
+                }
+                else if (xType.Value == "string" &&
+                        this.OnError(ConverterTestType.AssignVariableTypeFormatted, xVariable, "The \"string\" variable type now denotes a literal string. Use \"formatted\" to keep the previous behavior."))
+                {
+                    xType.Value = "formatted";
+                }
+            }
+        }
+
         private void ConvertPropertyElement(XElement xProperty)
         {
             var xId = xProperty.Attribute("Id");
@@ -1105,6 +1129,31 @@ namespace WixToolset.Converters
             }
         }
 
+        private static bool WasImplicitlyStringTyped(string value)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+            else if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+            {
+                if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var _))
+                {
+                    return false;
+                }
+                else if (Version.TryParse(value.Substring(1), out var _))
+                {
+                    return false;
+                }
+            }
+            else if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var _))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Converter test types.  These are used to condition error messages down to warnings.
         /// </summary>
@@ -1229,6 +1278,11 @@ namespace WixToolset.Converters
             /// DpiAwareness is new and is defaulted to 'perMonitorV2' which is a change in behavior.
             /// </summary>
             AssignBootstrapperApplicationDpiAwareness,
+
+            /// <summary>
+            /// The string variable type was previously treated as formatted.
+            /// </summary>
+            AssignVariableTypeFormatted,
         }
     }
 }
