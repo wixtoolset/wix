@@ -36,7 +36,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     @"bin\x86\Release\SimpleBundle.exe",
                     @"bin\x86\Release\SimpleBundle.wixpdb",
@@ -69,7 +69,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     @"bin\x86\Release\SimpleMergeModule.msm",
                     @"bin\x86\Release\SimpleMergeModule.wixpdb",
@@ -105,7 +105,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     @"bin\x86\Release\en-US\cab1.cab",
                     @"bin\x86\Release\en-US\MsiPackage.msi",
@@ -139,7 +139,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     @"bin\x86\Release\cab1.cab",
                     @"bin\x86\Release\MergeMsiPackage.msi",
@@ -199,7 +199,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(expectedOutputFiles, paths);
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
             }
         }
 
@@ -231,7 +231,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     @"bin\x64\Release\en-US\cab1.cab",
                     @"bin\x64\Release\en-US\MsiPackage.msi",
