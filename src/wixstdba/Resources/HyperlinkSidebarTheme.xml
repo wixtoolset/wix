@@ -83,8 +83,8 @@
                 <Text>#(loc.SuccessHeader)</Text>
                 <Text Condition="WixBundleAction = 2">#(loc.SuccessLayoutHeader)</Text>
                 <Text Condition="WixBundleAction = 3">#(loc.SuccessUninstallHeader)</Text>
-                <Text Condition="WixBundleAction = 4">#(loc.SuccessInstallHeader)</Text>
-                <Text Condition="WixBundleAction = 6">#(loc.SuccessRepairHeader)</Text>
+                <Text Condition="WixBundleAction = 5">#(loc.SuccessInstallHeader)</Text>
+                <Text Condition="WixBundleAction = 7">#(loc.SuccessRepairHeader)</Text>
             </Label>
             <Button Name="LaunchButton" X="-91" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessLaunchButton)</Button>
             <Label X="185" Y="-51" Width="400" Height="34" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBARestartRequired">
@@ -104,8 +104,8 @@
                 <Text>#(loc.FailureHeader)</Text>
                 <Text Condition="WixBundleAction = 2">#(loc.FailureLayoutHeader)</Text>
                 <Text Condition="WixBundleAction = 3">#(loc.FailureUninstallHeader)</Text>
-                <Text Condition="WixBundleAction = 4">#(loc.FailureInstallHeader)</Text>
-                <Text Condition="WixBundleAction = 6">#(loc.FailureRepairHeader)</Text>
+                <Text Condition="WixBundleAction = 5">#(loc.FailureInstallHeader)</Text>
+                <Text Condition="WixBundleAction = 7">#(loc.FailureRepairHeader)</Text>
             </Label>
             <Hypertext Name="FailureLogFileLink" X="185" Y="121" Width="-11" Height="68" FontId="3" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
             <Hypertext Name="FailureMessageText" X="185" Y="-115" Width="-11" Height="80" FontId="3" TabStop="yes" HideWhenDisabled="yes" />
