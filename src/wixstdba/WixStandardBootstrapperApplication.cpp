@@ -183,6 +183,7 @@ static HRESULT DAPI GetVariableStringCallback(
 static HRESULT DAPI SetVariableStringCallback(
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue,
+    __in BOOL fFormatted,
     __in_opt LPVOID pvContext
     );
 static LPCSTR LoggingRequestStateToString(
@@ -975,7 +976,7 @@ public: // IBootstrapperApplication
 
         // If a restart was encountered and we are not suppressing restarts, then restart is required.
         m_fRestartRequired = (BOOTSTRAPPER_APPLY_RESTART_NONE != restart && BOOTSTRAPPER_RESTART_NEVER < m_command.restart);
-        BalSetStringVariable(WIXSTDBA_VARIABLE_RESTART_REQUIRED, m_fRestartRequired ? L"1" : NULL);
+        BalSetStringVariable(WIXSTDBA_VARIABLE_RESTART_REQUIRED, m_fRestartRequired ? L"1" : NULL, FALSE);
 
         // If a restart is required and we're not displaying a UI or we are not supposed to prompt for restart then allow the restart.
         m_fAllowRestart = m_fRestartRequired && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_RESTART_PROMPT < m_command.restart);
@@ -1905,7 +1906,7 @@ private: // privates
                         hr = StrAllocString(&sczVariableValue, ++pwc, 0);
                         BalExitOnFailure(hr, "Failed to copy variable value.");
 
-                        hr = m_pEngine->SetVariableString(sczVariableName, sczVariableValue);
+                        hr = m_pEngine->SetVariableString(sczVariableName, sczVariableValue, FALSE);
                         BalExitOnFailure(hr, "Failed to set variable.");
                     }
                     else
@@ -2891,7 +2892,7 @@ private: // privates
                     }
                     else if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON))
                     {
-                        fLaunchTargetExists = BalStringVariableExists(WIXSTDBA_VARIABLE_LAUNCH_TARGET_PATH);
+                        fLaunchTargetExists = BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_TARGET_PATH);
                     }
 
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON, fLaunchTargetExists && BOOTSTRAPPER_ACTION_UNINSTALL < m_plannedAction);
@@ -3192,24 +3193,24 @@ private: // privates
         hr = BalFormatString(sczUnformattedLaunchTarget, &sczLaunchTarget);
         BalExitOnFailure(hr, "Failed to format launch target variable: %ls", sczUnformattedLaunchTarget);
 
-        if (BalStringVariableExists(WIXSTDBA_VARIABLE_LAUNCH_TARGET_ELEVATED_ID))
+        if (BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_TARGET_ELEVATED_ID))
         {
             hr = BalGetStringVariable(WIXSTDBA_VARIABLE_LAUNCH_TARGET_ELEVATED_ID, &sczLaunchTargetElevatedId);
             BalExitOnFailure(hr, "Failed to get launch target elevated id '%ls'.", WIXSTDBA_VARIABLE_LAUNCH_TARGET_ELEVATED_ID);
         }
 
-        if (BalStringVariableExists(WIXSTDBA_VARIABLE_LAUNCH_ARGUMENTS))
+        if (BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_ARGUMENTS))
         {
             hr = BalGetStringVariable(WIXSTDBA_VARIABLE_LAUNCH_ARGUMENTS, &sczUnformattedArguments);
             BalExitOnFailure(hr, "Failed to get launch arguments '%ls'.", WIXSTDBA_VARIABLE_LAUNCH_ARGUMENTS);
         }
 
-        if (BalStringVariableExists(WIXSTDBA_VARIABLE_LAUNCH_HIDDEN))
+        if (BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_HIDDEN))
         {
             nCmdShow = SW_HIDE;
         }
 
-        if (BalStringVariableExists(WIXSTDBA_VARIABLE_LAUNCH_WORK_FOLDER))
+        if (BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_WORK_FOLDER))
         {
             hr = BalGetStringVariable(WIXSTDBA_VARIABLE_LAUNCH_WORK_FOLDER, &sczUnformattedLaunchFolder);
             BalExitOnFailure(hr, "Failed to get launch working directory variable '%ls'.", WIXSTDBA_VARIABLE_LAUNCH_WORK_FOLDER);
@@ -3879,10 +3880,11 @@ static HRESULT DAPI GetVariableStringCallback(
 static HRESULT DAPI SetVariableStringCallback(
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue,
+    __in BOOL fFormatted,
     __in_opt LPVOID /*pvContext*/
     )
 {
-    return BalSetStringVariable(wzVariable, wzValue);
+    return BalSetStringVariable(wzVariable, wzValue, fFormatted);
 }
 
 static LPCSTR LoggingRequestStateToString(

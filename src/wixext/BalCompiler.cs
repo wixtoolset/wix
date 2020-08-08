@@ -491,7 +491,7 @@ namespace WixToolset.Bal
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTarget"))
                     {
                         Value = launchTarget,
-                        Type = "string",
+                        Type = WixBundleVariableType.Formatted,
                     });
                 }
 
@@ -500,7 +500,7 @@ namespace WixToolset.Bal
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTargetElevatedId"))
                     {
                         Value = launchTargetElevatedId,
-                        Type = "string",
+                        Type = WixBundleVariableType.Formatted,
                     });
                 }
 
@@ -509,7 +509,7 @@ namespace WixToolset.Bal
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchArguments"))
                     {
                         Value = launchArguments,
-                        Type = "string",
+                        Type = WixBundleVariableType.Formatted,
                     });
                 }
 
@@ -518,7 +518,7 @@ namespace WixToolset.Bal
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchHidden"))
                     {
                         Value = "yes",
-                        Type = "string",
+                        Type = WixBundleVariableType.Formatted,
                     });
                 }
 
@@ -528,7 +528,7 @@ namespace WixToolset.Bal
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchWorkingFolder"))
                     {
                         Value = launchWorkingDir,
-                        Type = "string",
+                        Type = WixBundleVariableType.Formatted,
                     });
                 }
 
