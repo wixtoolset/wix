@@ -15,7 +15,7 @@
 
         <BundleCustomDataRef Id='WixStdbaInformation'>
             <BundleElement>
-                <BundleAttribute Id='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</BundleAttribute>
+                <BundleAttribute Id='LicenseFile' Value='!(wix.WixStdbaLicenseRtfName=license.rtf)' />
             </BundleElement>
         </BundleCustomDataRef>
     </Fragment>
@@ -32,7 +32,7 @@
 
         <BundleCustomDataRef Id='WixStdbaInformation'>
             <BundleElement>
-                <BundleAttribute Id='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</BundleAttribute>
+                <BundleAttribute Id='LicenseFile' Value='!(wix.WixStdbaLicenseRtfName=license.rtf)' />
             </BundleElement>
         </BundleCustomDataRef>
     </Fragment>
@@ -47,7 +47,7 @@
 
         <BundleCustomDataRef Id='WixStdbaInformation'>
             <BundleElement>
-                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+                <BundleAttribute Id='LicenseUrl' Value='!(wix.WixStdbaLicenseUrl)' />
             </BundleElement>
         </BundleCustomDataRef>
     </Fragment>
@@ -62,7 +62,7 @@
 
         <BundleCustomDataRef Id='WixStdbaInformation'>
             <BundleElement>
-                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+                <BundleAttribute Id='LicenseUrl' Value='!(wix.WixStdbaLicenseUrl)' />
             </BundleElement>
         </BundleCustomDataRef>
     </Fragment>
@@ -78,7 +78,7 @@
 
         <BundleCustomDataRef Id='WixStdbaInformation'>
             <BundleElement>
-                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+                <BundleAttribute Id='LicenseUrl' Value='!(wix.WixStdbaLicenseUrl)' />
             </BundleElement>
         </BundleCustomDataRef>
     </Fragment>
