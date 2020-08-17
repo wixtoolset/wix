@@ -3,7 +3,8 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net461;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Harvester</Description>
     <Title>WiX Harvester</Title>
