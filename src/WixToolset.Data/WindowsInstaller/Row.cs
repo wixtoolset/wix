@@ -196,13 +196,20 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
+        /// Returns true if the specified field is null.
+        /// </summary>
+        /// <param name="field">Index of the field to check.</param>
+        /// <returns>true if the specified field is null, false otherwise.</returns>
+        public bool IsColumnNull(int field) => this.Fields[field].Data == null;
+
+        /// <summary>
         /// Returns true if the specified field is null or an empty string.
         /// </summary>
         /// <param name="field">Index of the field to check.</param>
         /// <returns>true if the specified field is null or an empty string, false otherwise.</returns>
         public bool IsColumnEmpty(int field)
         {
-            if (null == this.Fields[field].Data)
+            if (this.IsColumnNull(field))
             {
                 return true;
             }
