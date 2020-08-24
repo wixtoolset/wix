@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
+    using System.Xml.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -224,20 +225,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                CompareLineByLine(expectedFile, decompiledWxsPath);
+                WixAssert.CompareXml(expectedFile, decompiledWxsPath);
             }
-        }
-
-        private static void CompareLineByLine(string expectedFile, string actualFile)
-        {
-            var expectedLines = File.ReadAllLines(expectedFile);
-            var actualLines = File.ReadAllLines(actualFile);
-            for (var i = 0; i < expectedLines.Length; ++i)
-            {
-                Assert.True(actualLines.Length > i, $"{i}: Expected file longer than actual file");
-                Assert.Equal($"{i}: {expectedLines[i]}", $"{i}: {actualLines[i]}");
-            }
-            Assert.True(expectedLines.Length == actualLines.Length, "Actual file longer than expected file");
         }
     }
 }

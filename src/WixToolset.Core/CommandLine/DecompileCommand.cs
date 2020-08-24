@@ -33,7 +33,7 @@ namespace WixToolset.Core.CommandLine
 
         public Task<int> ExecuteAsync(CancellationToken _)
         {
-            if (this.commandLine.ShowHelp)
+            if (this.commandLine.ShowHelp || String.IsNullOrEmpty(this.commandLine.DecompileFilePath))
             {
                 Console.WriteLine("TODO: Show decompile command help");
                 return Task.FromResult(-1);

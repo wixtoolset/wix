@@ -6,14 +6,14 @@ namespace WixToolsetTest.CoreIntegration
     using System.Xml.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Extensibility.Services;
     using Xunit;
 
     public class DecompileFixture
     {
-        [Fact]
-        public void CanDecompileSingleFileCompressed()
+        private static void DecompileAndCompare(string sourceFolder, string msiName, string expectedWxsName)
         {
-            var folder = TestData.Get(@"TestData\DecompileSingleFileCompressed");
+            var folder = TestData.Get(sourceFolder);
 
             using (var fs = new DisposableFileSystem())
             {
@@ -23,75 +23,33 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "decompile",
-                    Path.Combine(folder, "example.msi"),
+                    Path.Combine(folder, msiName),
                     "-intermediateFolder", intermediateFolder,
                     "-o", outputPath
                 });
 
                 result.AssertSuccess();
 
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "Expected.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
+                WixAssert.CompareXml(Path.Combine(folder, expectedWxsName), outputPath);
             }
+        }
+
+        [Fact]
+        public void CanDecompileSingleFileCompressed()
+        {
+            DecompileAndCompare(@"TestData\DecompileSingleFileCompressed", "example.msi", "Expected.wxs");
         }
 
         [Fact]
         public void CanDecompile64BitSingleFileCompressed()
         {
-            var folder = TestData.Get(@"TestData\DecompileSingleFileCompressed64");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "decompile",
-                    Path.Combine(folder, "example.msi"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
-                });
-
-                result.AssertSuccess();
-
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "Expected.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
-            }
+            DecompileAndCompare(@"TestData\DecompileSingleFileCompressed64", "example.msi", "Expected.wxs");
         }
 
         [Fact]
         public void CanDecompileNestedDirSearchUnderRegSearch()
         {
-            var folder = TestData.Get(@"TestData\AppSearch");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "decompile",
-                    Path.Combine(folder, "NestedDirSearchUnderRegSearch.msi"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
-                });
-
-                result.AssertSuccess();
-
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "DecompiledNestedDirSearchUnderRegSearch.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
-            }
+            DecompileAndCompare(@"TestData\AppSearch", "NestedDirSearchUnderRegSearch.msi", "DecompiledNestedDirSearchUnderRegSearch.wxs");
         }
 
         [Fact]
@@ -100,85 +58,19 @@ namespace WixToolsetTest.CoreIntegration
             // The input MSI was not created using standard methods, it is an example of a real world database that needs to be decompiled.
             // The Class/@Feature_ column has length of 32, the File/@Attributes has length of 2,
             // and numerous foreign key relationships are missing.
-            var folder = TestData.Get(@"TestData\Class");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "decompile",
-                    Path.Combine(folder, "OldClassTableDef.msi"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
-                });
-
-                result.AssertSuccess();
-
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "DecompiledOldClassTableDef.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
-            }
+            DecompileAndCompare(@"TestData\Class", "OldClassTableDef.msi", "DecompiledOldClassTableDef.wxs");
         }
 
         [Fact]
         public void CanDecompileSequenceTables()
         {
-            var folder = TestData.Get(@"TestData\SequenceTables");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "decompile",
-                    Path.Combine(folder, "SequenceTables.msi"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
-                });
-
-                result.AssertSuccess();
-
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "DecompiledSequenceTables.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
-            }
+            DecompileAndCompare(@"TestData\SequenceTables", "SequenceTables.msi", "DecompiledSequenceTables.wxs");
         }
 
         [Fact]
         public void CanDecompileShortcuts()
         {
-            var folder = TestData.Get(@"TestData\Shortcut");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "decompile",
-                    Path.Combine(folder, "shortcuts.msi"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", outputPath
-                });
-
-                result.AssertSuccess();
-
-                var actual = File.ReadAllText(outputPath);
-                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-                var expected = XDocument.Load(Path.Combine(folder, "DecompiledShortcuts.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
-
-                Assert.Equal(expected, actualFormatted);
-            }
+            DecompileAndCompare(@"TestData\Shortcut", "shortcuts.msi", "DecompiledShortcuts.wxs");
         }
     }
 }

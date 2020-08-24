@@ -3331,7 +3331,7 @@ namespace WixToolset.Core
                             break;
                         }
                         break;
-                    case "ScriptFile":
+                    case "ScriptSourceFile":
                         scriptFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "SuppressModularization":
@@ -3387,7 +3387,7 @@ namespace WixToolset.Core
             {
                 if (String.IsNullOrEmpty(scriptFile))
                 {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ScriptFile", "Script"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ScriptSourceFile", "Script"));
                 }
             }
             else if (CustomActionTargetType.VBScript == targetType) // non-inline vbscript
@@ -3426,7 +3426,7 @@ namespace WixToolset.Core
 
             if (!inlineScript && !String.IsNullOrEmpty(scriptFile))
             {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ScriptFile", "Script"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ScriptSourceFile", "Script"));
             }
 
             if (win64 && CustomActionTargetType.VBScript != targetType && CustomActionTargetType.JScript != targetType)
