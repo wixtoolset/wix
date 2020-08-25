@@ -47,6 +47,7 @@ namespace WixToolset.Converters
         private static readonly XName ConditionElementName = WixNamespace + "Condition";
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
+        private static readonly XName DataElementName = WixNamespace + "Data";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
         private static readonly XName ErrorElementName = WixNamespace + "Error";
         private static readonly XName FeatureElementName = WixNamespace + "Feature";
@@ -137,6 +138,7 @@ namespace WixToolset.Converters
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
                 { WixConverter.ComponentElementName, this.ConvertComponentElement },
+                { WixConverter.DataElementName, this.ConvertDataElement },
                 { WixConverter.DirectoryElementName, this.ConvertDirectoryElement },
                 { WixConverter.FeatureElementName, this.ConvertFeatureElement },
                 { WixConverter.FileElementName, this.ConvertFileElement },
@@ -155,7 +157,6 @@ namespace WixToolset.Converters
                 { WixConverter.PublishElementName, this.ConvertPublishElement },
                 { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
-                { WixConverter.RowElementName, this.ConvertRowElement },
                 { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
                 { WixConverter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
                 { WixConverter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
@@ -719,6 +720,8 @@ namespace WixToolset.Converters
 
         private void ConvertRowElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
+        private void ConvertDataElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
         private void ConvertSequenceElement(XElement element)
         {
             foreach (var child in element.Elements())
@@ -801,7 +804,7 @@ namespace WixToolset.Converters
 
             if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText))
             {
-                if (this.OnError(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptFile' attribute to reference it.", xCustomAction.Name.LocalName))
+                if (this.OnError(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptSourceFile' attribute to reference it.", xCustomAction.Name.LocalName))
                 {
                     var scriptFolder = Path.GetDirectoryName(this.SourceFile) ?? String.Empty;
                     var id = xCustomAction.Attribute("Id")?.Value ?? Guid.NewGuid().ToString("N");
@@ -811,7 +814,7 @@ namespace WixToolset.Converters
                     File.WriteAllText(scriptFile, scriptText);
 
                     RemoveChildren(xCustomAction);
-                    xCustomAction.Add(new XAttribute("ScriptFile", scriptFile));
+                    xCustomAction.Add(new XAttribute("ScriptSourceFile", scriptFile));
                 }
             }
         }

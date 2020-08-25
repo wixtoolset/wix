@@ -60,7 +60,7 @@ namespace WixToolsetTest.Converters
 
             var expected = String.Join(Environment.NewLine,
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomAction Id=\"Foo\" Script=\"jscript\" ScriptFile=\"Foo.js\" />",
+                "  <CustomAction Id=\"Foo\" Script=\"jscript\" ScriptSourceFile=\"Foo.js\" />",
                 "</Wix>");
 
             var expectedScript = String.Join("\n",
