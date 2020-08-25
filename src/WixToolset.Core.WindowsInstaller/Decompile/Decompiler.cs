@@ -3876,7 +3876,7 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     var xRow = new XElement(Names.RowElement);
 
-                    foreach (var field in row.Fields)
+                    foreach (var field in row.Fields.Where(f => f.Data != null))
                     {
                         var xData = new XElement(Names.DataElement,
                             new XAttribute("Column", field.Column.Name),
