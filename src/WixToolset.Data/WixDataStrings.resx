@@ -120,43 +120,10 @@
   <data name="EXP_UnsupportedTable" xml:space="preserve">
     <value>The table {0} is not supported.</value>
   </data>
-  <data name="EXP_MergeTableFileCompressionColumnContainsInvalidValue" xml:space="preserve">
-    <value>A Merge table FileCompression column contains an invalid value '{0}'.</value>
-  </data>
-  <data name="EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue" xml:space="preserve">
-    <value>A Merge table FileCompression column cannot be set to the invalid value '{0}'.</value>
-  </data>
   <data name="EXP_CannotModularizeIllegalID" xml:space="preserve">
     <value>The value '{0}' is not a legal identifier and therefore cannot be modularized.</value>
   </data>
   <data name="EXP_UnknownColumnType" xml:space="preserve">
     <value>Unknown column type: {0}</value>
-  </data>
-  <data name="EXP_MultipleRootElementsFoundInFile" xml:space="preserve">
-    <value>Multiple root elements found in file.</value>
-  </data>
-  <data name="EXP_ISchemaElementDoesnotImplementICreateChildren" xml:space="preserve">
-    <value>ISchemaElement with name {0} does not implement ICreateChildren.</value>
-  </data>
-  <data name="EXP_ISchemaElementDoesnotImplementISetAttribute" xml:space="preserve">
-    <value>ISchemaElement with name {0} does not implement ISetAttributes.</value>
-  </data>
-  <data name="EXP_XmlElementDoesnotHaveISchemaElement" xml:space="preserve">
-    <value>XmlElement with name {0} does not have a corresponding ISchemaElement.</value>
-  </data>
-  <data name="EXP_CollectionMustHaveAtLeastOneElement" xml:space="preserve">
-    <value>Collection has {0} elements. Must have at least one.</value>
-  </data>
-  <data name="EXP_ElementIsSubclassOfDifferentType" xml:space="preserve">
-    <value>Element must be a subclass of {0}, but was of type {1}.</value>
-  </data>
-  <data name="EXP_ElementOfTypeIsNotValidForThisCollection" xml:space="preserve">
-    <value>Element of type {0} is not valid for this collection.</value>
-  </data>
-  <data name="EXP_TypeIsNotValidForThisCollection" xml:space="preserve">
-    <value>Type {0} is not valid for this collection.</value>
-  </data>
-  <data name="EXP_ElementMustBeChoiceItemOrSequenceItem" xml:space="preserve">
-    <value>Element of type {0} found in enumerator. Must be ChoiceItem or SequenceItem.</value>
   </data>
 </root>
