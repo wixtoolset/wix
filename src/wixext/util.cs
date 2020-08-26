@@ -10,6 +10,7 @@
 
 namespace WixToolset.Util.Serialize
 {
+#if TODO_CONSIDER_DECOMPILER
     using System;
     using System.CodeDom.Compiler;
     using System.Collections;
@@ -11458,4 +11459,5 @@ namespace WixToolset.Util.Serialize
             uninstall,
         }
     }
+#endif
 }
