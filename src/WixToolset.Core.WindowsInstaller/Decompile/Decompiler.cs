@@ -3147,7 +3147,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 var progressText = new XElement(Names.ProgressTextElement,
                     new XAttribute("Action", row.FieldAsString(0)),
-                    row.IsColumnNull(1) ? null : new XAttribute("Content", row.FieldAsString(1)),
+                    row.IsColumnNull(1) ? null : new XAttribute("Message", row.FieldAsString(1)),
                     row.IsColumnNull(2) ? null : new XAttribute("Template", row.FieldAsString(2)));
 
                 this.UIElement.Add(progressText);
@@ -4144,7 +4144,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 var xComponent = new XElement(Names.ComponentElement,
                     new XAttribute("Id", row.FieldAsString(0)),
-                    new XAttribute("Guid", row.FieldAsString(1)));
+                    row.IsColumnEmpty(1) ? null : new XAttribute("Guid", row.FieldAsString(1)));
 
                 var attributes = row.FieldAsInteger(3);
 
