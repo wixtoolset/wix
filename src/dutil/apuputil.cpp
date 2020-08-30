@@ -22,7 +22,7 @@ static __callback int __cdecl CompareEntries(
 static HRESULT FilterEntries(
     __in APPLICATION_UPDATE_ENTRY* rgEntries,
     __in DWORD cEntries,
-    __in DWORD64 dw64CurrentVersion,
+    __in VERUTIL_VERSION* pCurrentVersion,
     __inout APPLICATION_UPDATE_ENTRY** prgFilteredEntries,
     __inout DWORD* pcFilteredEntries
     );
@@ -128,7 +128,7 @@ LExit:
 //
 HRESULT DAPI ApupFilterChain(
     __in APPLICATION_UPDATE_CHAIN* pChain,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __out APPLICATION_UPDATE_CHAIN** ppFilteredChain
     )
 {
@@ -140,7 +140,7 @@ HRESULT DAPI ApupFilterChain(
     pNewChain = static_cast<APPLICATION_UPDATE_CHAIN*>(MemAlloc(sizeof(APPLICATION_UPDATE_CHAIN), TRUE));
     ExitOnNull(pNewChain, hr, E_OUTOFMEMORY, "Failed to allocate filtered chain.");
 
-    hr = FilterEntries(pChain->rgEntries, pChain->cEntries, dw64Version, &prgEntries, &cEntries);
+    hr = FilterEntries(pChain->rgEntries, pChain->cEntries, pVersion, &prgEntries, &cEntries);
     ExitOnFailure(hr, "Failed to filter entries by version.");
 
     if (pChain->wzDefaultApplicationId)
@@ -197,6 +197,7 @@ static HRESULT ProcessEntry(
 {
     HRESULT hr = S_OK;
     BOOL fVersionFound = FALSE;
+    int nCompareResult = 0;
 
     // First search the ATOM entry's custom elements to try and find the application update information.
     for (ATOM_UNKNOWN_ELEMENT* pElement = pAtomEntry->pUnknownElements; pElement; pElement = pElement->pNext)
@@ -226,13 +227,8 @@ static HRESULT ProcessEntry(
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"version", -1))
                     {
-                        DWORD dwMajor = 0;
-                        DWORD dwMinor = 0;
-
-                        hr = FileVersionFromString(pAttribute->wzValue, &dwMajor, &dwMinor);
-                        ExitOnFailure(hr, "Failed to parse version string from ATOM entry.");
-
-                        pApupEntry->dw64UpgradeVersion = static_cast<DWORD64>(dwMajor) << 32 | dwMinor;
+                        hr = VerParseVersion(pAttribute->wzValue, 0, FALSE, &pApupEntry->pUpgradeVersion);
+                        ExitOnFailure(hr, "Failed to parse upgrade version string '%ls' from ATOM entry.", pAttribute->wzValue);
                     }
                     else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"exclusive", -1))
                     {
@@ -245,13 +241,9 @@ static HRESULT ProcessEntry(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"version", -1))
             {
-                DWORD dwMajor = 0;
-                DWORD dwMinor = 0;
+                hr = VerParseVersion(pElement->wzValue, 0, FALSE, &pApupEntry->pVersion);
+                ExitOnFailure(hr, "Failed to parse version string '%ls' from ATOM entry.", pElement->wzValue);
 
-                hr = FileVersionFromString(pElement->wzValue, &dwMajor, &dwMinor);
-                ExitOnFailure(hr, "Failed to parse version string from ATOM entry.");
-
-                pApupEntry->dw64Version = static_cast<DWORD64>(dwMajor) << 32 | dwMinor;
                 fVersionFound = TRUE;
             }
         }
@@ -263,7 +255,10 @@ static HRESULT ProcessEntry(
         ExitFunction1(hr = S_FALSE); // skip this update since it has no application id or version.
     }
 
-    if (pApupEntry->dw64UpgradeVersion >= pApupEntry->dw64Version)
+    hr = VerCompareParsedVersions(pApupEntry->pUpgradeVersion, pApupEntry->pVersion, &nCompareResult);
+    ExitOnFailure(hr, "Failed to compare version to upgrade version.");
+
+    if (nCompareResult >= 0)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
         ExitOnRootFailure(hr, "Upgrade version is greater than or equal to application version.");
@@ -404,31 +399,24 @@ LExit:
 
 
 static __callback int __cdecl CompareEntries(
-    void* pvContext,
+    void* /*pvContext*/,
     const void* pvLeft,
     const void* pvRight
     )
 {
-    UNREFERENCED_PARAMETER(pvContext);
-
     int ret = 0;
     const APPLICATION_UPDATE_ENTRY* pEntryLeft = static_cast<const APPLICATION_UPDATE_ENTRY*>(pvLeft);
     const APPLICATION_UPDATE_ENTRY* pEntryRight = static_cast<const APPLICATION_UPDATE_ENTRY*>(pvRight);
 
-    if (pEntryLeft->dw64Version == pEntryRight->dw64Version)
+    VerCompareParsedVersions(pEntryLeft->pVersion, pEntryRight->pVersion, &ret);
+    if (0 == ret)
     {
-        if (pEntryLeft->dw64UpgradeVersion == pEntryRight->dw64UpgradeVersion)
+        VerCompareParsedVersions(pEntryLeft->pUpgradeVersion, pEntryRight->pUpgradeVersion, &ret);
+        if (0 == ret)
         {
-            ret = (pEntryRight->dw64TotalSize < pEntryLeft->dw64TotalSize) ? -1 : 1;
+            ret = (pEntryRight->dw64TotalSize < pEntryLeft->dw64TotalSize) ? -1 :
+                  (pEntryRight->dw64TotalSize > pEntryLeft->dw64TotalSize) ?  1 : 0;
         }
-        else
-        {
-            ret = (pEntryLeft->dw64UpgradeVersion > pEntryRight->dw64UpgradeVersion) ? -1 : 1;
-        }
-    }
-    else
-    {
-        ret = (pEntryLeft->dw64Version > pEntryRight->dw64Version) ? -1 : 1;
     }
 
     return ret;
@@ -438,12 +426,13 @@ static __callback int __cdecl CompareEntries(
 static HRESULT FilterEntries(
     __in APPLICATION_UPDATE_ENTRY* rgEntries,
     __in DWORD cEntries,
-    __in DWORD64 dw64CurrentVersion,
+    __in VERUTIL_VERSION* pCurrentVersion,
     __inout APPLICATION_UPDATE_ENTRY** prgFilteredEntries,
     __inout DWORD* pcFilteredEntries
     )
 {
     HRESULT hr = S_OK;
+    int nCompareResult = 0;
     size_t cbAllocSize = 0;
     const APPLICATION_UPDATE_ENTRY* pRequired = NULL;;
     LPVOID pv = NULL;
@@ -453,8 +442,19 @@ static HRESULT FilterEntries(
         for (DWORD i = 0; i < cEntries; ++i)
         {
             const APPLICATION_UPDATE_ENTRY* pEntry = rgEntries + i;
-            if (((pEntry->fUpgradeExclusive && dw64CurrentVersion > pEntry->dw64UpgradeVersion) || (!pEntry->fUpgradeExclusive && dw64CurrentVersion >= pEntry->dw64UpgradeVersion)) && 
-                dw64CurrentVersion < pEntry->dw64Version)
+
+            hr = VerCompareParsedVersions(pCurrentVersion, pEntry->pVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare versions.");
+
+            if (nCompareResult >= 0)
+            {
+                continue;
+            }
+
+            hr = VerCompareParsedVersions(pCurrentVersion, pEntry->pUpgradeVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare upgrade versions.");
+
+            if (nCompareResult > 0 || (!pEntry->fUpgradeExclusive && nCompareResult == 0))
             {
                 pRequired = pEntry;
                 break;
@@ -486,9 +486,12 @@ static HRESULT FilterEntries(
             hr = CopyEntry(pRequired, *prgFilteredEntries + *pcFilteredEntries - 1);
             ExitOnFailure(hr, "Failed to deep copy entry.");
 
-            if (pRequired->dw64Version < rgEntries[0].dw64Version)
+            hr = VerCompareParsedVersions(pRequired->pVersion, rgEntries[0].pVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare required version.");
+
+            if (nCompareResult < 0)
             {
-                FilterEntries(rgEntries, cEntries, pRequired->dw64Version, prgFilteredEntries, pcFilteredEntries);
+                FilterEntries(rgEntries, cEntries, pRequired->pVersion, prgFilteredEntries, pcFilteredEntries);
             }
         }
     }
@@ -552,8 +555,13 @@ static HRESULT CopyEntry(
     }
 
     pDest->dw64TotalSize = pSrc->dw64TotalSize;
-    pDest->dw64UpgradeVersion = pSrc->dw64UpgradeVersion;
-    pDest->dw64Version = pSrc->dw64Version;
+
+    hr = VerCopyVersion(pSrc->pUpgradeVersion, &pDest->pUpgradeVersion);
+    ExitOnFailure(hr, "Failed to copy upgrade version.");
+
+    hr = VerCopyVersion(pSrc->pVersion, &pDest->pVersion);
+    ExitOnFailure(hr, "Failed to copy version.");
+
     pDest->fUpgradeExclusive = pSrc->fUpgradeExclusive;
 
     hr = ::SizeTMult(sizeof(APPLICATION_UPDATE_ENCLOSURE), pSrc->cEnclosures, &cbAllocSize);
@@ -641,6 +649,8 @@ static void FreeEntry(
         ReleaseStr(pEntry->wzSummary);
         ReleaseStr(pEntry->wzContentType);
         ReleaseStr(pEntry->wzContent);
+        ReleaseVerutilVersion(pEntry->pVersion);
+        ReleaseVerutilVersion(pEntry->pUpgradeVersion);
     }
 }
 

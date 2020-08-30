@@ -46,8 +46,8 @@ struct APPLICATION_UPDATE_ENTRY
 
     LPWSTR wzUpgradeId;
     BOOL fUpgradeExclusive;
-    DWORD64 dw64Version;
-    DWORD64 dw64UpgradeVersion;
+    VERUTIL_VERSION* pVersion;
+    VERUTIL_VERSION* pUpgradeVersion;
 
     DWORD64 dw64TotalSize;
 
@@ -73,7 +73,7 @@ HRESULT DAPI ApupAllocChainFromAtom(
 
 HRESULT DAPI ApupFilterChain(
     __in APPLICATION_UPDATE_CHAIN* pChain,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __out APPLICATION_UPDATE_CHAIN** ppFilteredChain
     );
 

@@ -33,7 +33,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
     __in_z LPCWSTR wzProviderKey,
     __deref_out_z_opt LPWSTR* psczId,
     __deref_out_z_opt LPWSTR* psczName,
-    __out_opt DWORD64* pqwVersion
+    __deref_out_z_opt LPWSTR* psczVersion
     )
 {
     HRESULT hr = S_OK;
@@ -75,9 +75,9 @@ DAPI_(HRESULT) DepGetProviderInformation(
     }
 
     // Get the Version if requested and available.
-    if (pqwVersion)
+    if (psczVersion)
     {
-        hr = RegReadVersion(hkKey, vcszVersionValue, pqwVersion);
+        hr = RegReadString(hkKey, vcszVersionValue, psczVersion);
         if (E_FILENOTFOUND == hr)
         {
             hr = S_OK;

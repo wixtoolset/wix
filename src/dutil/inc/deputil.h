@@ -27,7 +27,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
     __in_z LPCWSTR wzProviderKey,
     __deref_out_z_opt LPWSTR* psczId,
     __deref_out_z_opt LPWSTR* psczName,
-    __out_opt DWORD64* pqwVersion
+    __deref_out_z_opt LPWSTR* psczVersion
     );
 
 /***************************************************************************
