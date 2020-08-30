@@ -49,6 +49,7 @@
     <ClCompile Include="SceUtilTest.cpp" Condition=" Exists('$(SqlCESdkIncludePath)') " />
     <ClCompile Include="StrUtilTest.cpp" />
     <ClCompile Include="UriUtilTest.cpp" />
+    <ClCompile Include="VerUtilTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h" />

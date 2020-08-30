@@ -159,6 +159,9 @@
     <ClCompile Include="userutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="verutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="wiutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -327,6 +330,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\userutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\verutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\wiutil.h">

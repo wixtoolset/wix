@@ -22,6 +22,7 @@
 #include <monutil.h>
 #include <regutil.h>
 #include <uriutil.h>
+#include <verutil.h>
 
 #pragma managed
 #include <vcclr.h>
