@@ -560,9 +560,9 @@ namespace WixToolset.Converters
             if (xAbsent != null &&
                 this.OnError(ConverterTestType.FeatureAbsentAttributeReplaced, element, "The Feature element's Absent attribute has been replaced with the AllowAbsent attribute. Use the 'AllowAbsent' attribute instead."))
             {
-                if (xAbsent.Value == "allow")
+                if (xAbsent.Value == "disallow")
                 {
-                    element.Add(new XAttribute("AllowAbsent", "yes"));
+                    element.Add(new XAttribute("AllowAbsent", "no"));
                 }
                 xAbsent.Remove();
             }
@@ -571,12 +571,12 @@ namespace WixToolset.Converters
             if (xAllowAdvertise != null)
             {
                 if ((xAllowAdvertise.Value == "system" || xAllowAdvertise.Value == "allow") &&
-                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value deprecated. Set the value to 'yes' instead.", xAllowAdvertise.Value))
+                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Set the value to 'yes' instead.", xAllowAdvertise.Value))
                 {
                     xAllowAdvertise.Value = "yes";
                 }
                 else if (xAllowAdvertise.Value == "disallow" &&
-                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value deprecated. Remove the value instead.", xAllowAdvertise.Value))
+                    this.OnError(ConverterTestType.FeatureAllowAdvertiseValueDeprecated, element, "The AllowAdvertise attribute's '{0}' value is deprecated. Remove the value instead.", xAllowAdvertise.Value))
                 {
                     xAllowAdvertise.Remove();
                 }

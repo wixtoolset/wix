@@ -25,7 +25,7 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <Feature AllowAdvertise=\"yes\" AllowAbsent=\"yes\" />",
+                "    <Feature AllowAdvertise=\"yes\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -37,6 +37,38 @@ namespace WixToolsetTest.Converters
 
             var errors = converter.ConvertDocument(document);
             Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixDisallowAttributes()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Feature Absent='disallow' AllowAdvertise='no' />",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Feature AllowAdvertise=\"no\" AllowAbsent=\"no\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);
