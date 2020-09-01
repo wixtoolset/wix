@@ -371,6 +371,10 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[]
                 {
                     "Directory:DUPLICATENAMEANDSHORTNAME\tINSTALLFOLDER\tduplicat",
+                    "Directory:Folder1\tINSTALLFOLDER\tFolder.1",
+                    "Directory:Folder12\tINSTALLFOLDER\tFolder.12",
+                    "Directory:Folder123\tINSTALLFOLDER\tFolder.123",
+                    "Directory:Folder1234\tINSTALLFOLDER\tyakwclwy|Folder.1234",
                     "Directory:INSTALLFOLDER\tProgramFiles6432Folder\t1egc1laj|MsiPackage",
                     "Directory:NAMEANDSHORTNAME\tINSTALLFOLDER\tSHORTNAM|NameAndShortName",
                     "Directory:NAMEANDSHORTSOURCENAME\tINSTALLFOLDER\tNAMEASSN|NameAndShortSourceName",

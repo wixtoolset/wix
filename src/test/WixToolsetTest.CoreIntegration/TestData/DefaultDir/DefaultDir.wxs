@@ -17,6 +17,10 @@
             <Directory Id="NAMEANDSHORTSOURCENAME" Name="NameAndShortSourceName" ShortName="NAMEASSN"></Directory>
             <Directory Id="SHORTNAMEANDLONGSOURCENAME" SourceName="ShortNameAndLongSourceName" Name="SHNALSNM"></Directory>
             <Directory Id="SOURCENAMEWITHSHORTVALUE" SourceName="SRTSRCVL"></Directory>
+            <Directory Id="Folder1" Name="Folder.1"></Directory>
+            <Directory Id="Folder12" Name="Folder.12"></Directory>
+            <Directory Id="Folder123" Name="Folder.123"></Directory>
+            <Directory Id="Folder1234" Name="Folder.1234"></Directory>
         </DirectoryRef>
     </Fragment>
 </Wix>
