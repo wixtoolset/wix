@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -8,18 +7,18 @@
   <Fragment>
     <UIRef Id="WixIIsErrors" />
     <UI>
-      <ProgressText Action="$(var.Prefix)ConfigureIIs$(var.Suffix)">!(loc.ConfigureIIs)</ProgressText>
-      <ProgressText Action="$(var.Prefix)ConfigureIIsExec$(var.Suffix)">!(loc.ConfigureIIsExec)</ProgressText>
-      <ProgressText Action="$(var.Prefix)StartMetabaseTransaction$(var.Suffix)">!(loc.StartMetabaseTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)RollbackMetabaseTransaction$(var.Suffix)">!(loc.RollbackMetabaseTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)CommitMetabaseTransaction$(var.Suffix)">!(loc.CommitMetabaseTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)WriteMetabaseChanges$(var.Suffix)">!(loc.WriteMetabaseChanges)</ProgressText>
+      <ProgressText Action="$(var.Prefix)ConfigureIIs$(var.Suffix)" Message="!(loc.ConfigureIIs)" />
+      <ProgressText Action="$(var.Prefix)ConfigureIIsExec$(var.Suffix)" Message="!(loc.ConfigureIIsExec)" />
+      <ProgressText Action="$(var.Prefix)StartMetabaseTransaction$(var.Suffix)" Message="!(loc.StartMetabaseTransaction)" />
+      <ProgressText Action="$(var.Prefix)RollbackMetabaseTransaction$(var.Suffix)" Message="!(loc.RollbackMetabaseTransaction)" />
+      <ProgressText Action="$(var.Prefix)CommitMetabaseTransaction$(var.Suffix)" Message="!(loc.CommitMetabaseTransaction)" />
+      <ProgressText Action="$(var.Prefix)WriteMetabaseChanges$(var.Suffix)" Message="!(loc.WriteMetabaseChanges)" />
 
-      <ProgressText Action="$(var.Prefix)ConfigureIIs7Exec$(var.Suffix)">!(loc.ConfigureIIs7Exec)</ProgressText>
-      <ProgressText Action="$(var.Prefix)StartIIS7ConfigTransaction$(var.Suffix)">!(loc.StartIIS7ConfigTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)RollbackIIS7ConfigTransaction$(var.Suffix)">!(loc.RollbackIIS7ConfigTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)CommitIIS7ConfigTransaction$(var.Suffix)">!(loc.CommitIIS7ConfigTransaction)</ProgressText>
-      <ProgressText Action="$(var.Prefix)WriteIIS7ConfigChanges$(var.Suffix)">!(loc.WriteIIS7ConfigChanges)</ProgressText>
+      <ProgressText Action="$(var.Prefix)ConfigureIIs7Exec$(var.Suffix)" Message="!(loc.ConfigureIIs7Exec)" />
+      <ProgressText Action="$(var.Prefix)StartIIS7ConfigTransaction$(var.Suffix)" Message="!(loc.StartIIS7ConfigTransaction)" />
+      <ProgressText Action="$(var.Prefix)RollbackIIS7ConfigTransaction$(var.Suffix)" Message="!(loc.RollbackIIS7ConfigTransaction)" />
+      <ProgressText Action="$(var.Prefix)CommitIIS7ConfigTransaction$(var.Suffix)" Message="!(loc.CommitIIS7ConfigTransaction)" />
+      <ProgressText Action="$(var.Prefix)WriteIIS7ConfigChanges$(var.Suffix)" Message="!(loc.WriteIIS7ConfigChanges)" />
     </UI>
 
     <CustomAction Id="$(var.Prefix)ConfigureIIs$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="ConfigureIIs" Execute="immediate" Return="check" SuppressModularization="yes" />
@@ -36,7 +35,7 @@
     <CustomAction Id="$(var.Prefix)WriteIIS7ConfigChanges$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="WriteIIS7ConfigChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)ConfigureIIs$(var.Suffix)" Before="RegisterUser" Overridable="yes">NOT SKIPCONFIGUREIIS AND VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureIIs$(var.Suffix)" Before="RegisterUser" Overridable="yes" Condition="NOT SKIPCONFIGUREIIS AND VersionNT &gt; 400" />
     </InstallExecuteSequence>
   </Fragment>
 
@@ -59,8 +58,8 @@
     <CustomAction Id="$(var.Prefix)RollbackDeleteMachineCertificate$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="UninstallCertificates$(var.Suffix)" Before="RemoveFiles" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="InstallCertificates$(var.Suffix)" After="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="UninstallCertificates$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+      <Custom Action="InstallCertificates$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
     </InstallExecuteSequence>
   </Fragment>
 
