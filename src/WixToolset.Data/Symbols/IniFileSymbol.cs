@@ -85,9 +85,9 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)IniFileSymbolFields.Value, value);
         }
 
-        public InifFileActionType Action
+        public IniFileActionType Action
         {
-            get => (InifFileActionType)this.Fields[(int)IniFileSymbolFields.Action]?.AsNumber();
+            get => (IniFileActionType)this.Fields[(int)IniFileSymbolFields.Action]?.AsNumber();
             set => this.Set((int)IniFileSymbolFields.Action, (int)value);
         }
 

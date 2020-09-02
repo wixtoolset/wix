@@ -2,7 +2,7 @@
 
 namespace WixToolset.Data.Symbols
 {
-    public enum InifFileActionType
+    public enum IniFileActionType
     {
         AddLine,
         AddTag,
