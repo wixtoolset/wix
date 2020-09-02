@@ -606,7 +606,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddIniFileSymbol(IniFileSymbol symbol)
         {
-            var tableName = (InifFileActionType.AddLine == symbol.Action || InifFileActionType.AddTag == symbol.Action || InifFileActionType.CreateLine == symbol.Action) ? "IniFile" : "RemoveIniFile";
+            var tableName = (IniFileActionType.AddLine == symbol.Action || IniFileActionType.AddTag == symbol.Action || IniFileActionType.CreateLine == symbol.Action) ? "IniFile" : "RemoveIniFile";
 
             var name = symbol.FileName;
             if (null == symbol.ShortFileName  && null != name && !Common.IsValidShortFilename(name, false))

@@ -6405,7 +6405,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            InifFileActionType? action = null;
+            IniFileActionType? action = null;
             string directory = null;
             string key = null;
             string name = null;
@@ -6427,16 +6427,16 @@ namespace WixToolset.Core
                         switch (actionValue)
                         {
                             case "addLine":
-                                action = InifFileActionType.AddLine;
+                                action = IniFileActionType.AddLine;
                                 break;
                             case "addTag":
-                                action = InifFileActionType.AddTag;
+                                action = IniFileActionType.AddTag;
                                 break;
                             case "removeLine":
-                                action = InifFileActionType.RemoveLine;
+                                action = IniFileActionType.RemoveLine;
                                 break;
                             case "removeTag":
-                                action = InifFileActionType.RemoveTag;
+                                action = IniFileActionType.RemoveTag;
                                 break;
                             case "": // error case handled by GetAttributeValue()
                                 break;
@@ -6478,7 +6478,7 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
-            else if (InifFileActionType.AddLine == action || InifFileActionType.AddTag == action || InifFileActionType.CreateLine == action)
+            else if (IniFileActionType.AddLine == action || IniFileActionType.AddTag == action || IniFileActionType.CreateLine == action)
             {
                 if (null == value)
                 {
