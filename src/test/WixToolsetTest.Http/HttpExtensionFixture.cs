@@ -19,8 +19,8 @@ namespace WixToolsetTest.Http
             var results = build.BuildAndQuery(Build, "WixHttpUrlAce", "WixHttpUrlReservation");
             Assert.Equal(new[]
             {
-                "WixHttpUrlAce:ace3u9zYtPm8dLIoYgB0bARb0dbB9w\turlt8sDcF469vDrZNldk0moxI25IGM\tNT SERVICE\\TestService\t268435456",
-                "WixHttpUrlReservation:urlt8sDcF469vDrZNldk0moxI25IGM\t0\t\thttp://+:80/vroot/\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "WixHttpUrlAce:aceu5os2gQoblRmzwjt85LQf997uD4\turlO23FkY2xzEY54lY6E6sXFW6glXc\tNT SERVICE\\TestService\t268435456",
+                "WixHttpUrlReservation:urlO23FkY2xzEY54lY6E6sXFW6glXc\t0\t\thttp://+:80/vroot/\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
             }, results);
         }
 

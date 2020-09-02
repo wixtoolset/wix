@@ -47,7 +47,6 @@
     <TargetName>httpca</TargetName>
     <ProjectModuleDefinitionFile>wixhttpca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Http CustomAction</Description>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
