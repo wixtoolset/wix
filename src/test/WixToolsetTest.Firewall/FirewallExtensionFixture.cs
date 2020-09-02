@@ -57,7 +57,7 @@ namespace WixToolsetTest.Firewall
             var results = build.BuildAndQuery(Build, "WixFirewallException");
             Assert.Equal(new[]
             {
-                "WixFirewallException:fexPv9RR1kBvP6gMgWyXMVQkVbopOA\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example outbound firewall\t2",
+                "WixFirewallException:fex.5c8b_4C0THcQTvn8tpwhoRrgck\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example outbound firewall\t2",
             }, results);
         }
 
