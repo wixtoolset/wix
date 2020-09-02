@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -14,11 +13,11 @@
         <CustomAction Id="WixQueryDirectXCaps" BinaryKey="DirectXCA" DllEntry="WixQueryDirectXCaps" Return="ignore" />
         
         <InstallUISequence>
-            <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes">VersionNT &gt; 400</Custom>
+            <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes" Condition="VersionNT &gt; 400" />
         </InstallUISequence>
 
         <InstallExecuteSequence>
-            <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes">VersionNT &gt; 400</Custom>
+            <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
