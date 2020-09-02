@@ -18,8 +18,6 @@
   <Fragment>
     <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
     <Property Id="WIX_IS_NETFRAMEWORK_471_OR_LATER_INSTALLED" Secure="yes" />
-    <SetProperty Id="WIX_IS_NETFRAMEWORK_471_OR_LATER_INSTALLED" Value="1" After="AppSearch">
-      WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx471MinRelease)"
-    </SetProperty>
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_471_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx471MinRelease)&quot;" />
   </Fragment>
 </Wix>

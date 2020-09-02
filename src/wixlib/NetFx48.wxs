@@ -21,13 +21,11 @@
     <Fragment>
         <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
         <Property Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" Secure="yes" />
-        <SetProperty Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" Value="1" After="AppSearch">
-            WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx48MinRelease)"
-        </SetProperty>
+        <SetProperty Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx48MinRelease)&quot;" />
     </Fragment>
 
     <Fragment>
-        <util:RegistrySearchRef Id="NETFRAMEWORK45"/>
+        <util:RegistrySearchRef Id="NETFRAMEWORK45" />
 
         <WixVariable Id="NetFx48WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx48MinRelease)" Overridable="yes" />
         <WixVariable Id="NetFx48WebInstallCondition" Value="" Overridable="yes" />
@@ -68,7 +66,7 @@
     </Fragment>
 
     <Fragment>
-        <util:RegistrySearchRef Id="NETFRAMEWORK45"/>
+        <util:RegistrySearchRef Id="NETFRAMEWORK45" />
 
         <WixVariable Id="NetFx48RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx48MinRelease)" Overridable="yes" />
         <WixVariable Id="NetFx48RedistInstallCondition" Value="" Overridable="yes" />

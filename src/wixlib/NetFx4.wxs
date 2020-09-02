@@ -27,9 +27,7 @@
   <Fragment>
     <PropertyRef Id="NETFRAMEWORK40FULL" />
     <Property Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED" Secure="yes" />
-    <SetProperty Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED" Value="1" After="AppSearch">
-      NETFRAMEWORK40FULL
-    </SetProperty>
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="NETFRAMEWORK40FULL" />
   </Fragment>
 
   <Fragment>
@@ -43,7 +41,7 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40"/>
+    <util:RegistrySearchRef Id="NETFRAMEWORK40" />
 
     <PackageGroup Id="$(var.NetFx40WebId)">
       <ExePackage
@@ -78,7 +76,7 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40"/>
+    <util:RegistrySearchRef Id="NETFRAMEWORK40" />
 
     <PackageGroup Id="$(var.NetFx40RedistId)">
       <ExePackage
@@ -123,7 +121,7 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT"/>
+    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT" />
 
     <PackageGroup Id="$(var.NetFx40ClientWebId)">
       <ExePackage
@@ -158,7 +156,7 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT"/>
+    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT" />
 
     <PackageGroup Id="$(var.NetFx40ClientRedistId)">
       <ExePackage

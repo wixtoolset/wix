@@ -15,10 +15,10 @@
 
     <InstallExecuteSequence>
       <Custom Action="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" Before="InstallFiles" Overridable="yes" />
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" After="MsiPublishAssemblies" Overridable="yes">RollbackDisabled &lt;&gt; 1</Custom>
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" Overridable="yes">RollbackDisabled = 1</Custom>
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" Overridable="yes">RollbackDisabled &lt;&gt; 1</Custom>
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" Overridable="yes">RollbackDisabled = 1</Custom>
+      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" After="MsiPublishAssemblies" Overridable="yes" Condition="RollbackDisabled &lt;&gt; 1" />
+      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
+      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled &lt;&gt; 1" />
+      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
     </InstallExecuteSequence>
   </Fragment>
 
