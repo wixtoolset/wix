@@ -4,6 +4,7 @@ namespace WixToolsetTest.Converters
 {
     using System;
     using System.Xml.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Converters;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
@@ -40,7 +41,7 @@ namespace WixToolsetTest.Converters
             Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
-            CompareLineByLine(expected, actualLines);
+            WixAssert.CompareLineByLine(expected, actualLines);
         }
 
         [Fact]
@@ -73,7 +74,7 @@ namespace WixToolsetTest.Converters
             Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
-            CompareLineByLine(expected, actualLines);
+            WixAssert.CompareLineByLine(expected, actualLines);
         }
     }
 }

@@ -11,12 +11,12 @@ namespace WixToolsetTest.Converters
 
     public abstract class BaseConverterFixture
     {
-        protected static string UnformattedDocumentString(XDocument document)
+        protected static string UnformattedDocumentString(XDocument document, bool omitXmlDeclaration = true)
         {
             var sb = new StringBuilder();
 
             using (var writer = new StringWriter(sb))
-            using (var xml = XmlWriter.Create(writer, new XmlWriterSettings { OmitXmlDeclaration = true }))
+            using (var xml = XmlWriter.Create(writer, new XmlWriterSettings { OmitXmlDeclaration = omitXmlDeclaration }))
             {
                 document.Save(xml);
             }
@@ -24,20 +24,10 @@ namespace WixToolsetTest.Converters
             return sb.ToString().TrimStart();
         }
 
-        protected static string[] UnformattedDocumentLines(XDocument document)
+        protected static string[] UnformattedDocumentLines(XDocument document, bool omitXmlDeclaration = true)
         {
-            var unformatted = UnformattedDocumentString(document);
+            var unformatted = UnformattedDocumentString(document, omitXmlDeclaration);
             return unformatted.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        protected static void CompareLineByLine(string[] expectedLines, string[] actualLines)
-        {
-            for (var i = 0; i < expectedLines.Length; ++i)
-            {
-                Assert.True(actualLines.Length > i, $"{i}: Expected file longer than actual file");
-                Assert.Equal($"{i}: {expectedLines[i]}", $"{i}: {actualLines[i]}");
-            }
-            Assert.True(expectedLines.Length == actualLines.Length, "Actual file longer than expected file");
         }
     }
 }

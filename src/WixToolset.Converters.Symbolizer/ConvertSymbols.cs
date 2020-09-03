@@ -315,7 +315,7 @@ namespace WixToolset.Converters.Symbolizer
                     Section = FieldAsString(row, 3),
                     Key = FieldAsString(row, 4),
                     Value = FieldAsString(row, 5),
-                    Action = action == 3 ? InifFileActionType.AddTag : action == 1 ? InifFileActionType.CreateLine : InifFileActionType.AddLine,
+                    Action = action == 3 ? IniFileActionType.AddTag : action == 1 ? IniFileActionType.CreateLine : IniFileActionType.AddLine,
                     ComponentRef = FieldAsString(row, 7),
                 };
 

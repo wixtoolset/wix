@@ -26,9 +26,9 @@ namespace WixToolset.Converters
                 return Task.FromResult(-1);
             }
 
-            var converter = new WixConverter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
-
             this.ParseSettings(SettingsFileDefault);
+
+            var converter = new WixConverter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
 
             var errors = base.Inspect(Inspector, cancellationToken);
 

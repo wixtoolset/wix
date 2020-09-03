@@ -39,7 +39,7 @@ namespace WixToolsetTest.Converters
             Assert.Equal(2, errors);
 
             var actualLines = UnformattedDocumentLines(document);
-            CompareLineByLine(expected, actualLines);
+            WixAssert.CompareLineByLine(expected, actualLines);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace WixToolsetTest.Converters
             Assert.Equal(0, errors);
 
             var actualLines = UnformattedDocumentLines(document);
-            CompareLineByLine(expected, actualLines);
+            WixAssert.CompareLineByLine(expected, actualLines);
         }
     }
 }

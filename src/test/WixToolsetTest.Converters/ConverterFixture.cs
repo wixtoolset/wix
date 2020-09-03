@@ -40,6 +40,34 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void EnsuresDeclarationWhenIgnored()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-16'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, ignoreErrors: new[] { "DeclarationPresent" } );
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document, omitXmlDeclaration: false);
+
+            Assert.Equal(0, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanConvertMainNamespace()
         {
             var parse = String.Join(Environment.NewLine,

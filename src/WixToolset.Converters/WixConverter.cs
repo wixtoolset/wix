@@ -237,15 +237,12 @@ namespace WixToolset.Converters
             this.Operation = ConvertOperation.Convert;
 
             // Remove the declaration.
-            if (null != document.Declaration)
+            if (null != document.Declaration
+                && this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
             {
-                if (this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
-                {
-                    document.Declaration = null;
-                }
+                document.Declaration = null;
+                TrimLeadingText(document);
             }
-
-            TrimLeadingText(document);
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
@@ -292,15 +289,12 @@ namespace WixToolset.Converters
             this.Operation = ConvertOperation.Format;
 
             // Remove the declaration.
-            if (null != document.Declaration)
+            if (null != document.Declaration
+                && this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
             {
-                if (this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
-                {
-                    document.Declaration = null;
-                }
+                document.Declaration = null;
+                TrimLeadingText(document);
             }
-
-            TrimLeadingText(document);
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
@@ -326,9 +320,11 @@ namespace WixToolset.Converters
 
         private void SaveDocument(XDocument document)
         {
+            var ignoreDeclarationError = this.IgnoreErrors.Contains(ConverterTestType.DeclarationPresent);
+
             try
             {
-                using (var writer = XmlWriter.Create(this.SourceFile, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                using (var writer = XmlWriter.Create(this.SourceFile, new XmlWriterSettings { OmitXmlDeclaration = !ignoreDeclarationError }))
                 {
                     document.Save(writer);
                 }
