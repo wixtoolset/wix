@@ -447,7 +447,7 @@ namespace WixToolset.Sql
             int attributes = 0;
             var rollbackAttribute = false;
             var nonRollbackAttribute = false;
-            string binary = null;
+            string binaryRef = null;
             var sequence = CompilerConstants.IntegerNotSet;
             string user = null;
 
@@ -460,9 +460,9 @@ namespace WixToolset.Sql
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "BinaryKey":
-                            binary = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binary);
+                        case "BinaryRef":
+                            binaryRef = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binaryRef);
                             break;
                         case "Sequence":
                             sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
@@ -575,12 +575,12 @@ namespace WixToolset.Sql
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("ssc", componentId, binary, sqlDb);
+                id = this.ParseHelper.CreateIdentifier("ssc", componentId, binaryRef, sqlDb);
             }
 
-            if (null == binary)
+            if (null == binaryRef)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryKey"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryRef"));
             }
 
             if (null == sqlDb)
@@ -604,7 +604,7 @@ namespace WixToolset.Sql
                 {
                     SqlDbRef = sqlDb,
                     ComponentRef = componentId,
-                    ScriptBinaryRef = binary,
+                    ScriptBinaryRef = binaryRef,
                     UserRef = user,
                     Attributes = attributes,
                 });
