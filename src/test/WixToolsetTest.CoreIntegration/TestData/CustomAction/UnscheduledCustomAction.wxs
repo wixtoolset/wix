@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents">
             <ComponentGroupRef Id="MinimalComponentGroup" />
         </ComponentGroup>
 
         <Binary Id="Binary1" SourceFile="test.txt" />
-        <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" />
+        <CustomAction Id="CustomAction1" DllEntry="InvalidEntryPoint" BinaryRef="Binary1" />
         <CustomAction Id="DiscardOptimismAllBeingsWhoProceed" Error="Abandon hope all ye who enter here." />
-        <CustomAction Id="CustomActionWithHiddenTarget" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" Execute="deferred" HideTarget="yes" />
+        <CustomAction Id="CustomActionWithHiddenTarget" DllEntry="InvalidEntryPoint" Execute="deferred" HideTarget="yes" BinaryRef="Binary1" />
         <CustomAction Id="CustomAction2" Property="TestAdvtExecuteSequenceProperty" Value="1" />
         <AdminExecuteSequence>
             <Custom Action="CustomAction2" After="CostInitialize" />

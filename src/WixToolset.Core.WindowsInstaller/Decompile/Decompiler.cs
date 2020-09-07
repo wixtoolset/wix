@@ -3997,12 +3997,12 @@ namespace WixToolset.Core.WindowsInstaller
                 switch (source)
                 {
                     case WindowsInstallerConstants.MsidbCustomActionTypeBinaryData:
-                        xCustomAction.SetAttributeValue("BinaryKey", row.FieldAsString(2));
+                        xCustomAction.SetAttributeValue("BinaryRef", row.FieldAsString(2));
                         break;
                     case WindowsInstallerConstants.MsidbCustomActionTypeSourceFile:
                         if (!row.IsColumnNull(2))
                         {
-                            xCustomAction.SetAttributeValue("FileKey", row.FieldAsString(2));
+                            xCustomAction.SetAttributeValue("FileRef", row.FieldAsString(2));
                         }
                         break;
                     case WindowsInstallerConstants.MsidbCustomActionTypeDirectory:

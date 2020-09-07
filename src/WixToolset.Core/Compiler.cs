@@ -3159,10 +3159,10 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
-                    case "BinaryKey":
+                    case "BinaryRef":
                         if (null != source)
                         {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.Binary;
@@ -3171,7 +3171,7 @@ namespace WixToolset.Core
                     case "Directory":
                         if (null != source)
                         {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileRef", "Property", "Script"));
                         }
                         source = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
                         sourceType = CustomActionSourceType.Directory;
@@ -3239,10 +3239,10 @@ namespace WixToolset.Core
                             break;
                         }
                         break;
-                    case "FileKey":
+                    case "FileRef":
                         if (null != source)
                         {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.File;
@@ -3268,7 +3268,7 @@ namespace WixToolset.Core
                     case "Property":
                         if (null != source)
                         {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.Property;
@@ -3299,7 +3299,7 @@ namespace WixToolset.Core
                     case "Script":
                         if (null != source)
                         {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
                         }
 
                         if (null != target)
@@ -3394,7 +3394,7 @@ namespace WixToolset.Core
             {
                 if (null == source)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "BinaryKey", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "BinaryRef", "FileRef", "Property"));
                 }
                 else if (CustomActionSourceType.Directory == sourceType)
                 {
@@ -3405,7 +3405,7 @@ namespace WixToolset.Core
             {
                 if (null == source)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "BinaryKey", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "BinaryRef", "FileRef", "Property"));
                 }
                 else if (CustomActionSourceType.Directory == sourceType)
                 {
@@ -3416,7 +3416,7 @@ namespace WixToolset.Core
             {
                 if (null == source)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ExeCommand", "BinaryKey", "Directory", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ExeCommand", "BinaryRef", "Directory", "FileRef", "Property"));
                 }
             }
             else if (CustomActionTargetType.TextData == targetType && CustomActionSourceType.Directory != sourceType && CustomActionSourceType.Property != sourceType && CustomActionSourceType.File != sourceType)

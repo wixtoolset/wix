@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents">
             <ComponentGroupRef Id="MinimalComponentGroup" />
         </ComponentGroup>
 
         <Binary Id="Binary1" SourceFile="test.txt" />
-        <CustomAction Id="Action1" BinaryKey="Binary1" DllEntry="EntryPoint1" />
+        <CustomAction Id="Action1" DllEntry="EntryPoint1" BinaryRef="Binary1" />
 
         <InstallExecuteSequence>
             <Custom Action="Action1" After="InstallFiles" />

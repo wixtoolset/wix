@@ -5,7 +5,7 @@
 
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
-        <CustomAction Id="CAFromExtension" BinaryKey="BinFromWir" DllEntry="DoesntExist" />
+        <CustomAction Id="CAFromExtension" DllEntry="DoesntExist" BinaryRef="BinFromWir" />
 
         <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
             <ComponentGroupRef Id="ProductComponents" />
