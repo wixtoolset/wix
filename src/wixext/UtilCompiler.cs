@@ -2318,7 +2318,7 @@ namespace WixToolset.Util
                 {
                     switch (attrib.Name.LocalName)
                     {
-                        case "BinaryKey":
+                        case "BinaryRef":
                             binaryId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
@@ -2336,7 +2336,7 @@ namespace WixToolset.Util
 
             if (null == binaryId)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryKey"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryRef"));
             }
 
             if (!this.Messaging.EncounteredError)

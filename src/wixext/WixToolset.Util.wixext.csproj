@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
-    <Content Include="util.xsd" PackagePath="tools" />
     <EmbeddedResource Include="$(OutputPath)..\util.wixlib" />
   </ItemGroup>
 

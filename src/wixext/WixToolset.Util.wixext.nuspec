@@ -18,7 +18,6 @@
     <file src="$projectFolder$$id$.targets" target="build" />
 
     <file src="netstandard2.0\$id$.dll" target="tools" />
-    <file src="$projectFolder$util.xsd" target="tools" />
 
     <file src="ARM\*.pdb" target="pdbs\ARM" />
     <file src="ARM64\*.pdb" target="pdbs\ARM64" />
