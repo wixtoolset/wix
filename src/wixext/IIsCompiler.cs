@@ -141,7 +141,7 @@ namespace WixToolset.Iis
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
-            string binaryKey = null;
+            string binaryRef = null;
             string certificatePath = null;
             string name = null;
             string pfxPassword = null;
@@ -157,10 +157,10 @@ namespace WixToolset.Iis
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "BinaryKey":
+                        case "BinaryRef":
                             attributes |= 2; // SCA_CERT_ATTRIBUTE_BINARYDATA
-                            binaryKey = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binaryKey);
+                            binaryRef = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Binary, binaryRef);
                             break;
                         case "CertificatePath":
                             certificatePath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -258,7 +258,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("crt", componentId, binaryKey, certificatePath);
+                id = this.ParseHelper.CreateIdentifier("crt", componentId, binaryRef, certificatePath);
             }
 
             if (null == name)
@@ -276,13 +276,13 @@ namespace WixToolset.Iis
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "StoreName"));
             }
 
-            if (null != binaryKey && null != certificatePath)
+            if (null != binaryRef && null != certificatePath)
             {
-                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryKey", "CertificatePath", certificatePath));
+                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryRef", "CertificatePath", certificatePath));
             }
-            else if (null == binaryKey && null == certificatePath)
+            else if (null == binaryRef && null == certificatePath)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "BinaryKey", "CertificatePath"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "BinaryRef", "CertificatePath"));
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -301,7 +301,7 @@ namespace WixToolset.Iis
                     StoreLocation = storeLocation,
                     StoreName = storeName,
                     Attributes = attributes,
-                    BinaryRef = binaryKey,
+                    BinaryRef = binaryRef,
                     CertificatePath = certificatePath,
                     PFXPassword = pfxPassword,
                 });

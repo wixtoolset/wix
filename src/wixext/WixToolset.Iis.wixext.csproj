@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
-    <Content Include="iis.xsd" PackagePath="tools" />
     <EmbeddedResource Include="$(OutputPath)..\iis.wixlib" />
   </ItemGroup>
 
