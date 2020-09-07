@@ -25,10 +25,10 @@ namespace WixToolsetTest.Converters
 
             var expected = String.Join(Environment.NewLine,
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
+                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
+                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
+                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec\" BinaryRef=\"Wix4UtilCA_X86\" />",
+                "  <CustomAction Id=\"Foo\" DllEntry=\"WixQuietExec64\" BinaryRef=\"Wix4UtilCA_X64\" />",
                 "</Wix>");
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
@@ -40,7 +40,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(7, errors);
+            Assert.Equal(11, errors);
             Assert.Equal(expected, actual);
         }
 

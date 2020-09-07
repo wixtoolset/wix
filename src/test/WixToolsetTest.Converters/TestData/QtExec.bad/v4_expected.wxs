@@ -15,7 +15,7 @@
 
         <Property Id="QtExecCmdTimeout" Value="600000" />
         <CustomAction Id="InstallVSTemplateCommand" Property="WixQuietExecCmdLine" Value="&quot;[VSENVPRODUCT80]\devenv.exe&quot; /setup" />
-        <CustomAction Id="InstallVSTemplate" BinaryKey="Wix4UtilCA_X86" DllEntry="WixQuietExec" Return="asyncWait" />
+        <CustomAction Id="InstallVSTemplate" DllEntry="WixQuietExec" Return="asyncWait" BinaryRef="Wix4UtilCA_X86" />
 
         <Feature Id="Feature_WiX" Title="WiX Toolset" Level="1">
             <Component Id="Licensing" Directory="INSTALLFOLDER">

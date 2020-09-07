@@ -469,7 +469,7 @@ namespace WixToolset.Converters
             if (modularization != null)
             {
                 var camelCaseValue = LowercaseFirstChar(modularization.Value);
-                if (category.Value != camelCaseValue &&
+                if (modularization.Value != camelCaseValue &&
                     this.OnError(ConverterTestType.ColumnModularizeCamelCase, element, "The CustomTable Modularize attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", modularization.Name))
                 {
                     modularization.Value = camelCaseValue;
@@ -759,6 +759,19 @@ namespace WixToolset.Converters
         private void ConvertCustomActionElement(XElement xCustomAction)
         {
             var xBinaryKey = xCustomAction.Attribute("BinaryKey");
+            if (xBinaryKey != null && this.OnError(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
+            {
+                xCustomAction.SetAttributeValue("BinaryRef", xBinaryKey.Value);
+                xBinaryKey.Remove();
+                xBinaryKey = xCustomAction.Attribute("BinaryRef");
+            }
+
+            var xFileKey = xCustomAction.Attribute("FileKey");
+            if (xFileKey != null && this.OnError(ConverterTestType.CustomActionKeysAreNowRefs, xCustomAction, "The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef."))
+            {
+                xCustomAction.SetAttributeValue("FileRef", xFileKey.Value);
+                xFileKey.Remove();
+            }
 
             if (xBinaryKey?.Value == "WixCA" || xBinaryKey?.Value == "UtilCA")
             {
@@ -1282,6 +1295,11 @@ namespace WixToolset.Converters
             /// The string variable type was previously treated as formatted.
             /// </summary>
             AssignVariableTypeFormatted,
+
+            /// <summary>
+            /// The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef.
+            /// </summary>
+            CustomActionKeysAreNowRefs,
         }
     }
 }
