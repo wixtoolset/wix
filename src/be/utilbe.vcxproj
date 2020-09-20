@@ -8,14 +8,6 @@
   <Import Project="..\..\packages\WixToolset.BootstrapperCore.Native.4.0.33\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.33\build\WixToolset.BootstrapperCore.Native.props')" />
   <Import Project="..\..\packages\WixToolset.DUtil.4.0.49\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.49\build\WixToolset.DUtil.props')" />
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|ARM">
-      <Configuration>Debug</Configuration>
-      <Platform>ARM</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|ARM">
-      <Configuration>Release</Configuration>
-      <Platform>ARM</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
       <Platform>ARM64</Platform>
