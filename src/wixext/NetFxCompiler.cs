@@ -145,7 +145,7 @@ namespace WixToolset.Netfx
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "NetFxScheduleNativeImage", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "NetFxScheduleNativeImage", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
             if (!this.Messaging.EncounteredError)
             {
