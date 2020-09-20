@@ -1,4 +1,4 @@
-<Include>
+﻿<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?define msierrSecureObjectsFailedCreateSD = 25520?>
   <?define msierrSecureObjectsFailedSet = 25521?>
   <?define msierrSecureObjectsUnknownType = 25522?>
