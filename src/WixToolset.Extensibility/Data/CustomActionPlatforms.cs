@@ -19,13 +19,7 @@ namespace WixToolset.Extensibility.Data
         /// <summary>x64.</summary>
         X64 = 0x2,
 
-        /// <summary>ia64.</summary>
-        IA64 = 0x4,
-
-        /// <summary>arm.</summary>
-        ARM = 0x8,
-
         /// <summary>arm64.</summary>
-        ARM64 = 0x10
+        ARM64 = 0x4,
     }
 }
