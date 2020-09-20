@@ -300,8 +300,8 @@ namespace WixToolset.Firewall
                     symbol.Attributes = attributes;
                 }
 
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsUninstall", this.Context.Platform, CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
             }
         }
 

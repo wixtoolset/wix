@@ -13,12 +13,12 @@
             <ProgressText Action="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixExecFirewallExceptionsUninstall)" />
         </UI>
 
-        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)FWCA$(var.Suffix)" />
 
         <!--
             We need the firewall on Windows XP SP2 or later.
