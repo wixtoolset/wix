@@ -14,13 +14,13 @@
         </UI>
 
         <!-- The SQL custom actions impersonate the user because the user's credentials are used when connecting to the database if none are provided. -->
-        <CustomAction Id="$(var.Prefix)InstallSqlData$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="InstallSqlData" Execute="immediate" Return="check" />
-        <CustomAction Id="$(var.Prefix)UninstallSqlData$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="UninstallSqlData" Execute="immediate" Return="check" />
-        <CustomAction Id="$(var.Prefix)CreateDatabase$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="CreateDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="$(var.Prefix)RollbackCreateDatabase$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="DropDatabase" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="$(var.Prefix)DropDatabase$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="DropDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="$(var.Prefix)ExecuteSqlStrings$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="$(var.Prefix)RollbackExecuteSqlStrings$(var.Suffix)" BinaryKey="SqlCA$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="$(var.Prefix)InstallSqlData$(var.Suffix)" DllEntry="InstallSqlData" Execute="immediate" Return="check" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)UninstallSqlData$(var.Suffix)" DllEntry="UninstallSqlData" Execute="immediate" Return="check" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)CreateDatabase$(var.Suffix)" DllEntry="CreateDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackCreateDatabase$(var.Suffix)" DllEntry="DropDatabase" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DropDatabase$(var.Suffix)" DllEntry="DropDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)ExecuteSqlStrings$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackExecuteSqlStrings$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
             <Custom Action="$(var.Prefix)UninstallSqlData$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="NOT SKIPUNINSTALLSQLDATA AND VersionNT &gt; 400" />
