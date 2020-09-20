@@ -4,12 +4,18 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
+    <!-- PropertyModularizationSuppressed -->
     <SuppressSpecificWarnings>1086</SuppressSpecificWarnings>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=ARM" />
+    <BindInputPaths Include="$(OutputPath)x86" BindName='x86' />
+    <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
+    <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=ARM64" />
     <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x64" />

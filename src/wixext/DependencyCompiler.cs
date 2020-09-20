@@ -362,7 +362,7 @@ namespace WixToolset.Dependency
 
                 if (PackageType.None == packageType)
                 {
-                    this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyCheck", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+                    this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyCheck", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
 
                     // Generate registry rows for the provider using binder properties.
                     var keyProvides = String.Concat(DependencyCommon.RegistryRoot, key);
@@ -568,7 +568,7 @@ namespace WixToolset.Dependency
 
         private void AddReferenceToWixDependencyRequire(IntermediateSection section, SourceLineNumber sourceLineNumbers)
         {
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyRequire", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "DependencyRequire", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
         }
     }
 }

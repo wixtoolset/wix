@@ -19,7 +19,7 @@ namespace WixToolsetTest.Dependency
             var results = build.BuildAndQuery(Build, "WixDependencyProvider");
             Assert.Equal(new[]
             {
-                "WixDependencyProvider:depJQsOasf1FRUsKxq8THB9sXk8yws\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
+                "WixDependencyProvider:dep74OfIcniaqxA7EprRGBw4Oyy3r8\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
             }, results);
         }
 
