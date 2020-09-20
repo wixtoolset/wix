@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -7,11 +6,11 @@
   <?include caDecor.wxi ?>
 
   <Fragment>
-    <CustomAction Id="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" BinaryKey="$(var.Prefix)NetFxCA$(var.Suffix)" DllEntry="SchedNetFx" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" BinaryKey="$(var.Prefix)NetFxCA$(var.Suffix)" DllEntry="ExecNetFx" Execute="deferred" Impersonate="no" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" BinaryKey="$(var.Prefix)NetFxCA$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)NetFxCA$(var.Suffix)" DllEntry="ExecNetFx" Execute="deferred" Impersonate="no" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)NetFxCA$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" DllEntry="SchedNetFx" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="deferred" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="deferred" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
       <Custom Action="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" Before="InstallFiles" Overridable="yes" />
