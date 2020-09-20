@@ -82,7 +82,7 @@ namespace WixToolset.Core
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
         /// </summary>
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
-        public bool IsCurrentPlatform64Bit => this.Context.Platform == Platform.ARM64 || this.Context.Platform == Platform.IA64 || this.Context.Platform == Platform.X64;
+        public bool IsCurrentPlatform64Bit => this.Context.Platform == Platform.ARM64 || this.Context.Platform == Platform.X64;
 
         /// <summary>
         /// Gets or sets the option to show pedantic messages.
@@ -5639,19 +5639,13 @@ namespace WixToolset.Core
                         case "x64":
                             procArch = "amd64";
                             break;
-                        case "ia64":
-                            procArch = "ia64";
-                            break;
-                        case "arm":
-                            procArch = "arm";
-                            break;
                         case "arm64":
                             procArch = "arm64";
                             break;
                         case "":
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64", "ia64"));
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64"));
                             break;
                         }
                         break;

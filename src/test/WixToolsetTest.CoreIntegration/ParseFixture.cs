@@ -19,10 +19,10 @@ namespace WixToolsetTest.CoreIntegration
             var section = new IntermediateSection("section", SectionType.Fragment, 0);
             var parseHelper = serviceProvider.GetService<IParseHelper>();
 
-            parseHelper.CreateCustomActionReference(null, section, "CustomAction32", Platform.X86, CustomActionPlatforms.X86 | CustomActionPlatforms.ARM);
-            parseHelper.CreateCustomActionReference(null, section, "CustomArmAction", Platform.ARM64, CustomActionPlatforms.X86 | CustomActionPlatforms.ARM);
+            parseHelper.CreateCustomActionReference(null, section, "CustomAction32", Platform.X86, CustomActionPlatforms.X86);
+            parseHelper.CreateCustomActionReference(null, section, "CustomArmAction", Platform.ARM64, CustomActionPlatforms.X86);
             parseHelper.CreateCustomActionReference(null, section, "CustomArmAction", Platform.ARM64, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
-            parseHelper.CreateCustomActionReference(null, section, "CustomAction", Platform.X64, CustomActionPlatforms.X86 | CustomActionPlatforms.ARM);
+            parseHelper.CreateCustomActionReference(null, section, "CustomAction", Platform.X64, CustomActionPlatforms.X86);
             parseHelper.CreateCustomActionReference(null, section, "CustomAction", Platform.X64, CustomActionPlatforms.X86 | CustomActionPlatforms.X64);
 
             var simpleReferences = section.Symbols.OfType<WixSimpleReferenceSymbol>();

@@ -154,14 +154,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 case "x64":
                     return Platform.X64;
 
-                case "Arm":
-                    return Platform.ARM;
-
                 case "Arm64":
                     return Platform.ARM64;
-
-                case "Intel64":
-                    return Platform.IA64;
 
                 case "Intel":
                 default:

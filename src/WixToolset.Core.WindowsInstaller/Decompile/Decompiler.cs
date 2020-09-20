@@ -3011,14 +3011,8 @@ namespace WixToolset.Core.WindowsInstaller
                                         case "Intel":
                                             xPackage.SetAttributeValue("Platform", "x86");
                                             break;
-                                        case "Intel64":
-                                            xPackage.SetAttributeValue("Platform", "ia64");
-                                            break;
                                         case "x64":
                                             xPackage.SetAttributeValue("Platform", "x64");
-                                            break;
-                                        case "Arm":
-                                            xPackage.SetAttributeValue("Platform", "arm");
                                             break;
                                         case "Arm64":
                                             xPackage.SetAttributeValue("Platform", "arm64");

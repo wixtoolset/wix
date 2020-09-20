@@ -642,14 +642,6 @@ namespace WixToolset.Core
                     platform = "x64";
                     msiVersion = 200;
                     break;
-                case Platform.IA64:
-                    platform = "Intel64";
-                    msiVersion = 200;
-                    break;
-                case Platform.ARM:
-                    platform = "Arm";
-                    msiVersion = 500;
-                    break;
                 case Platform.ARM64:
                     platform = "Arm64";
                     msiVersion = 500;
@@ -766,15 +758,6 @@ namespace WixToolset.Core
                         case "x64":
                             platform = "x64";
                             break;
-                        case "intel64":
-                            this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "ia64"));
-                            goto case "ia64";
-                        case "ia64":
-                            platform = "Intel64";
-                            break;
-                        case "arm":
-                            platform = "Arm";
-                            break;
                         case "arm64":
                             platform = "Arm64";
                             break;
@@ -823,13 +806,13 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "InstallPrivileges", "InstallScope"));
             }
 
-            if ((String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) || String.Equals(platform, "Intel64", StringComparison.OrdinalIgnoreCase)) && 200 > msiVersion)
+            if (String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) && 200 > msiVersion)
             {
                 msiVersion = 200;
                 this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
             }
 
-            if ((String.Equals(platform, "Arm", StringComparison.OrdinalIgnoreCase) || String.Equals(platform, "Arm64", StringComparison.OrdinalIgnoreCase)) && 500 > msiVersion)
+            if (String.Equals(platform, "Arm64", StringComparison.OrdinalIgnoreCase) && 500 > msiVersion)
             {
                 msiVersion = 500;
                 this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));

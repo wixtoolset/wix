@@ -138,12 +138,6 @@ namespace WixToolset.Core.ExtensibilityServices
                         suffix = "_X64";
                     }
                     break;
-                case Platform.ARM:
-                    if ((supportedPlatforms & BurnPlatforms.ARM) == BurnPlatforms.ARM)
-                    {
-                        suffix = "_A32";
-                    }
-                    break;
                 case Platform.ARM64:
                     if ((supportedPlatforms & BurnPlatforms.ARM64) == BurnPlatforms.ARM64)
                     {
@@ -905,12 +899,6 @@ namespace WixToolset.Core.ExtensibilityServices
                         if ((supportedPlatforms & CustomActionPlatforms.X64) == CustomActionPlatforms.X64)
                         {
                             suffix = "_X64";
-                        }
-                        break;
-                    case Platform.ARM:
-                        if ((supportedPlatforms & CustomActionPlatforms.ARM) == CustomActionPlatforms.ARM)
-                        {
-                            suffix = "_A32";
                         }
                         break;
                     case Platform.ARM64:

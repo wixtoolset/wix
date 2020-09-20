@@ -238,12 +238,6 @@ namespace WixToolset.Core.ExtensibilityServices
                                 case Platform.X64:
                                     return "x64";
 
-                                case Platform.IA64:
-                                    return "ia64";
-
-                                case Platform.ARM:
-                                    return "arm";
-
                                 case Platform.ARM64:
                                     return "arm64";
 

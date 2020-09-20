@@ -80,7 +80,7 @@ namespace WixToolset.Core.Burn.Bundles
                     // "Elevated privileges are not required to install this package."
                     // in MSI 4.5 and below, if this bit is 0, elevation is required.
                     var perMachine = (0 == (sumInfo.WordCount & 8));
-                    var x64 = (sumInfo.Template.Contains("x64") || sumInfo.Template.Contains("Intel64"));
+                    var x64 = sumInfo.Template.Contains("x64");
 
                     this.Facade.PackageSymbol.PerMachine = perMachine ? YesNoDefaultType.Yes : YesNoDefaultType.No;
                     this.Facade.PackageSymbol.Win64 = x64;
