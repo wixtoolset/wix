@@ -504,7 +504,7 @@ namespace WixToolset.Data
 
         public static Message RequiresMsi500forArmPackage(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.RequiresMsi500forArmPackage, "Package/@InstallerVersion must be 500 or greater for an ARM or ARM64 package. The value will be changed to 500. Please specify a value of 500 or greater in order to eliminate this warning.");
+            return Message(sourceLineNumbers, Ids.RequiresMsi500forArmPackage, "Package/@InstallerVersion must be 500 or greater for an ARM64 package. The value will be changed to 500. Please specify a value of 500 or greater in order to eliminate this warning.");
         }
 
         public static Message ReservedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)

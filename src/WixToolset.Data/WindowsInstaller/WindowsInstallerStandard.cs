@@ -433,13 +433,13 @@ namespace WixToolset.Data.WindowsInstaller
             switch (directoryId)
             {
                 case "CommonFiles6432Folder":
-                    return platform == Platform.X86 || platform == Platform.ARM ? "CommonFilesFolder" : "CommonFiles64Folder";
+                    return platform == Platform.X86 ? "CommonFilesFolder" : "CommonFiles64Folder";
 
                 case "ProgramFiles6432Folder":
-                    return platform == Platform.X86 || platform == Platform.ARM ? "ProgramFilesFolder" : "ProgramFiles64Folder";
+                    return platform == Platform.X86 ? "ProgramFilesFolder" : "ProgramFiles64Folder";
 
                 case "System6432Folder":
-                    return platform == Platform.X86 || platform == Platform.ARM ? "SystemFolder" : "System64Folder";
+                    return platform == Platform.X86 ? "SystemFolder" : "System64Folder";
 
                 default:
                     return directoryId;

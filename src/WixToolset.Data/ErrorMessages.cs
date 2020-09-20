@@ -1324,14 +1324,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidModuleOrBundleVersion, "Invalid {0}/@Version '{1}'. {0} version has a max value of \"65535.65535.65535.65535\" and must be all numeric.", moduleOrBundle, version);
         }
 
-        public static Message InvalidPlatformParameter(string name, string value)
-        {
-            return Message(null, Ids.InvalidPlatformParameter, "The parameter '{0}' is missing or has an invalid value {1}.  Possible values are x86, x64, or ia64.", name, value);
-        }
-
         public static Message InvalidPlatformValue(SourceLineNumber sourceLineNumbers, string value)
         {
-            return Message(sourceLineNumbers, Ids.InvalidPlatformValue, "The Platform attribute has an invalid value {0}.  Possible values are x86, x64, or ia64.", value);
+            return Message(sourceLineNumbers, Ids.InvalidPlatformValue, "The Platform attribute has an invalid value {0}.  Possible values are x86, x64, or arm64.", value);
         }
 
         public static Message InvalidPreprocessorFunction(SourceLineNumber sourceLineNumbers, string variable)

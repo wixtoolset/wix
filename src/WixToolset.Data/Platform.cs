@@ -13,12 +13,6 @@ namespace WixToolset.Data
         /// <summary>x64.</summary>
         X64,
 
-        /// <summary>ia64.</summary>
-        IA64,
-
-        /// <summary>arm.</summary>
-        ARM,
-
         /// <summary>arm64.</summary>
         ARM64,
     }
