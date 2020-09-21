@@ -9,9 +9,9 @@
     <?define NetCoreVersion = 3.1.3?>
     <?include NetCore3_Platform.wxi?>
 
-    <?define AspNetCoreRedistLink = ?>
-    <?define DesktopNetCoreRedistLink = ?>
-    <?define DotNetCoreRedistLink = ?>
+    <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/afec5ced-6298-4e54-add1-1d2e02d950f9/3a8064ac78eaf651c0030e8a96d4bd83/aspnetcore-runtime-3.1.3-win-x86.exe?>
+    <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/7cd5c874-5d11-4e72-81f0-4a005d956708/0eb310169770c893407169fc3abaac4f/windowsdesktop-runtime-3.1.3-win-x86.exe?>
+    <?define DotNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/9afebfd7-7719-4612-b15b-79b67b725b42/b93c5514f58eed2e66fc30d0e88aafcb/dotnet-runtime-3.1.3-win-x86.exe?>
 
     <Fragment>
         <util:DirectorySearchRef Id="$(var.DotNetCoreId)" />
@@ -21,7 +21,6 @@
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <!--
         <PackageGroup Id="$(var.DotNetCoreRedistId)">
             <ExePackage
                 Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
@@ -38,17 +37,16 @@
                 DownloadUrl="$(var.DotNetCoreRedistLink)"
                 LogPathVariable="$(var.DotNetCoreRedistLog)"
                 Compressed="no">
-                TODO: Get RemotePayload info
-                <RemotePayload CertificatePublicKey=""
-                               CertificateThumbprint=""
-                               Description=""
-                               Hash=""
-                               ProductName=""
-                               Size=""
-                               Version=""/>
+                <RemotePayload
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft .NET Core Runtime - 3.1.2 (x86)"
+                    Hash="3A53B9646B32B15D20B0B4EDC8EF9787E00EF490"
+                    ProductName="Microsoft .NET Core Runtime - 3.1.2 (x86)"
+                    Size="23298048"
+                    Version="3.1.2.28517" />
             </ExePackage>
         </PackageGroup>
-        -->
     </Fragment>
 
     <Fragment>
@@ -59,7 +57,6 @@
         <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <!--
         <PackageGroup Id="$(var.AspNetCoreRedistId)">
             <ExePackage
                 Name="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)aspnetcore-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
@@ -76,18 +73,16 @@
                 DownloadUrl="$(var.AspNetCoreRedistLink)"
                 LogPathVariable="$(var.AspNetCoreRedistLog)"
                 Compressed="no">
-                TODO: Get RemotePayload info
                 <RemotePayload
-                  CertificatePublicKey=""
-                  CertificateThumbprint=""
-                  Description=""
-                  Hash=""
-                  ProductName=""
-                  Size=""
-                  Version="" />
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
+                    Hash="42F8DF6AAC1299E05A04B4D2DB3E10D0D1A8E942"
+                    ProductName="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
+                    Size="7157720"
+                    Version="3.1.3.20163" />
             </ExePackage>
         </PackageGroup>
-        -->
     </Fragment>
 
     <Fragment>
@@ -98,7 +93,6 @@
         <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <!--
         <PackageGroup Id="$(var.DesktopNetCoreRedistId)">
             <ExePackage
                 Name="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)windowsdesktop-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
@@ -115,17 +109,15 @@
                 DownloadUrl="$(var.DesktopNetCoreRedistLink)"
                 LogPathVariable="$(var.DesktopNetCoreRedistLog)"
                 Compressed="no">
-                TODO: Get RemotePayload info
                 <RemotePayload
-                  CertificatePublicKey=""
-                  CertificateThumbprint=""
-                  Description=""
-                  Hash=""
-                  ProductName=""
-                  Size=""
-                  Version="" />
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft Windows Desktop Runtime - 3.1.2 (x86)"
+                    Hash="53E9F596F3333EB8576CC237396B5D6A26F98EBE"
+                    ProductName="Microsoft Windows Desktop Runtime - 3.1.2 (x86)"
+                    Size="48525928"
+                    Version="3.1.2.28517" />
             </ExePackage>
         </PackageGroup>
-        -->
     </Fragment>
 </Wix>

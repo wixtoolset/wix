@@ -37,13 +37,14 @@
                 DownloadUrl="$(var.DotNetCoreRedistLink)"
                 LogPathVariable="$(var.DotNetCoreRedistLog)"
                 Compressed="no">
-                <RemotePayload CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                               CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                               Description="Microsoft .NET Core Runtime - 3.1.3 (x64)"
-                               Hash="AE0F5F1E87D687FDFE9FBE0A3BB1B9573FF9DD56"
-                               ProductName="Microsoft .NET Core Runtime - 3.1.3 (x64)"
-                               Size="26117496"
-                               Version="3.1.3.28628"/>
+                <RemotePayload
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft .NET Core Runtime - 3.1.3 (x64)"
+                    Hash="AE0F5F1E87D687FDFE9FBE0A3BB1B9573FF9DD56"
+                    ProductName="Microsoft .NET Core Runtime - 3.1.3 (x64)"
+                    Size="26117496"
+                    Version="3.1.3.28628"/>
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -72,13 +73,14 @@
                 DownloadUrl="$(var.AspNetCoreRedistLink)"
                 LogPathVariable="$(var.AspNetCoreRedistLog)"
                 Compressed="no">
-                <RemotePayload CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                               CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                               Description="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
-                               Hash="E6B175E66DE4662CEF161FF3263A97410E993D18"
-                               ProductName="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
-                               Size="7868592"
-                               Version="3.1.3.20163"/>
+                <RemotePayload
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
+                    Hash="E6B175E66DE4662CEF161FF3263A97410E993D18"
+                    ProductName="Microsoft ASP.NET Core 3.1.3 - Shared Framework"
+                    Size="7868592"
+                    Version="3.1.3.20163"/>
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -107,13 +109,14 @@
                 DownloadUrl="$(var.DesktopNetCoreRedistLink)"
                 LogPathVariable="$(var.DesktopNetCoreRedistLog)"
                 Compressed="no">
-                <RemotePayload CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                               CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                               Description="Microsoft Windows Desktop Runtime - 3.1.3 (x64)"
-                               Hash="9A965A63214627F2C9B3A38E402B561BFD275422"
-                               ProductName="Microsoft Windows Desktop Runtime - 3.1.3 (x64)"
-                               Size="54449000"
-                               Version="3.1.3.28628"/>
+                <RemotePayload
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft Windows Desktop Runtime - 3.1.3 (x64)"
+                    Hash="9A965A63214627F2C9B3A38E402B561BFD275422"
+                    ProductName="Microsoft Windows Desktop Runtime - 3.1.3 (x64)"
+                    Size="54449000"
+                    Version="3.1.3.28628"/>
             </ExePackage>
         </PackageGroup>
     </Fragment>

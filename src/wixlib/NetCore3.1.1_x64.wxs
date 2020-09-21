@@ -11,7 +11,7 @@
 
     <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/fa469b98-e312-4744-9dab-a46d2242b0ab/ae5e1eb530e312d68b501b7dd03d4c00/aspnetcore-runtime-3.1.1-win-x64.exe?>
     <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/a1d41522-4da0-42bc-b3f2-e4b7d842974d/03101425368c87c55c1fe7cafbb4e0fb/windowsdesktop-runtime-3.1.1-win-x64.exe?>
-    <?define DotNetCoreRedistLink = ?>
+    <?define DotNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/fda71c5b-ee58-4919-95dc-4f32dbebd2cd/97ffe3880a25f5f7cae1a7e40cd3509e/dotnet-runtime-3.1.1-win-x64.exe?>
 
     <Fragment>
         <util:DirectorySearchRef Id="$(var.DotNetCoreId)" />
@@ -21,7 +21,6 @@
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
         <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <!--
         <PackageGroup Id="$(var.DotNetCoreRedistId)">
             <ExePackage
                 Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
@@ -38,17 +37,16 @@
                 DownloadUrl="$(var.DotNetCoreRedistLink)"
                 LogPathVariable="$(var.DotNetCoreRedistLog)"
                 Compressed="no">
-                TODO: Get RemotePayload info
-                <RemotePayload CertificatePublicKey=""
-                               CertificateThumbprint=""
-                               Description=""
-                               Hash=""
-                               ProductName=""
-                               Size=""
-                               Version=""/>
+                <RemotePayload
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft .NET Core Runtime - 3.1.1 (x64)"
+                    Hash="B9E2166EDDEFAA4D7543F24A2E7CD76C35D4E617"
+                    ProductName="Microsoft .NET Core Runtime - 3.1.1 (x64)"
+                    Size="26055096"
+                    Version="3.1.1.28408" />
             </ExePackage>
         </PackageGroup>
-        -->
     </Fragment>
 
     <Fragment>
@@ -76,13 +74,13 @@
                 LogPathVariable="$(var.AspNetCoreRedistLog)"
                 Compressed="no">
                 <RemotePayload
-                  CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                  CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                  Description="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
-                  Hash="6614D5792D9335632D66C3EB7DE942A7AE10D6BE"
-                  ProductName="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
-                  Size="7867488"
-                  Version="3.1.1.19615"/>
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
+                    Hash="6614D5792D9335632D66C3EB7DE942A7AE10D6BE"
+                    ProductName="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
+                    Size="7867488"
+                    Version="3.1.1.19615"/>
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -112,13 +110,13 @@
                 LogPathVariable="$(var.DesktopNetCoreRedistLog)"
                 Compressed="no">
                 <RemotePayload
-                  CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                  CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                  Description="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
-                  Hash="AE723619D9CD6407F3D4B4948DF4F026A99781DC"
-                  ProductName="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
-                  Size="54211664"
-                  Version="3.1.1.28408"/>
+                    CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
+                    CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
+                    Description="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
+                    Hash="AE723619D9CD6407F3D4B4948DF4F026A99781DC"
+                    ProductName="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
+                    Size="54211664"
+                    Version="3.1.1.28408"/>
             </ExePackage>
         </PackageGroup>
     </Fragment>
