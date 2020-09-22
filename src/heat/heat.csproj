@@ -3,8 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Harvester</Description>
     <Title>WiX Harvester</Title>
@@ -23,6 +22,10 @@
 
   <ItemGroup>
     <Compile Include="..\wix\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net461' and '$(OS)' != 'Windows_NT'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
