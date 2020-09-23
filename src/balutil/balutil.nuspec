@@ -23,11 +23,9 @@
     <file src="..\..\build\$configuration$\v140\x64\balutil.lib" target="build\native\v140\x64" />
     <file src="..\..\build\$configuration$\v141\x86\balutil.lib" target="build\native\v141\x86" />
     <file src="..\..\build\$configuration$\v141\x64\balutil.lib" target="build\native\v141\x64" />
-    <file src="..\..\build\$configuration$\v141\ARM\balutil.lib" target="build\native\v141\ARM" />
     <file src="..\..\build\$configuration$\v141\ARM64\balutil.lib" target="build\native\v141\ARM64" />
     <file src="..\..\build\$configuration$\v142\x86\balutil.lib" target="build\native\v142\x86" />
     <file src="..\..\build\$configuration$\v142\x64\balutil.lib" target="build\native\v142\x64" />
-    <file src="..\..\build\$configuration$\v142\ARM\balutil.lib" target="build\native\v142\ARM" />
     <file src="..\..\build\$configuration$\v142\ARM64\balutil.lib" target="build\native\v142\ARM64" />
   </files>
 </package>
