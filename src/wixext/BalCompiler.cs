@@ -280,7 +280,7 @@ namespace WixToolset.Bal
         private void ParseConditionElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
-            var condition = this.ParseHelper.GetConditionInnerText(node); // condition is the inner text of the element.
+            string condition = null;
             string message = null;
 
             foreach (var attrib in node.Attributes())
@@ -291,6 +291,9 @@ namespace WixToolset.Bal
                     {
                         case "Message":
                             message = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
