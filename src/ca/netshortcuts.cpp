@@ -219,6 +219,8 @@ static HRESULT CreateUrl(
 
     if (wzIconPath)
     {
+        WcaLog(LOGMSG_STANDARD, "Adding icon '%ls' index '%d'", wzIconPath, iconIndex);
+
         hr = piURL->QueryInterface(IID_IPropertySetStorage, (void **)&piProperties);
         ExitOnFailure(hr, "failed to get IPropertySetStorage for shortcut '%ls'", wzShortcutPath);
 
@@ -234,7 +236,7 @@ static HRESULT CreateUrl(
         ppvar[0].vt = VT_I4;
         ppvar[0].lVal = iconIndex;
         ppvar[1].vt = VT_LPWSTR;
-        ppvar[1].pwszVal = (LPWSTR)wzIconPath;
+        ppvar[1].pwszVal = const_cast<LPWSTR>(wzIconPath);
 
         hr = piStorage->WriteMultiple(2, ppids, ppvar, 0);
         ExitOnFailure(hr, "failed to write icon storage for shortcut '%ls'", wzShortcutPath);
@@ -285,6 +287,7 @@ static HRESULT CreateLink(
 
     if (wzIconPath)
     {
+        WcaLog(LOGMSG_STANDARD, "Adding icon '%ls' index '%d'", wzIconPath, iconIndex);
         hr = piShellLink->SetIconLocation(wzIconPath, iconIndex);
         ExitOnFailure(hr, "failed to set icon for shortcut '%ls'", wzShortcutPath);
     }

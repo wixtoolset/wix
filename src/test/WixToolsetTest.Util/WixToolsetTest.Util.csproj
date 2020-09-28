@@ -27,10 +27,14 @@
     <Content Include="TestData\CloseApplication\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CloseApplication\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CloseApplication\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcut\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InternetShortcut\Package.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InternetShortcut\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InternetShortcut\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InternetShortcut\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InternetShortcutModule\Package.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InternetShortcutModule\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InternetShortcutModule\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InternetShortcutModule\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PermissionEx\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PermissionEx\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PermissionEx\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

@@ -100,7 +100,7 @@ namespace WixToolset.Util
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Name used for shortcut.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Target", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "URL target."),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, description: "Attribute flags that control how the shortcut is created."),
-                new ColumnDefinition("IconFile", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Icon file for shortcut"),
+                new ColumnDefinition("IconFile", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Icon file for shortcut", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("IconIndex", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Index of the icon being referenced."),
             },
             symbolIdIsPrimaryKey: true
