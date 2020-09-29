@@ -6,29 +6,9 @@
             <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" />
         </BootstrapperApplicationRef>
         <Chain>
-            <PackageGroupRef Id="AspNetCoreRuntime310Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime310Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime310Redist_x64" />
-
-            <PackageGroupRef Id="AspNetCoreRuntime311Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime311Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime311Redist_x64" />
-
-            <PackageGroupRef Id="AspNetCoreRuntime312Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime312Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime312Redist_x64" />
-
-            <PackageGroupRef Id="AspNetCoreRuntime313Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime313Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime313Redist_x64" />
-
-            <PackageGroupRef Id="AspNetCoreRuntime314Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime314Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime314Redist_x64" />
-
-            <PackageGroupRef Id="AspNetCoreRuntime31LatestRedist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime31LatestRedist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime31LatestRedist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime31Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime31Redist_x64" />
+            <PackageGroupRef Id="DotNetCoreRuntime31Redist_x64" />
         </Chain>
     </Bundle>
 </Wix>
