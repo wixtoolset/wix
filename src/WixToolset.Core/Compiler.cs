@@ -3382,6 +3382,8 @@ namespace WixToolset.Core
                 win64 = true;
             }
 
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
@@ -5348,6 +5350,8 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
+
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (CompilerConstants.IntegerNotSet == id)
             {
@@ -7598,7 +7602,7 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Parses a condition element.
+        /// Parses a Level element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="featureId">Id of the parent Feature element.</param>

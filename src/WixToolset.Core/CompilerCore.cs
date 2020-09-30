@@ -1086,6 +1086,15 @@ namespace WixToolset.Core
             return this.parseHelper.ScheduleActionSymbol(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
         }
 
+        internal void VerifyNoInnerText(SourceLineNumber sourceLineNumbers, XElement element)
+        {
+            var innerText = Common.GetInnerText(element);
+            if (!String.IsNullOrWhiteSpace(innerText))
+            {
+                this.messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
+            }
+        }
+
         private static string CreateValueList(ValueListKind kind, IEnumerable<string> values)
         {
             // Ideally, we could denote the list kind (and the list itself) directly in the

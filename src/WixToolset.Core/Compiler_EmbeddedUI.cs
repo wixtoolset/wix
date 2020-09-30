@@ -80,6 +80,8 @@ namespace WixToolset.Core
                 }
             }
 
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+
             if (null == id)
             {
                 id = this.Core.CreateIdentifier("mec", source, type.ToString());

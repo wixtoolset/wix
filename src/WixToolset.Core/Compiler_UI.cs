@@ -700,6 +700,8 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
@@ -745,6 +747,8 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
+
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (null == id)
             {
@@ -1422,6 +1426,8 @@ namespace WixToolset.Core
                             }
                         }
 
+                        this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
                         {
                             this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "SourceFile", "Value"));
@@ -1688,6 +1694,8 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
+
+            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (null == control)
             {
