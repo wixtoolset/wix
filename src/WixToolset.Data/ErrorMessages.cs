@@ -2284,6 +2284,11 @@ namespace WixToolset.Data
             return Message(null, Ids.UnknownSymbolType, "Could not deserialize symbol of type type '{0}' because it is not a standard symbol type or one provided by a loaded extension.", symbolName);
         }
 
+        public static Message IllegalInnerText(SourceLineNumber sourceLineNumbers, string elementName, string innerText)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalInnerText, "The {0} element contains illegal inner text: '{1}'.", elementName, innerText);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2686,6 +2691,7 @@ namespace WixToolset.Data
             MissingBundleSearch = 397,
             CircularSearchReference = 398,
             UnknownSymbolType = 399,
+            IllegalInnerText = 400,
         }
     }
 }
