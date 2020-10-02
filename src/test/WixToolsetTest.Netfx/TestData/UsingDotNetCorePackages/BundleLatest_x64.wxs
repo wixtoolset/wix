@@ -6,9 +6,9 @@
             <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" />
         </BootstrapperApplicationRef>
         <Chain>
-            <PackageGroupRef Id="AspNetCoreRuntime318Redist_x64" />
-            <PackageGroupRef Id="DesktopNetCoreRuntime318Redist_x64" />
-            <PackageGroupRef Id="DotNetCoreRuntime318Redist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime31Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime31Redist_x64" />
+            <PackageGroupRef Id="DotNetCoreRuntime31Redist_x64" />
         </Chain>
     </Bundle>
 </Wix>
