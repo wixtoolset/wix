@@ -4,6 +4,7 @@ namespace WixToolset.Core
 { 
     using System.Collections.Generic;
     using System.Xml.Linq;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
     internal class DecompileResult : IDecompileResult
@@ -11,5 +12,7 @@ namespace WixToolset.Core
         public XDocument Document { get; set; }
 
         public IEnumerable<string> ExtractedFilePaths { get; set; }
+
+        public Platform? Platform { get; set; }
     }
 }

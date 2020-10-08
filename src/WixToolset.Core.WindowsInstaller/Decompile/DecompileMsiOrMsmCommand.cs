@@ -6,8 +6,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
+    using System.Linq;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -41,12 +43,14 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         Directory.Delete(this.Context.ExtractFolder, true);
                     }
 
-                    var unbindCommand = new UnbindDatabaseCommand(this.Messaging, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, false, skipSummaryInfo: false);
+                    var unbindCommand = new UnbindDatabaseCommand(this.Messaging, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, suppressDemodularization: false, skipSummaryInfo: false);
                     var output = unbindCommand.Execute();
                     var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);
 
                     var decompiler = new Decompiler(this.Messaging, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
                     result.Document = decompiler.Decompile(output);
+
+                    result.Platform = GetPlatformFromOutput(output);
 
                     // extract the files from the cabinets
                     if (!String.IsNullOrEmpty(this.Context.ExtractFolder) && !this.Context.SuppressExtractCabinets)
@@ -76,6 +80,14 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             return result;
+        }
+
+        private static Platform? GetPlatformFromOutput(WindowsInstallerData output)
+        {
+            var template = output.Tables["_SummaryInformation"]?.Rows.SingleOrDefault(row => row.FieldAsInteger(0) == 7)?.FieldAsString(1);
+
+            return Decompiler.GetPlatformFromTemplateSummaryInformation(template?.Split(';'));
+
         }
     }
 }

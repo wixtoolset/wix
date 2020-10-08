@@ -93,7 +93,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         private string ModularizationGuid { get; set; }
 
-        public XElement UIElement
+        private XElement UIElement
         {
             get
             {
@@ -107,12 +107,11 @@ namespace WixToolset.Core.WindowsInstaller
             }
         }
 
-        public Dictionary<string, XElement> Singletons { get; } = new Dictionary<string, XElement>();
+        private Dictionary<string, XElement> Singletons { get; } = new Dictionary<string, XElement>();
 
-        public Dictionary<string, XElement> IndexedElements { get; } = new Dictionary<string, XElement>();
+        private Dictionary<string, XElement> IndexedElements { get; } = new Dictionary<string, XElement>();
 
-        public Dictionary<string, XElement> PatchTargetFiles { get; } = new Dictionary<string, XElement>();
-
+        private Dictionary<string, XElement> PatchTargetFiles { get; } = new Dictionary<string, XElement>();
 
         /// <summary>
         /// Decompile the database file.
@@ -215,12 +214,30 @@ namespace WixToolset.Core.WindowsInstaller
         }
 #endif
 
+        internal static Platform? GetPlatformFromTemplateSummaryInformation(string[] template)
+        {
+            if (null != template && 1 < template.Length && null != template[0] && 0 < template[0].Length)
+            {
+                switch (template[0])
+                {
+                    case "Intel":
+                        return Platform.X86;
+                    case "x64":
+                        return Platform.X64;
+                    case "Arm64":
+                        return Platform.ARM64;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Gets the element corresponding to the row it came from.
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        public XElement GetIndexedElement(WixToolset.Data.WindowsInstaller.Row row) => this.GetIndexedElement(row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        private XElement GetIndexedElement(WixToolset.Data.WindowsInstaller.Row row) => this.GetIndexedElement(row.TableDefinition.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
 
         /// <summary>
         /// Gets the element corresponding to the primary key of the given table.
@@ -228,7 +245,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="table">The table corresponding to the element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        public XElement GetIndexedElement(string table, params string[] primaryKey) => this.IndexedElements[String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey))];
+        private XElement GetIndexedElement(string table, params string[] primaryKey) => this.IndexedElements[String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey))];
 
         /// <summary>
         /// Gets the element corresponding to the primary key of the given table.
@@ -236,7 +253,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="table">The table corresponding to the element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        public bool TryGetIndexedElement(WixToolset.Data.WindowsInstaller.Row row, out XElement xElement) => this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
+        private bool TryGetIndexedElement(WixToolset.Data.WindowsInstaller.Row row, out XElement xElement) => this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
 
         /// <summary>
         /// Gets the element corresponding to the primary key of the given table.
@@ -244,14 +261,14 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="table">The table corresponding to the element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        public bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey) => this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
+        private bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey) => this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
 
         /// <summary>
         /// Index an element by its corresponding row.
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <param name="element">The element to index.</param>
-        public void IndexElement(WixToolset.Data.WindowsInstaller.Row row, XElement element)
+        private void IndexElement(WixToolset.Data.WindowsInstaller.Row row, XElement element)
         {
             this.IndexedElements.Add(String.Concat(row.TableDefinition.Name, ':', row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)), element);
         }
@@ -261,7 +278,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <param name="element">The element to index.</param>
-        public void IndexElement(XElement element, string table, params string[] primaryKey)
+        private void IndexElement(XElement element, string table, params string[] primaryKey)
         {
             this.IndexedElements.Add(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), element);
         }
@@ -3004,20 +3021,10 @@ namespace WixToolset.Core.WindowsInstaller
                                     xPackage.SetAttributeValue("Languages", template[template.Length - 1]);
                                 }
 
-                                if (1 < template.Length && null != template[0] && 0 < template[0].Length)
+                                var platform = GetPlatformFromTemplateSummaryInformation(template).ToString().ToLowerInvariant();
+                                if (!String.IsNullOrEmpty(platform))
                                 {
-                                    switch (template[0])
-                                    {
-                                        case "Intel":
-                                            xPackage.SetAttributeValue("Platform", "x86");
-                                            break;
-                                        case "x64":
-                                            xPackage.SetAttributeValue("Platform", "x64");
-                                            break;
-                                        case "Arm64":
-                                            xPackage.SetAttributeValue("Platform", "arm64");
-                                            break;
-                                    }
+                                    xPackage.SetAttributeValue("Platform", platform);
                                 }
                                 break;
                             case 9:
