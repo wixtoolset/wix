@@ -4,11 +4,14 @@ namespace WixToolset.Extensibility.Data
 {
     using System.Collections.Generic;
     using System.Xml.Linq;
+    using WixToolset.Data;
 
     public interface IDecompileResult
     {
         XDocument Document { get; set; }
 
         IEnumerable<string> ExtractedFilePaths { get; set; }
+
+        Platform? Platform { get; set; }
     }
 }
