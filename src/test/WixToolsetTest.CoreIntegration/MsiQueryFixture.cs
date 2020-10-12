@@ -590,6 +590,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "InstallExecuteSequence:CostFinalize\t\t1000",
                     "InstallExecuteSequence:CostInitialize\t\t800",
+                    "InstallExecuteSequence:CreateFolders\t\t3700",
                     "InstallExecuteSequence:FileCost\t\t900",
                     "InstallExecuteSequence:FindRelatedProducts\t\t25",
                     "InstallExecuteSequence:InstallFiles\t\t4000",
@@ -605,6 +606,7 @@ namespace WixToolsetTest.CoreIntegration
                     "InstallExecuteSequence:RegisterUser\t\t6000",
                     "InstallExecuteSequence:RemoveExistingProducts\t\t1401",
                     "InstallExecuteSequence:RemoveFiles\t\t3500",
+                    "InstallExecuteSequence:RemoveFolders\t\t3600",
                     "InstallExecuteSequence:UnpublishFeatures\t\t1800",
                     "InstallExecuteSequence:ValidateProductID\t\t700",
                 }, results);

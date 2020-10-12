@@ -425,6 +425,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/RegisterComPlus");
                         set.Add("InstallExecuteSequence/UnregisterComPlus");
                         break;
+                    case SymbolDefinitionType.Component:
                     case SymbolDefinitionType.CreateFolder:
                         set.Add("InstallExecuteSequence/CreateFolders");
                         set.Add("InstallExecuteSequence/RemoveFolders");
