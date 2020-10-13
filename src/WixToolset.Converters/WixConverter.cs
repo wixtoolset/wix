@@ -680,10 +680,10 @@ namespace WixToolset.Converters
                 }
             }
 
-            var xCondition = element.Element(ConditionElementName);
-            if (xCondition != null)
+            var xConditions = element.Elements(ConditionElementName).ToList();
+            foreach (var xCondition in xConditions)
             {
-                var message = element.Attribute("Message")?.Value;
+                var message = xCondition.Attribute("Message")?.Value;
 
                 if (!String.IsNullOrEmpty(message) &&
                     TryGetInnerText(xCondition, out var text) &&

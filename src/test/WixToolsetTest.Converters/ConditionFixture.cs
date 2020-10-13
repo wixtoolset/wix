@@ -214,6 +214,44 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixLaunchConditionInProduct()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Product>",
+                "    <Condition Message='Stop the install'>",
+                "      1&lt;2",
+                "    </Condition>",
+                "    <Condition Message='Do not stop'>",
+                "      1=2",
+                "    </Condition>",
+                "  </Product>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Product>",
+                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
+                "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
+                "  </Product>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
         public void FixPermissionExCondition()
         {
             var parse = String.Join(Environment.NewLine,
