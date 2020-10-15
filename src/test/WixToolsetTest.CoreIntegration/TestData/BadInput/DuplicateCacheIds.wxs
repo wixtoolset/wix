@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage Id="Manual1" SourceFile="burn.exe" Name="manual1\burn.exe" CacheId="Manual" />
+            <ExePackage Id="Manual2" SourceFile="burn.exe" Name="manual2\burn.exe" CacheId="Manual" />
+        </PackageGroup>
+    </Fragment>
+</Wix>

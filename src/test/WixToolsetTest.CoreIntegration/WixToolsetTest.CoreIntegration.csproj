@@ -23,6 +23,8 @@
     <Content Include="TestData\AppSearch\RegistrySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BadEnsureTable\BadEnsureTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BadInput\BundleVariable.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BadInput\DuplicateCacheIds.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BadInput\DuplicatePayloadNames.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BadInput\RegistryKey.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BindVariables\DefaultedVariable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BindVariables\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
