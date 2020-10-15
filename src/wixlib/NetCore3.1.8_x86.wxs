@@ -76,10 +76,10 @@
                 <RemotePayload
                     CertificatePublicKey="3756E9BBF4461DCD0AA68E0D1FCFFA9CEA47AC18"
                     CertificateThumbprint="2485A7AFA98E178CB8F30C9838346B514AEA4769"
-                    Description="Microsoft .NET Core Runtime - 3.1.8 (x86)"
-                    Hash="E3B05751BA0E48D81EF3EB60DABFC6388BAA5E91"
-                    ProductName="Microsoft .NET Core Runtime - 3.1.8 (x86)"
-                    Size="23183576"
+                    Description="Microsoft Windows Desktop Runtime - 3.1.8 (x86)"
+                    Hash="6105823D7417C265929DF2978A7214E7394E404F"
+                    ProductName="Microsoft Windows Desktop Runtime - 3.1.8 (x86)"
+                    Size="48377976"
                     Version="3.1.8.29220" />
             </ExePackage>
         </PackageGroup>

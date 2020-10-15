@@ -62,56 +62,6 @@ namespace WixToolsetTest.Netfx
         }
 
         [Fact]
-        public void CanBuildUsingDotNetCorePackages()
-        {
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
-
-                Assert.True(File.Exists(bundleFile));
-            }
-        }
-
-        [Fact]
-        public void CanBuildUsingDotNetCorePackages_X64()
-        {
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "Bundle_x64.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", bundleFile,
-                });
-                compileResult.AssertSuccess();
-
-                Assert.True(File.Exists(bundleFile));
-            }
-        }
-
-        [Fact]
         public void CanBuildUsingNativeImage()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");
