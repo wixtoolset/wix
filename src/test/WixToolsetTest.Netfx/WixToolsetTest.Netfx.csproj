@@ -12,7 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\UsingDotNetCorePackages\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingDotNetCorePackages\BundleLatest.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingDotNetCorePackages\BundleLatest_x64.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
