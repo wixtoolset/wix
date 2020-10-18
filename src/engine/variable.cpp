@@ -268,7 +268,7 @@ extern "C" HRESULT VariableInitialize(
         {BURN_BUNDLE_SOURCE_PROCESS_FOLDER, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_TAG, InitializeVariableString, (DWORD_PTR)L"", FALSE, TRUE},
         {BURN_BUNDLE_UILEVEL, InitializeVariableNumeric, 0, FALSE, TRUE},
-        {BURN_BUNDLE_VERSION, InitializeVariableVersion, 0, FALSE, TRUE},
+        {BURN_BUNDLE_VERSION, InitializeVariableVersion, (DWORD_PTR)L"0", FALSE, TRUE},
     };
 
     for (DWORD i = 0; i < countof(vrgBuiltInVariables); ++i)
@@ -561,11 +561,11 @@ LExit:
     return hr;
 }
 
-// The contents of pqwValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
+// The contents of ppValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
 extern "C" HRESULT VariableGetVersion(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __in DWORD64* pqwValue
+    __in VERUTIL_VERSION** ppValue
     )
 {
     HRESULT hr = S_OK;
@@ -584,7 +584,7 @@ extern "C" HRESULT VariableGetVersion(
     }
     ExitOnFailure(hr, "Failed to get value of variable: %ls", wzVariable);
 
-    hr = BVariantGetVersion(&pVariable->Value, pqwValue);
+    hr = BVariantGetVersion(&pVariable->Value, ppValue);
     ExitOnFailure(hr, "Failed to get value as version for variable: %ls", wzVariable);
 
 LExit:
@@ -701,14 +701,14 @@ extern "C" HRESULT VariableSetString(
 extern "C" HRESULT VariableSetVersion(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __in DWORD64 qwValue,
+    __in VERUTIL_VERSION* pValue,
     __in BOOL fOverwriteBuiltIn
     )
 {
     BURN_VARIANT variant = { };
 
     // We're not going to encrypt this value, so can access the value directly.
-    variant.qwValue = qwValue;
+    variant.pValue = pValue;
     variant.Type = BURN_VARIANT_TYPE_VERSION;
 
     return SetVariableValue(pVariables, wzVariable, &variant, fOverwriteBuiltIn ? SET_VARIABLE_OVERRIDE_BUILTIN : SET_VARIABLE_NOT_BUILTIN, TRUE);
@@ -810,7 +810,6 @@ extern "C" HRESULT VariableSerialize(
     BOOL fIncluded = FALSE;
     LONGLONG ll = 0;
     LPWSTR scz = NULL;
-    DWORD64 qw = 0;
 
     ::EnterCriticalSection(&pVariables->csAccess);
 
@@ -859,15 +858,7 @@ extern "C" HRESULT VariableSerialize(
 
             SecureZeroMemory(&ll, sizeof(ll));
             break;
-        case BURN_VARIANT_TYPE_VERSION:
-            hr = BVariantGetVersion(&pVariable->Value, &qw);
-            ExitOnFailure(hr, "Failed to get version.");
-
-            hr = BuffWriteNumber64(ppbBuffer, piBuffer, qw);
-            ExitOnFailure(hr, "Failed to write variable value as number.");
-
-            SecureZeroMemory(&qw, sizeof(qw));
-            break;
+        case BURN_VARIANT_TYPE_VERSION: __fallthrough;
         case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
         case BURN_VARIANT_TYPE_STRING:
             hr = BVariantGetString(&pVariable->Value, &scz);
@@ -887,7 +878,6 @@ extern "C" HRESULT VariableSerialize(
 LExit:
     ::LeaveCriticalSection(&pVariables->csAccess);
     SecureZeroMemory(&ll, sizeof(ll));
-    SecureZeroMemory(&qw, sizeof(qw));
     StrSecureZeroFreeString(scz);
 
     return hr;
@@ -908,6 +898,7 @@ extern "C" HRESULT VariableDeserialize(
     BURN_VARIANT value = { };
     LPWSTR scz = NULL;
     DWORD64 qw = 0;
+    VERUTIL_VERSION* pVersion = NULL;
 
     ::EnterCriticalSection(&pVariables->csAccess);
 
@@ -950,10 +941,13 @@ extern "C" HRESULT VariableDeserialize(
             SecureZeroMemory(&qw, sizeof(qw));
             break;
         case BURN_VARIANT_TYPE_VERSION:
-            hr = BuffReadNumber64(pbBuffer, cbBuffer, piBuffer, &qw);
-            ExitOnFailure(hr, "Failed to read variable value as number.");
+            hr = BuffReadString(pbBuffer, cbBuffer, piBuffer, &scz);
+            ExitOnFailure(hr, "Failed to read variable value as string.");
 
-            hr = BVariantSetVersion(&value, qw);
+            hr = VerParseVersion(scz, 0, FALSE, &pVersion);
+            ExitOnFailure(hr, "Failed to parse variable value as version.");
+
+            hr = BVariantSetVersion(&value, pVersion);
             ExitOnFailure(hr, "Failed to set variable value.");
 
             SecureZeroMemory(&qw, sizeof(qw));
@@ -984,6 +978,7 @@ extern "C" HRESULT VariableDeserialize(
 LExit:
     ::LeaveCriticalSection(&pVariables->csAccess);
 
+    ReleaseVerutilVersion(pVersion);
     ReleaseStr(sczName);
     BVariantUninitialize(&value);
     SecureZeroMemory(&qw, sizeof(qw));
@@ -1572,7 +1567,7 @@ static HRESULT SetVariableValue(
                 break;
 
             case BURN_VARIANT_TYPE_VERSION:
-                LogStringLine(REPORT_STANDARD, "Setting version variable '%ls' to value '%hu.%hu.%hu.%hu'", wzVariable, (WORD)(pVariant->qwValue >> 48), (WORD)(pVariant->qwValue >> 32), (WORD)(pVariant->qwValue >> 16), (WORD)(pVariant->qwValue));
+                LogStringLine(REPORT_STANDARD, "Setting version variable '%ls' to value '%ls'", wzVariable, pVariant->pValue->sczVersion);
                 break;
 
             default:
@@ -1609,6 +1604,7 @@ static HRESULT InitializeVariableVersionNT(
     RTL_GET_VERSION rtlGetVersion = NULL;
     RTL_OSVERSIONINFOEXW ovix = { };
     BURN_VARIANT value = { };
+    VERUTIL_VERSION* pVersion = NULL;
 
     if (!::GetModuleHandleExW(0, L"ntdll", &ntdll))
     {
@@ -1630,12 +1626,15 @@ static HRESULT InitializeVariableVersionNT(
     case OS_INFO_VARIABLE_ServicePackLevel:
         if (0 != ovix.wServicePackMajor)
         {
-            value.qwValue = static_cast<DWORD64>(ovix.wServicePackMajor);
+            value.llValue = static_cast<LONGLONG>(ovix.wServicePackMajor);
             value.Type = BURN_VARIANT_TYPE_NUMERIC;
         }
         break;
     case OS_INFO_VARIABLE_VersionNT:
-        value.qwValue = MAKEQWORDVERSION(ovix.dwMajorVersion, ovix.dwMinorVersion, 0, 0);
+        hr = VerVersionFromQword(MAKEQWORDVERSION(ovix.dwMajorVersion, ovix.dwMinorVersion, 0, 0), &pVersion);
+        ExitOnFailure(hr, "Failed to create VersionNT from QWORD.");
+
+        value.pValue = pVersion;
         value.Type = BURN_VARIANT_TYPE_VERSION;
         break;
     case OS_INFO_VARIABLE_VersionNT64:
@@ -1647,13 +1646,16 @@ static HRESULT InitializeVariableVersionNT(
             if (fIsWow64)
 #endif
             {
-                value.qwValue = MAKEQWORDVERSION(ovix.dwMajorVersion, ovix.dwMinorVersion, 0, 0);
+                hr = VerVersionFromQword(MAKEQWORDVERSION(ovix.dwMajorVersion, ovix.dwMinorVersion, 0, 0), &pVersion);
+                ExitOnFailure(hr, "Failed to create VersionNT64 from QWORD.");
+
+                value.pValue = pVersion;
                 value.Type = BURN_VARIANT_TYPE_VERSION;
             }
         }
         break;
     case OS_INFO_VARIABLE_WindowsBuildNumber:
-        value.qwValue = static_cast<DWORD64>(ovix.dwBuildNumber);
+        value.llValue = static_cast<LONGLONG>(ovix.dwBuildNumber);
         value.Type = BURN_VARIANT_TYPE_NUMERIC;
     default:
         AssertSz(FALSE, "Unknown OS info type.");
@@ -1668,6 +1670,8 @@ LExit:
     {
         FreeLibrary(ntdll);
     }
+
+    ReleaseVerutilVersion(pVersion);
 
     return hr;
 }
@@ -1805,15 +1809,14 @@ LExit:
 }
 
 static HRESULT InitializeVariableVersionMsi(
-    __in DWORD_PTR dwpData,
+    __in DWORD_PTR /*dwpData*/,
     __inout BURN_VARIANT* pValue
     )
 {
-    UNREFERENCED_PARAMETER(dwpData);
-
     HRESULT hr = S_OK;
     DLLGETVERSIONPROC pfnMsiDllGetVersion = NULL;
     DLLVERSIONINFO msiVersionInfo = { };
+    VERUTIL_VERSION* pVersion = NULL;
 
     // get DllGetVersion proc address
     pfnMsiDllGetVersion = (DLLGETVERSIONPROC)::GetProcAddress(::GetModuleHandleW(L"msi"), "DllGetVersion");
@@ -1824,10 +1827,15 @@ static HRESULT InitializeVariableVersionMsi(
     hr = pfnMsiDllGetVersion(&msiVersionInfo);
     ExitOnFailure(hr, "Failed to get msi.dll version info.");
 
-    hr = BVariantSetVersion(pValue, MAKEQWORDVERSION(msiVersionInfo.dwMajorVersion, msiVersionInfo.dwMinorVersion, 0, 0));
+    hr = VerVersionFromQword(MAKEQWORDVERSION(msiVersionInfo.dwMajorVersion, msiVersionInfo.dwMinorVersion, 0, 0), &pVersion);
+    ExitOnFailure(hr, "Failed to create msi.dll version from QWORD.");
+
+    hr = BVariantSetVersion(pValue, pVersion);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
+    ReleaseVerutilVersion(pVersion);
+
     return hr;
 }
 
@@ -2270,12 +2278,19 @@ static HRESULT InitializeVariableVersion(
     )
 {
     HRESULT hr = S_OK;
+    LPCWSTR wzValue = (LPCWSTR)dwpData;
+    VERUTIL_VERSION* pVersion = NULL;
+
+    hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
+    ExitOnFailure(hr, "Failed to initialize version.");
 
     // set value
-    hr = BVariantSetVersion(pValue, static_cast<DWORD64>(dwpData));
+    hr = BVariantSetVersion(pValue, pVersion);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
+    ReleaseVerutilVersion(pVersion);
+
     return hr;
 }
 

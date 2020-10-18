@@ -79,7 +79,7 @@ extern "C" HRESULT MsiEngineParsePackageFromXml(
     hr = XmlGetAttributeEx(pixnMsiPackage, L"Version", &scz);
     ExitOnFailure(hr, "Failed to get @Version.");
 
-    hr = FileVersionFromStringEx(scz, 0, &pPackage->Msi.qwVersion);
+    hr = VerParseVersion(scz, 0, FALSE, &pPackage->Msi.pVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
 
     // @UpgradeCode
@@ -399,6 +399,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
     Trace(REPORT_STANDARD, "Detecting MSI package 0x%p", pPackage);
 
     HRESULT hr = S_OK;
+    int nCompareResult = 0;
     LPWSTR sczInstalledVersion = NULL;
     LPWSTR sczInstalledLanguage = NULL;
     LPWSTR sczInstalledProductCode = NULL;
@@ -407,7 +408,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
     BOOTSTRAPPER_RELATED_OPERATION operation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
     BOOTSTRAPPER_RELATED_OPERATION relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_NONE;
     WCHAR wzProductCode[MAX_GUID_CHARS + 1] = { };
-    DWORD64 qwVersion = 0;
+    VERUTIL_VERSION* pVersion = NULL;
     UINT uLcid = 0;
     BOOL fPerMachine = FALSE;
 
@@ -416,18 +417,21 @@ extern "C" HRESULT MsiEngineDetectPackage(
     hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
     if (SUCCEEDED(hr))
     {
-        hr = FileVersionFromStringEx(sczInstalledVersion, 0, &pPackage->Msi.qwInstalledVersion);
-        ExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for ProductCode: %ls", sczInstalledVersion, pPackage->Msi.sczProductCode);
+        hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pPackage->Msi.pInstalledVersion);
+        ExitOnFailure(hr, "Failed to parse installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, pPackage->Msi.sczProductCode);
 
         // compare versions
-        if (pPackage->Msi.qwVersion < pPackage->Msi.qwInstalledVersion)
+        hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pPackage->Msi.pInstalledVersion, &nCompareResult);
+        ExitOnFailure(hr, "Failed to compare version '%ls' to installed version: '%ls'", pPackage->Msi.pVersion->sczVersion, pPackage->Msi.pInstalledVersion->sczVersion);
+
+        if (nCompareResult < 0)
         {
             operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
         }
         else
         {
-            if (pPackage->Msi.qwVersion > pPackage->Msi.qwInstalledVersion)
+            if (nCompareResult > 0)
             {
                 operation = BOOTSTRAPPER_RELATED_OPERATION_MINOR_UPDATE;
             }
@@ -438,9 +442,9 @@ extern "C" HRESULT MsiEngineDetectPackage(
         // Report related MSI package to BA.
         if (BOOTSTRAPPER_RELATED_OPERATION_NONE != operation)
         {
-            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), LoggingVersionToString(pPackage->Msi.qwInstalledVersion), pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(operation));
+            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), pPackage->Msi.pInstalledVersion->sczVersion, pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(operation));
 
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pPackage->Msi.qwInstalledVersion, operation);
+            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pPackage->Msi.pInstalledVersion, operation);
             ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
         }
     }
@@ -453,21 +457,26 @@ extern "C" HRESULT MsiEngineDetectPackage(
             hr = WiuGetProductInfoEx(sczInstalledProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
             if (SUCCEEDED(hr))
             {
-                hr = FileVersionFromStringEx(sczInstalledVersion, 0, &qwVersion);
-                ExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for ProductCode: %ls", sczInstalledVersion, sczInstalledProductCode);
+                hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
+                ExitOnFailure(hr, "Failed to parse dependency version: '%ls' for ProductCode: %ls", sczInstalledVersion, sczInstalledProductCode);
 
-                if (pPackage->Msi.qwVersion < qwVersion)
+                // compare versions
+                hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare version '%ls' to dependency version: '%ls'", pPackage->Msi.pVersion->sczVersion, pVersion->sczVersion);
+
+                if (nCompareResult < 0)
                 {
                     LogId(REPORT_STANDARD, MSG_DETECTED_COMPATIBLE_PACKAGE_FROM_PROVIDER, pPackage->sczId, sczInstalledProviderKey, sczInstalledProductCode, sczInstalledVersion, pPackage->Msi.sczProductCode);
 
-                    hr = UserExperienceOnDetectCompatibleMsiPackage(pUserExperience, pPackage->sczId, sczInstalledProductCode, qwVersion);
+                    hr = UserExperienceOnDetectCompatibleMsiPackage(pUserExperience, pPackage->sczId, sczInstalledProductCode, pVersion);
                     ExitOnRootFailure(hr, "BA aborted detect compatible MSI package.");
 
                     hr = StrAllocString(&pPackage->Msi.sczInstalledProductCode, sczInstalledProductCode, 0);
                     ExitOnFailure(hr, "Failed to copy the installed ProductCode to the package.");
 
-                    pPackage->Msi.qwInstalledVersion = qwVersion;
+                    pPackage->Msi.pInstalledVersion = pVersion;
                     pPackage->Msi.fCompatibleInstalled = TRUE;
+                    pVersion = NULL;
                 }
             }
         }
@@ -524,18 +533,30 @@ extern "C" HRESULT MsiEngineDetectPackage(
                 }
             }
 
-            hr = FileVersionFromStringEx(sczInstalledVersion, 0, &qwVersion);
-            ExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for ProductCode: %ls", sczInstalledVersion, wzProductCode);
+            hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
+            ExitOnFailure(hr, "Failed to parse related installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, wzProductCode);
 
             // compare versions
-            if (pRelatedMsi->fMinProvided && (pRelatedMsi->fMinInclusive ? (qwVersion < pRelatedMsi->qwMinVersion) : (qwVersion <= pRelatedMsi->qwMinVersion)))
+            if (pRelatedMsi->fMinProvided)
             {
-                continue;
+                hr = VerCompareParsedVersions(pVersion, pRelatedMsi->pMinVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare related installed version '%ls' to related min version: '%ls'", pVersion->sczVersion, pRelatedMsi->pMinVersion->sczVersion);
+
+                if (pRelatedMsi->fMinInclusive ? (nCompareResult < 0) : (nCompareResult <= 0))
+                {
+                    continue;
+                }
             }
 
-            if (pRelatedMsi->fMaxProvided && (pRelatedMsi->fMaxInclusive ? (qwVersion > pRelatedMsi->qwMaxVersion) : (qwVersion >= pRelatedMsi->qwMaxVersion)))
+            if (pRelatedMsi->fMaxProvided)
             {
-                continue;
+                hr = VerCompareParsedVersions(pVersion, pRelatedMsi->pMaxVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare related installed version '%ls' to related max version: '%ls'", pVersion->sczVersion, pRelatedMsi->pMaxVersion->sczVersion);
+
+                if (pRelatedMsi->fMaxInclusive ? (nCompareResult > 0) : (nCompareResult >= 0))
+                {
+                    continue;
+                }
             }
 
             // Filter by language if necessary.
@@ -605,10 +626,10 @@ extern "C" HRESULT MsiEngineDetectPackage(
                 operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
             }
 
-            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), LoggingVersionToString(qwVersion), uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
+            LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), pVersion->sczVersion, uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
 
             // Pass to BA.
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, qwVersion, relatedMsiOperation);
+            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, pVersion, relatedMsiOperation);
             ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
         }
     }
@@ -667,6 +688,7 @@ LExit:
     ReleaseStr(sczInstalledProductCode);
     ReleaseStr(sczInstalledLanguage);
     ReleaseStr(sczInstalledVersion);
+    ReleaseVerutilVersion(pVersion);
 
     return hr;
 }
@@ -684,8 +706,9 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     Trace(REPORT_STANDARD, "Planning MSI package 0x%p", pPackage);
 
     HRESULT hr = S_OK;
-    DWORD64 qwVersion = pPackage->Msi.qwVersion;
-    DWORD64 qwInstalledVersion = pPackage->Msi.qwInstalledVersion;
+    VERUTIL_VERSION* pVersion = pPackage->Msi.pVersion;
+    VERUTIL_VERSION* pInstalledVersion = pPackage->Msi.pInstalledVersion;
+    int nCompareResult = 0;
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOL fFeatureActionDelta = FALSE;
@@ -739,10 +762,13 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
         if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
         {
+            hr = VerCompareParsedVersions(pVersion, pInstalledVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare '%ls' to '%ls' for planning.", pVersion->sczVersion, pInstalledVersion->sczVersion);
+
             // Take a look at the version and determine if this is a potential
             // minor upgrade (same ProductCode newer ProductVersion), otherwise,
             // there is a newer version so no work necessary.
-            if (qwVersion > qwInstalledVersion)
+            if (nCompareResult > 0)
             {
                 execute = BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE;
             }
@@ -1014,20 +1040,18 @@ extern "C" HRESULT MsiEngineAddCompatiblePackage(
     }
 
     // Read in the compatible ProductVersion if not already available.
-    if (pPackage->Msi.qwInstalledVersion)
+    if (pPackage->Msi.pInstalledVersion)
     {
-        pCompatiblePackage->Msi.qwVersion = pPackage->Msi.qwInstalledVersion;
-
-        hr = FileVersionToStringEx(pCompatiblePackage->Msi.qwVersion, &sczInstalledVersion);
-        ExitOnFailure(hr, "Failed to format version number string.");
+        hr = VerCopyVersion(pPackage->Msi.pInstalledVersion, &pCompatiblePackage->Msi.pVersion);
+        ExitOnFailure(hr, "Failed to copy version for compatible package.");
     }
     else
     {
         hr = WiuGetProductInfoEx(pCompatiblePackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
         ExitOnFailure(hr, "Failed to read version from compatible package.");
 
-        hr = FileVersionFromStringEx(sczInstalledVersion, 0, &pCompatiblePackage->Msi.qwVersion);
-        ExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for ProductCode: %ls", sczInstalledVersion, pCompatiblePackage->Msi.sczProductCode);
+        hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pCompatiblePackage->Msi.pVersion);
+        ExitOnFailure(hr, "Failed to parse version: '%ls' for ProductCode: %ls", sczInstalledVersion, pCompatiblePackage->Msi.sczProductCode);
     }
 
     // For now, copy enough information to support uninstalling the newer, compatible package.
@@ -1046,7 +1070,7 @@ extern "C" HRESULT MsiEngineAddCompatiblePackage(
     ExitOnFailure(hr, "Failed to format log path variable for compatible package.");
 
     // Use the default cache ID generation from the binder.
-    hr = StrAllocFormatted(&pCompatiblePackage->sczCacheId, L"%lsv%ls", pCompatiblePackage->sczId, sczInstalledVersion);
+    hr = StrAllocFormatted(&pCompatiblePackage->sczCacheId, L"%lsv%ls", pCompatiblePackage->sczId, pCompatiblePackage->Msi.pVersion->sczVersion);
     ExitOnFailure(hr, "Failed to format cache ID for compatible package.");
 
     pCompatiblePackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
@@ -1068,7 +1092,7 @@ extern "C" HRESULT MsiEngineAddCompatiblePackage(
             ExitOnFailure(hr, "Failed to copy the compatible provider key.");
 
             // Assume the package version is the same as the provider version.
-            hr = StrAllocString(&pCompatibleProvider->sczVersion, sczInstalledVersion, 0);
+            hr = StrAllocString(&pCompatibleProvider->sczVersion, pCompatiblePackage->Msi.pVersion->sczVersion, 0);
             ExitOnFailure(hr, "Failed to copy the compatible provider version.");
 
             // Assume provider keys are similarly authored for this package.
@@ -1479,7 +1503,7 @@ static HRESULT ParseRelatedMsiFromXml(
     {
         ExitOnFailure(hr, "Failed to get @MinVersion.");
 
-        hr = FileVersionFromStringEx(scz, 0, &pRelatedMsi->qwMinVersion);
+        hr = VerParseVersion(scz, 0, FALSE, &pRelatedMsi->pMinVersion);
         ExitOnFailure(hr, "Failed to parse @MinVersion: %ls", scz);
 
         // flag that we have a min version
@@ -1496,7 +1520,7 @@ static HRESULT ParseRelatedMsiFromXml(
     {
         ExitOnFailure(hr, "Failed to get @MaxVersion.");
 
-        hr = FileVersionFromStringEx(scz, 0, &pRelatedMsi->qwMaxVersion);
+        hr = VerParseVersion(scz, 0, FALSE, &pRelatedMsi->pMaxVersion);
         ExitOnFailure(hr, "Failed to parse @MaxVersion: %ls", scz);
 
         // flag that we have a max version

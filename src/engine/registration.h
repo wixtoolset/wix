@@ -59,7 +59,7 @@ typedef struct _BURN_RELATED_BUNDLE
 {
     BOOTSTRAPPER_RELATION_TYPE relationType;
 
-    DWORD64 qwVersion;
+    VERUTIL_VERSION* pVersion;
     LPWSTR sczTag;
 
     BURN_PACKAGE package;
@@ -105,7 +105,7 @@ typedef struct _BURN_REGISTRATION
     LPWSTR *rgsczPatchCodes;
     DWORD cPatchCodes;
 
-    DWORD64 qwVersion;
+    VERUTIL_VERSION* pVersion;
     LPWSTR sczActiveParent;
     LPWSTR sczProviderKey;
     LPWSTR sczExecutableName;

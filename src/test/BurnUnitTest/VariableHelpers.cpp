@@ -33,12 +33,23 @@ namespace Bootstrapper
         TestThrowOnFailure2(hr, L"Failed to set %s to: %I64d", wzVariable, llValue);
     }
 
-    void VariableSetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, DWORD64 qwValue)
+    void VariableSetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LPCWSTR wzValue)
     {
         HRESULT hr = S_OK;
+        VERUTIL_VERSION* pVersion = NULL;
 
-        hr = VariableSetVersion(pVariables, wzVariable, qwValue, FALSE);
-        TestThrowOnFailure2(hr, L"Failed to set %s to: 0x%016I64x", wzVariable, qwValue);
+        try
+        {
+            hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
+            TestThrowOnFailure1(hr, L"Failed to parse version '%ls'", wzValue);
+
+            hr = VariableSetVersion(pVariables, wzVariable, pVersion, FALSE);
+            TestThrowOnFailure2(hr, L"Failed to set %s to: '%ls'", wzVariable, wzValue);
+        }
+        finally
+        {
+            ReleaseVerutilVersion(pVersion);
+        }
     }
 
     String^ VariableGetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable)
@@ -69,15 +80,22 @@ namespace Bootstrapper
         return llValue;
     }
 
-    unsigned __int64 VariableGetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable)
+    String^ VariableGetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable)
     {
         HRESULT hr = S_OK;
-        DWORD64 qwValue = 0;
+        VERUTIL_VERSION* pValue = NULL;
 
-        hr = VariableGetVersion(pVariables, wzVariable, &qwValue);
-        TestThrowOnFailure1(hr, L"Failed to get: %s", wzVariable);
+        try
+        {
+            hr = VariableGetVersion(pVariables, wzVariable, &pValue);
+            TestThrowOnFailure1(hr, L"Failed to get: %s", wzVariable);
 
-        return qwValue;
+            return gcnew String(pValue->sczVersion);
+        }
+        finally
+        {
+            ReleaseVerutilVersion(pValue);
+        }
     }
 
     String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable)

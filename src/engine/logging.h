@@ -133,11 +133,6 @@ LPWSTR LoggingStringOrUnknownIfNull(
     __in LPCWSTR wz
     );
 
-// Note: this function is not thread safe.
-LPCSTR LoggingVersionToString(
-    __in DWORD64 dw64Version
-    );
-
 
 #if defined(__cplusplus)
 }

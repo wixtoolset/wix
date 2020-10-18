@@ -37,10 +37,10 @@ namespace Bootstrapper
             {
                 InitNumericValue(expectedVariants + 0, 2, FALSE, L"PROP1", actualVariants + 0);
                 InitStringValue(expectedVariants + 1, L"VAL2", FALSE, L"PROP2", actualVariants + 1);
-                InitVersionValue(expectedVariants + 2, MAKEQWORDVERSION(1, 1, 0, 0), FALSE, L"PROP3", actualVariants + 2);
+                InitVersionValue(expectedVariants + 2, L"1.1.0.0", FALSE, L"PROP3", actualVariants + 2);
                 InitNoneValue(expectedVariants + 3, FALSE, L"PROP4", actualVariants + 3);
                 InitNoneValue(expectedVariants + 4, TRUE, L"PROP5", actualVariants + 4);
-                InitVersionValue(expectedVariants + 5, MAKEQWORDVERSION(1, 1, 1, 0), TRUE, L"PROP6", actualVariants + 5);
+                InitVersionValue(expectedVariants + 5, L"1.1.1.0", TRUE, L"PROP6", actualVariants + 5);
                 InitStringValue(expectedVariants + 6, L"7", TRUE, L"PROP7", actualVariants + 6);
                 InitNumericValue(expectedVariants + 7, 11, TRUE, L"PROP8", actualVariants + 7);
                 InitFormattedValue(expectedVariants + 8, L"VAL9", FALSE, L"PROP9", actualVariants + 8);
@@ -143,21 +143,34 @@ namespace Bootstrapper
             }
         }
 
-        void InitVersionValue(BURN_VARIANT* pValue, DWORD64 qwValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitVersionValue(BURN_VARIANT* pValue, LPCWSTR wzValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
-            pValue->Type = BURN_VARIANT_TYPE_VERSION;
-            pValue->qwValue = qwValue;
+            VERUTIL_VERSION* pVersion = NULL;
 
-            hr = BVariantCopy(pValue, pActualValue);
-            NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-            if (fHidden)
+            try
             {
-                hr = BVariantSetEncryption(pActualValue, TRUE);
-                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
+                hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
+                NativeAssert::Succeeded(hr, "Failed to parse version {0}", wzValue);
 
-                NativeAssert::True(pActualValue->fEncryptString);
+                pValue->Type = BURN_VARIANT_TYPE_VERSION;
+                pValue->pValue = pVersion;
+                pVersion = NULL;
+
+                hr = BVariantCopy(pValue, pActualValue);
+                NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
+
+                if (fHidden)
+                {
+                    hr = BVariantSetEncryption(pActualValue, TRUE);
+                    NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
+
+                    NativeAssert::True(pActualValue->fEncryptString);
+                }
+            }
+            finally
+            {
+                ReleaseVerutilVersion(pVersion);
             }
         }
 
@@ -224,14 +237,21 @@ namespace Bootstrapper
         void VerifyVersionValue(BURN_VARIANT* pExpectedValue, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
-            DWORD64 qwValue = 0;
+            VERUTIL_VERSION* pValue = NULL;
             NativeAssert::Equal<DWORD>(BURN_VARIANT_TYPE_VERSION, pExpectedValue->Type);
             NativeAssert::Equal<DWORD>(BURN_VARIANT_TYPE_VERSION, pActualValue->Type);
 
-            hr = BVariantGetVersion(pActualValue, &qwValue);
-            NativeAssert::Succeeded(hr, "Failed to get version value");
+            try
+            {
+                hr = BVariantGetVersion(pActualValue, &pValue);
+                NativeAssert::Succeeded(hr, "Failed to get version value");
 
-            NativeAssert::Equal<DWORD64>(pExpectedValue->qwValue, qwValue);
+                NativeAssert::StringEqual(pExpectedValue->pValue->sczVersion, pActualValue->pValue->sczVersion);
+            }
+            finally
+            {
+                ReleaseVerutilVersion(pValue);
+            }
         }
     };
 }

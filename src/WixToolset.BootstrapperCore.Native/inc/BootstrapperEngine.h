@@ -258,8 +258,10 @@ typedef struct _BAENGINE_GETVARIABLEVERSION_ARGS
 typedef struct _BAENGINE_GETVARIABLEVERSION_RESULTS
 {
     DWORD cbSize;
-    // The contents of qwValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
-    DWORD64 qwValue;
+    // The contents of wzValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroFree.
+    LPWSTR wzValue;
+    // Should be initialized to the size of wzValue.
+    DWORD cchValue;
 } BAENGINE_GETVARIABLEVERSION_RESULTS;
 
 typedef struct _BAENGINE_LAUNCHAPPROVEDEXE_ARGS
@@ -410,7 +412,7 @@ typedef struct _BAENGINE_SETVARIABLEVERSION_ARGS
 {
     DWORD cbSize;
     LPCWSTR wzVariable;
-    DWORD64 qwValue;
+    LPCWSTR wzValue;
 } BAENGINE_SETVARIABLEVERSION_ARGS;
 
 typedef struct _BAENGINE_SETVARIABLEVERSION_RESULTS

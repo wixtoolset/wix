@@ -16,10 +16,10 @@ namespace Bootstrapper
 
 void VariableSetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LPCWSTR wzValue, BOOL fFormatted);
 void VariableSetNumericHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LONGLONG llValue);
-void VariableSetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, DWORD64 qwValue);
+void VariableSetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LPCWSTR wzValue);
 System::String^ VariableGetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
 __int64 VariableGetNumericHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
-unsigned __int64 VariableGetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
+System::String^ VariableGetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
 System::String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
 System::String^ VariableFormatStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzIn);
 System::String^ VariableEscapeStringHelper(LPCWSTR wzIn);

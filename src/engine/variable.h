@@ -85,7 +85,7 @@ HRESULT VariableGetString(
 HRESULT VariableGetVersion(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __in DWORD64* pqwValue
+    __in VERUTIL_VERSION** ppValue
     );
 HRESULT VariableGetVariant(
     __in BURN_VARIABLES* pVariables,
@@ -113,7 +113,7 @@ HRESULT VariableSetString(
 HRESULT VariableSetVersion(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __in DWORD64 qwValue,
+    __in VERUTIL_VERSION* pValue,
     __in BOOL fOverwriteBuiltIn
     );
 HRESULT VariableSetVariant(

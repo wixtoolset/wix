@@ -396,6 +396,7 @@ static HRESULT LoadRelatedBundleFromKey(
 {
     HRESULT hr = S_OK;
     DWORD64 qwEngineVersion = 0;
+    LPWSTR sczBundleVersion = NULL;
     LPWSTR sczCachePath = NULL;
     DWORD64 qwFileSize = 0;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
@@ -407,8 +408,11 @@ static HRESULT LoadRelatedBundleFromKey(
         hr = S_OK;
     }
 
-    hr = RegReadVersion(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, &pRelatedBundle->qwVersion);
+    hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, &sczBundleVersion);
     ExitOnFailure(hr, "Failed to read version from registry for bundle: %ls", wzRelatedBundleId);
+
+    hr = VerParseVersion(sczBundleVersion, 0, FALSE, &pRelatedBundle->pVersion);
+    ExitOnFailure(hr, "Failed to parse pseudo bundle version: %ls", sczBundleVersion);
 
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH, &sczCachePath);
     ExitOnFailure(hr, "Failed to read cache path from registry for bundle: %ls", wzRelatedBundleId);
@@ -423,7 +427,7 @@ static HRESULT LoadRelatedBundleFromKey(
 
         dependencyProvider.fImported = TRUE;
 
-        hr = FileVersionToStringEx(pRelatedBundle->qwVersion, &dependencyProvider.sczVersion);
+        hr = StrAllocString(&dependencyProvider.sczVersion, pRelatedBundle->pVersion->sczVersion, 0);
         ExitOnFailure(hr, "Failed to copy version for bundle: %ls", wzRelatedBundleId);
 
         hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_DISPLAY_NAME, &dependencyProvider.sczDisplayName);
@@ -452,6 +456,7 @@ static HRESULT LoadRelatedBundleFromKey(
 LExit:
     DependencyUninitialize(&dependencyProvider);
     ReleaseStr(sczCachePath);
+    ReleaseStr(sczBundleVersion);
 
     return hr;
 }

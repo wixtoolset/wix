@@ -1087,7 +1087,7 @@ extern "C" HRESULT ElevationLoadCompatiblePackageAction(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->compatiblePackage.sczInstalledProductCode);
     ExitOnFailure(hr, "Failed to write installed ProductCode to message buffer.");
 
-    hr = BuffWriteNumber64(&pbData, &cbData, pExecuteAction->compatiblePackage.qwInstalledVersion);
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->compatiblePackage.pInstalledVersion->sczVersion);
     ExitOnFailure(hr, "Failed to write installed version to message buffer.");
 
     // Send the message.
@@ -2566,6 +2566,7 @@ static HRESULT OnLoadCompatiblePackage(
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
     LPWSTR sczPackage = NULL;
+    LPWSTR sczVersion = NULL;
     BURN_EXECUTE_ACTION executeAction = { };
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE;
@@ -2581,20 +2582,24 @@ static HRESULT OnLoadCompatiblePackage(
     hr = BuffReadString(pbData, cbData, &iData, &executeAction.compatiblePackage.sczInstalledProductCode);
     ExitOnFailure(hr, "Failed to read installed ProductCode from message buffer.");
 
-    hr = BuffReadNumber64(pbData, cbData, &iData, &executeAction.compatiblePackage.qwInstalledVersion);
+    hr = BuffReadString(pbData, cbData, &iData, &sczVersion);
     ExitOnFailure(hr, "Failed to read installed version from message buffer.");
+
+    hr = VerParseVersion(sczVersion, 0, FALSE, &executeAction.compatiblePackage.pInstalledVersion);
+    ExitOnFailure(hr, "Failed to parse installed version from compatible package.");
 
     // Copy the installed data to the reference package.
     hr = StrAllocString(&executeAction.compatiblePackage.pReferencePackage->Msi.sczInstalledProductCode, executeAction.compatiblePackage.sczInstalledProductCode, 0);
     ExitOnFailure(hr, "Failed to copy installed ProductCode.");
 
-    executeAction.compatiblePackage.pReferencePackage->Msi.qwInstalledVersion = executeAction.compatiblePackage.qwInstalledVersion;
+    executeAction.compatiblePackage.pReferencePackage->Msi.pInstalledVersion = executeAction.compatiblePackage.pInstalledVersion;
 
     // Load the compatible package and add it to the list.
     hr = MsiEngineAddCompatiblePackage(pPackages, executeAction.compatiblePackage.pReferencePackage, NULL);
     ExitOnFailure(hr, "Failed to load compatible package.");
 
 LExit:
+    ReleaseStr(sczVersion);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
 

@@ -646,7 +646,7 @@ EXTERN_C BAAPI UserExperienceOnDetectCompatibleMsiPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCompatiblePackageId,
-    __in DWORD64 dw64CompatiblePackageVersion
+    __in VERUTIL_VERSION* pCompatiblePackageVersion
     )
 {
     HRESULT hr = S_OK;
@@ -656,7 +656,7 @@ EXTERN_C BAAPI UserExperienceOnDetectCompatibleMsiPackage(
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
     args.wzCompatiblePackageId = wzCompatiblePackageId;
-    args.dw64CompatiblePackageVersion = dw64CompatiblePackageVersion;
+    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
 
     results.cbSize = sizeof(results);
 
@@ -699,7 +699,7 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __inout BOOL* pfIgnoreBundle
     )
 {
@@ -712,7 +712,7 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     args.relationType = relationType;
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
-    args.dw64Version = dw64Version;
+    args.wzVersion = pVersion->sczVersion;
 
     results.cbSize = sizeof(results);
     results.fIgnoreBundle = *pfIgnoreBundle;
@@ -817,7 +817,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in BOOTSTRAPPER_RELATED_OPERATION operation
     )
 {
@@ -830,7 +830,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     args.relationType = relationType;
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
-    args.dw64Version = dw64Version;
+    args.wzVersion = pVersion->sczVersion;
     args.operation = operation;
 
     results.cbSize = sizeof(results);
@@ -853,7 +853,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedMsiPackage(
     __in_z LPCWSTR wzUpgradeCode,
     __in_z LPCWSTR wzProductCode,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in BOOTSTRAPPER_RELATED_OPERATION operation
     )
 {
@@ -866,7 +866,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedMsiPackage(
     args.wzUpgradeCode = wzUpgradeCode;
     args.wzProductCode = wzProductCode;
     args.fPerMachine = fPerMachine;
-    args.dw64Version = dw64Version;
+    args.wzVersion = pVersion->sczVersion;
     args.operation = operation;
 
     results.cbSize = sizeof(results);
@@ -917,7 +917,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,
     __in_z_opt LPCWSTR wzSummary,
     __in_z_opt LPCWSTR wzContentType,
@@ -932,7 +932,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     args.cbSize = sizeof(args);
     args.wzUpdateLocation = wzUpdateLocation;
     args.dw64Size = dw64Size;
-    args.dw64Version = dw64Version;
+    args.wzVersion = pVersion->sczVersion;
     args.wzTitle = wzTitle;
     args.wzSummary = wzSummary;
     args.wzContentType = wzContentType;
@@ -1414,7 +1414,7 @@ EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCompatiblePackageId,
-    __in DWORD64 dw64CompatiblePackageVersion,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     )
 {
@@ -1425,7 +1425,7 @@ EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
     args.wzCompatiblePackageId = wzCompatiblePackageId;
-    args.dw64CompatiblePackageVersion = dw64CompatiblePackageVersion;
+    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
     args.recommendedState = *pRequestedState;
 
     results.cbSize = sizeof(results);

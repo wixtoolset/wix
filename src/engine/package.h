@@ -123,8 +123,8 @@ typedef struct _BURN_MSIFEATURE
 typedef struct _BURN_RELATED_MSI
 {
     LPWSTR sczUpgradeCode;
-    DWORD64 qwMinVersion;
-    DWORD64 qwMaxVersion;
+    VERUTIL_VERSION* pMinVersion;
+    VERUTIL_VERSION* pMaxVersion;
     BOOL fMinProvided;
     BOOL fMaxProvided;
     BOOL fMinInclusive;
@@ -236,9 +236,9 @@ typedef struct _BURN_PACKAGE
         {
             LPWSTR sczProductCode;
             DWORD dwLanguage;
-            DWORD64 qwVersion;
+            VERUTIL_VERSION* pVersion;
             LPWSTR sczInstalledProductCode;
-            DWORD64 qwInstalledVersion;
+            VERUTIL_VERSION* pInstalledVersion;
             LPWSTR sczUpgradeCode;
 
             BURN_MSIPROPERTY* rgProperties;

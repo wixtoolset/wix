@@ -13,6 +13,7 @@
 #include "wininet.h"
 
 #include <dutil.h>
+#include <verutil.h>
 #include <cryputil.h>
 #include <dlutil.h>
 #include <buffutil.h>

@@ -123,8 +123,8 @@ static HRESULT CompareIntegerValues(
     );
 static HRESULT CompareVersionValues(
     __in BURN_SYMBOL_TYPE comparison,
-    __in DWORD64 qwLeftOperand,
-    __in DWORD64 qwRightOperand,
+    __in VERUTIL_VERSION* pLeftOperand,
+    __in VERUTIL_VERSION* pRightOperand,
     __out BOOL* pfResult
     );
 
@@ -379,7 +379,7 @@ static HRESULT ParseTerm(
     {
         LONGLONG llValue = 0;
         LPWSTR sczValue = NULL;
-        DWORD64 qwValue = 0;
+        VERUTIL_VERSION* pVersion = NULL;
         switch (firstValue.Type)
         {
         case BURN_VARIANT_TYPE_NONE:
@@ -402,12 +402,12 @@ static HRESULT ParseTerm(
             SecureZeroMemory(&llValue, sizeof(llValue));
             break;
         case BURN_VARIANT_TYPE_VERSION:
-            hr = BVariantGetVersion(&firstValue, &qwValue);
+            hr = BVariantGetVersion(&firstValue, &pVersion);
             if (SUCCEEDED(hr))
             {
-                *pf = 0 != qwValue;
+                *pf = 0 != *pVersion->sczVersion;
             }
-            SecureZeroMemory(&llValue, sizeof(qwValue));
+            ReleaseVerutilVersion(pVersion);
             break;
         default:
             ExitFunction1(hr = E_UNEXPECTED);
@@ -689,33 +689,14 @@ static HRESULT NextSymbol(
             if (L'v' == pContext->wzRead[0] && C1_DIGIT & charType)
             {
                 // version
-                DWORD cParts = 1;
-                for (;;)
+                do
                 {
                     ++n;
-                    if (L'.' == pContext->wzRead[n])
-                    {
-                        ++cParts;
-                        if (4 < cParts)
-                        {
-                            // error, too many parts in version
-                            pContext->fError = TRUE;
-                            hr = E_INVALIDDATA;
-                            ExitOnRootFailure(hr, "Failed to parse condition \"%ls\". Version can have a maximum of 4 parts, at position %d.", pContext->wzCondition, iPosition);
-                        }
-                    }
-                    else
-                    {
-                        ::GetStringTypeW(CT_CTYPE1, &pContext->wzRead[n], 1, &charType);
-                        if (C1_DIGIT != (C1_DIGIT & charType))
-                        {
-                            break;
-                        }
-                    }
-                }
+                    ::GetStringTypeW(CT_CTYPE1, &pContext->wzRead[n], 1, &charType);
+                } while (L'\0' != pContext->wzRead[n] && C1_BLANK != (C1_BLANK & charType));
 
                 // Symbols don't encrypt their value, so can access the value directly.
-                hr = FileVersionFromStringEx(&pContext->wzRead[1], n - 1, &pContext->NextSymbol.Value.qwValue);
+                hr = VerParseVersion(&pContext->wzRead[1], n - 1, FALSE, &pContext->NextSymbol.Value.pValue);
                 if (FAILED(hr))
                 {
                     pContext->fError = TRUE;
@@ -785,10 +766,10 @@ static HRESULT CompareValues(
 {
     HRESULT hr = S_OK;
     LONGLONG llLeft = 0;
-    DWORD64 qwLeft = 0;
+    VERUTIL_VERSION* pVersionLeft = 0;
     LPWSTR sczLeft = NULL;
     LONGLONG llRight = 0;
-    DWORD64 qwRight = 0;
+    VERUTIL_VERSION* pVersionRight = 0;
     LPWSTR sczRight = NULL;
 
     // get values to compare based on type
@@ -810,17 +791,17 @@ static HRESULT CompareValues(
     }
     else if (BURN_VARIANT_TYPE_VERSION == leftOperand.Type && BURN_VARIANT_TYPE_VERSION == rightOperand.Type)
     {
-        hr = BVariantGetVersion(&leftOperand, &qwLeft);
+        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
         ExitOnFailure(hr, "Failed to get the left version");
-        hr = BVariantGetVersion(&rightOperand, &qwRight);
+        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
         ExitOnFailure(hr, "Failed to get the right version");
-        hr = CompareVersionValues(comparison, qwLeft, qwRight, pfResult);
+        hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
     }
     else if (BURN_VARIANT_TYPE_VERSION == leftOperand.Type && BURN_VARIANT_TYPE_STRING == rightOperand.Type)
     {
-        hr = BVariantGetVersion(&leftOperand, &qwLeft);
+        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
         ExitOnFailure(hr, "Failed to get the left version");
-        hr = BVariantGetVersion(&rightOperand, &qwRight);
+        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)
@@ -832,14 +813,14 @@ static HRESULT CompareValues(
         }
         else
         {
-            hr = CompareVersionValues(comparison, qwLeft, qwRight, pfResult);
+            hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
         }
     }
     else if (BURN_VARIANT_TYPE_STRING == leftOperand.Type && BURN_VARIANT_TYPE_VERSION == rightOperand.Type)
     {
-        hr = BVariantGetVersion(&rightOperand, &qwRight);
+        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
         ExitOnFailure(hr, "Failed to get the right version");
-        hr = BVariantGetVersion(&leftOperand, &qwLeft);
+        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)
@@ -851,7 +832,7 @@ static HRESULT CompareValues(
         }
         else
         {
-            hr = CompareVersionValues(comparison, qwLeft, qwRight, pfResult);
+            hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
         }
     }
     else if (BURN_VARIANT_TYPE_NUMERIC == leftOperand.Type && BURN_VARIANT_TYPE_STRING == rightOperand.Type)
@@ -899,10 +880,10 @@ static HRESULT CompareValues(
     }
 
 LExit:
-    SecureZeroMemory(&qwLeft, sizeof(DWORD64));
+    ReleaseVerutilVersion(pVersionLeft);
     SecureZeroMemory(&llLeft, sizeof(LONGLONG));
     StrSecureZeroFreeString(sczLeft);
-    SecureZeroMemory(&qwRight, sizeof(DWORD64));
+    ReleaseVerutilVersion(pVersionRight);
     SecureZeroMemory(&llRight, sizeof(LONGLONG));
     StrSecureZeroFreeString(sczRight);
 
@@ -1010,24 +991,25 @@ LExit:
 //
 static HRESULT CompareVersionValues(
     __in BURN_SYMBOL_TYPE comparison,
-    __in DWORD64 qwLeftOperand,
-    __in DWORD64 qwRightOperand,
+    __in VERUTIL_VERSION* pLeftOperand,
+    __in VERUTIL_VERSION* pRightOperand,
     __out BOOL* pfResult
     )
 {
     HRESULT hr = S_OK;
+    int nResult = 0;
+
+    hr = VerCompareParsedVersions(pLeftOperand, pRightOperand, &nResult);
+    ExitOnFailure(hr, "Failed to compare condition versions: '%ls', '%ls'", pLeftOperand->sczVersion, pRightOperand->sczVersion);
 
     switch (comparison)
     {
-    case BURN_SYMBOL_TYPE_LT: *pfResult = qwLeftOperand <  qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_GT: *pfResult = qwLeftOperand >  qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_LE: *pfResult = qwLeftOperand <= qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_GE: *pfResult = qwLeftOperand >= qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_EQ: *pfResult = qwLeftOperand == qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_NE: *pfResult = qwLeftOperand != qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_BAND: *pfResult = (qwLeftOperand & qwRightOperand) ? TRUE : FALSE; break;
-    case BURN_SYMBOL_TYPE_HIEQ: *pfResult = ((qwLeftOperand >> 16) & 0xFFFF) == qwRightOperand; break;
-    case BURN_SYMBOL_TYPE_LOEQ: *pfResult = (qwLeftOperand & 0xFFFF) == qwRightOperand; break;
+    case BURN_SYMBOL_TYPE_LT: *pfResult = nResult <  0; break;
+    case BURN_SYMBOL_TYPE_GT: *pfResult = nResult >  0; break;
+    case BURN_SYMBOL_TYPE_LE: *pfResult = nResult <= 0; break;
+    case BURN_SYMBOL_TYPE_GE: *pfResult = nResult >= 0; break;
+    case BURN_SYMBOL_TYPE_EQ: *pfResult = nResult == 0; break;
+    case BURN_SYMBOL_TYPE_NE: *pfResult = nResult != 0; break;
     default:
         ExitFunction1(hr = E_INVALIDARG);
     }

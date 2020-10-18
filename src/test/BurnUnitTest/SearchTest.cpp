@@ -106,6 +106,7 @@ namespace Bootstrapper
             BURN_SEARCHES searches = { };
             BURN_EXTENSIONS burnExtensions = { };
             ULARGE_INTEGER uliVersion = { };
+            VERUTIL_VERSION* pVersion = NULL;
             try
             {
                 hr = VariableInitialize(&variables);
@@ -116,6 +117,9 @@ namespace Bootstrapper
 
                 hr = FileVersion(wzFile2, &uliVersion.HighPart, &uliVersion.LowPart);
                 TestThrowOnFailure(hr, L"Failed to get DLL version.");
+
+                hr = VerVersionFromQword(uliVersion.QuadPart, &pVersion);
+                NativeAssert::Succeeded(hr, "Failed to create version.");
 
                 VariableSetStringHelper(&variables, L"File1", wzFile1, FALSE);
                 VariableSetStringHelper(&variables, L"File2", wzFile2, FALSE);
@@ -140,10 +144,11 @@ namespace Bootstrapper
                 // check variable values
                 Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable1"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable2"));
-                Assert::Equal(uliVersion.QuadPart, VariableGetVersionHelper(&variables, L"Variable3"));
+                Assert::Equal<String^>(gcnew String(pVersion->sczVersion), VariableGetVersionHelper(&variables, L"Variable3"));
             }
             finally
             {
+                ReleaseVerutilVersion(pVersion);
                 ReleaseObject(pixeBundle);
                 VariablesUninitialize(&variables);
                 SearchesUninitialize(&searches);
@@ -247,8 +252,8 @@ namespace Bootstrapper
                 Assert::NotEqual(gcnew String(L"String1 %TEMP%"), VariableGetStringHelper(&variables, L"Variable10"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable11"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable12"));
-                Assert::Equal(MAKEQWORDVERSION(1,1,1,1), VariableGetVersionHelper(&variables, L"Variable13"));
-                Assert::Equal(MAKEQWORDVERSION(1,1,1,1), VariableGetVersionHelper(&variables, L"Variable14"));
+                Assert::Equal<String^>(gcnew String(L"1.1.1.1"), VariableGetVersionHelper(&variables, L"Variable13"));
+                Assert::Equal<String^>(gcnew String(L"1.1.1.1"), VariableGetVersionHelper(&variables, L"Variable14"));
                 Assert::Equal<String^>(gcnew String(L"String1"), VariableGetStringHelper(&variables, L"Variable15"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable16"));
                 Assert::False(VariableExistsHelper(&variables, L"Variable17"));
@@ -401,11 +406,11 @@ namespace Bootstrapper
 
                 // check variable values
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables, L"Variable1"));
-                Assert::Equal(MAKEQWORDVERSION(1,0,0,0), VariableGetVersionHelper(&variables, L"Variable2"));
+                Assert::Equal<String^>(gcnew String(L"1.0.0.0"), VariableGetVersionHelper(&variables, L"Variable2"));
                 Assert::Equal(1033ll, VariableGetNumericHelper(&variables, L"Variable3"));
                 Assert::Equal(5ll, VariableGetNumericHelper(&variables, L"Variable4"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable5"));
-                Assert::Equal(MAKEQWORDVERSION(1,0,0,0), VariableGetVersionHelper(&variables, L"Variable6"));
+                Assert::Equal<String^>(gcnew String(L"1.0.0.0"), VariableGetVersionHelper(&variables, L"Variable6"));
             }
             finally
             {
@@ -581,7 +586,7 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"VAL5"), VariableGetStringHelper(&variables, L"PROP5"));
                 Assert::Equal<String^>(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
                 Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
-                Assert::Equal(MAKEQWORDVERSION(1, 1, 0, 0), VariableGetVersionHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetVersionHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"[VAL9]"), VariableGetStringHelper(&variables, L"PROP9"));
 

@@ -2,6 +2,13 @@
 
 #include "precomp.h"
 
+
+static HRESULT CopyStringToBE(
+    __in LPWSTR wzValue,
+    __in LPWSTR wzBuffer,
+    __inout DWORD* pcchBuffer
+    );
+
 static HRESULT BEEngineEscapeString(
     __in BURN_EXTENSION_ENGINE_CONTEXT* /*pContext*/,
     __in BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS* pArgs,
@@ -10,7 +17,6 @@ static HRESULT BEEngineEscapeString(
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
-    size_t cchRemaining = 0;
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
@@ -20,21 +26,7 @@ static HRESULT BEEngineEscapeString(
         hr = VariableEscapeString(wzIn, &sczValue);
         if (SUCCEEDED(hr))
         {
-            if (wzOut)
-            {
-                hr = ::StringCchCopyExW(wzOut, *pcchOut, sczValue, NULL, &cchRemaining, STRSAFE_FILL_BEHIND_NULL);
-                if (STRSAFE_E_INSUFFICIENT_BUFFER == hr)
-                {
-                    hr = E_MOREDATA;
-                    ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchRemaining);
-                    *pcchOut = cchRemaining;
-                }
-            }
-            else
-            {
-                ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchRemaining);
-                *pcchOut = cchRemaining;
-            }
+            hr = CopyStringToBE(sczValue, wzOut, pcchOut);
         }
     }
     else
@@ -76,33 +68,16 @@ static HRESULT BEEngineFormatString(
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
-    DWORD cchValue = 0;
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
 
     if (wzIn && *wzIn)
     {
-        hr = VariableFormatString(&pContext->pEngineState->variables, wzIn, &sczValue, &cchValue);
+        hr = VariableFormatString(&pContext->pEngineState->variables, wzIn, &sczValue, NULL);
         if (SUCCEEDED(hr))
         {
-            if (wzOut)
-            {
-                hr = ::StringCchCopyExW(wzOut, *pcchOut, sczValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-                if (FAILED(hr))
-                {
-                    *pcchOut = cchValue;
-                    if (STRSAFE_E_INSUFFICIENT_BUFFER == hr)
-                    {
-                        hr = E_MOREDATA;
-                    }
-                }
-            }
-            else
-            {
-                hr = E_MOREDATA;
-                *pcchOut = cchValue;
-            }
+            hr = CopyStringToBE(sczValue, wzOut, pcchOut);
         }
     }
     else
@@ -144,7 +119,6 @@ static HRESULT BEEngineGetVariableString(
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
-    size_t cchRemaining = 0;
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPWSTR wzValue = pResults->wzValue;
     DWORD* pcchValue = &pResults->cchValue;
@@ -154,24 +128,7 @@ static HRESULT BEEngineGetVariableString(
         hr = VariableGetString(&pContext->pEngineState->variables, wzVariable, &sczValue);
         if (SUCCEEDED(hr))
         {
-            if (wzValue)
-            {
-                hr = ::StringCchCopyExW(wzValue, *pcchValue, sczValue, NULL, &cchRemaining, STRSAFE_FILL_BEHIND_NULL);
-                if (STRSAFE_E_INSUFFICIENT_BUFFER == hr)
-                {
-                    hr = E_MOREDATA;
-
-                    ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchRemaining);
-                    *pcchValue = cchRemaining + 1;
-                }
-            }
-            else
-            {
-                hr = E_MOREDATA;
-
-                ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchRemaining);
-                *pcchValue = cchRemaining + 1;
-            }
+            hr = CopyStringToBE(sczValue, wzValue, pcchValue);
         }
     }
     else
@@ -190,17 +147,25 @@ static HRESULT BEEngineGetVariableVersion(
     )
 {
     HRESULT hr = S_OK;
+    VERUTIL_VERSION* pVersion = NULL;
     LPCWSTR wzVariable = pArgs->wzVariable;
-    DWORD64* pqwValue = &pResults->qwValue;
+    LPWSTR wzValue = pResults->wzValue;
+    DWORD* pcchValue = &pResults->cchValue;
 
     if (wzVariable && *wzVariable)
     {
-        hr = VariableGetVersion(&pContext->pEngineState->variables, wzVariable, pqwValue);
+        hr = VariableGetVersion(&pContext->pEngineState->variables, wzVariable, &pVersion);
+        if (SUCCEEDED(hr))
+        {
+            hr = CopyStringToBE(pVersion->sczVersion, wzValue, pcchValue);
+        }
     }
     else
     {
         hr = E_INVALIDARG;
     }
+
+    ReleaseVerutilVersion(pVersion);
 
     return hr;
 }
@@ -303,11 +268,15 @@ static HRESULT BEEngineSetVariableVersion(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzVariable = pArgs->wzVariable;
-    DWORD64 qwValue = pArgs->qwValue;
+    LPCWSTR wzValue = pArgs->wzValue;
+    VERUTIL_VERSION* pVersion = NULL;
 
     if (wzVariable && *wzVariable)
     {
-        hr = VariableSetVersion(&pContext->pEngineState->variables, wzVariable, qwValue, FALSE);
+        hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
+        ExitOnFailure(hr, "Failed to parse new version value.");
+
+        hr = VariableSetVersion(&pContext->pEngineState->variables, wzVariable, pVersion, FALSE);
         ExitOnFailure(hr, "Failed to set version variable.");
     }
     else
@@ -317,6 +286,8 @@ static HRESULT BEEngineSetVariableVersion(
     }
 
 LExit:
+    ReleaseVerutilVersion(pVersion);
+
     return hr;
 }
 
@@ -373,5 +344,36 @@ HRESULT WINAPI EngineForExtensionProc(
     }
 
 LExit:
+    return hr;
+}
+
+static HRESULT CopyStringToBE(
+    __in LPWSTR wzValue,
+    __in LPWSTR wzBuffer,
+    __inout DWORD* pcchBuffer
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fTooSmall = !wzBuffer;
+
+    if (!fTooSmall)
+    {
+        hr = ::StringCchCopyExW(wzBuffer, *pcchBuffer, wzValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
+        if (STRSAFE_E_INSUFFICIENT_BUFFER == hr)
+        {
+            fTooSmall = TRUE;
+        }
+    }
+
+    if (fTooSmall)
+    {
+        hr = ::StringCchLengthW(wzValue, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(pcchBuffer));
+        if (SUCCEEDED(hr))
+        {
+            hr = E_MOREDATA;
+            *pcchBuffer += 1; // null terminator.
+        }
+    }
+
     return hr;
 }

@@ -583,23 +583,6 @@ extern "C" LPWSTR LoggingStringOrUnknownIfNull(
     return wz ? wz : L"Unknown";
 }
 
-// Note: this function is not thread safe.
-extern "C" LPCSTR LoggingVersionToString(
-    __in DWORD64 dw64Version
-    )
-{
-    static CHAR szVersion[40] = { 0 };
-    HRESULT hr = S_OK;
-
-    hr = ::StringCchPrintfA(szVersion, countof(szVersion), "%I64u.%I64u.%I64u.%I64u", dw64Version >> 48 & 0xFFFF, dw64Version >> 32 & 0xFFFF, dw64Version >> 16 & 0xFFFF, dw64Version  & 0xFFFF);
-    if (FAILED(hr))
-    {
-        memset(szVersion, 0, sizeof(szVersion));
-    }
-
-    return szVersion;
-}
-
 
 // internal function declarations
 

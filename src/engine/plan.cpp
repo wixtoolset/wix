@@ -530,7 +530,7 @@ extern "C" HRESULT PlanPackages(
 
             pAction->type = BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE;
             pAction->compatiblePackage.pReferencePackage = pPackage;
-            pAction->compatiblePackage.qwInstalledVersion = pCompatiblePackage->Msi.qwVersion;
+            pAction->compatiblePackage.pInstalledVersion = pCompatiblePackage->Msi.pVersion;
 
             hr = StrAllocString(&pAction->compatiblePackage.sczInstalledProductCode, pCompatiblePackage->Msi.sczProductCode, 0);
             ExitOnFailure(hr, "Failed to copy installed ProductCode");
@@ -880,7 +880,7 @@ static HRESULT ProcessPackage(
     {
         AssertSz(BURN_PACKAGE_TYPE_MSI == pPackage->type, "Currently only MSI packages have compatible packages.");
 
-        hr = UserExperienceOnPlanCompatibleMsiPackageBegin(pUX, pCompatiblePackageParent->sczId, pPackage->sczId, pPackage->Msi.qwVersion, &pPackage->requested);
+        hr = UserExperienceOnPlanCompatibleMsiPackageBegin(pUX, pCompatiblePackageParent->sczId, pPackage->sczId, pPackage->Msi.pVersion, &pPackage->requested);
         ExitOnRootFailure(hr, "BA aborted plan compatible MSI package begin.");
     }
     else
@@ -1207,6 +1207,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
     LPWSTR* rgsczAncestors = NULL;
     UINT cAncestors = 0;
     STRINGDICT_HANDLE sdAncestors = NULL;
+    int nCompareResult = 0;
 
     if (pRegistration->sczAncestors)
     {
@@ -1261,7 +1262,10 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         case BOOTSTRAPPER_RELATION_UPGRADE:
             if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action)
             {
-                pRelatedBundle->package.requested = (pRegistration->qwVersion > pRelatedBundle->qwVersion) ? BOOTSTRAPPER_REQUEST_STATE_ABSENT : BOOTSTRAPPER_REQUEST_STATE_NONE;
+                hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
+
+                pRelatedBundle->package.requested = (nCompareResult > 0) ? BOOTSTRAPPER_REQUEST_STATE_ABSENT : BOOTSTRAPPER_REQUEST_STATE_NONE;
             }
             break;
         case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;

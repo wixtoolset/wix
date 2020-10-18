@@ -416,7 +416,7 @@ struct BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS
     DWORD cbSize;
     LPCWSTR wzPackageId;
     LPCWSTR wzCompatiblePackageId;
-    DWORD64 dw64CompatiblePackageVersion;
+    LPCWSTR wzCompatiblePackageVersion;
 };
 
 struct BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS
@@ -443,7 +443,7 @@ struct BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_ARGS
     BOOTSTRAPPER_RELATION_TYPE relationType;
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
-    DWORD64 dw64Version;
+    LPCWSTR wzVersion;
 };
 
 struct BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS
@@ -499,7 +499,7 @@ struct BA_ONDETECTRELATEDBUNDLE_ARGS
     BOOTSTRAPPER_RELATION_TYPE relationType;
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
-    DWORD64 dw64Version;
+    LPCWSTR wzVersion;
     BOOTSTRAPPER_RELATED_OPERATION operation;
 };
 
@@ -516,7 +516,7 @@ struct BA_ONDETECTRELATEDMSIPACKAGE_ARGS
     LPCWSTR wzUpgradeCode;
     LPCWSTR wzProductCode;
     BOOL fPerMachine;
-    DWORD64 dw64Version;
+    LPCWSTR wzVersion;
     BOOTSTRAPPER_RELATED_OPERATION operation;
 };
 
@@ -545,7 +545,7 @@ struct BA_ONDETECTUPDATE_ARGS
     DWORD cbSize;
     LPCWSTR wzUpdateLocation;
     DWORD64 dw64Size;
-    DWORD64 dw64Version;
+    LPCWSTR wzVersion;
     LPCWSTR wzTitle;
     LPCWSTR wzSummary;
     LPCWSTR wzContentType;
@@ -781,7 +781,7 @@ struct BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS
     DWORD cbSize;
     LPCWSTR wzPackageId;
     LPCWSTR wzCompatiblePackageId;
-    DWORD64 dw64CompatiblePackageVersion;
+    LPCWSTR wzCompatiblePackageVersion;
     BOOTSTRAPPER_REQUEST_STATE recommendedState;
 };
 

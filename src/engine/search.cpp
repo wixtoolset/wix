@@ -754,6 +754,7 @@ static HRESULT FileSearchVersion(
     HRESULT hr = S_OK;
     ULARGE_INTEGER uliVersion = { };
     LPWSTR sczPath = NULL;
+    VERUTIL_VERSION* pVersion = NULL;
 
     // format path
     hr = VariableFormatString(pVariables, pSearch->FileSearch.sczPath, &sczPath, NULL);
@@ -767,14 +768,18 @@ static HRESULT FileSearchVersion(
         LogStringLine(REPORT_STANDARD, "File search: %ls, did not find path: %ls", pSearch->sczKey, sczPath);
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed get file version.");
+    ExitOnFailure(hr, "Failed to get file version.");
+
+    hr = VerVersionFromQword(uliVersion.QuadPart, &pVersion);
+    ExitOnFailure(hr, "Failed to create version from file version.");
 
     // set variable
-    hr = VariableSetVersion(pVariables, pSearch->sczVariable, uliVersion.QuadPart, FALSE);
+    hr = VariableSetVersion(pVariables, pSearch->sczVariable, pVersion, FALSE);
     ExitOnFailure(hr, "Failed to set variable.");
 
 LExit:
     StrSecureZeroFreeString(sczPath);
+    ReleaseVerutilVersion(pVersion);
     return hr;
 }
 

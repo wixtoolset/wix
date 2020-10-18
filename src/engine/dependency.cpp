@@ -593,20 +593,14 @@ extern "C" HRESULT DependencyRegisterBundle(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczVersion = NULL;
 
-    hr = FileVersionToStringEx(pRegistration->qwVersion, &sczVersion);
-    ExitOnFailure(hr, "Failed to format the registration version string.");
-
-    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_REGISTER, pRegistration->sczProviderKey, sczVersion);
+    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_REGISTER, pRegistration->sczProviderKey, pRegistration->pVersion->sczVersion);
 
     // Register the bundle provider key.
-    hr = DepRegisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey, sczVersion, pRegistration->sczDisplayName, pRegistration->sczId, 0);
+    hr = DepRegisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey, pRegistration->pVersion->sczVersion, pRegistration->sczDisplayName, pRegistration->sczId, 0);
     ExitOnFailure(hr, "Failed to register the bundle dependency provider.");
 
 LExit:
-    ReleaseStr(sczVersion);
-
     return hr;
 }
 

@@ -24,6 +24,7 @@
 #define DUTIL_SOURCE_DEFAULT DUTIL_SOURCE_EXTERNAL
 
 #include <dutil.h>
+#include <verutil.h>
 #include <aclutil.h>
 #include <apputil.h>
 #include <buffutil.h>

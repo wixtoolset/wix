@@ -26,7 +26,7 @@ typedef struct _BURN_VARIANT
     union
     {
         LONGLONG llValue;
-        DWORD64 qwValue;
+        VERUTIL_VERSION* pValue;
         LPWSTR sczValue;
     };
     BURN_VARIANT_TYPE Type;
@@ -49,7 +49,7 @@ HRESULT BVariantGetString(
     );
 HRESULT BVariantGetVersion(
     __in BURN_VARIANT* pVariant,
-    __out DWORD64* pqwValue
+    __out VERUTIL_VERSION** ppValue
     );
 HRESULT BVariantSetNumeric(
     __in BURN_VARIANT* pVariant,
@@ -63,7 +63,7 @@ HRESULT BVariantSetString(
     );
 HRESULT BVariantSetVersion(
     __in BURN_VARIANT* pVariant,
-    __in DWORD64 qwValue
+    __in VERUTIL_VERSION* pValue
     );
 /********************************************************************
 BVariantSetValue - Convenience function that calls BVariantUninitialize,

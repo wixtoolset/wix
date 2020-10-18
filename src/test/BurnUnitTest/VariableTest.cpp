@@ -42,7 +42,7 @@ namespace Bootstrapper
                 VariableSetStringHelper(&variables, L"PROP4", L"VAL4", FALSE);
                 VariableSetStringHelper(&variables, L"PROP6", L"VAL6", FALSE);
                 VariableSetStringHelper(&variables, L"PROP7", L"7", FALSE);
-                VariableSetVersionHelper(&variables, L"PROP8", MAKEQWORDVERSION(1,1,0,0));
+                VariableSetVersionHelper(&variables, L"PROP8", L"1.1.0.0");
                 VariableSetStringHelper(&variables, L"PROP9", L"[VAL9]", TRUE);
 
                 // set overwritten variables
@@ -61,7 +61,7 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"VAL5"), VariableGetStringHelper(&variables, L"PROP5"));
                 Assert::Equal<String^>(gcnew String(L"VAL6"), VariableGetStringHelper(&variables, L"PROP6"));
                 Assert::Equal(7ll, VariableGetNumericHelper(&variables, L"PROP7"));
-                Assert::Equal(MAKEQWORDVERSION(1,1,0,0), VariableGetVersionHelper(&variables, L"PROP8"));
+                Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetVersionHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"1.1.0.0"), VariableGetStringHelper(&variables, L"PROP8"));
                 Assert::Equal<String^>(gcnew String(L"[VAL9]"), VariableGetStringHelper(&variables, L"PROP9"));
 
@@ -110,7 +110,7 @@ namespace Bootstrapper
 
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Var1"));
                 Assert::Equal<String^>(gcnew String(L"String value."), VariableGetStringHelper(&variables, L"Var2"));
-                Assert::Equal(MAKEQWORDVERSION(1,2,3,4), VariableGetVersionHelper(&variables, L"Var3"));
+                Assert::Equal<String^>(gcnew String(L"1.2.3.4"), VariableGetVersionHelper(&variables, L"Var3"));
                 Assert::Equal<String^>(gcnew String(L"[Formatted]"), VariableGetStringHelper(&variables, L"Var6"));
             }
             finally
@@ -214,13 +214,13 @@ namespace Bootstrapper
                 VariableSetNumericHelper(&variables, L"PROP13", 0x00010000);
                 VariableSetNumericHelper(&variables, L"PROP14", 0x00000001);
                 VariableSetNumericHelper(&variables, L"PROP15", 0x00010001);
-                VariableSetVersionHelper(&variables, L"PROP16", MAKEQWORDVERSION(0,0,0,0));
-                VariableSetVersionHelper(&variables, L"PROP17", MAKEQWORDVERSION(1,0,0,0));
-                VariableSetVersionHelper(&variables, L"PROP18", MAKEQWORDVERSION(1,1,0,0));
-                VariableSetVersionHelper(&variables, L"PROP19", MAKEQWORDVERSION(1,1,1,0));
-                VariableSetVersionHelper(&variables, L"PROP20", MAKEQWORDVERSION(1,1,1,1));
+                VariableSetVersionHelper(&variables, L"PROP16", L"0.0.0.0");
+                VariableSetVersionHelper(&variables, L"PROP17", L"1.0.0.0");
+                VariableSetVersionHelper(&variables, L"PROP18", L"1.1.0.0");
+                VariableSetVersionHelper(&variables, L"PROP19", L"1.1.1.0");
+                VariableSetVersionHelper(&variables, L"PROP20", L"1.1.1.1");
                 VariableSetNumericHelper(&variables, L"vPROP21", 1);
-                VariableSetVersionHelper(&variables, L"PROP22", MAKEQWORDVERSION(65535,65535,65535,65535));
+                VariableSetVersionHelper(&variables, L"PROP22", L"65535.65535.65535.65535");
                 VariableSetStringHelper(&variables, L"PROP23", L"1.1.1", FALSE);
                 VariableSetStringHelper(&variables, L"PROP24", L"[PROP1]", TRUE);
                 VariableSetStringHelper(&variables, L"PROP25", L"[PROP7]", TRUE);
@@ -233,7 +233,7 @@ namespace Bootstrapper
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP7"));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP8"));
                 Assert::True(EvaluateConditionHelper(&variables, L"_PROP9"));
-                Assert::False(EvaluateConditionHelper(&variables, L"PROP16"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP16"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP17"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP24"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP25"));
@@ -268,8 +268,8 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP18 = v1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP19 = v1.1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP20 = v1.1.1.1"));
-                Assert::True(EvaluateFailureConditionHelper(&variables, L"PROP20 = v1.1.1.1.0"));
-                Assert::True(EvaluateFailureConditionHelper(&variables, L"PROP20 = v1.1.1.1.1"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP20 > v1.1.1.1.0"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP20 > v1.1.1.1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"vPROP21 = 1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP23 = v1.1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"v1.1.1 = PROP23"));
@@ -287,8 +287,8 @@ namespace Bootstrapper
                 Assert::True(EvaluateFailureConditionHelper(&variables, L"PROP12 = -92233720368547758080000"));
 
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP22 = v65535.65535.65535.65535"));
-                Assert::True(EvaluateFailureConditionHelper(&variables, L"PROP22 = v65536.65535.65535.65535"));
-                Assert::True(EvaluateFailureConditionHelper(&variables, L"PROP22 = v65535.655350000.65535.65535"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP22 < v65536.65535.65535.65535"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP22 < v65535.655350000.65535.65535"));
 
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP5 < 6"));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP5 < 5"));
@@ -388,7 +388,7 @@ namespace Bootstrapper
 
                 VariableSetStringHelper(&variables1, L"PROP1", L"VAL1", FALSE);
                 VariableSetNumericHelper(&variables1, L"PROP2", 2);
-                VariableSetVersionHelper(&variables1, L"PROP3", MAKEQWORDVERSION(1,1,1,1));
+                VariableSetVersionHelper(&variables1, L"PROP3", L"1.1.1.1");
                 VariableSetStringHelper(&variables1, L"PROP4", L"VAL4", FALSE);
                 VariableSetStringHelper(&variables1, L"PROP5", L"[PROP1]", TRUE);
 
@@ -404,7 +404,7 @@ namespace Bootstrapper
 
                 Assert::Equal<String^>(gcnew String(L"VAL1"), VariableGetStringHelper(&variables2, L"PROP1"));
                 Assert::Equal(2ll, VariableGetNumericHelper(&variables2, L"PROP2"));
-                Assert::Equal(MAKEQWORDVERSION(1,1,1,1), VariableGetVersionHelper(&variables2, L"PROP3"));
+                Assert::Equal<String^>(gcnew String(L"1.1.1.1"), VariableGetVersionHelper(&variables2, L"PROP3"));
                 Assert::Equal<String^>(gcnew String(L"VAL4"), VariableGetStringHelper(&variables2, L"PROP4"));
                 Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetStringHelper(&variables2, L"PROP5"));
 

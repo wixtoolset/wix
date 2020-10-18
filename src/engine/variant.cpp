@@ -23,7 +23,7 @@ static HRESULT BVariantRetrieveDecryptedString(
 
 static void BVariantRetrieveVersion(
     __in BURN_VARIANT* pVariant,
-    __out DWORD64* pqwValue
+    __out VERUTIL_VERSION** ppValue
     );
 
 // function definitions
@@ -48,6 +48,7 @@ extern "C" HRESULT BVariantGetNumeric(
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    VERUTIL_VERSION* pVersionValue = NULL;
 
     switch (pVariant->Type)
     {
@@ -68,7 +69,13 @@ extern "C" HRESULT BVariantGetNumeric(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        BVariantRetrieveVersion(pVariant, (DWORD64*)pllValue);
+        BVariantRetrieveVersion(pVariant, &pVersionValue);
+
+        hr = StrStringToInt64(pVersionValue->sczVersion, 0, pllValue);
+        if (FAILED(hr))
+        {
+            hr = DISP_E_TYPEMISMATCH;
+        }
         break;
     default:
         hr = E_INVALIDARG;
@@ -86,7 +93,7 @@ extern "C" HRESULT BVariantGetString(
 {
     HRESULT hr = S_OK;
     LONGLONG llValue = 0;
-    DWORD64 qwValue = 0;
+    VERUTIL_VERSION* pVersionValue = NULL;
 
     switch (pVariant->Type)
     {
@@ -104,17 +111,9 @@ extern "C" HRESULT BVariantGetString(
         hr = BVariantRetrieveDecryptedString(pVariant, psczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        BVariantRetrieveVersion(pVariant, &qwValue);
-        if (SUCCEEDED(hr))
-        {
-            hr = StrAllocFormattedSecure(psczValue, L"%hu.%hu.%hu.%hu",
-                (WORD)(qwValue >> 48),
-                (WORD)(qwValue >> 32),
-                (WORD)(qwValue >> 16),
-                (WORD)qwValue);
-            ExitOnFailure(hr, "Failed to convert version to string.");
-        }
-        SecureZeroMemory(&qwValue, sizeof(qwValue));
+        BVariantRetrieveVersion(pVariant, &pVersionValue);
+
+        hr = StrAllocStringSecure(psczValue, pVersionValue->sczVersion, 0);
         break;
     default:
         hr = E_INVALIDARG;
@@ -125,26 +124,30 @@ LExit:
     return hr;
 }
 
-// The contents of pqwValue may be sensitive, should keep encrypted and SecureZeroMemory.
+// The contents of ppValue may be sensitive, should keep encrypted and SecureZeroMemory.
 extern "C" HRESULT BVariantGetVersion(
     __in BURN_VARIANT* pVariant,
-    __out DWORD64* pqwValue
+    __out VERUTIL_VERSION** ppValue
     )
 {
     HRESULT hr = S_OK;
+    LONGLONG llValue = 0;
     LPWSTR sczValue = NULL;
+    VERUTIL_VERSION* pValue = NULL;
 
     switch (pVariant->Type)
     {
     case BURN_VARIANT_TYPE_NUMERIC:
-        BVariantRetrieveNumeric(pVariant, (LONGLONG*)pqwValue);
+        BVariantRetrieveNumeric(pVariant, &llValue);
+
+        hr = VerVersionFromQword(llValue, ppValue);
         break;
     case BURN_VARIANT_TYPE_FORMATTED: __fallthrough;
     case BURN_VARIANT_TYPE_STRING:
         hr = BVariantRetrieveDecryptedString(pVariant, &sczValue);
         if (SUCCEEDED(hr))
         {
-            hr = FileVersionFromStringEx(sczValue, 0, pqwValue);
+            hr = VerParseVersion(sczValue, 0, FALSE, ppValue);
             if (FAILED(hr))
             {
                 hr = DISP_E_TYPEMISMATCH;
@@ -153,7 +156,9 @@ extern "C" HRESULT BVariantGetVersion(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        BVariantRetrieveVersion(pVariant, pqwValue);
+        BVariantRetrieveVersion(pVariant, &pValue);
+
+        hr = VerCopyVersion(pValue, ppValue);
         break;
     default:
         hr = E_INVALIDARG;
@@ -224,7 +229,7 @@ LExit:
 
 extern "C" HRESULT BVariantSetVersion(
     __in BURN_VARIANT* pVariant,
-    __in DWORD64 qwValue
+    __in VERUTIL_VERSION* pValue
     )
 {
     HRESULT hr = S_OK;
@@ -236,7 +241,7 @@ extern "C" HRESULT BVariantSetVersion(
         StrSecureZeroFreeString(pVariant->sczValue);
     }
     memset(pVariant, 0, sizeof(BURN_VARIANT));
-    pVariant->qwValue = qwValue;
+    hr = VerCopyVersion(pValue, &pVariant->pValue);
     pVariant->Type = BURN_VARIANT_TYPE_VERSION;
     BVariantSetEncryption(pVariant, fEncryptValue);
 
@@ -251,7 +256,7 @@ extern "C" HRESULT BVariantSetValue(
     HRESULT hr = S_OK;
     LONGLONG llValue = 0;
     LPWSTR sczValue = NULL;
-    DWORD64 qwValue = 0;
+    VERUTIL_VERSION* pVersionValue = NULL;
     BOOL fEncrypt = pVariant->fEncryptString;
 
     switch (pValue->Type)
@@ -277,12 +282,11 @@ extern "C" HRESULT BVariantSetValue(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pValue, &qwValue);
+        hr = BVariantGetVersion(pValue, &pVersionValue);
         if (SUCCEEDED(hr))
         {
-            hr = BVariantSetVersion(pVariant, qwValue);
+            hr = BVariantSetVersion(pVariant, pVersionValue);
         }
-        SecureZeroMemory(&qwValue, sizeof(qwValue));
         break;
     default:
         hr = E_INVALIDARG;
@@ -303,7 +307,7 @@ extern "C" HRESULT BVariantCopy(
     HRESULT hr = S_OK;
     LONGLONG llValue = 0;
     LPWSTR sczValue = NULL;
-    DWORD64 qwValue = 0;
+    VERUTIL_VERSION* pVersionValue = 0;
 
     BVariantUninitialize(pTarget);
 
@@ -329,12 +333,11 @@ extern "C" HRESULT BVariantCopy(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pSource, &qwValue);
+        hr = BVariantGetVersion(pSource, &pVersionValue);
         if (SUCCEEDED(hr))
         {
-            hr = BVariantSetVersion(pTarget, qwValue);
+            hr = BVariantSetVersion(pTarget, pVersionValue);
         }
-        SecureZeroMemory(&qwValue, sizeof(qwValue));
         break;
     default:
         hr = E_INVALIDARG;
@@ -380,13 +383,13 @@ extern "C" HRESULT BVariantChangeType(
         hr = BVariantGetString(pVariant, &variant.sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pVariant, &variant.qwValue);
+        hr = BVariantGetVersion(pVariant, &variant.pValue);
         break;
     default:
         ExitFunction1(hr = E_INVALIDARG);
     }
-    ExitOnFailure(hr, "Failed to copy variant value.");
     variant.Type = type;
+    ExitOnFailure(hr, "Failed to copy variant value.");
 
     BVariantUninitialize(pVariant);
     memcpy_s(pVariant, sizeof(BURN_VARIANT), &variant, sizeof(BURN_VARIANT));
@@ -524,10 +527,10 @@ LExit:
 
 static void BVariantRetrieveVersion(
     __in BURN_VARIANT* pVariant,
-    __out DWORD64* pqwValue
+    __out VERUTIL_VERSION** ppValue
     )
 {
-    Assert(NULL != pqwValue);
+    Assert(ppValue);
 
-    *pqwValue = pVariant->qwValue;
+    *ppValue = pVariant->pValue;
 }

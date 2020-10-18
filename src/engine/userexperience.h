@@ -171,7 +171,7 @@ BAAPI UserExperienceOnDetectCompatibleMsiPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCompatiblePackageId,
-    __in DWORD64 dw64CompatiblePackageVersion
+    __in VERUTIL_VERSION* pCompatiblePackageVersion
     );
 BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -183,7 +183,7 @@ BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __inout BOOL* pfIgnoreBundle
     );
 BAAPI UserExperienceOnDetectMsiFeature(
@@ -208,7 +208,7 @@ BAAPI UserExperienceOnDetectRelatedBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in BOOTSTRAPPER_RELATED_OPERATION operation
     );
 BAAPI UserExperienceOnDetectRelatedMsiPackage(
@@ -217,7 +217,7 @@ BAAPI UserExperienceOnDetectRelatedMsiPackage(
     __in_z LPCWSTR wzUpgradeCode,
     __in_z LPCWSTR wzProductCode,
     __in BOOL fPerMachine,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in BOOTSTRAPPER_RELATED_OPERATION operation
     );
 BAAPI UserExperienceOnDetectTargetMsiPackage(
@@ -230,7 +230,7 @@ BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
-    __in DWORD64 dw64Version,
+    __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,
     __in_z_opt LPCWSTR wzSummary,
     __in_z_opt LPCWSTR wzContentType,
@@ -333,7 +333,7 @@ BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCompatiblePackageId,
-    __in DWORD64 dw64CompatiblePackageVersion,
+    __in VERUTIL_VERSION* pCompatiblePackageVersion,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     );
 BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(

@@ -133,7 +133,7 @@ extern "C" HRESULT RegistrationParseFromXml(
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Version", &scz);
     ExitOnFailure(hr, "Failed to get @Version.");
 
-    hr = FileVersionFromStringEx(scz, 0, &pRegistration->qwVersion);
+    hr = VerParseVersion(scz, 0, FALSE, &pRegistration->pVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
 
     // @ProviderKey
@@ -436,7 +436,7 @@ extern "C" HRESULT RegistrationSetVariables(
     hr = VariableSetString(pVariables, BURN_BUNDLE_TAG, pRegistration->sczTag, TRUE, FALSE);
     ExitOnFailure(hr, "Failed to overwrite the bundle tag built-in variable.");
 
-    hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->qwVersion, TRUE);
+    hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle tag built-in variable.");
 
 LExit:
@@ -630,15 +630,13 @@ extern "C" HRESULT RegistrationSessionBegin(
         hr = RegWriteStringArray(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE, pRegistration->rgsczPatchCodes, pRegistration->cPatchCodes);
         ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE);
 
-        hr = RegWriteStringFormatted(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, L"%hu.%hu.%hu.%hu", 
-            static_cast<WORD>(pRegistration->qwVersion >> 48), static_cast<WORD>(pRegistration->qwVersion >> 32), 
-            static_cast<WORD>(pRegistration->qwVersion >> 16), static_cast<WORD>(pRegistration->qwVersion));
+        hr = RegWriteString(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, pRegistration->pVersion->sczVersion);
         ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION);
 
-        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_VERSION_MAJOR, static_cast<WORD>(pRegistration->qwVersion >> 48));
+        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_VERSION_MAJOR, pRegistration->pVersion->dwMajor);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_VERSION_MAJOR);
 
-        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_VERSION_MINOR, static_cast<WORD>(pRegistration->qwVersion >> 32));
+        hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_VERSION_MINOR, pRegistration->pVersion->dwMinor);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_VERSION_MINOR);
 
         if (pRegistration->sczProviderKey)

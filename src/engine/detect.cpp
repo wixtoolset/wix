@@ -90,6 +90,7 @@ extern "C" HRESULT DetectForwardCompatibleBundle(
     HRESULT hr = S_OK;
     BOOL fRecommendIgnore = TRUE;
     BOOL fIgnoreBundle = FALSE;
+    int nCompareResult = 0;
 
     if (pRegistration->sczDetectedProviderKeyBundleId &&
         CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRegistration->sczId, -1))
@@ -122,22 +123,27 @@ extern "C" HRESULT DetectForwardCompatibleBundle(
             fIgnoreBundle = fRecommendIgnore;
 
             if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->relationType &&
-                pRegistration->qwVersion <= pRelatedBundle->qwVersion &&
                 CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRelatedBundle->package.sczId, -1))
             {
-                hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->qwVersion, &fIgnoreBundle);
-                ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
+                hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion->sczVersion, pRelatedBundle->pVersion->sczVersion);
 
-                if (!fIgnoreBundle)
+                if (nCompareResult <= 0)
                 {
-                    hr = PseudoBundleInitializePassthrough(&pRegistration->forwardCompatibleBundle, pCommand, NULL, pRegistration->sczActiveParent, pRegistration->sczAncestors, &pRelatedBundle->package);
-                    ExitOnFailure(hr, "Failed to initialize update bundle.");
+                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
+                    ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
 
-                    pRegistration->fEnabledForwardCompatibleBundle = TRUE;
+                    if (!fIgnoreBundle)
+                    {
+                        hr = PseudoBundleInitializePassthrough(&pRegistration->forwardCompatibleBundle, pCommand, NULL, pRegistration->sczActiveParent, pRegistration->sczAncestors, &pRelatedBundle->package);
+                        ExitOnFailure(hr, "Failed to initialize update bundle.");
+
+                        pRegistration->fEnabledForwardCompatibleBundle = TRUE;
+                    }
+
+                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRegistration->fEnabledForwardCompatibleBundle));
+                    break;
                 }
-
-                LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), LoggingVersionToString(pRelatedBundle->qwVersion), LoggingBoolToString(pRegistration->fEnabledForwardCompatibleBundle));
-                break;
             }
         }
     }
@@ -154,6 +160,7 @@ extern "C" HRESULT DetectReportRelatedBundles(
     )
 {
     HRESULT hr = S_OK;
+    int nCompareResult = 0;
 
     for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {
@@ -165,11 +172,14 @@ extern "C" HRESULT DetectReportRelatedBundles(
         case BOOTSTRAPPER_RELATION_UPGRADE:
             if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL < action)
             {
-                if (pRegistration->qwVersion > pRelatedBundle->qwVersion)
+                hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
+                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
+
+                if (nCompareResult > 0)
                 {
                     operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
                 }
-                else if (pRegistration->qwVersion < pRelatedBundle->qwVersion)
+                else if (nCompareResult < 0)
                 {
                     operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
                 }
@@ -202,9 +212,9 @@ extern "C" HRESULT DetectReportRelatedBundles(
             break;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), LoggingVersionToString(pRelatedBundle->qwVersion), LoggingRelatedOperationToString(operation));
+        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingRelatedOperationToString(operation));
 
-        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->qwVersion, operation);
+        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, operation);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
     }
 
@@ -405,7 +415,7 @@ static HRESULT DetectAtomFeedUpdate(
 
             hr = UserExperienceOnDetectUpdate(pUX, pAppUpdateEntry->rgEnclosures ? pAppUpdateEntry->rgEnclosures->wzUrl : NULL, 
                 pAppUpdateEntry->rgEnclosures ? pAppUpdateEntry->rgEnclosures->dw64Size : 0, 
-                pAppUpdateEntry->dw64Version, pAppUpdateEntry->wzTitle,
+                pAppUpdateEntry->pVersion, pAppUpdateEntry->wzTitle,
                 pAppUpdateEntry->wzSummary, pAppUpdateEntry->wzContentType, pAppUpdateEntry->wzContent, &fStopProcessingUpdates);
             ExitOnRootFailure(hr, "BA aborted detect update.");
 
