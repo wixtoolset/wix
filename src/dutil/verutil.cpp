@@ -85,22 +85,6 @@ DAPI_(HRESULT) VerCompareParsedVersions(
         ExitFunction();
     }
 
-    if (pVersion1->fInvalid)
-    {
-        if (!pVersion2->fInvalid)
-        {
-            ExitFunction1(nResult = -1);
-        }
-        else
-        {
-            fCompareMetadata = TRUE;
-        }
-    }
-    else if (pVersion2->fInvalid)
-    {
-        ExitFunction1(nResult = 1);
-    }
-
     if (pVersion1->cReleaseLabels)
     {
         if (pVersion2->cReleaseLabels)
@@ -130,6 +114,22 @@ DAPI_(HRESULT) VerCompareParsedVersions(
                 ExitFunction();
             }
         }
+    }
+
+    if (pVersion1->fInvalid)
+    {
+        if (!pVersion2->fInvalid)
+        {
+            ExitFunction1(nResult = -1);
+        }
+        else
+        {
+            fCompareMetadata = TRUE;
+        }
+    }
+    else if (pVersion2->fInvalid)
+    {
+        ExitFunction1(nResult = 1);
     }
 
     if (fCompareMetadata)
@@ -191,20 +191,23 @@ DAPI_(HRESULT) VerCopyVersion(
     pCopy->dwPatch = pSource->dwPatch;
     pCopy->dwRevision = pSource->dwRevision;
 
-    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pCopy->rgReleaseLabels), 0, sizeof(VERUTIL_VERSION_RELEASE_LABEL), pSource->cReleaseLabels);
-    VerExitOnFailure(hr, "Failed to allocate memory for Verutil version release labels copies.");
-
-    pCopy->cReleaseLabels = pSource->cReleaseLabels;
-
-    for (DWORD i = 0; i < pCopy->cReleaseLabels; ++i)
+    if (pSource->cReleaseLabels)
     {
-        VERUTIL_VERSION_RELEASE_LABEL* pSourceLabel = pSource->rgReleaseLabels + i;
-        VERUTIL_VERSION_RELEASE_LABEL* pCopyLabel = pCopy->rgReleaseLabels + i;
+        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pCopy->rgReleaseLabels), 0, sizeof(VERUTIL_VERSION_RELEASE_LABEL), pSource->cReleaseLabels);
+        VerExitOnFailure(hr, "Failed to allocate memory for Verutil version release labels copies.");
 
-        pCopyLabel->cchLabelOffset = pSourceLabel->cchLabelOffset;
-        pCopyLabel->cchLabel = pSourceLabel->cchLabel;
-        pCopyLabel->fNumeric = pSourceLabel->fNumeric;
-        pCopyLabel->dwValue = pSourceLabel->dwValue;
+        pCopy->cReleaseLabels = pSource->cReleaseLabels;
+
+        for (DWORD i = 0; i < pCopy->cReleaseLabels; ++i)
+        {
+            VERUTIL_VERSION_RELEASE_LABEL* pSourceLabel = pSource->rgReleaseLabels + i;
+            VERUTIL_VERSION_RELEASE_LABEL* pCopyLabel = pCopy->rgReleaseLabels + i;
+
+            pCopyLabel->cchLabelOffset = pSourceLabel->cchLabelOffset;
+            pCopyLabel->cchLabel = pSourceLabel->cchLabel;
+            pCopyLabel->fNumeric = pSourceLabel->fNumeric;
+            pCopyLabel->dwValue = pSourceLabel->dwValue;
+        }
     }
 
     pCopy->cchMetadataOffset = pSource->cchMetadataOffset;

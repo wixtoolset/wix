@@ -237,7 +237,7 @@ namespace DutilTests
 
                 TestVerutilCompareParsedVersions(pVersion1, pVersion2, 1);
                 TestVerutilCompareParsedVersions(pVersion3, pVersion4, 1);
-                TestVerutilCompareParsedVersions(pVersion5, pVersion6, 1);
+                TestVerutilCompareParsedVersions(pVersion5, pVersion6, -1);
             }
             finally
             {
@@ -661,6 +661,48 @@ namespace DutilTests
 
         [Fact]
         void VerCopyVersionCopiesVersion()
+        {
+            HRESULT hr = S_OK;
+            LPCWSTR wzVersion = L"1.2.3.4+abc123";
+            VERUTIL_VERSION* pSource = NULL;
+            VERUTIL_VERSION* pCopy = NULL;
+            int nResult = 0;
+
+            try
+            {
+                hr = VerParseVersion(wzVersion, 0, FALSE, &pSource);
+                NativeAssert::Succeeded(hr, "VerParseVersion failed");
+
+                NativeAssert::StringEqual(wzVersion, pSource->sczVersion);
+                Assert::Equal<DWORD>(1, pSource->dwMajor);
+                Assert::Equal<DWORD>(2, pSource->dwMinor);
+                Assert::Equal<DWORD>(3, pSource->dwPatch);
+                Assert::Equal<DWORD>(4, pSource->dwRevision);
+                Assert::Equal<DWORD>(0, pSource->cReleaseLabels);
+
+                Assert::Equal<DWORD>(8, pSource->cchMetadataOffset);
+                Assert::Equal<BOOL>(FALSE, pSource->fInvalid);
+
+                hr = VerCopyVersion(pSource, &pCopy);
+                NativeAssert::Succeeded(hr, "VerCopyVersion failed");
+
+                Assert::False(pSource == pCopy);
+                Assert::False(pSource->sczVersion == pCopy->sczVersion);
+
+                hr = VerCompareParsedVersions(pSource, pCopy, &nResult);
+                NativeAssert::Succeeded(hr, "VerCompareParsedVersions failed");
+
+                Assert::Equal<int>(nResult, 0);
+            }
+            finally
+            {
+                ReleaseVerutilVersion(pCopy);
+                ReleaseVerutilVersion(pSource);
+            }
+        }
+
+        [Fact]
+        void VerCopyVersionCopiesPrereleaseVersion()
         {
             HRESULT hr = S_OK;
             LPCWSTR wzVersion = L"1.2.3.4-a.b.c.d.5.+abc123";
