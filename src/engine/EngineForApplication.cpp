@@ -616,6 +616,22 @@ static HRESULT BAEngineCloseSplashScreen(
     return S_OK;
 }
 
+static HRESULT BAEngineCompareVersions(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* /*pContext*/,
+    __in const BAENGINE_COMPAREVERSIONS_ARGS* pArgs,
+    __in BAENGINE_COMPAREVERSIONS_RESULTS* pResults
+    )
+{
+    HRESULT hr = S_OK;
+    LPCWSTR wzVersion1 = pArgs->wzVersion1;
+    LPCWSTR wzVersion2 = pArgs->wzVersion2;
+    int* pnResult = &pResults->nResult;
+
+    hr = VerCompareStringVersions(wzVersion1, wzVersion2, FALSE, pnResult);
+
+    return hr;
+}
+
 static HRESULT BAEngineDetect(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
     __in BAENGINE_DETECT_ARGS* pArgs,
@@ -860,6 +876,9 @@ HRESULT WINAPI EngineForApplicationProc(
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_LAUNCHAPPROVEDEXE:
         hr = BAEngineLaunchApprovedExe(pContext, reinterpret_cast<BAENGINE_LAUNCHAPPROVEDEXE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_LAUNCHAPPROVEDEXE_RESULTS*>(pvResults));
+        break;
+    case BOOTSTRAPPER_ENGINE_MESSAGE_COMPAREVERSIONS:
+        hr = BAEngineCompareVersions(pContext, reinterpret_cast<BAENGINE_COMPAREVERSIONS_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_COMPAREVERSIONS_RESULTS*>(pvResults));
         break;
     default:
         hr = E_NOTIMPL;

@@ -291,6 +291,22 @@ LExit:
     return hr;
 }
 
+static HRESULT BEEngineCompareVersions(
+    __in BURN_EXTENSION_ENGINE_CONTEXT* /*pContext*/,
+    __in const BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS* pArgs,
+    __in BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS* pResults
+    )
+{
+    HRESULT hr = S_OK;
+    LPCWSTR wzVersion1 = pArgs->wzVersion1;
+    LPCWSTR wzVersion2 = pArgs->wzVersion2;
+    int* pnResult = &pResults->nResult;
+
+    hr = VerCompareStringVersions(wzVersion1, wzVersion2, FALSE, pnResult);
+
+    return hr;
+}
+
 HRESULT WINAPI EngineForExtensionProc(
     __in BUNDLE_EXTENSION_ENGINE_MESSAGE message,
     __in const LPVOID pvArgs,
@@ -337,6 +353,9 @@ HRESULT WINAPI EngineForExtensionProc(
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION:
         hr = BEEngineSetVariableVersion(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS*>(pvResults));
+        break;
+    case BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS:
+        hr = BEEngineCompareVersions(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS*>(pvResults));
         break;
     default:
         hr = E_NOTIMPL;

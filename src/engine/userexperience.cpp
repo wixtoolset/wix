@@ -97,7 +97,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 5, 14, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 8, 31, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 

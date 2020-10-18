@@ -38,6 +38,7 @@ typedef struct _BUNDLE_EXTENSION_CREATE_ARGS
     LPVOID pvBundleExtensionEngineProcContext;
     LPCWSTR wzBootstrapperWorkingFolder;
     LPCWSTR wzBundleExtensionDataPath;
+    LPCWSTR wzExtensionId;
 } BUNDLE_EXTENSION_CREATE_ARGS;
 
 typedef struct _BUNDLE_EXTENSION_CREATE_RESULTS

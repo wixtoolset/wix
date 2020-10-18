@@ -126,9 +126,10 @@ EXTERN_C HRESULT BurnExtensionLoad(
         args.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_ARGS);
         args.pfnBundleExtensionEngineProc = EngineForExtensionProc;
         args.pvBundleExtensionEngineProcContext = pEngineContext;
-        args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 1); // TODO: need to decide whether to keep this, and if so when to update it.
+        args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 8, 31, 0);
         args.wzBootstrapperWorkingFolder = pEngineContext->pEngineState->userExperience.sczTempDirectory;
         args.wzBundleExtensionDataPath = sczBundleExtensionDataPath;
+        args.wzExtensionId = pExtension->sczId;
 
         results.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_RESULTS);
 
