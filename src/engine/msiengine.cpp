@@ -82,6 +82,11 @@ extern "C" HRESULT MsiEngineParsePackageFromXml(
     hr = VerParseVersion(scz, 0, FALSE, &pPackage->Msi.pVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
 
+    if (pPackage->Msi.pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+    }
+
     // @UpgradeCode
     hr = XmlGetAttributeEx(pixnMsiPackage, L"UpgradeCode", &pPackage->Msi.sczUpgradeCode);
     if (E_NOTFOUND != hr)
@@ -420,6 +425,11 @@ extern "C" HRESULT MsiEngineDetectPackage(
         hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pPackage->Msi.pInstalledVersion);
         ExitOnFailure(hr, "Failed to parse installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, pPackage->Msi.sczProductCode);
 
+        if (pPackage->Msi.pInstalledVersion->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, pPackage->Msi.sczProductCode, sczInstalledVersion);
+        }
+
         // compare versions
         hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pPackage->Msi.pInstalledVersion, &nCompareResult);
         ExitOnFailure(hr, "Failed to compare version '%ls' to installed version: '%ls'", pPackage->Msi.pVersion->sczVersion, pPackage->Msi.pInstalledVersion->sczVersion);
@@ -459,6 +469,11 @@ extern "C" HRESULT MsiEngineDetectPackage(
             {
                 hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
                 ExitOnFailure(hr, "Failed to parse dependency version: '%ls' for ProductCode: %ls", sczInstalledVersion, sczInstalledProductCode);
+
+                if (pVersion->fInvalid)
+                {
+                    LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, sczInstalledProductCode, sczInstalledVersion);
+                }
 
                 // compare versions
                 hr = VerCompareParsedVersions(pPackage->Msi.pVersion, pVersion, &nCompareResult);
@@ -535,6 +550,11 @@ extern "C" HRESULT MsiEngineDetectPackage(
 
             hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pVersion);
             ExitOnFailure(hr, "Failed to parse related installed version: '%ls' for ProductCode: %ls", sczInstalledVersion, wzProductCode);
+
+            if (pVersion->fInvalid)
+            {
+                LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, wzProductCode, sczInstalledVersion);
+            }
 
             // compare versions
             if (pRelatedMsi->fMinProvided)
@@ -1052,6 +1072,11 @@ extern "C" HRESULT MsiEngineAddCompatiblePackage(
 
         hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pCompatiblePackage->Msi.pVersion);
         ExitOnFailure(hr, "Failed to parse version: '%ls' for ProductCode: %ls", sczInstalledVersion, pCompatiblePackage->Msi.sczProductCode);
+
+        if (pCompatiblePackage->Msi.pVersion->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION, pCompatiblePackage->Msi.sczProductCode, sczInstalledVersion);
+        }
     }
 
     // For now, copy enough information to support uninstalling the newer, compatible package.
@@ -1506,6 +1531,11 @@ static HRESULT ParseRelatedMsiFromXml(
         hr = VerParseVersion(scz, 0, FALSE, &pRelatedMsi->pMinVersion);
         ExitOnFailure(hr, "Failed to parse @MinVersion: %ls", scz);
 
+        if (pRelatedMsi->pMinVersion->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+        }
+
         // flag that we have a min version
         pRelatedMsi->fMinProvided = TRUE;
 
@@ -1522,6 +1552,11 @@ static HRESULT ParseRelatedMsiFromXml(
 
         hr = VerParseVersion(scz, 0, FALSE, &pRelatedMsi->pMaxVersion);
         ExitOnFailure(hr, "Failed to parse @MaxVersion: %ls", scz);
+
+        if (pRelatedMsi->pMaxVersion->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+        }
 
         // flag that we have a max version
         pRelatedMsi->fMaxProvided = TRUE;

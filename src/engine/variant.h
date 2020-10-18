@@ -51,6 +51,16 @@ HRESULT BVariantGetVersion(
     __in BURN_VARIANT* pVariant,
     __out VERUTIL_VERSION** ppValue
     );
+HRESULT BVariantGetVersionHidden(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fHidden,
+    __out VERUTIL_VERSION** ppValue
+    );
+HRESULT BVariantGetVersionSilent(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fSilent,
+    __out VERUTIL_VERSION** ppValue
+    );
 HRESULT BVariantSetNumeric(
     __in BURN_VARIANT* pVariant,
     __in LONGLONG llValue

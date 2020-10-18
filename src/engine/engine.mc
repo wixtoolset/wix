@@ -114,6 +114,13 @@ Language=English
 Connected to elevated engine.
 .
 
+MessageId=13
+Severity=Warning
+SymbolicName=MSG_MANIFEST_INVALID_VERSION
+Language=English
+The manifest contains an invalid version string: '%1!ls!'
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
@@ -154,6 +161,13 @@ Severity=Error
 SymbolicName=MSG_USER_CANCELED
 Language=English
 Application canceled operation: %2!ls!, error: %1!ls!
+.
+
+MessageId=57
+Severity=Warning
+SymbolicName=MSG_CONDITION_INVALID_VERSION
+Language=English
+Condition '%1!ls!' contains invalid version string '%2!ls!'.
 .
 
 MessageId=100
@@ -231,6 +245,20 @@ Severity=Warning
 SymbolicName=MSG_DETECT_FAILED_CALCULATE_PATCH_APPLICABILITY
 Language=English
 Could not calculate patch applicability for target product code: %1!ls!, context: %2!hs!, reason: 0x%3!x!
+.
+
+MessageId=122
+Severity=Warning
+SymbolicName=MSG_RELATED_PACKAGE_INVALID_VERSION
+Language=English
+Related package: '%1!ls!' has invalid version: %2!ls!
+.
+
+MessageId=123
+Severity=Warning
+SymbolicName=MSG_DETECTED_MSI_PACKAGE_INVALID_VERSION
+Language=English
+Detected msi package with invalid version, product code: '%1!ls!', version: '%2!ls!'
 .
 
 MessageId=151
@@ -834,6 +862,20 @@ Severity=Success
 SymbolicName=MSG_VARIABLE_DUMP
 Language=English
 Variable: %1!ls!
+.
+
+MessageId=411
+Severity=Warning
+SymbolicName=MSG_VARIABLE_INVALID_VERSION
+Language=English
+The variable '%1!ls!' is being set with an invalid version string.
+.
+
+MessageId=412
+Severity=Warning
+SymbolicName=MSG_INVALID_VERSION_COERSION
+Language=English
+The string '%1!ls!' could not be coerced to a valid version.
 .
 
 MessageId=420

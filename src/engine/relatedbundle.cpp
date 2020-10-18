@@ -414,6 +414,11 @@ static HRESULT LoadRelatedBundleFromKey(
     hr = VerParseVersion(sczBundleVersion, 0, FALSE, &pRelatedBundle->pVersion);
     ExitOnFailure(hr, "Failed to parse pseudo bundle version: %ls", sczBundleVersion);
 
+    if (pRelatedBundle->pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, wzRelatedBundleId, sczBundleVersion);
+    }
+
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH, &sczCachePath);
     ExitOnFailure(hr, "Failed to read cache path from registry for bundle: %ls", wzRelatedBundleId);
 

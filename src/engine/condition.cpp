@@ -73,6 +73,12 @@ struct BURN_CONDITION_PARSE_CONTEXT
     BOOL fError;
 };
 
+struct BURN_CONDITION_OPERAND
+{
+    BOOL fHidden;
+    BURN_VARIANT Value;
+};
+
 
 // internal function declarations
 
@@ -92,9 +98,9 @@ static HRESULT ParseTerm(
     __in BURN_CONDITION_PARSE_CONTEXT* pContext,
     __out BOOL* pf
     );
-static HRESULT ParseValue(
+static HRESULT ParseOperand(
     __in BURN_CONDITION_PARSE_CONTEXT* pContext,
-    __out BURN_VARIANT* pValue
+    __out BURN_CONDITION_OPERAND* pOperand
     );
 static HRESULT Expect(
     __in BURN_CONDITION_PARSE_CONTEXT* pContext,
@@ -103,10 +109,10 @@ static HRESULT Expect(
 static HRESULT NextSymbol(
     __in BURN_CONDITION_PARSE_CONTEXT* pContext
     );
-static HRESULT CompareValues(
+static HRESULT CompareOperands(
     __in BURN_SYMBOL_TYPE comparison,
-    __in BURN_VARIANT leftOperand,
-    __in BURN_VARIANT rightOperand,
+    __in BURN_CONDITION_OPERAND* pLeftOperand,
+    __in BURN_CONDITION_OPERAND* pRightOperand,
     __out BOOL* pfResult
     );
 static HRESULT CompareStringValues(
@@ -342,8 +348,8 @@ static HRESULT ParseTerm(
     )
 {
     HRESULT hr = S_OK;
-    BURN_VARIANT firstValue = { };
-    BURN_VARIANT secondValue = { };
+    BURN_CONDITION_OPERAND firstOperand = { };
+    BURN_CONDITION_OPERAND secondOperand = { };
 
     if (BURN_SYMBOL_TYPE_LPAREN == pContext->NextSymbol.Type)
     {
@@ -359,8 +365,8 @@ static HRESULT ParseTerm(
         ExitFunction1(hr = S_OK);
     }
 
-    hr = ParseValue(pContext, &firstValue);
-    ExitOnFailure(hr, "Failed to parse value.");
+    hr = ParseOperand(pContext, &firstOperand);
+    ExitOnFailure(hr, "Failed to parse operand.");
 
     if (COMPARISON & pContext->NextSymbol.Type)
     {
@@ -369,24 +375,24 @@ static HRESULT ParseTerm(
         hr = NextSymbol(pContext);
         ExitOnFailure(hr, "Failed to read next symbol.");
 
-        hr = ParseValue(pContext, &secondValue);
-        ExitOnFailure(hr, "Failed to parse value.");
+        hr = ParseOperand(pContext, &secondOperand);
+        ExitOnFailure(hr, "Failed to parse operand.");
 
-        hr = CompareValues(comparison, firstValue, secondValue, pf);
-        ExitOnFailure(hr, "Failed to compare value.");
+        hr = CompareOperands(comparison, &firstOperand, &secondOperand, pf);
+        ExitOnFailure(hr, "Failed to compare operands.");
     }
     else
     {
         LONGLONG llValue = 0;
         LPWSTR sczValue = NULL;
         VERUTIL_VERSION* pVersion = NULL;
-        switch (firstValue.Type)
+        switch (firstOperand.Value.Type)
         {
         case BURN_VARIANT_TYPE_NONE:
             *pf = FALSE;
             break;
         case BURN_VARIANT_TYPE_STRING:
-            hr = BVariantGetString(&firstValue, &sczValue);
+            hr = BVariantGetString(&firstOperand.Value, &sczValue);
             if (SUCCEEDED(hr))
             {
                 *pf = sczValue && *sczValue;
@@ -394,7 +400,7 @@ static HRESULT ParseTerm(
             StrSecureZeroFreeString(sczValue);
             break;
         case BURN_VARIANT_TYPE_NUMERIC:
-            hr = BVariantGetNumeric(&firstValue, &llValue);
+            hr = BVariantGetNumeric(&firstOperand.Value, &llValue);
             if (SUCCEEDED(hr))
             {
                 *pf = 0 != llValue;
@@ -402,7 +408,7 @@ static HRESULT ParseTerm(
             SecureZeroMemory(&llValue, sizeof(llValue));
             break;
         case BURN_VARIANT_TYPE_VERSION:
-            hr = BVariantGetVersion(&firstValue, &pVersion);
+            hr = BVariantGetVersionHidden(&firstOperand.Value, firstOperand.fHidden, &pVersion);
             if (SUCCEEDED(hr))
             {
                 *pf = 0 != *pVersion->sczVersion;
@@ -415,14 +421,14 @@ static HRESULT ParseTerm(
     }
 
 LExit:
-    BVariantUninitialize(&firstValue);
-    BVariantUninitialize(&secondValue);
+    BVariantUninitialize(&firstOperand.Value);
+    BVariantUninitialize(&secondOperand.Value);
     return hr;
 }
 
-static HRESULT ParseValue(
+static HRESULT ParseOperand(
     __in BURN_CONDITION_PARSE_CONTEXT* pContext,
-    __out BURN_VARIANT* pValue
+    __out BURN_CONDITION_OPERAND* pOperand
     )
 {
     HRESULT hr = S_OK;
@@ -434,16 +440,19 @@ static HRESULT ParseValue(
         Assert(BURN_VARIANT_TYPE_STRING == pContext->NextSymbol.Value.Type);
 
         // find variable
-        hr = VariableGetVariant(pContext->pVariables, pContext->NextSymbol.Value.sczValue, pValue);
+        hr = VariableGetVariant(pContext->pVariables, pContext->NextSymbol.Value.sczValue, &pOperand->Value);
         if (E_NOTFOUND != hr)
         {
             ExitOnRootFailure(hr, "Failed to find variable.");
+
+            hr = VariableIsHidden(pContext->pVariables, pContext->NextSymbol.Value.sczValue, &pOperand->fHidden);
+            ExitOnRootFailure(hr, "Failed to get if variable is hidden.");
         }
 
-        if (BURN_VARIANT_TYPE_FORMATTED == pValue->Type)
+        if (BURN_VARIANT_TYPE_FORMATTED == pOperand->Value.Type)
         {
             // TODO: actually format the value?
-            hr = BVariantChangeType(pValue, BURN_VARIANT_TYPE_STRING);
+            hr = BVariantChangeType(&pOperand->Value, BURN_VARIANT_TYPE_STRING);
             ExitOnRootFailure(hr, "Failed to change variable '%ls' type for condition '%ls'", pContext->NextSymbol.Value.sczValue, pContext->wzCondition);
         }
         break;
@@ -451,8 +460,9 @@ static HRESULT ParseValue(
     case BURN_SYMBOL_TYPE_NUMBER: __fallthrough;
     case BURN_SYMBOL_TYPE_LITERAL: __fallthrough;
     case BURN_SYMBOL_TYPE_VERSION:
+        pOperand->fHidden = FALSE;
         // steal value of symbol
-        memcpy_s(pValue, sizeof(BURN_VARIANT), &pContext->NextSymbol.Value, sizeof(BURN_VARIANT));
+        memcpy_s(&pOperand->Value, sizeof(BURN_VARIANT), &pContext->NextSymbol.Value, sizeof(BURN_VARIANT));
         memset(&pContext->NextSymbol.Value, 0, sizeof(BURN_VARIANT));
         break;
 
@@ -692,8 +702,13 @@ static HRESULT NextSymbol(
                 do
                 {
                     ++n;
-                    ::GetStringTypeW(CT_CTYPE1, &pContext->wzRead[n], 1, &charType);
-                } while (L'\0' != pContext->wzRead[n] && C1_BLANK != (C1_BLANK & charType));
+                } while (pContext->wzRead[n] >= L'0' && pContext->wzRead[n] <= L'9' ||
+                         pContext->wzRead[n] >= L'A' && pContext->wzRead[n] <= L'Z' ||
+                         pContext->wzRead[n] >= L'a' && pContext->wzRead[n] <= L'z' ||
+                         pContext->wzRead[n] == L'_' ||
+                         pContext->wzRead[n] == L'+' ||
+                         pContext->wzRead[n] == L'-' ||
+                         pContext->wzRead[n] == L'.');
 
                 // Symbols don't encrypt their value, so can access the value directly.
                 hr = VerParseVersion(&pContext->wzRead[1], n - 1, FALSE, &pContext->NextSymbol.Value.pValue);
@@ -702,6 +717,10 @@ static HRESULT NextSymbol(
                     pContext->fError = TRUE;
                     hr = E_INVALIDDATA;
                     ExitOnRootFailure(hr, "Failed to parse condition \"%ls\". Invalid version format, at position %d.", pContext->wzCondition, iPosition);
+                }
+                else if (pContext->NextSymbol.Value.pValue->fInvalid)
+                {
+                    LogId(REPORT_WARNING, MSG_CONDITION_INVALID_VERSION, pContext->wzCondition, pContext->NextSymbol.Value.pValue->sczVersion);
                 }
 
                 pContext->NextSymbol.Value.Type = BURN_VARIANT_TYPE_VERSION;
@@ -755,12 +774,12 @@ LExit:
 }
 
 //
-// CompareValues - compares two variant values using a given comparison.
+// CompareOperands - compares two variant values using a given comparison.
 //
-static HRESULT CompareValues(
+static HRESULT CompareOperands(
     __in BURN_SYMBOL_TYPE comparison,
-    __in BURN_VARIANT leftOperand,
-    __in BURN_VARIANT rightOperand,
+    __in BURN_CONDITION_OPERAND* pLeftOperand,
+    __in BURN_CONDITION_OPERAND* pRightOperand,
     __out BOOL* pfResult
     )
 {
@@ -771,37 +790,39 @@ static HRESULT CompareValues(
     LONGLONG llRight = 0;
     VERUTIL_VERSION* pVersionRight = 0;
     LPWSTR sczRight = NULL;
+    BURN_VARIANT* pLeftValue = &pLeftOperand->Value;
+    BURN_VARIANT* pRightValue = &pRightOperand->Value;
 
     // get values to compare based on type
-    if (BURN_VARIANT_TYPE_STRING == leftOperand.Type && BURN_VARIANT_TYPE_STRING == rightOperand.Type)
+    if (BURN_VARIANT_TYPE_STRING == pLeftValue->Type && BURN_VARIANT_TYPE_STRING == pRightValue->Type)
     {
-        hr = BVariantGetString(&leftOperand, &sczLeft);
+        hr = BVariantGetString(pLeftValue, &sczLeft);
         ExitOnFailure(hr, "Failed to get the left string");
-        hr = BVariantGetString(&rightOperand, &sczRight);
+        hr = BVariantGetString(pRightValue, &sczRight);
         ExitOnFailure(hr, "Failed to get the right string");
         hr = CompareStringValues(comparison, sczLeft, sczRight, pfResult);
     }
-    else if (BURN_VARIANT_TYPE_NUMERIC == leftOperand.Type && BURN_VARIANT_TYPE_NUMERIC == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_NUMERIC == pLeftValue->Type && BURN_VARIANT_TYPE_NUMERIC == pRightValue->Type)
     {
-        hr = BVariantGetNumeric(&leftOperand, &llLeft);
+        hr = BVariantGetNumeric(pLeftValue, &llLeft);
         ExitOnFailure(hr, "Failed to get the left numeric");
-        hr = BVariantGetNumeric(&rightOperand, &llRight);
+        hr = BVariantGetNumeric(pRightValue, &llRight);
         ExitOnFailure(hr, "Failed to get the right numeric");
         hr = CompareIntegerValues(comparison, llLeft, llRight, pfResult);
     }
-    else if (BURN_VARIANT_TYPE_VERSION == leftOperand.Type && BURN_VARIANT_TYPE_VERSION == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_VERSION == pLeftValue->Type && BURN_VARIANT_TYPE_VERSION == pRightValue->Type)
     {
-        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
+        hr = BVariantGetVersionHidden(pLeftValue, pLeftOperand->fHidden, &pVersionLeft);
         ExitOnFailure(hr, "Failed to get the left version");
-        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
+        hr = BVariantGetVersionHidden(pRightValue, pRightOperand->fHidden, &pVersionRight);
         ExitOnFailure(hr, "Failed to get the right version");
         hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
     }
-    else if (BURN_VARIANT_TYPE_VERSION == leftOperand.Type && BURN_VARIANT_TYPE_STRING == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_VERSION == pLeftValue->Type && BURN_VARIANT_TYPE_STRING == pRightValue->Type)
     {
-        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
+        hr = BVariantGetVersionHidden(pLeftValue, pLeftOperand->fHidden, &pVersionLeft);
         ExitOnFailure(hr, "Failed to get the left version");
-        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
+        hr = BVariantGetVersionHidden(pRightValue, pRightOperand->fHidden, &pVersionRight);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)
@@ -816,11 +837,11 @@ static HRESULT CompareValues(
             hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
         }
     }
-    else if (BURN_VARIANT_TYPE_STRING == leftOperand.Type && BURN_VARIANT_TYPE_VERSION == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_STRING == pLeftValue->Type && BURN_VARIANT_TYPE_VERSION == pRightValue->Type)
     {
-        hr = BVariantGetVersion(&rightOperand, &pVersionRight);
+        hr = BVariantGetVersionHidden(pRightValue, pRightOperand->fHidden, &pVersionRight);
         ExitOnFailure(hr, "Failed to get the right version");
-        hr = BVariantGetVersion(&leftOperand, &pVersionLeft);
+        hr = BVariantGetVersionHidden(pLeftValue, pLeftOperand->fHidden, &pVersionLeft);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)
@@ -835,11 +856,11 @@ static HRESULT CompareValues(
             hr = CompareVersionValues(comparison, pVersionLeft, pVersionRight, pfResult);
         }
     }
-    else if (BURN_VARIANT_TYPE_NUMERIC == leftOperand.Type && BURN_VARIANT_TYPE_STRING == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_NUMERIC == pLeftValue->Type && BURN_VARIANT_TYPE_STRING == pRightValue->Type)
     {
-        hr = BVariantGetNumeric(&leftOperand, &llLeft);
+        hr = BVariantGetNumeric(pLeftValue, &llLeft);
         ExitOnFailure(hr, "Failed to get the left numeric");
-        hr = BVariantGetNumeric(&rightOperand, &llRight);
+        hr = BVariantGetNumeric(pRightValue, &llRight);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)
@@ -854,11 +875,11 @@ static HRESULT CompareValues(
             hr = CompareIntegerValues(comparison, llLeft, llRight, pfResult);
         }
     }
-    else if (BURN_VARIANT_TYPE_STRING == leftOperand.Type && BURN_VARIANT_TYPE_NUMERIC == rightOperand.Type)
+    else if (BURN_VARIANT_TYPE_STRING == pLeftValue->Type && BURN_VARIANT_TYPE_NUMERIC == pRightValue->Type)
     {
-        hr = BVariantGetNumeric(&rightOperand, &llRight);
+        hr = BVariantGetNumeric(pRightValue, &llRight);
         ExitOnFailure(hr, "Failed to get the right numeric");
-        hr = BVariantGetNumeric(&leftOperand, &llLeft);
+        hr = BVariantGetNumeric(pLeftValue, &llLeft);
         if (FAILED(hr))
         {
             if (DISP_E_TYPEMISMATCH != hr)

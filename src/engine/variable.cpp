@@ -393,6 +393,11 @@ extern "C" HRESULT VariablesParseFromXml(
         hr = BVariantChangeType(&value, valueType);
         ExitOnFailure(hr, "Failed to change variant type.");
 
+        if (BURN_VARIANT_TYPE_VERSION == valueType && value.pValue->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_VARIABLE_INVALID_VERSION, sczId);
+        }
+
         // find existing variable
         hr = FindVariableIndexByName(pVariables, sczId, &iVariable);
         ExitOnFailure(hr, "Failed to find variable value '%ls'.", sczId);
@@ -584,7 +589,7 @@ extern "C" HRESULT VariableGetVersion(
     }
     ExitOnFailure(hr, "Failed to get value of variable: %ls", wzVariable);
 
-    hr = BVariantGetVersion(&pVariable->Value, ppValue);
+    hr = BVariantGetVersionHidden(&pVariable->Value, pVariable->fHidden, ppValue);
     ExitOnFailure(hr, "Failed to get value as version for variable: %ls", wzVariable);
 
 LExit:
@@ -1574,6 +1579,11 @@ static HRESULT SetVariableValue(
                 AssertSz(FALSE, "Unknown variant type.");
                 break;
             }
+        }
+
+        if (BURN_VARIANT_TYPE_VERSION == pVariant->Type && pVariant->pValue->fInvalid)
+        {
+            LogId(REPORT_WARNING, MSG_VARIABLE_INVALID_VERSION, wzVariable);
         }
     }
 

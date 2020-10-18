@@ -136,6 +136,11 @@ extern "C" HRESULT RegistrationParseFromXml(
     hr = VerParseVersion(scz, 0, FALSE, &pRegistration->pVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
 
+    if (pRegistration->pVersion->fInvalid)
+    {
+        LogId(REPORT_WARNING, MSG_MANIFEST_INVALID_VERSION, scz);
+    }
+
     // @ProviderKey
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"ProviderKey", &pRegistration->sczProviderKey);
     ExitOnFailure(hr, "Failed to get @ProviderKey.");

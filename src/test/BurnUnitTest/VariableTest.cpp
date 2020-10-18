@@ -273,6 +273,7 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"vPROP21 = 1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP23 = v1.1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"v1.1.1 = PROP23"));
+                Assert::False(EvaluateConditionHelper(&variables, L"v1.1.1<>PROP23"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP1 <> v1.1.1"));
                 Assert::True(EvaluateConditionHelper(&variables, L"v1.1.1 <> PROP1"));
 

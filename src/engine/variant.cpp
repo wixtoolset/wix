@@ -6,6 +6,12 @@
 
 // internal function declarations
 
+static HRESULT GetVersionInternal(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fHidden,
+    __in BOOL fSilent,
+    __out VERUTIL_VERSION** ppValue
+    );
 static HRESULT BVariantEncryptString(
     __in BURN_VARIANT* pVariant,
     __in BOOL fEncrypt
@@ -130,6 +136,36 @@ extern "C" HRESULT BVariantGetVersion(
     __out VERUTIL_VERSION** ppValue
     )
 {
+    return GetVersionInternal(pVariant, FALSE, FALSE, ppValue);
+}
+
+// The contents of ppValue may be sensitive, should keep encrypted and SecureZeroMemory.
+extern "C" HRESULT BVariantGetVersionHidden(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fHidden,
+    __out VERUTIL_VERSION** ppValue
+    )
+{
+    return GetVersionInternal(pVariant, fHidden, FALSE, ppValue);
+}
+
+// The contents of ppValue may be sensitive, should keep encrypted and SecureZeroMemory.
+extern "C" HRESULT BVariantGetVersionSilent(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fSilent,
+    __out VERUTIL_VERSION** ppValue
+    )
+{
+    return GetVersionInternal(pVariant, FALSE, fSilent, ppValue);
+}
+
+static HRESULT GetVersionInternal(
+    __in BURN_VARIANT* pVariant,
+    __in BOOL fHidden,
+    __in BOOL fSilent,
+    __out VERUTIL_VERSION** ppValue
+    )
+{
     HRESULT hr = S_OK;
     LONGLONG llValue = 0;
     LPWSTR sczValue = NULL;
@@ -151,6 +187,10 @@ extern "C" HRESULT BVariantGetVersion(
             if (FAILED(hr))
             {
                 hr = DISP_E_TYPEMISMATCH;
+            }
+            else if (!fSilent && (*ppValue)->fInvalid)
+            {
+                LogId(REPORT_WARNING, MSG_INVALID_VERSION_COERSION, fHidden ? L"*****" : sczValue);
             }
         }
         StrSecureZeroFreeString(sczValue);
@@ -282,7 +322,7 @@ extern "C" HRESULT BVariantSetValue(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pValue, &pVersionValue);
+        hr = BVariantGetVersionSilent(pValue, TRUE, &pVersionValue);
         if (SUCCEEDED(hr))
         {
             hr = BVariantSetVersion(pVariant, pVersionValue);
@@ -333,7 +373,7 @@ extern "C" HRESULT BVariantCopy(
         StrSecureZeroFreeString(sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pSource, &pVersionValue);
+        hr = BVariantGetVersionSilent(pSource, TRUE, &pVersionValue);
         if (SUCCEEDED(hr))
         {
             hr = BVariantSetVersion(pTarget, pVersionValue);
@@ -383,7 +423,7 @@ extern "C" HRESULT BVariantChangeType(
         hr = BVariantGetString(pVariant, &variant.sczValue);
         break;
     case BURN_VARIANT_TYPE_VERSION:
-        hr = BVariantGetVersion(pVariant, &variant.pValue);
+        hr = BVariantGetVersionSilent(pVariant, TRUE, &variant.pValue);
         break;
     default:
         ExitFunction1(hr = E_INVALIDARG);
