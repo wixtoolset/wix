@@ -198,7 +198,14 @@ static HRESULT GetVersionInternal(
     case BURN_VARIANT_TYPE_VERSION:
         BVariantRetrieveVersion(pVariant, &pValue);
 
-        hr = VerCopyVersion(pValue, ppValue);
+        if (!pValue)
+        {
+            *ppValue = NULL;
+        }
+        else
+        {
+            hr = VerCopyVersion(pValue, ppValue);
+        }
         break;
     default:
         hr = E_INVALIDARG;
@@ -275,14 +282,22 @@ extern "C" HRESULT BVariantSetVersion(
     HRESULT hr = S_OK;
     BOOL fEncryptValue = pVariant->fEncryptString;
 
-    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
-        BURN_VARIANT_TYPE_STRING == pVariant->Type)
+    if (!pValue) // if we're nulling out the version, make the variable NONE.
     {
-        StrSecureZeroFreeString(pVariant->sczValue);
+        BVariantUninitialize(pVariant);
     }
-    memset(pVariant, 0, sizeof(BURN_VARIANT));
-    hr = VerCopyVersion(pValue, &pVariant->pValue);
-    pVariant->Type = BURN_VARIANT_TYPE_VERSION;
+    else // assign the value.
+    {
+        if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
+            BURN_VARIANT_TYPE_STRING == pVariant->Type)
+        {
+            StrSecureZeroFreeString(pVariant->sczValue);
+        }
+        memset(pVariant, 0, sizeof(BURN_VARIANT));
+        hr = VerCopyVersion(pValue, &pVariant->pValue);
+        pVariant->Type = BURN_VARIANT_TYPE_VERSION;
+    }
+
     BVariantSetEncryption(pVariant, fEncryptValue);
 
     return hr;

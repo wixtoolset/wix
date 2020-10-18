@@ -583,8 +583,11 @@ static HRESULT BAEngineSetVariableVersion(
 
     if (wzVariable && *wzVariable)
     {
-        hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
-        ExitOnFailure(hr, "Failed to parse new version value.");
+        if (wzValue)
+        {
+            hr = VerParseVersion(wzValue, 0, FALSE, &pVersion);
+            ExitOnFailure(hr, "Failed to parse new version value.");
+        }
 
         hr = VariableSetVersion(&pContext->pEngineState->variables, wzVariable, pVersion, FALSE);
         ExitOnFailure(hr, "Failed to set version variable.");

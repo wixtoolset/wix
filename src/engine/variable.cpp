@@ -1551,7 +1551,7 @@ static HRESULT SetVariableValue(
             case BURN_VARIANT_TYPE_NONE:
                 if (BURN_VARIANT_TYPE_NONE != pVariables->rgVariables[iVariable].Value.Type)
                 {
-                    LogStringLine(REPORT_STANDARD, "Unsetting variable '%ls'", wzVariable, pVariant->sczValue);
+                    LogStringLine(REPORT_STANDARD, "Unsetting variable '%ls'", wzVariable);
                 }
                 break;
 
@@ -1563,7 +1563,7 @@ static HRESULT SetVariableValue(
             case BURN_VARIANT_TYPE_STRING:
                 if (!pVariant->sczValue)
                 {
-                    LogStringLine(REPORT_STANDARD, "Unsetting variable '%ls'", wzVariable, pVariant->sczValue);
+                    LogStringLine(REPORT_STANDARD, "Unsetting variable '%ls'", wzVariable);
                 }
                 else
                 {
@@ -1572,7 +1572,14 @@ static HRESULT SetVariableValue(
                 break;
 
             case BURN_VARIANT_TYPE_VERSION:
-                LogStringLine(REPORT_STANDARD, "Setting version variable '%ls' to value '%ls'", wzVariable, pVariant->pValue->sczVersion);
+                if (!pVariant->pValue)
+                {
+                    LogStringLine(REPORT_STANDARD, "Unsetting variable '%ls'", wzVariable);
+                }
+                else
+                {
+                    LogStringLine(REPORT_STANDARD, "Setting version variable '%ls' to value '%ls'", wzVariable, pVariant->pValue->sczVersion);
+                }
                 break;
 
             default:
@@ -1581,7 +1588,7 @@ static HRESULT SetVariableValue(
             }
         }
 
-        if (BURN_VARIANT_TYPE_VERSION == pVariant->Type && pVariant->pValue->fInvalid)
+        if (BURN_VARIANT_TYPE_VERSION == pVariant->Type && pVariant->pValue && pVariant->pValue->fInvalid)
         {
             LogId(REPORT_WARNING, MSG_VARIABLE_INVALID_VERSION, wzVariable);
         }
