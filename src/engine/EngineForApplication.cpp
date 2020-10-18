@@ -369,7 +369,7 @@ static HRESULT BAEngineSetUpdate(
             sczId = pContext->pEngineState->registration.sczId;
         }
 
-        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, 0), &pContext->pEngineState->update.package, FALSE, sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, pContext->pEngineState->registration.sczExecutableName, sczLocalSource ? sczLocalSource : wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
+        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, rpr), &pContext->pEngineState->update.package, FALSE, sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, pContext->pEngineState->registration.sczExecutableName, sczLocalSource ? sczLocalSource : wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
         ExitOnFailure(hr, "Failed to set update bundle.");
 
         pContext->pEngineState->update.fUpdateAvailable = TRUE;

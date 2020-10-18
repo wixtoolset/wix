@@ -151,10 +151,17 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
   <Target Name="SetWixVersion"
           DependsOnTargets="GetBuildVersion"
           BeforeTargets="ClCompile">
+    <PropertyGroup>
+      <rmj>$(MajorMinorVersion.Split(`.`)[0])</rmj>
+      <rmm>$(MajorMinorVersion.Split(`.`)[1])</rmm>
+      <rup>0</rup>
+      <rpr>$(BuildNumber)</rpr>
+      <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
+      <wixver>rmj=$(rmj);rmm=$(rmm);rup=$(rup);rpr=$(rpr);szVerMajorMinorBuild="$(szVerMajorMinorBuild)"</wixver>
+    </PropertyGroup>
     <ItemGroup>
       <ClCompile>
-        <!-- TODO: get rmj and rmm dynamically -->
-        <PreprocessorDefinitions>rmj=4;rmm=0;rup=$(BuildNumber);szVerMajorMinorBuild="$(BuildVersion)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        <PreprocessorDefinitions>$(wixver);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       </ClCompile>
     </ItemGroup>
   </Target>
