@@ -78,7 +78,7 @@ static HRESULT BalBaseBAProcOnDetectForwardCompatibleBundle(
     __inout BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->dw64Version, &pResults->fCancel, &pResults->fIgnoreBundle);
+    return pBA->OnDetectForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, &pResults->fCancel, &pResults->fIgnoreBundle);
 }
 
 static HRESULT BalBaseBAProcOnDetectUpdateBegin(
@@ -96,7 +96,7 @@ static HRESULT BalBaseBAProcOnDetectUpdate(
     __inout BA_ONDETECTUPDATE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectUpdate(pArgs->wzUpdateLocation, pArgs->dw64Size, pArgs->dw64Version, pArgs->wzTitle, pArgs->wzSummary, pArgs->wzContentType, pArgs->wzContent, &pResults->fCancel, &pResults->fStopProcessingUpdates);
+    return pBA->OnDetectUpdate(pArgs->wzUpdateLocation, pArgs->dw64Size, pArgs->wzVersion, pArgs->wzTitle, pArgs->wzSummary, pArgs->wzContentType, pArgs->wzContent, &pResults->fCancel, &pResults->fStopProcessingUpdates);
 }
 
 static HRESULT BalBaseBAProcOnDetectUpdateComplete(
@@ -114,7 +114,7 @@ static HRESULT BalBaseBAProcOnDetectRelatedBundle(
     __inout BA_ONDETECTRELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->dw64Version, pArgs->operation, &pResults->fCancel);
+    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->operation, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectPackageBegin(
@@ -132,7 +132,7 @@ static HRESULT BalBaseBAProcOnDetectCompatiblePackage(
     __inout BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectCompatibleMsiPackage(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->dw64CompatiblePackageVersion, &pResults->fCancel);
+    return pBA->OnDetectCompatibleMsiPackage(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->wzCompatiblePackageVersion, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectRelatedMsiPackage(
@@ -141,7 +141,7 @@ static HRESULT BalBaseBAProcOnDetectRelatedMsiPackage(
     __inout BA_ONDETECTRELATEDMSIPACKAGE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectRelatedMsiPackage(pArgs->wzPackageId, pArgs->wzUpgradeCode, pArgs->wzProductCode, pArgs->fPerMachine, pArgs->dw64Version, pArgs->operation, &pResults->fCancel);
+    return pBA->OnDetectRelatedMsiPackage(pArgs->wzPackageId, pArgs->wzUpgradeCode, pArgs->wzProductCode, pArgs->fPerMachine, pArgs->wzVersion, pArgs->operation, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectTargetMsiPackage(
@@ -195,7 +195,7 @@ static HRESULT BalBaseBAProcOnPlanCompatibleMsiPackageBegin(
     __inout BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnPlanCompatibleMsiPackageBegin(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->dw64CompatiblePackageVersion, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
+    return pBA->OnPlanCompatibleMsiPackageBegin(pArgs->wzPackageId, pArgs->wzCompatiblePackageId, pArgs->wzCompatiblePackageVersion, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnPlanCompatibleMsiPackageComplete(

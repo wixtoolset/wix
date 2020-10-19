@@ -34,7 +34,8 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
 
     STDMETHOD(GetVariableVersion)(
         __in_z LPCWSTR wzVariable,
-        __out DWORD64* pqwValue
+        __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+        __inout DWORD* pcchValue
         ) = 0;
 
     STDMETHOD(Log)(
@@ -55,6 +56,6 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
 
     STDMETHOD(SetVariableVersion)(
         __in_z LPCWSTR wzVariable,
-        __in DWORD64 qwValue
+        __in_z_opt LPCWSTR wzValue
         ) = 0;
 };

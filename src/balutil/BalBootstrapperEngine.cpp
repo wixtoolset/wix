@@ -133,26 +133,28 @@ public: // IBootstrapperEngine
 
     virtual STDMETHODIMP GetVariableVersion(
         __in_z LPCWSTR wzVariable,
-        __out DWORD64* pqwValue
+        __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+        __inout DWORD* pcchValue
         )
     {
         HRESULT hr = S_OK;
         BAENGINE_GETVARIABLEVERSION_ARGS args = { };
         BAENGINE_GETVARIABLEVERSION_RESULTS results = { };
 
-        ExitOnNull(pqwValue, hr, E_INVALIDARG, "pqwValue is required");
+        ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
 
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
 
         results.cbSize = sizeof(results);
+        results.wzValue = wzValue;
+        results.cchValue = *pcchValue;
 
         hr = m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_GETVARIABLEVERSION, &args, &results, m_pvBAEngineProcContext);
 
-        *pqwValue = results.qwValue;
+        *pcchValue = results.cchValue;
 
     LExit:
-        SecureZeroMemory(&results, sizeof(results));
         return hr;
     }
 
@@ -410,7 +412,7 @@ public: // IBootstrapperEngine
 
     virtual STDMETHODIMP SetVariableVersion(
         __in_z LPCWSTR wzVariable,
-        __in DWORD64 qwValue
+        __in_z_opt LPCWSTR wzValue
         )
     {
         BAENGINE_SETVARIABLEVERSION_ARGS args = { };
@@ -418,7 +420,7 @@ public: // IBootstrapperEngine
 
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
-        args.qwValue = qwValue;
+        args.wzValue = wzValue;
 
         results.cbSize = sizeof(results);
 

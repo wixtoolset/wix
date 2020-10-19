@@ -178,15 +178,21 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public Version GetVariableVersion(string name)
+        public string GetVariableVersion(string name)
         {
-            int ret = this.engine.GetVariableVersion(name, out long value);
-            if (NativeMethods.S_OK != ret)
+            int length;
+            IntPtr pUniString = this.getVersionVariable(name, out length);
+            try
             {
-                throw new Win32Exception(ret);
+                return Marshal.PtrToStringUni(pUniString, length);
             }
-
-            return LongToVersion(value);
+            finally
+            {
+                if (IntPtr.Zero != pUniString)
+                {
+                    Marshal.FreeCoTaskMem(pUniString);
+                }
+            }
         }
 
         public void LaunchApprovedExe(IntPtr hwndParent, string approvedExeForElevationId, string arguments)
@@ -224,12 +230,12 @@ namespace WixToolset.Mba.Core
             this.engine.SetDownloadSource(packageOrContainerId, payloadId, url, user, password);
         }
 
-        public void SetVariable(string name, long value)
+        public void SetVariableNumeric(string name, long value)
         {
             this.engine.SetVariableNumeric(name, value);
         }
 
-        public void SetVariable(string name, SecureString value, bool formatted)
+        public void SetVariableString(string name, SecureString value, bool formatted)
         {
             IntPtr pValue = Marshal.SecureStringToCoTaskMemUnicode(value);
             try
@@ -242,7 +248,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public void SetVariable(string name, string value, bool formatted)
+        public void SetVariableString(string name, string value, bool formatted)
         {
             IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
             try
@@ -255,10 +261,17 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public void SetVariable(string name, Version value)
+        public void SetVariableVersion(string name, string value)
         {
-            long version = VersionToLong(value);
-            this.engine.SetVariableVersion(name, version);
+            IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
+            try
+            {
+                this.engine.SetVariableVersion(name, pValue);
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(pValue);
+            }
         }
 
         public int SendEmbeddedError(int errorCode, string message, int uiHint)
@@ -312,6 +325,55 @@ namespace WixToolset.Mba.Core
                 for (length = 0; length < capacity; ++length)
                 {
                     if(0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
+                    {
+                        break;
+                    }
+                }
+
+                success = true;
+                return pValue;
+            }
+            finally
+            {
+                if (!success && IntPtr.Zero != pValue)
+                {
+                    Marshal.FreeCoTaskMem(pValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the variable given by <paramref name="name"/> as a version string.
+        /// </summary>
+        /// <param name="name">The name of the variable to get.</param>
+        /// <param name="length">The length of the Unicode string.</param>
+        /// <returns>The value by a pointer to a Unicode string.  Must be freed by Marshal.FreeCoTaskMem.</returns>
+        /// <exception cref="Exception">An error occurred getting the variable.</exception>
+        internal IntPtr getVersionVariable(string name, out int length)
+        {
+            int capacity = InitialBufferSize;
+            bool success = false;
+            IntPtr pValue = Marshal.AllocCoTaskMem(capacity * UnicodeEncoding.CharSize);
+            try
+            {
+                // Get the size of the buffer.
+                int ret = this.engine.GetVariableVersion(name, pValue, ref capacity);
+                if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
+                {
+                    // Don't need to add 1 for the null terminator, the engine already includes that.
+                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity * UnicodeEncoding.CharSize);
+                    ret = this.engine.GetVariableVersion(name, pValue, ref capacity);
+                }
+
+                if (NativeMethods.S_OK != ret)
+                {
+                    throw Marshal.GetExceptionForHR(ret);
+                }
+
+                // The engine only returns the exact length of the string if the buffer was too small, so calculate it ourselves.
+                for (length = 0; length < capacity; ++length)
+                {
+                    if (0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
                     {
                         break;
                     }

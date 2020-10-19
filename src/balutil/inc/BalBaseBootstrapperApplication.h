@@ -101,7 +101,7 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
         __in_z LPCWSTR /*wzBundleTag*/,
         __in BOOL /*fPerMachine*/,
-        __in DWORD64 /*dw64Version*/,
+        __in LPCWSTR /*wzVersion*/,
         __inout BOOL* pfCancel,
         __inout BOOL* /*pfIgnoreBundle*/
         )
@@ -123,7 +123,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectUpdate(
         __in_z LPCWSTR /*wzUpdateLocation*/,
         __in DWORD64 /*dw64Size*/,
-        __in DWORD64 /*dw64Version*/,
+        __in LPCWSTR /*wzVersion*/,
         __in_z LPCWSTR /*wzTitle*/,
         __in_z LPCWSTR /*wzSummary*/,
         __in_z LPCWSTR /*wzContentType*/,
@@ -149,7 +149,7 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
         __in_z LPCWSTR /*wzBundleTag*/,
         __in BOOL /*fPerMachine*/,
-        __in DWORD64 /*dw64Version*/,
+        __in LPCWSTR /*wzVersion*/,
         __in BOOTSTRAPPER_RELATED_OPERATION /*operation*/,
         __inout BOOL* pfCancel
         )
@@ -170,7 +170,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectCompatibleMsiPackage(
         __in_z LPCWSTR /*wzPackageId*/,
         __in_z LPCWSTR /*wzCompatiblePackageId*/,
-        __in DWORD64 /*dw64CompatiblePackageVersion*/,
+        __in LPCWSTR /*wzCompatiblePackageVersion*/,
         __inout BOOL* pfCancel
         )
     {
@@ -183,7 +183,7 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzUpgradeCode*/,
         __in_z LPCWSTR /*wzProductCode*/,
         __in BOOL /*fPerMachine*/,
-        __in DWORD64 /*dw64Version*/,
+        __in LPCWSTR /*wzVersion*/,
         __in BOOTSTRAPPER_RELATED_OPERATION /*operation*/,
         __inout BOOL* pfCancel
         ) 
@@ -264,7 +264,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnPlanCompatibleMsiPackageBegin(
         __in_z LPCWSTR /*wzPackageId*/,
         __in_z LPCWSTR /*wzCompatiblePackageId*/,
-        __in DWORD64 /*dw64CompatiblePackageVersion*/,
+        __in LPCWSTR /*wzCompatiblePackageVersion*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
         __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestedState*/,
         __inout BOOL* pfCancel

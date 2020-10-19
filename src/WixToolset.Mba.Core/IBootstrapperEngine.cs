@@ -36,7 +36,8 @@ namespace WixToolset.Mba.Core
         [PreserveSig]
         int GetVariableVersion(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
-            [MarshalAs(UnmanagedType.U8)] out long pqwValue
+                                              IntPtr wzValue,
+            [MarshalAs(UnmanagedType.U4)] ref int pcchValue
             );
 
         [PreserveSig]
@@ -112,7 +113,7 @@ namespace WixToolset.Mba.Core
 
         void SetVariableVersion(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
-            [MarshalAs(UnmanagedType.U8)] long qwValue
+                                              IntPtr wzValue
             );
 
         void CloseSplashScreen();

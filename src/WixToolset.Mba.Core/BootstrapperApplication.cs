@@ -1130,9 +1130,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, long version, ref bool fCancel, ref bool fIgnoreBundle)
+        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, ref bool fCancel, ref bool fIgnoreBundle)
         {
-            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, version, fCancel, fIgnoreBundle);
+            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fCancel, fIgnoreBundle);
             this.OnDetectForwardCompatibleBundle(args);
 
             fCancel = args.Cancel;
@@ -1150,9 +1150,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectUpdate(string wzUpdateLocation, long dw64Size, long dw64Version, string wzTitle, string wzSummary, string wzContentType, string wzContent, ref bool fCancel, ref bool fStopProcessingUpdates)
+        int IBootstrapperApplication.OnDetectUpdate(string wzUpdateLocation, long dw64Size, string wzVersion, string wzTitle, string wzSummary, string wzContentType, string wzContent, ref bool fCancel, ref bool fStopProcessingUpdates)
         {
-            DetectUpdateEventArgs args = new DetectUpdateEventArgs(wzUpdateLocation, dw64Size, dw64Version, wzTitle, wzSummary, wzContentType, wzContent, fCancel, fStopProcessingUpdates);
+            DetectUpdateEventArgs args = new DetectUpdateEventArgs(wzUpdateLocation, dw64Size, wzVersion, wzTitle, wzSummary, wzContentType, wzContent, fCancel, fStopProcessingUpdates);
             this.OnDetectUpdate(args);
 
             fCancel = args.Cancel;
@@ -1169,9 +1169,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, long version, RelatedOperation operation, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, RelatedOperation operation, ref bool fCancel)
         {
-            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, version, operation, fCancel);
+            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fCancel);
             this.OnDetectRelatedBundle(args);
 
             fCancel = args.Cancel;
@@ -1187,18 +1187,18 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectCompatibleMsiPackage(string wzPackageId, string wzCompatiblePackageId, long dw64CompatiblePackageVersion, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectCompatibleMsiPackage(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, ref bool fCancel)
         {
-            DetectCompatibleMsiPackageEventArgs args = new DetectCompatibleMsiPackageEventArgs(wzPackageId, wzCompatiblePackageId, dw64CompatiblePackageVersion, fCancel);
+            DetectCompatibleMsiPackageEventArgs args = new DetectCompatibleMsiPackageEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, fCancel);
             this.OnDetectCompatibleMsiPackage(args);
 
             fCancel = args.Cancel;
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectRelatedMsiPackage(string wzPackageId, string wzUpgradeCode, string wzProductCode, bool fPerMachine, long version, RelatedOperation operation, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectRelatedMsiPackage(string wzPackageId, string wzUpgradeCode, string wzProductCode, bool fPerMachine, string wzVersion, RelatedOperation operation, ref bool fCancel)
         {
-            DetectRelatedMsiPackageEventArgs args = new DetectRelatedMsiPackageEventArgs(wzPackageId, wzUpgradeCode, wzProductCode, fPerMachine, version, operation, fCancel);
+            DetectRelatedMsiPackageEventArgs args = new DetectRelatedMsiPackageEventArgs(wzPackageId, wzUpgradeCode, wzProductCode, fPerMachine, wzVersion, operation, fCancel);
             this.OnDetectRelatedMsiPackage(args);
 
             fCancel = args.Cancel;
@@ -1268,9 +1268,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanCompatibleMsiPackageBegin(string wzPackageId, string wzCompatiblePackageId, long dw64CompatiblePackageVersion, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanCompatibleMsiPackageBegin(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
-            PlanCompatibleMsiPackageBeginEventArgs args = new PlanCompatibleMsiPackageBeginEventArgs(wzPackageId, wzCompatiblePackageId, dw64CompatiblePackageVersion, recommendedState, pRequestedState, fCancel);
+            PlanCompatibleMsiPackageBeginEventArgs args = new PlanCompatibleMsiPackageBeginEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, recommendedState, pRequestedState, fCancel);
             this.OnPlanCompatibleMsiPackageBegin(args);
 
             pRequestedState = args.State;

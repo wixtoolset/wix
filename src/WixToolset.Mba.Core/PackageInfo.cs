@@ -159,11 +159,11 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public static IPackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, Version version)
+        public static IPackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, string version)
         {
             PackageInfo package = new PackageInfo();
             package.Id = id;
-            package.Version = version.ToString();
+            package.Version = version;
 
             switch (relationType)
             {

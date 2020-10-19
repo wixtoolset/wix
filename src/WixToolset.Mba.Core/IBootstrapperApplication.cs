@@ -45,7 +45,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
-            [MarshalAs(UnmanagedType.U8)] long dw64Version,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
             [MarshalAs(UnmanagedType.Bool)] ref bool fIgnoreBundle
             );
@@ -63,7 +63,7 @@ namespace WixToolset.Mba.Core
         int OnDetectUpdate(
             [MarshalAs(UnmanagedType.LPWStr)] string wzUpdateLocation,
             [MarshalAs(UnmanagedType.U8)] long dw64Size,
-            [MarshalAs(UnmanagedType.U8)] long dw64Version,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.LPWStr)] string wzTitle,
             [MarshalAs(UnmanagedType.LPWStr)] string wzSummary,
             [MarshalAs(UnmanagedType.LPWStr)] string wzContentType,
@@ -86,7 +86,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
-            [MarshalAs(UnmanagedType.U8)] long dw64Version,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.U4)] RelatedOperation operation,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
@@ -103,7 +103,7 @@ namespace WixToolset.Mba.Core
         int OnDetectCompatibleMsiPackage(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
-            [MarshalAs(UnmanagedType.U8)] long dw64CompatiblePackageVersion,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
@@ -114,7 +114,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzUpgradeCode,
             [MarshalAs(UnmanagedType.LPWStr)] string wzProductCode,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
-            [MarshalAs(UnmanagedType.U8)] long dw64Version,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.U4)] RelatedOperation operation,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
@@ -181,7 +181,7 @@ namespace WixToolset.Mba.Core
         int OnPlanCompatibleMsiPackageBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
-            [MarshalAs(UnmanagedType.U8)] long dw64CompatiblePackageVersion,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel

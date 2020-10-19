@@ -21,7 +21,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
 
     STDMETHOD(GetVariableVersion)(
         __in_z LPCWSTR wzVariable,
-        __out DWORD64* pqwValue
+        __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+        __inout DWORD* pcchValue
         ) = 0;
 
     STDMETHOD(FormatString)(
@@ -95,7 +96,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
 
     STDMETHOD(SetVariableVersion)(
         __in_z LPCWSTR wzVariable,
-        __in DWORD64 qwValue
+        __in_z_opt LPCWSTR wzValue
         ) = 0;
 
     STDMETHOD(CloseSplashScreen)() = 0;

@@ -241,14 +241,14 @@ namespace WixToolset.Mba.Core
         /// <param name="version">The version of the forward compatible bundle detected.</param>
         /// <param name="cancelRecommendation">The cancel recommendation from the engine.</param>
         /// <param name="ignoreBundleRecommendation">The ignore recommendation from the engine.</param>
-        public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, long version, bool cancelRecommendation, bool ignoreBundleRecommendation)
+        public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool cancelRecommendation, bool ignoreBundleRecommendation)
             : base(cancelRecommendation)
         {
             this.BundleId = bundleId;
             this.RelationType = relationType;
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
-            this.Version = Engine.LongToVersion(version);
+            this.Version = version;
             this.IgnoreBundle = ignoreBundleRecommendation;
         }
 
@@ -275,7 +275,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the forward compatible bundle detected.
         /// </summary>
-        public Version Version { get; private set; }
+        public string Version { get; private set; }
 
         /// <summary>
         /// Instructs the engine whether to use the forward compatible bundle.
@@ -330,12 +330,12 @@ namespace WixToolset.Mba.Core
         /// <param name="content">The content of the updated bundle.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
         /// <param name="stopRecommendation">The recommendation from the engine.</param>
-        public DetectUpdateEventArgs(string updateLocation, long size, long version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
+        public DetectUpdateEventArgs(string updateLocation, long size, string version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
             : base(cancelRecommendation)
         {
             this.UpdateLocation = updateLocation;
             this.Size = size;
-            this.Version = Engine.LongToVersion(version);
+            this.Version = version;
             this.Title = title;
             this.Summary = summary;
             this.ContentType = contentType;
@@ -356,7 +356,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the updated bundle.
         /// </summary>
-        public Version Version { get; private set; }
+        public string Version { get; private set; }
 
         /// <summary>
         /// Gets the title of the the updated bundle.
@@ -423,14 +423,14 @@ namespace WixToolset.Mba.Core
         /// <param name="version">The version of the related bundle detected.</param>
         /// <param name="operation">The operation that will be taken on the detected bundle.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, long version, RelatedOperation operation, bool cancelRecommendation)
+        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, RelatedOperation operation, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.ProductCode = productCode;
             this.RelationType = relationType;
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
-            this.Version = Engine.LongToVersion(version);
+            this.Version = version;
             this.Operation = operation;
         }
 
@@ -457,7 +457,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the related bundle detected.
         /// </summary>
-        public Version Version { get; private set; }
+        public string Version { get; private set; }
 
         /// <summary>
         /// Gets the operation that will be taken on the detected bundle.
@@ -501,12 +501,12 @@ namespace WixToolset.Mba.Core
         /// <param name="compatiblePackageId">The identity of the compatible package that was detected.</param>
         /// <param name="compatiblePackageVersion">The version of the compatible package that was detected.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectCompatibleMsiPackageEventArgs(string packageId, string compatiblePackageId, long compatiblePackageVersion, bool cancelRecommendation)
+        public DetectCompatibleMsiPackageEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.CompatiblePackageId = compatiblePackageId;
-            this.CompatiblePackageVersion = Engine.LongToVersion(compatiblePackageVersion);
+            this.CompatiblePackageVersion = compatiblePackageVersion;
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the compatible package that was detected.
         /// </summary>
-        public Version CompatiblePackageVersion { get; private set; }
+        public string CompatiblePackageVersion { get; private set; }
     }
 
     /// <summary>
@@ -541,14 +541,14 @@ namespace WixToolset.Mba.Core
         /// <param name="version">The version of the related package detected.</param>
         /// <param name="operation">The operation that will be taken on the detected package.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectRelatedMsiPackageEventArgs(string packageId, string upgradeCode, string productCode, bool perMachine, long version, RelatedOperation operation, bool cancelRecommendation)
+        public DetectRelatedMsiPackageEventArgs(string packageId, string upgradeCode, string productCode, bool perMachine, string version, RelatedOperation operation, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.UpgradeCode = upgradeCode;
             this.ProductCode = productCode;
             this.PerMachine = perMachine;
-            this.Version = Engine.LongToVersion(version);
+            this.Version = version;
             this.Operation = operation;
         }
 
@@ -575,7 +575,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the related package detected.
         /// </summary>
-        public Version Version { get; private set; }
+        public string Version { get; private set; }
 
         /// <summary>
         /// Gets the operation that will be taken on the detected package.
@@ -813,12 +813,12 @@ namespace WixToolset.Mba.Core
         /// <param name="recommendedState">The recommended request state for the compatible package.</param>
         /// <param name="state">The requested state for the compatible package.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public PlanCompatibleMsiPackageBeginEventArgs(string packageId, string compatiblePackageId, long compatiblePackageVersion, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        public PlanCompatibleMsiPackageBeginEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.CompatiblePackageId = compatiblePackageId;
-            this.CompatiblePackageVersion = Engine.LongToVersion(compatiblePackageVersion);
+            this.CompatiblePackageVersion = compatiblePackageVersion;
             this.RecommendedState = recommendedState;
             this.State = state;
         }
@@ -836,7 +836,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Gets the version of the compatible package detected.
         /// </summary>
-        public Version CompatiblePackageVersion { get; private set; }
+        public string CompatiblePackageVersion { get; private set; }
 
         /// <summary>
         /// Gets the recommended state to use for the compatible package for planning.

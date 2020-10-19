@@ -96,7 +96,7 @@ namespace WixToolset.Mba.Core
         /// Gets <see cref="Version"/> variables for the engine.
         /// </summary>
         /// <param name="name">The name of the variable.</param>
-        Version GetVariableVersion(string name);
+        string GetVariableVersion(string name);
 
         /// <summary>
         /// Launches a preapproved executable elevated.  As long as the engine already elevated, there will be no UAC prompt.
@@ -161,7 +161,7 @@ namespace WixToolset.Mba.Core
         /// </summary>
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value to set.</param>
-        void SetVariable(string name, long value);
+        void SetVariableNumeric(string name, long value);
 
         /// <summary>
         /// Sets string variables for the engine using SecureStrings.
@@ -169,7 +169,7 @@ namespace WixToolset.Mba.Core
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value to set.</param>
         /// <param name="formatted">False if the value is a literal string.</param>
-        void SetVariable(string name, SecureString value, bool formatted);
+        void SetVariableString(string name, SecureString value, bool formatted);
 
         /// <summary>
         /// Sets string variables for the engine.
@@ -177,21 +177,14 @@ namespace WixToolset.Mba.Core
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value to set.</param>
         /// <param name="formatted">False if the value is a literal string.</param>
-        void SetVariable(string name, string value, bool formatted);
+        void SetVariableString(string name, string value, bool formatted);
 
         /// <summary>
-        /// Sets <see cref="Version"/> variables for the engine.
-        /// 
-        /// The <see cref="Version"/> class can keep track of when the build and revision fields are undefined, but the engine can't.
-        /// Therefore, the build and revision fields must be defined when setting a <see cref="Version"/> variable.
-        /// Use the NormalizeVersion method to make sure the engine can accept the Version.
-        /// 
-        /// To keep track of versions without build or revision fields, use StringVariables instead.
+        /// Sets version variables for the engine.
         /// </summary>
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value to set.</param>
-        /// <exception cref="OverflowException">The given <see cref="Version"/> was invalid.</exception>
-        void SetVariable(string name, Version value);
+        void SetVariableVersion(string name, string value);
 
         /// <summary>
         /// Sends error message when embedded.
