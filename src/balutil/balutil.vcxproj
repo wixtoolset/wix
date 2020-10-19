@@ -43,7 +43,7 @@
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" />
   <Import Project="..\NativeMultiTargeting.Build.props" />
 
   <ImportGroup Label="ExtensionSettings">
@@ -100,6 +100,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.37\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.BootstrapperCore.Native.4.0.37\build\WixToolset.BootstrapperCore.Native.props'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.55\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.55\build\WixToolset.DUtil.props'))" />
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
 </Project>

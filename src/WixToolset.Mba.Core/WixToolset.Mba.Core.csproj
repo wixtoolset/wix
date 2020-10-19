@@ -10,6 +10,7 @@
     <Description>Managed Bootstrapper Application Core</Description>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <IncludeSymbols>true</IncludeSymbols>
+    <NBGV_EmitThisAssemblyClass>false</NBGV_EmitThisAssemblyClass>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(UsingMicrosoftNETSdk)'!='true' and '$(CreateDocumentation)'!='false' ">
@@ -18,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup>
