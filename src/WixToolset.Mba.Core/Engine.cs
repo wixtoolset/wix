@@ -49,6 +49,12 @@ namespace WixToolset.Mba.Core
             this.engine.CloseSplashScreen();
         }
 
+        public int CompareVersions(string version1, string version2)
+        {
+            this.engine.CompareVersions(version1, version2, out var result);
+            return result;
+        }
+
         public bool ContainsVariable(string name)
         {
             int capacity = 0;

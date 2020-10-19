@@ -4,3 +4,9 @@
 EXPORTS
     InitializeFromCreateArgs
     StoreBAInCreateResults
+    VerCompareParsedVersions
+    VerCompareStringVersions
+    VerCopyVersion
+    VerFreeVersion
+    VerParseVersion
+    VerVersionFromQword

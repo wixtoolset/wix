@@ -127,4 +127,10 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         __in_z_opt LPCWSTR wzArguments,
         __in DWORD dwWaitForInputIdleTimeout
         ) = 0;
+
+    STDMETHOD(CompareVersions)(
+        __in_z LPCWSTR wzVersion1,
+        __in_z LPCWSTR wzVersion2,
+        __out int* pnResult
+        ) = 0;
 };

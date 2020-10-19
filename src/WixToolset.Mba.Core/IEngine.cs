@@ -25,6 +25,9 @@ namespace WixToolset.Mba.Core
         /// </summary>
         void CloseSplashScreen();
 
+        /// <returns>0 if equal, 1 if version1 &gt; version2, -1 if version1 &lt; version2</returns>
+        int CompareVersions(string version1, string version2);
+
         /// <summary>
         /// Checks if a variable exists in the engine.
         /// </summary>

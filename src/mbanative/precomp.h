@@ -6,6 +6,7 @@
 #include <msiquery.h>
 
 #include <dutil.h>
+#include <verutil.h>
 
 #include <BootstrapperEngine.h>
 #include <BootstrapperApplication.h>

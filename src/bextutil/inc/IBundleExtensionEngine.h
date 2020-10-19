@@ -58,4 +58,10 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
         __in_z LPCWSTR wzVariable,
         __in_z_opt LPCWSTR wzValue
         ) = 0;
+
+    STDMETHOD(CompareVersions)(
+        __in_z LPCWSTR wzVersion1,
+        __in_z LPCWSTR wzVersion2,
+        __out int* pnResult
+        ) = 0;
 };

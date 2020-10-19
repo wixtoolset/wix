@@ -535,6 +535,32 @@ public: // IBootstrapperEngine
         return m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_LAUNCHAPPROVEDEXE, &args, &results, m_pvBAEngineProcContext);
     }
 
+    virtual STDMETHODIMP CompareVersions(
+        __in_z LPCWSTR wzVersion1,
+        __in_z LPCWSTR wzVersion2,
+        __out int* pnResult
+        )
+    {
+        HRESULT hr = S_OK;
+        BAENGINE_COMPAREVERSIONS_ARGS args = { };
+        BAENGINE_COMPAREVERSIONS_RESULTS results = { };
+
+        ExitOnNull(pnResult, hr, E_INVALIDARG, "pnResult is required");
+
+        args.cbSize = sizeof(args);
+        args.wzVersion1 = wzVersion1;
+        args.wzVersion2 = wzVersion2;
+
+        results.cbSize = sizeof(results);
+
+        hr = m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_COMPAREVERSIONS, &args, &results, m_pvBAEngineProcContext);
+
+        *pnResult = results.nResult;
+
+    LExit:
+        return hr;
+    }
+
 public: // IMarshal
     virtual STDMETHODIMP GetUnmarshalClass(
         __in REFIID /*riid*/,

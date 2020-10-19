@@ -145,6 +145,12 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzArguments,
             [MarshalAs(UnmanagedType.U4)] int dwWaitForInputIdleTimeout
             );
+
+        void CompareVersions(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion1,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion2,
+            [MarshalAs(UnmanagedType.I4)] out int pnResult
+            );
     }
 
     /// <summary>

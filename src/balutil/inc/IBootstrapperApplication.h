@@ -396,7 +396,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnExecuteBegin - called when the engine begins executing a package.
+    // OnExecutePackageBegin - called when the engine begins executing a package.
     //
     STDMETHOD(OnExecutePackageBegin)(
         __in_z LPCWSTR wzPackageId,

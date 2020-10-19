@@ -280,6 +280,32 @@ public: // IBundleExtensionEngine
         return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION, &args, &results, m_pvBundleExtensionEngineProcContext);
     }
 
+    virtual STDMETHODIMP CompareVersions(
+        __in_z LPCWSTR wzVersion1,
+        __in_z LPCWSTR wzVersion2,
+        __out int* pnResult
+        )
+    {
+        HRESULT hr = S_OK;
+        BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS args = { };
+        BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS results = { };
+
+        ExitOnNull(pnResult, hr, E_INVALIDARG, "pnResult is required");
+
+        args.cbSize = sizeof(args);
+        args.wzVersion1 = wzVersion1;
+        args.wzVersion2 = wzVersion2;
+
+        results.cbSize = sizeof(results);
+
+        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS, &args, &results, m_pvBundleExtensionEngineProcContext);
+
+        *pnResult = results.nResult;
+
+    LExit:
+        return hr;
+    }
+
 public:
     CBextBundleExtensionEngine(
         __in PFN_BUNDLE_EXTENSION_ENGINE_PROC pfnBundleExtensionEngineProc,
