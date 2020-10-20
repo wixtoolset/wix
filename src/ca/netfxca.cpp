@@ -23,8 +23,8 @@ LPCWSTR vcsFileId =
 enum eFileId { fiFile = 1 };
 
 LPCWSTR vcsNgenQuery =
-    L"SELECT `NetFxNativeImage`.`File_`, `NetFxNativeImage`.`NetFxNativeImage`, `NetFxNativeImage`.`Priority`, `NetFxNativeImage`.`Attributes`, `NetFxNativeImage`.`File_Application`, `NetFxNativeImage`.`Directory_ApplicationBase`, `File`.`Component_` "
-    L"FROM `NetFxNativeImage`, `File` WHERE `File`.`File`=`NetFxNativeImage`.`File_`";
+    L"SELECT `Wix4NetFxNativeImage`.`File_`, `Wix4NetFxNativeImage`.`Wix4NetFxNativeImage`, `Wix4NetFxNativeImage`.`Priority`, `Wix4NetFxNativeImage`.`Attributes`, `Wix4NetFxNativeImage`.`File_Application`, `Wix4NetFxNativeImage`.`Directory_ApplicationBase`, `File`.`Component_` "
+    L"FROM `Wix4NetFxNativeImage`, `File` WHERE `File`.`File`=`Wix4NetFxNativeImage`.`File_`";
 enum eNgenQuery { ngqFile = 1, ngqId, ngqPriority, ngqAttributes, ngqFileApp, ngqDirAppBase, ngqComponent };
 
 LPCWSTR vcsNgenGac =
@@ -232,7 +232,7 @@ static HRESULT GetStrongName(
 
     // get the name value records for this component
     hr = WcaOpenView(vcsNgenStrongName, &hView);
-    ExitOnFailure(hr, "failed to open view on NetFxNativeImage table");
+    ExitOnFailure(hr, "failed to open view on Wix4NetFxNativeImage table");
 
     hr = WcaExecuteView(hView, hComponentRec);
     ExitOnFailure(hr, "failed to execute strong name view");
@@ -462,17 +462,17 @@ extern "C" UINT __stdcall SchedNetFx(
 
     // loop through all the NetFx records
     hr = WcaOpenExecuteView(vcsNgenQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on NetFxNativeImage table");
+    ExitOnFailure(hr, "failed to open view on Wix4NetFxNativeImage table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         // Get Id
         hr = WcaGetRecordString(hRec, ngqId, &pwzId);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.NetFxNativeImage");
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.Wix4NetFxNativeImage");
 
         // Get File
         hr = WcaGetRecordString(hRec, ngqFile, &pwzData);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.File_ for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.File_ for record: %ls", pwzId);
         hr = StrAllocFormatted(&pwzTemp, vpwzUnformattedQuotedFile, pwzData);
         ExitOnFailure(hr, "failed to format file string for file: %ls", pwzData);
         hr = WcaGetFormattedString(pwzTemp, &pwzFile);
@@ -480,7 +480,7 @@ extern "C" UINT __stdcall SchedNetFx(
 
         // Get Priority
         hr = WcaGetRecordInteger(hRec, ngqPriority, &iPriority);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.Priority for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.Priority for record: %ls", pwzId);
 
         if (0 == iPriority)
             iAssemblyCost = COST_NGEN_BLOCKING;
@@ -489,11 +489,11 @@ extern "C" UINT __stdcall SchedNetFx(
 
         // Get Attributes
         hr = WcaGetRecordInteger(hRec, ngqAttributes, &iAttributes);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.Attributes for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.Attributes for record: %ls", pwzId);
 
         // Get File_Application or leave pwzFileApp NULL.
         hr = WcaGetRecordFormattedString(hRec, ngqFileApp, &pwzData);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.File_Application for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.File_Application for record: %ls", pwzId);
 
         // Check if the value resolves to a valid file ID.
         if (S_OK == FileIdExists(pwzData))
@@ -517,7 +517,7 @@ extern "C" UINT __stdcall SchedNetFx(
 
         // Get Directory_ApplicationBase or leave pwzDirAppBase NULL.
         hr = WcaGetRecordFormattedString(hRec, ngqDirAppBase, &pwzData);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.Directory_ApplicationBase for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.Directory_ApplicationBase for record: %ls", pwzId);
 
         if (WcaIsUnicodePropertySet(pwzData))
         {
@@ -540,7 +540,7 @@ extern "C" UINT __stdcall SchedNetFx(
 
         // Get Component
         hr = WcaGetRecordString(hRec, ngqComponent, &pwzComponent);
-        ExitOnFailure(hr, "failed to get NetFxNativeImage.Directory_ApplicationBase for record: %ls", pwzId);
+        ExitOnFailure(hr, "failed to get Wix4NetFxNativeImage.Directory_ApplicationBase for record: %ls", pwzId);
         er = ::MsiGetComponentStateW(hInstall, pwzComponent, &isInstalled, &isAction);
         ExitOnWin32Error(er, hr, "failed to get install state for Component: %ls", pwzComponent);
 
