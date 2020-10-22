@@ -44,6 +44,26 @@ namespace WixBuildTools.TestSupport
                 {
                     foreach (var table in tables)
                     {
+                        if (table == "_SummaryInformation")
+                        {
+                            var entries = new List<string>();
+                            results.Add(table, entries);
+
+                            entries.Add($"Title\t{db.SummaryInfo.Title}");
+                            entries.Add($"Subject\t{db.SummaryInfo.Subject}");
+                            entries.Add($"Author\t{db.SummaryInfo.Author}");
+                            entries.Add($"Keywords\t{db.SummaryInfo.Keywords}");
+                            entries.Add($"Comments\t{db.SummaryInfo.Comments}");
+                            entries.Add($"Template\t{db.SummaryInfo.Template}");
+                            entries.Add($"CodePage\t{db.SummaryInfo.CodePage}");
+                            entries.Add($"PageCount\t{db.SummaryInfo.PageCount}");
+                            entries.Add($"WordCount\t{db.SummaryInfo.WordCount}");
+                            entries.Add($"CharacterCount\t{db.SummaryInfo.CharacterCount}");
+                            entries.Add($"Security\t{db.SummaryInfo.Security}");
+
+                            continue;
+                        }
+
                         if (!db.IsTablePersistent(table))
                         {
                             results.Add(table, null);
@@ -52,6 +72,7 @@ namespace WixBuildTools.TestSupport
 
                         var rows = new List<string>();
                         results.Add(table, rows);
+
                         using (var view = db.OpenView("SELECT * FROM `{0}`", table))
                         {
                             view.Execute();
