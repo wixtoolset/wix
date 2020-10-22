@@ -22,8 +22,8 @@ namespace WixBuildTools.TestSupport
 
         public static void CompareXml(XContainer xExpected, XContainer xActual)
         {
-            var actuals = xActual.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={a.Value}"))}");
             var expecteds = xExpected.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={a.Value}"))}");
+            var actuals = xActual.Descendants().Select(x => $"{x.Name.LocalName}:{String.Join(",", x.Attributes().OrderBy(a => a.Name.LocalName).Select(a => $"{a.Name.LocalName}={a.Value}"))}");
 
             CompareLineByLine(expecteds.OrderBy(s => s).ToArray(), actuals.OrderBy(s => s).ToArray());
         }

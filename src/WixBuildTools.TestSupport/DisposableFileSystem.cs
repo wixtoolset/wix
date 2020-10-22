@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixBuildTools.TestSupport
 {
@@ -11,6 +11,13 @@ namespace WixBuildTools.TestSupport
         protected bool Disposed { get; private set; }
 
         private List<string> CleanupPaths { get; } = new List<string>();
+
+        public bool Keep { get; }
+
+        public DisposableFileSystem(bool keep = false)
+        {
+            this.Keep = keep;
+        }
 
         protected string GetFile(bool create = false)
         {
@@ -56,7 +63,7 @@ namespace WixBuildTools.TestSupport
                 return;
             }
 
-            if (disposing)
+            if (disposing && !this.Keep)
             {
                 foreach (var path in this.CleanupPaths)
                 {
