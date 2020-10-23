@@ -24,6 +24,12 @@ namespace WixToolset.Core
             var codepage = 0;
             string moduleId = null;
             string version = null;
+            var setCodepage = false;
+            var setPackageName = false;
+            var setKeywords = false;
+            var ignoredForMergeModules = false;
+
+            this.GetDefaultPlatformAndInstallerVersion(out var platform, out var msiVersion);
 
             this.activeName = null;
             this.activeLanguage = null;
@@ -50,7 +56,9 @@ namespace WixToolset.Core
                         break;
                     case "Guid":
                         moduleId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        this.Core.Write(WarningMessages.DeprecatedModuleGuidAttribute(sourceLineNumbers));
+                        break;
+                    case "InstallerVersion":
+                        msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                         break;
                     case "Language":
                         this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -72,6 +80,11 @@ namespace WixToolset.Core
             if (null == this.activeName)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (null == moduleId)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Guid"));
             }
 
             if (null == this.activeLanguage)
@@ -174,9 +187,6 @@ namespace WixToolset.Core
                         case "IgnoreTable":
                             this.ParseIgnoreTableElement(child);
                             break;
-                        case "Package":
-                            this.ParsePackageElement(child, null, moduleId);
-                            break;
                         case "Property":
                             this.ParsePropertyElement(child);
                             break;
@@ -195,6 +205,9 @@ namespace WixToolset.Core
                             break;
                         case "Substitution":
                             this.ParseSubstitutionElement(child);
+                            break;
+                        case "SummaryInformation":
+                            this.ParseSummaryInformationElement(child, ref setCodepage, ref setPackageName, ref setKeywords, ref ignoredForMergeModules);
                             break;
                         case "UI":
                             this.ParseUIElement(child);
@@ -219,6 +232,33 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
+                    if (!setCodepage)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Codepage,
+                            Value = "1252"
+                        });
+                    }
+
+                    if (!setPackageName)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Subject,
+                            Value = this.activeName
+                        });
+                    }
+
+                    if (!setKeywords)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Keywords,
+                            Value = "Installer"
+                        });
+                    }
+
                     var symbol = this.Core.AddSymbol(new ModuleSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
                     {
                         ModuleID = this.activeName,
@@ -226,6 +266,14 @@ namespace WixToolset.Core
                     });
 
                     symbol.Set((int)ModuleSignatureSymbolFields.Language, this.activeLanguage);
+
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.PackageCode,
+                        Value = moduleId
+                    });
+
+                    this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform);
                 }
             }
             finally

@@ -1,23 +1,16 @@
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Patch
-    AllowRemoval="yes"
-    Manufacturer="FireGiant"
-    MoreInfoURL="http://www.example.com/"
-    DisplayName="~Test Patch v$(var.V)"
-    Description="~Test Small Update Patch v($var.V)"
-    Classification="Update"
-    >
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Patch AllowRemoval="yes" Manufacturer="FireGiant" MoreInfoURL="http://www.example.com/" DisplayName="~Test Patch v$(var.V)" Description="~Test Small Update Patch v($var.V)" Classification="Update">
 
     <Media Id="1" Cabinet="foo.cab">
-      <PatchBaseline Id="RTM"/>
+      <PatchBaseline Id="RTM" />
     </Media>
 
-    <PatchFamilyRef Id='SamplePatchFamily'/>
+    <PatchFamilyRef Id="SamplePatchFamily" />
   </Patch>
 
   <Fragment>
-    <PatchFamily Id='SamplePatchFamily' Version='$(var.V)' Supersede='yes'>
-      <ComponentRef Id="A"/>
+    <PatchFamily Id="SamplePatchFamily" Version="$(var.V)" Supersede="yes">
+      <ComponentRef Id="A" />
     </PatchFamily>
   </Fragment>
 </Wix>

@@ -160,7 +160,7 @@ namespace WixToolset.Core.WindowsInstaller
                     this.RootElement = new XElement(Names.PatchCreationElement);
                     break;
                 case OutputType.Product:
-                    this.RootElement = new XElement(Names.ProductElement);
+                    this.RootElement = new XElement(Names.PackageElement);
                     break;
                 default:
                     throw new InvalidOperationException("Unknown output type.");
@@ -669,6 +669,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
             else
             {
+                this.FinalizeSummaryInformationStream(tables);
                 this.FinalizeCheckBoxTable(tables);
                 this.FinalizeComponentTable(tables);
                 this.FinalizeDialogTable(tables);
@@ -2548,7 +2549,7 @@ namespace WixToolset.Core.WindowsInstaller
                 switch (table.Name)
                 {
                     case "_SummaryInformation":
-                        this.Decompile_SummaryInformationTable(table);
+                        // handled in FinalizeDecompile
                         break;
                     case "AdminExecuteSequence":
                     case "AdminUISequence":
@@ -2976,11 +2977,13 @@ namespace WixToolset.Core.WindowsInstaller
         /// Decompile the _SummaryInformation table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
-        private void Decompile_SummaryInformationTable(Table table)
+        private void FinalizeSummaryInformationStream(TableIndexedCollection tables)
         {
+            var table = tables["_SummaryInformation"];
+
             if (OutputType.Module == this.OutputType || OutputType.Product == this.OutputType)
             {
-                var xPackage = new XElement(Names.PackageElement);
+                var xSummaryInformation = new XElement(Names.SummaryInformationElement);
 
                 foreach (var row in table.Rows)
                 {
@@ -2993,56 +2996,63 @@ namespace WixToolset.Core.WindowsInstaller
                             case 1:
                                 if ("1252" != value)
                                 {
-                                    xPackage.SetAttributeValue("SummaryCodepage", value);
+                                    xSummaryInformation.SetAttributeValue("Codepage", value);
                                 }
                                 break;
                             case 3:
-                                xPackage.SetAttributeValue("Description", value);
+                            {
+                                var productName = this.RootElement.Attribute("Name")?.Value;
+                                if (value != productName)
+                                {
+                                    xSummaryInformation.SetAttributeValue("Description", value);
+                                }
                                 break;
+                            }
                             case 4:
-                                xPackage.SetAttributeValue("Manufacturer", value);
+                            {
+                                var productManufacturer = this.RootElement.Attribute("Manufacturer")?.Value;
+                                if (value != productManufacturer)
+                                {
+                                    xSummaryInformation.SetAttributeValue("Manufacturer", value);
+                                }
                                 break;
+                            }
                             case 5:
                                 if ("Installer" != value)
                                 {
-                                    xPackage.SetAttributeValue("Keywords", value);
-                                }
-                                break;
-                            case 6:
-                                if (!value.StartsWith("This installer database contains the logic and data required to install "))
-                                {
-                                    xPackage.SetAttributeValue("Comments", value);
+                                    xSummaryInformation.SetAttributeValue("Keywords", value);
                                 }
                                 break;
                             case 7:
                                 var template = value.Split(';');
                                 if (0 < template.Length && 0 < template[template.Length - 1].Length)
                                 {
-                                    xPackage.SetAttributeValue("Languages", template[template.Length - 1]);
-                                }
-
-                                var platform = GetPlatformFromTemplateSummaryInformation(template).ToString().ToLowerInvariant();
-                                if (!String.IsNullOrEmpty(platform))
-                                {
-                                    xPackage.SetAttributeValue("Platform", platform);
+                                    this.RootElement.SetAttributeValue("Language", template[template.Length - 1]);
                                 }
                                 break;
                             case 9:
                                 if (OutputType.Module == this.OutputType)
                                 {
                                     this.ModularizationGuid = value;
-                                    xPackage.SetAttributeValue("Id", value);
                                 }
                                 break;
                             case 14:
-                                xPackage.SetAttributeValue("InstallerVersion", row.FieldAsInteger(1));
+                                var installerVersion = row.FieldAsInteger(1);
+                                // Default InstallerVersion.
+                                if (installerVersion != 500)
+                                {
+                                    this.RootElement.SetAttributeValue("InstallerVersion", installerVersion);
+                                }
                                 break;
                             case 15:
                                 var wordCount = row.FieldAsInteger(1);
                                 if (0x1 == (wordCount & 0x1))
                                 {
                                     this.ShortNames = true;
-                                    xPackage.SetAttributeValue("ShortNames", "yes");
+                                    if (OutputType.Product == this.OutputType)
+                                    {
+                                        this.RootElement.SetAttributeValue("ShortNames", "yes");
+                                    }
                                 }
 
                                 if (0x2 == (wordCount & 0x2))
@@ -3051,38 +3061,35 @@ namespace WixToolset.Core.WindowsInstaller
 
                                     if (OutputType.Product == this.OutputType)
                                     {
-                                        xPackage.SetAttributeValue("Compressed", "yes");
+                                        this.RootElement.SetAttributeValue("Compressed", "yes");
                                     }
                                 }
 
-                                if (0x4 == (wordCount & 0x4))
+                                if (OutputType.Product == this.OutputType)
                                 {
-                                    xPackage.SetAttributeValue("AdminImage", "yes");
+                                    if (0x8 == (wordCount & 0x8))
+                                    {
+                                        this.RootElement.SetAttributeValue("Scope", "perUser");
+                                    }
+                                    else
+                                    {
+                                        var xAllUsers = this.RootElement.Elements(Names.PropertyElement).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
+                                        if (xAllUsers?.Attribute("Value")?.Value == "1")
+                                        {
+                                            xAllUsers?.Remove();
+                                        }
+                                    }
                                 }
 
-                                if (0x8 == (wordCount & 0x8))
-                                {
-                                    xPackage.SetAttributeValue("InstallPrivileges", "limited");
-                                }
-
-                                break;
-                            case 19:
-                                var security = row.FieldAsInteger(1);
-                                switch (security)
-                                {
-                                    case 0:
-                                        xPackage.SetAttributeValue("ReadOnly", "no");
-                                        break;
-                                    case 4:
-                                        xPackage.SetAttributeValue("ReadOnly", "yes");
-                                        break;
-                                }
                                 break;
                         }
                     }
                 }
 
-                this.RootElement.Add(xPackage);
+                if (xSummaryInformation.HasAttributes)
+                {
+                    this.RootElement.Add(xSummaryInformation);
+                }
             }
             else
             {
@@ -6204,7 +6211,7 @@ namespace WixToolset.Core.WindowsInstaller
                             this.RootElement.SetAttributeValue("Manufacturer", value);
                             continue;
                         case "ProductCode":
-                            this.RootElement.SetAttributeValue("Id", value.ToUpper(CultureInfo.InvariantCulture));
+                            this.RootElement.SetAttributeValue("ProductCode", value.ToUpper(CultureInfo.InvariantCulture));
                             continue;
                         case "ProductLanguage":
                             this.RootElement.SetAttributeValue("Language", value);

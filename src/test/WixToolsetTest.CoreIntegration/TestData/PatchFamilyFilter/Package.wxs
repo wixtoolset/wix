@@ -1,29 +1,27 @@
-<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-  <Product Id='e703bf17-4765-444c-91fd-88550fa681d4' Name='~Test Package'
-            Version='$(var.V)' Manufacturer='Example Corporation' Language='1033'
-            UpgradeCode='e703bf17-4765-444c-91fd-88550fa681d4'>
-    <Package InstallScope='perMachine' />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="~Test Package" Version="$(var.V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="e703bf17-4765-444c-91fd-88550fa681d4" Scope="perMachine" ProductCode="e703bf17-4765-444c-91fd-88550fa681d4">
+    
 
-    <MajorUpgrade DowngradeErrorMessage='Newer version already installed.' />
+    <MajorUpgrade DowngradeErrorMessage="Newer version already installed." />
 
-    <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Directory Id='ProgramFilesFolder'>
-        <Directory Id='INSTALLFOLDER' Name='~Test App' />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="~Test App" />
       </Directory>
     </Directory>
 
-    <Feature Id='Main'>
-      <ComponentGroupRef Id='Components' />
+    <Feature Id="Main">
+      <ComponentGroupRef Id="Components" />
     </Feature>
-  </Product>
+  </Package>
 
   <Fragment>
-    <ComponentGroup Id="Components" Directory='INSTALLFOLDER'>
-      <Component Id='A'>
-        <File Name='a.txt' Source='Av$(var.A).txt' />
+    <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
+      <Component Id="A">
+        <File Id="a.txt" Name="a.txt" Source="Av$(var.A).txt" />
       </Component>
-      <Component Id='B'>
-        <File Name='b.txt' Source='Bv$(var.B).txt' />
+      <Component Id="B">
+        <File Id="b.txt" Name="b.txt" Source="Bv$(var.B).txt" />
       </Component>
     </ComponentGroup>
   </Fragment>

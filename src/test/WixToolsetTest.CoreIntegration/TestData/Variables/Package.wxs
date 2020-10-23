@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<?define Foo = "Foo" ?>
+﻿<?define Foo = "Foo" ?>
 <?define Foo = "Foo" ?>
 
 <?define Bar = "Bar" ?>
@@ -13,15 +11,15 @@
 <?endif?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="*" Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+    
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
-  </Product>
+  </Package>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">

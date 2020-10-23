@@ -8,9 +8,11 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         public static readonly XName WixElement = WxsNamespace + "Wix";
 
-        public static readonly XName ProductElement = WxsNamespace + "Product";
+        public static readonly XName PackageElement = WxsNamespace + "Package";
         public static readonly XName ModuleElement = WxsNamespace + "Module";
         public static readonly XName PatchCreationElement = WxsNamespace + "PatchCreation";
+
+        public static readonly XName SummaryInformationElement = WxsNamespace + "SummaryInformation";
 
         public static readonly XName CustomElement = WxsNamespace + "Custom";
 
@@ -30,9 +32,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         public static readonly XName FileElement = WxsNamespace + "File";
 
         public static readonly XName EnsureTableElement = WxsNamespace + "EnsureTable";
-        public static readonly XName PackageElement = WxsNamespace + "Package";
         public static readonly XName PatchInformationElement = WxsNamespace + "PatchInformation";
-        
+
         public static readonly XName ProgressTextElement = WxsNamespace + "ProgressText";
         public static readonly XName UIElement = WxsNamespace + "UI";
 

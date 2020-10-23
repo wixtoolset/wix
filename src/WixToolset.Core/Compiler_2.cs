@@ -23,15 +23,24 @@ namespace WixToolset.Core
         /// Parses a product element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        private void ParseProductElement(XElement node)
+        private void ParsePackageElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var sourceBits = 0;
             var codepage = 65001;
             var productCode = "*";
+            var isPerMachine = true;
+            string installScope = null;
             string upgradeCode = null;
             string manufacturer = null;
             string version = null;
             string symbols = null;
+            var isCodepageSet = false;
+            var isPackageNameSet = false;
+            var isKeywordsSet = false;
+            var isPackageAuthorSet = false;
+
+            this.GetDefaultPlatformAndInstallerVersion(out var platform, out var msiVersion);
 
             this.activeName = null;
             this.activeLanguage = null;
@@ -42,11 +51,17 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
-                        break;
                     case "Codepage":
                         codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Compressed":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            sourceBits |= 2;
+                        }
+                        break;
+                    case "InstallerVersion":
+                        msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                         break;
                     case "Language":
                         this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -63,6 +78,31 @@ namespace WixToolset.Core
                         if ("PUT-PRODUCT-NAME-HERE" == this.activeName)
                         {
                             this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
+                        }
+                        break;
+                    case "ProductCode":
+                        productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
+                        break;
+                    case "Scope":
+                        installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (installScope)
+                        {
+                            case "perMachine":
+                                // handled below after we create the section.
+                                break;
+                            case "perUser":
+                                isPerMachine = false;
+                                sourceBits |= 8;
+                                break;
+                            default:
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
+                                break;
+                            }
+                        break;
+                    case "ShortNames":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            sourceBits |= 1;
                         }
                         break;
                     case "UpgradeCode":
@@ -139,6 +179,19 @@ namespace WixToolset.Core
                 {
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "UpgradeCode"), upgradeCode, false, false, false, true);
                 }
+
+                if (isPerMachine)
+                {
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ALLUSERS"), "1", false, false, false, false);
+                }
+
+                this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform);
+
+                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                {
+                    PropertyId = SummaryInformationType.WordCount,
+                    Value = sourceBits.ToString(CultureInfo.InvariantCulture)
+                });
 
                 var contextValues = new Dictionary<string, string>
                 {
@@ -240,9 +293,6 @@ namespace WixToolset.Core
                         case "MediaTemplate":
                             this.ParseMediaTemplateElement(child, null);
                             break;
-                        case "Package":
-                            this.ParsePackageElement(child, manufacturer, null);
-                            break;
                         case "PackageCertificates":
                         case "PatchCertificates":
                             this.ParseCertificatesElement(child);
@@ -262,6 +312,9 @@ namespace WixToolset.Core
                         case "SFPCatalog":
                             string parentName = null;
                             this.ParseSFPCatalogElement(child, ref parentName);
+                            break;
+                        case "SummaryInformation":
+                            this.ParseSummaryInformationElement(child, ref isCodepageSet, ref isPackageNameSet, ref isKeywordsSet, ref isPackageAuthorSet);
                             break;
                         case "SymbolPath":
                             if (null != symbols)
@@ -298,6 +351,42 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
+                    if (!isCodepageSet)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Codepage,
+                            Value = "1252"
+                        });
+                    }
+
+                    if (!isPackageNameSet)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Subject,
+                            Value = this.activeName
+                        });
+                    }
+
+                    if (!isPackageAuthorSet)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Author,
+                            Value = manufacturer
+                        });
+                    }
+
+                    if (!isKeywordsSet)
+                    {
+                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                        {
+                            PropertyId = SummaryInformationType.Keywords,
+                            Value = "Installer"
+                        });
+                    }
+
                     if (null != symbols)
                     {
                         this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers)
@@ -313,6 +402,74 @@ namespace WixToolset.Core
             {
                 this.compilingProduct = false;
             }
+        }
+
+        private void GetDefaultPlatformAndInstallerVersion(out string platform, out int msiVersion)
+        {
+            // Let's default to a modern version of MSI. Users can override,
+            // of course, subject to platform-specific limitations.
+            msiVersion = 500;
+
+            switch (this.CurrentPlatform)
+            {
+                case Platform.X86:
+                    platform = "Intel";
+                    break;
+                case Platform.X64:
+                    platform = "x64";
+                    break;
+                case Platform.ARM64:
+                    platform = "Arm64";
+                    break;
+                default:
+                    throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", this.CurrentPlatform.ToString());
+            }
+        }
+
+        private void ValidateAndAddCommonSummaryInformationSymbols(SourceLineNumber sourceLineNumbers, int msiVersion, string platform)
+        {
+            if (String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) && 200 > msiVersion)
+            {
+                msiVersion = 200;
+                this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
+            }
+
+            if (String.Equals(platform, "Arm64", StringComparison.OrdinalIgnoreCase) && 500 > msiVersion)
+            {
+                msiVersion = 500;
+                this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
+            }
+
+            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+            {
+                PropertyId = SummaryInformationType.Comments,
+                Value = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName)
+            });
+
+            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+            {
+                PropertyId = SummaryInformationType.Title,
+                Value = "Installation Database"
+            });
+
+            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+            {
+                PropertyId = SummaryInformationType.PlatformAndLanguage,
+                Value = String.Format(CultureInfo.InvariantCulture, "{0};{1}", platform, this.activeLanguage)
+            });
+
+            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+            {
+                PropertyId = SummaryInformationType.WindowsInstallerVersion,
+                Value = msiVersion.ToString(CultureInfo.InvariantCulture)
+            });
+
+            this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+            {
+                PropertyId = SummaryInformationType.Security,
+                Value = "2"
+            });
+
         }
 
         /// <summary>
@@ -615,40 +772,13 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="productAuthor">Default package author.</param>
         /// <param name="moduleId">The module guid - this is necessary until Module/@Guid is removed.</param>
-        private void ParsePackageElement(XElement node, string productAuthor, string moduleId)
+        private void ParseSummaryInformationElement(XElement node, ref bool isCodepageSet, ref bool isPackageNameSet, ref bool isKeywordsSet, ref bool isPackageAuthorSet)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var codepage = "1252";
-            var comments = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName);
-            var keywords = "Installer";
-            var msiVersion = 100; // lowest released version, really should be specified
-            var packageAuthor = productAuthor;
-            string packageCode = null;
-            var packageLanguages = this.activeLanguage;
-            var packageName = this.activeName;
-            string platform = null;
-            string platformValue = null;
-            var security = YesNoDefaultType.Default;
-            var sourceBits = (this.compilingModule ? 2 : 0);
-            var installPrivilegeSeen = false;
-            var installScopeSeen = false;
-
-            switch (this.CurrentPlatform)
-            {
-                case Platform.X86:
-                    platform = "Intel";
-                    break;
-                case Platform.X64:
-                    platform = "x64";
-                    msiVersion = 200;
-                    break;
-                case Platform.ARM64:
-                    platform = "Arm64";
-                    msiVersion = 500;
-                    break;
-                default:
-                    throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", this.CurrentPlatform.ToString());
-            }
+            string codepage = null;
+            string packageName = null;
+            string keywords = null;
+            string packageAuthor = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -656,82 +786,14 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        packageCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, this.compilingProduct);
-                        break;
-                    case "AdminImage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits |= 4;
-                        }
-                        break;
-                    case "Comments":
-                        comments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Compressed":
-                        // merge modules must always be compressed, so this attribute is invalid
-                        if (this.compilingModule)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedPackageCompressedAttribute(sourceLineNumbers));
-                            // this.core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Compressed", "Module"));
-                        }
-                        else if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits |= 2;
-                        }
+                    case "Codepage":
+                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib, true);
                         break;
                     case "Description":
                         packageName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
-                    case "InstallPrivileges":
-                        var installPrivileges = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (installPrivileges)
-                        {
-                        case "elevated":
-                            // this is the default setting
-                            installPrivilegeSeen = true;
-                            break;
-                        case "limited":
-                            sourceBits |= 8;
-                            installPrivilegeSeen = true;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installPrivileges, "elevated", "limited"));
-                            break;
-                        }
-                        break;
-                    case "InstallScope":
-                        var installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (installScope)
-                        {
-                        case "perMachine":
-                            this.Core.AddSymbol(new PropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "ALLUSERS"))
-                            {
-                                Value = "1"
-                            });
-                            installScopeSeen = true;
-                            break;
-                        case "perUser":
-                            sourceBits |= 8;
-                            installScopeSeen = true;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
-                            break;
-                        }
-                        break;
-                    case "InstallerVersion":
-                        msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
                     case "Keywords":
                         keywords = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Languages":
-                        packageLanguages = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Manufacturer":
                         packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -739,56 +801,6 @@ namespace WixToolset.Core
                         {
                             this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
                         }
-                        break;
-                    case "Platform":
-                        if (null != platformValue)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platforms"));
-                        }
-
-                        platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (platformValue)
-                        {
-                        case "intel":
-                            this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "x86"));
-                            goto case "x86";
-                        case "x86":
-                            platform = "Intel";
-                            break;
-                        case "x64":
-                            platform = "x64";
-                            break;
-                        case "arm64":
-                            platform = "Arm64";
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.InvalidPlatformValue(sourceLineNumbers, platformValue));
-                            break;
-                        }
-                        break;
-                    case "Platforms":
-                        if (null != platformValue)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
-                        }
-
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
-                        platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        platform = platformValue;
-                        break;
-                    case "ReadOnly":
-                        security = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortNames":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits |= 1;
-                        }
-                        break;
-                    case "SummaryCodepage":
-                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib, true);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -801,126 +813,49 @@ namespace WixToolset.Core
                 }
             }
 
-            if (installPrivilegeSeen && installScopeSeen)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "InstallPrivileges", "InstallScope"));
-            }
-
-            if (String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) && 200 > msiVersion)
-            {
-                msiVersion = 200;
-                this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
-            }
-
-            if (String.Equals(platform, "Arm64", StringComparison.OrdinalIgnoreCase) && 500 > msiVersion)
-            {
-                msiVersion = 500;
-                this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
-            }
-
-            if (null == packageAuthor)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
-            }
-
-            if (this.compilingModule)
-            {
-                if (null == packageCode)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                }
-
-                // merge modules use the modularization guid as the package code
-                if (null != moduleId)
-                {
-                    packageCode = moduleId;
-                }
-
-                // merge modules are always compressed
-                sourceBits = 2;
-            }
-            else // product
-            {
-                if (null == packageCode)
-                {
-                    packageCode = "*";
-                }
-
-                if ("*" != packageCode)
-                {
-                    this.Core.Write(WarningMessages.PackageCodeSet(sourceLineNumbers));
-                }
-            }
-
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                if (null != codepage)
                 {
-                    PropertyId = SummaryInformationType.Codepage,
-                    Value = codepage
-                });
+                    isCodepageSet = true;
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Codepage,
+                        Value = codepage
+                    });
+                }
 
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                if (null != packageName)
                 {
-                    PropertyId = SummaryInformationType.Title,
-                    Value = "Installation Database"
-                });
+                    isPackageNameSet = true;
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Subject,
+                        Value = packageName
+                    });
+                }
 
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                if (null != packageAuthor)
                 {
-                    PropertyId = SummaryInformationType.Subject,
-                    Value = packageName
-                });
+                    isPackageAuthorSet = true;
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Author,
+                        Value = packageAuthor
+                    });
+                }
 
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                if (null != keywords)
                 {
-                    PropertyId = SummaryInformationType.Author,
-                    Value = packageAuthor
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.Keywords,
-                    Value = keywords
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.Comments,
-                    Value = comments
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.PlatformAndLanguage,
-                    Value = String.Format(CultureInfo.InvariantCulture, "{0};{1}", platform, packageLanguages)
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.PackageCode,
-                    Value = packageCode
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.WindowsInstallerVersion,
-                    Value = msiVersion.ToString(CultureInfo.InvariantCulture)
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.WordCount,
-                    Value = sourceBits.ToString(CultureInfo.InvariantCulture)
-                });
-
-                this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                {
-                    PropertyId = SummaryInformationType.Security,
-                    Value = YesNoDefaultType.No == security ? "0" : YesNoDefaultType.Yes == security ? "4" : "2"
-                });
+                    isKeywordsSet = true;
+                    this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
+                    {
+                        PropertyId = SummaryInformationType.Keywords,
+                        Value = keywords
+                    });
+                }
             }
         }
 

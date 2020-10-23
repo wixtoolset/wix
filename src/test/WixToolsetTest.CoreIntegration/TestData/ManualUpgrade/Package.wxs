@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="*" Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+    
 
     <Upgrade Id="01120000-00E0-0000-0000-0000000FF1CE">
       <UpgradeVersion ExcludeLanguages="no" IgnoreRemoveFailure="yes" IncludeMaximum="no" IncludeMinimum="yes" Maximum="13.0.0" Minimum="12.0.0" OnlyDetect="no" Property="BLAHBLAHBLAH" />
@@ -15,7 +14,7 @@
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
-  </Product>
+  </Package>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">

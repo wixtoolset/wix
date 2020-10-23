@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="{74C29381-1915-4948-B8B4-5646806A0BD4}" Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0">
-    <Package Description="MsiPackage" InstallerVersion="500" Languages="1033" Manufacturer="Example Corporation" Platform="x86" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0" ProductCode="{74C29381-1915-4948-B8B4-5646806A0BD4}">
     <CustomAction Id="CustomAction2" Property="TestAdvtExecuteSequenceProperty" Value="1" />
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
@@ -17,7 +15,6 @@
     </Feature>
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <Media Id="1" />
-    <Property Id="ALLUSERS" Value="1" />
     <InstallExecuteSequence>
       <Custom Action="CustomAction2" After="CostInitialize" />
     </InstallExecuteSequence>
@@ -33,5 +30,5 @@
     <AdvertiseExecuteSequence>
       <Custom Action="CustomAction2" After="CostInitialize" />
     </AdvertiseExecuteSequence>
-  </Product>
+  </Package>
 </Wix>

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Module Id="MergeModule1" Language="1033" Version="1.0.0.0">
-    <Package Id="243FB739-4D05-472F-9CFB-EF6B1017B6DE" Manufacturer="!(loc.Manufacturer)" InstallerVersion="200" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" Guid="243FB739-4D05-472F-9CFB-EF6B1017B6DE" InstallerVersion="200">
+    <SummaryInformation Manufacturer="!(loc.Manufacturer)" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="MergeRedirectFolder">

@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="{C51B773A-B3BE-4F29-A8A9-549AAF7FF6EC}" Codepage="65001" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{047730A5-30FE-4A62-A520-DA9381B8226A}" Version="1.0.0.0">
-    <Package Compressed="yes" Description="MsiPackage" InstallerVersion="500" Languages="1033" Manufacturer="Example Corporation" Platform="x64" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="65001" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{047730A5-30FE-4A62-A520-DA9381B8226A}" Version="1.0.0.0" Compressed="yes" ProductCode="{C51B773A-B3BE-4F29-A8A9-549AAF7FF6EC}">
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="oekcr5lq">
@@ -16,6 +14,5 @@
     </Feature>
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <Media Id="1" Cabinet="example.cab" />
-    <Property Id="ALLUSERS" Value="1" />
-  </Product>
+  </Package>
 </Wix>

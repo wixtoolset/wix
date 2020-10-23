@@ -227,8 +227,8 @@ namespace WixToolset.Core
                     case "PatchCreation":
                         this.ParsePatchCreationElement(child);
                         break;
-                    case "Product":
-                        this.ParseProductElement(child);
+                    case "Package":
+                        this.ParsePackageElement(child);
                         break;
                     case "Patch":
                         this.ParsePatchElement(child);

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Product Id="*" Name="MsiPackage" Language="1033" Version="1.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Language="1033" Version="1.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+    
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
@@ -13,7 +12,7 @@
         <ComponentGroupRef Id="ProductComponents.x64" />
         <ComponentGroupRef Id="ProductComponents.arm" />
     </Feature>
-  </Product>
+  </Package>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">

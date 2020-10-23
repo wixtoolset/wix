@@ -46,9 +46,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.InstallerVersion = 0;
             this.ModularizationSuffix = null;
 
-            var foundCreateDataTime = false;
+            var foundCreateDateTime = false;
             var foundLastSaveDataTime = false;
             var foundCreatingApplication = false;
+            var foundPackageCode = false;
             var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
             foreach (var summaryInformationSymbol in this.Section.Symbols.OfType<SummaryInformationSymbol>())
@@ -73,20 +74,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     case SummaryInformationType.PackageCode: // PID_REVNUMBER
+                        foundPackageCode = true;
                         var packageCode = summaryInformationSymbol.Value;
 
                         if (SectionType.Module == this.Section.Type)
                         {
                             this.ModularizationSuffix = "." + packageCode.Substring(1, 36).Replace('-', '_');
                         }
-                        else if ("*" == packageCode)
-                        {
-                            // set the revision number (package/patch code) if it should be automatically generated
-                            summaryInformationSymbol.Value = Common.GenerateGuid();
-                        }
                         break;
                     case SummaryInformationType.Created:
-                        foundCreateDataTime = true;
+                        foundCreateDateTime = true;
                         break;
                     case SummaryInformationType.LastSaved:
                         foundLastSaveDataTime = true;
@@ -113,8 +110,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            // set the revision number (package/patch code) if it should be automatically generated
+            if (!foundPackageCode)
+            {
+                this.Section.AddSymbol(new SummaryInformationSymbol(null)
+                {
+                    PropertyId = SummaryInformationType.PackageCode,
+                    Value = Common.GenerateGuid(),
+                });
+            }
+
             // add a summary information row for the create time/date property if its not already set
-            if (!foundCreateDataTime)
+            if (!foundCreateDateTime)
             {
                 this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
