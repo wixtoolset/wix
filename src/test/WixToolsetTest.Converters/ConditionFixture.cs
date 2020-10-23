@@ -220,6 +220,7 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Product>",
+                "  <Package />",
                 "    <Condition Message='Stop the install'>",
                 "      1&lt;2",
                 "    </Condition>",
@@ -232,10 +233,11 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Product>",
+                "  <Package>",
+                "  ",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",
-                "  </Product>",
+                "  </Package>",
                 "</Wix>"
             };
 
@@ -245,7 +247,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(4, errors);
+            Assert.Equal(5, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);

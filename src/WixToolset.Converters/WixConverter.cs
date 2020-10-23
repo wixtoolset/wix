@@ -57,9 +57,11 @@ namespace WixToolset.Converters
         private static readonly XName LaunchElementName = WixNamespace + "Launch";
         private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
+        private static readonly XName ModuleElementName = WixNamespace + "Module";
         private static readonly XName MsiPackageElementName = WixNamespace + "MsiPackage";
         private static readonly XName MspPackageElementName = WixNamespace + "MspPackage";
         private static readonly XName MsuPackageElementName = WixNamespace + "MsuPackage";
+        private static readonly XName PackageElementName = WixNamespace + "Package";
         private static readonly XName PayloadElementName = WixNamespace + "Payload";
         private static readonly XName PermissionExElementName = WixNamespace + "PermissionEx";
         private static readonly XName ProductElementName = WixNamespace + "Product";
@@ -67,7 +69,6 @@ namespace WixToolset.Converters
         private static readonly XName PublishElementName = WixNamespace + "Publish";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
         private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
-        private static readonly XName RowElementName = WixNamespace + "Row";
         private static readonly XName ServiceArgumentElementName = WixNamespace + "ServiceArgument";
         private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
         private static readonly XName SetPropertyElementName = WixNamespace + "SetProperty";
@@ -86,6 +87,7 @@ namespace WixToolset.Converters
         private static readonly XName Include4ElementName = WixNamespace + "Include";
         private static readonly XName Include3ElementName = Wix3Namespace + "Include";
         private static readonly XName IncludeElementWithoutNamespaceName = XNamespace.None + "Include";
+        private static readonly XName SummaryInformationElementName = WixNamespace + "SummaryInformation";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
@@ -147,6 +149,7 @@ namespace WixToolset.Converters
                 { WixConverter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
                 { WixConverter.ErrorElementName, this.ConvertErrorElement },
                 { WixConverter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.ModuleElementName, this.ConvertModuleElement },
                 { WixConverter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
@@ -669,6 +672,36 @@ namespace WixToolset.Converters
 
         private void ConvertProgressTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
 
+        private void ConvertModuleElement(XElement element)
+        {
+            if (element.Attribute("Guid") == null // skip already-converted Module elements
+                && this.OnError(ConverterTestType.ModuleAndPackageRenamed, element, "The Module and Package elements have been renamed and reorganized for simplicity."))
+            {
+                var xModule = element;
+
+                var xSummaryInformation = xModule.Element(PackageElementName);
+                if (xSummaryInformation != null)
+                {
+                    xSummaryInformation.Name = SummaryInformationElementName;
+
+                    RemoveAttribute(xSummaryInformation, "AdminImage");
+                    RemoveAttribute(xSummaryInformation, "Comments");
+                    MoveAttribute(xSummaryInformation, "Id", xModule, "Guid");
+                    MoveAttribute(xSummaryInformation, "InstallerVersion", xModule);
+                    RemoveAttribute(xSummaryInformation, "Languages");
+                    RemoveAttribute(xSummaryInformation, "Platform");
+                    RemoveAttribute(xSummaryInformation, "Platforms");
+                    RemoveAttribute(xSummaryInformation, "ReadOnly");
+                    MoveAttribute(xSummaryInformation, "SummaryCodepage", xSummaryInformation, "Codepage", defaultValue: "1252");
+
+                    if (!xSummaryInformation.HasAttributes)
+                    {
+                        xSummaryInformation.Remove();
+                    }
+                }
+            }
+        }
+
         private void ConvertProductElement(XElement element)
         {
             var id = element.Attribute("Id");
@@ -696,6 +729,72 @@ namespace WixToolset.Converters
                     xCondition.Remove();
                 }
             }
+
+            if (this.OnError(ConverterTestType.ProductAndPackageRenamed, element, "The Product and Package elements have been renamed and reorganized for simplicity."))
+            {
+                var xPackage = element;
+                xPackage.Name = PackageElementName;
+
+                var xSummaryInformation = xPackage.Element(PackageElementName);
+                if (xSummaryInformation != null)
+                {
+                    xSummaryInformation.Name = SummaryInformationElementName;
+
+                    RemoveAttribute(xSummaryInformation, "AdminImage");
+                    RemoveAttribute(xSummaryInformation, "Comments");
+                    MoveAttribute(xSummaryInformation, "Compressed", xPackage);
+                    RemoveAttribute(xSummaryInformation, "Id");
+                    MoveAttribute(xSummaryInformation, "InstallerVersion", xPackage, defaultValue: "500");
+                    MoveAttribute(xSummaryInformation, "InstallScope", xPackage, "Scope", defaultValue: "perMachine");
+                    RemoveAttribute(xSummaryInformation, "Platform");
+                    RemoveAttribute(xSummaryInformation, "Platforms");
+                    RemoveAttribute(xSummaryInformation, "ReadOnly");
+                    MoveAttribute(xSummaryInformation, "ShortNames", xPackage);
+                    MoveAttribute(xSummaryInformation, "SummaryCodepage", xSummaryInformation, "Codepage", defaultValue: "1252");
+                    MoveAttribute(xPackage, "Id", xPackage, "ProductCode");
+
+                    var xInstallPrivileges = xSummaryInformation.Attribute("InstallPrivileges");
+                    switch (xInstallPrivileges?.Value)
+                    {
+                        case "limited":
+                            xPackage.SetAttributeValue("Scope", "perUser");
+                            break;
+                        case "elevated":
+                        {
+                            var xAllUsers = xPackage.Elements(PropertyElementName).SingleOrDefault(p => p.Attribute("Id")?.Value == "ALLUSERS");
+                            if (xAllUsers?.Attribute("Value")?.Value == "1")
+                            {
+                                xAllUsers?.Remove();
+                            }
+                        }
+                        break;
+                    }
+
+                    xInstallPrivileges?.Remove();
+
+                    if (!xSummaryInformation.HasAttributes)
+                    {
+                        xSummaryInformation.Remove();
+                    }
+                }
+            }
+        }
+
+        private static void MoveAttribute(XElement xSource, string attributeName, XElement xDestination, string destinationAttributeName = null, string defaultValue = null)
+        {
+            var xAttribute = xSource.Attribute(attributeName);
+            if (xAttribute != null && (defaultValue == null || xAttribute.Value != defaultValue))
+            {
+                xDestination.SetAttributeValue(destinationAttributeName ?? attributeName, xAttribute.Value);
+            }
+
+            xAttribute?.Remove();
+        }
+
+        private static void RemoveAttribute(XElement xSummaryInformation, string attributeName)
+        {
+            var xAttribute = xSummaryInformation.Attribute(attributeName);
+            xAttribute?.Remove();
         }
 
         private void ConvertPublishElement(XElement element)
@@ -1300,6 +1399,16 @@ namespace WixToolset.Converters
             /// The CustomAction attributes have been renamed from BinaryKey and FileKey to BinaryRef and FileRef.
             /// </summary>
             CustomActionKeysAreNowRefs,
+
+            /// <summary>
+            /// The Product and Package elements have been renamed and reorganized.
+            /// </summary>
+            ProductAndPackageRenamed,
+
+            /// <summary>
+            /// The Module and Package elements have been renamed and reorganized.
+            /// </summary>
+            ModuleAndPackageRenamed,
         }
     }
 }

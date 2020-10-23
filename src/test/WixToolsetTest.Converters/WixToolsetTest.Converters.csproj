@@ -23,6 +23,8 @@
     <Content Include="TestData\QtExec.bad\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\ConvertedSingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\SingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PackageSummaryInformation\TypicalV3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PackageSummaryInformation\TypicalV3.msi" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

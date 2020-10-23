@@ -58,7 +58,7 @@ namespace WixToolsetTest.Converters
                 var converter = new WixConverter(messaging, 4);
                 var errors = converter.ConvertFile(targetFile, true);
 
-                Assert.Equal(7, errors);
+                Assert.Equal(8, errors);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
@@ -84,7 +84,7 @@ namespace WixToolsetTest.Converters
                 var settingsFile = Path.Combine(folder, "wixcop.settings.xml");
 
                 var result = RunConversion(targetFile, settingsFile: settingsFile);
-                Assert.Equal(7, result.ExitCode);
+                Assert.Equal(8, result.ExitCode);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
@@ -108,7 +108,7 @@ namespace WixToolsetTest.Converters
                 File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
 
                 var result = RunConversion(targetFile);
-                Assert.Equal(11, result.ExitCode);
+                Assert.Equal(12, result.ExitCode);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
@@ -133,7 +133,7 @@ namespace WixToolsetTest.Converters
 
                 var result = RunConversion(targetFile);
 
-                Assert.Equal(11, result.ExitCode);
+                Assert.Equal(12, result.ExitCode);
                 Assert.Single(result.Messages.Where(message => message.ToString().EndsWith("(QtExecCmdTimeoutAmbiguous)")));
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define Name = "Package and summary information testing" ?>
+  
+  <Product Id="*"
+           Name="$(var.Name)"
+           Language="1033"
+           Version="1.0"
+           Manufacturer="Example Corporation"
+           UpgradeCode="D86CAC27-51EA-46BD-8105-C465109AFA74">
+
+    <Package InstallerVersion="500"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="x64"
+             InstallPrivileges="elevated" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="Feature" Title="Installer" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="$(var.Name)" />
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Example\$(var.Name)" Name="Installed" Value="1" Type="integer" />
+      </Component>
+    </ComponentGroup>
+  </Product>
+</Wix>

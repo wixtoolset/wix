@@ -9,7 +9,7 @@ namespace WixToolsetTest.Converters
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
 
-    public class FirewallExtensionFixture : BaseConverterFixture
+    public class ExtensionFixture : BaseConverterFixture
     {
         [Fact]
         public void FixRemoteAddressValue()
