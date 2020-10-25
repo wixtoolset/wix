@@ -264,7 +264,7 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
-        __in DWORD64 dw64Version,
+        __in LPCWSTR wzVersion,
         __in BOOTSTRAPPER_RELATED_OPERATION operation,
         __inout BOOL* pfCancel
         )
@@ -281,7 +281,7 @@ public: // IBootstrapperApplication
             m_fDowngrading = TRUE;
         }
 
-        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, dw64Version, operation, pfCancel);
+        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, operation, pfCancel);
     }
 
 
@@ -2272,6 +2272,7 @@ private: // privates
         HRESULT hr = S_OK;
         ULARGE_INTEGER uliVersion = { };
         LPWSTR sczCurrentPath = NULL;
+        VERUTIL_VERSION* pVersion = NULL;
 
         hr = PathForCurrentProcess(&sczCurrentPath, NULL);
         BalExitOnFailure(hr, "Failed to get bundle path.");
@@ -2279,10 +2280,14 @@ private: // privates
         hr = FileVersion(sczCurrentPath, &uliVersion.HighPart, &uliVersion.LowPart);
         BalExitOnFailure(hr, "Failed to get bundle file version.");
 
-        hr = m_pEngine->SetVariableVersion(WIXSTDBA_VARIABLE_BUNDLE_FILE_VERSION, uliVersion.QuadPart);
+        hr = VerVersionFromQword(uliVersion.QuadPart, &pVersion);
+        BalExitOnFailure(hr, "Failed to create bundle file version.");
+
+        hr = m_pEngine->SetVariableVersion(WIXSTDBA_VARIABLE_BUNDLE_FILE_VERSION, pVersion->sczVersion);
         BalExitOnFailure(hr, "Failed to set WixBundleFileVersion variable.");
 
     LExit:
+        ReleaseVerutilVersion(pVersion);
         ReleaseStr(sczCurrentPath);
 
         return hr;

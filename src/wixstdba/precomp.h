@@ -30,6 +30,7 @@
 #include "shelutil.h"
 #include "strutil.h"
 #include "thmutil.h"
+#include "verutil.h"
 #include "uriutil.h"
 #include "xmlutil.h"
 
