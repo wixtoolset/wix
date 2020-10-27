@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -47,15 +46,15 @@
         </Property>
 
         <!-- Use the latest VS- or VWD-installed VSIXInstaller.exe. -->
-        <SetProperty Action="SetVS2015Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2015_VSIX_INSTALLER_PATH]" Sequence="both" After="AppSearch">NOT VS_VSIX_INSTALLER_PATH AND VS2015_VSIX_INSTALLER_PATH</SetProperty>
-        <SetProperty Action="Vwd2015VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2015_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2015Vsix">NOT VS_VSIX_INSTALLER_PATH AND VWD2015_VSIX_INSTALL_ROOT</SetProperty>
+        <SetProperty Action="SetVS2015Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2015_VSIX_INSTALLER_PATH]" Sequence="both" After="AppSearch" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2015_VSIX_INSTALLER_PATH" />
+        <SetProperty Action="Vwd2015VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2015_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2015Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VWD2015_VSIX_INSTALL_ROOT" />
 
-        <SetProperty Action="SetVS2013Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2013_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2015VsixWhenVSAbsent">NOT VS_VSIX_INSTALLER_PATH AND VS2013_VSIX_INSTALLER_PATH</SetProperty>
-        <SetProperty Action="Vwd2013VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2013_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2013Vsix">NOT VS_VSIX_INSTALLER_PATH AND VWD2013_VSIX_INSTALL_ROOT</SetProperty>
+        <SetProperty Action="SetVS2013Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2013_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2015VsixWhenVSAbsent" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2013_VSIX_INSTALLER_PATH" />
+        <SetProperty Action="Vwd2013VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2013_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2013Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VWD2013_VSIX_INSTALL_ROOT" />
 
-        <SetProperty Action="SetVS2012Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2012_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2013VsixWhenVSAbsent">NOT VS_VSIX_INSTALLER_PATH AND VS2012_VSIX_INSTALLER_PATH</SetProperty>
-        <SetProperty Action="Vwd2012VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2012_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2012Vsix">NOT VS_VSIX_INSTALLER_PATH AND VWD2012_VSIX_INSTALL_ROOT</SetProperty>
+        <SetProperty Action="SetVS2012Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2012_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2013VsixWhenVSAbsent" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2012_VSIX_INSTALLER_PATH" />
+        <SetProperty Action="Vwd2012VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2012_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2012Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VWD2012_VSIX_INSTALL_ROOT" />
 
-        <SetProperty Action="SetVS2010Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2010_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2012VsixWhenVSAbsent">NOT VS_VSIX_INSTALLER_PATH AND VS2010_VSIX_INSTALLER_PATH</SetProperty>
+        <SetProperty Action="SetVS2010Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2010_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2012VsixWhenVSAbsent" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2010_VSIX_INSTALLER_PATH" />
     </Fragment>
 </Wix>

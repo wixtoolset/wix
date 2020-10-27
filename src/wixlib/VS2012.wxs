@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -60,7 +59,7 @@
         <PropertyRef Id="VS2012DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2012Setup" Before="InstallFinalize" Overridable="yes">VS2012DEVENV</Custom>
+            <Custom Action="VS2012Setup" Before="InstallFinalize" Overridable="yes" Condition="VS2012DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -69,7 +68,7 @@
         <PropertyRef Id="VS2012DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS2012DEVENV</Custom>
+            <Custom Action="VS2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS2012DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -108,7 +107,7 @@
         <CustomAction Id="VWD2012Setup" Property="VWD2012EXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VWD2012EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VWD2012Setup" Before="InstallFinalize" Overridable="yes">VWD2012EXPRESS_IDE</Custom>
+            <Custom Action="VWD2012Setup" Before="InstallFinalize" Overridable="yes" Condition="VWD2012EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run vwdexpress.exe /InstallVSTemplates                  -->
@@ -116,7 +115,7 @@
         <CustomAction Id="VWD2012InstallVSTemplates" Property="VWD2012EXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VWD2012EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VWD2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VWD2012EXPRESS_IDE</Custom>
+            <Custom Action="VWD2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VWD2012EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -131,7 +130,7 @@
         <CustomAction Id="VPD2012Setup" Property="VPD2012EXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VPD2012EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VPD2012Setup" Before="InstallFinalize" Overridable="yes">VPD2012EXPRESS_IDE</Custom>
+            <Custom Action="VPD2012Setup" Before="InstallFinalize" Overridable="yes" Condition="VPD2012EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run VPDexpress.exe /InstallVSTemplates                  -->
@@ -139,7 +138,7 @@
         <CustomAction Id="VPD2012InstallVSTemplates" Property="VPD2012EXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VPD2012EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VPD2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VPD2012EXPRESS_IDE</Custom>
+            <Custom Action="VPD2012InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VPD2012EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -215,7 +214,7 @@
         <CustomAction Id="VS2012WinExpressSetup" Property="VS2012WINEXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS2012WINEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS2012WinExpressSetup" Before="InstallFinalize" Overridable="yes">VS2012WINEXPRESS_IDE</Custom>
+            <Custom Action="VS2012WinExpressSetup" Before="InstallFinalize" Overridable="yes" Condition="VS2012WINEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run vswinexpress.exe /InstallVSTemplates                -->
@@ -223,7 +222,7 @@
         <CustomAction Id="VS2012WinExpressInstallVSTemplates" Property="VS2012WINEXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS2012WINEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS2012WinExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS2012WINEXPRESS_IDE</Custom>
+            <Custom Action="VS2012WinExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS2012WINEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     
@@ -242,7 +241,7 @@
         <CustomAction Id="VS2012WDExpressSetup" Property="VS2012WDEXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS2012WDEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS2012WDExpressSetup" Before="InstallFinalize" Overridable="yes">VS2012WDEXPRESS_IDE</Custom>
+            <Custom Action="VS2012WDExpressSetup" Before="InstallFinalize" Overridable="yes" Condition="VS2012WDEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run WDExpress.exe /InstallVSTemplates -->
@@ -250,7 +249,7 @@
         <CustomAction Id="VS2012WDExpressInstallVSTemplates" Property="VS2012WDEXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS2012WDEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS2012WDExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS2012WDEXPRESS_IDE</Custom>
+            <Custom Action="VS2012WDExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS2012WDEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 </Wix>

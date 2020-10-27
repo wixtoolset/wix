@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -24,41 +23,41 @@
         </Component>
       </Directory>
     </DirectoryRef>
-    <CustomAction Id="CA_HxMerge_VSIPCC_VSCC" Return="ignore" Execute="commit" Impersonate="no" BinaryKey="BIN_File_60377" ExeCommand="ms-help://MS.VSCC.v80" />
-    <CustomAction Id="CA_HxMerge_VSIPCC_VSExpCC" Return="ignore" Execute="commit" Impersonate="no" BinaryKey="BIN_File_60377" ExeCommand="ms-help://MS.VSExpressCC.v80" />
+    <CustomAction Id="CA_HxMerge_VSIPCC_VSCC" Return="ignore" Execute="commit" Impersonate="no" ExeCommand="ms-help://MS.VSCC.v80" BinaryRef="BIN_File_60377" />
+    <CustomAction Id="CA_HxMerge_VSIPCC_VSExpCC" Return="ignore" Execute="commit" Impersonate="no" ExeCommand="ms-help://MS.VSExpressCC.v80" BinaryRef="BIN_File_60377" />
     <InstallExecuteSequence>
-      <Custom Action="CA_HxMerge_VSIPCC_VSCC" After="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8"/>
-      <Custom Action="CA_HxMerge_VSIPCC_VSExpCC" After="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8"/>
+      <Custom Action="CA_HxMerge_VSIPCC_VSCC" After="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" />
+      <Custom Action="CA_HxMerge_VSIPCC_VSExpCC" After="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" />
     </InstallExecuteSequence>
     <Binary Id="BIN_File_60377" SourceFile="$(sys.SOURCEFILEDIR)\Redist\BIN_File_60377.dll" />
     <CustomTable Id="HelpPlugin">
       <Row>
-        <Data Column="HelpNamespace_">MS_VSIPCC_v80</Data>
-        <Data Column="HelpNamespace_Parent">MS_VSCC_v80</Data>
-        <Data Column="File_HxT">FL_vsipcc_hxt_86880________</Data>
+        <Data Column="HelpNamespace_" Value="MS_VSIPCC_v80" />
+        <Data Column="HelpNamespace_Parent" Value="MS_VSCC_v80" />
+        <Data Column="File_HxT" Value="FL_vsipcc_hxt_86880________" />
         <Data Column="File_HxA" />
         <Data Column="File_ParentHxT" />
       </Row>
       <Row>
-        <Data Column="HelpNamespace_">MS_VSIPCC_v80</Data>
-        <Data Column="HelpNamespace_Parent">MS_VSExpressCC_v80</Data>
-        <Data Column="File_HxT">FL_vsipcc_hxt_86880________</Data>
+        <Data Column="HelpNamespace_" Value="MS_VSIPCC_v80" />
+        <Data Column="HelpNamespace_Parent" Value="MS_VSExpressCC_v80" />
+        <Data Column="File_HxT" Value="FL_vsipcc_hxt_86880________" />
         <Data Column="File_HxA" />
         <Data Column="File_ParentHxT" />
       </Row>
     </CustomTable>
     <CustomTable Id="HelpNamespace">
       <Row>
-        <Data Column="NamespaceKey">MS_VSIPCC_v80</Data>
-        <Data Column="NamespaceName">MS.VSIPCC.v80</Data>
-        <Data Column="File_Collection">FL_vsipcc_hxc_86879________</Data>
-        <Data Column="Description">VSIP Documentation</Data>
+        <Data Column="NamespaceKey" Value="MS_VSIPCC_v80" />
+        <Data Column="NamespaceName" Value="MS.VSIPCC.v80" />
+        <Data Column="File_Collection" Value="FL_vsipcc_hxc_86879________" />
+        <Data Column="Description" Value="VSIP Documentation" />
       </Row>
     </CustomTable>
 
     <ComponentGroup Id="Help2_VS2005_Namespace_Components">
-      <ComponentRef Id="VSIPCC_Reg"/>
-      <ComponentRef Id="vsipcc_collection________"/>
+      <ComponentRef Id="VSIPCC_Reg" />
+      <ComponentRef Id="vsipcc_collection________" />
     </ComponentGroup>
   </Fragment>
 </Wix>

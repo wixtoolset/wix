@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -47,7 +46,7 @@
         <PropertyRef Id="VS2005DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2005Setup" Before="InstallFinalize" Overridable="yes">VS2005DEVENV</Custom>
+            <Custom Action="VS2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VS2005DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -56,7 +55,7 @@
         <PropertyRef Id="VS2005DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS2005DEVENV</Custom>
+            <Custom Action="VS2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS2005DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -72,8 +71,8 @@
     <!-- installed on the system.                                                  -->
     <Fragment>
         <Property Id="VCSHARP2005EXPRESS_IDE" Secure="yes">
-            <ComponentSearch Id="SearchForVcsExpressIde2005Component" Guid="E8A67F23-21D0-4E7B-BBD3-54E2D505BED8" Type="file" >
-                <FileSearch Id="VcsExpressIde2005" Name="vcsexpress.exe"/>
+            <ComponentSearch Id="SearchForVcsExpressIde2005Component" Guid="E8A67F23-21D0-4E7B-BBD3-54E2D505BED8" Type="file">
+                <FileSearch Id="VcsExpressIde2005" Name="vcsexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -84,7 +83,7 @@
         <PropertyRef Id="VCSHARP2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VCSHARP2005Setup" Before="InstallFinalize" Overridable="yes">VCSHARP2005EXPRESS_IDE</Custom>
+            <Custom Action="VCSHARP2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VCSHARP2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -94,7 +93,7 @@
         <PropertyRef Id="VCSHARP2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VCSHARP2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VCSHARP2005EXPRESS_IDE</Custom>
+            <Custom Action="VCSHARP2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VCSHARP2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
   
@@ -114,7 +113,7 @@
     <Fragment>
         <Property Id="VB2005EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVbExpressIde2005Component" Guid="FCDD3EF0-FFF4-4391-9467-AA48ADC7028F" Type="file">
-                <FileSearch Id="VbExpressIde2005" Name="vbexpress.exe"/>
+                <FileSearch Id="VbExpressIde2005" Name="vbexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -125,7 +124,7 @@
         <PropertyRef Id="VB2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VB2005Setup" Before="InstallFinalize" Overridable="yes">VB2005EXPRESS_IDE</Custom>
+            <Custom Action="VB2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VB2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -135,7 +134,7 @@
         <PropertyRef Id="VB2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VB2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VB2005EXPRESS_IDE</Custom>
+            <Custom Action="VB2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VB2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -155,7 +154,7 @@
     <Fragment>
         <Property Id="VWD2005EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVwdExpressIde2005Component" Guid="56B053EA-AEFA-490A-A537-5EA145574862" Type="file">
-                <FileSearch Id="VwdExpressIde2005" Name="vwdexpress.exe"/>
+                <FileSearch Id="VwdExpressIde2005" Name="vwdexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -166,7 +165,7 @@
         <PropertyRef Id="VWD2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VWD2005Setup" Before="InstallFinalize" Overridable="yes">VWD2005EXPRESS_IDE</Custom>
+            <Custom Action="VWD2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VWD2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -176,7 +175,7 @@
         <PropertyRef Id="VWD2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VWD2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VWD2005EXPRESS_IDE</Custom>
+            <Custom Action="VWD2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VWD2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -196,7 +195,7 @@
     <Fragment>
         <Property Id="VC2005EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVcExpressIde2005Component" Guid="83D8DFB7-73ED-4C83-9606-805F4CD7E1EE" Type="file">
-                <FileSearch Id="VcExpressIde2005" Name="vcexpress.exe"/>
+                <FileSearch Id="VcExpressIde2005" Name="vcexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -207,7 +206,7 @@
         <PropertyRef Id="VC2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VC2005Setup" Before="InstallFinalize" Overridable="yes">VC2005EXPRESS_IDE</Custom>
+            <Custom Action="VC2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VC2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -217,7 +216,7 @@
         <PropertyRef Id="VC2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VC2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VC2005EXPRESS_IDE</Custom>
+            <Custom Action="VC2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VC2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -237,7 +236,7 @@
     <Fragment>
         <Property Id="VJSHARP2005EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVjsExpressIde2005Component" Guid="7077FCC9-C3E4-437E-83ED-D5D7D8D9BB6C" Type="file">
-                <FileSearch Id="VjsExpressIde2005" Name="vjsexpress.exe"/>
+                <FileSearch Id="VjsExpressIde2005" Name="vjsexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -248,7 +247,7 @@
         <PropertyRef Id="VJSHARP2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VJSHARP2005Setup" Before="InstallFinalize" Overridable="yes">VJSHARP2005EXPRESS_IDE</Custom>
+            <Custom Action="VJSHARP2005Setup" Before="InstallFinalize" Overridable="yes" Condition="VJSHARP2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -258,7 +257,7 @@
         <PropertyRef Id="VJSHARP2005EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VJSHARP2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VJSHARP2005EXPRESS_IDE</Custom>
+            <Custom Action="VJSHARP2005InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VJSHARP2005EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 

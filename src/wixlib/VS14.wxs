@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -60,7 +59,7 @@
         <PropertyRef Id="VS14DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS14Setup" Before="InstallFinalize" Overridable="yes">VS14DEVENV</Custom>
+            <Custom Action="VS14Setup" Before="InstallFinalize" Overridable="yes" Condition="VS14DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -69,7 +68,7 @@
         <PropertyRef Id="VS14DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS14InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS14DEVENV</Custom>
+            <Custom Action="VS14InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS14DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -106,7 +105,7 @@
         <CustomAction Id="VWD14Setup" Property="VWD14EXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VWD14EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VWD14Setup" Before="InstallFinalize" Overridable="yes">VWD14EXPRESS_IDE</Custom>
+            <Custom Action="VWD14Setup" Before="InstallFinalize" Overridable="yes" Condition="VWD14EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run vwdexpress.exe /InstallVSTemplates                  -->
@@ -114,7 +113,7 @@
         <CustomAction Id="VWD14InstallVSTemplates" Property="VWD14EXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VWD14EXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VWD14InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VWD14EXPRESS_IDE</Custom>
+            <Custom Action="VWD14InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VWD14EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -173,7 +172,7 @@
         <CustomAction Id="VS14WinExpressSetup" Property="VS14WINEXPRESS_IDE" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS14WINEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS14WinExpressSetup" Before="InstallFinalize" Overridable="yes">VS14WINEXPRESS_IDE</Custom>
+            <Custom Action="VS14WinExpressSetup" Before="InstallFinalize" Overridable="yes" Condition="VS14WINEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
     <!-- Custom action definition to run vswinexpress.exe /InstallVSTemplates                -->
@@ -181,7 +180,7 @@
         <CustomAction Id="VS14WinExpressInstallVSTemplates" Property="VS14WINEXPRESS_IDE" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
         <PropertyRef Id="VS14WINEXPRESS_IDE" />
         <InstallExecuteSequence>
-            <Custom Action="VS14WinExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS14WINEXPRESS_IDE</Custom>
+            <Custom Action="VS14WinExpressInstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS14WINEXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 </Wix>

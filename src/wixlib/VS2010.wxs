@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -60,7 +59,7 @@
         <PropertyRef Id="VS2010DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2010Setup" Before="InstallFinalize" Overridable="yes">VS2010DEVENV</Custom>
+            <Custom Action="VS2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VS2010DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -69,7 +68,7 @@
         <PropertyRef Id="VS2010DEVENV" />
 
         <InstallExecuteSequence>
-            <Custom Action="VS2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VS2010DEVENV</Custom>
+            <Custom Action="VS2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VS2010DEVENV" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -78,8 +77,8 @@
     <!-- installed on the system.                                                  -->
     <Fragment>
         <Property Id="VCSHARP2010EXPRESS_IDE" Secure="yes">
-            <ComponentSearch Id="SearchForVcsExpressIde2010Component" Guid="A4945167-D8A4-4B10-9B78-99C2CDC243EC" Type="file" >
-                <FileSearch Id="VcsExpressIde2010" Name="vcsexpress.exe"/>
+            <ComponentSearch Id="SearchForVcsExpressIde2010Component" Guid="A4945167-D8A4-4B10-9B78-99C2CDC243EC" Type="file">
+                <FileSearch Id="VcsExpressIde2010" Name="vcsexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -90,7 +89,7 @@
         <PropertyRef Id="VCSHARP2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VCSHARP2010Setup" Before="InstallFinalize" Overridable="yes">VCSHARP2010EXPRESS_IDE</Custom>
+            <Custom Action="VCSHARP2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VCSHARP2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -100,7 +99,7 @@
         <PropertyRef Id="VCSHARP2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VCSHARP2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VCSHARP2010EXPRESS_IDE</Custom>
+            <Custom Action="VCSHARP2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VCSHARP2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -120,7 +119,7 @@
     <Fragment>
         <Property Id="VB2010EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVbExpressIde2010Component" Guid="3EDEF607-9E3A-4A64-BFE1-104979CF2899" Type="file">
-                <FileSearch Id="VbExpressIde2010" Name="vbexpress.exe"/>
+                <FileSearch Id="VbExpressIde2010" Name="vbexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -131,7 +130,7 @@
         <PropertyRef Id="VB2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VB2010Setup" Before="InstallFinalize" Overridable="yes">VB2010EXPRESS_IDE</Custom>
+            <Custom Action="VB2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VB2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -141,7 +140,7 @@
         <PropertyRef Id="VB2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VB2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VB2010EXPRESS_IDE</Custom>
+            <Custom Action="VB2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VB2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -161,7 +160,7 @@
     <Fragment>
         <Property Id="VWD2010EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVwdExpressIde2010Component" Guid="771B6CF7-C8D2-4D85-BACD-ED01600256DC" Type="file">
-                <FileSearch Id="VwdExpressIde2010" Name="vwdexpress.exe"/>
+                <FileSearch Id="VwdExpressIde2010" Name="vwdexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -172,7 +171,7 @@
         <PropertyRef Id="VWD2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VWD2010Setup" Before="InstallFinalize" Overridable="yes">VWD2010EXPRESS_IDE</Custom>
+            <Custom Action="VWD2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VWD2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -182,7 +181,7 @@
         <PropertyRef Id="VWD2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VWD2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VWD2010EXPRESS_IDE</Custom>
+            <Custom Action="VWD2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VWD2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -202,7 +201,7 @@
     <Fragment>
         <Property Id="VC2010EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVcExpressIde2010Component" Guid="B455E8D3-90CB-47F6-AB7B-9B31E5DE6266" Type="file">
-                <FileSearch Id="VcExpressIde2010" Name="vcexpress.exe"/>
+                <FileSearch Id="VcExpressIde2010" Name="vcexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -213,7 +212,7 @@
         <PropertyRef Id="VC2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VC2010Setup" Before="InstallFinalize" Overridable="yes">VC2010EXPRESS_IDE</Custom>
+            <Custom Action="VC2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VC2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -223,7 +222,7 @@
         <PropertyRef Id="VC2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VC2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VC2010EXPRESS_IDE</Custom>
+            <Custom Action="VC2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VC2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -243,7 +242,7 @@
     <Fragment>
         <Property Id="VPD2010EXPRESS_IDE" Secure="yes">
             <ComponentSearch Id="SearchForVpdExpressIde2010Component" Guid="80C81DB2-E95B-4C03-A559-C664E8411DDF" Type="file">
-                <FileSearch Id="VpdExpressIde2010" Name="vpdexpress.exe"/>
+                <FileSearch Id="VpdExpressIde2010" Name="vpdexpress.exe" />
             </ComponentSearch>
         </Property>
     </Fragment>
@@ -254,7 +253,7 @@
         <PropertyRef Id="VPD2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VPD2010Setup" Before="InstallFinalize" Overridable="yes">VPD2010EXPRESS_IDE</Custom>
+            <Custom Action="VPD2010Setup" Before="InstallFinalize" Overridable="yes" Condition="VPD2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -264,7 +263,7 @@
         <PropertyRef Id="VPD2010EXPRESS_IDE" />
 
         <InstallExecuteSequence>
-            <Custom Action="VPD2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes">VPD2010EXPRESS_IDE</Custom>
+            <Custom Action="VPD2010InstallVSTemplates" Before="InstallFinalize" Overridable="yes" Condition="VPD2010EXPRESS_IDE" />
         </InstallExecuteSequence>
     </Fragment>
 
