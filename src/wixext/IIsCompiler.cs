@@ -102,7 +102,7 @@ namespace WixToolset.Iis
                     break;
                 case "Fragment":
                 case "Module":
-                case "Product":
+                case "Package":
                     switch (element.Name.LocalName)
                     {
                         case "WebApplication":
