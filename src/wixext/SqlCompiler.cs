@@ -48,7 +48,6 @@ namespace WixToolset.Sql
             {
                 case "Component":
                     var componentId = context["ComponentId"];
-                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -68,7 +67,7 @@ namespace WixToolset.Sql
                     break;
                 case "Fragment":
                 case "Module":
-                case "Product":
+                case "Package":
                     switch (element.Name.LocalName)
                     {
                         case "SqlDatabase":
