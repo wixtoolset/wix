@@ -94,7 +94,7 @@ namespace WixToolset.ComPlus
                     break;
                 case "Fragment":
                 case "Module":
-                case "Product":
+                case "Package":
                     switch (element.Name.LocalName)
                     {
                         case "ComPlusPartition":
@@ -2150,15 +2150,8 @@ namespace WixToolset.ComPlus
         {
             if (win64)
             {
-                if (this.Context.Platform == Platform.IA64)
-                {
-                    this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", elementName));
-                }
-                else
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
-                }
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
             }
             else
             {

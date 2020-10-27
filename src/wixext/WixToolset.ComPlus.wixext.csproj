@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
-    <Content Include="complus.xsd" PackagePath="tools" />
     <EmbeddedResource Include="$(OutputPath)..\complus.wixlib" />
   </ItemGroup>
 
