@@ -4,7 +4,6 @@ namespace WixToolset.Dependency
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Text;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -76,7 +75,7 @@ namespace WixToolset.Dependency
                 case "Bundle":
                 case "Fragment":
                 case "Module":
-                case "Product":
+                case "Package":
                     switch (element.Name.LocalName)
                     {
                         case "Requires":

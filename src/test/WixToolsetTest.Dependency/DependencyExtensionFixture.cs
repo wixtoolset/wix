@@ -2,7 +2,6 @@
 
 namespace WixToolsetTest.Dependency
 {
-    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Dependency;
