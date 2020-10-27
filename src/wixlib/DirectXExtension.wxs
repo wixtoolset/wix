@@ -10,7 +10,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixQueryDirectXCaps" BinaryKey="DirectXCA" DllEntry="WixQueryDirectXCaps" Return="ignore" />
+        <CustomAction Id="WixQueryDirectXCaps" DllEntry="WixQueryDirectXCaps" Return="ignore" BinaryRef="DirectXCA" />
         
         <InstallUISequence>
             <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes" Condition="VersionNT &gt; 400" />
