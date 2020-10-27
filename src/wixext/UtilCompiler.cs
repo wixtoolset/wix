@@ -210,7 +210,7 @@ namespace WixToolset.Util
                 case "Bundle":
                 case "Fragment":
                 case "Module":
-                case "Product":
+                case "Package":
                     switch (element.Name.LocalName)
                     {
                         case "CloseApplication":
