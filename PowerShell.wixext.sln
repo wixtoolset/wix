@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "powershell", "src\wixlib\powershell.wixproj", "{9D4CCDFC-840C-4D4E-A9B0-3D6015480645}"
 EndProject

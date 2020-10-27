@@ -16,15 +16,15 @@ namespace WixToolset.PowerShell
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
+        public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
-            tupleDefinition = null;
-            return tupleDefinition != null;
+            return Intermediate.Load(typeof(PSExtensionData).Assembly, "WixToolset.PowerShell.powershell.wixlib", symbolDefinitions);
         }
 
-        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
+        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
-            return Intermediate.Load(typeof(PSExtensionData).Assembly, "WixToolset.PowerShell.powershell.wixlib", tupleDefinitions);
+            symbolDefinition = null;
+            return symbolDefinition != null;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace WixToolset.PowerShell
     using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -176,7 +176,7 @@ namespace WixToolset.PowerShell
             var major = (2 == requiredPowerShellVersion.Major) ? 1 : requiredPowerShellVersion.Major;
 
             var variableId = new Identifier(AccessModifier.Public, String.Format(CultureInfo.InvariantCulture, "{0}_{1}", VarPrefix, id));
-            section.AddTuple(new WixVariableTuple(sourceLineNumbers, variableId)
+            section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, variableId)
             {
                 Value = major.ToString(CultureInfo.InvariantCulture),
                 Overridable = false,
@@ -185,46 +185,46 @@ namespace WixToolset.PowerShell
             var registryRoot = RegistryRootType.LocalMachine; // HKLM
             var registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, major, id);
 
-            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "ApplicationBase", String.Format(CultureInfo.InvariantCulture, "[${0}]", componentId), componentId, false);
+            this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "ApplicationBase", String.Format(CultureInfo.InvariantCulture, "[${0}]", componentId), componentId, false);
 
             // set the assembly name automatically when binding.
             // processorArchitecture is not handled correctly by PowerShell v1.0
             // so format the assembly name explicitly.
             var assemblyName = String.Format(CultureInfo.InvariantCulture, "!(bind.assemblyName.{0}), Version=!(bind.assemblyVersion.{0}), Culture=!(bind.assemblyCulture.{0}), PublicKeyToken=!(bind.assemblyPublicKeyToken.{0})", fileId);
-            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "AssemblyName", assemblyName, componentId, false);
+            this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "AssemblyName", assemblyName, componentId, false);
 
             if (null != customSnapInType)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "CustomPSSnapInType", customSnapInType, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "CustomPSSnapInType", customSnapInType, componentId, false);
             }
 
             if (null != description)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Description", description, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "Description", description, componentId, false);
             }
 
             if (null != descriptionIndirect)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "DescriptionIndirect", descriptionIndirect, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "DescriptionIndirect", descriptionIndirect, componentId, false);
             }
 
-            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "ModuleName", String.Format(CultureInfo.InvariantCulture, "[#{0}]", fileId), componentId, false);
+            this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "ModuleName", String.Format(CultureInfo.InvariantCulture, "[#{0}]", fileId), componentId, false);
 
-            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "PowerShellVersion", requiredPowerShellVersion.ToString(2), componentId, false);
+            this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "PowerShellVersion", requiredPowerShellVersion.ToString(2), componentId, false);
 
             if (null != vendor)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Vendor", vendor, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "Vendor", vendor, componentId, false);
             }
 
             if (null != vendorIndirect)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "VendorIndirect", vendorIndirect, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "VendorIndirect", vendorIndirect, componentId, false);
             }
 
             if (null != version)
             {
-                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Version", version, componentId, false);
+                this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, "Version", version, componentId, false);
             }
         }
 
@@ -278,8 +278,8 @@ namespace WixToolset.PowerShell
             var registryRoot = RegistryRootType.LocalMachine; // HKLM
             var registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, String.Format(CultureInfo.InvariantCulture, "!(wix.{0}_{1})", VarPrefix, snapIn), snapIn);
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
-            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, valueName, String.Format(CultureInfo.InvariantCulture, "[~][#{0}]", fileId), componentId, false);
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.File, fileId);
+            this.ParseHelper.CreateRegistrySymbol(section, sourceLineNumbers, registryRoot, registryKey, valueName, String.Format(CultureInfo.InvariantCulture, "[~][#{0}]", fileId), componentId, false);
         }
     }
 }
