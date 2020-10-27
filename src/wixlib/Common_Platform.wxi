@@ -5,12 +5,12 @@
   <?include caSuffix.wxi ?>
     <Fragment>
     <!-- print EULA functionality -->
-        <CustomAction Id="WixUIPrintEula$(var.Suffix)" BinaryKey="WixUIWixca$(var.Suffix)" DllEntry="PrintEula" Return="ignore" Execute="immediate" />
+        <CustomAction Id="WixUIPrintEula$(var.Suffix)" DllEntry="PrintEula" Return="ignore" Execute="immediate" BinaryRef="WixUIWixca$(var.Suffix)" />
     </Fragment>
 
     <Fragment>
     <!-- Validate install directory -->
-        <CustomAction Id="WixUIValidatePath$(var.Suffix)" BinaryKey="WixUIWixca$(var.Suffix)" DllEntry="ValidatePath" Return="ignore" Execute="immediate" />
+        <CustomAction Id="WixUIValidatePath$(var.Suffix)" DllEntry="ValidatePath" Return="ignore" Execute="immediate" BinaryRef="WixUIWixca$(var.Suffix)" />
     </Fragment>
 
     <Fragment>

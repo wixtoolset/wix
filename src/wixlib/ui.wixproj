@@ -23,7 +23,6 @@
   <ItemGroup>
     <BindInputPaths Include="$(OutputPath)Win32" BindName='x86' />
     <BindInputPaths Include="$(OutputPath)x64" BindName='x64' />
-    <BindInputPaths Include="$(OutputPath)arm" BindName='arm' />
     <BindInputPaths Include="$(OutputPath)arm64" BindName='arm64' />
   </ItemGroup>
 
