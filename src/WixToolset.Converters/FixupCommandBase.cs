@@ -69,7 +69,7 @@ namespace WixToolset.Converters
                     return true;
 
                 case "n":
-                case "--dry-run":
+                case "-dry-run":
                     this.DryRun = true;
                     return true;
 
@@ -81,6 +81,7 @@ namespace WixToolset.Converters
                 case "s":
                 case "r":
                 case "-recurse":
+                case "-recursive":
                     this.Recurse = true;
                     return true;
 

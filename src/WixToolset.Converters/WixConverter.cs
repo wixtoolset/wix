@@ -88,6 +88,7 @@ namespace WixToolset.Converters
         private static readonly XName Include3ElementName = Wix3Namespace + "Include";
         private static readonly XName IncludeElementWithoutNamespaceName = XNamespace.None + "Include";
         private static readonly XName SummaryInformationElementName = WixNamespace + "SummaryInformation";
+        private static readonly XName MediaTemplateElementName = WixNamespace + "MediaTemplate";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
@@ -730,6 +731,13 @@ namespace WixToolset.Converters
                 }
             }
 
+            var xMediaTemplate = element.Element(MediaTemplateElementName);
+            if (xMediaTemplate?.HasAttributes == false
+                && this.OnError(ConverterTestType.DefaultMediaTemplate, element, "A MediaTemplate with no attributes set is now provided by default. Remove the element."))
+            {
+                xMediaTemplate.Remove();
+            }
+
             if (this.OnError(ConverterTestType.ProductAndPackageRenamed, element, "The Product and Package elements have been renamed and reorganized for simplicity."))
             {
                 var xPackage = element;
@@ -742,7 +750,7 @@ namespace WixToolset.Converters
 
                     RemoveAttribute(xSummaryInformation, "AdminImage");
                     RemoveAttribute(xSummaryInformation, "Comments");
-                    MoveAttribute(xSummaryInformation, "Compressed", xPackage);
+                    MoveAttribute(xSummaryInformation, "Compressed", xPackage, defaultValue: "no");
                     RemoveAttribute(xSummaryInformation, "Id");
                     MoveAttribute(xSummaryInformation, "InstallerVersion", xPackage, defaultValue: "500");
                     MoveAttribute(xSummaryInformation, "InstallScope", xPackage, "Scope", defaultValue: "perMachine");
@@ -1409,6 +1417,11 @@ namespace WixToolset.Converters
             /// The Module and Package elements have been renamed and reorganized.
             /// </summary>
             ModuleAndPackageRenamed,
+
+            /// <summary>
+            /// A MediaTemplate with no attributes set is now provided by default.
+            /// </summary>
+            DefaultMediaTemplate,
         }
     }
 }
