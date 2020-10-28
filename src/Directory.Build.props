@@ -8,6 +8,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <EnableSourceLink Condition=" '$(NCrunch)' == '1' ">false</EnableSourceLink>
+    <MSBuildWarningsAsMessages>MSB3246</MSBuildWarningsAsMessages>
 
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
     <BaseOutputPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</BaseOutputPath>
@@ -21,6 +22,8 @@
     <Product>WiX Toolset</Product>
   </PropertyGroup>
 
-  <Import Project="Cpp.Build.props" Condition=" '$(MSBuildProjectExtension)'=='.vcxproj' " />
+  <Import Project="CSharp.Build.props" Condition=" '$(MSBuildProjectExtension)'=='.csproj' and Exists('CSharp.Build.props') " />
+  <Import Project="Cpp.Build.props" Condition=" Exists('Cpp.Build.props') And '$(MSBuildProjectExtension)'=='.vcxproj' " />
+  <Import Project="Wix.Build.props" Condition=" Exists('Wix.Build.props') And '$(MSBuildProjectExtension)'=='.wixproj' " />
   <Import Project="Custom.Build.props" Condition=" Exists('Custom.Build.props') " />
 </Project>
