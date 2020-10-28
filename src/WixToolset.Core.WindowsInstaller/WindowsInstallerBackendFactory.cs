@@ -23,6 +23,7 @@ namespace WixToolset.Core.WindowsInstaller
                     return true;
 
                 case "msipackage":
+                case "package":
                 case "product":
                 case ".msi":
                     backend = new MsiBackend();

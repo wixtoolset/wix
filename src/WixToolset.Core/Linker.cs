@@ -793,7 +793,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
                                             continue;
                                         }
                                         else
@@ -825,7 +825,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                         continue;
                                     }
 
@@ -842,7 +842,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                             continue;
                                         }
                                         else
@@ -915,7 +915,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                         continue;
                                     }
 

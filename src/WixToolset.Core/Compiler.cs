@@ -6962,13 +6962,13 @@ namespace WixToolset.Core
             var upgradeCode = contextValues["UpgradeCode"];
             if (String.IsNullOrEmpty(upgradeCode))
             {
-                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Product", "UpgradeCode", node.Name.LocalName));
+                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Package", "UpgradeCode", node.Name.LocalName));
             }
 
             var productVersion = contextValues["ProductVersion"];
             if (String.IsNullOrEmpty(productVersion))
             {
-                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Product", "Version", node.Name.LocalName));
+                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Package", "Version", node.Name.LocalName));
             }
 
             var productLanguage = contextValues["ProductLanguage"];
