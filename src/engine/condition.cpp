@@ -432,6 +432,7 @@ static HRESULT ParseOperand(
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczFormatted = NULL;
 
     // Symbols don't encrypt their value, so can access the value directly.
     switch (pContext->NextSymbol.Type)
@@ -451,9 +452,11 @@ static HRESULT ParseOperand(
 
         if (BURN_VARIANT_TYPE_FORMATTED == pOperand->Value.Type)
         {
-            // TODO: actually format the value?
-            hr = BVariantChangeType(&pOperand->Value, BURN_VARIANT_TYPE_STRING);
-            ExitOnRootFailure(hr, "Failed to change variable '%ls' type for condition '%ls'", pContext->NextSymbol.Value.sczValue, pContext->wzCondition);
+            hr = VariableGetFormatted(pContext->pVariables, pContext->NextSymbol.Value.sczValue, &sczFormatted, &pOperand->fHidden);
+            ExitOnRootFailure(hr, "Failed to format variable '%ls' for condition '%ls'", pContext->NextSymbol.Value.sczValue, pContext->wzCondition);
+
+            hr = BVariantSetString(&pOperand->Value, sczFormatted, 0, FALSE);
+            ExitOnRootFailure(hr, "Failed to store formatted value for variable '%ls' for condition '%ls'", pContext->NextSymbol.Value.sczValue, pContext->wzCondition);
         }
         break;
 
@@ -477,6 +480,8 @@ static HRESULT ParseOperand(
     ExitOnFailure(hr, "Failed to read next symbol.");
 
 LExit:
+    StrSecureZeroFreeString(sczFormatted);
+
     return hr;
 }
 

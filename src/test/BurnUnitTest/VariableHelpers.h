@@ -20,7 +20,7 @@ void VariableSetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, LP
 System::String^ VariableGetStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
 __int64 VariableGetNumericHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
 System::String^ VariableGetVersionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
-System::String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable);
+System::String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, BOOL* pfContainsHiddenVariable);
 System::String^ VariableFormatStringHelper(BURN_VARIABLES* pVariables, LPCWSTR wzIn);
 System::String^ VariableEscapeStringHelper(LPCWSTR wzIn);
 bool EvaluateConditionHelper(BURN_VARIABLES* pVariables, LPCWSTR wzCondition);

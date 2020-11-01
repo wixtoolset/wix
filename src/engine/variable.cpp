@@ -54,7 +54,14 @@ static HRESULT FormatString(
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
     __out_opt DWORD* pcchOut,
-    __in BOOL fObfuscateHiddenVariables
+    __in BOOL fObfuscateHiddenVariables,
+    __out BOOL* pfContainsHiddenVariable
+    );
+static HRESULT GetFormatted(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __out_z LPWSTR* psczValue,
+    __out BOOL* pfContainsHiddenVariable
     );
 static HRESULT AddBuiltInVariable(
     __in BURN_VARIABLES* pVariables,
@@ -629,43 +636,18 @@ LExit:
 extern "C" HRESULT VariableGetFormatted(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __out_z LPWSTR* psczValue
+    __out_z LPWSTR* psczValue,
+    __out BOOL* pfContainsHiddenVariable
     )
 {
     HRESULT hr = S_OK;
-    BURN_VARIABLE* pVariable = NULL;
-    LPWSTR scz = NULL;
 
-    ::EnterCriticalSection(&pVariables->csAccess);
-
-    hr = GetVariable(pVariables, wzVariable, &pVariable);
-    if (SUCCEEDED(hr) && BURN_VARIANT_TYPE_NONE == pVariable->Value.Type)
+    if (pfContainsHiddenVariable)
     {
-        ExitFunction1(hr = E_NOTFOUND);
-    }
-    else if (E_NOTFOUND == hr)
-    {
-        ExitFunction();
-    }
-    ExitOnFailure(hr, "Failed to get variable: %ls", wzVariable);
-
-    if (BURN_VARIANT_TYPE_FORMATTED == pVariable->Value.Type)
-    {
-        hr = BVariantGetString(&pVariable->Value, &scz);
-        ExitOnFailure(hr, "Failed to get unformatted string.");
-
-        hr = VariableFormatString(pVariables, scz, psczValue, NULL);
-        ExitOnFailure(hr, "Failed to format value '%ls' of variable: %ls", pVariable->fHidden ? L"*****" : pVariable->Value.sczValue, wzVariable);
-    }
-    else
-    {
-        hr = BVariantGetString(&pVariable->Value, psczValue);
-        ExitOnFailure(hr, "Failed to get value as string for variable: %ls", wzVariable);
+        *pfContainsHiddenVariable = FALSE;
     }
 
-LExit:
-    ::LeaveCriticalSection(&pVariables->csAccess);
-    StrSecureZeroFreeString(scz);
+    hr = GetFormatted(pVariables, wzVariable, psczValue, pfContainsHiddenVariable);
 
     return hr;
 }
@@ -736,7 +718,7 @@ extern "C" HRESULT VariableFormatString(
     __out_opt DWORD* pcchOut
     )
 {
-    return FormatString(pVariables, wzIn, psczOut, pcchOut, FALSE);
+    return FormatString(pVariables, wzIn, psczOut, pcchOut, FALSE, NULL);
 }
 
 extern "C" HRESULT VariableFormatStringObfuscated(
@@ -746,7 +728,7 @@ extern "C" HRESULT VariableFormatStringObfuscated(
     __out_opt DWORD* pcchOut
     )
 {
-    return FormatString(pVariables, wzIn, psczOut, pcchOut, TRUE);
+    return FormatString(pVariables, wzIn, psczOut, pcchOut, TRUE, NULL);
 }
 
 extern "C" HRESULT VariableEscapeString(
@@ -1116,7 +1098,8 @@ static HRESULT FormatString(
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
     __out_opt DWORD* pcchOut,
-    __in BOOL fObfuscateHiddenVariables
+    __in BOOL fObfuscateHiddenVariables,
+    __out BOOL* pfContainsHiddenVariable
     )
 {
     HRESULT hr = S_OK;
@@ -1204,20 +1187,22 @@ static HRESULT FormatString(
             }
             else
             {
-                if (fObfuscateHiddenVariables)
+                hr = VariableIsHidden(pVariables, scz, &fHidden);
+                ExitOnFailure(hr, "Failed to determine variable visibility: '%ls'.", scz);
+
+                if (pfContainsHiddenVariable)
                 {
-                    hr = VariableIsHidden(pVariables, scz, &fHidden);
-                    ExitOnFailure(hr, "Failed to determine variable visibility: '%ls'.", scz);
+                    *pfContainsHiddenVariable |= fHidden;
                 }
 
-                if (fHidden)
+                if (fObfuscateHiddenVariables && fHidden)
                 {
                     hr = StrAllocString(&rgVariables[cVariables], L"*****", 0);
                 }
                 else
                 {
                     // get formatted variable value
-                    hr = VariableGetFormatted(pVariables, scz, &rgVariables[cVariables]);
+                    hr = GetFormatted(pVariables, scz, &rgVariables[cVariables], pfContainsHiddenVariable);
                     if (E_NOTFOUND == hr) // variable not found
                     {
                         hr = StrAllocStringSecure(&rgVariables[cVariables], L"", 0);
@@ -1323,6 +1308,57 @@ LExit:
         StrSecureZeroFreeString(sczFormat);
         StrSecureZeroFreeString(scz);
     }
+
+    return hr;
+}
+
+// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
+static HRESULT GetFormatted(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __out_z LPWSTR* psczValue,
+    __out BOOL* pfContainsHiddenVariable
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_VARIABLE* pVariable = NULL;
+    LPWSTR scz = NULL;
+
+    ::EnterCriticalSection(&pVariables->csAccess);
+
+    hr = GetVariable(pVariables, wzVariable, &pVariable);
+    if (SUCCEEDED(hr) && BURN_VARIANT_TYPE_NONE == pVariable->Value.Type)
+    {
+        ExitFunction1(hr = E_NOTFOUND);
+    }
+    else if (E_NOTFOUND == hr)
+    {
+        ExitFunction();
+    }
+    ExitOnFailure(hr, "Failed to get variable: %ls", wzVariable);
+
+    if (pfContainsHiddenVariable)
+    {
+        *pfContainsHiddenVariable |= pVariable->fHidden;
+    }
+
+    if (BURN_VARIANT_TYPE_FORMATTED == pVariable->Value.Type)
+    {
+        hr = BVariantGetString(&pVariable->Value, &scz);
+        ExitOnFailure(hr, "Failed to get unformatted string.");
+
+        hr = FormatString(pVariables, scz, psczValue, NULL, FALSE, pfContainsHiddenVariable);
+        ExitOnFailure(hr, "Failed to format value '%ls' of variable: %ls", pVariable->fHidden ? L"*****" : pVariable->Value.sczValue, wzVariable);
+    }
+    else
+    {
+        hr = BVariantGetString(&pVariable->Value, psczValue);
+        ExitOnFailure(hr, "Failed to get value as string for variable: %ls", wzVariable);
+    }
+
+LExit:
+    ::LeaveCriticalSection(&pVariables->csAccess);
+    StrSecureZeroFreeString(scz);
 
     return hr;
 }

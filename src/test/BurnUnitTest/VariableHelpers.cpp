@@ -98,13 +98,13 @@ namespace Bootstrapper
         }
     }
 
-    String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable)
+    String^ VariableGetFormattedHelper(BURN_VARIABLES* pVariables, LPCWSTR wzVariable, BOOL* pfContainsHiddenVariable)
     {
         HRESULT hr = S_OK;
         LPWSTR scz = NULL;
         try
         {
-            hr = VariableGetFormatted(pVariables, wzVariable, &scz);
+            hr = VariableGetFormatted(pVariables, wzVariable, &scz, pfContainsHiddenVariable);
             TestThrowOnFailure1(hr, L"Failed to get formatted: %s", wzVariable);
 
             return gcnew String(scz);

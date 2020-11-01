@@ -95,7 +95,8 @@ HRESULT VariableGetVariant(
 HRESULT VariableGetFormatted(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
-    __out_z LPWSTR* psczValue
+    __out_z LPWSTR* psczValue,
+    __out BOOL* pfContainsHiddenVariable
     );
 HRESULT VariableSetNumeric(
     __in BURN_VARIABLES* pVariables,

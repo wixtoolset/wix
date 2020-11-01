@@ -80,6 +80,7 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             IXMLDOMElement* pixeBundle = NULL;
             BURN_VARIABLES variables = { };
+            BOOL fContainsHiddenData = FALSE;
             try
             {
                 LPCWSTR wzDocument =
@@ -90,6 +91,7 @@ namespace Bootstrapper
                     L"    <Variable Id='Var4' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var5' Type='string' Value='' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var6' Type='formatted' Value='[Formatted]' Hidden='no' Persisted='no' />"
+                    L"    <Variable Id='Formatted' Type='formatted' Value='supersecret' Hidden='yes' Persisted='no' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);
@@ -99,7 +101,7 @@ namespace Bootstrapper
                 LoadBundleXmlHelper(wzDocument, &pixeBundle);
 
                 hr = VariablesParseFromXml(&variables, pixeBundle);
-                TestThrowOnFailure(hr, L"Failed to parse searches from XML.");
+                TestThrowOnFailure(hr, L"Failed to parse variables from XML.");
 
                 // get and verify variable values
                 Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables, L"Var1"));
@@ -112,6 +114,12 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"String value."), VariableGetStringHelper(&variables, L"Var2"));
                 Assert::Equal<String^>(gcnew String(L"1.2.3.4"), VariableGetVersionHelper(&variables, L"Var3"));
                 Assert::Equal<String^>(gcnew String(L"[Formatted]"), VariableGetStringHelper(&variables, L"Var6"));
+                Assert::Equal<String^>(gcnew String(L"supersecret"), VariableGetFormattedHelper(&variables, L"Formatted", &fContainsHiddenData));
+                Assert::Equal<BOOL>(TRUE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"supersecret"), VariableGetFormattedHelper(&variables, L"Var6", &fContainsHiddenData));
+                Assert::Equal<BOOL>(TRUE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"String value."), VariableGetFormattedHelper(&variables, L"Var2", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
             }
             finally
             {
@@ -127,6 +135,7 @@ namespace Bootstrapper
             BURN_VARIABLES variables = { };
             LPWSTR scz = NULL;
             DWORD cch = 0;
+            BOOL fContainsHiddenData = FALSE;
             try
             {
                 hr = VariableInitialize(&variables);
@@ -155,12 +164,18 @@ namespace Bootstrapper
                 Assert::Equal<String^>(gcnew String(L"]"), VariableFormatStringHelper(&variables, L"[\\]]"));
                 Assert::Equal<String^>(gcnew String(L"[]"), VariableFormatStringHelper(&variables, L"[]"));
                 Assert::Equal<String^>(gcnew String(L"[NONE"), VariableFormatStringHelper(&variables, L"[NONE"));
-                Assert::Equal<String^>(gcnew String(L"VAL2"), VariableGetFormattedHelper(&variables, L"PROP2"));
-                Assert::Equal<String^>(gcnew String(L"3"), VariableGetFormattedHelper(&variables, L"PROP3"));
-                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP4"));
-                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP5"));
-                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP6"));
-                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP7"));
+                Assert::Equal<String^>(gcnew String(L"VAL2"), VariableGetFormattedHelper(&variables, L"PROP2", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"3"), VariableGetFormattedHelper(&variables, L"PROP3", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP4", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP5", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"[PROP1]"), VariableGetFormattedHelper(&variables, L"PROP6", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
+                Assert::Equal<String^>(gcnew String(L"[PROP2]"), VariableGetFormattedHelper(&variables, L"PROP7", &fContainsHiddenData));
+                Assert::Equal<BOOL>(FALSE, fContainsHiddenData);
 
                 hr = VariableFormatString(&variables, L"PRE [PROP1] POST", &scz, &cch);
                 TestThrowOnFailure(hr, L"Failed to format string");
@@ -235,8 +250,8 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"_PROP9"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP16"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP17"));
-                Assert::True(EvaluateConditionHelper(&variables, L"PROP24"));
-                Assert::True(EvaluateConditionHelper(&variables, L"PROP25"));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP24=\"VAL1\""));
+                Assert::False(EvaluateConditionHelper(&variables, L"PROP25"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP26"));
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP27"));
 
