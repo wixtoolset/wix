@@ -946,8 +946,7 @@ static HRESULT RegistrySearchValue(
     {
         // What if there is a hidden variable in sczKey?
         LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", sczKey);
-        hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
-        ExitOnFailure(hr, "Failed to clear variable.");
+
         ExitFunction1(hr = S_OK);
     }
     ExitOnFailure(hr, "Failed to open registry key.");
@@ -958,8 +957,7 @@ static HRESULT RegistrySearchValue(
     {
         // What if there is a hidden variable in sczKey or sczValue?
         LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", sczKey, sczValue);
-        hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);
-        ExitOnFailure(hr, "Failed to clear variable.");
+
         ExitFunction1(hr = S_OK);
     }
     ExitOnWin32Error(er, hr, "Failed to query registry key value size.");

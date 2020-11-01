@@ -198,6 +198,8 @@ namespace Bootstrapper
 
                 VariableSetStringHelper(&variables, L"MyKey", L"SOFTWARE\\Microsoft\\WiX_Burn_UnitTest\\Value", FALSE);
                 VariableSetStringHelper(&variables, L"MyValue", L"String", FALSE);
+                VariableSetStringHelper(&variables, L"Variable27", L"Default27", FALSE);
+                VariableSetStringHelper(&variables, L"Variable28", L"Default28", FALSE);
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
@@ -227,6 +229,8 @@ namespace Bootstrapper
                     L"    <RegistrySearch Id='Search24' Type='exists' Root='HKU' Key='.DEFAULT\\System\\NetworkServiceSidSubkeyDoesNotExist' Variable='Variable24' />"
                     L"    <RegistrySearch Id='Search25' Type='value' Root='HKCR' Key='.msi' Variable='Variable25' VariableType='string' />"
                     L"    <RegistrySearch Id='Search26' Type='value' Root='HKCR' Key='.msi' Variable='Variable26' VariableType='formatted' />"
+                    L"    <RegistrySearch Id='Search27' Type='value' Root='HKCU' Key='SOFTWARE\\Microsoft\\WiX_Burn_UnitTest\\StringDoesNotExist' Value='String' Variable='Variable27' VariableType='string' />"
+                    L"    <RegistrySearch Id='Search28' Type='value' Root='HKCU' Key='SOFTWARE\\Microsoft\\WiX_Burn_UnitTest\\String' Value='DoesNotExist' Variable='Variable28' VariableType='string' />"
                     L"</Bundle>";
 
                 // load XML document
@@ -270,6 +274,8 @@ namespace Bootstrapper
                 Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable24"));
                 Assert::Equal<String^>(gcnew String(L"Msi.Package"), VariableGetStringHelper(&variables, L"Variable25"));
                 Assert::Equal<String^>(gcnew String(L"Msi.Package"), VariableGetStringHelper(&variables, L"Variable26"));
+                Assert::Equal<String^>(gcnew String(L"Default27"), VariableGetStringHelper(&variables, L"Variable27"));
+                Assert::Equal<String^>(gcnew String(L"Default28"), VariableGetStringHelper(&variables, L"Variable28"));
             }
             finally
             {
