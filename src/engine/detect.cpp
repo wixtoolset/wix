@@ -175,13 +175,13 @@ extern "C" HRESULT DetectReportRelatedBundles(
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
                 ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
 
-                if (nCompareResult > 0)
-                {
-                    operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
-                }
-                else if (nCompareResult < 0)
+                if (nCompareResult < 0)
                 {
                     operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
+                }
+                else
+                {
+                    operation = BOOTSTRAPPER_RELATED_OPERATION_MAJOR_UPGRADE;
                 }
             }
             break;

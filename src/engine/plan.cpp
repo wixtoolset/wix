@@ -1265,7 +1265,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
                 ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
 
-                pRelatedBundle->package.requested = (nCompareResult > 0) ? BOOTSTRAPPER_REQUEST_STATE_ABSENT : BOOTSTRAPPER_REQUEST_STATE_NONE;
+                pRelatedBundle->package.requested = (nCompareResult < 0) ? BOOTSTRAPPER_REQUEST_STATE_NONE : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
             }
             break;
         case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
