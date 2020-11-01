@@ -76,5 +76,40 @@ namespace WixToolsetTest.Converters
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
         }
+
+        [Fact]
+        public void WarnsOnAllRegistryValueSearches()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>",
+                "  <Fragment>",
+                "    <util:RegistrySearch Id='RegValue' Root='HKLM' Key='Converter' Variable='Test' />",
+                "    <util:RegistrySearch Id='RegValue2' Root='HKLM' Key='Converter' Variable='Test' Result='value' />",
+                "    <util:RegistrySearch Id='RegValue3' Root='HKLM' Key='Converter' Variable='Test' Result='exists' />",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
+                "  <Fragment>",
+                "    <util:RegistrySearch Id=\"RegValue\" Root=\"HKLM\" Key=\"Converter\" Variable=\"Test\" />",
+                "    <util:RegistrySearch Id=\"RegValue2\" Root=\"HKLM\" Key=\"Converter\" Variable=\"Test\" Result=\"value\" />",
+                "    <util:RegistrySearch Id=\"RegValue3\" Root=\"HKLM\" Key=\"Converter\" Variable=\"Test\" Result=\"exists\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(4, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
     }
 }

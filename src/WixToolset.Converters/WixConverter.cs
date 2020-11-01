@@ -78,6 +78,7 @@ namespace WixToolset.Converters
         private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
+        private static readonly XName UtilRegistrySearchName = WixUtilNamespace + "RegistrySearch";
         private static readonly XName UtilXmlConfigElementName = WixUtilNamespace + "XmlConfig";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
@@ -151,8 +152,8 @@ namespace WixToolset.Converters
                 { WixConverter.ErrorElementName, this.ConvertErrorElement },
                 { WixConverter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.ModuleElementName, this.ConvertModuleElement },
-                { WixConverter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
-                { WixConverter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.MsiPackageElementName, this.ConvertWindowsInstallerPackageElement },
+                { WixConverter.MspPackageElementName, this.ConvertWindowsInstallerPackageElement },
                 { WixConverter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.PermissionExElementName, this.ConvertPermissionExElement },
@@ -171,6 +172,7 @@ namespace WixToolset.Converters
                 { WixConverter.VariableElementName, this.ConvertVariableElement },
                 { WixConverter.UtilCloseApplicationElementName, this.ConvertUtilCloseApplicationElementName },
                 { WixConverter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
+                { WixConverter.UtilRegistrySearchName, this.ConvertUtilRegistrySearchElement },
                 { WixConverter.UtilXmlConfigElementName, this.ConvertUtilXmlConfigElement },
                 { WixConverter.PropertyElementName, this.ConvertPropertyElement },
                 { WixConverter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
@@ -863,6 +865,16 @@ namespace WixToolset.Converters
 
         private void ConvertUITextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
+        private void ConvertWindowsInstallerPackageElement(XElement element)
+        {
+            this.ConvertSuppressSignatureValidation(element);
+
+            if (null != element.Attribute("DisplayInternalUI"))
+            {
+                this.OnError(ConverterTestType.DisplayInternalUiNotConvertable, element, "The DisplayInternalUI functionality has fundamentally changed and requires BootstrapperApplication support.");
+            }
+        }
+
         private void ConvertCustomActionElement(XElement xCustomAction)
         {
             var xBinaryKey = xCustomAction.Attribute("BinaryKey");
@@ -982,6 +994,18 @@ namespace WixToolset.Converters
                     {
                         element.Add(new XAttribute("Inheritable", "no"));
                     }
+                }
+            }
+        }
+
+        private void ConvertUtilRegistrySearchElement(XElement element)
+        {
+            if (this.SourceVersion < 4)
+            {
+                var result = element.Attribute("Result")?.Value;
+                if (result == null || result == "value")
+                {
+                    this.OnError(ConverterTestType.UtilRegistryValueSearchBehaviorChange, element, "Breaking change: util:RegistrySearch for a value no longer clears the variable when the key or value is missing.");
                 }
             }
         }
@@ -1422,6 +1446,16 @@ namespace WixToolset.Converters
             /// A MediaTemplate with no attributes set is now provided by default.
             /// </summary>
             DefaultMediaTemplate,
+
+            /// <summary>
+            /// util:RegistrySearch has breaking change when value is missing.
+            /// </summary>
+            UtilRegistryValueSearchBehaviorChange,
+
+            /// <summary>
+            /// DisplayInternalUI can't be converted.
+            /// </summary>
+            DisplayInternalUiNotConvertable,
         }
     }
 }
