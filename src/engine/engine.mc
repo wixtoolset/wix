@@ -188,14 +188,14 @@ MessageId=102
 Severity=Success
 SymbolicName=MSG_DETECTED_RELATED_BUNDLE
 Language=English
-Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!hs!, operation: %5!hs!
+Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, operation: %5!hs!
 .
 
 MessageId=103
 Severity=Success
 SymbolicName=MSG_DETECTED_RELATED_PACKAGE
 Language=English
-Detected related package: %1!ls!, scope: %2!hs!, version: %3!hs!, language: %4!u! operation: %5!hs!
+Detected related package: %1!ls!, scope: %2!hs!, version: %3!ls!, language: %4!u! operation: %5!hs!
 .
 
 MessageId=104
@@ -223,7 +223,7 @@ MessageId=107
 Severity=Success
 SymbolicName=MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE
 Language=English
-Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!hs!, enabled: %5!hs!
+Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, enabled: %5!hs!
 .
 
 MessageId=108
