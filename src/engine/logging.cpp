@@ -33,6 +33,7 @@ extern "C" HRESULT LoggingOpen(
 {
     HRESULT hr = S_OK;
     LPWSTR sczLoggingBaseFolder = NULL;
+    LPWSTR sczPrefixFormatted = NULL;
 
     // Check if the logging policy is set and configure the logging appropriately.
     CheckLoggingPolicy(&pLog->dwAttributes);
@@ -103,29 +104,49 @@ extern "C" HRESULT LoggingOpen(
             pLog->state = BURN_LOGGING_STATE_OPEN;
         }
     }
-    else if (pLog->sczPrefix && *pLog->sczPrefix)
+    else
     {
-        hr = GetNonSessionSpecificTempFolder(&sczLoggingBaseFolder);
-        ExitOnFailure(hr, "Failed to get non-session specific TEMP folder.");
+        if (pLog->sczPrefix && *pLog->sczPrefix)
+        {
+            hr = VariableFormatString(pVariables, pLog->sczPrefix, &sczPrefixFormatted, NULL);
+        }
 
-        // Best effort to open default logging.
-        hr = LogOpen(sczLoggingBaseFolder, pLog->sczPrefix, NULL, pLog->sczExtension, FALSE, FALSE, &pLog->sczPath);
-        if (FAILED(hr))
+        if (sczPrefixFormatted && *sczPrefixFormatted)
+        {
+            LPCWSTR wzPrefix = sczPrefixFormatted;
+
+            // Best effort to open default logging.
+            if (PathIsAbsolute(sczPrefixFormatted))
+            {
+                hr = PathGetDirectory(sczPrefixFormatted, &sczLoggingBaseFolder);
+                ExitOnFailure(hr, "Failed to get parent directory from '%ls'.", sczPrefixFormatted);
+
+                wzPrefix = PathFile(sczPrefixFormatted);
+            }
+            else
+            {
+                hr = GetNonSessionSpecificTempFolder(&sczLoggingBaseFolder);
+                ExitOnFailure(hr, "Failed to get non-session specific TEMP folder.");
+            }
+
+            hr = LogOpen(sczLoggingBaseFolder, wzPrefix, NULL, pLog->sczExtension, FALSE, FALSE, &pLog->sczPath);
+            if (FAILED(hr))
+            {
+                LogDisable();
+                pLog->state = BURN_LOGGING_STATE_DISABLED;
+
+                hr = S_OK;
+            }
+            else
+            {
+                pLog->state = BURN_LOGGING_STATE_OPEN;
+            }
+        }
+        else // no logging enabled.
         {
             LogDisable();
             pLog->state = BURN_LOGGING_STATE_DISABLED;
-
-            hr = S_OK;
         }
-        else
-        {
-            pLog->state = BURN_LOGGING_STATE_OPEN;
-        }
-    }
-    else // no logging enabled.
-    {
-        LogDisable();
-        pLog->state = BURN_LOGGING_STATE_DISABLED;
     }
 
     // If the log was opened, write the header info and update the prefix and extension to match
@@ -155,6 +176,7 @@ extern "C" HRESULT LoggingOpen(
 
 LExit:
     ReleaseStr(sczLoggingBaseFolder);
+    StrSecureZeroFreeString(sczPrefixFormatted);
 
     return hr;
 }
