@@ -218,7 +218,6 @@ typedef struct _BAENGINE_FORMATSTRING_ARGS
 typedef struct _BAENGINE_FORMATSTRING_RESULTS
 {
     DWORD cbSize;
-    // The contents of wzOut may be sensitive, should keep encrypted and SecureZeroFree.
     LPWSTR wzOut;
     // Should be initialized to the size of wzOut.
     DWORD cchOut;
@@ -244,7 +243,6 @@ typedef struct _BAENGINE_GETVARIABLENUMERIC_ARGS
 typedef struct _BAENGINE_GETVARIABLENUMERIC_RESULTS
 {
     DWORD cbSize;
-    // The contents of llValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
     LONGLONG llValue;
 } BAENGINE_GETVARIABLENUMERIC_RESULTS;
 
@@ -257,7 +255,6 @@ typedef struct _BAENGINE_GETVARIABLESTRING_ARGS
 typedef struct _BAENGINE_GETVARIABLESTRING_RESULTS
 {
     DWORD cbSize;
-    // The contents of wzValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroFree.
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
     DWORD cchValue;
@@ -272,7 +269,6 @@ typedef struct _BAENGINE_GETVARIABLEVERSION_ARGS
 typedef struct _BAENGINE_GETVARIABLEVERSION_RESULTS
 {
     DWORD cbSize;
-    // The contents of wzValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroFree.
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
     DWORD cchValue;

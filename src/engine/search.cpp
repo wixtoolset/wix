@@ -1136,7 +1136,6 @@ static HRESULT MsiProductSearch(
     DWORD dwRelatedProducts = 0;
     BURN_VARIANT_TYPE type = BURN_VARIANT_TYPE_NONE;
     BURN_VARIANT value = { };
-    // We're not going to encrypt this value, so can access the value directly.
 
     switch (pSearch->MsiProductSearch.Type)
     {

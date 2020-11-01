@@ -427,9 +427,6 @@ extern "C" HRESULT VariablesParseFromXml(
         hr = BVariantSetValue(&pVariables->rgVariables[iVariable].Value, &value);
         ExitOnFailure(hr, "Failed to set value of variable: %ls", sczId);
 
-        hr = BVariantSetEncryption(&pVariables->rgVariables[iVariable].Value, fHidden);
-        ExitOnFailure(hr, "Failed to set variant encryption");
-
         // prepare next iteration
         ReleaseNullObject(pixnNode);
         BVariantUninitialize(&value);
@@ -509,7 +506,6 @@ extern "C" void VariablesDump(
     StrSecureZeroFreeString(sczValue);
 }
 
-// The contents of pllValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
 extern "C" HRESULT VariableGetNumeric(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -541,7 +537,6 @@ LExit:
     return hr;
 }
 
-// The contents of psczValue may be sensitive, if variable is hidden should keep encrypted and SecureZeroFree.
 extern "C" HRESULT VariableGetString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -573,7 +568,6 @@ LExit:
     return hr;
 }
 
-// The contents of ppValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroMemory.
 extern "C" HRESULT VariableGetVersion(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -632,7 +626,6 @@ LExit:
     return hr;
 }
 
-// The contents of psczValue may be sensitive, should keep encrypted and SecureZeroFree.
 extern "C" HRESULT VariableGetFormatted(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -661,7 +654,6 @@ extern "C" HRESULT VariableSetNumeric(
 {
     BURN_VARIANT variant = { };
 
-    // We're not going to encrypt this value, so can access the value directly.
     variant.llValue = llValue;
     variant.Type = BURN_VARIANT_TYPE_NUMERIC;
 
@@ -678,7 +670,6 @@ extern "C" HRESULT VariableSetString(
 {
     BURN_VARIANT variant = { };
 
-    // We're not going to encrypt this value, so can access the value directly.
     variant.sczValue = (LPWSTR)wzValue;
     variant.Type = fFormatted ? BURN_VARIANT_TYPE_FORMATTED : BURN_VARIANT_TYPE_STRING;
 
@@ -694,7 +685,6 @@ extern "C" HRESULT VariableSetVersion(
 {
     BURN_VARIANT variant = { };
 
-    // We're not going to encrypt this value, so can access the value directly.
     variant.pValue = pValue;
     variant.Type = BURN_VARIANT_TYPE_VERSION;
 
@@ -710,7 +700,6 @@ extern "C" HRESULT VariableSetVariant(
     return SetVariableValue(pVariables, wzVariable, pVariant, SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
-// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree
 extern "C" HRESULT VariableFormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
@@ -1092,7 +1081,6 @@ LExit:
 
 // internal function definitions
 
-// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
 static HRESULT FormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
@@ -1312,7 +1300,6 @@ LExit:
     return hr;
 }
 
-// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
 static HRESULT GetFormatted(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzVariable,
@@ -1581,7 +1568,6 @@ static HRESULT SetVariableValue(
         }
         else
         {
-            // Assume value isn't encrypted since it's not hidden.
             switch (pVariant->Type)
             {
             case BURN_VARIANT_TYPE_NONE:

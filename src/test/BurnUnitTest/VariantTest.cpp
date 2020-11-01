@@ -68,7 +68,7 @@ namespace Bootstrapper
         }
 
     private:
-        void InitFormattedValue(BURN_VARIANT* pValue, LPWSTR wzValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitFormattedValue(BURN_VARIANT* pValue, LPWSTR wzValue, BOOL /*fHidden*/, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
             pValue->Type = BURN_VARIANT_TYPE_FORMATTED;
@@ -78,34 +78,18 @@ namespace Bootstrapper
 
             hr = BVariantCopy(pValue, pActualValue);
             NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-            if (fHidden)
-            {
-                hr = BVariantSetEncryption(pActualValue, TRUE);
-                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
-
-                NativeAssert::True(pActualValue->fEncryptString);
-            }
         }
 
-        void InitNoneValue(BURN_VARIANT* pValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitNoneValue(BURN_VARIANT* pValue, BOOL /*fHidden*/, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
             pValue->Type = BURN_VARIANT_TYPE_NONE;
 
             hr = BVariantCopy(pValue, pActualValue);
             NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-            if (fHidden)
-            {
-                hr = BVariantSetEncryption(pActualValue, TRUE);
-                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
-
-                NativeAssert::True(pActualValue->fEncryptString);
-            }
         }
 
-        void InitNumericValue(BURN_VARIANT* pValue, LONGLONG llValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitNumericValue(BURN_VARIANT* pValue, LONGLONG llValue, BOOL /*fHidden*/, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
             pValue->Type = BURN_VARIANT_TYPE_NUMERIC;
@@ -113,17 +97,9 @@ namespace Bootstrapper
 
             hr = BVariantCopy(pValue, pActualValue);
             NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-            if (fHidden)
-            {
-                hr = BVariantSetEncryption(pActualValue, TRUE);
-                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
-
-                NativeAssert::True(pActualValue->fEncryptString);
-            }
         }
 
-        void InitStringValue(BURN_VARIANT* pValue, LPWSTR wzValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitStringValue(BURN_VARIANT* pValue, LPWSTR wzValue, BOOL /*fHidden*/, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
             pValue->Type = BURN_VARIANT_TYPE_STRING;
@@ -133,17 +109,9 @@ namespace Bootstrapper
 
             hr = BVariantCopy(pValue, pActualValue);
             NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-            if (fHidden)
-            {
-                hr = BVariantSetEncryption(pActualValue, TRUE);
-                NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
-
-                NativeAssert::True(pActualValue->fEncryptString);
-            }
         }
 
-        void InitVersionValue(BURN_VARIANT* pValue, LPCWSTR wzValue, BOOL fHidden, LPCWSTR wz, BURN_VARIANT* pActualValue)
+        void InitVersionValue(BURN_VARIANT* pValue, LPCWSTR wzValue, BOOL /*fHidden*/, LPCWSTR wz, BURN_VARIANT* pActualValue)
         {
             HRESULT hr = S_OK;
             VERUTIL_VERSION* pVersion = NULL;
@@ -159,14 +127,6 @@ namespace Bootstrapper
 
                 hr = BVariantCopy(pValue, pActualValue);
                 NativeAssert::Succeeded(hr, "Failed to copy variant {0}", wz);
-
-                if (fHidden)
-                {
-                    hr = BVariantSetEncryption(pActualValue, TRUE);
-                    NativeAssert::Succeeded(hr, "Failed to encrypt variant {0}", wz);
-
-                    NativeAssert::True(pActualValue->fEncryptString);
-                }
             }
             finally
             {

@@ -1402,7 +1402,6 @@ LExit:
     return hr;
 }
 
-// The contents of psczProperties may be sensitive, should keep encrypted and SecureZeroFree.
 extern "C" HRESULT MsiEngineConcatProperties(
     __in_ecount(cProperties) BURN_MSIPROPERTY* rgProperties,
     __in DWORD cProperties,

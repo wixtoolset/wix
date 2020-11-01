@@ -434,7 +434,6 @@ static HRESULT ParseOperand(
     HRESULT hr = S_OK;
     LPWSTR sczFormatted = NULL;
 
-    // Symbols don't encrypt their value, so can access the value directly.
     switch (pContext->NextSymbol.Type)
     {
     case BURN_SYMBOL_TYPE_IDENTIFIER:
@@ -715,7 +714,6 @@ static HRESULT NextSymbol(
                          pContext->wzRead[n] == L'-' ||
                          pContext->wzRead[n] == L'.');
 
-                // Symbols don't encrypt their value, so can access the value directly.
                 hr = VerParseVersion(&pContext->wzRead[1], n - 1, FALSE, &pContext->NextSymbol.Value.pValue);
                 if (FAILED(hr))
                 {
