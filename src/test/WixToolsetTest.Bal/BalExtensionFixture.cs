@@ -46,6 +46,39 @@ namespace WixToolsetTest.Bal
         }
 
         [Fact]
+        public void CanBuildUsingOverridable()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\Overridable");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var balOverridableVariables = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixStdbaOverridableVariable");
+                var balOverridableVariable = (XmlNode)Assert.Single(balOverridableVariables);
+                Assert.Equal("<WixStdbaOverridableVariable Name='Test1' />", balOverridableVariable.GetTestXml());
+            }
+        }
+
+        [Fact]
         public void CanBuildUsingWixStdBa()
         {
             using (var fs = new DisposableFileSystem())
@@ -69,7 +102,7 @@ namespace WixToolsetTest.Bal
             }
         }
 
-        [Fact(Skip = "Skip test until cycle with Netfx.wixext and this repo is resolved")]
+        [Fact]
         public void CantBuildUsingMBAWithNoPrereqs()
         {
             using (var fs = new DisposableFileSystem())
@@ -84,7 +117,6 @@ namespace WixToolsetTest.Bal
                     "build",
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
                 });
