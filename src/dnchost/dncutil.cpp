@@ -182,7 +182,14 @@ static void HOSTFXR_CALLTYPE DnchostErrorWriter(
     __in LPCWSTR wzMessage
     )
 {
-    BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "error from hostfxr: %ls", wzMessage);
+    BOOTSTRAPPER_LOG_LEVEL level = BOOTSTRAPPER_LOG_LEVEL_ERROR;
+
+    if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, 0, wzMessage, -1, L"The requested delegate type is not available in the target framework.", -1))
+    {
+        level = BOOTSTRAPPER_LOG_LEVEL_DEBUG;
+    }
+
+    BalLog(level, "error from hostfxr: %ls", wzMessage);
 }
 
 static HRESULT InitializeHostfxr(

@@ -28,7 +28,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup>
-    <NetHostPath>..\..\packages\runtime.win-x86.Microsoft.NETCore.DotNetAppHost.5.0.0-preview.7.20364.11\runtimes\win-x86\native\</NetHostPath>
+    <NetHostPath>..\..\packages\runtime.win-x86.Microsoft.NETCore.DotNetAppHost.5.0.0-rc.2.20475.5\runtimes\win-x86\native\</NetHostPath>
     <ProjectAdditionalLinkLibraries>shlwapi.lib;$(NetHostPath)libnethost.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
   <ItemGroup>

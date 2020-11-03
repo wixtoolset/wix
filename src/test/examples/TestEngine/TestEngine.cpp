@@ -69,11 +69,19 @@ LExit:
 }
 
 HRESULT TestEngine::Log(
+    __in BOOTSTRAPPER_LOG_LEVEL level,
     __in LPCWSTR wzMessage
     )
 {
-    LogStringLine(REPORT_STANDARD, "%ls", wzMessage);
-    return ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls", wzMessage);
+    switch (level)
+    {
+    case BOOTSTRAPPER_LOG_LEVEL_NONE:
+    case BOOTSTRAPPER_LOG_LEVEL_DEBUG:
+        return S_OK;
+    default:
+        LogStringLine(REPORT_STANDARD, "%ls", wzMessage);
+        return ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls", wzMessage);
+    }
 }
 
 HRESULT TestEngine::RunApplication()
@@ -169,7 +177,7 @@ HRESULT TestEngine::BAEngineLog(
     __in BAENGINE_LOG_RESULTS* /*pResults*/
     )
 {
-    return Log(pArgs->wzMessage);
+    return Log(pArgs->level, pArgs->wzMessage);
 }
 
 HRESULT TestEngine::BAEngineQuit(

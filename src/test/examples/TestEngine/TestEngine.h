@@ -28,6 +28,7 @@ public:
         );
 
     HRESULT Log(
+        __in BOOTSTRAPPER_LOG_LEVEL level,
         __in LPCWSTR wzMessage
         );
 

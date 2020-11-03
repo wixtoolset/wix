@@ -1,23 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Description>Latest .NET Core MBA</Description>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(PublishTrimmed)'=='true'">
-    <PublishReadyToRunShowWarnings>false</PublishReadyToRunShowWarnings>
-    <PublishReadyToRun>true</PublishReadyToRun>
-  </PropertyGroup>
-
   <ItemGroup>
+    <TrimmerRootAssembly Include="System.Diagnostics.Tools" />
+    <TrimmerRootAssembly Include="System.Runtime" />
+    <TrimmerRootAssembly Include="System.Runtime.InteropServices" />
     <TrimmerRootAssembly Include="System.Runtime.Loader" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.41" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" />
   </ItemGroup>
 </Project>
