@@ -687,6 +687,12 @@ namespace WixToolset.Converters
                 {
                     xSummaryInformation.Name = SummaryInformationElementName;
 
+                    var xInstallerVersion = xSummaryInformation.Attribute("InstallerVersion");
+                    if (this.SourceVersion < 4 && xInstallerVersion == null)
+                    {
+                        this.OnError(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Module element.");
+                    }
+
                     RemoveAttribute(xSummaryInformation, "AdminImage");
                     RemoveAttribute(xSummaryInformation, "Comments");
                     MoveAttribute(xSummaryInformation, "Id", xModule, "Guid");
@@ -749,6 +755,12 @@ namespace WixToolset.Converters
                 if (xSummaryInformation != null)
                 {
                     xSummaryInformation.Name = SummaryInformationElementName;
+
+                    var xInstallerVersion = xSummaryInformation.Attribute("InstallerVersion");
+                    if (this.SourceVersion < 4 && xInstallerVersion == null)
+                    {
+                        this.OnError(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Package element.");
+                    }
 
                     RemoveAttribute(xSummaryInformation, "AdminImage");
                     RemoveAttribute(xSummaryInformation, "Comments");
@@ -1456,6 +1468,11 @@ namespace WixToolset.Converters
             /// DisplayInternalUI can't be converted.
             /// </summary>
             DisplayInternalUiNotConvertable,
+
+            /// <summary>
+            /// InstallerVersion has breaking change when missing.
+            /// </summary>
+            InstallerVersionBehaviorChange,
         }
     }
 }

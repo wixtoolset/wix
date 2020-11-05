@@ -33,7 +33,7 @@ namespace WixToolsetTest.Converters
                 "</Wix>"
             };
 
-            AssertSuccess(parse, 3, expected);
+            AssertSuccess(parse, 4, expected);
         }
 
         private static void AssertSuccess(string input, int expectedErrorCount, string[] expected)
@@ -97,6 +97,29 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void FixesImplicitInstallerVersion()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Product>",
+                "    <Package />",
+                "  </Product>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Package>",
+                "    ",
+                "  </Package>",
+                "</Wix>"
+            };
+
+            AssertSuccess(parse, 4, expected);
+        }
+
+        [Fact]
         public void FixesNonDefaultInstallerVersion()
         {
             var parse = String.Join(Environment.NewLine,
@@ -139,7 +162,7 @@ namespace WixToolsetTest.Converters
                 "</Wix>"
             };
 
-            AssertSuccess(parse, 3, expected);
+            AssertSuccess(parse, 4, expected);
         }
 
         [Fact]
@@ -164,7 +187,7 @@ namespace WixToolsetTest.Converters
                 "</Wix>"
             };
 
-            AssertSuccess(parse, 3, expected);
+            AssertSuccess(parse, 4, expected);
         }
 
         [Fact]
