@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(WixMSBuildProps)" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ProjectGuid>BB919765-DD69-41E7-91C5-415A69BE923E</ProjectGuid>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformName>$(Platform)</PlatformName>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformName>$(Platform)</PlatformName>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <PlatformName>$(Platform)</PlatformName>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <PlatformName>$(Platform)</PlatformName>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Package.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BindInputPaths Include="." />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <EnableProjectHarvesting>true</EnableProjectHarvesting>
+    <HarvestProjectsSuppressUniqueIds>true</HarvestProjectsSuppressUniqueIds>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ToolsVersion4Cs\ToolsVersion4Cs.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>

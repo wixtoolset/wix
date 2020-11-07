@@ -39,6 +39,8 @@ namespace WixToolset.BuildTasks
             set { this.generateType = value; }
         }
 
+        public string MsbuildBinPath { get; set; }
+
         public string Platform
         {
             get { return this.platform; }
@@ -77,6 +79,8 @@ namespace WixToolset.BuildTasks
             }
         }
 
+        public bool UseToolsVersion { get; set; }
+
         protected override string OperationName
         {
             get { return "project"; }
@@ -90,10 +94,15 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-configuration ", this.Configuration);
             commandLineBuilder.AppendSwitchIfNotNull("-directoryid ", this.DirectoryIds);
             commandLineBuilder.AppendSwitchIfNotNull("-generate ", this.GenerateType);
+            commandLineBuilder.AppendSwitchIfNotNull("-msbuildbinpath ", this.MsbuildBinPath);
             commandLineBuilder.AppendSwitchIfNotNull("-platform ", this.Platform);
             commandLineBuilder.AppendArrayIfNotNull("-pog ", this.ProjectOutputGroups);
             commandLineBuilder.AppendSwitchIfNotNull("-projectname ", this.ProjectName);
             commandLineBuilder.AppendIfTrue("-wixvar", this.GenerateWixVariables);
+
+#if !NETCOREAPP
+            commandLineBuilder.AppendIfTrue("-usetoolsversion", this.UseToolsVersion);
+#endif
 
             base.BuildCommandLine(commandLineBuilder);
         }

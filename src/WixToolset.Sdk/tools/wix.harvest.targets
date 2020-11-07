@@ -48,6 +48,7 @@
     <HarvestProjectsTransforms Condition=" '$(HarvestProjectsTransforms)' == '' ">$(HarvestTransforms)</HarvestProjectsTransforms>
     <HarvestProjectsGeneratedFile Condition=" '$(HarvestProjectsGeneratedFile)' == '' and '$(OutputType)' != 'Bundle' ">$(IntermediateOutputPath)Product.Generated.wxs</HarvestProjectsGeneratedFile>
     <HarvestProjectsGeneratedFile Condition=" '$(HarvestProjectsGeneratedFile)' == '' and '$(OutputType)' == 'Bundle' ">$(IntermediateOutputPath)Bundle.Generated.wxs</HarvestProjectsGeneratedFile>
+    <HarvestProjectsMsbuildBinPath Condition=" '$(HarvestProjectsMsbuildBinPath)' == '' ">$(MSBuildBinPath)</HarvestProjectsMsbuildBinPath>
   </PropertyGroup>
 
   <!-- Default HarvestDirectory properties -->
@@ -273,11 +274,13 @@
       Project="%(_AllHeatProjects.FullPath)"
       ProjectOutputGroups="%(_AllHeatProjects.ProjectOutputGroups)"
       GenerateType="%(_AllHeatProjects.GenerateType)"
+      MsbuildBinPath="$(HarvestProjectsMsbuildBinPath)"
       DirectoryIds="%(_AllHeatProjects.DirectoryIds)"
       ProjectName="%(_AllHeatProjects.ProjectName)"
       Configuration="%(_AllHeatProjects.Configuration)"
       Platform="%(_AllHeatProjects.Platform)"
       GenerateWixVariables="$(HarvestProjectsGenerateWixVariables)"
+      UseToolsVersion="$(HarvestProjectsUseToolsVersion)"
       AdditionalOptions="$(HarvestProjectsAdditionalOptions)"
       RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
       ToolExe="$(HeatToolExe)"

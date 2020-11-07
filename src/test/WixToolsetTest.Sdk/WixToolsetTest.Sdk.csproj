@@ -6,6 +6,7 @@
     <TargetFramework>net461</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
+    <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,14 @@
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectPreSdkStyle\HeatProjectPreSdkStyle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectPreSdkStyle\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectSdkStyle\HeatProjectSdkStyle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectSdkStyle\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\SdkStyleCs\SdkStyleCs.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\SdkStyleCs\SdkStyleCs.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\ToolsVersion4Cs\Properties\AssemblyInfo.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\ToolsVersion4Cs\ToolsVersion4Cs.csproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MergeModule\MergeMsiPackage\MergeMsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MergeModule\MergeMsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MergeModule\SimpleMergeModule\data\MergeModule.txt" CopyToOutputDirectory="PreserveNewest" />
