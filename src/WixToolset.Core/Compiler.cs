@@ -4105,6 +4105,8 @@ namespace WixToolset.Core
                             }
                         }
 
+                        this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+
                         if (null == columnName)
                         {
                             this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Column"));
