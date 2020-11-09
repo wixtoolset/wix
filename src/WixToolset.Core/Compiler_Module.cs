@@ -181,9 +181,6 @@ namespace WixToolset.Core
                         case "Icon":
                             this.ParseIconElement(child);
                             break;
-                        case "IgnoreModularization":
-                            this.ParseIgnoreModularizationElement(child);
-                            break;
                         case "IgnoreTable":
                             this.ParseIgnoreTableElement(child);
                             break;
@@ -621,53 +618,6 @@ namespace WixToolset.Core
                     Column = column,
                     Value = value
                 });
-            }
-        }
-
-        /// <summary>
-        /// Parses an ignore modularization element.
-        /// </summary>
-        /// <param name="node">XmlNode on an IgnoreModulatization element.</param>
-        private void ParseIgnoreModularizationElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string name = null;
-
-            this.Core.Write(WarningMessages.DeprecatedIgnoreModularizationElement(sourceLineNumbers));
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Name":
-                        name = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Type":
-                        // this is actually not used
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name)));
             }
         }
 

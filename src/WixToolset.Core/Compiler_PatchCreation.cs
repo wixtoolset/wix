@@ -305,29 +305,9 @@ namespace WixToolset.Core
                         }
                         break;
                     case "SourceFile":
-                    case "src":
-                        if (null != sourceFile)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
-                        }
-
-                        if ("src" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
-                        }
                         sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "SourcePatch":
-                    case "srcPatch":
-                        if (null != sourcePatch)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "srcPatch", "SourcePatch"));
-                        }
-
-                        if ("srcPatch" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourcePatch"));
-                        }
                         sourcePatch = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     default:
@@ -518,16 +498,6 @@ namespace WixToolset.Core
                         order = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
                         break;
                     case "SourceFile":
-                    case "src":
-                        if (null != sourceFile)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
-                        }
-
-                        if ("src" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
-                        }
                         sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Validation":
@@ -727,16 +697,6 @@ namespace WixToolset.Core
                         order = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
                         break;
                     case "Source":
-                    case "src":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "Source"));
-                        }
-
-                        if ("src" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Source"));
-                        }
                         source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     default:

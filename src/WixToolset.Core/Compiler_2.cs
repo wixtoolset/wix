@@ -4774,7 +4774,6 @@ namespace WixToolset.Core
             string argument = null;
             string command = null;
             var sequence = CompilerConstants.IntegerNotSet;
-            string target = null;
             string targetFile = null;
             string targetProperty = null;
 
@@ -4795,10 +4794,6 @@ namespace WixToolset.Core
                         break;
                     case "Sequence":
                         sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "Target":
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetFile", "TargetProperty"));
                         break;
                     case "TargetFile":
                         targetFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -4823,16 +4818,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            if (null != target && null != targetFile)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetFile"));
-            }
-
-            if (null != target && null != targetProperty)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetProperty"));
-            }
-
             if (null != targetFile && null != targetProperty)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty"));
@@ -4842,11 +4827,6 @@ namespace WixToolset.Core
 
             if (YesNoType.Yes == advertise)
             {
-                if (null != target)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Target"));
-                }
-
                 if (null != targetFile)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
@@ -4880,22 +4860,19 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Sequence", "Advertise", "no"));
                 }
 
-                if (null == target && null == targetFile && null == targetProperty)
+                if (null == targetFile && null == targetProperty)
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty", "Advertise", "no"));
                 }
 
-                if (null == target)
+                string target = null;
+                if (null != targetFile)
                 {
-                    if (null != targetFile)
-                    {
-                        target = String.Concat("\"[#", targetFile, "]\"");
-                    }
-
-                    if (null != targetProperty)
-                    {
-                        target = String.Concat("\"[", targetProperty, "]\"");
-                    }
+                    target = String.Concat("\"[#", targetFile, "]\"");
+                }
+                else if (null != targetProperty)
+                {
+                    target = String.Concat("\"[", targetProperty, "]\"");
                 }
 
                 if (null != argument)
@@ -4903,7 +4880,7 @@ namespace WixToolset.Core
                     target = String.Concat(target, " ", argument);
                 }
 
-                var prefix = (null != progId ? progId : String.Concat(".", extension));
+                var prefix = progId ?? String.Concat(".", extension);
 
                 if (null != command)
                 {

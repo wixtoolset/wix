@@ -694,16 +694,6 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "SourceFile":
-                    case "src":
-                        if (null != sourceFile)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile", "src"));
-                        }
-
-                        if ("src" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
-                        }
                         sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "SuppressModularization":
@@ -6251,9 +6241,6 @@ namespace WixToolset.Core
                         break;
                     case "Icon":
                         this.ParseIconElement(child);
-                        break;
-                    case "IgnoreModularization":
-                        this.ParseIgnoreModularizationElement(child);
                         break;
                     case "Media":
                         this.ParseMediaElement(child, null);
