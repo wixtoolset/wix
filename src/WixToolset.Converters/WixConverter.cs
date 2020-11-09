@@ -76,6 +76,7 @@ namespace WixToolset.Converters
         private static readonly XName TextElementName = WixNamespace + "Text";
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
+        private static readonly XName VerbElementName = WixNamespace + "Verb";
         private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName UtilRegistrySearchName = WixUtilNamespace + "RegistrySearch";
@@ -177,6 +178,7 @@ namespace WixToolset.Converters
                 { WixConverter.PropertyElementName, this.ConvertPropertyElement },
                 { WixConverter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { WixConverter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
+                { WixConverter.VerbElementName, this.ConvertVerbElement },
             };
 
             this.Messaging = messaging;
@@ -768,6 +770,7 @@ namespace WixToolset.Converters
                     RemoveAttribute(xSummaryInformation, "Id");
                     MoveAttribute(xSummaryInformation, "InstallerVersion", xPackage, defaultValue: "500");
                     MoveAttribute(xSummaryInformation, "InstallScope", xPackage, "Scope", defaultValue: "perMachine");
+                    RemoveAttribute(xSummaryInformation, "Languages");
                     RemoveAttribute(xSummaryInformation, "Platform");
                     RemoveAttribute(xSummaryInformation, "Platforms");
                     RemoveAttribute(xSummaryInformation, "ReadOnly");
@@ -884,6 +887,14 @@ namespace WixToolset.Converters
             if (null != element.Attribute("DisplayInternalUI"))
             {
                 this.OnError(ConverterTestType.DisplayInternalUiNotConvertable, element, "The DisplayInternalUI functionality has fundamentally changed and requires BootstrapperApplication support.");
+            }
+        }
+
+        private void ConvertVerbElement(XElement element)
+        {
+            if (null != element.Attribute("Target"))
+            {
+                this.OnError(ConverterTestType.VerbTargetNotConvertable, element, "The Verb/@Target attribute has been replaced with typed @TargetFile and @TargetProperty attributes.");
             }
         }
 
@@ -1473,6 +1484,11 @@ namespace WixToolset.Converters
             /// InstallerVersion has breaking change when missing.
             /// </summary>
             InstallerVersionBehaviorChange,
+
+            /// <summary>
+            /// Verb/@Target can't be converted.
+            /// </summary>
+            VerbTargetNotConvertable,
         }
     }
 }

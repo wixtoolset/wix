@@ -355,5 +355,31 @@ namespace WixToolsetTest.Converters
             Assert.Equal(1, errors);
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void CantConvertVerbTarget()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Verb Target='anything' />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Verb Target=\"anything\" />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(2, errors);
+            Assert.Equal(expected, actual);
+        }
     }
 }
