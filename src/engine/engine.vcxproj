@@ -27,7 +27,7 @@
     <ProjectGuid>{8119537D-E1D9-6591-D51A-49768A2F9C37}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>engine</TargetName>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
   </PropertyGroup>
@@ -144,7 +144,7 @@
       <Message>Compiling message file...</Message>
       <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z engine.messages "$(InputDir)engine.mc"
 rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
-      <Outputs>$(IntDir)engine.messages.h;$(OutDir)engine.messages.rc</Outputs>
+      <Outputs>$(IntDir)engine.messages.h;$(IntDir)engine.messages.rc;$(OutDir)engine.res</Outputs>
     </CustomBuild>
   </ItemGroup>
 
