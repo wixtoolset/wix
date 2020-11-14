@@ -51,7 +51,7 @@ HRESULT BuffReadStream(
 HRESULT BuffWriteNumber(
     __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
-    __in DWORD dw
+    __in DWORD_PTR dw
     );
 HRESULT BuffWriteNumber64(
     __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,

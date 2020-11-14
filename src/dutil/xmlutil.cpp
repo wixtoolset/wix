@@ -416,7 +416,7 @@ LExit:
 *********************************************************************/
 extern "C" HRESULT DAPI XmlLoadDocumentFromBuffer(
     __in_bcount(cbSource) const BYTE* pbSource,
-    __in DWORD cbSource,
+    __in SIZE_T cbSource,
     __out IXMLDOMDocument** ppixdDocument
     )
 {
@@ -447,7 +447,7 @@ extern "C" HRESULT DAPI XmlLoadDocumentFromBuffer(
     sa.fFeatures = FADF_STATIC | FADF_FIXEDSIZE;
     sa.cbElements = 1;
     sa.pvData = (PVOID)pbSource;
-    sa.rgsabound[0].cElements = cbSource;
+    sa.rgsabound[0].cElements = (ULONG)cbSource;
     vtXmlSource.vt = VT_ARRAY | VT_UI1;
     vtXmlSource.parray = &sa;
 

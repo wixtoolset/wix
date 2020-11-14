@@ -53,7 +53,7 @@ HRESULT DAPI XmlLoadDocumentFromFile(
     );
 HRESULT DAPI XmlLoadDocumentFromBuffer(
     __in_bcount(cbSource) const BYTE* pbSource,
-    __in DWORD cbSource,
+    __in SIZE_T cbSource,
     __out IXMLDOMDocument** ppixdDocument
     );
 HRESULT DAPI XmlLoadDocumentFromFileEx(

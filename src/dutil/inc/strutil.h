@@ -46,29 +46,29 @@ HRESULT DAPI StrAnsiTrimWhitespace(
 HRESULT DAPI StrAllocString(
     __deref_out_ecount_z(cchSource+1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAllocStringSecure(
     __deref_out_ecount_z(cchSource + 1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAnsiAllocString(
     __deref_out_ecount_z(cchSource+1) LPSTR* ppsz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in UINT uiCodepage
     );
 HRESULT DAPI StrAllocStringAnsi(
     __deref_out_ecount_z(cchSource+1) LPWSTR* ppwz,
     __in_z LPCSTR szSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in UINT uiCodepage
     );
 HRESULT DAPI StrAnsiAllocStringAnsi(
     __deref_out_ecount_z(cchSource+1) LPSTR* ppsz,
     __in_z LPCSTR szSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAllocPrefix(
     __deref_out_z LPWSTR* ppwz,
@@ -78,17 +78,17 @@ HRESULT DAPI StrAllocPrefix(
 HRESULT DAPI StrAllocConcat(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAllocConcatSecure(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAnsiAllocConcat(
     __deref_out_z LPSTR* ppz,
     __in_z LPCSTR pzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 HRESULT __cdecl StrAllocFormatted(
     __deref_out_z LPWSTR* ppwz,
@@ -289,7 +289,7 @@ HRESULT DAPI StrArrayAllocString(
     __deref_inout_ecount_opt(*pcStrArray) LPWSTR **prgsczStrArray,
     __inout LPUINT pcStrArray,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     );
 
 HRESULT DAPI StrArrayFree(

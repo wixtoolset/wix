@@ -257,7 +257,7 @@ LExit:
 extern "C" HRESULT BuffWriteNumber(
     __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
-    __in DWORD dw
+    __in DWORD_PTR dw
     )
 {
     Assert(ppbBuffer);
@@ -270,7 +270,7 @@ extern "C" HRESULT BuffWriteNumber(
     ExitOnFailure(hr, "Failed to ensure buffer size.");
 
     // copy data to buffer
-    *(DWORD*)(*ppbBuffer + *piBuffer) = dw;
+    *(DWORD_PTR*)(*ppbBuffer + *piBuffer) = dw;
     *piBuffer += sizeof(DWORD);
 
 LExit:

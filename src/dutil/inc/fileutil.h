@@ -96,24 +96,24 @@ HRESULT DAPI FileRemoveFromPendingRename(
     );
 HRESULT DAPI FileRead(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out DWORD* pcbDest,
+    __out SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath
     );
 HRESULT DAPI FileReadEx(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out DWORD* pcbDest,
+    __out SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in DWORD dwShareMode
     );
 HRESULT DAPI FileReadUntil(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in DWORD cbMaxRead
     );
 HRESULT DAPI FileReadPartial(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,
     __in DWORD cbStartPosition,
@@ -122,7 +122,7 @@ HRESULT DAPI FileReadPartial(
     );
 HRESULT DAPI FileReadPartialEx(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,
     __in DWORD cbStartPosition,
@@ -134,13 +134,13 @@ HRESULT DAPI FileWrite(
     __in_z LPCWSTR pwzFileName,
     __in DWORD dwFlagsAndAttributes,
     __in_bcount_opt(cbData) LPCBYTE pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out_opt HANDLE* pHandle
     );
 HRESULT DAPI FileWriteHandle(
     __in HANDLE hFile,
     __in_bcount_opt(cbData) LPCBYTE pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 HRESULT DAPI FileCopyUsingHandles(
     __in HANDLE hSource,

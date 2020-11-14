@@ -789,7 +789,7 @@ LExit:
 ********************************************************************/
 extern "C" HRESULT DAPI FileRead(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out DWORD* pcbDest,
+    __out SIZE_T* pcbDest,
     __in LPCWSTR wzSrcPath
     )
 {
@@ -803,7 +803,7 @@ extern "C" HRESULT DAPI FileRead(
 ********************************************************************/
 extern "C" HRESULT DAPI FileReadEx(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out DWORD* pcbDest,
+    __out SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in DWORD dwShareMode
     )
@@ -818,7 +818,7 @@ extern "C" HRESULT DAPI FileReadEx(
 ********************************************************************/
 extern "C" HRESULT DAPI FileReadUntil(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in LPCWSTR wzSrcPath,
     __in DWORD cbMaxRead
     )
@@ -834,7 +834,7 @@ extern "C" HRESULT DAPI FileReadUntil(
 ********************************************************************/
 extern "C" HRESULT DAPI FileReadPartial(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in LPCWSTR wzSrcPath,
     __in BOOL fSeek,
     __in DWORD cbStartPosition,
@@ -851,7 +851,7 @@ extern "C" HRESULT DAPI FileReadPartial(
 ********************************************************************/
 extern "C" HRESULT DAPI FileReadPartialEx(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
-    __out_range(<=, cbMaxRead) DWORD* pcbDest,
+    __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,
     __in DWORD cbStartPosition,
@@ -990,7 +990,7 @@ extern "C" HRESULT DAPI FileWrite(
     __in_z LPCWSTR pwzFileName,
     __in DWORD dwFlagsAndAttributes,
     __in_bcount_opt(cbData) LPCBYTE pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out_opt HANDLE* pHandle
     )
 {
@@ -1024,7 +1024,7 @@ LExit:
 extern "C" HRESULT DAPI FileWriteHandle(
     __in HANDLE hFile,
     __in_bcount_opt(cbData) LPCBYTE pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -1034,7 +1034,7 @@ extern "C" HRESULT DAPI FileWriteHandle(
     // Write out all of the data.
     do
     {
-        if (!::WriteFile(hFile, pbData + cbTotal, cbData - cbTotal, &cbDataWritten, NULL))
+        if (!::WriteFile(hFile, pbData + cbTotal, (DWORD)(cbData - cbTotal), &cbDataWritten, NULL))
         {
             ExitOnLastError(hr, "Failed to write data to file handle.");
         }
@@ -1700,7 +1700,7 @@ extern "C" HRESULT DAPI FileToString(
 {
     HRESULT hr = S_OK;
     BYTE *pbFullFileBuffer = NULL;
-    DWORD cbFullFileBuffer = 0;
+    SIZE_T cbFullFileBuffer = 0;
     BOOL fNullCharFound = FALSE;
     LPWSTR sczFileText = NULL;
 
