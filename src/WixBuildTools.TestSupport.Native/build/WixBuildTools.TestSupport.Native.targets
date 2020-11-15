@@ -12,4 +12,8 @@
     <Error Condition="!Exists('$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets'))" />
     <Error Condition="!Exists('$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
+  <UsingTask AssemblyFile="$(RepoRootDir)\packages\xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
+  <Target Name="Test" DependsOnTargets="Build">
+    <xunit Assemblies="$(TargetPath)" />
+  </Target>
 </Project>
