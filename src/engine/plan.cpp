@@ -23,9 +23,12 @@ static void UninitializeCacheAction(
 static void ResetPlannedPackageState(
     __in BURN_PACKAGE* pPackage
     );
+static void ResetPlannedRollbackBoundaryState(
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    );
 static HRESULT ProcessPackage(
     __in BOOL fBundlePerMachine,
-    __in BURN_PACKAGE* pCompatiblePackageParent,
+    __in_opt BURN_PACKAGE* pCompatiblePackageParent,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
@@ -153,6 +156,7 @@ static HRESULT CalculateExecuteActions(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables,
+    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
     __out_opt BOOL* pfBARequestedCache
     );
 static BOOL NeedsCache(
@@ -261,6 +265,15 @@ extern "C" void PlanReset(
         for (DWORD i = 0; i < pPackages->cPackages; ++i)
         {
             ResetPlannedPackageState(&pPackages->rgPackages[i]);
+        }
+    }
+
+    // Reset the planned state for each rollback boundary.
+    if (pPackages->rgRollbackBoundaries)
+    {
+        for (DWORD i = 0; i < pPackages->cRollbackBoundaries; ++i)
+        {
+            ResetPlannedRollbackBoundaryState(&pPackages->rgRollbackBoundaries[i]);
         }
     }
 }
@@ -853,7 +866,7 @@ LExit:
 
 static HRESULT ProcessPackage(
     __in BOOL fBundlePerMachine,
-    __in BURN_PACKAGE* pCompatiblePackageParent,
+    __in_opt BURN_PACKAGE* pCompatiblePackageParent,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
@@ -1069,7 +1082,7 @@ extern "C" HRESULT PlanCachePackage(
     BOOL fBARequestedCache = FALSE;
 
     // Calculate the execute actions because we need them to decide whether the package should be cached.
-    hr = CalculateExecuteActions(pUserExperience, pPackage, pVariables, &fBARequestedCache);
+    hr = CalculateExecuteActions(pUserExperience, pPackage, pVariables, pPlan->pActiveRollbackBoundary, &fBARequestedCache);
     ExitOnFailure(hr, "Failed to calculate execute actions for package: %ls", pPackage->sczId);
 
     if (fBARequestedCache || NeedsCache(pPlan, pPackage))
@@ -1105,7 +1118,7 @@ extern "C" HRESULT PlanExecutePackage(
     HRESULT hr = S_OK;
     BOOL fBARequestedCache = FALSE;
 
-    hr = CalculateExecuteActions(pUserExperience, pPackage, pVariables, &fBARequestedCache);
+    hr = CalculateExecuteActions(pUserExperience, pPackage, pVariables, pPlan->pActiveRollbackBoundary, &fBARequestedCache);
     ExitOnFailure(hr, "Failed to calculate plan actions for package: %ls", pPackage->sczId);
 
     // Calculate package states based on reference count and plan certain dependency actions prior to planning the package execute action.
@@ -1631,6 +1644,7 @@ extern "C" HRESULT PlanExecuteCheckpoint(
 
     pAction->type = BURN_EXECUTE_ACTION_TYPE_CHECKPOINT;
     pAction->checkpoint.dwId = dwCheckpointId;
+    pAction->checkpoint.pActiveRollbackBoundary = pPlan->pActiveRollbackBoundary;
 
     // rollback checkpoint
     hr = PlanAppendRollbackAction(pPlan, &pAction);
@@ -1638,6 +1652,7 @@ extern "C" HRESULT PlanExecuteCheckpoint(
 
     pAction->type = BURN_EXECUTE_ACTION_TYPE_CHECKPOINT;
     pAction->checkpoint.dwId = dwCheckpointId;
+    pAction->checkpoint.pActiveRollbackBoundary = pPlan->pActiveRollbackBoundary;
 
 LExit:
     return hr;
@@ -1783,6 +1798,9 @@ extern "C" HRESULT PlanRollbackBoundaryBegin(
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pExecuteAction = NULL;
 
+    AssertSz(!pPlan->pActiveRollbackBoundary, "PlanRollbackBoundaryBegin called without completing previous RollbackBoundary");
+    pPlan->pActiveRollbackBoundary = pRollbackBoundary;
+
     // Add begin rollback boundary to execute plan.
     hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
     ExitOnFailure(hr, "Failed to append rollback boundary begin action.");
@@ -1797,6 +1815,19 @@ extern "C" HRESULT PlanRollbackBoundaryBegin(
     pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY;
     pExecuteAction->rollbackBoundary.pRollbackBoundary = pRollbackBoundary;
 
+    // Add begin MSI transaction to execute plan.
+    if (pRollbackBoundary->fTransaction)
+    {
+        hr = PlanExecuteCheckpoint(pPlan);
+        ExitOnFailure(hr, "Failed to append checkpoint before MSI transaction begin action.");
+
+        hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
+        ExitOnFailure(hr, "Failed to append MSI transaction begin action.");
+
+        pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION;
+        pExecuteAction->msiTransaction.pRollbackBoundary = pRollbackBoundary;
+    }
+
 LExit:
     return hr;
 }
@@ -1807,22 +1838,24 @@ extern "C" HRESULT PlanRollbackBoundaryComplete(
 {
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pExecuteAction = NULL;
-    DWORD dwCheckpointId = 0;
+    BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = pPlan->pActiveRollbackBoundary;
+
+    AssertSz(pRollbackBoundary, "PlanRollbackBoundaryComplete called without an active RollbackBoundary");
+
+    if (pRollbackBoundary && pRollbackBoundary->fTransaction)
+    {
+        // Add commit MSI transaction to execute plan.
+        hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
+        ExitOnFailure(hr, "Failed to append MSI transaction commit action.");
+
+        pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION;
+        pExecuteAction->msiTransaction.pRollbackBoundary = pRollbackBoundary;
+    }
+
+    pPlan->pActiveRollbackBoundary = NULL;
 
     // Add checkpoints.
-    dwCheckpointId = GetNextCheckpointId(pPlan);
-
-    hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
-    ExitOnFailure(hr, "Failed to append execute action.");
-
-    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_CHECKPOINT;
-    pExecuteAction->checkpoint.dwId = dwCheckpointId;
-
-    hr = PlanAppendRollbackAction(pPlan, &pExecuteAction);
-    ExitOnFailure(hr, "Failed to append rollback action.");
-
-    pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_CHECKPOINT;
-    pExecuteAction->checkpoint.dwId = dwCheckpointId;
+    hr = PlanExecuteCheckpoint(pPlan);
 
 LExit:
     return hr;
@@ -1934,6 +1967,13 @@ static void ResetPlannedPackageState(
             pTargetProduct->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
         }
     }
+}
+
+static void ResetPlannedRollbackBoundaryState(
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    )
+{
+    pRollbackBoundary->fActiveTransaction = FALSE;
 }
 
 static HRESULT GetActionDefaultRequestState(
@@ -2848,10 +2888,12 @@ static HRESULT CalculateExecuteActions(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables,
+    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
     __out_opt BOOL* pfBARequestedCache
     )
 {
     HRESULT hr = S_OK;
+    BOOL fInsideMsiTransaction = pActiveRollbackBoundary && pActiveRollbackBoundary->fTransaction;
 
     // Calculate execute actions.
     switch (pPackage->type)
@@ -2861,11 +2903,11 @@ static HRESULT CalculateExecuteActions(
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEnginePlanCalculatePackage(pPackage, pVariables, pUserExperience, pfBARequestedCache);
+        hr = MsiEnginePlanCalculatePackage(pPackage, pVariables, pUserExperience, fInsideMsiTransaction, pfBARequestedCache);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEnginePlanCalculatePackage(pPackage, pUserExperience, pfBARequestedCache);
+        hr = MspEnginePlanCalculatePackage(pPackage, pUserExperience, fInsideMsiTransaction, pfBARequestedCache);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:
@@ -3065,7 +3107,7 @@ static void ExecuteActionLog(
     switch (pAction->type)
     {
     case BURN_EXECUTE_ACTION_TYPE_CHECKPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: CHECKPOINT id: %u", wzBase, iAction, pAction->checkpoint.dwId);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: CHECKPOINT id: %u, msi transaction id: %ls", wzBase, iAction, pAction->checkpoint.dwId, pAction->checkpoint.pActiveRollbackBoundary && pAction->checkpoint.pActiveRollbackBoundary->fTransaction ? pAction->checkpoint.pActiveRollbackBoundary->sczId : L"(none)");
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
@@ -3118,6 +3160,14 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE:
         LogStringLine(REPORT_STANDARD, "%ls action[%u]: COMPATIBLE_PACKAGE reference id: %ls, installed ProductCode: %ls", wzBase, iAction, pAction->compatiblePackage.pReferencePackage->sczId, pAction->compatiblePackage.sczInstalledProductCode);
+        break;
+
+    case BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION:
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: BEGIN_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
+        break;
+
+    case BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION:
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: COMMIT_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
         break;
 
     default:

@@ -35,6 +35,7 @@ HRESULT MsiEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables,
     __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOL fInsideMsiTransaction,
     __out_opt BOOL* pfBARequestedCache
     );
 HRESULT MsiEnginePlanAddPackage(

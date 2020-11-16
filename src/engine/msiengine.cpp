@@ -717,7 +717,8 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables,
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __out BOOL* pfBARequestedCache
+    __in BOOL fInsideMsiTransaction,
+    __out_opt BOOL* pfBARequestedCache
     )
 {
     Trace(REPORT_STANDARD, "Planning MSI package 0x%p", pPackage);
@@ -853,7 +854,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     }
 
     // Calculate the rollback action if there is an execute action.
-    if (BOOTSTRAPPER_ACTION_STATE_NONE != execute)
+    if (BOOTSTRAPPER_ACTION_STATE_NONE != execute && !fInsideMsiTransaction)
     {
         switch (BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN != pPackage->expected ? pPackage->expected : pPackage->currentState)
         {

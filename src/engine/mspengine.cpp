@@ -266,6 +266,7 @@ LExit:
 extern "C" HRESULT MspEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOL fInsideMsiTransaction,
     __out BOOL* pfBARequestedCache
     )
 {
@@ -329,7 +330,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
         }
 
         // Calculate the rollback action if there is an execute action.
-        if (BOOTSTRAPPER_ACTION_STATE_NONE != execute)
+        if (BOOTSTRAPPER_ACTION_STATE_NONE != execute && !fInsideMsiTransaction)
         {
             switch (BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN != pPackage->expected ? pPackage->expected : pPackage->currentState)
             {
@@ -442,7 +443,7 @@ extern "C" HRESULT MspEnginePlanAddPackage(
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->rollback)
         {
             hr = PlanTargetProduct(display, pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
-            ExitOnFailure(hr, "Failed to plan rollack target product.");
+            ExitOnFailure(hr, "Failed to plan rollback target product.");
         }
     }
 

@@ -68,6 +68,8 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY,
     BURN_EXECUTE_ACTION_TYPE_REGISTRATION,
     BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE,
+    BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION,
+    BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION,
 };
 
 enum BURN_CLEAN_ACTION_TYPE
@@ -214,16 +216,19 @@ typedef struct _BURN_ORDERED_PATCHES
     BURN_PACKAGE* pPackage;
 } BURN_ORDERED_PATCHES;
 
+typedef struct _BURN_EXECUTE_ACTION_CHECKPOINT
+{
+    DWORD dwId;
+    BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary;
+} BURN_EXECUTE_ACTION_CHECKPOINT;
+
 typedef struct _BURN_EXECUTE_ACTION
 {
     BURN_EXECUTE_ACTION_TYPE type;
     BOOL fDeleted; // used to skip an action after it was planned since deleting actions out of the plan is too hard.
     union
     {
-        struct
-        {
-            DWORD dwId;
-        } checkpoint;
+        BURN_EXECUTE_ACTION_CHECKPOINT checkpoint;
         struct
         {
             HANDLE hEvent;
@@ -307,6 +312,10 @@ typedef struct _BURN_EXECUTE_ACTION
             LPWSTR sczInstalledProductCode;
             VERUTIL_VERSION* pInstalledVersion;
         } compatiblePackage;
+        struct
+        {
+            BURN_ROLLBACK_BOUNDARY* pRollbackBoundary;
+        } msiTransaction;
     };
 } BURN_EXECUTE_ACTION;
 
@@ -368,7 +377,8 @@ typedef struct _BURN_PLAN
     DWORD cPayloadProgress;
     STRINGDICT_HANDLE shPayloadProgress;
 
-    DWORD dwNextCheckpointId;
+    DWORD dwNextCheckpointId; // for plan internal use
+    BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary; // for plan internal use
 } BURN_PLAN;
 
 
