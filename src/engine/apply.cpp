@@ -198,6 +198,19 @@ static HRESULT ExecuteCompatiblePackageAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pAction
     );
+static HRESULT ExecuteMsiBeginTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in LPCWSTR wzName,
+    __in BURN_EXECUTE_CONTEXT* pContext
+    );
+static HRESULT ExecuteMsiCommitTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* pContext
+    );
+static HRESULT ExecuteMsiRollbackTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* pContext
+    );
 static HRESULT CleanPackage(
     __in HANDLE hElevatedPipe,
     __in BURN_PACKAGE* pPackage
@@ -228,30 +241,6 @@ static HRESULT ExecutePackageComplete(
     __out BOOL* pfSuspend
     );
 
-static HRESULT DoMsiBeginTransaction(
-    __in BURN_EXECUTE_CONTEXT *context
-    , __in BURN_ENGINE_STATE* pEngineState
-);
-static HRESULT DoMsiCommitTransaction(
-    __in BURN_EXECUTE_CONTEXT *context
-    , __in BURN_ENGINE_STATE* pEngineState
-);
-static HRESULT DoMsiRollbackTransaction(
-    __in BURN_EXECUTE_CONTEXT *context
-    , __in BURN_ENGINE_STATE* pEngineState
-);
-static HRESULT ExecuteMsiBeginTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-);
-static HRESULT ExecuteMsiCommitTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-);
-static HRESULT ExecuteMsiRollbackTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-);
 
 // function definitions
 
@@ -773,7 +762,7 @@ extern "C" HRESULT ApplyExecute(
             if (fInTransaction)
             {
                 LogString(REPORT_STANDARD, "Committing MSI transaction\n");
-                hr = DoMsiCommitTransaction(&context, pEngineState);
+                hr = ExecuteMsiCommitTransaction(pEngineState, &context);
                 ExitOnFailure(hr, "Failed committing an MSI transaction");
                 fInTransaction = FALSE;
             }
@@ -789,7 +778,7 @@ extern "C" HRESULT ApplyExecute(
                 else
                 {
                     LogString(REPORT_STANDARD, "Starting a new MSI transaction\n");
-                    hr = DoMsiBeginTransaction(&context, pEngineState);
+                    hr = ExecuteMsiBeginTransaction(pEngineState, pExecuteAction->rollbackBoundary.pRollbackBoundary->sczId, &context);
                     ExitOnFailure(hr, "Failed beginning an MSI transaction");
                     fInTransaction = TRUE;
                 }
@@ -855,7 +844,7 @@ extern "C" HRESULT ApplyExecute(
     if (fInTransaction)
     {
         LogString(REPORT_STANDARD, "Committing an MSI transaction\n");
-        hr = DoMsiCommitTransaction(&context, pEngineState);
+        hr = ExecuteMsiCommitTransaction(pEngineState, &context);
         ExitOnFailure(hr, "Failed committing an MSI transaction");
         fInTransaction = FALSE;
     }
@@ -1658,127 +1647,6 @@ static void DoRollbackCache(
     }
 }
 
-/* MSI Transactions:
- * All MSI/MSP/MSU packages wrapped in MsiBeginTranasaction-MsiEndTransaction pair are installed or uninstalled together.
-*/
-static HRESULT ExecuteMsiBeginTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
-
-    // Per user/machine context
-    if (pEngineState->plan.fPerMachine)
-    {
-        hr = ElevationMsiBeginTransaction(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pContext);
-        ExitOnFailure(hr, "Failed to begin an MSI transaction.");
-    }
-    else
-    {
-        MSIHANDLE hMsiTrns = NULL;
-        HANDLE hMsiTrnsEvent = NULL;
-        uResult = MsiBeginTransaction(L"WiX", 0, &hMsiTrns, &hMsiTrnsEvent);
-        ExitOnWin32Error(uResult, hr, "Failed beginning an MSI transaction");
-    }
-
-LExit:
-    return hr;
-}
-
-static HRESULT ExecuteMsiCommitTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
-
-    // Per user/machine context
-    if (pEngineState->plan.fPerMachine)
-    {
-        hr = ElevationMsiCommitTransaction(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pContext);
-        ExitOnFailure(hr, "Failed to commit an MSI transaction.");
-    }
-    else
-    {
-        uResult = MsiEndTransaction(MSITRANSACTIONSTATE_COMMIT);
-        ExitOnWin32Error(uResult, hr, "Failed beginning an MSI transaction");
-    }
-
-LExit:
-    return hr;
-}
-
-static HRESULT ExecuteMsiRollbackTransaction(
-    __in BURN_EXECUTE_CONTEXT* pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
-
-    // Per user/machine context
-    if (pEngineState->plan.fPerMachine)
-    {
-        hr = ElevationMsiRollbackTransaction(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pContext);
-        ExitOnFailure(hr, "Failed to rollback an MSI transaction.");
-    }
-    else
-    {
-        uResult = MsiEndTransaction(MSITRANSACTIONSTATE_ROLLBACK);
-        ExitOnWin32Error(uResult, hr, "Failed beginning an MSI transaction");
-    }
-
-LExit:
-    return hr;
-}
-
-// Currently, supporting only elevated transactions.
-static HRESULT DoMsiBeginTransaction(
-    __in BURN_EXECUTE_CONTEXT *pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-
-    hr = ExecuteMsiBeginTransaction(pContext, pEngineState);
-    ExitOnFailure(hr, "Failed to execute EXE package.");
-
-LExit:
-    return hr;
-}
-
-static HRESULT DoMsiCommitTransaction(
-    __in BURN_EXECUTE_CONTEXT *pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-
-    hr = ExecuteMsiCommitTransaction(pContext, pEngineState);
-    ExitOnFailure(hr, "Failed to execute EXE package.");
-
-LExit:
-    return hr;
-}
-
-static HRESULT DoMsiRollbackTransaction(
-    __in BURN_EXECUTE_CONTEXT *pContext
-    , __in BURN_ENGINE_STATE* pEngineState
-)
-{
-    HRESULT hr = S_OK;
-
-    hr = ExecuteMsiRollbackTransaction(pContext, pEngineState);
-    ExitOnFailure(hr, "Failed to execute EXE package.");
-
-LExit:
-    return hr;
-}
-
-
 static HRESULT DoExecuteAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
@@ -1904,7 +1772,7 @@ static HRESULT DoRollbackActions(
     __in BOOL fInTransaction,
     __out BOOL* pfKeepRegistration,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD iCheckpoint = 0;
@@ -1916,7 +1784,7 @@ static HRESULT DoRollbackActions(
     // Rollback MSI transaction
     if (fInTransaction)
     {
-        hr = DoMsiRollbackTransaction(pContext, pEngineState);
+        hr = ExecuteMsiRollbackTransaction(pEngineState, pContext);
         ExitOnFailure(hr, "Failed rolling back transaction");
     }
 
@@ -2359,6 +2227,70 @@ static HRESULT ExecuteCompatiblePackageAction(
     }
 
     // Compatible package already loaded in this process.
+
+LExit:
+    return hr;
+}
+
+static HRESULT ExecuteMsiBeginTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in LPCWSTR wzName,
+    __in BURN_EXECUTE_CONTEXT* /*pContext*/
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pEngineState->plan.fPerMachine)
+    {
+        hr = ElevationMsiBeginTransaction(pEngineState->companionConnection.hPipe, wzName);
+        ExitOnFailure(hr, "Failed to begin an elevated MSI transaction.");
+    }
+    else
+    {
+        hr = MsiEngineBeginTransaction(wzName);
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT ExecuteMsiCommitTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* /*pContext*/
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pEngineState->plan.fPerMachine)
+    {
+        hr = ElevationMsiCommitTransaction(pEngineState->companionConnection.hPipe);
+        ExitOnFailure(hr, "Failed to commit an elevated MSI transaction.");
+    }
+    else
+    {
+        hr = MsiEngineCommitTransaction();
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT ExecuteMsiRollbackTransaction(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BURN_EXECUTE_CONTEXT* /*pContext*/
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pEngineState->plan.fPerMachine)
+    {
+        hr = ElevationMsiRollbackTransaction(pEngineState->companionConnection.hPipe);
+        ExitOnFailure(hr, "Failed to rollback an elevated MSI transaction.");
+    }
+    else
+    {
+        hr = MsiEngineRollbackTransaction();
+    }
 
 LExit:
     return hr;

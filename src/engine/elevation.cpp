@@ -28,17 +28,15 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_EMBEDDED_CHILD,
     BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE,
+    BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION,
+    BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION,
+    BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION,
 
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID,
-
-    BURN_ELEVATION_TRANSACTION_BEGIN,
-    BURN_ELEVATION_TRANSACTION_COMMIT,
-    BURN_ELEVATION_TRANSACTION_ROLLBACK
-
 } BURN_ELEVATION_MESSAGE_TYPE;
 
 
@@ -74,23 +72,10 @@ typedef struct _BURN_ELEVATION_CHILD_MESSAGE_CONTEXT
     BURN_VARIABLES* pVariables;
     BURN_REGISTRATION* pRegistration;
     BURN_USER_EXPERIENCE* pUserExperience;
-
-	MSIHANDLE hMsiTrns;
-	HANDLE hMsiTrnsEvent;
 } BURN_ELEVATION_CHILD_MESSAGE_CONTEXT;
 
 
 // internal function declarations
-
-static HRESULT OnMsiBeginTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-);
-static HRESULT OnMsiCommitTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-);
-static HRESULT OnMsiRollbackTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-);
 
 static DWORD WINAPI ElevatedChildCacheThreadProc(
     __in LPVOID lpThreadParameter
@@ -248,6 +233,13 @@ static HRESULT OnLaunchApprovedExe(
     __in BYTE* pbData,
     __in DWORD cbData
     );
+static HRESULT OnMsiBeginTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    );
+static HRESULT OnMsiCommitTransaction();
+static HRESULT OnMsiRollbackTransaction();
+
 
 
 // function definitions
@@ -726,62 +718,56 @@ LExit:
 
 extern "C" HRESULT ElevationMsiBeginTransaction(
     __in HANDLE hPipe,
-    __in_opt HWND hwndParent,
-    __in LPVOID pvContext
-)
+    __in LPCWSTR wzName
+    )
 {
-    UNREFERENCED_PARAMETER(hwndParent);
     HRESULT hr = S_OK;
-    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = {};
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
     DWORD dwResult = ERROR_SUCCESS;
 
-    context.pvContext = pvContext;
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, wzName);
+    ExitOnFailure(hr, "Failed to write transaction name to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_TRANSACTION_BEGIN, NULL, 0, NULL, &context, &dwResult);
-    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE message to per-machine process.");
-    ExitOnWin32Error(dwResult, hr, "Failed beginning an elevated MSI transaction");
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION message to per-machine process.");
+
+    hr = static_cast<HRESULT>(dwResult);
 
 LExit:
+    ReleaseBuffer(pbData);
+
     return hr;
 }
 
 extern "C" HRESULT ElevationMsiCommitTransaction(
-    __in HANDLE hPipe,
-    __in_opt HWND hwndParent,
-    __in LPVOID pvContext
-)
+    __in HANDLE hPipe
+    )
 {
-    UNREFERENCED_PARAMETER(hwndParent);
     HRESULT hr = S_OK;
-    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = {};
     DWORD dwResult = ERROR_SUCCESS;
 
-    context.pvContext = pvContext;
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION message to per-machine process.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_TRANSACTION_COMMIT, NULL, 0, NULL, &context, &dwResult);
-    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE message to per-machine process.");
-    ExitOnWin32Error(dwResult, hr, "Failed committing an elevated MSI transaction");
+    hr = static_cast<HRESULT>(dwResult);
 
 LExit:
     return hr;
 }
 
 extern "C" HRESULT ElevationMsiRollbackTransaction(
-    __in HANDLE hPipe,
-    __in_opt HWND hwndParent,
-    __in LPVOID pvContext
-)
+    __in HANDLE hPipe
+    )
 {
-    UNREFERENCED_PARAMETER(hwndParent);
     HRESULT hr = S_OK;
-    BURN_ELEVATION_MSI_MESSAGE_CONTEXT context = {};
     DWORD dwResult = ERROR_SUCCESS;
 
-    context.pvContext = pvContext;
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION message to per-machine process.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_TRANSACTION_ROLLBACK, NULL, 0, NULL, &context, &dwResult);
-    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE message to per-machine process.");
-    ExitOnWin32Error(dwResult, hr, "Failed rolling back an elevated MSI transaction");
+    hr = static_cast<HRESULT>(dwResult);
 
 LExit:
     return hr;
@@ -1543,16 +1529,16 @@ static HRESULT ProcessElevatedChildMessage(
 
     switch (pMsg->dwMessage)
     {
-    case BURN_ELEVATION_TRANSACTION_BEGIN:
-        hrResult = OnMsiBeginTransaction(pContext);
+    case BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION:
+        hrResult = OnMsiBeginTransaction((BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
-    case BURN_ELEVATION_TRANSACTION_COMMIT:
-        hrResult = OnMsiCommitTransaction(pContext);
+    case BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION:
+        hrResult = OnMsiCommitTransaction();
         break;
 
-    case BURN_ELEVATION_TRANSACTION_ROLLBACK:
-        hrResult = OnMsiRollbackTransaction(pContext);
+    case BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION:
+        hrResult = OnMsiRollbackTransaction();
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
@@ -1687,53 +1673,6 @@ static HRESULT ProcessResult(
         hr = S_OK;
     }
 
-    return hr;
-}
-
-static HRESULT OnMsiBeginTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-)
-{
-    UINT uResult = ERROR_SUCCESS;
-    HRESULT hr = S_OK;
-
-    pContext->hMsiTrns = NULL;
-    pContext->hMsiTrnsEvent = NULL;
-    uResult = MsiBeginTransaction(L"WiX", 0, &pContext->hMsiTrns, &pContext->hMsiTrnsEvent);
-    ExitOnWin32Error(uResult, hr, "Failed beginning an MSI transaction");
-
-LExit:
-    return hr;
-}
-
-static HRESULT OnMsiCommitTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-)
-{
-    UINT uResult = ERROR_SUCCESS;
-    HRESULT hr = S_OK;
-
-    uResult = MsiEndTransaction(MSITRANSACTIONSTATE_COMMIT);
-    ExitOnWin32Error(uResult, hr, "Failed committing an MSI transaction");
-
-LExit:
-    pContext->hMsiTrns = NULL;
-    pContext->hMsiTrnsEvent = NULL;
-    return hr;
-}
-
-static HRESULT OnMsiRollbackTransaction(
-    __in BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext
-) {
-    UINT uResult = ERROR_SUCCESS;
-    HRESULT hr = S_OK;
-
-    uResult = MsiEndTransaction(MSITRANSACTIONSTATE_ROLLBACK);
-    ExitOnWin32Error(uResult, hr, "Failed rolling back an MSI transaction");
-
-LExit:
-    pContext->hMsiTrns = NULL;
-    pContext->hMsiTrnsEvent = NULL;
     return hr;
 }
 
@@ -2843,5 +2782,44 @@ static HRESULT OnLaunchApprovedExe(
 LExit:
     ReleaseBuffer(pbSendData);
     ApprovedExesUninitializeLaunch(pLaunchApprovedExe);
+    return hr;
+}
+
+static HRESULT OnMsiBeginTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczName = NULL;
+
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &sczName);
+    ExitOnFailure(hr, "Failed to read transaction name.");
+
+    hr = MsiEngineBeginTransaction(sczName);
+
+LExit:
+    ReleaseStr(sczName);
+
+    return hr;
+}
+
+static HRESULT OnMsiCommitTransaction()
+{
+    HRESULT hr = S_OK;
+
+    hr = MsiEngineCommitTransaction();
+
+    return hr;
+}
+
+static HRESULT OnMsiRollbackTransaction()
+{
+    HRESULT hr = S_OK;
+
+    hr = MsiEngineRollbackTransaction();
+
     return hr;
 }

@@ -1137,6 +1137,48 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT MsiEngineBeginTransaction(
+    __in LPCWSTR wzName
+    )
+{
+    HRESULT hr = S_OK;
+    UINT uResult = ERROR_SUCCESS;
+    MSIHANDLE hTransactionHandle = NULL;
+    HANDLE hChangeOfOwnerEvent = NULL;
+
+    uResult = ::MsiBeginTransaction(wzName, 0, &hTransactionHandle, &hChangeOfOwnerEvent);
+    ExitOnWin32Error(uResult, hr, "Failed to begin an MSI transaction");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT MsiEngineCommitTransaction()
+{
+    HRESULT hr = S_OK;
+    UINT uResult = ERROR_SUCCESS;
+
+    uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_COMMIT);
+    ExitOnWin32Error(uResult, hr, "Failed to commit the MSI transaction");
+
+LExit:
+
+    return hr;
+}
+
+extern "C" HRESULT MsiEngineRollbackTransaction()
+{
+    HRESULT hr = S_OK;
+    UINT uResult = ERROR_SUCCESS;
+
+    uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_ROLLBACK);
+    ExitOnWin32Error(uResult, hr, "Failed to rollback the MSI transaction");
+
+LExit:
+
+    return hr;
+}
+
 extern "C" HRESULT MsiEngineExecutePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,

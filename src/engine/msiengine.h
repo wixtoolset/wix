@@ -52,6 +52,11 @@ HRESULT MsiEngineAddCompatiblePackage(
     __in const BURN_PACKAGE* pPackage,
     __out_opt BURN_PACKAGE** ppCompatiblePackage
     );
+HRESULT MsiEngineBeginTransaction(
+    __in LPCWSTR wzName
+    );
+HRESULT MsiEngineCommitTransaction();
+HRESULT MsiEngineRollbackTransaction();
 HRESULT MsiEngineExecutePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
