@@ -16,6 +16,10 @@
     <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
   <ItemDefinitionGroup>
     <ClCompile>
       <DisableSpecificWarnings>$(DisableSpecificCompilerWarnings)</DisableSpecificWarnings>
