@@ -1,6 +1,12 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+// constants
+#define BURNMSIINSTALL_PROPERTY_NAME L"BURNMSIINSTALL"
+#define BURNMSIMODIFY_PROPERTY_NAME L"BURNMSIMODIFY"
+#define BURNMSIREPAIR_PROPERTY_NAME L"BURNMSIREPAIR"
+#define BURNMSIUNINSTALL_PROPERTY_NAME L"BURNMSIUNINSTALL"
+
 
 #if defined(__cplusplus)
 extern "C" {

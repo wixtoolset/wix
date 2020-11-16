@@ -325,6 +325,7 @@ typedef struct _BURN_PLAN
     DWORD dwRegistrationOperations;
     BOOL fKeepRegistrationDefault;
     BOOL fDisallowRemoval;
+    BOOL fDisableRollback;
 
     DWORD64 qwCacheSizeTotal;
 
@@ -366,6 +367,8 @@ typedef struct _BURN_PLAN
     BURN_CACHE_PAYLOAD_PROGRESS* rgPayloadProgress;
     DWORD cPayloadProgress;
     STRINGDICT_HANDLE shPayloadProgress;
+
+    DWORD dwNextCheckpointId;
 } BURN_PLAN;
 
 

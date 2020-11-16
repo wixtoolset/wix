@@ -69,6 +69,7 @@
 #include "manifest.h"
 #include "splashscreen.h"
 #include "bitsengine.h"
+#include "detect.h"
 
 #pragma managed
 #include <vcclr.h>

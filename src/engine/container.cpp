@@ -17,7 +17,6 @@ static HRESULT GetAttachedContainerInfo(
 // function definitions
 
 extern "C" HRESULT ContainersParseFromXml(
-    __in BURN_SECTION* pSection,
     __in BURN_CONTAINERS* pContainers,
     __in IXMLDOMNode* pixnBundle
     )
@@ -128,14 +127,6 @@ extern "C" HRESULT ContainersParseFromXml(
             ExitOnFailure(hr, "Failed to get @Hash.");
         }
 
-        // If the container is attached, make sure the information in the section matches what the
-        // manifest contained and get the offset to the container.
-        if (pContainer->fAttached)
-        {
-            hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, pContainer->type, &pContainer->qwAttachedOffset, &pContainer->qwFileSize, &pContainer->fActuallyAttached);
-            ExitOnFailure(hr, "Failed to get attached container information.");
-        }
-
         // prepare next iteration
         ReleaseNullObject(pixnNode);
     }
@@ -147,6 +138,33 @@ LExit:
     ReleaseObject(pixnNode);
     ReleaseStr(scz);
 
+    return hr;
+}
+
+extern "C" HRESULT ContainersInitialize(
+    __in BURN_CONTAINERS* pContainers,
+    __in BURN_SECTION* pSection
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pContainers->rgContainers)
+    {
+        for (DWORD i = 0; i < pContainers->cContainers; ++i)
+        {
+            BURN_CONTAINER* pContainer = &pContainers->rgContainers[i];
+
+            // If the container is attached, make sure the information in the section matches what the
+            // manifest contained and get the offset to the container.
+            if (pContainer->fAttached)
+            {
+                hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, pContainer->type, &pContainer->qwAttachedOffset, &pContainer->qwFileSize, &pContainer->fActuallyAttached);
+                ExitOnFailure(hr, "Failed to get attached container information.");
+            }
+        }
+    }
+
+LExit:
     return hr;
 }
 

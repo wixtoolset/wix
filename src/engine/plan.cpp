@@ -74,7 +74,9 @@ static BOOL AlreadyPlannedCachePackage(
     __in_z LPCWSTR wzPackageId,
     __out HANDLE* phSyncpointEvent
     );
-static DWORD GetNextCheckpointId();
+static DWORD GetNextCheckpointId(
+    __in BURN_PLAN* pPlan
+    );
 static HRESULT AppendCacheAction(
     __in BURN_PLAN* pPlan,
     __out BURN_CACHE_ACTION** ppCacheAction
@@ -1621,7 +1623,7 @@ extern "C" HRESULT PlanExecuteCheckpoint(
 {
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pAction = NULL;
-    DWORD dwCheckpointId = GetNextCheckpointId();
+    DWORD dwCheckpointId = GetNextCheckpointId(pPlan);
 
     // execute checkpoint
     hr = PlanAppendExecuteAction(pPlan, &pAction);
@@ -1808,7 +1810,7 @@ extern "C" HRESULT PlanRollbackBoundaryComplete(
     DWORD dwCheckpointId = 0;
 
     // Add checkpoints.
-    dwCheckpointId = GetNextCheckpointId();
+    dwCheckpointId = GetNextCheckpointId(pPlan);
 
     hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
     ExitOnFailure(hr, "Failed to append execute action.");
@@ -2095,7 +2097,7 @@ static HRESULT AddCachePackageHelper(
     // Cache checkpoints happen before the package is cached because downloading packages'
     // payloads will not roll themselves back the way installation packages rollback on
     // failure automatically.
-    dwCheckpoint = GetNextCheckpointId();
+    dwCheckpoint = GetNextCheckpointId(pPlan);
 
     hr = AppendCacheAction(pPlan, &pCacheAction);
     ExitOnFailure(hr, "Failed to append package start action.");
@@ -2234,10 +2236,11 @@ static BOOL AlreadyPlannedCachePackage(
     return fPlanned;
 }
 
-static DWORD GetNextCheckpointId()
+static DWORD GetNextCheckpointId(
+    __in BURN_PLAN* pPlan
+    )
 {
-    static DWORD dwCounter = 0;
-    return ++dwCounter;
+    return ++pPlan->dwNextCheckpointId;
 }
 
 static HRESULT AppendCacheAction(
@@ -3039,11 +3042,11 @@ static void CacheActionLog(
         break;
 
     case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: SIGNAL_SYNCPOINT event handle: 0x%x, skip until retried: %hs", wzBase, iAction, pAction->syncpoint.hEvent, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: SIGNAL_SYNCPOINT event handle: 0x%p, skip until retried: %hs", wzBase, iAction, pAction->syncpoint.hEvent, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_TRANSACTION_BOUNDARY:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: TRANSACTION_BOUNDARY id: %ls, event handle: 0x%x, vital: %ls, transaction: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.hEvent, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no", pAction->rollbackBoundary.pRollbackBoundary->fTransaction ? L"yes" : L"no");
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: TRANSACTION_BOUNDARY id: %ls, event handle: 0x%p, vital: %ls, transaction: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.hEvent, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no", pAction->rollbackBoundary.pRollbackBoundary->fTransaction ? L"yes" : L"no");
         break;
 
     default:
@@ -3066,11 +3069,11 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls, action: %u", wzBase, iAction, pAction->packageProvider.pPackage->sczId, pAction->packageProvider.action);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls, action: %hs", wzBase, iAction, pAction->packageProvider.pPackage->sczId, LoggingDependencyActionToString(pAction->packageProvider.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %u", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, pAction->packageDependency.action);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %hs", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, LoggingDependencyActionToString(pAction->packageDependency.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
@@ -3078,15 +3081,15 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %u, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), pAction->msiPackage.actionMsiProperty, pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
         for (DWORD j = 0; j < pAction->msiPackage.cPatches; ++j)
         {
-            LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches->dwOrder, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
+            LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
         }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %u, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", pAction->mspTarget.actionMsiProperty, pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
         {
             LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
@@ -3106,7 +3109,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: WAIT_SYNCPOINT event handle: 0x%x", wzBase, iAction, pAction->syncpoint.hEvent);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: WAIT_SYNCPOINT event handle: 0x%p", wzBase, iAction, pAction->syncpoint.hEvent);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
@@ -3131,6 +3134,7 @@ extern "C" void PlanDump(
 
     LogStringLine(REPORT_STANDARD, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
     LogStringLine(REPORT_STANDARD, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
+    LogStringLine(REPORT_STANDARD, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
     LogStringLine(REPORT_STANDARD, "     keep registration by default: %hs", LoggingTrueFalseToString(pPlan->fKeepRegistrationDefault));
     LogStringLine(REPORT_STANDARD, "     estimated size: %llu", pPlan->qwEstimatedSize);
 

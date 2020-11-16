@@ -30,6 +30,9 @@
     <ClCompile Include="ManifestTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlanTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="precomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

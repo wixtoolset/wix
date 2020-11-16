@@ -3,7 +3,32 @@
 #include "precomp.h"
 
 
+static HRESULT ParseFromXml(
+    __in IXMLDOMDocument* pixdDocument,
+    __in BURN_ENGINE_STATE* pEngineState
+    );
+
 // function definitions
+
+extern "C" HRESULT ManifestLoadXml(
+    __in LPCWSTR wzDocument,
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMDocument* pixdDocument = NULL;
+
+    // load xml document
+    hr = XmlLoadDocument(wzDocument, &pixdDocument);
+    ExitOnFailure(hr, "Failed to load manifest as XML document.");
+
+    hr = ParseFromXml(pixdDocument, pEngineState);
+
+LExit:
+    ReleaseObject(pixdDocument);
+
+    return hr;
+}
 
 extern "C" HRESULT ManifestLoadXmlFromBuffer(
     __in_bcount(cbBuffer) BYTE* pbBuffer,
@@ -13,13 +38,28 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
 {
     HRESULT hr = S_OK;
     IXMLDOMDocument* pixdDocument = NULL;
-    IXMLDOMElement* pixeBundle = NULL;
-    IXMLDOMNode* pixnLog = NULL;
-    IXMLDOMNode* pixnChain = NULL;
 
     // load xml document
     hr = XmlLoadDocumentFromBuffer(pbBuffer, cbBuffer, &pixdDocument);
     ExitOnFailure(hr, "Failed to load manifest as XML document.");
+
+    hr = ParseFromXml(pixdDocument, pEngineState);
+
+LExit:
+    ReleaseObject(pixdDocument);
+
+    return hr;
+}
+
+static HRESULT ParseFromXml(
+    __in IXMLDOMDocument* pixdDocument,
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMElement* pixeBundle = NULL;
+    IXMLDOMNode* pixnLog = NULL;
+    IXMLDOMNode* pixnChain = NULL;
 
     // get bundle element
     hr = pixdDocument->get_documentElement(&pixeBundle);
@@ -105,7 +145,7 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     ExitOnFailure(hr, "Failed to parse update.");
 
     // parse containers
-    hr = ContainersParseFromXml(&pEngineState->section, &pEngineState->containers, pixeBundle);
+    hr = ContainersParseFromXml(&pEngineState->containers, pixeBundle);
     ExitOnFailure(hr, "Failed to parse containers.");
 
     // parse payloads
@@ -124,6 +164,5 @@ LExit:
     ReleaseObject(pixnChain);
     ReleaseObject(pixnLog);
     ReleaseObject(pixeBundle);
-    ReleaseObject(pixdDocument);
     return hr;
 }

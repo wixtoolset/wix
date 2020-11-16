@@ -135,9 +135,12 @@ typedef struct _BURN_CONTAINER_CONTEXT
 // functions
 
 HRESULT ContainersParseFromXml(
-    __in BURN_SECTION* pSection,
     __in BURN_CONTAINERS* pContainers,
     __in IXMLDOMNode* pixnBundle
+    );
+HRESULT ContainersInitialize(
+    __in BURN_CONTAINERS* pContainers,
+    __in BURN_SECTION* pSection
     );
 void ContainersUninitialize(
     __in BURN_CONTAINERS* pContainers

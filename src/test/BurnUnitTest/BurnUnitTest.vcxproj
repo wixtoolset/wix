@@ -36,6 +36,7 @@
     <ClCompile Include="ElevationTest.cpp" />
     <ClCompile Include="ManifestHelpers.cpp" />
     <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="PlanTest.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->

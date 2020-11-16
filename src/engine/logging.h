@@ -101,6 +101,10 @@ LPCSTR LoggingMsiInstallContext(
     __in MSIINSTALLCONTEXT context
     );
 
+LPCWSTR LoggingBurnMsiPropertyToString(
+    __in BURN_MSI_PROPERTY burnMsiProperty
+    );
+
 LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
     );

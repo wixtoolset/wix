@@ -11,6 +11,11 @@ extern "C" {
 
 // function declarations
 
+HRESULT ManifestLoadXml(
+    __in LPCWSTR wzDocument,
+    __in BURN_ENGINE_STATE* pEngineState
+    );
+
 HRESULT ManifestLoadXmlFromBuffer(
     __in_bcount(cbBuffer) BYTE* pbBuffer,
     __in SIZE_T cbBuffer,

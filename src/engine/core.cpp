@@ -96,6 +96,9 @@ extern "C" HRESULT CoreInitialize(
     hr = ManifestLoadXmlFromBuffer(pbBuffer, cbBuffer, pEngineState);
     ExitOnFailure(hr, "Failed to load manifest.");
 
+    hr = ContainersInitialize(&pEngineState->containers, &pEngineState->section);
+    ExitOnFailure(hr, "Failed to intialize containers.");
+
     // Parse command line.
     hr = ParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->variables, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &sczSourceProcessPath, &sczOriginalSource, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &sczSanitizedCommandLine);
     ExitOnFailure(hr, "Failed to parse command line.");
@@ -411,6 +414,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.action = action;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
+    pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback;
 
     hr = PlanSetVariables(action, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to update action.");

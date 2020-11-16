@@ -468,6 +468,27 @@ extern "C" LPCSTR LoggingMsiInstallContext(
     }
 }
 
+extern "C" LPCWSTR LoggingBurnMsiPropertyToString(
+    __in BURN_MSI_PROPERTY burnMsiProperty
+    )
+{
+    switch (burnMsiProperty)
+    {
+    case BURN_MSI_PROPERTY_INSTALL:
+        return BURNMSIINSTALL_PROPERTY_NAME;
+    case BURN_MSI_PROPERTY_MODIFY:
+        return BURNMSIMODIFY_PROPERTY_NAME;
+    case BURN_MSI_PROPERTY_NONE:
+        return L"(none)";
+    case BURN_MSI_PROPERTY_REPAIR:
+        return BURNMSIREPAIR_PROPERTY_NAME;
+    case BURN_MSI_PROPERTY_UNINSTALL:
+        return BURNMSIUNINSTALL_PROPERTY_NAME;
+    default:
+        return L"Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
     )
