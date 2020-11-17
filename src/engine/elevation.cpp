@@ -237,8 +237,14 @@ static HRESULT OnMsiBeginTransaction(
     __in BYTE* pbData,
     __in DWORD cbData
     );
-static HRESULT OnMsiCommitTransaction();
-static HRESULT OnMsiRollbackTransaction();
+static HRESULT OnMsiCommitTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    );
+static HRESULT OnMsiRollbackTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    );
 
 
 
@@ -730,7 +736,7 @@ extern "C" HRESULT ElevationMsiBeginTransaction(
     hr = BuffWriteString(&pbData, &cbData, wzName);
     ExitOnFailure(hr, "Failed to write transaction name to message buffer.");
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_BEGIN_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -742,13 +748,20 @@ LExit:
 }
 
 extern "C" HRESULT ElevationMsiCommitTransaction(
-    __in HANDLE hPipe
+    __in HANDLE hPipe,
+    __in LPCWSTR wzName
     )
 {
     HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
     DWORD dwResult = ERROR_SUCCESS;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, wzName);
+    ExitOnFailure(hr, "Failed to write transaction name to message buffer.");
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -758,13 +771,20 @@ LExit:
 }
 
 extern "C" HRESULT ElevationMsiRollbackTransaction(
-    __in HANDLE hPipe
+    __in HANDLE hPipe,
+    __in LPCWSTR wzName
     )
 {
     HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
     DWORD dwResult = ERROR_SUCCESS;
 
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, NULL, 0, NULL, NULL, &dwResult);
+    // serialize message data
+    hr = BuffWriteString(&pbData, &cbData, wzName);
+    ExitOnFailure(hr, "Failed to write transaction name to message buffer.");
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION, pbData, cbData, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION message to per-machine process.");
 
     hr = static_cast<HRESULT>(dwResult);
@@ -1534,11 +1554,11 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION:
-        hrResult = OnMsiCommitTransaction();
+        hrResult = OnMsiCommitTransaction((BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION:
-        hrResult = OnMsiRollbackTransaction();
+        hrResult = OnMsiRollbackTransaction((BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
@@ -2806,20 +2826,44 @@ LExit:
     return hr;
 }
 
-static HRESULT OnMsiCommitTransaction()
+static HRESULT OnMsiCommitTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    )
 {
     HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczName = NULL;
 
-    hr = MsiEngineCommitTransaction();
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &sczName);
+    ExitOnFailure(hr, "Failed to read transaction name.");
+
+    hr = MsiEngineCommitTransaction(sczName);
+
+LExit:
+    ReleaseStr(sczName);
 
     return hr;
 }
 
-static HRESULT OnMsiRollbackTransaction()
+static HRESULT OnMsiRollbackTransaction(
+    __in BYTE* pbData,
+    __in DWORD cbData
+    )
 {
     HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR sczName = NULL;
 
-    hr = MsiEngineRollbackTransaction();
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &sczName);
+    ExitOnFailure(hr, "Failed to read transaction name.");
+
+    hr = MsiEngineRollbackTransaction(sczName);
+
+LExit:
+    ReleaseStr(sczName);
 
     return hr;
 }

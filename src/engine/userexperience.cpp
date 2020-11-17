@@ -348,6 +348,55 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONBEGINMSITRANSACTIONBEGIN_ARGS args = { };
+    BA_ONBEGINMSITRANSACTIONBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+
+    results.cbSize = sizeof(results);
+    
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnBeginMsiTransactionBegin failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONBEGINMSITRANSACTIONCOMPLETE_ARGS args = { };
+    BA_ONBEGINMSITRANSACTIONCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnBeginMsiTransactionComplete failed.");
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnCacheAcquireBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,
@@ -609,6 +658,55 @@ EXTERN_C BAAPI UserExperienceOnCacheVerifyComplete(
     {
         *pAction = results.action;
     }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCOMMITMSITRANSACTIONBEGIN_ARGS args = { };
+    BA_ONCOMMITMSITRANSACTIONBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+
+    results.cbSize = sizeof(results);
+    
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnCommitMsiTransactionBegin failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS args = { };
+    BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnCommitMsiTransactionComplete failed.");
 
 LExit:
     return hr;
@@ -1794,6 +1892,50 @@ EXTERN_C BAAPI UserExperienceOnResolveSource(
     {
         *pAction = results.action;
     }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS args = { };
+    BA_ONROLLBACKMSITRANSACTIONBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+
+    results.cbSize = sizeof(results);
+    
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnRollbackMsiTransactionBegin failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS args = { };
+    BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzTransactionId = wzTransactionId;
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnRollbackMsiTransactionComplete failed.");
 
 LExit:
     return hr;

@@ -1147,17 +1147,29 @@ extern "C" HRESULT MsiEngineBeginTransaction(
     MSIHANDLE hTransactionHandle = NULL;
     HANDLE hChangeOfOwnerEvent = NULL;
 
+    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_BEGIN, wzName);
+
     uResult = ::MsiBeginTransaction(wzName, 0, &hTransactionHandle, &hChangeOfOwnerEvent);
+
+    if (ERROR_ROLLBACK_DISABLED == uResult)
+    {
+        LogId(REPORT_ERROR, MSG_MSI_TRANSACTIONS_DISABLED);
+    }
+
     ExitOnWin32Error(uResult, hr, "Failed to begin an MSI transaction");
 
 LExit:
     return hr;
 }
 
-extern "C" HRESULT MsiEngineCommitTransaction()
+extern "C" HRESULT MsiEngineCommitTransaction(
+    __in LPCWSTR wzName
+    )
 {
     HRESULT hr = S_OK;
     UINT uResult = ERROR_SUCCESS;
+
+    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_COMMIT, wzName);
 
     uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_COMMIT);
     ExitOnWin32Error(uResult, hr, "Failed to commit the MSI transaction");
@@ -1167,10 +1179,14 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT MsiEngineRollbackTransaction()
+extern "C" HRESULT MsiEngineRollbackTransaction(
+    __in LPCWSTR wzName
+    )
 {
     HRESULT hr = S_OK;
     UINT uResult = ERROR_SUCCESS;
+
+    LogId(REPORT_WARNING, MSG_MSI_TRANSACTION_ROLLBACK, wzName);
 
     uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_ROLLBACK);
     ExitOnWin32Error(uResult, hr, "Failed to rollback the MSI transaction");

@@ -843,6 +843,48 @@ Language=English
 Ignoring application request to cancel from %1!ls! during rollback. 
 .
 
+MessageId=382
+Severity=Warning
+SymbolicName=MSG_PLAN_ROLLBACK_DISABLED
+Language=English
+Rollback is disabled for this bundle.
+.
+
+MessageId=383
+Severity=Error
+SymbolicName=MSG_MSI_TRANSACTIONS_DISABLED
+Language=English
+Windows Installer rollback is disabled on this computer. It must be enabled for this bundle to proceed.
+.
+
+MessageId=384
+Severity=Success
+SymbolicName=MSG_MSI_TRANSACTION_BEGIN
+Language=English
+Starting a new MSI transaction, id: %1!ls!
+.
+
+MessageId=385
+Severity=Success
+SymbolicName=MSG_MSI_TRANSACTION_COMMIT
+Language=English
+Committing MSI transaction, id: %1!ls!
+.
+
+MessageId=386
+Severity=Warning
+SymbolicName=MSG_MSI_TRANSACTION_ROLLBACK
+Language=English
+Rolling back MSI transaction, id: %1!ls!
+.
+
+MessageId=387
+Severity=Error
+SymbolicName=MSG_RESTART_REQUEST_DURING_MSI_TRANSACTION
+Language=English
+Illegal state: Reboot requested within an MSI transaction, id: %1!ls!
+.
+
 MessageId=399
 Severity=Success
 SymbolicName=MSG_APPLY_COMPLETE

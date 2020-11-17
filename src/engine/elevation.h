@@ -162,10 +162,12 @@ HRESULT ElevationMsiBeginTransaction(
     __in LPCWSTR wzName
     );
 HRESULT ElevationMsiCommitTransaction(
-    __in HANDLE hPipe
+    __in HANDLE hPipe,
+    __in LPCWSTR wzName
     );
 HRESULT ElevationMsiRollbackTransaction(
-    __in HANDLE hPipe
+    __in HANDLE hPipe,
+    __in LPCWSTR wzName
     );
 
 #ifdef __cplusplus

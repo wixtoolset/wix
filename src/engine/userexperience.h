@@ -108,7 +108,16 @@ BAAPI UserExperienceOnApplyComplete(
     __in HRESULT hrStatus,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __inout BOOTSTRAPPER_APPLYCOMPLETE_ACTION* pAction
-);
+    );
+BAAPI UserExperienceOnBeginMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    );
+BAAPI UserExperienceOnBeginMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
+    );
 BAAPI UserExperienceOnCacheAcquireBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,
@@ -161,6 +170,15 @@ BAAPI UserExperienceOnCacheVerifyComplete(
     __in_z_opt LPCWSTR wzPayloadId,
     __in HRESULT hrStatus,
     __inout BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION* pAction
+    );
+BAAPI UserExperienceOnCommitMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    );
+BAAPI UserExperienceOnCommitMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
     );
 BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -272,7 +290,7 @@ BAAPI UserExperienceOnExecuteBegin(
 BAAPI UserExperienceOnExecuteComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
-);
+    );
 BAAPI UserExperienceOnExecuteFilesInUse(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
@@ -315,7 +333,7 @@ BAAPI UserExperienceOnExecuteProgress(
     __in_z LPCWSTR wzPackageId,
     __in DWORD dwProgressPercentage,
     __in DWORD dwOverallPercentage,
-    __inout int* pnResult
+    __out int* pnResult
     );
 BAAPI UserExperienceOnLaunchApprovedExeBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience
@@ -410,6 +428,15 @@ BAAPI UserExperienceOnResolveSource(
     __in_z LPCWSTR wzLocalSource,
     __in_z_opt LPCWSTR wzDownloadSource,
     __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* pAction
+    );
+BAAPI UserExperienceOnRollbackMsiTransactionBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId
+    );
+BAAPI UserExperienceOnRollbackMsiTransactionComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzTransactionId,
+    __in HRESULT hrStatus
     );
 BAAPI UserExperienceOnShutdown(
     __in BURN_USER_EXPERIENCE* pUserExperience,
