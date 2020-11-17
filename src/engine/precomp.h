@@ -100,6 +100,7 @@
 #include "bitsengine.h"
 #include "netfxchainer.h"
 
+#include "externalengine.h"
 #include "EngineForApplication.h"
 #include "EngineForExtension.h"
 #include "engine.messages.h"

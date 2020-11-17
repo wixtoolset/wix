@@ -17,6 +17,13 @@ static HRESULT FilterExecuteResult(
     __in LPCWSTR sczEventName
     );
 
+static HRESULT SendBAMessage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    );
+
 
 // function definitions
 
@@ -97,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 8, 31, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 11, 17, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -308,7 +315,7 @@ EXTERN_C BAAPI UserExperienceOnApplyBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnApplyBegin failed.");
 
     if (results.fCancel)
@@ -339,7 +346,7 @@ EXTERN_C BAAPI UserExperienceOnApplyComplete(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnApplyComplete failed.");
 
     *pAction = results.action;
@@ -362,7 +369,7 @@ EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionBegin(
 
     results.cbSize = sizeof(results);
     
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnBeginMsiTransactionBegin failed.");
 
     if (results.fCancel)
@@ -390,7 +397,7 @@ EXTERN_C BAAPI UserExperienceOnBeginMsiTransactionComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnBeginMsiTransactionComplete failed.");
 
 LExit:
@@ -417,7 +424,7 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireBegin failed.");
 
     if (results.fCancel)
@@ -450,7 +457,7 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireComplete(
     results.cbSize = sizeof(results);
     results.action = args.recommendation;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireComplete failed.");
 
     if (FAILED(hrStatus))
@@ -484,7 +491,7 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireProgress(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREPROGRESS, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREPROGRESS, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireProgress failed.");
 
     if (results.fCancel)
@@ -508,7 +515,7 @@ EXTERN_C BAAPI UserExperienceOnCacheBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCacheBegin failed.");
 
     if (results.fCancel)
@@ -534,7 +541,7 @@ EXTERN_C BAAPI UserExperienceOnCacheComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCacheComplete failed.");
 
 LExit:
@@ -559,7 +566,7 @@ EXTERN_C BAAPI UserExperienceOnCachePackageBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCachePackageBegin failed.");
 
     if (results.fCancel)
@@ -590,7 +597,7 @@ EXTERN_C BAAPI UserExperienceOnCachePackageComplete(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCachePackageComplete failed.");
 
     if (FAILED(hrStatus))
@@ -618,7 +625,7 @@ EXTERN_C BAAPI UserExperienceOnCacheVerifyBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCacheVerifyBegin failed.");
 
     if (results.fCancel)
@@ -651,7 +658,7 @@ EXTERN_C BAAPI UserExperienceOnCacheVerifyComplete(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCacheVerifyComplete failed.");
 
     if (FAILED(hrStatus))
@@ -677,7 +684,7 @@ EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionBegin(
 
     results.cbSize = sizeof(results);
     
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCommitMsiTransactionBegin failed.");
 
     if (results.fCancel)
@@ -705,7 +712,7 @@ EXTERN_C BAAPI UserExperienceOnCommitMsiTransactionComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCommitMsiTransactionComplete failed.");
 
 LExit:
@@ -728,7 +735,7 @@ EXTERN_C BAAPI UserExperienceOnDetectBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnDetectBegin failed.");
 
     if (results.fCancel)
@@ -758,7 +765,7 @@ EXTERN_C BAAPI UserExperienceOnDetectCompatibleMsiPackage(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectCompatibleMsiPackage failed.");
 
     if (results.fCancel)
@@ -784,7 +791,7 @@ EXTERN_C BAAPI UserExperienceOnDetectComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectComplete failed.");
 
 LExit:
@@ -815,7 +822,7 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     results.cbSize = sizeof(results);
     results.fIgnoreBundle = *pfIgnoreBundle;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectForwardCompatibleBundle failed.");
 
     if (results.fCancel)
@@ -846,7 +853,7 @@ EXTERN_C BAAPI UserExperienceOnDetectMsiFeature(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTMSIFEATURE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTMSIFEATURE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectMsiFeature failed.");
 
     if (results.fCancel)
@@ -872,7 +879,7 @@ EXTERN_C BAAPI UserExperienceOnDetectPackageBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPACKAGEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnDetectPackageBegin failed.");
 
     if (results.fCancel)
@@ -902,7 +909,7 @@ EXTERN_C BAAPI UserExperienceOnDetectPackageComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPACKAGECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPACKAGECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectPackageComplete failed.");
 
 LExit:
@@ -933,7 +940,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectRelatedBundle failed.");
 
     if (results.fCancel)
@@ -969,7 +976,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedMsiPackage(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectRelatedMsiPackage failed.");
 
     if (results.fCancel)
@@ -999,7 +1006,7 @@ EXTERN_C BAAPI UserExperienceOnDetectTargetMsiPackage(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTTARGETMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTTARGETMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectTargetMsiPackage failed.");
 
     if (results.fCancel)
@@ -1039,7 +1046,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     results.cbSize = sizeof(results);
     results.fStopProcessingUpdates = *pfStopProcessingUpdates;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdate failed.");
 
     if (results.fCancel)
@@ -1068,7 +1075,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdateBegin(
     results.cbSize = sizeof(results);
     results.fSkip = *pfSkip;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdateBegin failed.");
 
     if (results.fCancel)
@@ -1097,7 +1104,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdateComplete(
     results.cbSize = sizeof(results);
     results.fIgnoreError = *pfIgnoreError;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdateComplete failed.");
 
     if (FAILED(hrStatus))
@@ -1121,7 +1128,7 @@ EXTERN_C BAAPI UserExperienceOnElevateBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnElevateBegin failed.");
 
     if (results.fCancel)
@@ -1147,7 +1154,7 @@ EXTERN_C BAAPI UserExperienceOnElevateComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnElevateComplete failed.");
 
 LExit:
@@ -1183,7 +1190,7 @@ EXTERN_C BAAPI UserExperienceOnError(
     results.cbSize = sizeof(results);
     results.nResult = *pnResult;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONERROR, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONERROR, &args, &results);
     ExitOnFailure(hr, "BA OnError failed.");
 
     *pnResult = results.nResult;
@@ -1206,7 +1213,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnExecuteBegin failed.");
 
     if (results.fCancel)
@@ -1232,7 +1239,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnExecuteComplete failed.");
 
 LExit:
@@ -1260,7 +1267,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteFilesInUse(
     results.cbSize = sizeof(results);
     results.nResult = *pnResult;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEFILESINUSE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEFILESINUSE, &args, &results);
     ExitOnFailure(hr, "BA OnExecuteFilesInUse failed.");
 
     *pnResult = results.nResult;
@@ -1296,7 +1303,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteMsiMessage(
     results.cbSize = sizeof(results);
     results.nResult = *pnResult;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEMSIMESSAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEMSIMESSAGE, &args, &results);
     ExitOnFailure(hr, "BA OnExecuteMsiMessage failed.");
 
     *pnResult = results.nResult;
@@ -1327,7 +1334,7 @@ EXTERN_C BAAPI UserExperienceOnExecutePackageBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPACKAGEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnExecutePackageBegin failed.");
 
     if (results.fCancel)
@@ -1360,7 +1367,7 @@ EXTERN_C BAAPI UserExperienceOnExecutePackageComplete(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPACKAGECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPACKAGECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnExecutePackageComplete failed.");
 
     *pAction = results.action;
@@ -1385,7 +1392,7 @@ EXTERN_C BAAPI UserExperienceOnExecutePatchTarget(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPATCHTARGET, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPATCHTARGET, &args, &results);
     ExitOnFailure(hr, "BA OnExecutePatchTarget failed.");
 
     if (results.fCancel)
@@ -1416,7 +1423,7 @@ EXTERN_C BAAPI UserExperienceOnExecuteProgress(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPROGRESS, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONEXECUTEPROGRESS, &args, &results);
     ExitOnFailure(hr, "BA OnExecuteProgress failed.");
 
 LExit:
@@ -1447,7 +1454,7 @@ EXTERN_C BAAPI UserExperienceOnLaunchApprovedExeBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnLaunchApprovedExeBegin failed.");
 
     if (results.fCancel)
@@ -1475,7 +1482,7 @@ EXTERN_C BAAPI UserExperienceOnLaunchApprovedExeComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnLaunchApprovedExeComplete failed.");
 
 LExit:
@@ -1494,7 +1501,7 @@ EXTERN_C BAAPI UserExperienceOnPauseAUBegin(
 
     results.cbSize = sizeof(results);
     
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPauseAUBegin failed.");
 
 LExit:
@@ -1515,7 +1522,7 @@ EXTERN_C BAAPI UserExperienceOnPauseAUComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPauseAUComplete failed.");
 
 LExit:
@@ -1536,7 +1543,7 @@ EXTERN_C BAAPI UserExperienceOnPlanBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPlanBegin failed.");
 
     if (results.fCancel)
@@ -1569,7 +1576,7 @@ EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageBegin failed.");
 
     if (results.fCancel)
@@ -1608,7 +1615,7 @@ EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageComplete failed.");
 
 LExit:
@@ -1634,7 +1641,7 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiFeature(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIFEATURE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIFEATURE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanMsiFeature failed.");
 
     if (results.fCancel)
@@ -1661,7 +1668,7 @@ EXTERN_C BAAPI UserExperienceOnPlanComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanComplete failed.");
 
 LExit:
@@ -1692,7 +1699,7 @@ EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
     results.uiLevel = *pUiLevel;
     results.fDisableExternalUiHandler = *pfDisableExternalUiHandler;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanMsiPackage failed.");
 
     if (results.fCancel)
@@ -1724,7 +1731,7 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPlanPackageBegin failed.");
 
     if (results.fCancel)
@@ -1761,7 +1768,7 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGECOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanPackageComplete failed.");
 
 LExit:
@@ -1785,7 +1792,7 @@ EXTERN_C BAAPI UserExperienceOnPlanRelatedBundle(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanRelatedBundle failed.");
 
     if (results.fCancel)
@@ -1817,7 +1824,7 @@ EXTERN_C BAAPI UserExperienceOnPlanTargetMsiPackage(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANTARGETMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANTARGETMSIPACKAGE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanTargetMsiPackage failed.");
 
     if (results.fCancel)
@@ -1847,7 +1854,7 @@ EXTERN_C BAAPI UserExperienceOnProgress(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPROGRESS, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPROGRESS, &args, &results);
     hr = FilterExecuteResult(pUserExperience, hr, fRollback, results.fCancel, L"OnProgress");
 
     return hr;
@@ -1865,7 +1872,7 @@ EXTERN_C BAAPI UserExperienceOnRegisterBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnRegisterBegin failed.");
 
     if (results.fCancel)
@@ -1891,7 +1898,7 @@ EXTERN_C BAAPI UserExperienceOnRegisterComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnRegisterComplete failed.");
 
 LExit:
@@ -1921,7 +1928,7 @@ EXTERN_C BAAPI UserExperienceOnResolveSource(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE, &args, &results);
     ExitOnFailure(hr, "BA OnResolveSource failed.");
 
     if (results.fCancel)
@@ -1951,7 +1958,7 @@ EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionBegin(
 
     results.cbSize = sizeof(results);
     
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnRollbackMsiTransactionBegin failed.");
 
 LExit:
@@ -1974,7 +1981,7 @@ EXTERN_C BAAPI UserExperienceOnRollbackMsiTransactionComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnRollbackMsiTransactionComplete failed.");
 
 LExit:
@@ -1995,7 +2002,7 @@ EXTERN_C BAAPI UserExperienceOnShutdown(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN, &args, &results);
     ExitOnFailure(hr, "BA OnShutdown failed.");
 
     *pAction = results.action;
@@ -2016,7 +2023,7 @@ EXTERN_C BAAPI UserExperienceOnStartup(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &args, &results);
     ExitOnFailure(hr, "BA OnStartup failed.");
 
 LExit:
@@ -2035,7 +2042,7 @@ EXTERN_C BAAPI UserExperienceOnSystemRestorePointBegin(
 
     results.cbSize = sizeof(results);
     
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnSystemRestorePointBegin failed.");
 
 LExit:
@@ -2056,7 +2063,7 @@ EXTERN_C BAAPI UserExperienceOnSystemRestorePointComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnSystemRestorePointComplete failed.");
 
 LExit:
@@ -2079,7 +2086,7 @@ EXTERN_C BAAPI UserExperienceOnSystemShutdown(
     results.cbSize = sizeof(results);
     results.fCancel = *pfCancel;
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMSHUTDOWN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMSHUTDOWN, &args, &results);
     ExitOnFailure(hr, "BA OnSystemShutdown failed.");
     
     *pfCancel = results.fCancel;
@@ -2100,7 +2107,7 @@ EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnUnregisterBegin failed.");
 
     if (results.fCancel)
@@ -2126,7 +2133,7 @@ EXTERN_C BAAPI UserExperienceOnUnregisterComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnUnregisterComplete failed.");
 
 LExit:
@@ -2387,5 +2394,23 @@ static HRESULT FilterExecuteResult(
     }
 
 LExit:
+    return hr;
+}
+
+static HRESULT SendBAMessage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = pUserExperience->pfnBAProc(message, pvArgs, pvResults, pUserExperience->pvBAProcContext);
+    if (hr == E_NOTIMPL)
+    {
+        hr = S_OK;
+    }
+
     return hr;
 }

@@ -11,12 +11,14 @@ static HRESULT CopyStringToBE(
 
 static HRESULT BEEngineEscapeString(
     __in BURN_EXTENSION_ENGINE_CONTEXT* /*pContext*/,
-    __in BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS, pResults);
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
@@ -34,17 +36,20 @@ static HRESULT BEEngineEscapeString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BEEngineEvaluateCondition(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS, pResults);
     LPCWSTR wzCondition = pArgs->wzCondition;
     BOOL* pf = &pResults->f;
 
@@ -57,17 +62,20 @@ static HRESULT BEEngineEvaluateCondition(
         hr = E_INVALIDARG;
     }
 
+LExit:
     return hr;
 }
 
 static HRESULT BEEngineFormatString(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in BUNDLE_EXTENSION_ENGINE_FORMATSTRING_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_FORMATSTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS, pResults);
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
@@ -85,17 +93,20 @@ static HRESULT BEEngineFormatString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BEEngineGetVariableNumeric(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LONGLONG* pllValue = &pResults->llValue;
 
@@ -108,17 +119,20 @@ static HRESULT BEEngineGetVariableNumeric(
         hr = E_INVALIDARG;
     }
 
+LExit:
     return hr;
 }
 
 static HRESULT BEEngineGetVariableString(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPWSTR wzValue = pResults->wzValue;
     DWORD* pcchValue = &pResults->cchValue;
@@ -136,18 +150,21 @@ static HRESULT BEEngineGetVariableString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BEEngineGetVariableVersion(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     VERUTIL_VERSION* pVersion = NULL;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPWSTR wzValue = pResults->wzValue;
     DWORD* pcchValue = &pResults->cchValue;
@@ -165,6 +182,7 @@ static HRESULT BEEngineGetVariableVersion(
         hr = E_INVALIDARG;
     }
 
+LExit:
     ReleaseVerutilVersion(pVersion);
 
     return hr;
@@ -172,12 +190,14 @@ static HRESULT BEEngineGetVariableVersion(
 
 static HRESULT BEEngineLog(
     __in BURN_EXTENSION_ENGINE_CONTEXT* /*pContext*/,
-    __in BUNDLE_EXTENSION_ENGINE_LOG_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_LOG_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     REPORT_LEVEL rl = REPORT_NONE;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_LOG_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_LOG_RESULTS, pResults);
     BUNDLE_EXTENSION_LOG_LEVEL level = pArgs->level;
     LPCWSTR wzMessage = pArgs->wzMessage;
 
@@ -212,11 +232,13 @@ LExit:
 
 static HRESULT BEEngineSetVariableNumeric(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in const BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LONGLONG llValue = pArgs->llValue;
 
@@ -237,11 +259,13 @@ LExit:
 
 static HRESULT BEEngineSetVariableString(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in const BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPCWSTR wzValue = pArgs->wzValue;
 
@@ -262,14 +286,16 @@ LExit:
 
 static HRESULT BEEngineSetVariableVersion(
     __in BURN_EXTENSION_ENGINE_CONTEXT* pContext,
-    __in const BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    VERUTIL_VERSION* pVersion = NULL;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPCWSTR wzValue = pArgs->wzValue;
-    VERUTIL_VERSION* pVersion = NULL;
 
     if (wzVariable && *wzVariable)
     {
@@ -296,17 +322,20 @@ LExit:
 
 static HRESULT BEEngineCompareVersions(
     __in BURN_EXTENSION_ENGINE_CONTEXT* /*pContext*/,
-    __in const BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS* pArgs,
-    __in BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS, pResults);
     LPCWSTR wzVersion1 = pArgs->wzVersion1;
     LPCWSTR wzVersion2 = pArgs->wzVersion2;
     int* pnResult = &pResults->nResult;
 
     hr = VerCompareStringVersions(wzVersion1, wzVersion2, FALSE, pnResult);
 
+LExit:
     return hr;
 }
 
@@ -328,37 +357,37 @@ HRESULT WINAPI EngineForExtensionProc(
     switch (message)
     {
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_ESCAPESTRING:
-        hr = BEEngineEscapeString(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS*>(pvResults));
+        hr = BEEngineEscapeString(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_EVALUATECONDITION:
-        hr = BEEngineEvaluateCondition(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS*>(pvResults));
+        hr = BEEngineEvaluateCondition(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_FORMATSTRING:
-        hr = BEEngineFormatString(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_FORMATSTRING_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS*>(pvResults));
+        hr = BEEngineFormatString(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLENUMERIC:
-        hr = BEEngineGetVariableNumeric(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS*>(pvResults));
+        hr = BEEngineGetVariableNumeric(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLESTRING:
-        hr = BEEngineGetVariableString(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS*>(pvResults));
+        hr = BEEngineGetVariableString(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLEVERSION:
-        hr = BEEngineGetVariableVersion(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS*>(pvResults));
+        hr = BEEngineGetVariableVersion(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_LOG:
-        hr = BEEngineLog(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_LOG_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_LOG_RESULTS*>(pvResults));
+        hr = BEEngineLog(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC:
-        hr = BEEngineSetVariableNumeric(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS*>(pvResults));
+        hr = BEEngineSetVariableNumeric(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLESTRING:
-        hr = BEEngineSetVariableString(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS*>(pvResults));
+        hr = BEEngineSetVariableString(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION:
-        hr = BEEngineSetVariableVersion(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS*>(pvResults));
+        hr = BEEngineSetVariableVersion(pContext, pvArgs, pvResults);
         break;
     case BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS:
-        hr = BEEngineCompareVersions(pContext, reinterpret_cast<BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS*>(pvArgs), reinterpret_cast<BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS*>(pvResults));
+        hr = BEEngineCompareVersions(pContext, pvArgs, pvResults);
         break;
     default:
         hr = E_NOTIMPL;

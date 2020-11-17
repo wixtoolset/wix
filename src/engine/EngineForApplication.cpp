@@ -5,31 +5,36 @@
 
 static HRESULT CopyStringToBA(
     __in LPWSTR wzValue,
-    __in LPWSTR wzBuffer,
+    __in_opt LPWSTR wzBuffer,
     __inout DWORD* pcchBuffer
     );
 
 static HRESULT BAEngineGetPackageCount(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_GETPACKAGECOUNT_ARGS* /*pArgs*/,
-    __in BAENGINE_GETPACKAGECOUNT_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_GETPACKAGECOUNT_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_GETPACKAGECOUNT_RESULTS, pResults);
     DWORD* pcPackages = &pResults->cPackages;
 
     *pcPackages = pContext->pEngineState->packages.cPackages;
 
+LExit:
     return hr;
 }
 
 static HRESULT BAEngineGetVariableNumeric(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_GETVARIABLENUMERIC_ARGS* pArgs,
-    __in BAENGINE_GETVARIABLENUMERIC_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_GETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_GETVARIABLENUMERIC_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LONGLONG* pllValue = &pResults->llValue;
 
@@ -42,17 +47,20 @@ static HRESULT BAEngineGetVariableNumeric(
         hr = E_INVALIDARG;
     }
 
+LExit:
     return hr;
 }
 
 static HRESULT BAEngineGetVariableString(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_GETVARIABLESTRING_ARGS* pArgs,
-    __in BAENGINE_GETVARIABLESTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_GETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_GETVARIABLESTRING_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPWSTR wzValue = pResults->wzValue;
     DWORD* pcchValue = &pResults->cchValue;
@@ -70,18 +78,21 @@ static HRESULT BAEngineGetVariableString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BAEngineGetVariableVersion(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_GETVARIABLEVERSION_ARGS* pArgs,
-    __in BAENGINE_GETVARIABLEVERSION_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     VERUTIL_VERSION* pVersion = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_GETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_GETVARIABLEVERSION_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPWSTR wzValue = pResults->wzValue;
     DWORD* pcchValue = &pResults->cchValue;
@@ -99,6 +110,7 @@ static HRESULT BAEngineGetVariableVersion(
         hr = E_INVALIDARG;
     }
 
+LExit:
     ReleaseVerutilVersion(pVersion);
 
     return hr;
@@ -106,12 +118,14 @@ static HRESULT BAEngineGetVariableVersion(
 
 static HRESULT BAEngineFormatString(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_FORMATSTRING_ARGS* pArgs,
-    __in BAENGINE_FORMATSTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_FORMATSTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_FORMATSTRING_RESULTS, pResults);
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
@@ -129,18 +143,21 @@ static HRESULT BAEngineFormatString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BAEngineEscapeString(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* /*pContext*/,
-    __in BAENGINE_ESCAPESTRING_ARGS* pArgs,
-    __in BAENGINE_ESCAPESTRING_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_ESCAPESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_ESCAPESTRING_RESULTS, pResults);
     LPCWSTR wzIn = pArgs->wzIn;
     LPWSTR wzOut = pResults->wzOut;
     DWORD* pcchOut = &pResults->cchOut;
@@ -158,17 +175,20 @@ static HRESULT BAEngineEscapeString(
         hr = E_INVALIDARG;
     }
 
+LExit:
     StrSecureZeroFreeString(sczValue);
     return hr;
 }
 
 static HRESULT BAEngineEvaluateCondition(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_EVALUATECONDITION_ARGS* pArgs,
-    __in BAENGINE_EVALUATECONDITION_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_EVALUATECONDITION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_EVALUATECONDITION_RESULTS, pResults);
     LPCWSTR wzCondition = pArgs->wzCondition;
     BOOL* pf = &pResults->f;
 
@@ -181,16 +201,19 @@ static HRESULT BAEngineEvaluateCondition(
         hr = E_INVALIDARG;
     }
 
+LExit:
     return hr;
 }
 
 static HRESULT BAEngineLog(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* /*pContext*/,
-    __in BAENGINE_LOG_ARGS* pArgs,
-    __in BAENGINE_LOG_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_LOG_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_LOG_RESULTS, pResults);
     REPORT_LEVEL rl = REPORT_NONE;
     BOOTSTRAPPER_LOG_LEVEL level = pArgs->level;
     LPCWSTR wzMessage = pArgs->wzMessage;
@@ -226,14 +249,16 @@ LExit:
 
 static HRESULT BAEngineSendEmbeddedError(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_SENDEMBEDDEDERROR_ARGS* pArgs,
-    __in BAENGINE_SENDEMBEDDEDERROR_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     DWORD cbData = 0;
     DWORD dwResult = 0;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SENDEMBEDDEDERROR_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SENDEMBEDDEDERROR_RESULTS, pResults);
     DWORD dwErrorCode = pArgs->dwErrorCode;
     LPCWSTR wzMessage = pArgs->wzMessage;
     DWORD dwUIHint = pArgs->dwUIHint;
@@ -266,14 +291,16 @@ LExit:
 
 static HRESULT BAEngineSendEmbeddedProgress(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_SENDEMBEDDEDPROGRESS_ARGS* pArgs,
-    __in BAENGINE_SENDEMBEDDEDPROGRESS_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     DWORD cbData = 0;
     DWORD dwResult = 0;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SENDEMBEDDEDPROGRESS_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SENDEMBEDDEDPROGRESS_RESULTS, pResults);
     DWORD dwProgressPercentage = pArgs->dwProgressPercentage;
     DWORD dwOverallProgressPercentage = pArgs->dwOverallProgressPercentage;
     int* pnResult = &pResults->nResult;
@@ -302,8 +329,8 @@ LExit:
 
 static HRESULT BAEngineSetUpdate(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_SETUPDATE_ARGS* pArgs,
-    __in BAENGINE_SETUPDATE_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
@@ -313,6 +340,8 @@ static HRESULT BAEngineSetUpdate(
     UUID guid = { };
     WCHAR wzGuid[39];
     RPC_STATUS rs = RPC_S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETUPDATE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETUPDATE_RESULTS, pResults);
     LPCWSTR wzLocalSource = pArgs->wzLocalSource;
     LPCWSTR wzDownloadSource = pArgs->wzDownloadSource;
     DWORD64 qwSize = pArgs->qwSize;
@@ -385,13 +414,15 @@ LExit:
 
 static HRESULT BAEngineSetLocalSource(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_SETLOCALSOURCE_ARGS* pArgs,
-    __in BAENGINE_SETLOCALSOURCE_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     BURN_CONTAINER* pContainer = NULL;
     BURN_PAYLOAD* pPayload = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETLOCALSOURCE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETLOCALSOURCE_RESULTS, pResults);
     LPCWSTR wzPackageOrContainerId = pArgs->wzPackageOrContainerId;
     LPCWSTR wzPayloadId = pArgs->wzPayloadId;
     LPCWSTR wzPath = pArgs->wzPath;
@@ -438,14 +469,16 @@ LExit:
 
 static HRESULT BAEngineSetDownloadSource(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_SETDOWNLOADSOURCE_ARGS* pArgs,
-    __in BAENGINE_SETDOWNLOADSOURCE_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     BURN_CONTAINER* pContainer = NULL;
     BURN_PAYLOAD* pPayload = NULL;
     DOWNLOAD_SOURCE* pDownloadSource = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETDOWNLOADSOURCE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETDOWNLOADSOURCE_RESULTS, pResults);
     LPCWSTR wzPackageOrContainerId = pArgs->wzPackageOrContainerId;
     LPCWSTR wzPayloadId = pArgs->wzPayloadId;
     LPCWSTR wzUrl = pArgs->wzUrl;
@@ -522,11 +555,13 @@ LExit:
 
 static HRESULT BAEngineSetVariableNumeric(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_SETVARIABLENUMERIC_ARGS* pArgs,
-    __in BAENGINE_SETVARIABLENUMERIC_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETVARIABLENUMERIC_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LONGLONG llValue = pArgs->llValue;
 
@@ -547,11 +582,13 @@ LExit:
 
 static HRESULT BAEngineSetVariableString(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_SETVARIABLESTRING_ARGS* pArgs,
-    __in BAENGINE_SETVARIABLESTRING_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETVARIABLESTRING_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPCWSTR wzValue = pArgs->wzValue;
 
@@ -572,14 +609,16 @@ LExit:
 
 static HRESULT BAEngineSetVariableVersion(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_SETVARIABLEVERSION_ARGS* pArgs,
-    __in BAENGINE_SETVARIABLEVERSION_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    VERUTIL_VERSION* pVersion = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETVARIABLEVERSION_RESULTS, pResults);
     LPCWSTR wzVariable = pArgs->wzVariable;
     LPCWSTR wzValue = pArgs->wzValue;
-    VERUTIL_VERSION* pVersion = NULL;
 
     if (wzVariable && *wzVariable)
     {
@@ -606,42 +645,52 @@ LExit:
 
 static HRESULT BAEngineCloseSplashScreen(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_CLOSESPLASHSCREEN_ARGS* /*pArgs*/,
-    __in BAENGINE_CLOSESPLASHSCREEN_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
+    HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_CLOSESPLASHSCREEN_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_CLOSESPLASHSCREEN_RESULTS, pResults);
+
     // If the splash screen is still around, close it.
     if (::IsWindow(pContext->pEngineState->command.hwndSplashScreen))
     {
         ::PostMessageW(pContext->pEngineState->command.hwndSplashScreen, WM_CLOSE, 0, 0);
     }
 
-    return S_OK;
+LExit:
+    return hr;
 }
 
 static HRESULT BAEngineCompareVersions(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* /*pContext*/,
-    __in const BAENGINE_COMPAREVERSIONS_ARGS* pArgs,
-    __in BAENGINE_COMPAREVERSIONS_RESULTS* pResults
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_COMPAREVERSIONS_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_COMPAREVERSIONS_RESULTS, pResults);
     LPCWSTR wzVersion1 = pArgs->wzVersion1;
     LPCWSTR wzVersion2 = pArgs->wzVersion2;
     int* pnResult = &pResults->nResult;
 
     hr = VerCompareStringVersions(wzVersion1, wzVersion2, FALSE, pnResult);
 
+LExit:
     return hr;
 }
 
 static HRESULT BAEngineDetect(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in BAENGINE_DETECT_ARGS* pArgs,
-    __in BAENGINE_DETECT_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_DETECT_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_DETECT_RESULTS, pResults);
 
     if (!::PostThreadMessageW(pContext->dwThreadId, WM_BURN_DETECT, 0, reinterpret_cast<LPARAM>(pArgs->hwndParent)))
     {
@@ -654,11 +703,13 @@ LExit:
 
 static HRESULT BAEnginePlan(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_PLAN_ARGS* pArgs,
-    __in BAENGINE_PLAN_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_PLAN_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_PLAN_RESULTS, pResults);
     BOOTSTRAPPER_ACTION action = pArgs->action;
 
     if (!::PostThreadMessageW(pContext->dwThreadId, WM_BURN_PLAN, 0, action))
@@ -672,11 +723,13 @@ LExit:
 
 static HRESULT BAEngineElevate(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_ELEVATE_ARGS* pArgs,
-    __in BAENGINE_ELEVATE_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_ELEVATE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_ELEVATE_RESULTS, pResults);
 
     if (INVALID_HANDLE_VALUE != pContext->pEngineState->companionConnection.hPipe)
     {
@@ -693,11 +746,13 @@ LExit:
 
 static HRESULT BAEngineApply(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_APPLY_ARGS* pArgs,
-    __in BAENGINE_APPLY_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_APPLY_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_APPLY_RESULTS, pResults);
 
     ExitOnNull(pArgs->hwndParent, hr, E_INVALIDARG, "BA passed NULL hwndParent to Apply.");
     if (!::IsWindow(pArgs->hwndParent))
@@ -716,11 +771,13 @@ LExit:
 
 static HRESULT BAEngineQuit(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_QUIT_ARGS* pArgs,
-    __in BAENGINE_QUIT_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_QUIT_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_QUIT_RESULTS, pResults);
 
     if (!::PostThreadMessageW(pContext->dwThreadId, WM_BURN_QUIT, static_cast<WPARAM>(pArgs->dwExitCode), 0))
     {
@@ -733,18 +790,23 @@ LExit:
 
 static HRESULT BAEngineLaunchApprovedExe(
     __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
-    __in const BAENGINE_LAUNCHAPPROVEDEXE_ARGS* pArgs,
-    __in BAENGINE_LAUNCHAPPROVEDEXE_RESULTS* /*pResults*/
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
     )
 {
     HRESULT hr = S_OK;
     BURN_APPROVED_EXE* pApprovedExe = NULL;
     BOOL fLeaveCriticalSection = FALSE;
-    BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
+    BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = NULL;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_LAUNCHAPPROVEDEXE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_LAUNCHAPPROVEDEXE_RESULTS, pResults);
     HWND hwndParent = pArgs->hwndParent;
     LPCWSTR wzApprovedExeForElevationId = pArgs->wzApprovedExeForElevationId;
     LPCWSTR wzArguments = pArgs->wzArguments;
     DWORD dwWaitForInputIdleTimeout = pArgs->dwWaitForInputIdleTimeout;
+
+    pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
+    ExitOnNull(pLaunchApprovedExe, hr, E_OUTOFMEMORY, "Failed to alloc BURN_LAUNCH_APPROVED_EXE");
 
     ::EnterCriticalSection(&pContext->pEngineState->csActive);
     fLeaveCriticalSection = TRUE;
@@ -812,76 +874,76 @@ HRESULT WINAPI EngineForApplicationProc(
     switch (message)
     {
     case BOOTSTRAPPER_ENGINE_MESSAGE_GETPACKAGECOUNT:
-        hr = BAEngineGetPackageCount(pContext, reinterpret_cast<BAENGINE_GETPACKAGECOUNT_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_GETPACKAGECOUNT_RESULTS*>(pvResults));
+        hr = BAEngineGetPackageCount(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_GETVARIABLENUMERIC:
-        hr = BAEngineGetVariableNumeric(pContext, reinterpret_cast<BAENGINE_GETVARIABLENUMERIC_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_GETVARIABLENUMERIC_RESULTS*>(pvResults));
+        hr = BAEngineGetVariableNumeric(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_GETVARIABLESTRING:
-        hr = BAEngineGetVariableString(pContext, reinterpret_cast<BAENGINE_GETVARIABLESTRING_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_GETVARIABLESTRING_RESULTS*>(pvResults));
+        hr = BAEngineGetVariableString(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_GETVARIABLEVERSION:
-        hr = BAEngineGetVariableVersion(pContext, reinterpret_cast<BAENGINE_GETVARIABLEVERSION_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_GETVARIABLEVERSION_RESULTS*>(pvResults));
+        hr = BAEngineGetVariableVersion(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_FORMATSTRING:
-        hr = BAEngineFormatString(pContext, reinterpret_cast<BAENGINE_FORMATSTRING_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_FORMATSTRING_RESULTS*>(pvResults));
+        hr = BAEngineFormatString(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_ESCAPESTRING:
-        hr = BAEngineEscapeString(pContext, reinterpret_cast<BAENGINE_ESCAPESTRING_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_ESCAPESTRING_RESULTS*>(pvResults));
+        hr = BAEngineEscapeString(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_EVALUATECONDITION:
-        hr = BAEngineEvaluateCondition(pContext, reinterpret_cast<BAENGINE_EVALUATECONDITION_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_EVALUATECONDITION_RESULTS*>(pvResults));
+        hr = BAEngineEvaluateCondition(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_LOG:
-        hr = BAEngineLog(pContext, reinterpret_cast<BAENGINE_LOG_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_LOG_RESULTS*>(pvResults));
+        hr = BAEngineLog(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SENDEMBEDDEDERROR:
-        hr = BAEngineSendEmbeddedError(pContext, reinterpret_cast<BAENGINE_SENDEMBEDDEDERROR_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SENDEMBEDDEDERROR_RESULTS*>(pvResults));
+        hr = BAEngineSendEmbeddedError(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SENDEMBEDDEDPROGRESS:
-        hr = BAEngineSendEmbeddedProgress(pContext, reinterpret_cast<BAENGINE_SENDEMBEDDEDPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SENDEMBEDDEDPROGRESS_RESULTS*>(pvResults));
+        hr = BAEngineSendEmbeddedProgress(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETUPDATE:
-        hr = BAEngineSetUpdate(pContext, reinterpret_cast<BAENGINE_SETUPDATE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETUPDATE_RESULTS*>(pvResults));
+        hr = BAEngineSetUpdate(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETLOCALSOURCE:
-        hr = BAEngineSetLocalSource(pContext, reinterpret_cast<BAENGINE_SETLOCALSOURCE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETLOCALSOURCE_RESULTS*>(pvResults));
+        hr = BAEngineSetLocalSource(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETDOWNLOADSOURCE:
-        hr = BAEngineSetDownloadSource(pContext, reinterpret_cast<BAENGINE_SETDOWNLOADSOURCE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETDOWNLOADSOURCE_RESULTS*>(pvResults));
+        hr = BAEngineSetDownloadSource(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETVARIABLENUMERIC:
-        hr = BAEngineSetVariableNumeric(pContext, reinterpret_cast<BAENGINE_SETVARIABLENUMERIC_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETVARIABLENUMERIC_RESULTS*>(pvResults));
+        hr = BAEngineSetVariableNumeric(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETVARIABLESTRING:
-        hr = BAEngineSetVariableString(pContext, reinterpret_cast<BAENGINE_SETVARIABLESTRING_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETVARIABLESTRING_RESULTS*>(pvResults));
+        hr = BAEngineSetVariableString(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_SETVARIABLEVERSION:
-        hr = BAEngineSetVariableVersion(pContext, reinterpret_cast<BAENGINE_SETVARIABLEVERSION_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_SETVARIABLEVERSION_RESULTS*>(pvResults));
+        hr = BAEngineSetVariableVersion(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_CLOSESPLASHSCREEN:
-        hr = BAEngineCloseSplashScreen(pContext, reinterpret_cast<BAENGINE_CLOSESPLASHSCREEN_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_CLOSESPLASHSCREEN_RESULTS*>(pvResults));
+        hr = BAEngineCloseSplashScreen(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_DETECT:
-        hr = BAEngineDetect(pContext, reinterpret_cast<BAENGINE_DETECT_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_DETECT_RESULTS*>(pvResults));
+        hr = BAEngineDetect(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_PLAN:
-        hr = BAEnginePlan(pContext, reinterpret_cast<BAENGINE_PLAN_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_PLAN_RESULTS*>(pvResults));
+        hr = BAEnginePlan(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_ELEVATE:
-        hr = BAEngineElevate(pContext, reinterpret_cast<BAENGINE_ELEVATE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_ELEVATE_RESULTS*>(pvResults));
+        hr = BAEngineElevate(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_APPLY:
-        hr = BAEngineApply(pContext, reinterpret_cast<BAENGINE_APPLY_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_APPLY_RESULTS*>(pvResults));
+        hr = BAEngineApply(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_QUIT:
-        hr = BAEngineQuit(pContext, reinterpret_cast<BAENGINE_QUIT_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_QUIT_RESULTS*>(pvResults));
+        hr = BAEngineQuit(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_LAUNCHAPPROVEDEXE:
-        hr = BAEngineLaunchApprovedExe(pContext, reinterpret_cast<BAENGINE_LAUNCHAPPROVEDEXE_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_LAUNCHAPPROVEDEXE_RESULTS*>(pvResults));
+        hr = BAEngineLaunchApprovedExe(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_COMPAREVERSIONS:
-        hr = BAEngineCompareVersions(pContext, reinterpret_cast<BAENGINE_COMPAREVERSIONS_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_COMPAREVERSIONS_RESULTS*>(pvResults));
+        hr = BAEngineCompareVersions(pContext, pvArgs, pvResults);
         break;
     default:
         hr = E_NOTIMPL;
@@ -894,7 +956,7 @@ LExit:
 
 static HRESULT CopyStringToBA(
     __in LPWSTR wzValue,
-    __in LPWSTR wzBuffer,
+    __in_opt LPWSTR wzBuffer,
     __inout DWORD* pcchBuffer
     )
 {

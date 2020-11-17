@@ -51,6 +51,7 @@
     <ClCompile Include="embedded.cpp" />
     <ClCompile Include="EngineForApplication.cpp" />
     <ClCompile Include="EngineForExtension.cpp" />
+    <ClCompile Include="externalengine.cpp" />
     <ClCompile Include="cabextract.cpp" />
     <ClCompile Include="cache.cpp" />
     <ClCompile Include="condition.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="EngineForApplication.h" />
     <ClInclude Include="EngineForExtension.h" />
     <ClInclude Include="exeengine.h" />
+    <ClInclude Include="externalengine.h" />
     <ClInclude Include="inc\engine.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="manifest.h" />

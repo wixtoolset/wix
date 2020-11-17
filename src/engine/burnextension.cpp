@@ -2,6 +2,14 @@
 
 #include "precomp.h"
 
+
+static HRESULT SendRequiredBextMessage(
+    __in BURN_EXTENSION* pExtension,
+    __in BUNDLE_EXTENSION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    );
+
 // function definitions
 
 /*******************************************************************
@@ -234,9 +242,23 @@ EXTERN_C BEEAPI BurnExtensionPerformSearch(
 
     results.cbSize = sizeof(results);
 
-    hr = pExtension->pfnBurnExtensionProc(BUNDLE_EXTENSION_MESSAGE_SEARCH, &args, &results, pExtension->pvBurnExtensionProcContext);
+    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_SEARCH, &args, &results);
     ExitOnFailure(hr, "BundleExtension '%ls' Search '%ls' failed.", pExtension->sczId, wzSearchId);
 
 LExit:
+    return hr;
+}
+
+static HRESULT SendRequiredBextMessage(
+    __in BURN_EXTENSION* pExtension,
+    __in BUNDLE_EXTENSION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = pExtension->pfnBurnExtensionProc(message, pvArgs, pvResults, pExtension->pvBurnExtensionProcContext);
+
     return hr;
 }
