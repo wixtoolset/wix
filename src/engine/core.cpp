@@ -626,7 +626,7 @@ extern "C" HRESULT CoreApply(
         hr = CoreElevate(pEngineState, pEngineState->userExperience.hwndApply);
         ExitOnFailure(hr, "Failed to elevate.");
 
-        hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->variables, pEngineState->plan.action, pEngineState->automaticUpdates, !pEngineState->fDisableSystemRestore);
+        hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->userExperience, &pEngineState->variables, pEngineState->plan.action, pEngineState->automaticUpdates, !pEngineState->fDisableSystemRestore);
         ExitOnFailure(hr, "Another per-machine setup is already executing.");
 
         fElevated = TRUE;

@@ -14,6 +14,7 @@ HRESULT ElevationElevate(
     );
 HRESULT ElevationApplyInitialize(
     __in HANDLE hPipe,
+    __in BURN_USER_EXPERIENCE* pBA,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_ACTION action,
     __in BURN_AU_PAUSE_ACTION auAction,

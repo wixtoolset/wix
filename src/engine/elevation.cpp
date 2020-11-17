@@ -32,6 +32,10 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_COMMIT_MSI_TRANSACTION,
     BURN_ELEVATION_MESSAGE_TYPE_ROLLBACK_MSI_TRANSACTION,
 
+    BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN,
+    BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE,
+    BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN,
+    BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE,
@@ -41,6 +45,13 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
 
 
 // struct
+
+typedef struct _BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT
+{
+    BURN_USER_EXPERIENCE* pBA;
+    BOOL fPauseCompleteNeeded;
+    BOOL fSrpCompleteNeeded;
+} BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT;
 
 typedef struct _BURN_ELEVATION_GENERIC_MESSAGE_CONTEXT
 {
@@ -89,6 +100,11 @@ static HRESULT OnLoadCompatiblePackage(
     __in BYTE* pbData,
     __in DWORD cbData
     );
+static HRESULT ProcessApplyInitializeMessages(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in_opt LPVOID pvContext,
+    __out DWORD* pdwResult
+    );
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
@@ -119,6 +135,7 @@ static HRESULT ProcessResult(
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT OnApplyInitialize(
+    __in HANDLE hPipe,
     __in BURN_VARIABLES* pVariables,
     __in BURN_REGISTRATION* pRegistration,
     __in HANDLE* phLock,
@@ -245,7 +262,20 @@ static HRESULT OnMsiRollbackTransaction(
     __in BYTE* pbData,
     __in DWORD cbData
     );
-
+static HRESULT ElevatedOnPauseAUBegin(
+    __in HANDLE hPipe
+    );
+static HRESULT ElevatedOnPauseAUComplete(
+    __in HANDLE hPipe,
+    __in HRESULT hrStatus
+    );
+static HRESULT ElevatedOnSystemRestorePointBegin(
+    __in HANDLE hPipe
+    );
+static HRESULT ElevatedOnSystemRestorePointComplete(
+    __in HANDLE hPipe,
+    __in HRESULT hrStatus
+    );
 
 
 // function definitions
@@ -321,6 +351,7 @@ LExit:
 
 extern "C" HRESULT ElevationApplyInitialize(
     __in HANDLE hPipe,
+    __in BURN_USER_EXPERIENCE* pBA,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_ACTION action,
     __in BURN_AU_PAUSE_ACTION auAction,
@@ -331,6 +362,9 @@ extern "C" HRESULT ElevationApplyInitialize(
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
+    BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT context = { };
+
+    context.pBA = pBA;
 
     // serialize message data
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)action);
@@ -346,10 +380,20 @@ extern "C" HRESULT ElevationApplyInitialize(
     ExitOnFailure(hr, "Failed to write variables.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE, pbData, cbData, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE, pbData, cbData, ProcessApplyInitializeMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
+
+    // Best effort to keep the sequence of BA events sane.
+    if (context.fPauseCompleteNeeded)
+    {
+        UserExperienceOnPauseAUComplete(pBA, hr);
+    }
+    if (context.fSrpCompleteNeeded)
+    {
+        UserExperienceOnSystemRestorePointComplete(pBA, hr);
+    }
 
 LExit:
     ReleaseBuffer(pbData);
@@ -1317,6 +1361,68 @@ LExit:
     return hr;
 }
 
+static HRESULT ProcessApplyInitializeMessages(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in_opt LPVOID pvContext,
+    __out DWORD* pdwResult
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT*>(pvContext);
+    BYTE* pbData = (BYTE*)pMsg->pvData;
+    SIZE_T iData = 0;
+    HRESULT hrStatus = S_OK;
+    HRESULT hrBA = S_OK;
+
+    // Process the message.
+    switch (pMsg->dwMessage)
+    {
+    case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN:
+        pContext->fPauseCompleteNeeded = TRUE;
+        hrBA = UserExperienceOnPauseAUBegin(pContext->pBA);
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE:
+        // read hrStatus
+        hr = BuffReadNumber(pbData, pMsg->cbData, &iData, reinterpret_cast<DWORD*>(&hrStatus));
+        ExitOnFailure(hr, "Failed to read pause AU hrStatus.");
+
+        pContext->fPauseCompleteNeeded = FALSE;
+        hrBA = UserExperienceOnPauseAUComplete(pContext->pBA, hrStatus);
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN:
+        if (pContext->fPauseCompleteNeeded)
+        {
+            pContext->fPauseCompleteNeeded = FALSE;
+            hrBA = UserExperienceOnPauseAUComplete(pContext->pBA, E_INVALIDSTATE);
+        }
+
+        pContext->fSrpCompleteNeeded = TRUE;
+        hrBA = UserExperienceOnSystemRestorePointBegin(pContext->pBA);
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE:
+        // read hrStatus
+        hr = BuffReadNumber(pbData, pMsg->cbData, &iData, reinterpret_cast<DWORD*>(&hrStatus));
+        ExitOnFailure(hr, "Failed to read system restore point hrStatus.");
+
+        pContext->fSrpCompleteNeeded = FALSE;
+        hrBA = UserExperienceOnSystemRestorePointComplete(pContext->pBA, hrStatus);
+        break;
+
+    default:
+        hr = E_INVALIDARG;
+        ExitOnRootFailure(hr, "Invalid apply initialize message.");
+        break;
+    }
+
+    *pdwResult = static_cast<DWORD>(hrBA);
+
+LExit:
+    return hr;
+}
+
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
@@ -1385,7 +1491,7 @@ static HRESULT ProcessGenericExecuteMessages(
     }
 
     // send message
-    *pdwResult =  (DWORD)pContext->pfnGenericMessageHandler(&message, pContext->pvContext);;
+    *pdwResult =  (DWORD)pContext->pfnGenericMessageHandler(&message, pContext->pvContext);
 
 LExit:
     ReleaseStr(sczMessage);
@@ -1562,7 +1668,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE:
-        hrResult = OnApplyInitialize(pContext->pVariables, pContext->pRegistration, pContext->phLock, pContext->pfDisabledAutomaticUpdates, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnApplyInitialize(pContext->hPipe, pContext->pVariables, pContext->pRegistration, pContext->phLock, pContext->pfDisabledAutomaticUpdates, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_UNINITIALIZE:
@@ -1697,6 +1803,7 @@ static HRESULT ProcessResult(
 }
 
 static HRESULT OnApplyInitialize(
+    __in HANDLE hPipe,
     __in BURN_VARIABLES* pVariables,
     __in BURN_REGISTRATION* pRegistration,
     __in HANDLE* phLock,
@@ -1711,6 +1818,7 @@ static HRESULT OnApplyInitialize(
     DWORD dwAUAction = 0;
     DWORD dwTakeSystemRestorePoint = 0;
     LPWSTR sczBundleName = NULL;
+    HRESULT hrStatus = S_OK;
 
     // Deserialize message data.
     hr = BuffReadNumber(pbData, cbData, &iData, &dwAction);
@@ -1738,9 +1846,12 @@ static HRESULT OnApplyInitialize(
     // Attempt to pause AU with best effort.
     if (BURN_AU_PAUSE_ACTION_IFELEVATED == dwAUAction || BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME == dwAUAction)
     {
+        hr = ElevatedOnPauseAUBegin(hPipe);
+        ExitOnFailure(hr, "ElevatedOnPauseAUBegin failed.");
+
         LogId(REPORT_STANDARD, MSG_PAUSE_AU_STARTING);
 
-        hr = WuaPauseAutomaticUpdates();
+        hrStatus = hr = WuaPauseAutomaticUpdates();
         if (FAILED(hr))
         {
             LogId(REPORT_STANDARD, MSG_FAILED_PAUSE_AU, hr);
@@ -1754,6 +1865,9 @@ static HRESULT OnApplyInitialize(
                 *pfDisabledWindowsUpdate = TRUE;
             }
         }
+
+        hr = ElevatedOnPauseAUComplete(hPipe, hrStatus);
+        ExitOnFailure(hr, "ElevatedOnPauseAUComplete failed.");
     }
 
     if (dwTakeSystemRestorePoint)
@@ -1765,11 +1879,14 @@ static HRESULT OnApplyInitialize(
             ExitFunction();
         }
 
+        hr = ElevatedOnSystemRestorePointBegin(hPipe);
+        ExitOnFailure(hr, "ElevatedOnSystemRestorePointBegin failed.");
+
         LogId(REPORT_STANDARD, MSG_SYSTEM_RESTORE_POINT_STARTING);
 
         BOOTSTRAPPER_ACTION action = static_cast<BOOTSTRAPPER_ACTION>(dwAction);
         SRP_ACTION restoreAction = (BOOTSTRAPPER_ACTION_INSTALL == action) ? SRP_ACTION_INSTALL : (BOOTSTRAPPER_ACTION_UNINSTALL == action) ? SRP_ACTION_UNINSTALL : SRP_ACTION_MODIFY;
-        hr = SrpCreateRestorePoint(sczBundleName, restoreAction);
+        hrStatus = hr = SrpCreateRestorePoint(sczBundleName, restoreAction);
         if (SUCCEEDED(hr))
         {
             LogId(REPORT_STANDARD, MSG_SYSTEM_RESTORE_POINT_SUCCEEDED);
@@ -1779,11 +1896,14 @@ static HRESULT OnApplyInitialize(
             LogId(REPORT_STANDARD, MSG_SYSTEM_RESTORE_POINT_DISABLED);
             hr = S_OK;
         }
-        else if (FAILED(hr))
+        else
         {
             LogId(REPORT_STANDARD, MSG_SYSTEM_RESTORE_POINT_FAILED, hr);
             hr = S_OK;
         }
+
+        hr = ElevatedOnSystemRestorePointComplete(hPipe, hrStatus);
+        ExitOnFailure(hr, "ElevatedOnSystemRestorePointComplete failed.");
     }
 
 LExit:
@@ -2699,7 +2819,7 @@ static int MsiExecuteMessageHandler(
 
     // send message
     hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, (DWORD*)&nResult);
-    ExitOnFailure(hr, "Failed to send message to per-machine process.");
+    ExitOnFailure(hr, "Failed to send msi message to per-user process.");
 
 LExit:
     ReleaseBuffer(pbData);
@@ -2864,6 +2984,78 @@ static HRESULT OnMsiRollbackTransaction(
 
 LExit:
     ReleaseStr(sczName);
+
+    return hr;
+}
+
+static HRESULT ElevatedOnPauseAUBegin(
+    __in HANDLE hPipe
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN message to per-user process.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT ElevatedOnPauseAUComplete(
+    __in HANDLE hPipe,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbSendData = NULL;
+    SIZE_T cbSendData = 0;
+    DWORD dwResult = 0;
+
+    hr = BuffWriteNumber(&pbSendData, &cbSendData, hrStatus);
+    ExitOnFailure(hr, "Failed to write the pause au status to message buffer.");
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE message to per-user process.");
+
+LExit:
+    ReleaseBuffer(pbSendData);
+
+    return hr;
+}
+
+static HRESULT ElevatedOnSystemRestorePointBegin(
+    __in HANDLE hPipe
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN, NULL, 0, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN message to per-user process.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT ElevatedOnSystemRestorePointComplete(
+    __in HANDLE hPipe,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbSendData = NULL;
+    SIZE_T cbSendData = 0;
+    DWORD dwResult = 0;
+
+    hr = BuffWriteNumber(&pbSendData, &cbSendData, hrStatus);
+    ExitOnFailure(hr, "Failed to write the system restore point status to message buffer.");
+
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE, pbSendData, cbSendData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE message to per-user process.");
+
+LExit:
+    ReleaseBuffer(pbSendData);
 
     return hr;
 }

@@ -343,6 +343,13 @@ BAAPI UserExperienceOnLaunchApprovedExeComplete(
     __in HRESULT hrStatus,
     __in DWORD dwProcessId
     );
+BAAPI UserExperienceOnPauseAUBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    );
+BAAPI UserExperienceOnPauseAUComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus
+    );
 BAAPI UserExperienceOnPlanBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD cPackages
@@ -444,6 +451,13 @@ BAAPI UserExperienceOnShutdown(
     );
 BAAPI UserExperienceOnStartup(
     __in BURN_USER_EXPERIENCE* pUserExperience
+    );
+BAAPI UserExperienceOnSystemRestorePointBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    );
+BAAPI UserExperienceOnSystemRestorePointComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus
     );
 BAAPI UserExperienceOnSystemShutdown(
     __in BURN_USER_EXPERIENCE* pUserExperience,

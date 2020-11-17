@@ -1482,6 +1482,46 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnPauseAUBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPAUSEAUTOMATICUPDATESBEGIN_ARGS args = { };
+    BA_ONPAUSEAUTOMATICUPDATESBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+
+    results.cbSize = sizeof(results);
+    
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnPauseAUBegin failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPauseAUComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_ARGS args = { };
+    BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnPauseAUComplete failed.");
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnPlanBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD cPackages
@@ -1978,6 +2018,46 @@ EXTERN_C BAAPI UserExperienceOnStartup(
 
     hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &args, &results, pUserExperience->pvBAProcContext);
     ExitOnFailure(hr, "BA OnStartup failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnSystemRestorePointBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONSYSTEMRESTOREPOINTBEGIN_ARGS args = { };
+    BA_ONSYSTEMRESTOREPOINTBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+
+    results.cbSize = sizeof(results);
+    
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnSystemRestorePointBegin failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnSystemRestorePointComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS args = { };
+    BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnSystemRestorePointComplete failed.");
 
 LExit:
     return hr;
