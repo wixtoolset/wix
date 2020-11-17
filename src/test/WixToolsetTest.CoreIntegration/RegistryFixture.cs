@@ -74,7 +74,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(new[]
                 {
                     "Registry:regitq_Wx9LfvJuNSc2un6gIHAzr4A\t2\tPath\\To\\AnotherKey\tSecret\t#x\tMultiStringComponent",
-                    "Registry:regmeTJMpOD41igfxhTcUVZ7kNG1Mo\t2\tPath\\To\\Key\t\ta[~]b[~]c\tMultiStringComponent",
+                    "Registry:regmeTJMpOD41igfxhTcUVZ7kNG1Mo\t2\tPath\\To\\Key\t\ta[~]b[~][~]c[~]\tMultiStringComponent",
                 }, results);
             }
         }

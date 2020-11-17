@@ -6,7 +6,9 @@
                 <RegistryValue Root="HKLM" Key="Path\To\Key" Type="multiString" KeyPath="yes">
                     <MultiString Value="a" />
                     <MultiStringValue Value="b" />
+                    <MultiStringValue />
                     <MultiString Value="c" />
+                    <MultiStringValue />
                 </RegistryValue>
                 <RegistryValue Root="HKLM" Key="Path\To\AnotherKey" Name="Secret" Type="binary"  />
             </Component>

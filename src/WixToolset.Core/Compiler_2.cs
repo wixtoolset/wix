@@ -1977,16 +1977,11 @@ namespace WixToolset.Core
                 }
             }
 
-            if (multiStringValue == null)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
             this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             this.Core.ParseForExtensionElements(node);
 
-            return (null == value) ? multiStringValue : String.Concat(value, "[~]", multiStringValue);
+            return null == value ? multiStringValue ?? "[~]" : String.Concat(value, "[~]", multiStringValue);
         }
 
         /// <summary>
