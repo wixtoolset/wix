@@ -19,8 +19,8 @@ extern "C" HRESULT PseudoBundleInitialize(
     __in_z_opt LPCWSTR wzRepairArguments,
     __in_z_opt LPCWSTR wzUninstallArguments,
     __in_opt BURN_DEPENDENCY_PROVIDER* pDependencyProvider,
-    __in_opt BYTE* pbHash,
-    __in DWORD cbHash
+    __in_opt const BYTE* pbHash,
+    __in const DWORD cbHash
     )
 {
     HRESULT hr = S_OK;
