@@ -257,7 +257,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory(Skip = "DotNetCoreSdk builds fail in 16.8.1")]
+        [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk, true)]
         [InlineData(BuildSystem.DotNetCoreSdk, false)]
         [InlineData(BuildSystem.MSBuild, true)]
