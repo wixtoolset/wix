@@ -328,7 +328,7 @@ DAPI_(HRESULT) PathPrefix(
 
     HRESULT hr = S_OK;
     LPWSTR wzFullPath = *psczFullPath;
-    DWORD_PTR cbFullPath = 0;
+    SIZE_T cbFullPath = 0;
 
     if (((L'a' <= wzFullPath[0] && L'z' >= wzFullPath[0]) ||
          (L'A' <= wzFullPath[0] && L'Z' >= wzFullPath[0])) &&
@@ -365,7 +365,7 @@ LExit:
 
 DAPI_(HRESULT) PathFixedBackslashTerminate(
     __inout_ecount_z(cchPath) LPWSTR wzPath,
-    __in DWORD_PTR cchPath
+    __in SIZE_T cchPath
     )
 {
     HRESULT hr = S_OK;
@@ -396,7 +396,7 @@ DAPI_(HRESULT) PathBackslashTerminate(
     Assert(psczPath && *psczPath);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cchPath = 0;
+    SIZE_T cchPath = 0;
     size_t cchLength = 0;
 
     hr = StrMaxLength(*psczPath, &cchPath);

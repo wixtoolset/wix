@@ -28,6 +28,12 @@ HRESULT BuffReadNumber64(
     __inout SIZE_T* piBuffer,
     __out DWORD64* pdw64
     );
+HRESULT BuffReadPointer(
+    __in_bcount(cbBuffer) const BYTE* pbBuffer,
+    __in SIZE_T cbBuffer,
+    __inout SIZE_T* piBuffer,
+    __out DWORD_PTR* pdw
+);
 HRESULT BuffReadString(
     __in_bcount(cbBuffer) const BYTE* pbBuffer,
     __in SIZE_T cbBuffer,
@@ -58,6 +64,11 @@ HRESULT BuffWriteNumber64(
     __inout SIZE_T* piBuffer,
     __in DWORD64 dw64
     );
+HRESULT BuffWritePointer(
+    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __inout SIZE_T* piBuffer,
+    __in DWORD_PTR dw
+);
 HRESULT BuffWriteString(
     __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,

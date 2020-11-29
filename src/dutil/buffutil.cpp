@@ -51,11 +51,11 @@ LExit:
 }
 
 extern "C" HRESULT BuffReadNumber64(
-    __in_bcount(cbBuffer) const BYTE* pbBuffer,
+    __in_bcount(cbBuffer) const BYTE * pbBuffer,
     __in SIZE_T cbBuffer,
     __inout SIZE_T* piBuffer,
     __out DWORD64* pdw64
-    )
+)
 {
     Assert(pbBuffer);
     Assert(piBuffer);
@@ -77,6 +77,38 @@ extern "C" HRESULT BuffReadNumber64(
 
     *pdw64 = *(const DWORD64*)(pbBuffer + *piBuffer);
     *piBuffer += sizeof(DWORD64);
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT BuffReadPointer(
+    __in_bcount(cbBuffer) const BYTE * pbBuffer,
+    __in SIZE_T cbBuffer,
+    __inout SIZE_T* piBuffer,
+    __out DWORD_PTR* pdw64
+)
+{
+    Assert(pbBuffer);
+    Assert(piBuffer);
+    Assert(pdw64);
+
+    HRESULT hr = S_OK;
+    SIZE_T cbAvailable = 0;
+
+    // get availiable data size
+    hr = ::SIZETSub(cbBuffer, *piBuffer, &cbAvailable);
+    ExitOnRootFailure(hr, "Failed to calculate available data size.");
+
+    // verify buffer size
+    if (sizeof(DWORD_PTR) > cbAvailable)
+    {
+        hr = E_INVALIDARG;
+        ExitOnRootFailure(hr, "Buffer too small.");
+    }
+
+    *pdw64 = *(const DWORD_PTR*)(pbBuffer + *piBuffer);
+    *piBuffer += sizeof(DWORD_PTR);
 
 LExit:
     return hr;
@@ -295,6 +327,29 @@ extern "C" HRESULT BuffWriteNumber64(
     // copy data to buffer
     *(DWORD64*)(*ppbBuffer + *piBuffer) = dw64;
     *piBuffer += sizeof(DWORD64);
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT BuffWritePointer(
+    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __inout SIZE_T* piBuffer,
+    __in DWORD_PTR dw
+)
+{
+    Assert(ppbBuffer);
+    Assert(piBuffer);
+
+    HRESULT hr = S_OK;
+
+    // make sure we have a buffer with sufficient space
+    hr = EnsureBufferSize(ppbBuffer, *piBuffer + sizeof(DWORD_PTR));
+    ExitOnFailure(hr, "Failed to ensure buffer size.");
+
+    // copy data to buffer
+    *(DWORD_PTR*)(*ppbBuffer + *piBuffer) = dw;
+    *piBuffer += sizeof(DWORD_PTR);
 
 LExit:
     return hr;

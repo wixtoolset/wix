@@ -71,7 +71,7 @@ DAPI_(HRESULT) PathPrefix(
 ********************************************************************/
 DAPI_(HRESULT) PathFixedBackslashTerminate(
     __inout_ecount_z(cchPath) LPWSTR wzPath,
-    __in DWORD_PTR cchPath
+    __in SIZE_T cchPath
     );
 
 /*******************************************************************

@@ -346,7 +346,7 @@ extern "C" HRESULT DAPI DirGetCurrent(
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
+    SIZE_T cch = 0;
 
     if (psczCurrentDirectory && *psczCurrentDirectory)
     {

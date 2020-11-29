@@ -19,11 +19,11 @@ extern "C" {
 
 HRESULT DAPI StrAlloc(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     );
 HRESULT DAPI StrAllocSecure(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     );
 HRESULT DAPI StrTrimCapacity(
     __deref_out_z LPWSTR* ppwz
@@ -34,7 +34,7 @@ HRESULT DAPI StrTrimWhitespace(
     );
 HRESULT DAPI StrAnsiAlloc(
     __deref_out_ecount_part(cch, 0) LPSTR* ppz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     );
 HRESULT DAPI StrAnsiTrimCapacity(
     __deref_out_z LPSTR* ppz
@@ -73,7 +73,7 @@ HRESULT DAPI StrAnsiAllocStringAnsi(
 HRESULT DAPI StrAllocPrefix(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzPrefix,
-    __in DWORD_PTR cchPrefix
+    __in SIZE_T cchPrefix
     );
 HRESULT DAPI StrAllocConcat(
     __deref_out_z LPWSTR* ppwz,
@@ -139,11 +139,11 @@ HRESULT DAPI StrAllocFromError(
 
 HRESULT DAPI StrMaxLength(
     __in LPCVOID p,
-    __out DWORD_PTR* pcch
+    __out SIZE_T* pcbch
     );
 HRESULT DAPI StrSize(
     __in LPCVOID p,
-    __out DWORD_PTR* pcb
+    __out SIZE_T* pcbb
     );
 
 HRESULT DAPI StrFree(
@@ -165,19 +165,19 @@ HRESULT DAPI StrReplaceString(
 
 HRESULT DAPI StrHexEncode(
     __in_ecount(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __out_ecount(cchDest) LPWSTR wzDest,
-    __in DWORD_PTR cchDest
+    __in SIZE_T cchDest
     );
 HRESULT DAPI StrAllocHexEncode(
     __in_ecount(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __deref_out_ecount_z(2*(cbSource+1)) LPWSTR* ppwzDest
     );
 HRESULT DAPI StrHexDecode(
     __in_z LPCWSTR wzSource,
     __out_bcount(cbDest) BYTE* pbDest,
-    __in DWORD_PTR cbDest
+    __in SIZE_T cbDest
     );
 HRESULT DAPI StrAllocHexDecode(
     __in_z LPCWSTR wzSource,
@@ -187,29 +187,29 @@ HRESULT DAPI StrAllocHexDecode(
 
 HRESULT DAPI StrAllocBase85Encode(
     __in_bcount_opt(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __deref_out_z LPWSTR* pwzDest
     );
 HRESULT DAPI StrAllocBase85Decode(
     __in_z LPCWSTR wzSource,
-    __deref_out_bcount(*pcbDest) BYTE** hbDest,
-    __out DWORD_PTR* pcbDest
-    );
+    __deref_out_bcount(*pcbDest) BYTE** ppbDest,
+    __out SIZE_T* pcbDest
+);
 
 HRESULT DAPI MultiSzLen(
     __in_ecount(*pcch) __nullnullterminated LPCWSTR pwzMultiSz,
-    __out DWORD_PTR* pcch
+    __out SIZE_T* pcbch
     );
 HRESULT DAPI MultiSzPrepend(
     __deref_inout_ecount(*pcchMultiSz) __nullnullterminated LPWSTR* ppwzMultiSz,
-    __inout_opt DWORD_PTR *pcchMultiSz,
+    __inout_opt SIZE_T* pcchMultiSz,
     __in __nullnullterminated LPCWSTR pwzInsert
     );
 HRESULT DAPI MultiSzFindSubstring(
     __in __nullnullterminated LPCWSTR pwzMultiSz,
     __in __nullnullterminated LPCWSTR pwzSubstring,
     __out_opt DWORD_PTR* pdwIndex,
-    __deref_opt_out_z LPCWSTR* ppwzFoundIn
+    __deref_opt_out __nullnullterminated LPCWSTR* ppwzFoundIn
     );
 HRESULT DAPI MultiSzFindString(
     __in __nullnullterminated LPCWSTR pwzMultiSz,
@@ -223,7 +223,7 @@ HRESULT DAPI MultiSzRemoveString(
     );
 HRESULT DAPI MultiSzInsertString(
     __deref_inout_z LPWSTR* ppwzMultiSz,
-    __inout_opt DWORD_PTR *pcchMultiSz,
+    __inout_opt SIZE_T* pcchMultiSz,
     __in DWORD_PTR dwIndex,
     __in_z LPCWSTR pwzInsert
     );

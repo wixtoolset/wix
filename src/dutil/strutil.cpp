@@ -7,19 +7,19 @@
 // Forward declarations.
 static HRESULT AllocHelper(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch,
+    __in SIZE_T cch,
     __in BOOL fZeroOnRealloc
     );
 static HRESULT AllocStringHelper(
     __deref_out_ecount_z(cchSource + 1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in BOOL fZeroOnRealloc
     );
 static HRESULT AllocConcatHelper(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in BOOL fZeroOnRealloc
     );
 static HRESULT AllocFormattedArgsHelper(
@@ -42,7 +42,7 @@ NOTE: caller is responsible for freeing ppwz even if function fails
 ********************************************************************/
 extern "C" HRESULT DAPI StrAlloc(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     )
 {
     return AllocHelper(ppwz, cch, FALSE);
@@ -57,7 +57,7 @@ NOTE: caller is responsible for freeing ppwz even if function fails
 ********************************************************************/
 extern "C" HRESULT DAPI StrAllocSecure(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     )
 {
     return AllocHelper(ppwz, cch, TRUE);
@@ -72,7 +72,7 @@ NOTE: caller is responsible for freeing ppwz even if function fails
 ********************************************************************/
 static HRESULT AllocHelper(
     __deref_out_ecount_part(cch, 0) LPWSTR* ppwz,
-    __in DWORD_PTR cch,
+    __in SIZE_T cch,
     __in BOOL fZeroOnRealloc
     )
 {
@@ -128,7 +128,7 @@ HRESULT DAPI StrTrimCapacity(
     Assert(ppwz);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cchLen = 0;
+    SIZE_T cchLen = 0;
 
     hr = ::StringCchLengthW(*ppwz, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchLen));
     ExitOnFailure(hr, "Failed to calculate length of string");
@@ -201,7 +201,7 @@ NOTE: caller is responsible for freeing ppsz even if function fails
 ********************************************************************/
 extern "C" HRESULT DAPI StrAnsiAlloc(
     __deref_out_ecount_part(cch, 0) LPSTR* ppsz,
-    __in DWORD_PTR cch
+    __in SIZE_T cch
     )
 {
     Assert(ppsz && cch);
@@ -246,7 +246,7 @@ HRESULT DAPI StrAnsiTrimCapacity(
     Assert(ppz);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cchLen = 0;
+    SIZE_T cchLen = 0;
 
 #pragma prefast(push)
 #pragma prefast(disable:25068)
@@ -324,7 +324,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAllocString(
     __deref_out_ecount_z(cchSource+1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     return AllocStringHelper(ppwz, wzSource, cchSource, FALSE);
@@ -342,7 +342,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAllocStringSecure(
     __deref_out_ecount_z(cchSource + 1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     return AllocStringHelper(ppwz, wzSource, cchSource, TRUE);
@@ -360,14 +360,14 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 static HRESULT AllocStringHelper(
     __deref_out_ecount_z(cchSource + 1) LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in BOOL fZeroOnRealloc
     )
 {
     Assert(ppwz && wzSource); // && *wzSource);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
+    SIZE_T cch = 0;
 
     if (*ppwz)
     {
@@ -385,7 +385,7 @@ static HRESULT AllocStringHelper(
         cchSource = lstrlenW(wzSource);
     }
 
-    DWORD_PTR cchNeeded;
+    SIZE_T cchNeeded;
     hr = ::ULongPtrAdd(cchSource, 1, &cchNeeded); // add one for the null terminator
     ExitOnFailure(hr, "source string is too long");
 
@@ -414,7 +414,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAnsiAllocString(
     __deref_out_ecount_z(cchSource+1) LPSTR* ppsz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in UINT uiCodepage
     )
 {
@@ -422,8 +422,8 @@ extern "C" HRESULT DAPI StrAnsiAllocString(
 
     HRESULT hr = S_OK;
     LPSTR psz = NULL;
-    DWORD_PTR cch = 0;
-    DWORD_PTR cchDest = cchSource; // at least enough
+    SIZE_T cch = 0;
+    SIZE_T cchDest = cchSource; // at least enough
 
     if (*ppsz)
     {
@@ -494,7 +494,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAllocStringAnsi(
     __deref_out_ecount_z(cchSource+1) LPWSTR* ppwz,
     __in_z LPCSTR szSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in UINT uiCodepage
     )
 {
@@ -502,8 +502,8 @@ extern "C" HRESULT DAPI StrAllocStringAnsi(
 
     HRESULT hr = S_OK;
     LPWSTR pwz = NULL;
-    DWORD_PTR cch = 0;
-    DWORD_PTR cchDest = cchSource;  // at least enough
+    SIZE_T cch = 0;
+    SIZE_T cchDest = cchSource;  // at least enough
 
     if (*ppwz)
     {
@@ -575,13 +575,13 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 HRESULT DAPI StrAnsiAllocStringAnsi(
     __deref_out_ecount_z(cchSource+1) LPSTR* ppsz,
     __in_z LPCSTR szSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     Assert(ppsz && szSource); // && *szSource);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
+    SIZE_T cch = 0;
 
     if (*ppsz)
     {
@@ -599,7 +599,7 @@ HRESULT DAPI StrAnsiAllocStringAnsi(
         cchSource = lstrlenA(szSource);
     }
 
-    DWORD_PTR cchNeeded;
+    SIZE_T cchNeeded;
     hr = ::ULongPtrAdd(cchSource, 1, &cchNeeded); // add one for the null terminator
     ExitOnFailure(hr, "source string is too long");
 
@@ -632,14 +632,14 @@ NOTE: if cchPrefix == 0, length of wzPrefix is used instead
 extern "C" HRESULT DAPI StrAllocPrefix(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzPrefix,
-    __in DWORD_PTR cchPrefix
+    __in SIZE_T cchPrefix
     )
 {
     Assert(ppwz && wzPrefix);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
-    DWORD_PTR cchLen = 0;
+    SIZE_T cch = 0;
+    SIZE_T cchLen = 0;
 
     if (*ppwz)
     {
@@ -672,8 +672,8 @@ extern "C" HRESULT DAPI StrAllocPrefix(
 
     if (*ppwz)
     {
-        DWORD_PTR cb = cch * sizeof(WCHAR);
-        DWORD_PTR cbPrefix = cchPrefix * sizeof(WCHAR);
+        SIZE_T cb = cch * sizeof(WCHAR);
+        SIZE_T cbPrefix = cchPrefix * sizeof(WCHAR);
 
         memmove(*ppwz + cchPrefix, *ppwz, cb - cbPrefix);
         memcpy(*ppwz, wzPrefix, cbPrefix);
@@ -699,7 +699,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAllocConcat(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     return AllocConcatHelper(ppwz, wzSource, cchSource, FALSE);
@@ -718,7 +718,7 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 extern "C" HRESULT DAPI StrAllocConcatSecure(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     return AllocConcatHelper(ppwz, wzSource, cchSource, TRUE);
@@ -737,15 +737,15 @@ NOTE: if cchSource == 0, length of wzSource is used instead
 static HRESULT AllocConcatHelper(
     __deref_out_z LPWSTR* ppwz,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource,
+    __in SIZE_T cchSource,
     __in BOOL fZeroOnRealloc
     )
 {
     Assert(ppwz && wzSource); // && *wzSource);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
-    DWORD_PTR cchLen = 0;
+    SIZE_T cch = 0;
+    SIZE_T cchLen = 0;
 
     if (*ppwz)
     {
@@ -801,14 +801,14 @@ NOTE: if cchSource == 0, length of pzSource is used instead
 extern "C" HRESULT DAPI StrAnsiAllocConcat(
     __deref_out_z LPSTR* ppz,
     __in_z LPCSTR pzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     Assert(ppz && pzSource); // && *pzSource);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = 0;
-    DWORD_PTR cchLen = 0;
+    SIZE_T cch = 0;
+    SIZE_T cchLen = 0;
 
     if (*ppz)
     {
@@ -842,7 +842,7 @@ extern "C" HRESULT DAPI StrAnsiAllocConcat(
     {
         cch = (cchSource + cchLen + 1) * 2;
         hr = StrAnsiAlloc(ppz, cch);
-        ExitOnFailure(hr, "failed to allocate string from string: %ls", pzSource);
+        ExitOnFailure(hr, "failed to allocate string from string: %hs", pzSource);
     }
 
     if (*ppz)
@@ -1138,7 +1138,7 @@ extern "C" HRESULT DAPI StrAnsiAllocFormattedArgs(
     Assert(ppsz && szFormat && *szFormat);
 
     HRESULT hr = S_OK;
-    DWORD_PTR cch = *ppsz ? MemSize(*ppsz) / sizeof(CHAR) : 0;
+    SIZE_T cch = *ppsz ? MemSize(*ppsz) / sizeof(CHAR) : 0;
     LPSTR pszOriginal = NULL;
     DWORD cchOriginal = 0;
 
@@ -1183,7 +1183,7 @@ extern "C" HRESULT DAPI StrAnsiAllocFormattedArgs(
             }
             cch *= 2;
             hr = StrAnsiAlloc(ppsz, cch);
-            ExitOnFailure(hr, "failed to allocate string to format: %ls", szFormat);
+            ExitOnFailure(hr, "failed to allocate string to format: %hs", szFormat);
             hr = S_FALSE;
         }
     } while (S_FALSE == hr);
@@ -1247,7 +1247,7 @@ NOTE:  assumes Unicode string
 ********************************************************************/
 extern "C" HRESULT DAPI StrMaxLength(
     __in LPCVOID p,
-    __out DWORD_PTR* pcch
+    __out SIZE_T* pcch
     )
 {
     Assert(pcch);
@@ -1281,7 +1281,7 @@ StrSize - returns count of bytes in dynamic string p
 ********************************************************************/
 extern "C" HRESULT DAPI StrSize(
     __in LPCVOID p,
-    __out DWORD_PTR* pcb
+    __out SIZE_T* pcb
     )
 {
     Assert(p && pcb);
@@ -1430,9 +1430,9 @@ NOTE: wzDest must have space for cbSource * 2 + 1 characters
 ****************************************************************************/
 extern "C" HRESULT DAPI StrHexEncode(
     __in_ecount(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __out_ecount(cchDest) LPWSTR wzDest,
-    __in DWORD_PTR cchDest
+    __in SIZE_T cchDest
     )
 {
     Assert(pbSource && wzDest);
@@ -1469,12 +1469,12 @@ StrAllocHexEncode - converts an array of bytes to an allocated text string
 ****************************************************************************/
 HRESULT DAPI StrAllocHexEncode(
     __in_ecount(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __deref_out_ecount_z(2*(cbSource+1)) LPWSTR* ppwzDest
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cchSource = sizeof(WCHAR) * (cbSource + 1);
+    SIZE_T cchSource = sizeof(WCHAR) * (cbSource + 1);
 
     hr = StrAlloc(ppwzDest, cchSource);
     ExitOnFailure(hr, "Failed to allocate hex string.");
@@ -1495,7 +1495,7 @@ NOTE: wzSource must contain even number of characters
 extern "C" HRESULT DAPI StrHexDecode(
     __in_z LPCWSTR wzSource,
     __out_bcount(cbDest) BYTE* pbDest,
-    __in DWORD_PTR cbDest
+    __in SIZE_T cbDest
     )
 {
     Assert(wzSource && pbDest);
@@ -1612,12 +1612,12 @@ StrAllocBase85Encode - converts an array of bytes into an XML compatible string
 ****************************************************************************/
 extern "C" HRESULT DAPI StrAllocBase85Encode(
     __in_bcount_opt(cbSource) const BYTE* pbSource,
-    __in DWORD_PTR cbSource,
+    __in SIZE_T cbSource,
     __deref_out_z LPWSTR* pwzDest
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cchDest = 0;
+    SIZE_T cchDest = 0;
     LPWSTR wzDest;
     DWORD_PTR iSource = 0;
     DWORD_PTR iDest = 0;
@@ -1709,15 +1709,15 @@ NOTE: Use MemFree() to release the allocated stream of bytes
 extern "C" HRESULT DAPI StrAllocBase85Decode(
     __in_z LPCWSTR wzSource,
     __deref_out_bcount(*pcbDest) BYTE** ppbDest,
-    __out DWORD_PTR* pcbDest
+    __out SIZE_T* pcbDest
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cchSource = lstrlenW(wzSource);
+    SIZE_T cchSource = lstrlenW(wzSource);
     DWORD_PTR i, n, k;
 
     BYTE* pbDest;
-    DWORD_PTR cbDest;
+    SIZE_T cbDest;
 
     if (!wzSource || !ppbDest || !pcbDest)
     {
@@ -1849,9 +1849,9 @@ including the double null terminator at the end of the MULTISZ.
 NOTE: returns 0 if the multisz in not properly terminated with two nulls
 ****************************************************************************/
 extern "C" HRESULT DAPI MultiSzLen(
-    __in __nullnullterminated LPCWSTR pwzMultiSz,
-    __out DWORD_PTR* pcch
-    )
+    __in_ecount(*pcch) __nullnullterminated LPCWSTR pwzMultiSz,
+    __out SIZE_T* pcch
+)
 {
     Assert(pcch);
 
@@ -1894,7 +1894,7 @@ MultiSzPrepend - prepends a string onto the front of a MUTLISZ
 ****************************************************************************/
 extern "C" HRESULT DAPI MultiSzPrepend(
     __deref_inout_ecount(*pcchMultiSz) __nullnullterminated LPWSTR* ppwzMultiSz,
-    __inout_opt DWORD_PTR *pcchMultiSz,
+    __inout_opt SIZE_T* pcchMultiSz,
     __in __nullnullterminated LPCWSTR pwzInsert
     )
 {
@@ -1902,9 +1902,9 @@ extern "C" HRESULT DAPI MultiSzPrepend(
 
     HRESULT hr =S_OK;
     LPWSTR pwzResult = NULL;
-    DWORD_PTR cchResult = 0;
-    DWORD_PTR cchInsert = 0;
-    DWORD_PTR cchMultiSz = 0;
+    SIZE_T cchResult = 0;
+    SIZE_T cchInsert = 0;
+    SIZE_T cchMultiSz = 0;
 
     // Get the lengths of the MULTISZ (and prime it if it's not initialized)
     if (pcchMultiSz && 0 != *pcchMultiSz)
@@ -1979,8 +1979,8 @@ extern "C" HRESULT DAPI MultiSzFindSubstring(
     HRESULT hr = S_FALSE; // Assume we won't find it (the glass is half empty)
     LPCWSTR wz = pwzMultiSz;
     DWORD_PTR dwIndex = 0;
-    DWORD_PTR cchMultiSz = 0;
-    DWORD_PTR cchProgress = 0;
+    SIZE_T cchMultiSz = 0;
+    SIZE_T cchProgress = 0;
 
     hr = MultiSzLen(pwzMultiSz, &cchMultiSz);
     ExitOnFailure(hr, "failed to get the length of a MULTISZ string");
@@ -2045,8 +2045,8 @@ extern "C" HRESULT DAPI MultiSzFindString(
     HRESULT hr = S_FALSE; // Assume we won't find it
     LPCWSTR wz = pwzMultiSz;
     DWORD_PTR dwIndex = 0;
-    DWORD_PTR cchMutliSz = 0;
-    DWORD_PTR cchProgress = 0;
+    SIZE_T cchMutliSz = 0;
+    SIZE_T cchProgress = 0;
 
     hr = MultiSzLen(pwzMultiSz, &cchMutliSz);
     ExitOnFailure(hr, "failed to get the length of a MULTISZ string");
@@ -2112,8 +2112,8 @@ extern "C" HRESULT DAPI MultiSzRemoveString(
     LPCWSTR wz = *ppwzMultiSz;
     LPCWSTR wzNext = NULL;
     DWORD_PTR dwCurrentIndex = 0;
-    DWORD_PTR cchMultiSz = 0;
-    DWORD_PTR cchProgress = 0;
+    SIZE_T cchMultiSz = 0;
+    SIZE_T cchProgress = 0;
 
     hr = MultiSzLen(*ppwzMultiSz, &cchMultiSz);
     ExitOnFailure(hr, "failed to get the length of a MULTISZ string");
@@ -2179,7 +2179,7 @@ MultiSzInsertString - inserts new string at the specified index
 ****************************************************************************/
 extern "C" HRESULT DAPI MultiSzInsertString(
     __deref_inout __nullnullterminated LPWSTR* ppwzMultiSz,
-    __inout_opt DWORD_PTR *pcchMultiSz,
+    __inout_opt SIZE_T* pcchMultiSz,
     __in DWORD_PTR dwIndex,
     __in __nullnullterminated LPCWSTR pwzInsert
     )
@@ -2189,11 +2189,11 @@ extern "C" HRESULT DAPI MultiSzInsertString(
     HRESULT hr = S_OK;
     LPCWSTR wz = *ppwzMultiSz;
     DWORD_PTR dwCurrentIndex = 0;
-    DWORD_PTR cchProgress = 0;
+    SIZE_T cchProgress = 0;
     LPWSTR pwzResult = NULL;
-    DWORD_PTR cchResult = 0;
-    DWORD_PTR cchString = lstrlenW(pwzInsert);
-    DWORD_PTR cchMultiSz = 0;
+    SIZE_T cchResult = 0;
+    SIZE_T cchString = lstrlenW(pwzInsert);
+    SIZE_T cchMultiSz = 0;
 
     if (pcchMultiSz && 0 != *pcchMultiSz)
     {
@@ -2302,7 +2302,7 @@ extern "C" LPCWSTR DAPI wcsistr(
 {
     LPCWSTR wzSource = wzString;
     LPCWSTR wzSearch = NULL;
-    DWORD_PTR cchSourceIndex = 0;
+    SIZE_T cchSourceIndex = 0;
 
     // Walk through wzString (the source string) one character at a time
     while (*wzSource)
@@ -2600,7 +2600,7 @@ extern "C" HRESULT DAPI StrArrayAllocString(
     __deref_inout_ecount_opt(*pcStrArray) LPWSTR **prgsczStrArray,
     __inout LPUINT pcStrArray,
     __in_z LPCWSTR wzSource,
-    __in DWORD_PTR cchSource
+    __in SIZE_T cchSource
     )
 {
     HRESULT hr = S_OK;
@@ -2726,7 +2726,7 @@ extern "C" DAPI_(HRESULT) StrSecureZeroString(
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cch;
+    SIZE_T cch;
 
     if (pwz)
     {

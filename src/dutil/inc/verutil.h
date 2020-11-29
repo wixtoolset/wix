@@ -12,7 +12,7 @@ typedef struct _VERUTIL_VERSION_RELEASE_LABEL
 {
     BOOL fNumeric;
     DWORD dwValue;
-    DWORD_PTR cchLabelOffset;
+    SIZE_T cchLabelOffset;
     int cchLabel;
 } VERUTIL_VERSION_RELEASE_LABEL;
 
@@ -25,7 +25,7 @@ typedef struct _VERUTIL_VERSION
     DWORD dwRevision;
     DWORD cReleaseLabels;
     VERUTIL_VERSION_RELEASE_LABEL* rgReleaseLabels;
-    DWORD_PTR cchMetadataOffset;
+    SIZE_T cchMetadataOffset;
     BOOL fInvalid;
 } VERUTIL_VERSION;
 
