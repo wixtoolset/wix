@@ -397,6 +397,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.MissingUpgradeCode, "The Product/@UpgradeCode attribute was not found; it is strongly recommended to ensure that this product can be upgraded.");
         }
 
+        public static Message MsiTransactionLimitations(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionLimitations, "MSI transactions have limitations that make it hard to use them successfully in a bundle. Test the bundle thoroughly, especially in upgrade scenarios and the scenario that required them in the first place.");
+        }
+
         public static Message NestedInstall(SourceLineNumber sourceLineNumbers, string tableName, string columnName, Object value)
         {
             return Message(sourceLineNumbers, Ids.NestedInstall, "The {0}.{1} column's value, '{2}', indicates a nested install.  Nested installations are not supported by the WiX team.  This action will be left out of the decompiled output.", tableName, columnName, value);
@@ -780,6 +785,7 @@ namespace WixToolset.Data
             VersionTruncated = 1148,
             ServiceConfigFamilyNotSupported = 1149,
             SymbolNotTranslatedToOutput = 1150,
+            MsiTransactionLimitations = 1151,
         }
     }
 }
