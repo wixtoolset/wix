@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?ifndef Version?>
+<?define Version = 1.0.0.0?>
+<?endif?>
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle Name="~$(var.TestGroupName) - Bundle A" Version="$(var.Version)" UpgradeCode="{90ED10D5-B187-4470-B498-05D80DAB729A}" Compressed="yes">
+    <Log Prefix="~$(var.TestGroupName)_BundleA"/>
+
+    <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
+
+    <Chain>
+      <PackageGroupRef Id="TestBA" />
+      <PackageGroupRef Id="BundlePackages" />
+    </Chain>
+  </Bundle>
+</Include>

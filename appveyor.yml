@@ -1,0 +1,25 @@
+# Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+branches:
+  only:
+    - master
+
+image: Visual Studio 2019
+
+environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  NUGET_XMLDOC_MODE: skip
+  RuntimeTestsEnabled: true
+  WIX_COMPRESSION_LEVEL: none
+
+build_script:
+  - appveyor.cmd
+
+test: off
+
+skip_tags: true
+
+on_finish:
+  - ps: 7z a logs.zip $env:TEMP\*.log $env:TEMP\..\*.log
+  - ps: Push-AppveyorArtifact logs.zip
