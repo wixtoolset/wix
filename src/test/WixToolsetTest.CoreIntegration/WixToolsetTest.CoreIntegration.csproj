@@ -64,6 +64,12 @@
     <Content Include="TestData\Font\TrueType.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Icon\SampleIcon.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\LockPermissions\EmptyPermissions.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\FirstX64.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\FirstX86.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\SecondX64.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\SecondX86.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\X64AfterX86Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MsiTransaction\X86AfterX64Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PatchFamilyFilter\.data\Av1.0.0.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PatchFamilyFilter\.data\Av1.0.1.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PatchFamilyFilter\.data\Bv1.0.0.txt" CopyToOutputDirectory="PreserveNewest" />

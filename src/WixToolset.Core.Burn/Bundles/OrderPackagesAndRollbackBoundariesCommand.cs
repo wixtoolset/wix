@@ -44,9 +44,10 @@ namespace WixToolset.Core.Burn.Bundles
             // We handle uninstall (aka: backwards) rollback boundaries after
             // we get these install/repair (aka: forward) rollback boundaries
             // defined.
-            WixBundleRollbackBoundarySymbol previousRollbackBoundary = null;
+            WixBundleRollbackBoundarySymbol pendingRollbackBoundary = null;
             WixBundleRollbackBoundarySymbol lastRollbackBoundary = null;
             var boundaryHadX86Package = false;
+            var warnedMsiTransaction = false;
 
             foreach (var groupSymbol in this.GroupSymbols)
             {
@@ -54,24 +55,30 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     if (this.PackageFacades.TryGetValue(groupSymbol.ChildId, out var facade))
                     {
-                        if (null != previousRollbackBoundary)
+                        var insideMsiTransaction = lastRollbackBoundary != null && lastRollbackBoundary.Transaction.HasValue && lastRollbackBoundary.Transaction.Value;
+                        if (null != pendingRollbackBoundary)
                         {
-                            usedBoundaries.Add(previousRollbackBoundary);
-                            facade.PackageSymbol.RollbackBoundaryRef = previousRollbackBoundary.Id.Id;
-                            previousRollbackBoundary = null;
+                            if (insideMsiTransaction && !warnedMsiTransaction)
+                            {
+                                warnedMsiTransaction = true;
+                                this.Messaging.Write(WarningMessages.MsiTransactionLimitations(pendingRollbackBoundary.SourceLineNumbers));
+                            }
 
-                            boundaryHadX86Package = facade.PackageSymbol.Win64;
+                            usedBoundaries.Add(pendingRollbackBoundary);
+                            facade.PackageSymbol.RollbackBoundaryRef = pendingRollbackBoundary.Id.Id;
+                            pendingRollbackBoundary = null;
+
+                            boundaryHadX86Package = !facade.PackageSymbol.Win64;
                         }
 
                         // Error if MSI transaction has x86 package preceding x64 packages
-                        if ((lastRollbackBoundary != null)
-                            && lastRollbackBoundary.Transaction == true
+                        if (insideMsiTransaction
                             && boundaryHadX86Package
                             && facade.PackageSymbol.Win64)
                         {
-                            this.Messaging.Write(ErrorMessages.MsiTransactionX86BeforeX64(lastRollbackBoundary.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.MsiTransactionX86BeforeX64(facade.PackageSymbol.SourceLineNumbers));
                         }
-                        boundaryHadX86Package |= facade.PackageSymbol.Win64;
+                        boundaryHadX86Package |= !facade.PackageSymbol.Win64;
 
                         orderedFacades.Add(facade);
                     }
@@ -79,22 +86,21 @@ namespace WixToolset.Core.Burn.Bundles
                     {
                         // Discard the next rollback boundary if we have a previously defined boundary.
                         var nextRollbackBoundary = this.Boundaries[groupSymbol.ChildId];
-                        if (null != previousRollbackBoundary)
+                        if (null != pendingRollbackBoundary)
                         {
                             this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
                         }
                         else
                         {
-                            previousRollbackBoundary = nextRollbackBoundary;
-                            lastRollbackBoundary = nextRollbackBoundary;
+                            lastRollbackBoundary = pendingRollbackBoundary = nextRollbackBoundary;
                         }
                     }
                 }
             }
 
-            if (null != previousRollbackBoundary)
+            if (null != pendingRollbackBoundary)
             {
-                this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(previousRollbackBoundary.SourceLineNumbers, previousRollbackBoundary.Id.Id));
+                this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(pendingRollbackBoundary.SourceLineNumbers, pendingRollbackBoundary.Id.Id));
             }
 
             // With the forward rollback boundaries assigned, we can now go
