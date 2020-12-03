@@ -320,12 +320,62 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Fired when the engine is about to launch the preapproved executable.
         /// </summary>
-        public event EventHandler<LaunchApprovedExeBeginArgs> LaunchApprovedExeBegin;
+        public event EventHandler<LaunchApprovedExeBeginEventArgs> LaunchApprovedExeBegin;
 
         /// <summary>
         /// Fired when the engine has completed launching the preapproved executable.
         /// </summary>
-        public event EventHandler<LaunchApprovedExeCompleteArgs> LaunchApprovedExeComplete;
+        public event EventHandler<LaunchApprovedExeCompleteEventArgs> LaunchApprovedExeComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to begin an MSI transaction.
+        /// </summary>
+        public event EventHandler<BeginMsiTransactionBeginEventArgs> BeginMsiTransactionBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed beginning an MSI transaction.
+        /// </summary>
+        public event EventHandler<BeginMsiTransactionCompleteEventArgs> BeginMsiTransactionComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to commit an MSI transaction.
+        /// </summary>
+        public event EventHandler<CommitMsiTransactionBeginEventArgs> CommitMsiTransactionBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed comitting an MSI transaction.
+        /// </summary>
+        public event EventHandler<CommitMsiTransactionCompleteEventArgs> CommitMsiTransactionComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to rollback an MSI transaction.
+        /// </summary>
+        public event EventHandler<RollbackMsiTransactionBeginEventArgs> RollbackMsiTransactionBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed rolling back an MSI transaction.
+        /// </summary>
+        public event EventHandler<RollbackMsiTransactionCompleteEventArgs> RollbackMsiTransactionComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to pause Windows automatic updates.
+        /// </summary>
+        public event EventHandler<PauseAutomaticUpdatesBeginEventArgs> PauseAutomaticUpdatesBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed pausing Windows automatic updates.
+        /// </summary>
+        public event EventHandler<PauseAutomaticUpdatesCompleteEventArgs> PauseAutomaticUpdatesComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to take a system restore point.
+        /// </summary>
+        public event EventHandler<SystemRestorePointBeginEventArgs> SystemRestorePointBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed taking a system restore point.
+        /// </summary>
+        public event EventHandler<SystemRestorePointCompleteEventArgs> SystemRestorePointComplete;
 
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
@@ -1071,9 +1121,9 @@ namespace WixToolset.Mba.Core
         /// Called by the engine before trying to launch the preapproved executable.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnLaunchApprovedExeBegin(LaunchApprovedExeBeginArgs args)
+        protected virtual void OnLaunchApprovedExeBegin(LaunchApprovedExeBeginEventArgs args)
         {
-            EventHandler<LaunchApprovedExeBeginArgs> handler = this.LaunchApprovedExeBegin;
+            EventHandler<LaunchApprovedExeBeginEventArgs> handler = this.LaunchApprovedExeBegin;
             if (null != handler)
             {
                 handler(this, args);
@@ -1084,9 +1134,139 @@ namespace WixToolset.Mba.Core
         /// Called by the engine after trying to launch the preapproved executable.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnLaunchApprovedExeComplete(LaunchApprovedExeCompleteArgs args)
+        protected virtual void OnLaunchApprovedExeComplete(LaunchApprovedExeCompleteEventArgs args)
         {
-            EventHandler<LaunchApprovedExeCompleteArgs> handler = this.LaunchApprovedExeComplete;
+            EventHandler<LaunchApprovedExeCompleteEventArgs> handler = this.LaunchApprovedExeComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine before beginning an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnBeginMsiTransactionBegin(BeginMsiTransactionBeginEventArgs args)
+        {
+            EventHandler<BeginMsiTransactionBeginEventArgs> handler = this.BeginMsiTransactionBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine after beginning an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnBeginMsiTransactionComplete(BeginMsiTransactionCompleteEventArgs args)
+        {
+            EventHandler<BeginMsiTransactionCompleteEventArgs> handler = this.BeginMsiTransactionComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine before committing an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnCommitMsiTransactionBegin(CommitMsiTransactionBeginEventArgs args)
+        {
+            EventHandler<CommitMsiTransactionBeginEventArgs> handler = this.CommitMsiTransactionBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine after committing an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnCommitMsiTransactionComplete(CommitMsiTransactionCompleteEventArgs args)
+        {
+            EventHandler<CommitMsiTransactionCompleteEventArgs> handler = this.CommitMsiTransactionComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine before rolling back an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnRollbackMsiTransactionBegin(RollbackMsiTransactionBeginEventArgs args)
+        {
+            EventHandler<RollbackMsiTransactionBeginEventArgs> handler = this.RollbackMsiTransactionBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine after rolling back an MSI transaction.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnRollbackMsiTransactionComplete(RollbackMsiTransactionCompleteEventArgs args)
+        {
+            EventHandler<RollbackMsiTransactionCompleteEventArgs> handler = this.RollbackMsiTransactionComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine before pausing Windows automatic updates.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPauseAutomaticUpdatesBegin(PauseAutomaticUpdatesBeginEventArgs args)
+        {
+            EventHandler<PauseAutomaticUpdatesBeginEventArgs> handler = this.PauseAutomaticUpdatesBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine after pausing Windows automatic updates.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPauseAutomaticUpdatesComplete(PauseAutomaticUpdatesCompleteEventArgs args)
+        {
+            EventHandler<PauseAutomaticUpdatesCompleteEventArgs> handler = this.PauseAutomaticUpdatesComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine before taking a system restore point.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnSystemRestorePointBegin(SystemRestorePointBeginEventArgs args)
+        {
+            EventHandler<SystemRestorePointBeginEventArgs> handler = this.SystemRestorePointBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine after taking a system restore point.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnSystemRestorePointComplete(SystemRestorePointCompleteEventArgs args)
+        {
+            EventHandler<SystemRestorePointCompleteEventArgs> handler = this.SystemRestorePointComplete;
             if (null != handler)
             {
                 handler(this, args);
@@ -1588,7 +1768,7 @@ namespace WixToolset.Mba.Core
 
         int IBootstrapperApplication.OnLaunchApprovedExeBegin(ref bool fCancel)
         {
-            LaunchApprovedExeBeginArgs args = new LaunchApprovedExeBeginArgs(fCancel);
+            LaunchApprovedExeBeginEventArgs args = new LaunchApprovedExeBeginEventArgs(fCancel);
             this.OnLaunchApprovedExeBegin(args);
 
             fCancel = args.Cancel;
@@ -1597,8 +1777,90 @@ namespace WixToolset.Mba.Core
 
         int IBootstrapperApplication.OnLaunchApprovedExeComplete(int hrStatus, int processId)
         {
-            LaunchApprovedExeCompleteArgs args = new LaunchApprovedExeCompleteArgs(hrStatus, processId);
+            LaunchApprovedExeCompleteEventArgs args = new LaunchApprovedExeCompleteEventArgs(hrStatus, processId);
             this.OnLaunchApprovedExeComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnBeginMsiTransactionBegin(string transactionId, ref bool fCancel)
+        {
+            BeginMsiTransactionBeginEventArgs args = new BeginMsiTransactionBeginEventArgs(transactionId, fCancel);
+            this.OnBeginMsiTransactionBegin(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnBeginMsiTransactionComplete(string transactionId, int hrStatus)
+        {
+            BeginMsiTransactionCompleteEventArgs args = new BeginMsiTransactionCompleteEventArgs(transactionId, hrStatus);
+            this.OnBeginMsiTransactionComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCommitMsiTransactionBegin(string transactionId, ref bool fCancel)
+        {
+            CommitMsiTransactionBeginEventArgs args = new CommitMsiTransactionBeginEventArgs(transactionId, fCancel);
+            this.OnCommitMsiTransactionBegin(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCommitMsiTransactionComplete(string transactionId, int hrStatus)
+        {
+            CommitMsiTransactionCompleteEventArgs args = new CommitMsiTransactionCompleteEventArgs(transactionId, hrStatus);
+            this.OnCommitMsiTransactionComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnRollbackMsiTransactionBegin(string transactionId)
+        {
+            RollbackMsiTransactionBeginEventArgs args = new RollbackMsiTransactionBeginEventArgs(transactionId);
+            this.OnRollbackMsiTransactionBegin(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnRollbackMsiTransactionComplete(string transactionId, int hrStatus)
+        {
+            RollbackMsiTransactionCompleteEventArgs args = new RollbackMsiTransactionCompleteEventArgs(transactionId, hrStatus);
+            this.OnRollbackMsiTransactionComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPauseAutomaticUpdatesBegin()
+        {
+            PauseAutomaticUpdatesBeginEventArgs args = new PauseAutomaticUpdatesBeginEventArgs();
+            this.OnPauseAutomaticUpdatesBegin(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPauseAutomaticUpdatesComplete(int hrStatus)
+        {
+            PauseAutomaticUpdatesCompleteEventArgs args = new PauseAutomaticUpdatesCompleteEventArgs(hrStatus);
+            this.OnPauseAutomaticUpdatesComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnSystemRestorePointBegin()
+        {
+            SystemRestorePointBeginEventArgs args = new SystemRestorePointBeginEventArgs();
+            this.OnSystemRestorePointBegin(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnSystemRestorePointComplete(int hrStatus)
+        {
+            SystemRestorePointCompleteEventArgs args = new SystemRestorePointCompleteEventArgs(hrStatus);
+            this.OnSystemRestorePointComplete(args);
 
             return args.HResult;
         }

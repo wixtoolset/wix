@@ -518,6 +518,49 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in DWORD dwProcessId
         ) = 0;
 
+    STDMETHOD(OnBeginMsiTransactionBegin)(
+        __in_z LPCWSTR wzTransactionId,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnBeginMsiTransactionComplete)(
+        __in_z LPCWSTR wzTransactionId,
+        __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnCommitMsiTransactionBegin)(
+        __in_z LPCWSTR wzTransactionId,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnCommitMsiTransactionComplete)(
+        __in_z LPCWSTR wzTransactionId,
+        __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnRollbackMsiTransactionBegin)(
+        __in_z LPCWSTR wzTransactionId
+        ) = 0;
+
+    STDMETHOD(OnRollbackMsiTransactionComplete)(
+        __in_z LPCWSTR wzTransactionId,
+        __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnPauseAutomaticUpdatesBegin)(
+        ) = 0;
+
+    STDMETHOD(OnPauseAutomaticUpdatesComplete)(
+        __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnSystemRestorePointBegin)(
+        ) = 0;
+
+    STDMETHOD(OnSystemRestorePointComplete)(
+        __in HRESULT hrStatus
+        ) = 0;
+
     // BAProc - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method to give the BA raw access to the callback from the engine.
     //          This might be used to help the BA support more than one version of the engine.
     STDMETHOD(BAProc)(

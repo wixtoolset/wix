@@ -612,6 +612,79 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnBeginMsiTransactionBegin(
+        __in_z LPCWSTR /*wzTransactionId*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnBeginMsiTransactionComplete(
+        __in_z LPCWSTR /*wzTransactionId*/,
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCommitMsiTransactionBegin(
+        __in_z LPCWSTR /*wzTransactionId*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCommitMsiTransactionComplete(
+        __in_z LPCWSTR /*wzTransactionId*/,
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnRollbackMsiTransactionBegin(
+        __in_z LPCWSTR /*wzTransactionId*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnRollbackMsiTransactionComplete(
+        __in_z LPCWSTR /*wzTransactionId*/,
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnPauseAutomaticUpdatesBegin(
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnPauseAutomaticUpdatesComplete(
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnSystemRestorePointBegin(
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnSystemRestorePointComplete(
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
     virtual STDMETHODIMP_(HRESULT) BAProc(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,

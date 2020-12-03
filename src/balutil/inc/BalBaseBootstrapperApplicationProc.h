@@ -513,6 +513,96 @@ static HRESULT BalBaseBAProcOnPlanMsiPackage(
     return pBA->OnPlanMsiPackage(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, &pResults->fCancel, &pResults->actionMsiProperty, &pResults->uiLevel, &pResults->fDisableExternalUiHandler);
 }
 
+static HRESULT BalBaseBAProcOnBeginMsiTransactionBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONBEGINMSITRANSACTIONBEGIN_ARGS* pArgs,
+    __inout BA_ONBEGINMSITRANSACTIONBEGIN_RESULTS* pResults
+    )
+{
+    return pBA->OnBeginMsiTransactionBegin(pArgs->wzTransactionId, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnBeginMsiTransactionComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONBEGINMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+    __inout BA_ONBEGINMSITRANSACTIONCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnBeginMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus);
+}
+
+static HRESULT BalBaseBAProcOnCommitMsiTransactionBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCOMMITMSITRANSACTIONBEGIN_ARGS* pArgs,
+    __inout BA_ONCOMMITMSITRANSACTIONBEGIN_RESULTS* pResults
+    )
+{
+    return pBA->OnCommitMsiTransactionBegin(pArgs->wzTransactionId, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnCommitMsiTransactionComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+    __inout BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnCommitMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus);
+}
+
+static HRESULT BalBaseBAProcOnRollbackMsiTransactionBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS* pArgs,
+    __inout BA_ONROLLBACKMSITRANSACTIONBEGIN_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnRollbackMsiTransactionBegin(pArgs->wzTransactionId);
+}
+
+static HRESULT BalBaseBAProcOnRollbackMsiTransactionComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+    __inout BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnRollbackMsiTransactionComplete(pArgs->wzTransactionId, pArgs->hrStatus);
+}
+
+static HRESULT BalBaseBAProcOnPauseAutomaticUpdatesBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPAUSEAUTOMATICUPDATESBEGIN_ARGS* /*pArgs*/,
+    __inout BA_ONPAUSEAUTOMATICUPDATESBEGIN_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnPauseAutomaticUpdatesBegin();
+}
+
+static HRESULT BalBaseBAProcOnPauseAutomaticUpdatesComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_ARGS* pArgs,
+    __inout BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnPauseAutomaticUpdatesComplete(pArgs->hrStatus);
+}
+
+static HRESULT BalBaseBAProcOnSystemRestorePointBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONSYSTEMRESTOREPOINTBEGIN_ARGS* /*pArgs*/,
+    __inout BA_ONSYSTEMRESTOREPOINTBEGIN_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnSystemRestorePointBegin();
+}
+
+static HRESULT BalBaseBAProcOnSystemRestorePointComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS* pArgs,
+    __inout BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnSystemRestorePointComplete(pArgs->hrStatus);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -700,6 +790,35 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE:
             hr = BalBaseBAProcOnPlanMsiPackage(pBA, reinterpret_cast<BA_ONPLANMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANMSIPACKAGE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN:
+            hr = BalBaseBAProcOnBeginMsiTransactionBegin(pBA, reinterpret_cast<BA_ONBEGINMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONBEGINMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE:
+            hr = BalBaseBAProcOnBeginMsiTransactionComplete(pBA, reinterpret_cast<BA_ONBEGINMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONBEGINMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN:
+            hr = BalBaseBAProcOnCommitMsiTransactionBegin(pBA, reinterpret_cast<BA_ONCOMMITMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCOMMITMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE:
+            hr = BalBaseBAProcOnCommitMsiTransactionComplete(pBA, reinterpret_cast<BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN:
+            hr = BalBaseBAProcOnRollbackMsiTransactionBegin(pBA, reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE:
+            hr = BalBaseBAProcOnRollbackMsiTransactionComplete(pBA, reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN:
+            hr = BalBaseBAProcOnPauseAutomaticUpdatesBegin(pBA, reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE:
+            hr = BalBaseBAProcOnPauseAutomaticUpdatesComplete(pBA, reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN:
+            hr = BalBaseBAProcOnSystemRestorePointBegin(pBA, reinterpret_cast<BA_ONSYSTEMRESTOREPOINTBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMRESTOREPOINTBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE:
+            hr = BalBaseBAProcOnSystemRestorePointComplete(pBA, reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS*>(pvResults));
             break;
         }
     }

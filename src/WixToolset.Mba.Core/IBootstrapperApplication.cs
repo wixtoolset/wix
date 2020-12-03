@@ -12,7 +12,6 @@ namespace WixToolset.Mba.Core
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [Guid("53C31D56-49C0-426B-AB06-099D717C67FE")]
-    [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
     public interface IBootstrapperApplication
     {
         [PreserveSig]
@@ -498,6 +497,69 @@ namespace WixToolset.Mba.Core
         int OnLaunchApprovedExeComplete(
             int hrStatus,
             int processId
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnBeginMsiTransactionBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnBeginMsiTransactionComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
+            int hrStatus
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCommitMsiTransactionBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCommitMsiTransactionComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
+            int hrStatus
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnRollbackMsiTransactionBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnRollbackMsiTransactionComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzTransactionId,
+            int hrStatus
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPauseAutomaticUpdatesBegin(
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPauseAutomaticUpdatesComplete(
+            int hrStatus
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnSystemRestorePointBegin(
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnSystemRestorePointComplete(
+            int hrStatus
             );
 
         [PreserveSig]

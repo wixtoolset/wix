@@ -1948,9 +1948,9 @@ namespace WixToolset.Mba.Core
     /// Additional arguments passed by the engine before it tries to launch the preapproved executable.
     /// </summary>
     [Serializable]
-    public class LaunchApprovedExeBeginArgs : CancellableHResultEventArgs
+    public class LaunchApprovedExeBeginEventArgs : CancellableHResultEventArgs
     {
-        public LaunchApprovedExeBeginArgs(bool cancelRecommendation)
+        public LaunchApprovedExeBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
         }
@@ -1960,11 +1960,11 @@ namespace WixToolset.Mba.Core
     /// Additional arguments passed by the engine after it finished trying to launch the preapproved executable.
     /// </summary>
     [Serializable]
-    public class LaunchApprovedExeCompleteArgs : StatusEventArgs
+    public class LaunchApprovedExeCompleteEventArgs : StatusEventArgs
     {
         private int processId;
 
-        public LaunchApprovedExeCompleteArgs(int hrStatus, int processId)
+        public LaunchApprovedExeCompleteEventArgs(int hrStatus, int processId)
             : base(hrStatus)
         {
             this.processId = processId;
@@ -1977,6 +1977,189 @@ namespace WixToolset.Mba.Core
         public int ProcessId
         {
             get { return this.processId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine before beginning an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class BeginMsiTransactionBeginEventArgs : CancellableHResultEventArgs
+    {
+        private string transactionId;
+
+        public BeginMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine after beginning an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class BeginMsiTransactionCompleteEventArgs : StatusEventArgs
+    {
+        private string transactionId;
+
+        public BeginMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
+            : base(hrStatus)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine before committing an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class CommitMsiTransactionBeginEventArgs : CancellableHResultEventArgs
+    {
+        private string transactionId;
+
+        public CommitMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine after committing an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class CommitMsiTransactionCompleteEventArgs : StatusEventArgs
+    {
+        private string transactionId;
+
+        public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
+            : base(hrStatus)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine before rolling back an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class RollbackMsiTransactionBeginEventArgs : HResultEventArgs
+    {
+        private string transactionId;
+
+        public RollbackMsiTransactionBeginEventArgs(string transactionId)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine after rolling back an MSI transaction.
+    /// </summary>
+    [Serializable]
+    public class RollbackMsiTransactionCompleteEventArgs : StatusEventArgs
+    {
+        private string transactionId;
+
+        public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
+            : base(hrStatus)
+        {
+            this.transactionId = transactionId;
+        }
+
+        /// <summary>
+        /// Gets the MSI transaction Id.
+        /// </summary>
+        public string TransactionId
+        {
+            get { return this.transactionId; }
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine before pausing Windows automatic updates.
+    /// </summary>
+    [Serializable]
+    public class PauseAutomaticUpdatesBeginEventArgs : HResultEventArgs
+    {
+        public PauseAutomaticUpdatesBeginEventArgs()
+        {
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine after pausing Windows automatic updates.
+    /// </summary>
+    [Serializable]
+    public class PauseAutomaticUpdatesCompleteEventArgs : StatusEventArgs
+    {
+        public PauseAutomaticUpdatesCompleteEventArgs(int hrStatus)
+            : base(hrStatus)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine before taking a system restore point.
+    /// </summary>
+    [Serializable]
+    public class SystemRestorePointBeginEventArgs : HResultEventArgs
+    {
+        public SystemRestorePointBeginEventArgs()
+        {
+        }
+    }
+
+    /// <summary>
+    /// Additional arguments passed by the engine after taking a system restore point.
+    /// </summary>
+    [Serializable]
+    public class SystemRestorePointCompleteEventArgs : StatusEventArgs
+    {
+        public SystemRestorePointCompleteEventArgs(int hrStatus)
+            : base(hrStatus)
+        {
         }
     }
 }
