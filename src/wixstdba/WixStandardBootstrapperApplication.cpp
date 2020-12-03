@@ -542,6 +542,58 @@ public: // IBootstrapperApplication
     }
 
 
+    virtual STDMETHODIMP OnPauseAutomaticUpdatesBegin(
+        )
+    {
+        HRESULT hr = S_OK;
+        LOC_STRING* pLocString = NULL;
+        LPWSTR sczFormattedString = NULL;
+        LPCWSTR wz = NULL;
+
+        hr = __super::OnPauseAutomaticUpdatesBegin();
+
+        LocGetString(m_pWixLoc, L"#(loc.PauseAutomaticUpdatesMessage)", &pLocString);
+
+        if (pLocString)
+        {
+            BalFormatString(pLocString->wzText, &sczFormattedString);
+        }
+
+        wz = sczFormattedString ? sczFormattedString : L"Pausing Windows automatic updates";
+
+        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+
+        ReleaseStr(sczFormattedString);
+        return hr;
+    }
+
+
+    virtual STDMETHODIMP OnSystemRestorePointBegin(
+        )
+    {
+        HRESULT hr = S_OK;
+        LOC_STRING* pLocString = NULL;
+        LPWSTR sczFormattedString = NULL;
+        LPCWSTR wz = NULL;
+
+        hr = __super::OnSystemRestorePointBegin();
+
+        LocGetString(m_pWixLoc, L"#(loc.SystemRestorePointMessage)", &pLocString);
+
+        if (pLocString)
+        {
+            BalFormatString(pLocString->wzText, &sczFormattedString);
+        }
+
+        wz = sczFormattedString ? sczFormattedString : L"Creating system restore point";
+
+        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+
+        ReleaseStr(sczFormattedString);
+        return hr;
+    }
+
+
     virtual STDMETHODIMP OnCachePackageBegin(
         __in_z LPCWSTR wzPackageId,
         __in DWORD cCachePayloads,
