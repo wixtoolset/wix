@@ -1224,6 +1224,36 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE:
             OnPlanMsiPackageFallback(reinterpret_cast<BA_ONPLANMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANMSIPACKAGE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONBEGIN:
+            OnBeginMsiTransactionBeginFallback(reinterpret_cast<BA_ONBEGINMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONBEGINMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE:
+            OnBeginMsiTransactionCompleteFallback(reinterpret_cast<BA_ONBEGINMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONBEGINMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN:
+            OnCommitMsiTransactionBeginFallback(reinterpret_cast<BA_ONCOMMITMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCOMMITMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE:
+            OnCommitMsiTransactionCompleteFallback(reinterpret_cast<BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN:
+            OnRollbackMsiTransactionBeginFallback(reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE:
+            OnRollbackMsiTransactionCompleteFallback(reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN:
+            OnPauseAutomaticUpdatesBeginFallback(reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE:
+            OnPauseAutomaticUpdatesCompleteFallback(reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN:
+            OnSystemRestorePointBeginFallback(reinterpret_cast<BA_ONSYSTEMRESTOREPOINTBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMRESTOREPOINTBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE:
+            OnSystemRestorePointCompleteFallback(reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS*>(pvResults));
+            break;
         default:
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
             m_pfnBAFunctionsProc((BA_FUNCTIONS_MESSAGE)message, pvArgs, pvResults, m_pvBAFunctionsProcContext);
@@ -1687,6 +1717,86 @@ private: // privates
         BOOL fDisableExternalUiHandler = pResults->fDisableExternalUiHandler;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_MSI_PACKAGE, m_hModule, pArgs->wzPackageId, actionMsiProperty, uiLevel, fDisableExternalUiHandler ? "yes" : "no", pResults->actionMsiProperty, pResults->uiLevel, pResults->fDisableExternalUiHandler ? "yes" : "no");
+    }
+
+    void OnBeginMsiTransactionBeginFallback(
+        __in BA_ONBEGINMSITRANSACTIONBEGIN_ARGS* pArgs,
+        __inout BA_ONBEGINMSITRANSACTIONBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONBEGINMSITRANSACTIONBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnBeginMsiTransactionCompleteFallback(
+        __in BA_ONBEGINMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+        __inout BA_ONBEGINMSITRANSACTIONCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONBEGINMSITRANSACTIONCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCommitMsiTransactionBeginFallback(
+        __in BA_ONCOMMITMSITRANSACTIONBEGIN_ARGS* pArgs,
+        __inout BA_ONCOMMITMSITRANSACTIONBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCOMMITMSITRANSACTIONBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCommitMsiTransactionCompleteFallback(
+        __in BA_ONCOMMITMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+        __inout BA_ONCOMMITMSITRANSACTIONCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCOMMITMSITRANSACTIONCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnRollbackMsiTransactionBeginFallback(
+        __in BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS* pArgs,
+        __inout BA_ONROLLBACKMSITRANSACTIONBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONROLLBACKMSITRANSACTIONBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnRollbackMsiTransactionCompleteFallback(
+        __in BA_ONROLLBACKMSITRANSACTIONCOMPLETE_ARGS* pArgs,
+        __inout BA_ONROLLBACKMSITRANSACTIONCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONROLLBACKMSITRANSACTIONCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnPauseAutomaticUpdatesBeginFallback(
+        __in BA_ONPAUSEAUTOMATICUPDATESBEGIN_ARGS* pArgs,
+        __inout BA_ONPAUSEAUTOMATICUPDATESBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPAUSEAUTOMATICUPDATESBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnPauseAutomaticUpdatesCompleteFallback(
+        __in BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_ARGS* pArgs,
+        __inout BA_ONPAUSEAUTOMATICUPDATESCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPAUSEAUTOMATICUPDATESCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnSystemRestorePointBeginFallback(
+        __in BA_ONSYSTEMRESTOREPOINTBEGIN_ARGS* pArgs,
+        __inout BA_ONSYSTEMRESTOREPOINTBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONSYSTEMRESTOREPOINTBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnSystemRestorePointCompleteFallback(
+        __in BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS* pArgs,
+        __inout BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     //
