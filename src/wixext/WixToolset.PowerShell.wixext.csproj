@@ -12,7 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
-    <Content Include="ps.xsd" PackagePath="tools" />
     <EmbeddedResource Include="$(OutputPath)..\powershell.wixlib" />
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
   </ItemGroup>
 </Project>
