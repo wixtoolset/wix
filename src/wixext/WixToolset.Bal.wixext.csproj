@@ -14,7 +14,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
-    <Content Include="bal.xsd" PackagePath="tools" />
     <EmbeddedResource Include="$(OutputPath)..\bal.wixlib" />
   </ItemGroup>
   <ItemGroup>
