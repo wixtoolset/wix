@@ -1333,7 +1333,6 @@ namespace WixToolset.Core
             string name = null;
             string sourceFile = null;
             string downloadUrl = null;
-            RemotePayload remotePayload = null;
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -1402,41 +1401,11 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
             }
 
-            // We only handle the elements we care about.  Let caller handle other children.
-            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
-            {
-                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+            // Let caller handle the children.
 
-                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage")
-                {
-                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
-                    continue;
-                }
-
-                if (null != remotePayload)
-                {
-                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                }
-
-                remotePayload = this.ParseRemotePayloadElement(child);
-            }
-
-            if (null != sourceFile && null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
-            }
-            else if (null == sourceFile && null == remotePayload)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeOrElement(sourceLineNumbers, node.Name.LocalName, "SourceFile", "RemotePayload"));
-            }
-            else if (null == sourceFile)
+            if (null == sourceFile)
             {
                 sourceFile = String.Empty;
-            }
-
-            if (null == downloadUrl && null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
             }
 
             if (Compiler.BurnUXContainerId == parentId)
@@ -1449,7 +1418,7 @@ namespace WixToolset.Core
                 compressed = YesNoDefaultType.Yes;
             }
 
-            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, remotePayload);
+            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, null);
 
             return id;
         }
