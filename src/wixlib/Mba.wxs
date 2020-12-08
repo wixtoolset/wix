@@ -6,33 +6,38 @@
      Mba.wxs - Managed UX resources.
     -->
     <Fragment>
-        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost" SourceFile="mbahost.dll">
+        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost">
             <PayloadGroupRef Id="Mba" />
             <PayloadGroupRef Id="MbaPreqStandard" />
+            <BootstrapperApplicationDll SourceFile="mbahost.dll" />
         </BootstrapperApplication>
     </Fragment>
     <Fragment>
-        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.RtfLicense" SourceFile="mbahost.dll">
+        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.RtfLicense">
             <PayloadGroupRef Id="Mba" />
             <PayloadGroupRef Id="MbaPreqStandard" />
+            <BootstrapperApplicationDll SourceFile="mbahost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.Minimal" SourceFile="mbahost.dll">
+        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.Minimal">
             <PayloadGroupRef Id="Mba" />
+            <BootstrapperApplicationDll SourceFile="mbahost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.RtfLicense.Minimal" SourceFile="mbahost.dll">
+        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.RtfLicense.Minimal">
             <PayloadGroupRef Id="Mba" />
+            <BootstrapperApplicationDll SourceFile="mbahost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.Foundation" SourceFile="mbahost.dll">
+        <BootstrapperApplication Id="ManagedBootstrapperApplicationHost.Foundation">
             <PayloadGroupRef Id="Mba" />
+            <BootstrapperApplicationDll SourceFile="mbahost.dll" />
         </BootstrapperApplication>
     </Fragment>
 

@@ -6,34 +6,39 @@
      Dnc.wxs - .NET Core BA resources.
     -->
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost" SourceFile="dnchost.dll">
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost">
             <PayloadGroupRef Id="Dnc" />
             <PayloadGroupRef Id="DncPreqStandard" />
+            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense" SourceFile="dnchost.dll">
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense">
             <PayloadGroupRef Id="Dnc" />
             <PayloadGroupRef Id="DncPreqStandard" />
+            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Minimal" SourceFile="dnchost.dll">
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Minimal">
             <PayloadGroupRef Id="Dnc" />
+            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal" SourceFile="dnchost.dll">
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal">
             <PayloadGroupRef Id="Dnc" />
+            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Foundation" SourceFile="dnchost.dll">
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Foundation">
             <PayloadGroupRef Id="Dnc" />
+            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
         </BootstrapperApplication>
     </Fragment>
 

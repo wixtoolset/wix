@@ -4,37 +4,44 @@
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?include caSuffix.wxi ?>
     <Fragment>
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLicense$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll">
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaRtfLicensePayloads" />
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLargeLicense$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll">
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.RtfLargeLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaRtfLargeLicensePayloads" />
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLicense$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll">
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkLicensePayloads" />
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLargeLicense$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll">
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkLargeLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkLargeLicensePayloads" />
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkSidebarLicense$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll">
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.HyperlinkSidebarLicense$(var.Suffix)">
             <PayloadGroupRef Id="WixStdbaHyperlinkSidebarLicensePayloads" />
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
 
-        <BootstrapperApplication Id="WixStandardBootstrapperApplication.Foundation$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
+        <BootstrapperApplication Id="WixStandardBootstrapperApplication.Foundation$(var.Suffix)">
+            <BootstrapperApplicationDll SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" />
+        </BootstrapperApplication>
     </Fragment>
 </Include>
