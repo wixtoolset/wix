@@ -1122,7 +1122,7 @@ namespace WixToolset.Core
             var previousType = ComplexReferenceChildType.Unknown;
 
             // The BundleExtension element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
-            if (this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false, out var id))
+            if (this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, true, out var id))
             {
                 previousId = id;
                 previousType = ComplexReferenceChildType.Payload;
@@ -1151,19 +1151,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionElement(node, child);
                 }
-            }
-
-            if (null == previousId)
-            {
-                // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BundleExtension...
-                // but we just say there's a missing <Payload>.
-                // TODO: Is there a better message for this?
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             // Add the BundleExtension.
