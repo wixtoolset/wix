@@ -22,7 +22,7 @@
     <ProjectGuid>{95228C13-97F5-484A-B4A2-ECF4618B0881}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>WiX Toolset Theme Viewer</Description>
   </PropertyGroup>
