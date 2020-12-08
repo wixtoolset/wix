@@ -1,55 +1,54 @@
-<?xml version='1.0' encoding='utf-8'?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <!--
      Dnc.wxs - .NET Core BA resources.
     -->
     <Fragment>
-        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost' SourceFile='dnchost.dll'>
-            <PayloadGroupRef Id='Dnc' />
-            <PayloadGroupRef Id='DncPreqStandard' />
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost" SourceFile="dnchost.dll">
+            <PayloadGroupRef Id="Dnc" />
+            <PayloadGroupRef Id="DncPreqStandard" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.RtfLicense' SourceFile='dnchost.dll'>
-            <PayloadGroupRef Id='Dnc' />
-            <PayloadGroupRef Id='DncPreqStandard' />
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense" SourceFile="dnchost.dll">
+            <PayloadGroupRef Id="Dnc" />
+            <PayloadGroupRef Id="DncPreqStandard" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.Minimal' SourceFile='dnchost.dll'>
-            <PayloadGroupRef Id='Dnc' />
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Minimal" SourceFile="dnchost.dll">
+            <PayloadGroupRef Id="Dnc" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal' SourceFile='dnchost.dll'>
-            <PayloadGroupRef Id='Dnc' />
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal" SourceFile="dnchost.dll">
+            <PayloadGroupRef Id="Dnc" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.Foundation' SourceFile='dnchost.dll'>
-            <PayloadGroupRef Id='Dnc' />
+        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Foundation" SourceFile="dnchost.dll">
+            <PayloadGroupRef Id="Dnc" />
         </BootstrapperApplication>
     </Fragment>
 
     <Fragment>
-        <PayloadGroup Id='Dnc'>
-            <Payload Compressed='yes' SourceFile='WixToolset.Dnc.Host.dll' />
-            <Payload Compressed='yes' SourceFile='wixstdba.dll' Name='dncpreq.dll' />
+        <PayloadGroup Id="Dnc">
+            <Payload Compressed="yes" SourceFile="WixToolset.Dnc.Host.dll" />
+            <Payload Compressed="yes" SourceFile="wixstdba.dll" Name="dncpreq.dll" />
         </PayloadGroup>
     </Fragment>
 
     <Fragment>
-        <PayloadGroup Id='DncPreqStandard'>
-            <Payload Name='mbapreq.thm' Compressed='yes' SourceFile='!(wix.DncPreqbaThemeXml=SourceDir\dncpreq.thm)' />
-            <Payload Name='mbapreq.png' Compressed='yes' SourceFile='!(wix.DncPreqbaLogo=SourceDir\mbapreq.png)' />
-            <Payload Name='mbapreq.wxl' Compressed='yes' SourceFile='!(wix.DncPreqbaThemeWxl=SourceDir\dncpreq.wxl)' />
+        <PayloadGroup Id="DncPreqStandard">
+            <Payload Name="mbapreq.thm" Compressed="yes" SourceFile="!(wix.DncPreqbaThemeXml=SourceDir\dncpreq.thm)" />
+            <Payload Name="mbapreq.png" Compressed="yes" SourceFile="!(wix.DncPreqbaLogo=SourceDir\mbapreq.png)" />
+            <Payload Name="mbapreq.wxl" Compressed="yes" SourceFile="!(wix.DncPreqbaThemeWxl=SourceDir\dncpreq.wxl)" />
         </PayloadGroup>
     </Fragment>
 </Wix>
