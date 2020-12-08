@@ -116,6 +116,7 @@ namespace WixToolset.Data
         WixApprovedExeForElevation,
         WixBindUpdatedFiles,
         WixBootstrapperApplication,
+        WixBootstrapperApplicationDll,
         WixBuildInfo,
         WixBundle,
         WixBundleCatalog,
@@ -532,6 +533,9 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBootstrapperApplication:
                     return SymbolDefinitions.WixBootstrapperApplication;
+
+                case SymbolDefinitionType.WixBootstrapperApplicationDll:
+                    return SymbolDefinitions.WixBootstrapperApplicationDll;
 
                 case SymbolDefinitionType.WixBuildInfo:
                     return SymbolDefinitions.WixBuildInfo;

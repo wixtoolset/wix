@@ -10,7 +10,6 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBootstrapperApplication,
             new IntermediateFieldDefinition[]
             {
-                new IntermediateFieldDefinition(nameof(WixBootstrapperApplicationSymbolFields.DpiAwareness), IntermediateFieldType.Number),
             },
             typeof(WixBootstrapperApplicationSymbol));
     }
@@ -20,16 +19,6 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixBootstrapperApplicationSymbolFields
     {
-        DpiAwareness,
-    }
-
-    public enum WixBootstrapperApplicationDpiAwarenessType
-    {
-        Unaware,
-        System,
-        PerMonitor,
-        PerMonitorV2,
-        GdiScaled,
     }
 
     public class WixBootstrapperApplicationSymbol : IntermediateSymbol
@@ -43,11 +32,5 @@ namespace WixToolset.Data.Symbols
         }
 
         public IntermediateField this[WixBootstrapperApplicationSymbolFields index] => this.Fields[(int)index];
-
-        public WixBootstrapperApplicationDpiAwarenessType DpiAwareness
-        {
-            get => (WixBootstrapperApplicationDpiAwarenessType)this.Fields[(int)WixBootstrapperApplicationSymbolFields.DpiAwareness].AsNumber();
-            set => this.Set((int)WixBootstrapperApplicationSymbolFields.DpiAwareness, (int)value);
-        }
     }
 }
