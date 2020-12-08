@@ -1,9 +1,9 @@
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <BootstrapperApplicationRef Id='ManagedBootstrapperApplicationHost'>
-      <Payload Name='WixToolset.Mba.Host.config' SourceFile='!(bindpath.x86)\TestBA.BootstrapperCore.config' />
-      <Payload SourceFile='!(bindpath.x86)\TestBA.dll' />
+    <BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost">
+      <Payload Name="WixToolset.Mba.Host.config" SourceFile="!(bindpath.x86)\TestBA.BootstrapperCore.config" />
+      <Payload SourceFile="!(bindpath.x86)\TestBA.dll" />
       <Payload SourceFile="!(bindpath.x86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.x86)\WixToolset.Mba.Core.dll" />
     </BootstrapperApplicationRef>
