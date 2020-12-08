@@ -72,5 +72,11 @@ namespace WixToolsetTest.CoreIntegration
         {
             DecompileAndCompare(@"TestData\Shortcut", "shortcuts.msi", "DecompiledShortcuts.wxs");
         }
+
+        [Fact]
+        public void CanDecompileNullComponent()
+        {
+            DecompileAndCompare(@"TestData\DecompileNullComponent", "example.msi", "Expected.wxs");
+        }
     }
 }

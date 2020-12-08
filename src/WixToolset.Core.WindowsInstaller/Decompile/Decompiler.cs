@@ -4152,7 +4152,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 var xComponent = new XElement(Names.ComponentElement,
                     new XAttribute("Id", row.FieldAsString(0)),
-                    row.IsColumnEmpty(1) ? null : new XAttribute("Guid", row.FieldAsString(1)));
+                    new XAttribute("Guid", row.FieldAsString(1) ?? String.Empty));
 
                 var attributes = row.FieldAsInteger(3);
 

@@ -1,0 +1,18 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="65001" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{047730A5-30FE-4A62-A520-DA9381B8226A}" Version="1.0.0.0" Compressed="yes" InstallerVersion="200" ProductCode="{6F9B5694-F0F1-437C-919B-0D2DAF2D9DEA}">
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="oekcr5lq">
+          <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="" Win64="no">
+            <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\File\filcV1yrx0x8wJWj4qMzcH21jwkPko" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="ProductFeature" Level="1" Title="MsiPackage">
+      <ComponentRef Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" />
+    </Feature>
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" Cabinet="example.cab" />
+  </Package>
+</Wix>
