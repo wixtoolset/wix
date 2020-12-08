@@ -652,8 +652,8 @@ namespace WixToolset.Core
             var dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
 
             // The BootstrapperApplication element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
-            var id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
-            if (null != id)
+            var hasSourceFile = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false, out var id);
+            if (hasSourceFile)
             {
                 previousId = id;
                 previousType = ComplexReferenceChildType.Payload;
@@ -726,7 +726,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
             }
 
-            // Add the application as an attached container and if an Id was provided add that too.
+            // Add the application as an attached container and if a SourceFile was provided add the Id as the BA.
             if (!this.Core.EncounteredError)
             {
                 this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
@@ -735,7 +735,7 @@ namespace WixToolset.Core
                     Type = ContainerType.Attached
                 });
 
-                if (null != id)
+                if (hasSourceFile)
                 {
                     this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id)
                     {
@@ -1122,8 +1122,7 @@ namespace WixToolset.Core
             var previousType = ComplexReferenceChildType.Unknown;
 
             // The BundleExtension element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
-            var id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
-            if (null != id)
+            if (this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false, out var id))
             {
                 previousId = id;
                 previousType = ComplexReferenceChildType.Payload;
@@ -1290,7 +1289,7 @@ namespace WixToolset.Core
             Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
             Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
 
-            var id = this.ParsePayloadElementContent(node, parentType, parentId, previousType, previousId, true);
+            this.ParsePayloadElementContent(node, parentType, parentId, previousType, previousId, true, out var id);
             var context = new Dictionary<string, string>
             {
                 ["Id"] = id?.Id
@@ -1322,14 +1321,15 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element.</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        private Identifier ParsePayloadElementContent(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, bool required)
+        /// <returns>Whether SourceFile was specified.</returns>
+        private bool ParsePayloadElementContent(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, bool required, out Identifier id)
         {
             Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compressed = YesNoDefaultType.Default;
             var enableSignatureVerification = YesNoType.No;
-            Identifier id = null;
+            id = null;
             string name = null;
             string sourceFile = null;
             string downloadUrl = null;
@@ -1379,12 +1379,6 @@ namespace WixToolset.Core
                 }
             }
 
-            if (!required && null == sourceFile)
-            {
-                // Nothing left to do!
-                return null;
-            }
-
             if (null == id)
             {
                 id = this.Core.CreateIdentifier("pay", sourceFile?.ToUpperInvariant() ?? String.Empty);
@@ -1393,7 +1387,7 @@ namespace WixToolset.Core
             // Now that the PayloadId is known, we can parse the extension attributes.
             var context = new Dictionary<string, string>
             {
-                ["Id"] = id?.Id
+                ["Id"] = id.Id
             };
 
             foreach (var extensionAttribute in extensionAttributes)
@@ -1402,11 +1396,6 @@ namespace WixToolset.Core
             }
 
             // Let caller handle the children.
-
-            if (null == sourceFile)
-            {
-                sourceFile = String.Empty;
-            }
 
             if (Compiler.BurnUXContainerId == parentId)
             {
@@ -1418,9 +1407,18 @@ namespace WixToolset.Core
                 compressed = YesNoDefaultType.Yes;
             }
 
+            if (sourceFile == null)
+            {
+                if (required)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                }
+                return false;
+            }
+
             this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, null);
 
-            return id;
+            return true;
         }
 
         private RemotePayload ParseRemotePayloadElement(XElement node)
