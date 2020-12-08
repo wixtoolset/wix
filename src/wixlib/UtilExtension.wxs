@@ -61,8 +61,4 @@
             <Error Id="$(var.msierrXmlConfigFailedSave)" Message="!(loc.msierrXmlConfigFailedSave)" />
         </UI>
     </Fragment>
-
-    <Fragment>
-        <BundleExtension Id="WixUtilBundleExtension" SourceFile="utilbe.dll" Name="WixUtilBundleExtension\utilbe.dll" />
-    </Fragment>
 </Wix>
