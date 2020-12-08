@@ -647,17 +647,72 @@ namespace WixToolset.Core
         private void ParseBootstrapperApplicationElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
             Identifier previousId = null;
             var previousType = ComplexReferenceChildType.Unknown;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "BootstrapperApplicationDll":
+                            previousId = this.ParseBootstrapperApplicationDllElement(child, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Payload;
+                            break;
+                        case "Payload":
+                            previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Payload;
+                            break;
+                        case "PayloadGroupRef":
+                            previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.PayloadGroup;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (id != null)
+            {
+                this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id));
+            }
+        }
+
+        /// <summary>
+        /// Parse the BoostrapperApplication element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private Identifier ParseBootstrapperApplicationDllElement(XElement node, ComplexReferenceChildType previousType, Identifier previousId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
 
-            // The BootstrapperApplication element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
-            var hasSourceFile = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false, out var id);
-            if (hasSourceFile)
-            {
-                previousId = id;
-                previousType = ComplexReferenceChildType.Payload;
-            }
+            // The BootstrapperApplicationDll element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
+            this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, true, out var id);
 
             foreach (var attrib in node.Attributes())
             {
@@ -699,17 +754,9 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
-                        break;
-                    case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -718,15 +765,6 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null == previousId)
-            {
-                // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BA...
-                // but we just say there's a missing <Payload>.
-                // TODO: Is there a better message for this?
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
-            }
-
-            // Add the application as an attached container and if a SourceFile was provided add the Id as the BA.
             if (!this.Core.EncounteredError)
             {
                 this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
@@ -735,14 +773,13 @@ namespace WixToolset.Core
                     Type = ContainerType.Attached
                 });
 
-                if (hasSourceFile)
+                this.Core.AddSymbol(new WixBootstrapperApplicationDllSymbol(sourceLineNumbers, id)
                 {
-                    this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id)
-                    {
-                        DpiAwareness = dpiAwareness,
-                    });
-                }
+                    DpiAwareness = dpiAwareness,
+                });
             }
+
+            return id;
         }
 
         /// <summary>

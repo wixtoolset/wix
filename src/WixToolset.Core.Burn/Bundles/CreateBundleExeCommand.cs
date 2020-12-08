@@ -17,13 +17,13 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBundleExeCommand
     {
-        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
+        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, WixBundleSymbol bundleSymbol, WixBundleContainerSymbol uxContainer, IEnumerable<WixBundleContainerSymbol> containers)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
             this.IntermediateFolder = intermediateFolder;
             this.OutputPath = outputPath;
-            this.BootstrapperApplicationSymbol = bootstrapperApplicationSymbol;
+            this.BootstrapperApplicationDllSymbol = bootstrapperApplicationDllSymbol;
             this.BundleSymbol = bundleSymbol;
             this.UXContainer = uxContainer;
             this.Containers = containers;
@@ -39,7 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private string OutputPath { get; }
 
-        private WixBootstrapperApplicationSymbol BootstrapperApplicationSymbol { get; }
+        private WixBootstrapperApplicationDllSymbol BootstrapperApplicationDllSymbol { get; }
 
         private WixBundleSymbol BundleSymbol { get; }
 
@@ -72,7 +72,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             var windowsAssemblyVersion = GetWindowsAssemblyVersion(this.BundleSymbol);
 
-            var applicationManifestData = GenerateApplicationManifest(this.BundleSymbol, this.BootstrapperApplicationSymbol, this.OutputPath, windowsAssemblyVersion);
+            var applicationManifestData = GenerateApplicationManifest(this.BundleSymbol, this.BootstrapperApplicationDllSymbol, this.OutputPath, windowsAssemblyVersion);
 
             UpdateBurnResources(bundleTempPath, this.OutputPath, this.BundleSymbol, windowsAssemblyVersion, applicationManifestData);
 
@@ -101,7 +101,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private static byte[] GenerateApplicationManifest(WixBundleSymbol bundleSymbol, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, string outputPath, Version windowsAssemblyVersion)
+        private static byte[] GenerateApplicationManifest(WixBundleSymbol bundleSymbol, WixBootstrapperApplicationDllSymbol bootstrapperApplicationSymbol, string outputPath, Version windowsAssemblyVersion)
         {
             const string asmv1Namespace = "urn:schemas-microsoft-com:asm.v1";
             const string asmv3Namespace = "urn:schemas-microsoft-com:asm.v3";

@@ -14,11 +14,11 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateNonUXContainers
     {
-        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationSymbol bootstrapperApplicationSymbol, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
+        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
         {
             this.BackendHelper = backendHelper;
             this.Section = section;
-            this.BootstrapperApplicationSymbol = bootstrapperApplicationSymbol;
+            this.BootstrapperApplicationDllSymbol = bootstrapperApplicationDllSymbol;
             this.PayloadSymbols = payloadSymbols;
             this.IntermediateFolder = intermediateFolder;
             this.LayoutFolder = layoutFolder;
@@ -39,7 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        private WixBootstrapperApplicationSymbol BootstrapperApplicationSymbol { get; }
+        private WixBootstrapperApplicationDllSymbol BootstrapperApplicationDllSymbol { get; }
 
         private Dictionary<string, WixBundlePayloadSymbol> PayloadSymbols { get; }
 
@@ -81,9 +81,9 @@ namespace WixToolset.Core.Burn.Bundles
                     container.WorkingPath = Path.Combine(this.IntermediateFolder, container.Name);
                     container.AttachedContainerIndex = 0;
 
-                    // Gather the list of UX payloads but ensure the BootstrapperApplication Payload is the first
+                    // Gather the list of UX payloads but ensure the BootstrapperApplicationDll Payload is the first
                     // in the list since that is the Payload that Burn attempts to load.
-                    var baPayloadId = this.BootstrapperApplicationSymbol.Id.Id;
+                    var baPayloadId = this.BootstrapperApplicationDllSymbol.Id.Id;
 
                     foreach (var uxPayload in containerPayloads)
                     {

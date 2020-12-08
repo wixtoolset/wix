@@ -101,10 +101,10 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
-            // Ensure there is one and only one row in the WixBootstrapperApplication table.
+            // Ensure there is one and only one row in the WixBootstrapperApplicationDll table.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
-            var bundleApplicationSymbol = this.GetSingleSymbol<WixBootstrapperApplicationSymbol>();
+            var bundleApplicationDllSymbol = this.GetSingleSymbol<WixBootstrapperApplicationDllSymbol>();
 
             // Ensure there is one and only one row in the WixChain table.
             // The compiler and linker behavior should have colluded to get
@@ -440,7 +440,7 @@ namespace WixToolset.Core.Burn
             IEnumerable<WixBundlePayloadSymbol> uxPayloads;
             IEnumerable<WixBundleContainerSymbol> containers;
             {
-                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationSymbol, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
+                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationDllSymbol, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -475,7 +475,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationSymbol, bundleSymbol, uxContainer, containers);
+                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);

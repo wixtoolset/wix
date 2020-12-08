@@ -61,6 +61,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.ProvidesDependency:
                     case SymbolDefinitionType.WixApprovedExeForElevation:
                     case SymbolDefinitionType.WixBootstrapperApplication:
+                    case SymbolDefinitionType.WixBootstrapperApplicationDll:
                     case SymbolDefinitionType.WixBundle:
                     case SymbolDefinitionType.WixBundleCatalog:
                     case SymbolDefinitionType.WixBundleContainer:
