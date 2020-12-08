@@ -31,6 +31,7 @@ namespace WixToolset.Converters
         private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
         private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
+        private static readonly XNamespace WixBalNamespace = "http://wixtoolset.org/schemas/v4/wxs/bal";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
 
@@ -40,6 +41,7 @@ namespace WixToolset.Converters
         private static readonly XName InstallExecuteSequenceElementName = WixNamespace + "InstallExecuteSequence";
         private static readonly XName InstallUISequenceSequenceElementName = WixNamespace + "InstallUISequence";
         private static readonly XName BootstrapperApplicationElementName = WixNamespace + "BootstrapperApplication";
+        private static readonly XName BootstrapperApplicationDllElementName = WixNamespace + "BootstrapperApplicationDll";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
@@ -77,6 +79,7 @@ namespace WixToolset.Converters
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName VerbElementName = WixNamespace + "Verb";
+        private static readonly XName BalUseUILanguagesName = WixBalNamespace + "UseUILanguages";
         private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName UtilRegistrySearchName = WixUtilNamespace + "RegistrySearch";
@@ -453,10 +456,83 @@ namespace WixToolset.Converters
 
         private void ConvertBootstrapperApplicationElement(XElement element)
         {
-            if (this.SourceVersion < 4 && null == element.Attribute("DpiAwareness") &&
-                this.OnError(ConverterTestType.AssignBootstrapperApplicationDpiAwareness, element, "The BootstrapperApplication DpiAwareness attribute is being set to 'unaware' to ensure it remains the same as the v3 default"))
+            var xUseUILanguages = element.Attribute(BalUseUILanguagesName);
+            if (xUseUILanguages != null &&
+                this.OnError(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
             {
-                element.Add(new XAttribute("DpiAwareness", "unaware"));
+                xUseUILanguages.Remove();
+            }
+
+            var xBADll = element.Elements(BootstrapperApplicationDllElementName).FirstOrDefault();
+            if (xBADll == null)
+            {
+                xBADll = this.CreateBootstrapperApplicationDllElement(element);
+
+                if (xBADll != null)
+                {
+                    element.Add(Environment.NewLine);
+                    element.Add(xBADll);
+                    element.Add(Environment.NewLine);
+                }
+            }
+        }
+
+        private XElement CreateBootstrapperApplicationDllElement(XElement element)
+        {
+            XElement xBADll = null;
+            var xSource = element.Attribute("SourceFile");
+            var xDpiAwareness = element.Attribute("DpiAwareness");
+
+            if (xSource != null)
+            {
+                if (xBADll != null || CreateBADllElement(element, out xBADll))
+                {
+                    MoveAttribute(element, "SourceFile", xBADll);
+                    MoveAttribute(element, "Name", xBADll);
+                }
+            }
+            else if (xDpiAwareness != null || this.SourceVersion < 4) // older code might be relying on old behavior of first Payload element being the BA dll.
+            {
+                var xFirstChild = element.Elements().FirstOrDefault();
+                if (xFirstChild?.Name == PayloadElementName)
+                {
+                    if (xBADll != null || CreateBADllElement(element, out xBADll))
+                    {
+                        var attributes = xFirstChild.Attributes().ToList();
+                        xFirstChild.Remove();
+
+                        foreach (var attribute in attributes)
+                        {
+                            xBADll.Add(attribute);
+                        }
+                    }
+                }
+                else
+                {
+                    this.OnError(ConverterTestType.BootstrapperApplicationDllRequired, element, "The new BootstrapperApplicationDll element is required but could not be added automatically since the bootstrapper application dll was not directly specified.");
+                }
+            }
+
+            if (xDpiAwareness != null)
+            {
+                if (xBADll != null || CreateBADllElement(element, out xBADll))
+                {
+                    MoveAttribute(element, "DpiAwareness", xBADll);
+                }
+            }
+            else if (this.SourceVersion < 4 && xBADll != null &&
+                this.OnError(ConverterTestType.AssignBootstrapperApplicationDpiAwareness, element, "The BootstrapperApplicationDll DpiAwareness attribute is being set to 'unaware' to ensure it remains the same as the v3 default"))
+            {
+                xBADll.Add(new XAttribute("DpiAwareness", "unaware"));
+            }
+
+            return xBADll;
+
+            bool CreateBADllElement(XObject node, out XElement xCreatedBADll)
+            {
+                var create = this.OnError(ConverterTestType.BootstrapperApplicationDll, node, "The bootstrapper application dll is now specified in the BootstrapperApplicationDll element.");
+                xCreatedBADll = create ? new XElement(BootstrapperApplicationDllElementName) : null;
+                return create;
             }
         }
 
@@ -1489,6 +1565,21 @@ namespace WixToolset.Converters
             /// Verb/@Target can't be converted.
             /// </summary>
             VerbTargetNotConvertable,
+
+            /// <summary>
+            /// The bootstrapper application dll is now specified in its own element.
+            /// </summary>
+            BootstrapperApplicationDll,
+
+            /// <summary>
+            /// The new bootstrapper application dll element is required.
+            /// </summary>
+            BootstrapperApplicationDllRequired,
+
+            /// <summary>
+            /// bal:UseUILanguages is deprecated, 'true' is now the standard behavior.
+            /// </summary>
+            BalUseUILanguagesDeprecated,
         }
     }
 }
