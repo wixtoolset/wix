@@ -1004,5 +1004,38 @@ namespace WixToolsetTest.CoreIntegration
                 }, files.Select(f => f.Name).ToArray());
             }
         }
+
+        [Fact]
+        public void CanPublishComponentWithMultipleFeatureComponents()
+        {
+            var folder = TestData.Get(@"TestData\PublishComponent");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "PublishComponent" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "PublishComponent:{0A82C8F6-9CE9-4336-B8BE-91A39B5F7081}	Qualifier2	Component2	AppData2	ProductFeature2",
+                    "PublishComponent:{BD245B5A-EC33-46ED-98FF-E9D3D416AD04}	Qualifier1	Component1	AppData1	ProductFeature1",
+                }, results);
+            }
+        }
     }
 }

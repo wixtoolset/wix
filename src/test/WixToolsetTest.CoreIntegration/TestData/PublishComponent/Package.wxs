@@ -1,0 +1,36 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Codepage="1252" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <Feature Id="ProductFeature1" Title="!(loc.FeatureTitle)">
+      <ComponentRef Id="Component1" Primary="yes" />
+    </Feature>
+
+    <Feature Id="ProductFeature2" Title="!(loc.FeatureTitle)">
+      <ComponentRef Id="Component1" />
+      <ComponentRef Id="Component2" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="Component1" Directory="INSTALLFOLDER" Guid="C8EFA5DF-2876-4724-A003-A6BEBF140BB1">
+        <File Id="File1" Source="test.txt" />
+        <Category Id="{BD245B5A-EC33-46ED-98FF-E9D3D416AD04}" AppData="AppData1" Qualifier="Qualifier1" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="Component2" Directory="INSTALLFOLDER" Guid="8DE79DE7-4B55-4D43-88F5-AD6A1E8D242A">
+        <File Id="File2" Source="test.txt" />
+        <Category Id="{0A82C8F6-9CE9-4336-B8BE-91A39B5F7081}" AppData="AppData2" Qualifier="Qualifier2" />
+    </Component>
+  </Fragment>
+</Wix>

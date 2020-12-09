@@ -210,6 +210,9 @@
     <Content Include="TestData\DecompileNullComponent\example.cab" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DecompileNullComponent\example.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DecompileNullComponent\Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PublishComponent\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PublishComponent\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PublishComponent\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
