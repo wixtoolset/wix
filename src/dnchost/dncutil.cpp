@@ -37,7 +37,7 @@ static HRESULT LoadCoreClr(
 static HRESULT StartCoreClr(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzNativeHostPath,
-    __in size_t cProperties,
+    __in DWORD cProperties,
     __in LPCWSTR* propertyKeys,
     __in LPCWSTR* propertyValues
     );
@@ -320,7 +320,7 @@ static HRESULT InitializeCoreClrPre5(
     hr = LoadCoreClr(pState, sczCoreClrPath);
     BalExitOnFailure(hr, "Failed to load coreclr.");
 
-    hr = StartCoreClr(pState, wzNativeHostPath, cProperties, rgPropertyKeys, rgPropertyValues);
+    hr = StartCoreClr(pState, wzNativeHostPath, (DWORD)cProperties, rgPropertyKeys, rgPropertyValues);
     BalExitOnFailure(hr, "Failed to start coreclr.");
 
 LExit:
@@ -358,7 +358,7 @@ LExit:
 static HRESULT StartCoreClr(
     __in HOSTFXR_STATE* pState,
     __in LPCWSTR wzNativeHostPath,
-    __in size_t cProperties,
+    __in DWORD cProperties,
     __in LPCWSTR* propertyKeys,
     __in LPCWSTR* propertyValues
     )

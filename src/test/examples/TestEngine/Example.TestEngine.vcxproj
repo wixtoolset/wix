@@ -5,6 +5,14 @@
   <Import Project="..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.54\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.54\build\WixToolset.BootstrapperCore.Native.props')" />
   <Import Project="..\..\..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props')" />
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>

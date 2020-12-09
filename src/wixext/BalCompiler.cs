@@ -918,7 +918,7 @@ namespace WixToolset.Bal
 
         private void CreateBARef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string name)
         {
-            var id = this.ParseHelper.CreateIdentifierValueFromPlatform(name, this.Context.Platform, BurnPlatforms.X86);
+            var id = this.ParseHelper.CreateIdentifierValueFromPlatform(name, this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
             if (id == null)
             {
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), node.Name.LocalName));
