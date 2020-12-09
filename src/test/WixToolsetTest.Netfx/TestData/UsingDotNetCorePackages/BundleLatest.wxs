@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="WixStdBa" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="75D5D534-E177-4689-AAE9-CAC1C39002C2">
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
-            <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" />
-        </BootstrapperApplicationRef>
+        <BootstrapperApplication>
+            <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" Theme="hyperlinkLicense" />
+        </BootstrapperApplication>
         <Chain>
             <PackageGroupRef Id="AspNetCoreRuntime31Redist_x86" />
             <PackageGroupRef Id="DesktopNetCoreRuntime31Redist_x86" />
