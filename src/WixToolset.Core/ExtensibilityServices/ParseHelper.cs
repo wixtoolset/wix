@@ -127,7 +127,7 @@ namespace WixToolset.Core.ExtensibilityServices
             switch (currentPlatform)
             {
                 case Platform.X86:
-                    if ((supportedPlatforms & BurnPlatforms.X64) == BurnPlatforms.X64)
+                    if ((supportedPlatforms & BurnPlatforms.X86) == BurnPlatforms.X86)
                     {
                         suffix = "_X86";
                     }
