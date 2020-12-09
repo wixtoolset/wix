@@ -10,7 +10,7 @@
     <ProjectReference Include="..\PackageCv1\PackageCv1.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.70" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.53" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.72" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.54" />
   </ItemGroup>
 </Project>
