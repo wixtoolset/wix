@@ -42,6 +42,7 @@ namespace WixToolset.Converters
         private static readonly XName InstallUISequenceSequenceElementName = WixNamespace + "InstallUISequence";
         private static readonly XName BootstrapperApplicationElementName = WixNamespace + "BootstrapperApplication";
         private static readonly XName BootstrapperApplicationDllElementName = WixNamespace + "BootstrapperApplicationDll";
+        private static readonly XName BootstrapperApplicationRefElementName = WixNamespace + "BootstrapperApplicationRef";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
@@ -80,6 +81,10 @@ namespace WixToolset.Converters
         private static readonly XName VariableElementName = WixNamespace + "Variable";
         private static readonly XName VerbElementName = WixNamespace + "Verb";
         private static readonly XName BalUseUILanguagesName = WixBalNamespace + "UseUILanguages";
+        private static readonly XName BalStandardBootstrapperApplicationName = WixBalNamespace + "WixStandardBootstrapperApplication";
+        private static readonly XName BalManagedBootstrapperApplicationHostName = WixBalNamespace + "WixManagedBootstrapperApplicationHost";
+        private static readonly XName BalOldDotNetCoreBootstrapperApplicationName = WixBalNamespace + "WixDotNetCoreBootstrapperApplication";
+        private static readonly XName BalNewDotNetCoreBootstrapperApplicationName = WixBalNamespace + "WixDotNetCoreBootstrapperApplicationHost";
         private static readonly XName UtilCloseApplicationElementName = WixUtilNamespace + "CloseApplication";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName UtilRegistrySearchName = WixUtilNamespace + "RegistrySearch";
@@ -142,6 +147,7 @@ namespace WixToolset.Converters
                 { WixConverter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.BootstrapperApplicationElementName, this.ConvertBootstrapperApplicationElement },
+                { WixConverter.BootstrapperApplicationRefElementName, this.ConvertBootstrapperApplicationRefElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
@@ -533,6 +539,105 @@ namespace WixToolset.Converters
                 var create = this.OnError(ConverterTestType.BootstrapperApplicationDll, node, "The bootstrapper application dll is now specified in the BootstrapperApplicationDll element.");
                 xCreatedBADll = create ? new XElement(BootstrapperApplicationDllElementName) : null;
                 return create;
+            }
+        }
+
+        private void ConvertBootstrapperApplicationRefElement(XElement element)
+        {
+            var xUseUILanguages = element.Attribute(BalUseUILanguagesName);
+            if (xUseUILanguages != null &&
+                this.OnError(ConverterTestType.BalUseUILanguagesDeprecated, element, "bal:UseUILanguages is deprecated, 'true' is now the standard behavior."))
+            {
+                xUseUILanguages.Remove();
+            }
+
+            var xId = element.Attribute("Id");
+            if (xId != null)
+            {
+                XName balBAName = null;
+                XName oldBalBAName = null;
+                string theme = null;
+
+                switch (xId.Value)
+                {
+                    case "WixStandardBootstrapperApplication.RtfLicense":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "rtfLicense";
+                        break;
+                    case "WixStandardBootstrapperApplication.RtfLargeLicense":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "rtfLargeLicense";
+                        break;
+                    case "WixStandardBootstrapperApplication.HyperlinkLicense":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "hyperlinkLicense";
+                        break;
+                    case "WixStandardBootstrapperApplication.HyperlinkLargeLicense":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "hyperlinkLargeLicense";
+                        break;
+                    case "WixStandardBootstrapperApplication.HyperlinkSidebarLicense":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "hyperlinkSidebarLicense";
+                        break;
+                    case "WixStandardBootstrapperApplication.Foundation":
+                        balBAName = BalStandardBootstrapperApplicationName;
+                        theme = "none";
+                        break;
+                    case "ManagedBootstrapperApplicationHost":
+                    case "ManagedBootstrapperApplicationHost.RtfLicense":
+                        balBAName = BalManagedBootstrapperApplicationHostName;
+                        theme = "standard";
+                        break;
+                    case "ManagedBootstrapperApplicationHost.Minimal":
+                    case "ManagedBootstrapperApplicationHost.RtfLicense.Minimal":
+                    case "ManagedBootstrapperApplicationHost.Foundation":
+                        balBAName = BalManagedBootstrapperApplicationHostName;
+                        theme = "none";
+                        break;
+                    case "DotNetCoreBootstrapperApplicationHost":
+                    case "DotNetCoreBootstrapperApplicationHost.RtfLicense":
+                        balBAName = BalNewDotNetCoreBootstrapperApplicationName;
+                        oldBalBAName = BalOldDotNetCoreBootstrapperApplicationName;
+                        theme = "standard";
+                        break;
+                    case "DotNetCoreBootstrapperApplicationHost.Minimal":
+                    case "DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal":
+                    case "DotNetCoreBootstrapperApplicationHost.Foundation":
+                        balBAName = BalNewDotNetCoreBootstrapperApplicationName;
+                        oldBalBAName = BalOldDotNetCoreBootstrapperApplicationName;
+                        theme = "none";
+                        break;
+                }
+
+                if (balBAName != null && theme != null &&
+                    this.OnError(ConverterTestType.BalBootstrapperApplicationRefToElement, element, "Built-in bootstrapper applications must be referenced through their custom element"))
+                {
+                    element.Name = BootstrapperApplicationElementName;
+                    xId.Remove();
+                    this.ConvertBalBootstrapperApplicationRef(element, theme, balBAName, oldBalBAName);
+                }
+            }
+        }
+
+        private void ConvertBalBootstrapperApplicationRef(XElement element, string theme, XName balBAElementName, XName oldBalBAElementName = null)
+        {
+            var xBalBa = element.Element(oldBalBAElementName ?? balBAElementName);
+            if (xBalBa == null)
+            {
+                xBalBa = new XElement(balBAElementName);
+                element.Add(Environment.NewLine);
+                element.Add(xBalBa);
+                element.Add(Environment.NewLine);
+            }
+            else if (oldBalBAElementName != null)
+            {
+                xBalBa.Name = BalNewDotNetCoreBootstrapperApplicationName;
+            }
+
+            if (theme != "standard")
+            {
+                xBalBa.Add(new XAttribute("Theme", theme));
             }
         }
 
@@ -1580,6 +1685,11 @@ namespace WixToolset.Converters
             /// bal:UseUILanguages is deprecated, 'true' is now the standard behavior.
             /// </summary>
             BalUseUILanguagesDeprecated,
+
+            /// <summary>
+            /// The custom elements for built-in BAs are now required.
+            /// </summary>
+            BalBootstrapperApplicationRefToElement,
         }
     }
 }
