@@ -9,6 +9,7 @@ namespace WixToolset.Bal
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// The compiler for the WiX Toolset Bal Extension.
@@ -16,6 +17,31 @@ namespace WixToolset.Bal
     public sealed class BalCompiler : BaseCompilerExtension
     {
         private readonly Dictionary<string, WixMbaPrereqInformationSymbol> prereqInfoSymbolsByPackageId;
+
+        private enum WixDotNetCoreBootstrapperApplicationHostTheme
+        {
+            Unknown,
+            None,
+            Standard,
+        }
+
+        private enum WixManagedBootstrapperApplicationHostTheme
+        {
+            Unknown,
+            None,
+            Standard,
+        }
+
+        private enum WixStandardBootstrapperApplicationTheme
+        {
+            Unknown,
+            HyperlinkLargeLicense,
+            HyperlinkLicense,
+            HyperlinkSidebarLicense,
+            None,
+            RtfLargeLicense,
+            RtfLicense,
+        }
 
         /// <summary>
         /// Instantiate a new BalCompiler.
@@ -54,7 +80,7 @@ namespace WixToolset.Bal
                             break;
                     }
                     break;
-                case "BootstrapperApplicationRef":
+                case "BootstrapperApplication":
                     switch (element.Name.LocalName)
                     {
                         case "WixStandardBootstrapperApplication":
@@ -63,8 +89,8 @@ namespace WixToolset.Bal
                         case "WixManagedBootstrapperApplicationHost":
                             this.ParseWixManagedBootstrapperApplicationHostElement(intermediate, section, element);
                             break;
-                        case "WixDotNetCoreBootstrapperApplication":
-                            this.ParseWixDotNetCoreBootstrapperApplicationElement(intermediate, section, element);
+                        case "WixDotNetCoreBootstrapperApplicationHost":
+                            this.ParseWixDotNetCoreBootstrapperApplicationHostElement(intermediate, section, element);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -407,6 +433,7 @@ namespace WixToolset.Bal
             string licenseUrl = null;
             string logoFile = null;
             string logoSideFile = null;
+            WixStandardBootstrapperApplicationTheme? theme = null;
             string themeFile = null;
             string localizationFile = null;
             var suppressOptionsUI = YesNoType.NotSet;
@@ -469,6 +496,34 @@ namespace WixToolset.Bal
                         case "SupportCacheOnly":
                             supportCacheOnly = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
+                        case "Theme":
+                            var themeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (themeValue)
+                            {
+                                case "hyperlinkLargeLicense":
+                                    theme = WixStandardBootstrapperApplicationTheme.HyperlinkLargeLicense;
+                                    break;
+                                case "hyperlinkLicense":
+                                    theme = WixStandardBootstrapperApplicationTheme.HyperlinkLicense;
+                                    break;
+                                case "hyperlinkSidebarLicense":
+                                    theme = WixStandardBootstrapperApplicationTheme.HyperlinkSidebarLicense;
+                                    break;
+                                case "none":
+                                    theme = WixStandardBootstrapperApplicationTheme.None;
+                                    break;
+                                case "rtfLargeLicense":
+                                    theme = WixStandardBootstrapperApplicationTheme.RtfLargeLicense;
+                                    break;
+                                case "rtfLicense":
+                                    theme = WixStandardBootstrapperApplicationTheme.RtfLicense;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Theme", themeValue, "hyperlinkLargeLicense", "hyperlinkLicense", "hyperlinkSidebarLicense", "none", "rtfLargeLicense", "rtfLicense"));
+                                    theme = WixStandardBootstrapperApplicationTheme.Unknown; // set a value to prevent expected attribute error below.
+                                    break;
+                            }
+                            break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
@@ -482,13 +537,20 @@ namespace WixToolset.Bal
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            if (String.IsNullOrEmpty(licenseFile) && null == licenseUrl)
+            if (!theme.HasValue)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Theme"));
+            }
+
+            if (theme != WixStandardBootstrapperApplicationTheme.None && String.IsNullOrEmpty(licenseFile) && null == licenseUrl)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "LicenseFile", "LicenseUrl", true));
             }
 
             if (!this.Messaging.EncounteredError)
             {
+                this.CreateBARef(section, sourceLineNumbers, node, "WixStandardBootstrapperApplication");
+
                 if (!String.IsNullOrEmpty(launchTarget))
                 {
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTarget"))
@@ -611,6 +673,31 @@ namespace WixToolset.Bal
                         symbol.SupportCacheOnly = 1;
                     }
                 }
+
+                string themePayloadGroup = null;
+                switch (theme)
+                {
+                    case WixStandardBootstrapperApplicationTheme.HyperlinkLargeLicense:
+                        themePayloadGroup = "WixStdbaHyperlinkLargeLicensePayloads";
+                        break;
+                    case WixStandardBootstrapperApplicationTheme.HyperlinkLicense:
+                        themePayloadGroup = "WixStdbaHyperlinkLicensePayloads";
+                        break;
+                    case WixStandardBootstrapperApplicationTheme.HyperlinkSidebarLicense:
+                        themePayloadGroup = "WixStdbaHyperlinkSidebarLicensePayloads";
+                        break;
+                    case WixStandardBootstrapperApplicationTheme.RtfLargeLicense:
+                        themePayloadGroup = "WixStdbaRtfLargeLicensePayloads";
+                        break;
+                    case WixStandardBootstrapperApplicationTheme.RtfLicense:
+                        themePayloadGroup = "WixStdbaRtfLicensePayloads";
+                        break;
+                }
+
+                if (themePayloadGroup != null)
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
+                }
             }
         }
 
@@ -624,6 +711,7 @@ namespace WixToolset.Bal
             string logoFile = null;
             string themeFile = null;
             string localizationFile = null;
+            WixManagedBootstrapperApplicationHostTheme? theme = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -640,6 +728,22 @@ namespace WixToolset.Bal
                         case "LocalizationFile":
                             localizationFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
+                        case "Theme":
+                            var themeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (themeValue)
+                            {
+                                case "none":
+                                    theme = WixManagedBootstrapperApplicationHostTheme.None;
+                                    break;
+                                case "standard":
+                                    theme = WixManagedBootstrapperApplicationHostTheme.Standard;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Theme", themeValue, "none", "standard"));
+                                    theme = WixManagedBootstrapperApplicationHostTheme.Unknown;
+                                    break;
+                            }
+                            break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
@@ -655,6 +759,8 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
+                this.CreateBARef(section, sourceLineNumbers, node, "WixManagedBootstrapperApplicationHost");
+
                 if (!String.IsNullOrEmpty(logoFile))
                 {
                     section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaLogo"))
@@ -678,6 +784,19 @@ namespace WixToolset.Bal
                         Value = localizationFile,
                     });
                 }
+
+                string themePayloadGroup = null;
+                switch (theme)
+                {
+                    case WixManagedBootstrapperApplicationHostTheme.Standard:
+                        themePayloadGroup = "MbaPreqStandardPayloads";
+                        break;
+                }
+
+                if (themePayloadGroup != null)
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
+                }
             }
         }
 
@@ -685,13 +804,14 @@ namespace WixToolset.Bal
         /// Parses a WixDotNetCoreBootstrapperApplication element for Bundles.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseWixDotNetCoreBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private void ParseWixDotNetCoreBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string logoFile = null;
             string themeFile = null;
             string localizationFile = null;
             var selfContainedDeployment = YesNoType.NotSet;
+            WixDotNetCoreBootstrapperApplicationHostTheme? theme = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -711,6 +831,22 @@ namespace WixToolset.Bal
                         case "SelfContainedDeployment":
                             selfContainedDeployment = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
+                        case "Theme":
+                            var themeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (themeValue)
+                            {
+                                case "none":
+                                    theme = WixDotNetCoreBootstrapperApplicationHostTheme.None;
+                                    break;
+                                case "standard":
+                                    theme = WixDotNetCoreBootstrapperApplicationHostTheme.Standard;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Theme", themeValue, "none", "standard"));
+                                    theme = WixDotNetCoreBootstrapperApplicationHostTheme.Unknown;
+                                    break;
+                            }
+                            break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
@@ -722,10 +858,17 @@ namespace WixToolset.Bal
                 }
             }
 
+            if (!theme.HasValue)
+            {
+                theme = WixDotNetCoreBootstrapperApplicationHostTheme.Standard;
+            }
+
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             if (!this.Messaging.EncounteredError)
             {
+                this.CreateBARef(section, sourceLineNumbers, node, "WixDotNetCoreBootstrapperApplicationHost");
+
                 if (!String.IsNullOrEmpty(logoFile))
                 {
                     section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaLogo"))
@@ -757,6 +900,33 @@ namespace WixToolset.Bal
                         SelfContainedDeployment = 1,
                     });
                 }
+
+                string themePayloadGroup = null;
+                switch (theme)
+                {
+                    case WixDotNetCoreBootstrapperApplicationHostTheme.Standard:
+                        themePayloadGroup = "DncPreqStandardPayloads";
+                        break;
+                }
+
+                if (themePayloadGroup != null)
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
+                }
+            }
+        }
+
+        private void CreateBARef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string name)
+        {
+            var id = this.ParseHelper.CreateIdentifierValueFromPlatform(name, this.Context.Platform, BurnPlatforms.X86);
+            if (id == null)
+            {
+                this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), node.Name.LocalName));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, id);
             }
         }
     }

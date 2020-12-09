@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="FDDLatestCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
-        <BootstrapperApplicationRef Id="DotNetCoreBootstrapperApplicationHost">
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.deps.json' Name='Example.LatestCoreMBA.deps.json' />
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.dll' Name='Example.LatestCoreMBA.dll' bal:BAFactoryAssembly='yes' />
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.pdb' Name='Example.LatestCoreMBA.pdb' />
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.runtimeconfig.json' Name='Example.LatestCoreMBA.runtimeconfig.json' />
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\mbanative.dll' Name='mbanative.dll' />
-            <Payload SourceFile='publish\Example.LatestCoreMBA\fdd\WixToolset.Mba.Core.dll' Name='WixToolset.Mba.Core.dll' />
-        </BootstrapperApplicationRef>
+        <BootstrapperApplication>
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.deps.json" Name="Example.LatestCoreMBA.deps.json" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.dll" Name="Example.LatestCoreMBA.dll" bal:BAFactoryAssembly="yes" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.pdb" Name="Example.LatestCoreMBA.pdb" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.runtimeconfig.json" Name="Example.LatestCoreMBA.runtimeconfig.json" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\mbanative.dll" Name="mbanative.dll" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\WixToolset.Mba.Core.dll" Name="WixToolset.Mba.Core.dll" />
+            <bal:WixDotNetCoreBootstrapperApplicationHost />
+        </BootstrapperApplication>
         <Chain>
             <ExePackage SourceFile="c:\windows\system32\kernel32.dll" bal:PrereqPackage="yes" />
         </Chain>

@@ -3,5 +3,5 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?define platform=x86 ?>
-    <?include wixstdba_platform.wxi ?>
+    <?include BalExtension_platform.wxi ?>
 </Wix>

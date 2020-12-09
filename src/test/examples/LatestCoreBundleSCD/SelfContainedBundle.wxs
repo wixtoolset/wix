@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="SCDLatestCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
-        <BootstrapperApplicationRef Id="DotNetCoreBootstrapperApplicationHost">
-            <bal:WixDotNetCoreBootstrapperApplication SelfContainedDeployment="yes" />
+        <BootstrapperApplication>
+            <bal:WixDotNetCoreBootstrapperApplicationHost SelfContainedDeployment="yes" />
             <PayloadGroupRef Id="publish.Example.LatestCoreMBA.scd" />
-        </BootstrapperApplicationRef>
+        </BootstrapperApplication>
         <Chain>
             <ExePackage SourceFile="c:\windows\system32\kernel32.dll" PerMachine="yes" />
         </Chain>

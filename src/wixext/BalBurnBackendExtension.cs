@@ -42,8 +42,8 @@ namespace WixToolset.Bal
             }
 
             var isStdBA = baId.StartsWith("WixStandardBootstrapperApplication");
-            var isMBA = baId.StartsWith("ManagedBootstrapperApplicationHost");
-            var isDNC = baId.StartsWith("DotNetCoreBootstrapperApplicationHost");
+            var isMBA = baId.StartsWith("WixManagedBootstrapperApplicationHost");
+            var isDNC = baId.StartsWith("WixDotNetCoreBootstrapperApplicationHost");
             var isSCD = isDNC && this.VerifySCD(section);
 
             if (isStdBA || isMBA || isDNC)

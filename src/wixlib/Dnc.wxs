@@ -6,54 +6,15 @@
      Dnc.wxs - .NET Core BA resources.
     -->
     <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost">
-            <PayloadGroupRef Id="Dnc" />
-            <PayloadGroupRef Id="DncPreqStandard" />
-            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
-        </BootstrapperApplication>
-    </Fragment>
-
-    <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense">
-            <PayloadGroupRef Id="Dnc" />
-            <PayloadGroupRef Id="DncPreqStandard" />
-            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
-        </BootstrapperApplication>
-    </Fragment>
-
-    <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Minimal">
-            <PayloadGroupRef Id="Dnc" />
-            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
-        </BootstrapperApplication>
-    </Fragment>
-
-    <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal">
-            <PayloadGroupRef Id="Dnc" />
-            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
-        </BootstrapperApplication>
-    </Fragment>
-
-    <Fragment>
-        <BootstrapperApplication Id="DotNetCoreBootstrapperApplicationHost.Foundation">
-            <PayloadGroupRef Id="Dnc" />
-            <BootstrapperApplicationDll SourceFile="dnchost.dll" />
-        </BootstrapperApplication>
-    </Fragment>
-
-    <Fragment>
-        <PayloadGroup Id="Dnc">
-            <Payload Compressed="yes" SourceFile="WixToolset.Dnc.Host.dll" />
-            <Payload Compressed="yes" SourceFile="wixstdba.dll" Name="dncpreq.dll" />
+        <PayloadGroup Id="WixDotNetCoreBootstrapperApplicationHostManagedPayloads">
+            <Payload SourceFile="WixToolset.Dnc.Host.dll" />
         </PayloadGroup>
     </Fragment>
-
     <Fragment>
-        <PayloadGroup Id="DncPreqStandard">
-            <Payload Name="mbapreq.thm" Compressed="yes" SourceFile="!(wix.DncPreqbaThemeXml=SourceDir\dncpreq.thm)" />
-            <Payload Name="mbapreq.png" Compressed="yes" SourceFile="!(wix.DncPreqbaLogo=SourceDir\mbapreq.png)" />
-            <Payload Name="mbapreq.wxl" Compressed="yes" SourceFile="!(wix.DncPreqbaThemeWxl=SourceDir\dncpreq.wxl)" />
+        <PayloadGroup Id="DncPreqStandardPayloads">
+            <Payload Name="mbapreq.thm" SourceFile="!(wix.DncPreqbaThemeXml=SourceDir\dncpreq.thm)" />
+            <Payload Name="mbapreq.png" SourceFile="!(wix.DncPreqbaLogo=SourceDir\mbapreq.png)" />
+            <Payload Name="mbapreq.wxl" SourceFile="!(wix.DncPreqbaThemeWxl=SourceDir\dncpreq.wxl)" />
         </PayloadGroup>
     </Fragment>
 </Wix>
