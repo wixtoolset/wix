@@ -2440,6 +2440,13 @@ namespace WixToolset.Core.WindowsInstaller
                 this.RootElement.SetAttributeValue("Codepage", codepage);
             }
 
+            if (this.OutputType == OutputType.Module)
+            {
+                var table = tables["_SummaryInformation"];
+                var row = table.Rows.SingleOrDefault(r => r.FieldAsInteger(0) == 9);
+                this.ModularizationGuid = row?.FieldAsString(1);
+            }
+
             // index the rows from the extension libraries
             var indexedExtensionTables = new Dictionary<string, HashSet<string>>();
 #if TODO_DECOMPILER_EXTENSIONS
@@ -3028,12 +3035,6 @@ namespace WixToolset.Core.WindowsInstaller
                                 if (0 < template.Length && 0 < template[template.Length - 1].Length)
                                 {
                                     this.RootElement.SetAttributeValue("Language", template[template.Length - 1]);
-                                }
-                                break;
-                            case 9:
-                                if (OutputType.Module == this.OutputType)
-                                {
-                                    this.ModularizationGuid = value;
                                 }
                                 break;
                             case 14:
@@ -3873,7 +3874,7 @@ namespace WixToolset.Core.WindowsInstaller
                                 xColumn.SetAttributeValue("Type", "string");
                                 break;
                             default:
-                                throw new InvalidOperationException($"Unknown custom column type '{columnDefinition.Type.ToString()}'.");
+                                throw new InvalidOperationException($"Unknown custom column type '{columnDefinition.Type}'.");
                         }
                     }
 

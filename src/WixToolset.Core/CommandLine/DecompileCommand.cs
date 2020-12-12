@@ -53,7 +53,7 @@ namespace WixToolset.Core.CommandLine
 
                 if (!this.Messaging.EncounteredError)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(context.OutputPath));
+                    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(context.OutputPath)));
                     result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
                 }
             }
