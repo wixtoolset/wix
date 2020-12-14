@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Extension", "src\te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.CoreIntegration", "src\test\WixToolsetTest.CoreIntegration\WixToolsetTest.CoreIntegration.csproj", "{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Core.Burn", "src\test\WixToolsetTest.Core.Burn\WixToolsetTest.Core.Burn.csproj", "{DF63F589-028E-45A1-A212-948FACF1FDCD}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.TestPackage", "src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj", "{853716DB-C02C-41BD-91BC-79CDC0C17D10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompileCoreTestExtensionWixlib", "src\test\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj", "{23FC60D7-B101-42F8-9786-DB7A9CD964A2}"
@@ -88,6 +90,18 @@ Global
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x64.Build.0 = Release|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.Build.0 = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|x64.Build.0 = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{DF63F589-028E-45A1-A212-948FACF1FDCD}.Release|x86.Build.0 = Release|Any CPU
 		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -119,6 +133,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C66C2503-C671-4230-8B48-1D93A8532A28} = {1284331E-BC6C-426D-AAAF-140C0174F875}
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B} = {1284331E-BC6C-426D-AAAF-140C0174F875}
+		{DF63F589-028E-45A1-A212-948FACF1FDCD} = {1284331E-BC6C-426D-AAAF-140C0174F875}
 		{23FC60D7-B101-42F8-9786-DB7A9CD964A2} = {1284331E-BC6C-426D-AAAF-140C0174F875}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

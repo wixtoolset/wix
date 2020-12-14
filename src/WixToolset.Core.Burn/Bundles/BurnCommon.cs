@@ -354,7 +354,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        private static UInt16 ReadUInt16(byte[] bytes, UInt32 offset)
+        internal static UInt16 ReadUInt16(byte[] bytes, UInt32 offset)
         {
             Debug.Assert(offset + 2 <= bytes.Length);
             return (UInt16)(bytes[offset] + (bytes[offset + 1] << 8));
@@ -366,10 +366,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        private static UInt32 ReadUInt32(byte[] bytes, UInt32 offset)
+        internal static UInt32 ReadUInt32(byte[] bytes, UInt32 offset)
         {
             Debug.Assert(offset + 4 <= bytes.Length);
-            return (UInt32)(bytes[offset] + (bytes[offset + 1] << 8) + (bytes[offset + 2] << 16) + (bytes[offset + 3] << 24));
+            return BurnCommon.ReadUInt16(bytes, offset) + ((UInt32)BurnCommon.ReadUInt16(bytes, offset + 2) << 16);
         }
 
         /// <summary>
@@ -378,10 +378,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="bytes">Array from which to read.</param>
         /// <param name="offset">Beginning offset from which to read.</param>
         /// <returns>value at offset</returns>
-        private static UInt64 ReadUInt64(byte[] bytes, UInt32 offset)
+        internal static UInt64 ReadUInt64(byte[] bytes, UInt32 offset)
         {
             Debug.Assert(offset + 8 <= bytes.Length);
-            return BurnCommon.ReadUInt32(bytes, offset) + ((UInt64)(BurnCommon.ReadUInt32(bytes, offset + 4)) << 32);
+            return BurnCommon.ReadUInt32(bytes, offset) + ((UInt64)BurnCommon.ReadUInt32(bytes, offset + 4) << 32);
         }
     }
 }
