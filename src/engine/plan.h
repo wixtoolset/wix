@@ -477,6 +477,14 @@ HRESULT PlanExecutePackage(
     __in BURN_VARIABLES* pVariables,
     __inout HANDLE* phSyncpointEvent
     );
+HRESULT PlanDefaultRelatedBundleRequestState(
+    __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
+    __in BOOTSTRAPPER_RELATION_TYPE relatedBundleRelationType,
+    __in BOOTSTRAPPER_ACTION action,
+    __in VERUTIL_VERSION* pRegistrationVersion,
+    __in VERUTIL_VERSION* pRelatedBundleVersion,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState
+    );
 HRESULT PlanRelatedBundlesBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_REGISTRATION* pRegistration,

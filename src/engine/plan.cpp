@@ -1211,6 +1211,65 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
+    __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
+    __in BOOTSTRAPPER_RELATION_TYPE relatedBundleRelationType,
+    __in BOOTSTRAPPER_ACTION action,
+    __in VERUTIL_VERSION* pRegistrationVersion,
+    __in VERUTIL_VERSION* pRelatedBundleVersion,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState
+    )
+{
+    HRESULT hr = S_OK;
+    int nCompareResult = 0;
+
+    switch (relatedBundleRelationType)
+    {
+    case BOOTSTRAPPER_RELATION_UPGRADE:
+        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && BOOTSTRAPPER_ACTION_UNINSTALL < action)
+        {
+            hr = VerCompareParsedVersions(pRegistrationVersion, pRelatedBundleVersion, &nCompareResult);
+            ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistrationVersion ? pRegistrationVersion->sczVersion : NULL, pRelatedBundleVersion ? pRelatedBundleVersion->sczVersion : NULL);
+
+            *pRequestState = (nCompareResult < 0) ? BOOTSTRAPPER_REQUEST_STATE_NONE : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+        }
+        break;
+    case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
+    case BOOTSTRAPPER_RELATION_ADDON:
+        if (BOOTSTRAPPER_ACTION_UNINSTALL == action)
+        {
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+        }
+        else if (BOOTSTRAPPER_ACTION_INSTALL == action || BOOTSTRAPPER_ACTION_MODIFY == action)
+        {
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+        }
+        else if (BOOTSTRAPPER_ACTION_REPAIR == action)
+        {
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
+        }
+        break;
+    case BOOTSTRAPPER_RELATION_DEPENDENT:
+        // Automatically repair dependent bundles to restore missing
+        // packages after uninstall unless we're being upgraded with the
+        // assumption that upgrades are cumulative (as intended).
+        if (BOOTSTRAPPER_RELATION_UPGRADE != commandRelationType && BOOTSTRAPPER_ACTION_UNINSTALL == action)
+        {
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
+        }
+        break;
+    case BOOTSTRAPPER_RELATION_DETECT:
+        break;
+    default:
+        hr = E_UNEXPECTED;
+        ExitOnFailure(hr, "Unexpected relation type encountered during plan: %d", relatedBundleRelationType);
+        break;
+    }
+
+LExit:
+    return hr;
+}
+
 extern "C" HRESULT PlanRelatedBundlesBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_REGISTRATION* pRegistration,
@@ -1222,7 +1281,6 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
     LPWSTR* rgsczAncestors = NULL;
     UINT cAncestors = 0;
     STRINGDICT_HANDLE sdAncestors = NULL;
-    int nCompareResult = 0;
 
     if (pRegistration->sczAncestors)
     {
@@ -1272,48 +1330,8 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
             ExitOnFailure(hr, "Failed to copy self to related bundle ancestors.");
         }
 
-        switch (pRelatedBundle->relationType)
-        {
-        case BOOTSTRAPPER_RELATION_UPGRADE:
-            if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action)
-            {
-                hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
-                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
-
-                pRelatedBundle->package.requested = (nCompareResult < 0) ? BOOTSTRAPPER_REQUEST_STATE_NONE : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
-            }
-            break;
-        case BOOTSTRAPPER_RELATION_PATCH: __fallthrough;
-        case BOOTSTRAPPER_RELATION_ADDON:
-            if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
-            {
-                pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
-            }
-            else if (BOOTSTRAPPER_ACTION_INSTALL == pPlan->action || BOOTSTRAPPER_ACTION_MODIFY == pPlan->action)
-            {
-                pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
-            }
-            else if (BOOTSTRAPPER_ACTION_REPAIR == pPlan->action)
-            {
-                pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
-            }
-            break;
-        case BOOTSTRAPPER_RELATION_DEPENDENT:
-            // Automatically repair dependent bundles to restore missing
-            // packages after uninstall unless we're being upgraded with the
-            // assumption that upgrades are cumulative (as intended).
-            if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
-            {
-                pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_REPAIR;
-            }
-            break;
-        case BOOTSTRAPPER_RELATION_DETECT:
-            break;
-        default:
-            hr = E_UNEXPECTED;
-            ExitOnFailure(hr, "Unexpected relation type encountered during plan: %d", pRelatedBundle->relationType);
-            break;
-        }
+        hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, pPlan->action, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->package.requested);
+        ExitOnFailure(hr, "Failed to get default request state for related bundle.");
 
         pRelatedBundle->package.defaultRequested = pRelatedBundle->package.requested;
 
