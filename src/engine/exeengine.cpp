@@ -377,8 +377,6 @@ extern "C" HRESULT ExeEngineExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    WCHAR wzCurrentDirectory[MAX_PATH] = { };
-    BOOL fChangedCurrentDirectory = FALSE;
     int nResult = IDNOACTION;
     LPCWSTR wzArguments = NULL;
     LPWSTR sczArguments = NULL;
@@ -535,13 +533,8 @@ extern "C" HRESULT ExeEngineExecutePackage(
     {
         // Make the cache location of the executable the current directory to help those executables
         // that expect stuff to be relative to them.
-        if (::GetCurrentDirectoryW(countof(wzCurrentDirectory), wzCurrentDirectory))
-        {
-            fChangedCurrentDirectory = ::SetCurrentDirectoryW(sczCachedDirectory);
-        }
-
-        si.cb = sizeof(si); // TODO: hookup the stdin/stdout/stderr pipes for logging purposes?
-        if (!::CreateProcessW(sczExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+        si.cb = sizeof(si);
+        if (!::CreateProcessW(sczExecutablePath, sczCommand, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, sczCachedDirectory, &si, &pi))
         {
             ExitWithLastError(hr, "Failed to CreateProcess on path: %ls", sczExecutablePath);
         }
@@ -573,11 +566,6 @@ extern "C" HRESULT ExeEngineExecutePackage(
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:
-    if (fChangedCurrentDirectory)
-    {
-        ::SetCurrentDirectoryW(wzCurrentDirectory);
-    }
-
     StrSecureZeroFreeString(sczArguments);
     StrSecureZeroFreeString(sczArgumentsFormatted);
     ReleaseStr(sczArgumentsObfuscated);
