@@ -311,11 +311,29 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
+        // If we're not interacting with the user or we're doing a layout or we're resuming just after a force restart
+        // then automatically start planning.
+        BOOL fSkipToPlan = SUCCEEDED(hrStatus) &&
+                           (BOOTSTRAPPER_DISPLAY_FULL > m_command.display ||
+                            BOOTSTRAPPER_ACTION_LAYOUT == m_command.action ||
+                            BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType);
+        // If we're requiring user input (which currently means Install, Repair, or Uninstall)
+        // or if we're skipping to an action that modifies machine state
+        // then evaluate conditions.
+        BOOL fEvaluateConditions = SUCCEEDED(hrStatus) &&
+            (!fSkipToPlan || BOOTSTRAPPER_ACTION_LAYOUT < m_command.action && BOOTSTRAPPER_ACTION_UPDATE_REPLACE > m_command.action);
 
-        if (SUCCEEDED(hrStatus))
+        if (fEvaluateConditions)
         {
             hrStatus = EvaluateConditions();
+        }
 
+        if (FAILED(hrStatus))
+        {
+            fSkipToPlan = FALSE;
+        }
+        else
+        {
             if (m_fPrereq)
             {
                 m_fPrereqAlreadyInstalled = TRUE;
@@ -336,32 +354,9 @@ public: // IBootstrapperApplication
 
         SetState(WIXSTDBA_STATE_DETECTED, hrStatus);
 
-        if (BOOTSTRAPPER_ACTION_CACHE == m_plannedAction)
+        if (fSkipToPlan)
         {
-            if (m_fSupportCacheOnly)
-            {
-                // Doesn't make sense to prompt the user if cache only is requested.
-                if (BOOTSTRAPPER_DISPLAY_PASSIVE < m_command.display)
-                {
-                    m_command.display = BOOTSTRAPPER_DISPLAY_PASSIVE;
-                }
-
-                m_command.action = BOOTSTRAPPER_ACTION_CACHE;
-            }
-            else
-            {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to only cache a bundle that does not explicitly support it.");
-            }
-        }
-
-        // If we're not interacting with the user or we're doing a layout or we're just after a force restart
-        // then automatically start planning.
-        if (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_ACTION_LAYOUT == m_command.action || BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType)
-        {
-            if (SUCCEEDED(hrStatus))
-            {
-                ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
-            }
+            ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
         }
 
         return hr;
@@ -1998,6 +1993,25 @@ private: // privates
         {
             hr = ParseBootstrapperApplicationDataFromXml(pixdManifest);
             BalExitOnFailure(hr, "Failed to read bootstrapper application data.");
+        }
+
+        if (BOOTSTRAPPER_ACTION_CACHE == m_plannedAction)
+        {
+            if (m_fSupportCacheOnly)
+            {
+                // Doesn't make sense to prompt the user if cache only is requested.
+                if (BOOTSTRAPPER_DISPLAY_PASSIVE < m_command.display)
+                {
+                    m_command.display = BOOTSTRAPPER_DISPLAY_PASSIVE;
+                }
+
+                m_command.action = BOOTSTRAPPER_ACTION_CACHE;
+            }
+            else
+            {
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to only cache a bundle that does not explicitly support it.");
+                m_plannedAction = BOOTSTRAPPER_ACTION_UNKNOWN;
+            }
         }
 
     LExit:
