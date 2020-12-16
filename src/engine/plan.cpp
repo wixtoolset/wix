@@ -1223,6 +1223,12 @@ extern "C" HRESULT PlanDefaultRelatedBundleRequestState(
     HRESULT hr = S_OK;
     int nCompareResult = 0;
 
+    // Never touch related bundles during Cache.
+    if (BOOTSTRAPPER_ACTION_CACHE == action)
+    {
+        ExitFunction1(*pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE);
+    }
+
     switch (relatedBundleRelationType)
     {
     case BOOTSTRAPPER_RELATION_UPGRADE:

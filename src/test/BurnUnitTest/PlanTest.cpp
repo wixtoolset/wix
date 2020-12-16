@@ -398,6 +398,78 @@ namespace Bootstrapper
         }
 
         [Fact]
+        void SingleMsiCacheTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzSingleMsiManifest, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPackagesAsAbsent(pEngineState);
+            DetectUpgradeBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0");
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_CACHE);
+            NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_CACHE, pPlan->action);
+            Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<BOOL>(FALSE, pPlan->fDisableRollback);
+            Assert::Equal<BOOL>(FALSE, pPlan->fKeepRegistrationDefault);
+
+            BOOL fRollback = FALSE;
+            DWORD dwIndex = 0;
+            DWORD dwPackageStart = 0;
+            ValidateCacheCheckpoint(pPlan, fRollback, dwIndex++, 1);
+            dwPackageStart = ValidateCachePackageStart(pPlan, fRollback, dwIndex++, L"PackageE", 5, 2, 33741, FALSE);
+            ValidateCacheExtractContainer(pPlan, fRollback, dwIndex++, L"WixAttachedContainer", FALSE, BURN_PLAN_INVALID_ACTION_INDEX, 2);
+            ValidateCacheCachePayload(pPlan, fRollback, dwIndex++, L"PackageE", L"PackageE", TRUE, FALSE, dwPackageStart);
+            ValidateCacheCachePayload(pPlan, fRollback, dwIndex++, L"PackageE", L"cabkAPka1fWa1PyiVdoVPuoB6Qvs3k", TRUE, FALSE, dwPackageStart);
+            ValidateCachePackageStop(pPlan, fRollback, dwIndex++, L"PackageE", FALSE);
+            ValidateCacheSignalSyncpoint(pPlan, fRollback, dwIndex++, FALSE);
+            Assert::Equal(dwIndex, pPlan->cCacheActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
+
+            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(33741ull, pPlan->qwCacheSizeTotal);
+
+            fRollback = FALSE;
+            dwIndex = 0;
+            DWORD dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundary(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteWaitSyncpoint(pPlan, fRollback, dwIndex++, pPlan->rgCacheActions[6].syncpoint.hEvent);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            Assert::Equal(dwIndex, pPlan->cExecuteActions);
+
+            fRollback = TRUE;
+            dwIndex = 0;
+            dwExecuteCheckpointId = 2;
+            ValidateExecuteRollbackBoundary(pPlan, fRollback, dwIndex++, L"WixDefaultBoundary", TRUE, FALSE);
+            ValidateExecuteUncachePackage(pPlan, fRollback, dwIndex++, L"PackageE");
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PackageE", BURN_DEPENDENCY_ACTION_UNREGISTER);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+            Assert::Equal(dwIndex, pPlan->cRollbackActions);
+
+            Assert::Equal(0ul, pPlan->cExecutePackagesTotal);
+            Assert::Equal(1ul, pPlan->cOverallProgressTicksTotal);
+
+            dwIndex = 0;
+            Assert::Equal(dwIndex, pPlan->cCleanActions);
+
+            UINT uIndex = 0;
+            ValidatePlannedProvider(pPlan, uIndex++, L"{4a04385a-0081-44ba-acd1-9e4e95cfc97f}", NULL);
+            Assert::Equal(uIndex, pPlan->cPlannedProviders);
+        }
+
+        [Fact]
         void SingleMsiInstallTest()
         {
             HRESULT hr = S_OK;
