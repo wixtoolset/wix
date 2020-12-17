@@ -442,6 +442,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.PatchTable, "The {0} table is added to the install package by a transform from a patch package (.msp) and not authored directly into an install package (.msi). The information in this table will be left out of the decompiled output.", tableName);
         }
 
+        public static Message PathCanonicalized(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string originalValue, string canonicalValue)
+        {
+            return Message(sourceLineNumbers, Ids.PathCanonicalized, "The {0}/@{1} attribute's value, '{2}', has been canonicalized to '{3}'.", elementName, attributeName, originalValue, canonicalValue);
+        }
+
         public static Message PerUserButForcingPerMachine(SourceLineNumber sourceLineNumbers, string path)
         {
             return Message(sourceLineNumbers, Ids.PerUserButForcingPerMachine, "The MSI '{0}' is a per-user package being forced to per-machine. Verify that the MsiPackage/@ForcePerMachine attribute is expected and that the per-user package works correctly when forced to install per-machine.", path);
@@ -786,6 +791,7 @@ namespace WixToolset.Data
             ServiceConfigFamilyNotSupported = 1149,
             SymbolNotTranslatedToOutput = 1150,
             MsiTransactionLimitations = 1151,
+            PathCanonicalized = 1152,
         }
     }
 }

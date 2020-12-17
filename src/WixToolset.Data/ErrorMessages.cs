@@ -1676,7 +1676,7 @@ namespace WixToolset.Data
 
         public static Message PayloadMustBeRelativeToCache(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeValue)
         {
-            return Message(sourceLineNumbers, Ids.PayloadMustBeRelativeToCache, "The {0}/@{1} attribute's value, '{2}', is not a legal path name: Payload names must be relative to their cache directory and cannot contain '..'.", elementName, attributeName, attributeValue);
+            return Message(sourceLineNumbers, Ids.PayloadMustBeRelativeToCache, "The {0}/@{1} attribute's value, '{2}', is not a relative path.", elementName, attributeName, attributeValue);
         }
 
         public static Message PerUserButAllUsersEquals1(SourceLineNumber sourceLineNumbers, string path)
