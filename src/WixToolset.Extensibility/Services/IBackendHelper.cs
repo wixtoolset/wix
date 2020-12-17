@@ -36,6 +36,17 @@ namespace WixToolset.Extensibility.Services
         IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name);
 
         /// <summary>
+        /// Validates path is relative and canonicalizes it.
+        /// For example, "a\..\c\.\d.exe" => "c\d.exe".
+        /// </summary>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="elementName"></param>
+        /// <param name="attributeName"></param>
+        /// <param name="relativePath"></param>
+        /// <returns>The original value if not relative, otherwise the canonicalized relative path.</returns>
+        string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath);
+
+        /// <summary>
         /// Creates a tracked file.
         /// </summary>
         /// <param name="path">Destination path for the build output.</param>

@@ -341,6 +341,17 @@ namespace WixToolset.Extensibility.Services
         YesNoDefaultType GetAttributeYesNoDefaultValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
 
         /// <summary>
+        /// Validates path is relative and canonicalizes it.
+        /// For example, "a\..\c\.\d.exe" => "c\d.exe".
+        /// </summary>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="elementName"></param>
+        /// <param name="attributeName"></param>
+        /// <param name="relativePath"></param>
+        /// <returns>The original value if not relative, otherwise the canonicalized relative path.</returns>
+        string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath);
+
+        /// <summary>
         /// Gets a source line number for an element.
         /// </summary>
         /// <param name="element">Element to get source line number.</param>
