@@ -50,11 +50,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (var payload in this.Payloads)
             {
-                var normalizedPath = payload.Name.Replace('\\', '/');
-                if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
-                {
-                    this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(payload.SourceLineNumbers, "Payload", "Name", payload.Name));
-                }
+                payload.Name = this.BackendHelper.GetCanonicalRelativePath(payload.SourceLineNumbers, "Payload", "Name", payload.Name);
 
                 // Embedded files (aka: files from binary .wixlibs) are not content files (because they are hidden
                 // in the .wixlib).

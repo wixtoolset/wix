@@ -15,9 +15,12 @@ namespace WixToolset.Core.ExtensibilityServices
         public BackendHelper(IWixToolsetServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ParseHelper = serviceProvider.GetService<IParseHelper>();
         }
 
         private IMessaging Messaging { get; }
+
+        private IParseHelper ParseHelper { get; }
 
         public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
         {
@@ -47,6 +50,11 @@ namespace WixToolset.Core.ExtensibilityServices
                 DirectoryParent = directoryParent,
                 Name = name
             };
+        }
+
+        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
+        {
+            return this.ParseHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
         }
 
         public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)

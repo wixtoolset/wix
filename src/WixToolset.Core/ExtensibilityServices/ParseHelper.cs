@@ -540,11 +540,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (allowRelative)
                 {
-                    var normalizedPath = value.Replace('\\', '/');
-                    if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
-                    {
-                        this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    }
+                    value = this.GetCanonicalRelativePath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value);
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
@@ -703,6 +699,27 @@ namespace WixToolset.Core.ExtensibilityServices
                     this.Messaging.Write(ErrorMessages.IllegalYesNoValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     return YesNoType.IllegalValue;
             }
+        }
+
+        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
+        {
+            const string root = @"C:\";
+            if (!Path.IsPathRooted(relativePath))
+            {
+                var normalizedPath = Path.GetFullPath(root + relativePath);
+                if (normalizedPath.StartsWith(root))
+                {
+                    var canonicalizedPath = normalizedPath.Substring(root.Length);
+                    if (canonicalizedPath != relativePath)
+                    {
+                        this.Messaging.Write(WarningMessages.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
+                    }
+                    return canonicalizedPath;
+                }
+            }
+
+            this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, elementName, attributeName, relativePath));
+            return relativePath;
         }
 
         public SourceLineNumber GetSourceLineNumbers(XElement element)
