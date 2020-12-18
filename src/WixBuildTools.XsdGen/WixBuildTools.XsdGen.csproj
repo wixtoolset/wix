@@ -6,8 +6,10 @@
     <TargetFrameworks>net461</TargetFrameworks>
     <IsTool>true</IsTool>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <NoWarn>CS0618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
