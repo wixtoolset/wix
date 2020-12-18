@@ -64,7 +64,6 @@ namespace WixToolset.Data.WindowsInstaller
         /// <summary>
         /// Sets the value of a particular field in the row without validating.
         /// </summary>
-        /// <param name="field">field index.</param>
         /// <param name="value">Value of a field in the row.</param>
         /// <returns>True if successful, false if validation failed.</returns>
         public bool BestEffortSet(object value)
@@ -133,8 +132,9 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
-        /// Validate a value for this column.
+        /// Validate a value for a column.
         /// </summary>
+        /// <param name="column">The column.</param>
         /// <param name="value">The value to validate.</param>
         /// <returns>Validated value.</returns>
         internal object ValidateValue(ColumnDefinition column, object value)

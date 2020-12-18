@@ -29,6 +29,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="modularizeType">Type of modularization for column</param>
         /// <param name="forceLocalizable">If the column is localizable.</param>
         /// <param name="useCData">If whitespace should be preserved in a CDATA node.</param>
+        /// <param name="unreal">If not saved to MSI.</param>
         public ColumnDefinition(string name, ColumnType type, int length, bool primaryKey, bool nullable, ColumnCategory category, long? minValue = null, long? maxValue = null, string keyTable = null, int? keyColumn = null, string possibilities = null, string description = null, ColumnModularizeType? modularizeType = null, bool forceLocalizable = false, bool useCData = false, bool unreal = false)
         {
             this.Name = name;

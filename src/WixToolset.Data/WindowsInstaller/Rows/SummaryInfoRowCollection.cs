@@ -32,7 +32,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// Gets the summary property ID for the <paramref name="row"/>.
         /// </summary>
         /// <param name="row">The row to index.</param>
-        /// <returns>The summary property ID for the <paramref name="row"/>.
+        /// <returns>The summary property ID for the <paramref name="row"/>.</returns>
         protected override int GetKeyForItem(Row row)
         {
             return (int)row[0];

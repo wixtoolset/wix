@@ -70,7 +70,6 @@ namespace WixToolset.Data.WindowsInstaller
         /// Ensure this output contains a particular table.
         /// </summary>
         /// <param name="tableDefinition">Definition of the table that should exist.</param>
-        /// <param name="section">Optional section to use for the table. If one is not provided, the entry section will be used.</param>
         /// <returns>The table in this output.</returns>
         public Table EnsureTable(TableDefinition tableDefinition)
         {
@@ -98,7 +97,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <summary>
         /// Saves an output to an <c>XmlWriter</c>.
         /// </summary>
-        /// <param name="wixout">XmlWriter to save to.</param>
+        /// <param name="writer">XmlWriter to save to.</param>
         public void Save(XmlWriter writer)
         {
             writer.WriteStartDocument();

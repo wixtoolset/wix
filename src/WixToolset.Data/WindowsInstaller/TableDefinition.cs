@@ -26,6 +26,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
         /// <param name="symbolIdIsPrimaryKey">Whether the primary key is the id of the symbol definition associated with this table.</param>
+        /// <param name="strongRowType">The specialized type for the rows.</param>
         public TableDefinition(string name, IntermediateSymbolDefinition symbolDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool symbolIdIsPrimaryKey = false, Type strongRowType = null)
         {
             this.Name = name;

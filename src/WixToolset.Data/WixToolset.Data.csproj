@@ -6,10 +6,12 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461;net472</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
-    <Title>WiX Toolset Data</Title>
-    <Description></Description>
+    <Description>WiX Toolset Data</Description>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
+    <!-- TODO: This shouldn't be ignored because this is public-facing -->
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

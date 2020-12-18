@@ -121,7 +121,6 @@ namespace WixToolset.Data
         /// Loads an intermediate from a WixOutput object.
         /// </summary>
         /// <param name="wixOutput">WixOutput object.</param>
-        /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(WixOutput wixOutput, bool suppressVersionCheck = false)
@@ -146,7 +145,6 @@ namespace WixToolset.Data
         /// Loads several intermediates from paths on disk using the same definitions.
         /// </summary>
         /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
-        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediates</returns>
         public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles)
         {
@@ -225,9 +223,9 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Saves an intermediate to a path on disk.
+        /// Saves an intermediate to a WixOutput.
         /// </summary>
-        /// <param name="path">Path to save intermediate file to disk.</param>
+        /// <param name="wixout">Destination to save.</param>
         public void Save(WixOutput wixout)
         {
             this.SaveEmbedFiles(wixout);
@@ -236,10 +234,9 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Loads an intermediate from a path on disk.
+        /// Loads an intermediate from a WixOutput.
         /// </summary>
-        /// <param name="stream">Stream to intermediate file.</param>
-        /// <param name="baseUri">Path name of intermediate file.</param>
+        /// <param name="wixout">Source to load from.</param>
         /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
@@ -254,9 +251,9 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Loads json form of intermedaite from stream.
+        /// Loads json form of intermediate.
         /// </summary>
-        /// <param name="stream">Stream to intermediate file.</param>
+        /// <param name="json">Source to load from.</param>
         /// <param name="baseUri">Path name of intermediate file.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded json.</returns>

@@ -24,6 +24,9 @@ namespace WixToolset.Data
             this.stream = stream;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Uri Uri { get; }
 
         /// <summary>
@@ -60,8 +63,8 @@ namespace WixToolset.Data
         /// <summary>
         /// Creates a new file structure.
         /// </summary>
+        /// <param name="uri"></param>
         /// <param name="stream">Stream to write the file structure to.</param>
-        /// <param name="embedFilePaths">Paths to files to embedd in the file structure.</param>
         /// <returns>Newly created <c>WixOutput</c>.</returns>
         public static WixOutput Create(Uri uri, Stream stream)
         {
@@ -109,9 +112,11 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Loads a wixout from a assembly resource stream.
+        /// Loads a wixout from an assembly resource stream.
         /// </summary>
-        /// <param name="path">Path to wixout file saved on disk.</param>
+        /// <param name="assembly"></param>
+        /// <param name="resourceName"></param>
+        /// <returns>Loaded created <c>WixOutput</c>.</returns>
         public static WixOutput Read(Assembly assembly, string resourceName)
         {
             var resourceStream = assembly.GetManifestResourceStream(resourceName);
@@ -128,6 +133,7 @@ namespace WixToolset.Data
         /// <summary>
         /// Reads a file structure from an open stream.
         /// </summary>
+        /// <param name="uri"></param>
         /// <param name="stream">Stream to read from.</param>
         /// <returns>Loaded created <c>WixOutput</c>.</returns>
         public static WixOutput Read(Uri uri, Stream stream)
