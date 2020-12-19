@@ -16,10 +16,6 @@
     <RollForward>LatestMajor</RollForward>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\wix\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
   </ItemGroup>

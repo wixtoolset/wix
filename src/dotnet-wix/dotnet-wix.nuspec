@@ -11,9 +11,6 @@
     <packageTypes>
       <packageType name="DotnetTool" />
     </packageTypes>
-    <dependencies>
-      <group targetFramework=".NETCoreApp2.1" />
-    </dependencies>
   </metadata>
 
   <files>

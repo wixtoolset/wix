@@ -13,10 +13,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>
