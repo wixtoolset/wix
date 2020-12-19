@@ -7,7 +7,14 @@ namespace WixToolset.Extensibility
     /// </summary>
     public static class DecompilerConstants
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public const char PrimaryKeyDelimiter = '/';
+
+        /// <summary>
+        /// 
+        /// </summary>
         public const string PrimaryKeyDelimiterString = "/";
     }
 }

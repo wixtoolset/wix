@@ -10,15 +10,13 @@ namespace WixToolset.Extensibility
     /// Interface for inspector extensions.
     /// </summary>
     /// <remarks>
-    /// The inspector methods are stateless, but extensions are loaded and last for the lifetime of the
-    /// containing classes like <see cref="Preprocessor"/>, <see cref="Compiler"/>, <see cref="Linker"/>,
-    /// <see cref="Differ"/>, and <see cref="Binder"/>. If you want to maintain state, you should check
+    /// The inspector methods are stateless, but extensions are loaded once. If you want to maintain state, you should check
     /// if your data is loaded for each method and, if not, load it.
     /// </remarks>
     public interface IInspectorExtension
     {
         /// <summary>
-        /// Gets or sets the <see cref="InspectorCore"/> for inspector extensions to use.
+        /// Gets or sets the <see cref="IInspectorCore"/> for inspector extensions to use.
         /// </summary>
         IInspectorCore Core { get; set; }
 
@@ -34,6 +32,7 @@ namespace WixToolset.Extensibility
         /// <param name="intermediate">The compiled output.</param>
         void InspectIntermediate(Intermediate intermediate);
 
+#if REWRITE
         /// <summary>
         /// Inspect the output.
         /// </summary>
@@ -46,13 +45,15 @@ namespace WixToolset.Extensibility
         /// transforms are the primary transforms you'll typically want to inspect
         /// and contain your changes to target products.
         /// </remarks>
+#endif
+        /// <summary />
         void InspectOutput(Intermediate output);
 
         /// <summary>
         /// Inspect the final output after binding.
         /// </summary>
         /// <param name="filePath">The file path to the final bound output.</param>
-        /// <param name="pdb">The <see cref="Pdb"/> that contains source line numbers
+        /// <param name="pdb">The <see cref="Intermediate"/> that contains source line numbers
         /// for the database and all rows.</param>
         void InspectDatabase(string filePath, Intermediate pdb);
     }

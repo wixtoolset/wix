@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility.Services
 {
+#pragma warning disable 1591 // TODO: add documentation
     public interface IVariableResolution
     {
         bool DelayedResolve { get; set; }

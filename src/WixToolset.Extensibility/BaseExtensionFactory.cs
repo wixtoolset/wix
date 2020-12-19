@@ -12,8 +12,14 @@ namespace WixToolset.Extensibility
     /// </summary>
     public abstract class BaseExtensionFactory : IExtensionFactory
     {
+        /// <summary>
+        /// The extension types of the WiX extension.
+        /// </summary>
         protected abstract IEnumerable<Type> ExtensionTypes { get; }
 
+        /// <summary>
+        /// See <see cref="IExtensionFactory.TryCreateExtension(Type, out object)"/>
+        /// </summary>
         public virtual bool TryCreateExtension(Type extensionType, out object extension)
         {
             extension = null;

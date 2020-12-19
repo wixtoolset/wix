@@ -5,6 +5,9 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
+    /// <summary>
+    /// Interface all Burn backend extensions implement.
+    /// </summary>
     public interface IBurnBackendExtension
     {
         /// <summary>
@@ -12,8 +15,26 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreBackendBind(IBindContext context);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="relatedSource"></param>
+        /// <param name="type"></param>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="bindStage"></param>
+        /// <returns></returns>
         IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="fallbackUrl"></param>
+        /// <param name="packageId"></param>
+        /// <param name="payloadId"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName);
 
         /// <summary>

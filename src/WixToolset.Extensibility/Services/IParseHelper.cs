@@ -68,15 +68,6 @@ namespace WixToolset.Extensibility.Services
         /// <returns>New symbol.</returns>
         IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, Identifier identifier = null);
 
-        [Obsolete]
-        IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
-
-        [Obsolete]
-        IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null);
-
-        [Obsolete]
-        IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null);
-
         /// <summary>
         /// Creates a directory row from a name.
         /// </summary>
@@ -106,6 +97,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Creates a Registry symbol in the active section.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source and line number of the current symbol.</param>
         /// <param name="root">The registry entry root.</param>
         /// <param name="key">The registry entry key.</param>
@@ -114,9 +106,6 @@ namespace WixToolset.Extensibility.Services
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
         Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
-
-        [Obsolete]
-        Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         /// <summary>
         /// Creates a short file/directory name using an identifier and long file/directory name as input.
@@ -131,6 +120,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKey">The primary key of the simple reference.</param>
@@ -139,6 +129,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolName">The symbol name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
@@ -147,6 +138,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
         /// <param name="primaryKey">The primary key of the simple reference.</param>
@@ -155,6 +147,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="symbolDefinition">The symbol definition of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
@@ -167,7 +160,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="sourceLineNumbers">Source line information.</param>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="customAction">The custom action base name.</param>
-        /// <param name="currentPlatform">The platform being compiled.</param>
+        /// <param name="platform">The platform being compiled.</param>
         /// <param name="supportedPlatforms">The platforms for which there are specialized custom actions.</param>
         void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms);
 
@@ -194,9 +187,6 @@ namespace WixToolset.Extensibility.Services
         /// <param name="childType">Complex reference type of child</param>
         /// <param name="childId">Id of the Child Node.</param>
         void CreateWixGroupSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
-
-        [Obsolete]
-        void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         /// <summary>
         /// Creates a symbol in the WixSearch table.
@@ -231,6 +221,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Add the appropriate symbols to make sure that the given table shows up in the resulting output.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableName">Name of the table to ensure existance of.</param>
         void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName);
@@ -238,6 +229,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Add the appropriate symbols to make sure that the given table shows up in the resulting output.
         /// </summary>
+        /// <param name="section">Active section.</param>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableDefinition">Definition of the table to ensure existance of.</param>
         void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition);
@@ -408,6 +400,9 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Attempts to use an extension to parse the attribute.
         /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="element">Element containing attribute to be parsed.</param>
         /// <param name="attribute">Attribute to be parsed.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
@@ -416,22 +411,31 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Attempts to use an extension to parse the element.
         /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         void ParseExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context = null);
 
         /// <summary>
         /// Attempts to use an extension to parse the element, with support for setting component keypath.
         /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         IComponentKeyPath ParsePossibleKeyPathExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context);
 
         /// <summary>
         /// Process all children of the element looking for extensions and erroring on the unexpected.
         /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="element">Element to parse children.</param>
         void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element);
 
@@ -452,7 +456,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Called when the compiler encounters an unexpected attribute.
         /// </summary>
-        /// <param name="parentElement">Parent element that found unexpected attribute.</param>
+        /// <param name="element">Parent element that found unexpected attribute.</param>
         /// <param name="attribute">Unexpected attribute.</param>
         void UnexpectedAttribute(XElement element, XAttribute attribute);
 

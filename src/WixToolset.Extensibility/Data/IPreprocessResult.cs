@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using System.Xml.Linq;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IPreprocessResult
     {
         XDocument Document { get; set; }

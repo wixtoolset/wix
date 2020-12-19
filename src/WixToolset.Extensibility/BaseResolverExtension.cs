@@ -36,6 +36,14 @@ namespace WixToolset.Extensibility
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
+        /// <summary>
+        /// See <see cref="IResolverExtension.ResolveFile(string, IntermediateSymbolDefinition, SourceLineNumber, BindStage)"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="symbolDefinition"></param>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="bindStage"></param>
+        /// <returns></returns>
         public virtual IResolveFileResult ResolveFile(string source, IntermediateSymbolDefinition symbolDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
             return null;

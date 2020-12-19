@@ -8,6 +8,7 @@ namespace WixToolset.Extensibility.Data
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface ICompileContext
     {
         IWixToolsetServiceProvider ServiceProvider { get; }

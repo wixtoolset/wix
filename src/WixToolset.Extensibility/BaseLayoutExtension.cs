@@ -30,11 +30,23 @@ namespace WixToolset.Extensibility
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
+        /// <summary>
+        /// See <see cref="ILayoutExtension.CopyFile(string, string)"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
         public virtual bool CopyFile(string source, string destination)
         {
             return false;
         }
 
+        /// <summary>
+        /// See <see cref="ILayoutExtension.MoveFile(string, string)"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
         public virtual bool MoveFile(string source, string destination)
         {
             return false;

@@ -2,6 +2,9 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    /// <summary>
+    /// Interface for a bind path.
+    /// </summary>
     public interface IBindPath
     {
         /// <summary>

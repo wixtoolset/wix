@@ -17,6 +17,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="source">Source for the file transfer.</param>
         /// <param name="destination">Destination for the file transfer.</param>
         /// <param name="move">Indicates whether to move or copy the source file.</param>
+        /// <param name="sourceLineNumbers">Optional source line numbers that requested the file transfer.</param>
         IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null);
 
         /// <summary>

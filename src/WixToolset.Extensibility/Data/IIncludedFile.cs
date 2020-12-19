@@ -4,6 +4,9 @@ namespace WixToolset.Extensibility.Data
 {
     using WixToolset.Data;
 
+    /// <summary>
+    /// Interface for an included file.
+    /// </summary>
     public interface IIncludedFile
     {
         /// <summary>

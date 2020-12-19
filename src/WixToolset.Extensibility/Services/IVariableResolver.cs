@@ -4,13 +4,16 @@ namespace WixToolset.Extensibility.Services
 {
     using WixToolset.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IVariableResolver
     {
         void AddLocalization(Localization localization);
+#pragma warning restore 1591
 
         /// <summary>
         /// Add a variable.
         /// </summary>
+        /// <param name="sourceLineNumber">The source line information for the value.</param>
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value of the variable.</param>
         /// <param name="overridable">Indicates whether the variable can be overridden by an existing variable.</param>

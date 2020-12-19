@@ -6,7 +6,9 @@ namespace WixToolset.Extensibility.Services
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IPathResolver
+#pragma warning restore 1591
     {
         /// <summary>
         /// Get the canonical source path of a directory.
@@ -14,6 +16,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="directories">All cached directories.</param>
         /// <param name="componentIdGenSeeds">Hash table of Component GUID generation seeds indexed by directory id.</param>
         /// <param name="directory">Directory identifier.</param>
+        /// <param name="platform">Current platform.</param>
         /// <returns>Source path of a directory.</returns>
         string GetCanonicalDirectoryPath(Dictionary<string, IResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, Platform platform);
 
@@ -28,7 +31,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Gets the source path of a file.
         /// </summary>
-        /// <param name="directories">All cached directories in <see cref="ResolvedDirectory"/>.</param>
+        /// <param name="directories">All cached directories in <see cref="IResolvedDirectory"/>.</param>
         /// <param name="directoryId">Parent directory identifier.</param>
         /// <param name="fileName">File name (in long|source format).</param>
         /// <param name="compressed">Specifies the package is compressed.</param>

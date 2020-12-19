@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IBackend
     {
         IBindResult Bind(IBindContext context);

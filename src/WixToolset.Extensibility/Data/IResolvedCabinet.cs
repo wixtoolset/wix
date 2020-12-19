@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility.Data
 {
+#pragma warning disable 1591 // TODO: add documentation
     public interface IResolvedCabinet
     {
         CabinetBuildOption BuildOption { get; set; }

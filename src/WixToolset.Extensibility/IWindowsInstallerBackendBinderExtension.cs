@@ -13,18 +13,22 @@ namespace WixToolset.Extensibility
     /// </summary>
     public interface IWindowsInstallerBackendBinderExtension
     {
+#pragma warning disable 1591 // TODO: add documentation
         IEnumerable<TableDefinition> TableDefinitions { get; }
+#pragma warning restore 1591
 
         /// <summary>
         /// Called before binding occurs.
         /// </summary>
         void PreBackendBind(IBindContext context);
 
+#pragma warning disable 1591 // TODO: add documentation
         IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files);
 
         string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
         bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
+#pragma warning restore 1591
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.

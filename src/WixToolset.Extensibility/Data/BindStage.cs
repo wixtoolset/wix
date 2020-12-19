@@ -2,6 +2,9 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum BindStage
     {
         /// <summary>

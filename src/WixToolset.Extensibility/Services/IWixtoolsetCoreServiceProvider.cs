@@ -24,7 +24,6 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Adds a service to the service locator.
         /// </summary>
-        /// <param name="serviceType">Type of the service to add.</param>
         /// <param name="creationFunction">
         /// A function that creates the service. The create function is provided the service provider
         /// itself to resolve additional services and a type dictionary that stores singleton services

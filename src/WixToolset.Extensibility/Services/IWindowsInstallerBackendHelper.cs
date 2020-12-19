@@ -10,7 +10,26 @@ namespace WixToolset.Extensibility.Services
     /// </summary>
     public interface IWindowsInstallerBackendHelper
     {
+        /// <summary>
+        /// Creates a <see cref="Row"/> in the specified table.
+        /// </summary>
+        /// <param name="section">Parent section.</param>
+        /// <param name="symbol">Symbol with line information for the row.</param>
+        /// <param name="output">Current context.</param>
+        /// <param name="tableDefinition">Table definition for the row.</param>
+        /// <returns></returns>
         Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinition tableDefinition);
+
+        /// <summary>
+        /// Looks up the registered <see cref="TableDefinition"/> for the given <see cref="IntermediateSymbol"/> and creates a <see cref="Row"/> in that table.
+        /// Goes sequentially through each field in the symbol and assigns the value to the column with the same index as the field.
+        /// If the symbol's Id is registered as the primary key then that is used for the first column and the column data is offset by 1.
+        /// </summary>
+        /// <param name="section">Parent section.</param>
+        /// <param name="symbol">Symbol to create the row from.</param>
+        /// <param name="output">Current context.</param>
+        /// <param name="tableDefinitions">Table definitions that have been registered with the binder.</param>
+        /// <returns>True if a row was created.</returns>
         bool TryAddSymbolToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
     }
 }

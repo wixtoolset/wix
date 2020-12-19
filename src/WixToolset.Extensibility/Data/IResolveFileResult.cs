@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility.Data
 {
     using System.Collections.Generic;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IResolveFileResult
     {
         IEnumerable<string> CheckedPaths { get; set; }

@@ -9,13 +9,22 @@ namespace WixToolset.Extensibility
     /// </summary>
     public abstract class BaseExtensionData : IExtensionData
     {
+        /// <summary>
+        /// See <see cref="IExtensionData.DefaultCulture"/>
+        /// </summary>
         public virtual string DefaultCulture => null;
 
+        /// <summary>
+        /// See <see cref="IExtensionData.GetLibrary"/>
+        /// </summary>
         public virtual Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
             return null;
         }
 
+        /// <summary>
+        /// See <see cref="IExtensionData.TryGetSymbolDefinitionByName"/>
+        /// </summary>
         public virtual bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
         {
             symbolDefinition = null;

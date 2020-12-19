@@ -70,7 +70,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Processes a pragma defined in the extension.
         /// </summary>
-        /// <param name="sourceLineNumbers">The location of this pragma's PI.</param>
         /// <param name="prefix">The prefix of the pragma to be processed by the extension.</param>
         /// <param name="pragma">The name of the pragma.</param>
         /// <param name="args">The pragma's arguments.</param>

@@ -52,34 +52,24 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// Processes an attribute for the Compiler.
+        /// See <see cref="ICompilerExtension.ParseAttribute(Intermediate, IntermediateSection, XElement, XAttribute, IDictionary{string, string})"/>
         /// </summary>
-        /// <param name="parentElement">Parent element of attribute.</param>
-        /// <param name="attribute">Attribute to process.</param>
-        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public virtual void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
             this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
         }
 
         /// <summary>
-        /// Processes an element for the Compiler.
+        /// See <see cref="ICompilerExtension.ParseElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{string, string})"/>
         /// </summary>
-        /// <param name="parentElement">Parent element of element to process.</param>
-        /// <param name="element">Element to process.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
         public virtual void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             this.ParseHelper.UnexpectedElement(parentElement, element);
         }
 
         /// <summary>
-        /// Processes an element for the Compiler, with the ability to supply a component keypath.
+        /// See <see cref="ICompilerExtension.ParsePossibleKeyPathElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{string, string})"/>
         /// </summary>
-        /// <param name="parentElement">Parent element of element to process.</param>
-        /// <param name="element">Element to process.</param>
-        /// <param name="keyPath">Explicit key path.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
         public virtual IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             this.ParseElement(intermediate, section, parentElement, element, context);

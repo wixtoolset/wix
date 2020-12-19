@@ -2,6 +2,9 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    /// <summary>
+    /// Key path types.
+    /// </summary>
     public enum PossibleKeyPathType
     {
         /// <summary>

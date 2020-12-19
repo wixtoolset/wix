@@ -9,6 +9,7 @@ namespace WixToolset.Extensibility
     /// </summary>
     public interface IFileSystemExtension
     {
+#pragma warning disable 1591 // TODO: add documentation
         void Initialize(IFileSystemContext context);
 
         bool? CompareFiles(string targetFile, string updatedFile);

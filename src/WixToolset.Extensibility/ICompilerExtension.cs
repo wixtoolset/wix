@@ -26,6 +26,8 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Processes an attribute for the Compiler.
         /// </summary>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="parentElement">Parent element of attribute.</param>
         /// <param name="attribute">Attribute to process.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
@@ -34,6 +36,8 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
@@ -42,9 +46,11 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Processes an element for the Compiler, with the ability to supply a component keypath.
         /// </summary>
+        /// <param name="intermediate">Parent intermediate.</param>
+        /// <param name="section">Parent section.</param>
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context);
 
         /// <summary>

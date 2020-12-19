@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility.Data
 {
     using System;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IExpectedExtractFile
     {
         Uri Uri { get; set; }

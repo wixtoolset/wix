@@ -14,9 +14,11 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreLayout(ILayoutContext context);
 
+#pragma warning disable 1591 // TODO: add documentation
         bool CopyFile(string source, string destination);
 
         bool MoveFile(string source, string destination);
+#pragma warning restore 1591
 
         /// <summary>
         /// Called after all layout occurs.

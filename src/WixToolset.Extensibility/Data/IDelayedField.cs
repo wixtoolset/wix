@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility.Data
 {
     using WixToolset.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IDelayedField
     {
         IntermediateField Field { get; }

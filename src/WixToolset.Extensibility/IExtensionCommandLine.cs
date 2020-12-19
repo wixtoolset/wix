@@ -34,11 +34,10 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Gives the extension an opportunity to provide a command.
         /// </summary>
-        /// </summary>
         /// <param name="parser">Parser to help parse the argument and additional arguments.</param>
         /// <param name="argument">Argument to parse.</param>
         /// <param name="command"></param>
-        /// <returns>True if the argument is recognized as a commond; otherwise false to allow another extension to process it.</returns>
+        /// <returns>True if the argument is recognized as a command; otherwise false to allow another extension to process it.</returns>
         bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command);
 
         /// <summary>

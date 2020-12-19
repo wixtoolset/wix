@@ -24,7 +24,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="context">The preprocess context.</param>
         /// <param name="name">The variable name.</param>
         /// <param name="value">The variable value.</param>
-        /// <param name="overwrite">Set to true to show variable overwrite warning.</param>
+        /// <param name="showWarning">Set to true to show variable overwrite warning.</param>
         void AddVariable(IPreprocessContext context, string name, string value, bool showWarning);
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace WixToolset.Extensibility.Services
         /// Evaluate a Pragma.
         /// </summary>
         /// <param name="context">The preprocess context.</param>
-        /// <param name="pragmaName">The pragma's full name (<prefix>.<pragma>).</param>
+        /// <param name="pragmaName">The pragma's full name (&lt;prefix&gt;.&lt;pragma&gt;).</param>
         /// <param name="args">The arguments to the pragma.</param>
         /// <param name="parent">The parent element of the pragma.</param>
         void PreprocessPragma(IPreprocessContext context, string pragmaName, string args, XContainer parent);

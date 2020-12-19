@@ -6,6 +6,7 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using WixToolset.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IBindResult : IDisposable
     {
         IEnumerable<IFileTransfer> FileTransfers { get; set; }

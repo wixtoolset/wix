@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility.Services
 {
     using System.Collections.Generic;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface ICommandLineParser
     {
         string ErrorArgument { get; set; }

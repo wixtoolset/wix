@@ -40,6 +40,9 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected IResolvedCabinet CreateResolvedCabinet() => this.Context.ServiceProvider.GetService<IResolvedCabinet>();
 
+        /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// </summary>
         public virtual void PreBackendBind(IBindContext context)
         {
             this.Context = context;
@@ -49,10 +52,19 @@ namespace WixToolset.Extensibility
             this.BackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
         }
 
+        /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// </summary>
         public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files) => null;
 
+        /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// </summary>
         public virtual string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
 
+        /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// </summary>
         public virtual bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
             if (this.TableDefinitions.Any(t => t.SymbolDefinition == symbol.Definition))
@@ -63,6 +75,9 @@ namespace WixToolset.Extensibility
             return false;
         }
 
+        /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// </summary>
         public virtual void PostBackendBind(IBindResult result)
         {
         }

@@ -9,6 +9,7 @@ namespace WixToolset.Extensibility.Data
     /// </summary>
     public interface ICommandLineArguments
     {
+#pragma warning disable 1591 // TODO: add documentation
         string[] OriginalArguments { get; set; }
 
         string[] Arguments { get; set; }

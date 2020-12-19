@@ -6,6 +6,7 @@ namespace WixToolset.Extensibility.Data
     using System.Xml.Linq;
     using WixToolset.Data;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IDecompileResult
     {
         XDocument Document { get; set; }

@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
+#pragma warning disable 1591 // TODO: add documentation
     public interface IMessageListener
     {
         MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel);
