@@ -10,6 +10,7 @@ namespace WixToolset.Core.Bind
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
+#pragma warning disable 1591 // TODO: this shouldn't be public, need interface in Extensibility
     /// <summary>
     /// Resolves the fields which had variables that needed to be resolved after the file information
     /// was loaded.
@@ -19,6 +20,7 @@ namespace WixToolset.Core.Bind
         /// <summary>
         /// Resolve delayed fields.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="delayedFields">The fields which had resolution delayed.</param>
         /// <param name="variableCache">The file information to use when resolving variables.</param>
         public ResolveDelayedFieldsCommand(IMessaging messaging, IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)

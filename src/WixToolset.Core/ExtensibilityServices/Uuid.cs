@@ -17,7 +17,6 @@ namespace WixToolset.Core.ExtensibilityServices
         /// </summary>
         /// <param name="namespaceGuid">The namespace UUID.</param>
         /// <param name="value">The value.</param>
-        /// <param name="backwardsCompatible">Flag to say to use MD5 instead of better SHA1.</param>
         /// <returns>The UUID for the given namespace and value.</returns>
         public static Guid NewUuid(Guid namespaceGuid, string value)
         {

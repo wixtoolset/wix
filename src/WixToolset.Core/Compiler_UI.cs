@@ -1049,12 +1049,11 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="dialog">Identifier for parent dialog.</param>
-        /// <param name="table">Table control belongs in.</param>
+        /// <param name="symbolType">Table control belongs in.</param>
         /// <param name="lastTabSymbol">Last control in the tab order.</param>
         /// <param name="firstControl">Name of the first control in the tab order.</param>
         /// <param name="defaultControl">Name of the default control.</param>
         /// <param name="cancelControl">Name of the candle control.</param>
-        /// <param name="trackDiskSpace">True if the containing dialog tracks disk space.</param>
         private void ParseControlElement(XElement node, string dialog, SymbolDefinitionType symbolType, ref ControlSymbol lastTabSymbol, ref string firstControl, ref string defaultControl, ref string cancelControl)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);

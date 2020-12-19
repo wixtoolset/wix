@@ -8,5 +8,6 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)wix.snk))</AssemblyOriginatorKeyFile>
+    <NBGV_EmitThisAssemblyClass>false</NBGV_EmitThisAssemblyClass>
   </PropertyGroup>
 </Project>

@@ -4,8 +4,15 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Class for creating <see cref="IWixToolsetCoreServiceProvider"/>.
+    /// </summary>
     public static class WixToolsetServiceProviderFactory
     {
+        /// <summary>
+        /// Creates a new <see cref="IWixToolsetCoreServiceProvider"/>.
+        /// </summary>
+        /// <returns>The created <see cref="IWixToolsetCoreServiceProvider"/></returns>
         public static IWixToolsetCoreServiceProvider CreateServiceProvider()
         {
             return new WixToolsetServiceProvider();

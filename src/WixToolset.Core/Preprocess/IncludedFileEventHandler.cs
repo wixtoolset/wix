@@ -9,13 +9,13 @@ namespace WixToolset.Core.Preprocess
     /// Included file event handler delegate.
     /// </summary>
     /// <param name="sender">Sender of the message.</param>
-    /// <param name="ea">Arguments for the included file event.</param>
-    public delegate void IncludedFileEventHandler(object sender, IncludedFileEventArgs e);
+    /// <param name="e">Arguments for the included file event.</param>
+    internal delegate void IncludedFileEventHandler(object sender, IncludedFileEventArgs e);
 
     /// <summary>
     /// Event args for included file event.
     /// </summary>
-    public class IncludedFileEventArgs : EventArgs
+    internal class IncludedFileEventArgs : EventArgs
     {
         /// <summary>
         /// Creates a new IncludedFileEventArgs.

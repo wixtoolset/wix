@@ -29,10 +29,8 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Creates a WixGroupingOrdering object.
         /// </summary>
-        /// <param name="output">Output from which to read the group and order information.</param>
+        /// <param name="entrySections">Output from which to read the group and order information.</param>
         /// <param name="messageHandler">Handler for any error messages.</param>
-        /// <param name="groupTypes">Group types to include.</param>
-        /// <param name="itemTypes">Item types to include.</param>
         public WixGroupingOrdering(IntermediateSection entrySections, IMessaging messageHandler)
         {
             this.EntrySection = entrySections;
@@ -582,7 +580,7 @@ namespace WixToolset.Core.Link
             /// <summary>
             /// Adds an item to the 'after' ordering collection.
             /// </summary>
-            /// <param name="item">Items to add.</param>
+            /// <param name="after">Item to add.</param>
             /// <param name="messageHandler">Message handler in case a circular ordering reference is found.</param>
             public void AddAfter(Item after, IMessaging messageHandler)
             {

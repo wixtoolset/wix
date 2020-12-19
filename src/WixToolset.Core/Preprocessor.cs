@@ -63,10 +63,10 @@ namespace WixToolset.Core
         /// </summary>
         public event ProcessedStreamEventHandler ProcessedStream;
 
-        /// <summary>
-        /// Event for resolved variables.
-        /// </summary>
-        /// TOOD: Remove?
+        // <summary>
+        // Event for resolved variables.
+        // </summary>
+        // TOOD: Remove?
         //public event ResolvedVariableEventHandler ResolvedVariable;
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Preprocesses a file.
         /// </summary>
-        /// <param name="context">The preprocessing context.</param>
+        /// <param name="state">The preprocessing context.</param>
         /// <param name="reader">XmlReader to processing the context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
         private IPreprocessResult Process(ProcessingState state, XmlReader reader)
@@ -266,6 +266,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes an xml reader into an xml writer.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="include">Specifies if reader is from an included file.</param>
         /// <param name="reader">Reader for the source document.</param>
         /// <param name="container">Node where content should be added.</param>
@@ -546,6 +547,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes an error processing instruction.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="errorMessage">Text from source.</param>
         private void PreprocessError(ProcessingState state, string errorMessage)
         {
@@ -558,6 +560,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes a warning processing instruction.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="warningMessage">Text from source.</param>
         private void PreprocessWarning(ProcessingState state, string warningMessage)
         {
@@ -570,6 +573,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes a define processing instruction and creates the appropriate parameter.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalDefine">Text from source.</param>
         private void PreprocessDefine(ProcessingState state, string originalDefine)
         {
@@ -607,6 +611,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes an undef processing instruction and creates the appropriate parameter.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalDefine">Text from source.</param>
         private void PreprocessUndef(ProcessingState state, string originalDefine)
         {
@@ -625,6 +630,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes an included file.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="includePath">Path to included file.</param>
         /// <param name="parent">Parent container for included content.</param>
         private void PreprocessInclude(ProcessingState state, string includePath, XContainer parent)
@@ -671,6 +677,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Preprocess a foreach processing instruction.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="reader">The xml reader.</param>
         /// <param name="container">The container where to output processed data.</param>
         /// <param name="offset">Offset for the line numbers.</param>
@@ -785,7 +792,9 @@ namespace WixToolset.Core
         /// <summary>
         /// Processes a pragma processing instruction
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="pragmaText">Text from source.</param>
+        /// <param name="parent"></param>
         private void PreprocessPragma(ProcessingState state, string pragmaText, XContainer parent)
         {
             var match = PragmaRegex.Match(pragmaText);
@@ -811,6 +820,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets the next token in an expression.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">Expression to parse.</param>
         /// <param name="expression">Expression with token removed.</param>
         /// <param name="stringLiteral">Flag if token is a string literal instead of a variable.</param>
@@ -958,6 +968,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets the value for a variable.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">Original expression for error message.</param>
         /// <param name="variable">Variable to evaluate.</param>
         /// <returns>Value of variable.</returns>
@@ -996,6 +1007,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets the left side value, operator, and right side value of an expression.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">Original expression to evaluate.</param>
         /// <param name="expression">Expression modified while processing.</param>
         /// <param name="leftValue">Left side value from expression.</param>
@@ -1048,6 +1060,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Evaluates an expression.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">Original expression to evaluate.</param>
         /// <param name="expression">Expression modified while processing.</param>
         /// <returns>true if expression evaluates to true.</returns>
@@ -1143,6 +1156,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets a sub-expression in parenthesis.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">Original expression to evaluate.</param>
         /// <param name="expression">Expression modified while processing.</param>
         /// <param name="endSubExpression">Index of end of sub-expression.</param>
@@ -1197,6 +1211,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Updates expression based on operation.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="currentValue">State to update.</param>
         /// <param name="operation">Operation to apply to current value.</param>
         /// <param name="prevResult">Previous result.</param>
@@ -1221,6 +1236,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Evaluate an expression.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="expression">Expression to evaluate.</param>
         /// <returns>Boolean result of expression.</returns>
         private bool EvaluateExpression(ProcessingState state, string expression)
@@ -1252,6 +1268,7 @@ namespace WixToolset.Core
         ///   $(var.A) and $(var.B)>2 or $(var.B) &lt;= 2
         ///   $(var.A) != "2" 
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="originalExpression">The original expression</param>
         /// <param name="expression">The expression currently being evaluated</param>
         /// <param name="prevResultOperation">The operation to apply to this result</param>
@@ -1322,6 +1339,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Update the current line number with the reader's current state.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="reader">The xml reader for the preprocessor.</param>
         /// <param name="offset">This is the artificial offset of the line numbers from the reader.  Used for the foreach processing.</param>
         private void UpdateCurrentLineNumber(ProcessingState state, XmlReader reader, int offset)
@@ -1341,6 +1359,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Pushes a file name on the stack of included files.
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="fileName">Name to push on to the stack of included files.</param>
         private void PushInclude(ProcessingState state, string fileName)
         {
@@ -1374,6 +1393,7 @@ namespace WixToolset.Core
         /// through the search paths in the order given on the command line
         /// (leftmost first, ...).
         /// </summary>
+        /// <param name="state"></param>
         /// <param name="includePath">User-specified path to the included file (usually just the file name).</param>
         /// <returns>Returns a FileInfo for the found include file, or null if the file cannot be found.</returns>
         private string GetIncludeFile(ProcessingState state, string includePath)

@@ -7,13 +7,13 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
-    /// A dictionary of rows. Unlike the <see cref="RowIndexedCollection"/> this
+    /// A dictionary of rows. Unlike the RowIndexedList this
     /// will throw when multiple rows with the same key are added.
     /// </summary>
-    public sealed class RowDictionary<T> : Dictionary<string, T> where T : Row
+    internal sealed class RowDictionary<T> : Dictionary<string, T> where T : Row
     {
         /// <summary>
-        /// Creates an empty <see cref="RowDictionary"/>.
+        /// Creates an empty <see cref="RowDictionary{T}"/>.
         /// </summary>
         public RowDictionary()
             : base(StringComparer.InvariantCulture)
@@ -21,9 +21,9 @@ namespace WixToolset.Core.WindowsInstaller
         }
 
         /// <summary>
-        /// Creates and populates a <see cref="RowDictionary"/> with the rows from the given enumerator.
+        /// Creates and populates a <see cref="RowDictionary{T}"/> with the rows from the given enumerator.
         /// </summary>
-        /// <param name="Rows">Rows to add.</param>
+        /// <param name="rows">Rows to add.</param>
         public RowDictionary(IEnumerable<T> rows)
             : this()
         {
@@ -34,7 +34,7 @@ namespace WixToolset.Core.WindowsInstaller
         }
 
         /// <summary>
-        /// Creates and populates a <see cref="RowDictionary"/> with the rows from the given <see cref="Table"/>.
+        /// Creates and populates a <see cref="RowDictionary{T}"/> with the rows from the given <see cref="Table"/>.
         /// </summary>
         /// <param name="table">The table to index.</param>
         /// <remarks>

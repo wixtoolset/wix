@@ -21,9 +21,21 @@ namespace WixToolset.Core
     public static class Common
     {
         // TODO: Find a place to put all of these so they doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string DowngradeDetectedProperty = "WIX_DOWNGRADE_DETECTED";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string DowngradePreventedCondition = "NOT WIX_DOWNGRADE_DETECTED";
 
         //-------------------------------------------------------------------------------------------------
@@ -51,6 +63,9 @@ namespace WixToolset.Core
         // GENERIC_WRITE                    (0x40000000L)
         // GENERIC_READ                     (0x80000000L)
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] GenericPermissions = { "GenericAll", "GenericExecute", "GenericWrite", "GenericRead" };
 
         // Standard Access Rights (per WinNT.h)
@@ -61,6 +76,9 @@ namespace WixToolset.Core
         // WRITE_OWNER                      (0x00080000L)
         // SYNCHRONIZE                      (0x00100000L)
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] StandardPermissions = { "Delete", "ReadPermission", "ChangePermission", "TakeOwnership", "Synchronize" };
 
         // Object-Specific Access Rights
@@ -77,11 +95,17 @@ namespace WixToolset.Core
         // FILE_READ_ATTRIBUTES      ( 0x0080 )
         // FILE_WRITE_ATTRIBUTES     ( 0x0100 )
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] FolderPermissions = { "Read", "CreateFile", "CreateChild", "ReadExtendedAttributes", "WriteExtendedAttributes", "Traverse", "DeleteChild", "ReadAttributes", "WriteAttributes" };
 
         // Registry Access Rights (per TODO)
         // ----------------------
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] RegistryPermissions = { "Read", "Write", "CreateSubkeys", "EnumerateSubkeys", "Notify", "CreateLink" };
 
         // File Access Rights (per WinNT.h)
@@ -99,6 +123,9 @@ namespace WixToolset.Core
         // STANDARD_RIGHTS_REQUIRED  (0x000F0000L)
         // FILE_ALL_ACCESS           (STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0x1FF)
         // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
 
         internal static readonly char[] IllegalLongFilenameCharacters = new[] { '\\', '/', '?', '*', '|', '>', '<', ':', '\"' }; // illegal: \ / ? | > < : / * "
@@ -596,10 +623,10 @@ namespace WixToolset.Core
         /// <summary>
         /// Get an attribute value.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="emptyRule">A rule for the contents of the value. If the contents do not follow the rule, an error is thrown.</param>
-        /// <param name="messageHandler">A delegate that receives error messages.</param>
         /// <returns>The attribute's value.</returns>
         internal static string GetAttributeValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule)
         {
@@ -641,9 +668,9 @@ namespace WixToolset.Core
         /// <summary>
         /// Get an identifier attribute value and displays an error for an illegal identifier value.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="messageHandler">A delegate that receives error messages.</param>
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         internal static string GetAttributeIdentifierValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
@@ -676,11 +703,11 @@ namespace WixToolset.Core
         /// <summary>
         /// Get an integer attribute value and displays an error for an illegal integer value.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="minimum">The minimum legal value.</param>
         /// <param name="maximum">The maximum legal value.</param>
-        /// <param name="messageHandler">A delegate that receives error messages.</param>
         /// <returns>The attribute's integer value or a special value if an error occurred during conversion.</returns>
         public static int GetAttributeIntegerValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute, int minimum, int maximum)
         {
@@ -715,9 +742,9 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets a yes/no value and displays an error for an illegal yes/no value.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="messageHandler">A delegate that receives error messages.</param>
         /// <returns>The attribute's YesNoType value.</returns>
         internal static YesNoType GetAttributeYesNoValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
@@ -833,6 +860,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Display an unexpected attribute error.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute.</param>
         public static void UnexpectedAttribute(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
@@ -848,6 +876,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Display an unsupported extension attribute error.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="extensionAttribute">The extension attribute.</param>
         internal static void UnsupportedExtensionAttribute(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute extensionAttribute)

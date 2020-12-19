@@ -1219,7 +1219,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Flattens the tables used in a Bundle.
         /// </summary>
-        /// <param name="output">Output containing the tables to process.</param>
+        /// <param name="entrySection">Output containing the tables to process.</param>
         private void FlattenBundleTables(IntermediateSection entrySection)
         {
             if (SectionType.Bundle != entrySection.Type)

@@ -7,8 +7,16 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Core.WindowsInstaller.ExtensibilityServices;
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Extensions methods for adding WindowsInstaller services.
+    /// </summary>
     public static class WixToolsetCoreServiceProviderExtensions
     {
+        /// <summary>
+        /// Adds WindowsInstaller services.
+        /// </summary>
+        /// <param name="coreProvider"></param>
+        /// <returns></returns>
         public static IWixToolsetCoreServiceProvider AddWindowsInstallerBackend(this IWixToolsetCoreServiceProvider coreProvider)
         {
             AddServices(coreProvider);

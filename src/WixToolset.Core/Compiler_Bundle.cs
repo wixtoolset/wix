@@ -436,6 +436,7 @@ namespace WixToolset.Core
         /// Parse a Container element.
         /// </summary>
         /// <param name="node">Element to parse</param>
+        /// <param name="fileSystemSafeBundleName"></param>
         private string ParseLogElement(XElement node, string fileSystemSafeBundleName)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -706,6 +707,8 @@ namespace WixToolset.Core
         /// Parse the BoostrapperApplication element.
         /// </summary>
         /// <param name="node">Element to parse</param>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
         private Identifier ParseBootstrapperApplicationDllElement(XElement node, ComplexReferenceChildType previousType, Identifier previousId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -1308,6 +1311,8 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element. (BA or PayloadGroup)</param>
         /// <param name="parentId">Identifier of parent element.</param>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
         private Identifier ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId)
         {
             Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
@@ -1345,6 +1350,10 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element.</param>
         /// <param name="parentId">Identifier of parent element.</param>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
+        /// <param name="required"></param>
+        /// <param name="id"></param>
         /// <returns>Whether SourceFile was specified.</returns>
         private bool ParsePayloadElementContent(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, bool required, out Identifier id)
         {
@@ -1519,9 +1528,21 @@ namespace WixToolset.Core
         /// <summary>
         /// Creates the row for a Payload.
         /// </summary>
-        /// <param name="node">Element to parse</param>
+        /// <param name="sourceLineNumbers"></param>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="sourceFile"></param>
+        /// <param name="downloadUrl"></param>
         /// <param name="parentType">ComplexReferenceParentType of parent element</param>
         /// <param name="parentId">Identifier of parent element.</param>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
+        /// <param name="compressed"></param>
+        /// <param name="enableSignatureVerification"></param>
+        /// <param name="displayName"></param>
+        /// <param name="description"></param>
+        /// <param name="remotePayload"></param>
+        /// <returns></returns>
         private WixBundlePayloadSymbol CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
             Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, YesNoDefaultType compressed, YesNoType enableSignatureVerification, string displayName, string description,
             RemotePayload remotePayload)
@@ -1640,6 +1661,8 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element (BA or PayloadGroup).</param>
         /// <param name="parentId">Identifier of parent element.</param>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
         private Identifier ParsePayloadGroupRefElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId)
         {
             Debug.Assert(ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
@@ -2513,6 +2536,7 @@ namespace WixToolset.Core
         /// Parse CommandLine element.
         /// </summary>
         /// <param name="node">Element to parse</param>
+        /// <param name="packageId">Parent packageId</param>
         private void ParseCommandLineElement(XElement node, string packageId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -2661,7 +2685,7 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        /// <returns>Identifier for package group element.</rereturns>
+        /// <returns>Identifier for package group element.</returns>
         private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             return this.ParsePackageGroupRefElement(node, parentType, parentId, ComplexReferenceChildType.Unknown, null);
@@ -2673,9 +2697,9 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        /// <param name="parentType">ComplexReferenceParentType of previous element (Unknown, Package, or PackageGroup).</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        /// <returns>Identifier for package group element.</rereturns>
+        /// <param name="previousType"></param>
+        /// <param name="previousId"></param>
+        /// <returns>Identifier for package group element.</returns>
         private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
         {
             Debug.Assert(ComplexReferenceParentType.Unknown == parentType || ComplexReferenceParentType.PackageGroup == parentType || ComplexReferenceParentType.Container == parentType);
@@ -2740,6 +2764,7 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="id">Identifier for the rollback boundary.</param>
         /// <param name="vital">Indicates whether the rollback boundary is vital or not.</param>
+        /// <param name="transaction">Indicates whether the rollback boundary will use an MSI transaction.</param>
         /// <param name="parentType">Type of parent group.</param>
         /// <param name="parentId">Identifier of parent group.</param>
         /// <param name="previousType">Type of previous item, if any.</param>

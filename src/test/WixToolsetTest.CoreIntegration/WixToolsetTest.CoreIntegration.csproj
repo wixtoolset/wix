@@ -8,10 +8,6 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\.Data\burn.exe" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppId\Advertised.wxs" CopyToOutputDirectory="PreserveNewest" />

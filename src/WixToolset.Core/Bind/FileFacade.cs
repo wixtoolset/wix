@@ -9,6 +9,7 @@ namespace WixToolset.Core.Bind
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
 
+#pragma warning disable 1591 // TODO: this shouldn't be public, need interface in Extensibility
     public class FileFacade
     {
         public FileFacade(FileSymbol file, AssemblySymbol assembly)

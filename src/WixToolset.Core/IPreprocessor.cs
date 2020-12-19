@@ -5,6 +5,7 @@ namespace WixToolset.Core
     using System.Xml;
     using WixToolset.Extensibility.Data;
 
+#pragma warning disable 1591 // TODO: add documentation, move into Extensibility
     public interface IPreprocessor
     {
         IPreprocessResult Preprocess(IPreprocessContext context);

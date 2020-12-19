@@ -770,8 +770,10 @@ namespace WixToolset.Core
         /// Parses a package element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="productAuthor">Default package author.</param>
-        /// <param name="moduleId">The module guid - this is necessary until Module/@Guid is removed.</param>
+        /// <param name="isCodepageSet"></param>
+        /// <param name="isPackageNameSet"></param>
+        /// <param name="isKeywordsSet"></param>
+        /// <param name="isPackageAuthorSet"></param>
         private void ParseSummaryInformationElement(XElement node, ref bool isCodepageSet, ref bool isPackageNameSet, ref bool isKeywordsSet, ref bool isPackageAuthorSet)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -3433,6 +3435,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="componentId">Identifier of parent component.</param>
+        /// <param name="win64Component"></param>
         private void ParseServiceInstallElement(XElement node, string componentId, bool win64Component)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -4266,6 +4269,7 @@ namespace WixToolset.Core
         /// Parses a shortcut property element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
+        /// <param name="shortcutId"></param>
         private void ParseShortcutPropertyElement(XElement node, string shortcutId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);

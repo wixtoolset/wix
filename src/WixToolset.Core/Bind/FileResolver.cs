@@ -67,7 +67,7 @@ namespace WixToolset.Core.Bind
         /// Resolves the source path of a file using binder extensions.
         /// </summary>
         /// <param name="source">Original source value.</param>
-        /// <param name="type">Optional type of source file being resolved.</param>
+        /// <param name="symbolDefinition">Optional type of source file being resolved.</param>
         /// <param name="sourceLineNumbers">Optional source line of source file being resolved.</param>
         /// <param name="bindStage">The binding stage used to determine what collection of bind paths will be used</param>
         /// <param name="alreadyCheckedPaths">Optional collection of paths already checked.</param>

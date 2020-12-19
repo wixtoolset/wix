@@ -4,7 +4,7 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    public interface IResolver
+    internal interface IResolver
     {
         IResolveResult Resolve(IResolveContext context);
     }

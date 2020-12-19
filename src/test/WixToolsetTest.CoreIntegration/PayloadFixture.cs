@@ -6,7 +6,6 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -109,8 +108,10 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.InRange(result.ExitCode, 2, int.MaxValue);
 
-                Assert.Equal(1, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.IllegalRelativeLongFilename).Count());
-                Assert.Equal(2, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.PayloadMustBeRelativeToCache).Count());
+                var expectedIllegalRelativeLongFileName = 1;
+                var expectedPayloadMustBeRelativeToCache = 2;
+                Assert.Equal(expectedIllegalRelativeLongFileName, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.IllegalRelativeLongFilename).Count());
+                Assert.Equal(expectedPayloadMustBeRelativeToCache, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.PayloadMustBeRelativeToCache).Count());
             }
         }
     }

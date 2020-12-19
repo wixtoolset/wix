@@ -319,6 +319,8 @@ namespace WixToolset.Core
         /// Parses a PatchFamily element.
         /// </summary>
         /// <param name="node">The element to parse.</param>
+        /// <param name="parentType"></param>
+        /// <param name="parentId"></param>
         private void ParsePatchFamilyElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -444,6 +446,8 @@ namespace WixToolset.Core
         /// Parses a PatchFamilyGroup element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
+        /// <param name="parentType"></param>
+        /// <param name="parentId"></param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParsePatchFamilyGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {

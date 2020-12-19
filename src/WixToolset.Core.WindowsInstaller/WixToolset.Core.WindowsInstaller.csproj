@@ -9,6 +9,7 @@
     <Title>WiX Toolset Core Windows Installer</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>

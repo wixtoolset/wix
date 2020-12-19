@@ -5,9 +5,9 @@ namespace WixToolset.Core.Preprocess
     using System;
     using WixToolset.Data;
 
-    public delegate void ResolvedVariableEventHandler(object sender, ResolvedVariableEventArgs e);
+    internal delegate void ResolvedVariableEventHandler(object sender, ResolvedVariableEventArgs e);
 
-    public class ResolvedVariableEventArgs : EventArgs
+    internal class ResolvedVariableEventArgs : EventArgs
     {
         public ResolvedVariableEventArgs(SourceLineNumber sourceLineNumbers, string variableName, string variableValue)
         {

@@ -29,8 +29,8 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Creates a BurnWriter for re-writing a PE file.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="fileExe">File to modify in-place.</param>
-        /// <param name="bundleGuid">GUID for the bundle.</param>
         private BurnWriter(IMessaging messaging, string fileExe)
             : base(messaging, fileExe)
         {
@@ -39,6 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Opens a Burn writer.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn writer.</returns>
         public static BurnWriter Open(IMessaging messaging, string fileExe)
@@ -197,7 +198,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// Appends a container to the exe and updates the ".wixburn" section data to point to it.
         /// </summary>
         /// <param name="containerStream">File stream to append to the current exe.</param>
+        /// <param name="containerSize">Size of the container.</param>
         /// <param name="burnSectionOffsetSize">Offset of size field for this container in ".wixburn" section data.</param>
+        /// <param name="burnSectionCount">Number of Burn sections.</param>
         /// <returns>true if the container data is successfully appended; false otherwise</returns>
         private bool AppendContainer(Stream containerStream, UInt32 containerSize, UInt32 burnSectionOffsetSize, UInt32 burnSectionCount)
         {

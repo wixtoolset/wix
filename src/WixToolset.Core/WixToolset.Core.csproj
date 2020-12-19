@@ -9,6 +9,8 @@
     <Title>WiX Toolset Core</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <NBGV_EmitThisAssemblyClass>true</NBGV_EmitThisAssemblyClass>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

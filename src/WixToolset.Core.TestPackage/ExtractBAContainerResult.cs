@@ -6,22 +6,61 @@ namespace WixToolset.Core.TestPackage
     using System.Xml;
     using Xunit;
 
+    /// <summary>
+    /// The result of extracting the BA container.
+    /// </summary>
     public class ExtractBAContainerResult
     {
+        /// <summary>
+        /// <see cref="XmlDocument"/> for BundleExtensionData.xml.
+        /// </summary>
         public XmlDocument BundleExtensionDataDocument { get; set; }
+
+        /// <summary>
+        /// <see cref="XmlNamespaceManager"/> for BundleExtensionData.xml.
+        /// </summary>
         public XmlNamespaceManager BundleExtensionDataNamespaceManager { get; set; }
+
+        /// <summary>
+        /// <see cref="XmlDocument"/> for BootstrapperApplicationData.xml.
+        /// </summary>
         public XmlDocument BADataDocument { get; set; }
+
+        /// <summary>
+        /// <see cref="XmlNamespaceManager"/> for BootstrapperApplicationData.xml.
+        /// </summary>
         public XmlNamespaceManager BADataNamespaceManager { get; set; }
+
+        /// <summary>
+        /// <see cref="XmlDocument"/> for the Burn manifest.xml.
+        /// </summary>
         public XmlDocument ManifestDocument { get; set; }
+
+        /// <summary>
+        /// <see cref="XmlNamespaceManager"/> for the Burn manifest.xml.
+        /// </summary>
         public XmlNamespaceManager ManifestNamespaceManager { get; set; }
+
+        /// <summary>
+        /// Whether extraction succeeded.
+        /// </summary>
         public bool Success { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ExtractBAContainerResult AssertSuccess()
         {
             Assert.True(this.Success);
             return this;
         }
 
+        /// <summary>
+        /// Returns the relative path of the BA entry point dll in the given folder.
+        /// </summary>
+        /// <param name="extractedBAContainerFolderPath"></param>
+        /// <returns></returns>
         public string GetBAFilePath(string extractedBAContainerFolderPath)
         {
             var uxPayloads = this.SelectManifestNodes("/burn:BurnManifest/burn:UX/burn:Payload");
@@ -30,6 +69,12 @@ namespace WixToolset.Core.TestPackage
             return Path.Combine(extractedBAContainerFolderPath, relativeBAPath);
         }
 
+        /// <summary>
+        /// Returns the relative path of the BundleExtension entry point dll in the given folder.
+        /// </summary>
+        /// <param name="extractedBAContainerFolderPath"></param>
+        /// <param name="extensionId"></param>
+        /// <returns></returns>
         public string GetBundleExtensionFilePath(string extractedBAContainerFolderPath, string extensionId)
         {
             var uxPayloads = this.SelectManifestNodes($"/burn:BurnManifest/burn:UX/burn:Payload[@Id='{extensionId}']");

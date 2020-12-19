@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Extensibility.Data;
 
-    public class PreprocessResult : IPreprocessResult
+    internal class PreprocessResult : IPreprocessResult
     {
         public XDocument Document { get; set; }
 

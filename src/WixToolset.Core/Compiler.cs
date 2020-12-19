@@ -886,7 +886,7 @@ namespace WixToolset.Core
         /// Parses an instance element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of instance property.</param>
+        /// <param name="propertyId">Identifier of instance property.</param>
         private void ParseInstanceElement(XElement node, string propertyId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -1641,6 +1641,7 @@ namespace WixToolset.Core
         /// Parses a product search element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
+        /// <param name="propertyId"></param>
         /// <returns>Signature for search element.</returns>
         private void ParseProductSearchElement(XElement node, string propertyId)
         {
@@ -2570,6 +2571,8 @@ namespace WixToolset.Core
         /// Parses a component group element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
+        /// <param name="parentType"></param>
+        /// <param name="parentId"></param>
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseComponentGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
@@ -5024,6 +5027,8 @@ namespace WixToolset.Core
         /// Parses a feature group element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
+        /// <param name="parentType"></param>
+        /// <param name="parentId"></param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseFeatureGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
@@ -5477,6 +5482,7 @@ namespace WixToolset.Core
         /// <param name="sourcePath">Default source path of parent directory.</param>
         /// <param name="possibleKeyPath">This will be set with the possible keyPath for the parent component.</param>
         /// <param name="win64Component">true if the component is 64-bit.</param>
+        /// <param name="componentGuid"></param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
@@ -6934,7 +6940,7 @@ namespace WixToolset.Core
         /// Parses a MajorUpgrade element.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        /// <param name="parentElement">The parent element.</param>
+        /// <param name="contextValues">The current context.</param>
         private void ParseMajorUpgradeElement(XElement node, IDictionary<string, string> contextValues)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);

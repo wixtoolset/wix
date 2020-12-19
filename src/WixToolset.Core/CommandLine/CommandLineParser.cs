@@ -192,7 +192,6 @@ namespace WixToolset.Core.CommandLine
         /// or DirectoryInfo.GetFiles.  The only way to get this directory path is manually since
         /// Path.GetDirectoryName does not support ".." in the path.
         /// </remarks>
-        /// <exception cref="WixFileNotFoundException">Throws WixFileNotFoundException if no file matching the pattern can be found.</exception>
         private string[] GetFiles(string searchPath, string fileType)
         {
             if (null == searchPath)

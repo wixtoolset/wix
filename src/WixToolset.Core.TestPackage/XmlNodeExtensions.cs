@@ -7,13 +7,28 @@ namespace WixToolset.Core.TestPackage
     using System.Text.RegularExpressions;
     using System.Xml;
 
+    /// <summary>
+    /// Utility class to help compare XML in tests using string comparisons by using single quotes and stripping all namespaces.
+    /// </summary>
     public static class XmlNodeExtensions
     {
+        /// <summary>
+        /// Returns the node's outer XML using single quotes and stripping all namespaces.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
         public static string GetTestXml(this XmlNode node, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
         {
             return node.OuterXml.GetTestXml(ignoredAttributesByElementName);
         }
 
+        /// <summary>
+        /// Returns the XML using single quotes and stripping all namespaces.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
+        /// <returns></returns>
         public static string GetTestXml(this string xml, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
         {
             string formattedXml;

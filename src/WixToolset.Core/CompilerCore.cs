@@ -127,6 +127,8 @@ namespace WixToolset.Core
         /// Constructor for all compiler core.
         /// </summary>
         /// <param name="intermediate">The Intermediate object representing compiled source document.</param>
+        /// <param name="messaging"></param>
+        /// <param name="parseHelper"></param>
         /// <param name="extensions">The WiX extensions collection.</param>
         internal CompilerCore(Intermediate intermediate, IMessaging messaging, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
         {
@@ -531,7 +533,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="onlyAscii">Whether to allow Unicode (UCS) or UTF code pages.</param>
+        /// <param name="onlyAnsi">Whether to allow Unicode (UCS) or UTF code pages.</param>
         /// <returns>A valid code page integer value or variable expression.</returns>
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeLocalizableCodePageValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool onlyAnsi = false)
@@ -892,7 +894,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Create an identifier based on passed file name
         /// </summary>
-        /// <param name="name">File name to generate identifer from</param>
+        /// <param name="filename">File name to generate identifer from</param>
         /// <returns></returns>
         public Identifier CreateIdentifierFromFilename(string filename)
         {
@@ -935,7 +937,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public IComponentKeyPath ParsePossibleKeyPathExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             return this.parseHelper.ParsePossibleKeyPathExtensionElement(this.extensions.Values, this.intermediate, this.ActiveSection, parentElement, element, context);
@@ -1017,6 +1019,7 @@ namespace WixToolset.Core
         /// <param name="id">Unique identifier for the section.</param>
         /// <param name="type">Type of section to create.</param>
         /// <param name="codepage">Codepage for the resulting database for this ection.</param>
+        /// <param name="compilationId"></param>
         /// <returns>New section.</returns>
         internal IntermediateSection CreateActiveSection(string id, SectionType type, int codepage, string compilationId)
         {
@@ -1034,6 +1037,7 @@ namespace WixToolset.Core
         /// <param name="id">Unique identifier for the section.</param>
         /// <param name="type">Type of section to create.</param>
         /// <param name="codepage">Codepage for the resulting database for this ection.</param>
+        /// <param name="compilationId"></param>
         /// <returns>New section.</returns>
         internal IntermediateSection CreateSection(string id, SectionType type, int codepage, string compilationId)
         {

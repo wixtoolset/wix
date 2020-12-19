@@ -85,7 +85,7 @@ namespace WixToolset.Core
         /// Writes the paths to the content files to a text file.
         /// </summary>
         /// <param name="path">Path to write file.</param>
-        /// <param name="contentFilePaths">Collection of paths to content files that will be written to file.</param>
+        /// <param name="trackedFiles">Collection of paths to content files that will be written to file.</param>
         private void CreateContentsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
             var uniqueInputFilePaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Input).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
@@ -111,7 +111,7 @@ namespace WixToolset.Core
         /// Writes the paths to the output files to a text file.
         /// </summary>
         /// <param name="path">Path to write file.</param>
-        /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
+        /// <param name="trackedFiles">Collection of files that were transferred to the output directory.</param>
         private void CreateOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
             var uniqueOutputPaths = new SortedSet<string>(trackedFiles.Where(t => t.Clean).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
@@ -142,7 +142,7 @@ namespace WixToolset.Core
         /// Writes the paths to the built output files to a text file.
         /// </summary>
         /// <param name="path">Path to write file.</param>
-        /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
+        /// <param name="trackedFiles">Collection of files that were transferred to the output directory.</param>
         private void CreateBuiltOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
             var uniqueBuiltPaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Final).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);

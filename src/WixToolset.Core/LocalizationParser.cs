@@ -63,6 +63,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Adds a WixVariableRow to a dictionary while performing the expected override checks.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="variables">Dictionary of variable rows.</param>
         /// <param name="wixVariableRow">Row to add to the variables dictionary.</param>
         private static void AddWixVariable(IMessaging messaging, IDictionary<string, BindVariable> variables, BindVariable wixVariableRow)
@@ -80,6 +81,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Parses the WixLocalization element.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="node">Element to parse.</param>
         private static Localization ParseWixLocalizationElement(IMessaging messaging, XElement node)
         {
@@ -147,7 +149,9 @@ namespace WixToolset.Core
         /// <summary>
         /// Parse a localization string into a WixVariableRow.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="node">Element to parse.</param>
+        /// <param name="variables"></param>
         private static void ParseString(IMessaging messaging, XElement node, IDictionary<string, BindVariable> variables)
         {
             string id = null;
@@ -208,6 +212,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Parse a localized control.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="node">Element to parse.</param>
         /// <param name="localizedControls">Dictionary of localized controls.</param>
         private static void ParseUI(IMessaging messaging, XElement node, IDictionary<string, LocalizedControl> localizedControls)

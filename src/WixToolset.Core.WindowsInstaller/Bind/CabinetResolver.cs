@@ -13,7 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public class CabinetResolver
+    internal class CabinetResolver
     {
         public CabinetResolver(IWixToolsetServiceProvider serviceProvider, string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {

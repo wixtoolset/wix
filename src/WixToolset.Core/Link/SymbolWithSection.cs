@@ -18,6 +18,7 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Creates a symbol for a symbol.
         /// </summary>
+        /// <param name="section"></param>
         /// <param name="symbol">Symbol for the symbol</param>
         public SymbolWithSection(IntermediateSection section, IntermediateSymbol symbol)
         {

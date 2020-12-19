@@ -5,9 +5,9 @@ namespace WixToolset.Core.Preprocess
     using System;
     using WixToolset.Data;
 
-    public delegate void IfDefEventHandler(object sender, IfDefEventArgs e);
+    internal delegate void IfDefEventHandler(object sender, IfDefEventArgs e);
 
-    public class IfDefEventArgs : EventArgs
+    internal class IfDefEventArgs : EventArgs
     {
         public IfDefEventArgs(SourceLineNumber sourceLineNumbers, bool isIfDef, bool isDefined, string variableName)
         {

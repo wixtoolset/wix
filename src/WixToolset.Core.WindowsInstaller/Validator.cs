@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// <summary>
     /// Runs internal consistency evaluators (ICEs) from cub files against a database.
     /// </summary>
-    public sealed class Validator
+    internal sealed class Validator
     {
         private string actionName;
         private StringCollection cubeFiles;

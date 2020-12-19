@@ -248,19 +248,20 @@ namespace WixToolset.Core.WindowsInstaller
         private XElement GetIndexedElement(string table, params string[] primaryKey) => this.IndexedElements[String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey))];
 
         /// <summary>
-        /// Gets the element corresponding to the primary key of the given table.
+        /// Tries to get the element corresponding to the primary key of the given table.
         /// </summary>
-        /// <param name="table">The table corresponding to the element.</param>
-        /// <param name="primaryKey">The primary key corresponding to the element.</param>
-        /// <returns>The indexed element.</returns>
+        /// <param name="row">The table corresponding to the element.</param>
+        /// <param name="xElement">The indexed element.</param>
+        /// <returns>Whether the element was found.</returns>
         private bool TryGetIndexedElement(WixToolset.Data.WindowsInstaller.Row row, out XElement xElement) => this.TryGetIndexedElement(row.TableDefinition.Name, out xElement, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter));
 
         /// <summary>
-        /// Gets the element corresponding to the primary key of the given table.
+        /// Tries to get the element corresponding to the primary key of the given table.
         /// </summary>
         /// <param name="table">The table corresponding to the element.</param>
+        /// <param name="xElement">The indexed element.</param>
         /// <param name="primaryKey">The primary key corresponding to the element.</param>
-        /// <returns>The indexed element.</returns>
+        /// <returns>Whether the element was found.</returns>
         private bool TryGetIndexedElement(string table, out XElement xElement, params string[] primaryKey) => this.IndexedElements.TryGetValue(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), out xElement);
 
         /// <summary>
@@ -276,8 +277,9 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Index an element by its corresponding row.
         /// </summary>
-        /// <param name="row">The row corresponding to the element.</param>
         /// <param name="element">The element to index.</param>
+        /// <param name="table"></param>
+        /// <param name="primaryKey"></param>
         private void IndexElement(XElement element, string table, params string[] primaryKey)
         {
             this.IndexedElements.Add(String.Concat(table, ':', String.Join(DecompilerConstants.PrimaryKeyDelimiterString, primaryKey)), element);
@@ -342,7 +344,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// Set the common control attributes in a control element.
         /// </summary>
         /// <param name="attributes">The control attributes.</param>
-        /// <param name="control">The control element.</param>
+        /// <param name="xControl">The control element.</param>
         private static void SetControlAttributes(int attributes, XElement xControl)
         {
             if (0 == (attributes & WindowsInstallerConstants.MsidbControlAttributesEnabled))
@@ -2424,6 +2426,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// Initialize decompilation.
         /// </summary>
         /// <param name="tables">The collection of all tables.</param>
+        /// <param name="codepage"></param>
         private void InitializeDecompile(TableIndexedCollection tables, int codepage)
         {
             // reset all the state information
@@ -2983,7 +2986,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Decompile the _SummaryInformation table.
         /// </summary>
-        /// <param name="table">The table to decompile.</param>
+        /// <param name="tables">The tables to decompile.</param>
         private void FinalizeSummaryInformationStream(TableIndexedCollection tables)
         {
             var table = tables["_SummaryInformation"];

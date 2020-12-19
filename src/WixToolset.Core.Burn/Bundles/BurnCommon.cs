@@ -9,7 +9,7 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Extensibility.Services;
 
     /// <summary>
-    /// Common functionality for Burn PE Writer & Reader for the WiX toolset.
+    /// Common functionality for Burn PE Writer &amp; Reader for the WiX toolset.
     /// </summary>
     /// <remarks>This class encapsulates common functionality related to 
     /// bundled/chained setup packages.</remarks>
@@ -107,8 +107,8 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Creates a BurnCommon for re-writing a PE file.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="fileExe">File to modify in-place.</param>
-        /// <param name="bundleGuid">GUID for the bundle.</param>
         public BurnCommon(IMessaging messaging, string fileExe)
         {
             this.messaging = messaging;

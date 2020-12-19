@@ -10,10 +10,10 @@ namespace WixToolset.Core
     /// </summary>
     internal class Inscriber
     {
-        /// <summary>
-        /// Gets or sets the temp files collection.
-        /// </summary>
-        /// <value>The temp files collection.</value>
+        // <summary>
+        // Gets or sets the temp files collection.
+        // </summary>
+        // <value>The temp files collection.</value>
         // public TempFileCollection TempFiles
         // {
         //     get { return this.tempFiles; }

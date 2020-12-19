@@ -90,9 +90,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<ITrackedFile> TrackedFiles => this.trackedFiles;
 
-        /// <param name="output">Output to generate image for.</param>
-        /// <param name="layoutDirectory">The directory in which the image should be layed out.</param>
-        /// <param name="compressed">Flag if source image should be compressed.</param>
         public void Execute()
         {
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
@@ -177,6 +174,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="output">Output for the current database.</param>
         /// <param name="cabinetDir">Directory to create cabinet in.</param>
         /// <param name="mediaSymbol">Media symbol containing information about the cabinet.</param>
+        /// <param name="compressionLevel">Desired compression level.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
         private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
@@ -284,7 +282,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// This callback will not be called in case there is no File splitting. i.e. MaximumCabinetSizeForLargeFileSplitting was not authored
         /// </summary>
         /// <param name="firstCabName">The name of splitting cabinet without extention e.g. "cab1".</param>
-        /// <param name="newCabName">The name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"</param>
+        /// <param name="newCabinetName">The name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"</param>
         /// <param name="fileToken">The file token of the first file present in the splitting cabinet</param>
         internal void NewCabNamesCallBack([MarshalAs(UnmanagedType.LPWStr)]string firstCabName, [MarshalAs(UnmanagedType.LPWStr)]string newCabinetName, [MarshalAs(UnmanagedType.LPWStr)]string fileToken)
         {

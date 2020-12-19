@@ -177,7 +177,7 @@ namespace WixToolset.Core.WindowsInstaller.Msi
     /// <summary>
     /// Class exposing static functions and structs from MSI API.
     /// </summary>
-    public sealed class MsiInterop
+    internal sealed class MsiInterop
     {
         // Patching constants
         public const int MsiMaxStreamNameLength = 62; // http://msdn2.microsoft.com/library/aa370551.aspx

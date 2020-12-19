@@ -55,7 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public List<ITrackedFile> GeneratedTemporaryFiles { get; } = new List<ITrackedFile>();
 
         /// <summary>
-        /// Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.
+        /// Whether to use a subdirectory based on the database file name for intermediate files.
         /// </summary>
         private bool SuppressAddingValidationRows { get; }
 

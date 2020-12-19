@@ -9,6 +9,7 @@ namespace WixToolset.Core.Bind
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
+#pragma warning disable 1591 // TODO: this shouldn't be public, need interface in Extensibility
     public class ExtractEmbeddedFilesCommand
     {
         public ExtractEmbeddedFilesCommand(IBackendHelper backendHelper, IEnumerable<IExpectedExtractFile> embeddedFiles)

@@ -52,7 +52,7 @@ namespace WixToolset.Extensibility
         /// Called at the beginning of the validation of a database file.
         /// </summary>
         /// <remarks>
-        /// <para>The <see cref="Validator"/> will set
+        /// <para>The Validator will set
         /// <see cref="DatabaseFile"/> before calling InitializeValidator.</para>
         /// <para><b>Notes to Inheritors:</b> When overriding
         /// <b>InitializeValidator</b> in a derived class, be sure to call
@@ -83,7 +83,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// Logs a message from the <see cref="Validator"/>.
+        /// Logs a message from the Validator.
         /// </summary>
         /// <param name="message">A <see cref="String"/> of tab-delmited tokens
         /// in the validation message.</param>
@@ -93,7 +93,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// Logs a message from the <see cref="Validator"/>.
+        /// Logs a message from the Validator.
         /// </summary>
         /// <param name="message">A <see cref="String"/> of tab-delmited tokens
         /// in the validation message.</param>

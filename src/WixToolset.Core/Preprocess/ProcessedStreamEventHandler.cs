@@ -9,13 +9,13 @@ namespace WixToolset.Core.Preprocess
     /// Preprocessed output stream event handler delegate.
     /// </summary>
     /// <param name="sender">Sender of the message.</param>
-    /// <param name="ea">Arguments for the preprocessed stream event.</param>
-    public delegate void ProcessedStreamEventHandler(object sender, ProcessedStreamEventArgs e);
+    /// <param name="e">Arguments for the preprocessed stream event.</param>
+    internal delegate void ProcessedStreamEventHandler(object sender, ProcessedStreamEventArgs e);
 
     /// <summary>
     /// Event args for preprocessed stream event.
     /// </summary>
-    public class ProcessedStreamEventArgs : EventArgs
+    internal class ProcessedStreamEventArgs : EventArgs
     {
         /// <summary>
         /// Creates a new ProcessedStreamEventArgs.

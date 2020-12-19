@@ -4,7 +4,7 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    public interface IDecompiler
+    internal interface IDecompiler
     {
         IDecompileResult Decompile(IDecompileContext context);
     }

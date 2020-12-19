@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.Link
 {
@@ -27,7 +27,8 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Compares two complex references without considering the primary bit.
         /// </summary>
-        /// <param name="obj">Complex reference to compare to.</param>
+        /// <param name="symbol">this</param>
+        /// <param name="other">Complex reference to compare to.</param>
         /// <returns>Zero if the objects are equivalent, negative number if the provided object is less, positive if greater.</returns>
         public static int CompareToWithoutConsideringPrimary(this WixComplexReferenceSymbol symbol, WixComplexReferenceSymbol other)
         {
@@ -57,6 +58,7 @@ namespace WixToolset.Core.Link
         /// <summary>
         /// Changes all of the parent references to point to the passed in parent reference.
         /// </summary>
+        /// <param name="symbol">this</param>
         /// <param name="parent">New parent complex reference.</param>
         public static void Reparent(this WixComplexReferenceSymbol symbol, WixComplexReferenceSymbol parent)
         {

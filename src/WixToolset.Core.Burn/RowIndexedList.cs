@@ -7,18 +7,18 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
-    /// A list of rows indexed by their primary key. Unlike a <see cref="RowDictionary"/>
+    /// A list of rows indexed by their primary key. Unlike a RowDictionary
     /// this indexed list will track rows in their added order and will allow rows with
     /// duplicate keys to be added to the list, although only the first row will be indexed.
     /// </summary>
-    public sealed class RowIndexedList<T> : IList<T> where T : Row
+    internal sealed class RowIndexedList<T> : IList<T> where T : Row
     {
         private Dictionary<string, T> index;
         private List<T> rows;
         private List<T> duplicates;
 
         /// <summary>
-        /// Creates an empty <see cref="RowIndexedList"/>.
+        /// Creates an empty <see cref="RowIndexedList{T}"/>.
         /// </summary>
         public RowIndexedList()
         {
@@ -28,7 +28,7 @@ namespace WixToolset.Core.Burn
         }
 
         /// <summary>
-        /// Creates and populates a <see cref="RowDictionary"/> with the rows from the given enumerator.
+        /// Creates and populates a <see cref="RowIndexedList{T}"/> with the rows from the given enumerator.
         /// </summary>
         /// <param name="rows">Rows to index.</param>
         public RowIndexedList(IEnumerable<T> rows)
@@ -41,7 +41,7 @@ namespace WixToolset.Core.Burn
         }
 
         /// <summary>
-        /// Creates and populates a <see cref="RowDictionary"/> with the rows from the given <see cref="Table"/>.
+        /// Creates and populates a <see cref="RowIndexedList{T}"/> with the rows from the given <see cref="Table"/>.
         /// </summary>
         /// <param name="table">The table to index.</param>
         /// <remarks>

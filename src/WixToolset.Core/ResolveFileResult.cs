@@ -5,7 +5,7 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using WixToolset.Extensibility.Data;
 
-    public class ResolveFileResult : IResolveFileResult
+    internal class ResolveFileResult : IResolveFileResult
     {
         public string Path { get; set; }
 

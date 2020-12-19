@@ -32,6 +32,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Creates a BurnReader for reading a PE file.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="fileExe">File to read.</param>
         private BurnReader(IMessaging messaging, string fileExe)
             : base(messaging, fileExe)
@@ -58,6 +59,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Opens a Burn reader.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn reader.</returns>
         public static BurnReader Open(IMessaging messaging, string fileExe)
@@ -77,6 +79,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// Gets the UX container from the exe and extracts its contents to the output directory.
         /// </summary>
         /// <param name="outputDirectory">Directory to write extracted files to.</param>
+        /// <param name="tempDirectory">Scratch directory.</param>
         /// <returns>True if successful, false otherwise</returns>
         public bool ExtractUXContainer(string outputDirectory, string tempDirectory)
         {
@@ -157,6 +160,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// Gets the attached container from the exe and extracts its contents to the output directory.
         /// </summary>
         /// <param name="outputDirectory">Directory to write extracted files to.</param>
+        /// <param name="tempDirectory">Scratch directory.</param>
         /// <returns>True if successful, false otherwise</returns>
         public bool ExtractAttachedContainer(string outputDirectory, string tempDirectory)
         {

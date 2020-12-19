@@ -7,12 +7,25 @@ namespace WixToolset.Core.TestPackage
     using WixToolset.Data;
     using Xunit;
 
+    /// <summary>
+    /// The result of an Execute method of <see cref="WixRunner"/>.
+    /// </summary>
     public class WixRunnerResult
     {
+        /// <summary>
+        /// ExitCode for the operation.
+        /// </summary>
         public int ExitCode { get; set; }
 
+        /// <summary>
+        /// Messages from the operation.
+        /// </summary>
         public Message[] Messages { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public WixRunnerResult AssertSuccess()
         {
             Assert.True(0 == this.ExitCode, $"\r\n\r\nWixRunner failed with exit code: {this.ExitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(this.Messages))}\r\n");

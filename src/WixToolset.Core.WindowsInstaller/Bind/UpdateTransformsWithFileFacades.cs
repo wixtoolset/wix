@@ -384,7 +384,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Signal a warning if a non-keypath file was changed in a patch without also changing the keypath file of the component.
         /// </summary>
-        /// <param name="output">The output to validate.</param>
+        /// <param name="transform">The output to validate.</param>
         private void ValidateFileRowChanges(WindowsInstallerData transform)
         {
             var componentTable = transform.Tables["Component"];

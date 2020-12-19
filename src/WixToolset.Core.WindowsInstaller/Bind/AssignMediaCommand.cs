@@ -115,7 +115,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Assign files to cabinets based on MediaTemplate authoring.
         /// </summary>
-        /// <param name="fileFacades">FileRowCollection</param>
         private void AutoAssignFiles(List<MediaSymbol> mediaTable, Dictionary<MediaSymbol, List<FileFacade>> filesByCabinetMedia, List<FileFacade> uncompressedFiles)
         {
             const int MaxCabIndex = 999;
@@ -295,7 +294,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Adds a symbol to the section with cab name template filled in.
         /// </summary>
-        /// <param name="mediaTable"></param>
+        /// <param name="mediaTemplateSymbol"></param>
         /// <param name="cabIndex"></param>
         /// <returns></returns>
         private MediaSymbol AddMediaSymbol(WixMediaTemplateSymbol mediaTemplateSymbol, int cabIndex)

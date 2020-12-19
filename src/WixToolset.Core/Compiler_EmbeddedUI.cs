@@ -335,7 +335,6 @@ namespace WixToolset.Core
         /// Parses a embedded UI resource element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="parentId">Identifier of parent EmbeddedUI element.</param>
         private void ParseEmbeddedUIResourceElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);

@@ -11,7 +11,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Unbinder core of the WiX toolset.
     /// </summary>
-    public sealed class Unbinder
+    internal sealed class Unbinder
     {
         public IEnumerable<IBackendFactory> BackendFactories { get; }
 

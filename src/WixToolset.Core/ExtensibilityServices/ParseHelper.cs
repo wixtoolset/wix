@@ -149,12 +149,6 @@ namespace WixToolset.Core.ExtensibilityServices
             return suffix == null ? null : name + suffix;
         }
 
-        [Obsolete]
-        public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
-        {
-            return this.CreateRegistrySymbol(section, sourceLineNumbers, root, key, name, value, componentId, escapeLeadingHash);
-        }
-
         public Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
             if (RegistryRootType.Unknown == root)
@@ -220,12 +214,6 @@ namespace WixToolset.Core.ExtensibilityServices
             this.CreateSimpleReference(section, sourceLineNumbers, symbolDefinition.Name, primaryKeys);
         }
 
-        [Obsolete]
-        public void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
-        {
-            this.CreateWixGroupSymbol(section, sourceLineNumbers, parentType, parentId, childType, childId);
-        }
-
         public void CreateWixGroupSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
         {
             if (null == parentId || ComplexReferenceParentType.Unknown == parentType)
@@ -284,18 +272,6 @@ namespace WixToolset.Core.ExtensibilityServices
             });
         }
 
-        [Obsolete]
-        public IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
-        {
-            return this.CreateSymbol(section, sourceLineNumbers, tableName, identifier);
-        }
-
-        [Obsolete]
-        public IntermediateSymbol CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null)
-        {
-            return this.CreateSymbol(section, sourceLineNumbers, symbolType, identifier);
-        }
-
         public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string symbolName, Identifier identifier = null)
         {
             if (this.Creator == null)
@@ -307,14 +283,6 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 throw new ArgumentException(nameof(symbolName));
             }
-
-            return this.CreateSymbol(section, sourceLineNumbers, symbolDefinition, identifier);
-        }
-
-        [Obsolete]
-        public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, SymbolDefinitionType symbolType, Identifier identifier = null)
-        {
-            var symbolDefinition = SymbolDefinitions.ByType(symbolType);
 
             return this.CreateSymbol(section, sourceLineNumbers, symbolDefinition, identifier);
         }

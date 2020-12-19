@@ -7,8 +7,16 @@ namespace WixToolset.Core.Burn
     using WixToolset.Core.Burn.ExtensibilityServices;
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Extensions methods for adding Burn services.
+    /// </summary>
     public static class WixToolsetCoreServiceProviderExtensions
     {
+        /// <summary>
+        /// Adds Burn Services.
+        /// </summary>
+        /// <param name="coreProvider"></param>
+        /// <returns></returns>
         public static IWixToolsetCoreServiceProvider AddBundleBackend(this IWixToolsetCoreServiceProvider coreProvider)
         {
             AddServices(coreProvider);

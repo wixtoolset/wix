@@ -15,7 +15,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// <summary>
     /// Creates a transform by diffing two outputs.
     /// </summary>
-    public sealed class GenerateTransformCommand
+    internal class GenerateTransformCommand
     {
         private const char sectionDelimiter = '/';
         private readonly IMessaging messaging;
@@ -62,10 +62,6 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Creates a transform by diffing two outputs.
         /// </summary>
-        /// <param name="targetOutput">The target output.</param>
-        /// <param name="updatedOutput">The updated output.</param>
-        /// <param name="validationFlags"></param>
-        /// <returns>The transform.</returns>
         public WindowsInstallerData Execute()
         {
             var targetOutput = this.TargetOutput;

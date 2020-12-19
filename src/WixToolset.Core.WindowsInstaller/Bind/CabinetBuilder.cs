@@ -28,6 +28,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Instantiate a new CabinetBuilder.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="threadCount">number of threads to use</param>
         /// <param name="newCabNamesCallBackAddress">Address of Binder's callback function for Cabinet Splitting</param>
         public CabinetBuilder(IMessaging messaging, int threadCount, IntPtr newCabNamesCallBackAddress)

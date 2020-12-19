@@ -8,6 +8,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.WindowsInst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.Burn", "src\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj", "{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.ExtensionCache", "src\WixToolset.Core.ExtensionCache\WixToolset.Core.ExtensionCache.csproj", "{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{1284331E-BC6C-426D-AAAF-140C0174F875}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Extension", "src\test\Example.Extension\Example.Extension.csproj", "{C66C2503-C671-4230-8B48-1D93A8532A28}"
@@ -66,6 +68,18 @@ Global
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x64.Build.0 = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.Build.0 = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|x64.Build.0 = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Debug|x86.Build.0 = Debug|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|x64.Build.0 = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1F0DF11-87FB-4BBC-B53B-83F2CE66604A}.Release|x86.Build.0 = Release|Any CPU
 		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|x64.ActiveCfg = Debug|Any CPU

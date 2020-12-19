@@ -6,8 +6,16 @@ namespace WixToolset.Core.ExtensionCache
     using System.Collections.Generic;
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Extensions methods for adding ExtensionCache services.
+    /// </summary>
     public static class WixToolsetCoreServiceProviderExtensions
     {
+        /// <summary>
+        /// Adds ExtensionCache services.
+        /// </summary>
+        /// <param name="coreProvider"></param>
+        /// <returns></returns>
         public static IWixToolsetCoreServiceProvider AddExtensionCacheManager(this IWixToolsetCoreServiceProvider coreProvider)
         {
             var extensionManager = coreProvider.GetService<IExtensionManager>();

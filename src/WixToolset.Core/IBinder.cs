@@ -4,7 +4,7 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    public interface IBinder
+    internal interface IBinder
     {
         IBindResult Bind(IBindContext context);
     }
