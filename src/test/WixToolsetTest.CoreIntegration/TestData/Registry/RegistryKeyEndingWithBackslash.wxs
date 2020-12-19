@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MiscComponent" Guid="7C40C257-AB36-4B8C-8FD1-C56E0AC4AAEF">
+                <RegistryKey Id="reg1" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Key="Software\WBM\WB\">
+                    <RegistryValue Id="reg2" Type="string" Name="InstallationPath" Value="[INSTALLFOLDER]" />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

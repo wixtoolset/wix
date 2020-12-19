@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" />
+            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" />
+        </PackageGroup>
+        <SetVariableRef Id="Dummy" />
+    </Fragment>
+    <Fragment>
+        <SetVariable Id="Dummy" Variable="Dummy" />
+        <PackageGroup Id="Unscheduled">
+            <RollbackBoundary Id="Unscheduled1" />
+        </PackageGroup>
+    </Fragment>
+</Wix>

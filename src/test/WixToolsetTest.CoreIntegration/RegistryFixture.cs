@@ -39,7 +39,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Registry:reg04OIwIchl.9ZTjisTT6NzGSsQSM\t2\tPath\\To\\AnotherKey\tSecret\t#x\tMiscComponent",
                     "Registry:regEblTuusqFNSUQNy88zaP_UA5kIY\t2\tPath\\To\\Key\t\t1.0.1234.123\tMiscComponent",
@@ -71,7 +71,7 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Registry:regitq_Wx9LfvJuNSc2un6gIHAzr4A\t2\tPath\\To\\AnotherKey\tSecret\t#x\tMultiStringComponent",
                     "Registry:regmeTJMpOD41igfxhTcUVZ7kNG1Mo\t2\tPath\\To\\Key\t\ta[~]b[~][~]c[~]\tMultiStringComponent",
@@ -104,9 +104,42 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
-                Assert.Equal(new[]
+                WixAssert.CompareLineByLine(new[]
                 {
                     "Registry:RemoveAKeyName\t2\tAKeyName\t-\t\tRemoveRegistryKeyComp",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/4753
+        public void PopulatesRegistryTableWithoutExtraBackslash()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Registry", "RegistryKeyEndingWithBackslash.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Registry:reg1\t2\tSoftware\\WBM\\WB\t*\t\tMiscComponent",
+                    "Registry:reg2\t2\tSoftware\\WBM\\WB\tInstallationPath\t[INSTALLFOLDER]\tMiscComponent",
                 }, results);
             }
         }

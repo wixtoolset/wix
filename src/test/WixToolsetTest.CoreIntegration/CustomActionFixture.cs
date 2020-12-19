@@ -11,7 +11,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class CustomActionFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/6201
         public void CanDetectCustomActionCycle()
         {
             var folder = TestData.Get(@"TestData");

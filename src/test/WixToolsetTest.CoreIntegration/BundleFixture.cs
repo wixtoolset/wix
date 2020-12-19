@@ -245,7 +245,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/4628
         public void CantBuildWithDuplicateCacheIds()
         {
             var folder = TestData.Get(@"TestData");
@@ -271,7 +271,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/4574
         public void CantBuildWithDuplicatePayloadNames()
         {
             var folder = TestData.Get(@"TestData");
@@ -286,6 +286,58 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "BadInput", "DuplicatePayloadNames.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/6291
+        public void CantBuildWithUnscheduledPackage()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadInput", "UnscheduledPackage.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/6291
+        public void CantBuildWithUnscheduledRollbackBoundary()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadInput", "UnscheduledRollbackBoundary.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
