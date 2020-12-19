@@ -29,6 +29,7 @@ namespace WixToolset.Core.Native
         /// </summary>
         /// <param name="file">Full path to file to add to cabinet.</param>
         /// <param name="token">Name of file in cabinet.</param>
+        /// <param name="fileHash"></param>
         /// <param name="contextHandle">Handle to open cabinet.</param>
         [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
         public static extern void CreateCabAddFile(string file, string token, MSIFILEHASHINFO fileHash, IntPtr contextHandle);
@@ -101,7 +102,8 @@ namespace WixToolset.Core.Native
         /// to be exposed by .NET Frameowkr.
         /// </summary>
         /// <param name="certContext">Pointer to a CERT_CONTEXT struct with public key information to hash.</param>
-        /// <param name="fileCount">Number of file paths in array.</param>
+        /// <param name="publicKeyInfoHashed"></param>
+        /// <param name="sizePublicKeyInfoHashed"></param>
         [DllImport("winterop.dll", EntryPoint = "HashPublicKeyInfo", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
         public static extern void HashPublicKeyInfo(IntPtr certContext, byte[] publicKeyInfoHashed, ref uint sizePublicKeyInfoHashed);
 

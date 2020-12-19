@@ -481,6 +481,9 @@ namespace WixToolset.Core.Native
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IClassFactory
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [return: MarshalAs(UnmanagedType.IUnknown)]
         object CreateInstance(IntPtr unkOuter, [MarshalAs(UnmanagedType.LPStruct)] Guid iid);
     }

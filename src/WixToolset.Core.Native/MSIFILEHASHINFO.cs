@@ -10,10 +10,25 @@ namespace WixToolset.Core.Native
     [StructLayout(LayoutKind.Explicit)]
     public class MSIFILEHASHINFO
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [FieldOffset(0)] public uint FileHashInfoSize;
+        /// <summary>
+        /// 
+        /// </summary>
         [FieldOffset(4)] public int Data0;
+        /// <summary>
+        /// 
+        /// </summary>
         [FieldOffset(8)] public int Data1;
+        /// <summary>
+        /// 
+        /// </summary>
         [FieldOffset(12)] public int Data2;
+        /// <summary>
+        /// 
+        /// </summary>
         [FieldOffset(16)] public int Data3;
     }
 }

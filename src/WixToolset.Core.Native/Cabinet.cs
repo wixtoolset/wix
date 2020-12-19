@@ -15,19 +15,25 @@ namespace WixToolset.Core.Native
         private const string CompressionLevelVariable = "WIX_COMPRESSION_LEVEL";
         private static readonly char[] TextLineSplitter = new[] { '\t' };
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path">Path of cabinet</param>
         public Cabinet(string path)
         {
             this.Path = path;
         }
 
+        /// <summary>
+        /// Cabinet path.
+        /// </summary>
         public string Path { get; }
 
         /// <summary>
         /// Creates a cabinet.
         /// </summary>
-        /// <param name="cabPath">Path of cabinet to create.</param>
+        /// <param name="files">Files to compress.</param>
         /// <param name="compressionLevel">Level of compression to apply.</param>
-        /// <param name="maxFiles">Maximum number of files that will be added to cabinet.</param>
         /// <param name="maxSize">Maximum size of cabinet.</param>
         /// <param name="maxThresh">Maximum threshold for each cabinet.</param>
         public void Compress(IEnumerable<CabinetCompressFile> files, CompressionLevel compressionLevel, int maxSize = 0, int maxThresh = 0)
