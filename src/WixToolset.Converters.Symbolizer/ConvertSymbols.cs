@@ -10,6 +10,7 @@ namespace WixToolset.Converters.Symbolizer
     using WixToolset.Data.WindowsInstaller;
     using Wix3 = Microsoft.Tools.WindowsInstallerXml;
 
+#pragma warning disable 1591 // TODO: add documentation
     public static class ConvertSymbols
     {
         public static Intermediate ConvertFile(string path)
@@ -19,6 +20,7 @@ namespace WixToolset.Converters.Symbolizer
         }
 
         public static Intermediate ConvertOutput(Wix3.Output output)
+#pragma warning restore 1591
         {
             var section = new IntermediateSection(String.Empty, OutputType3ToSectionType4(output.Type), output.Codepage);
 

@@ -10,10 +10,7 @@
     <Title>WiX Toolset Converters Tuplizer</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

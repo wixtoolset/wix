@@ -7,10 +7,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\PermissionEx\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PermissionEx\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -34,7 +30,9 @@
   <ItemGroup>
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>

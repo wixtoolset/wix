@@ -17,7 +17,7 @@ namespace WixToolset.Converters
     /// <summary>
     /// WiX source code converter.
     /// </summary>
-    public class WixConverter
+    public sealed class WixConverter
     {
         private enum ConvertOperation
         {
@@ -134,6 +134,7 @@ namespace WixToolset.Converters
         /// <summary>
         /// Instantiate a new Converter class.
         /// </summary>
+        /// <param name="messaging"></param>
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="errorsAsWarnings">Test errors to display as warnings.</param>
         /// <param name="ignoreErrors">Test errors to ignore.</param>

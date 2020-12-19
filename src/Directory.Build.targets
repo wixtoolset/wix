@@ -10,6 +10,11 @@
 -->
 <Project>
   <PropertyGroup>
+    <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
+    <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <ReplacePackageReferences>true</ReplacePackageReferences>
     <TheSolutionPath Condition=" '$(NCrunch)'=='' ">$(SolutionPath)</TheSolutionPath>
     <TheSolutionPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalSolutionPath)</TheSolutionPath>
@@ -45,4 +50,7 @@
 
     </When>
   </Choose>
+
+  <Import Project="Wix.Build.targets" Condition=" Exists('Wix.Build.targets') And '$(MSBuildProjectExtension)'=='.wixproj' " />
+  <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
 </Project>

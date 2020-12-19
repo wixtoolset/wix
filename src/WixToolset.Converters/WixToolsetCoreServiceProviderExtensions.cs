@@ -4,8 +4,16 @@ namespace WixToolset.Converters
 {
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Extension methods for adding Converters services.
+    /// </summary>
     public static class WixToolsetCoreServiceProviderExtensions
     {
+        /// <summary>
+        /// Adds Converters services.
+        /// </summary>
+        /// <param name="coreProvider"></param>
+        /// <returns></returns>
         public static IWixToolsetCoreServiceProvider AddConverter(this IWixToolsetCoreServiceProvider coreProvider)
         {
             var extensionManager = coreProvider.GetService<IExtensionManager>();

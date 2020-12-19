@@ -150,7 +150,9 @@ namespace WixToolset.Converters
         /// <summary>
         /// Inspect sub-directories.
         /// </summary>
+        /// <param name="inspector"></param>
         /// <param name="directory">The directory whose sub-directories will be inspected.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>The number of errors that were found.</returns>
         private int InspectSubDirectories(Func<string, bool, int> inspector, string directory, CancellationToken cancellationToken)
         {
