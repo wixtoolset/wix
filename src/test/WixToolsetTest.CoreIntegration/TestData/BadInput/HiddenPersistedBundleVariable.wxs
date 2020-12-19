@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
-        <Variable Name="BadType" Type="doesnotexist" Value="dne" />
+        <Variable Name="BadType" Hidden="yes" Persisted="yes" Value="dne" />
     </Fragment>
 </Wix>

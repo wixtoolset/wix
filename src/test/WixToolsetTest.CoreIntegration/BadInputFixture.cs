@@ -55,5 +55,28 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(21, result.ExitCode);
             }
         }
+
+        [Fact]
+        public void BundleVariableWithHiddenPersistedIsRejected()
+        {
+            var folder = TestData.Get(@"TestData\BadInput");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "HiddenPersistedBundleVariable.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                Assert.Equal(193, result.ExitCode);
+            }
+        }
     }
 }

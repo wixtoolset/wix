@@ -3178,6 +3178,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
             }
 
+            if (hidden && persisted)
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Hidden", "yes", "Persisted"));
+            }
+
             var type = this.ValidateVariableTypeWithValue(sourceLineNumbers, node, typeValue, value);
 
             this.Core.ParseForExtensionElements(node);
