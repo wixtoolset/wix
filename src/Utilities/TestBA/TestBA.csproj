@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.44" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.45" />
   </ItemGroup>
 
   <ItemGroup>

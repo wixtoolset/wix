@@ -1,6 +1,6 @@
 {
   "msbuild-sdks": {
-    "WixToolset.Sdk": "4.0.0-build-0172"
+    "WixToolset.Sdk": "4.0.0-build-0175"
   },
   "sdk": {
     "allowPrerelease": false

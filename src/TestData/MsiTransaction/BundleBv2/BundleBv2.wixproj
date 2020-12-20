@@ -2,6 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
+    <SuppressSpecificWarnings>1151</SuppressSpecificWarnings>
     <Version>2.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
@@ -11,7 +12,7 @@
     <ProjectReference Include="..\PackageF\PackageF.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.72" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.54" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.75" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.56" />
   </ItemGroup>
 </Project>
