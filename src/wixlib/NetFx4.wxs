@@ -70,7 +70,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx40WebId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx40WebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx40WebId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40WebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>
@@ -105,7 +107,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx40RedistId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx40RedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx40RedistId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40RedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>
@@ -150,7 +154,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx40ClientWebId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx40ClientWebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx40ClientWebId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientWebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>
@@ -185,7 +191,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx40ClientRedistId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx40ClientRedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx40ClientRedistId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientRedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>

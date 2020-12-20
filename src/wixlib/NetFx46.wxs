@@ -63,7 +63,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx46WebId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx46WebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx46WebId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx46WebId)" LicenseUrl="$(var.NetFx46EulaLink)" />
   </Fragment>
@@ -104,7 +106,9 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.NetFx46RedistId)AsPrereq" />
+    <PackageGroup Id="$(var.NetFx46RedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx46RedistId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx46RedistId)" LicenseUrl="$(var.NetFx46EulaLink)" />
   </Fragment>

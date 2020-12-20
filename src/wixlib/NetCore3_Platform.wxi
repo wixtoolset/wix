@@ -57,22 +57,26 @@
         After="$(var.DotNetHomeId)" />
   </Fragment>
 
-  <!--
   <Fragment>
-    <PackageGroup Id="$(var.AspNetCoreRedistId)AsPrereq" />
+    <PackageGroup Id="$(var.AspNetCoreRedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.AspNetCoreRedistId)" />
+    </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.AspNetCoreRedistId)" />
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.AspNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="$(var.DesktopNetCoreRedistId)AsPrereq" />
+    <PackageGroup Id="$(var.DesktopNetCoreRedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.DesktopNetCoreRedistId)" />
+    </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DesktopNetCoreRedistId)" />
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DesktopNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
-  -->
 
   <Fragment>
-    <PackageGroup Id="$(var.DotNetCoreRedistId)AsPrereq" />
+    <PackageGroup Id="$(var.DotNetCoreRedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.DotNetCoreRedistId)" />
+    </PackageGroup>
 
     <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
