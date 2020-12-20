@@ -7,10 +7,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Overridable\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />

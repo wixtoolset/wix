@@ -11,11 +11,9 @@
     <AssemblyName>WixToolset.Mba.Host</AssemblyName>
     <OutputType>Library</OutputType>
     <RootNamespace>WixToolset.Mba.Host</RootNamespace>
-    <NoWarn>0693;1591</NoWarn>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <Description>Managed Bootstrapper Application entry point</Description>
     <DebugType>embedded</DebugType>
-    <NBGV_EmitThisAssemblyClass>false</NBGV_EmitThisAssemblyClass>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,7 +47,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WixToolset.Mba.Core">
-      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.44\lib\net20\WixToolset.Mba.Core.dll</HintPath>
+      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.45\lib\net20\WixToolset.Mba.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -96,8 +94,4 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets'))" />
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
-
-  <PropertyGroup Condition=" '$(CreateDocumentation)'!='false' ">
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
 </Project>

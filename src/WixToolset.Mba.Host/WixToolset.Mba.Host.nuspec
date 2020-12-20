@@ -10,6 +10,10 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <group targetFramework=".NETFramework2.0" />
+    </dependencies>
   </metadata>
 
   <files>
