@@ -8,6 +8,7 @@
     <Description>WiX Toolset .NET Framework Extension</Description>
     <Title>WiX Toolset .NET Framework Extension</Title>
     <IsTool>true</IsTool>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <ContentTargetFolders>build</ContentTargetFolders>
   </PropertyGroup>
 

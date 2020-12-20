@@ -7,10 +7,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="TestData\UsingDotNetCorePackages\BundleLatest.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingDotNetCorePackages\BundleLatest_x64.wxs" CopyToOutputDirectory="PreserveNewest" />
