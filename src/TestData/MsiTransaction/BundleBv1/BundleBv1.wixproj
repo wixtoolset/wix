@@ -8,7 +8,7 @@
     <ProjectReference Include="..\PackageBv1\PackageBv1.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.76" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.77" />
     <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.56" />
   </ItemGroup>
 </Project>
