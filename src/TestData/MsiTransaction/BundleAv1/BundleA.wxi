@@ -4,14 +4,17 @@
 <?define Version = 1.0.0.0?>
 <?endif?>
 
-<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
   <Bundle Name="~$(var.TestGroupName) - Bundle A" Version="$(var.Version)" UpgradeCode="{90ED10D5-B187-4470-B498-05D80DAB729A}" Compressed="yes">
     <Log Prefix="~$(var.TestGroupName)_BundleA" />
 
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 
+    <BootstrapperApplication>
+        <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" Theme="hyperlinkLicense" />
+    </BootstrapperApplication>
+
     <Chain>
-      <PackageGroupRef Id="TestBA" />
       <PackageGroupRef Id="BundlePackages" />
     </Chain>
   </Bundle>
