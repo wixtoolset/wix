@@ -6,10 +6,28 @@ namespace WixToolset.Mba.Core
     using System.ComponentModel;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Default implementation of <see cref="IBootstrapperCommand"/>.
+    /// </summary>
     public sealed class BootstrapperCommand : IBootstrapperCommand
     {
         private readonly string commandLine;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="display"></param>
+        /// <param name="restart"></param>
+        /// <param name="commandLine"></param>
+        /// <param name="cmdShow"></param>
+        /// <param name="resume"></param>
+        /// <param name="splashScreen"></param>
+        /// <param name="relation"></param>
+        /// <param name="passthrough"></param>
+        /// <param name="layoutDirectory"></param>
+        /// <param name="bootstrapperWorkingFolder"></param>
+        /// <param name="bootstrapperApplicationDataPath"></param>
         public BootstrapperCommand(
             LaunchAction action,
             Display display,
@@ -38,28 +56,40 @@ namespace WixToolset.Mba.Core
             this.BootstrapperApplicationDataPath = bootstrapperApplicationDataPath;
         }
 
+        /// <inheritdoc/>
         public LaunchAction Action { get; }
 
+        /// <inheritdoc/>
         public Display Display { get; }
 
+        /// <inheritdoc/>
         public Restart Restart { get; }
 
+        /// <inheritdoc/>
         public string[] CommandLineArgs => GetCommandLineArgs(this.commandLine);
 
+        /// <inheritdoc/>
         public int CmdShow { get; }
 
+        /// <inheritdoc/>
         public ResumeType Resume { get; }
 
+        /// <inheritdoc/>
         public IntPtr SplashScreen { get; }
 
+        /// <inheritdoc/>
         public RelationType Relation { get; }
 
+        /// <inheritdoc/>
         public bool Passthrough { get; }
 
+        /// <inheritdoc/>
         public string LayoutDirectory { get; }
 
+        /// <inheritdoc/>
         public string BootstrapperWorkingFolder { get; }
 
+        /// <inheritdoc/>
         public string BootstrapperApplicationDataPath { get; }
 
         /// <summary>

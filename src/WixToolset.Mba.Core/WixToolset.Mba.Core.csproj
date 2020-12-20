@@ -10,11 +10,7 @@
     <Description>Managed Bootstrapper Application Core</Description>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <IncludeSymbols>true</IncludeSymbols>
-    <NBGV_EmitThisAssemblyClass>false</NBGV_EmitThisAssemblyClass>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(UsingMicrosoftNETSdk)'!='true' and '$(CreateDocumentation)'!='false' ">
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

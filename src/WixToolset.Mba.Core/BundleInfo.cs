@@ -8,11 +8,21 @@ namespace WixToolset.Mba.Core
     using System.Xml;
     using System.Xml.XPath;
 
+    /// <summary>
+    /// Default implementation of <see cref="IBundleInfo"/>.
+    /// </summary>
     public class BundleInfo : IBundleInfo
     {
+        /// <inheritdoc/>
         public bool PerMachine { get; internal set; }
+
+        /// <inheritdoc/>
         public string Name { get; internal set; }
+
+        /// <inheritdoc/>
         public string LogVariable { get; internal set; }
+
+        /// <inheritdoc/>
         public IDictionary<string, IPackageInfo> Packages { get; internal set; }
 
         internal BundleInfo()
@@ -20,6 +30,7 @@ namespace WixToolset.Mba.Core
             this.Packages = new Dictionary<string, IPackageInfo>();
         }
 
+        /// <inheritdoc/>
         public IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e)
         {
             var package = PackageInfo.GetRelatedBundleAsPackage(e.ProductCode, e.RelationType, e.PerMachine, e.Version);
@@ -27,6 +38,11 @@ namespace WixToolset.Mba.Core
             return package;
         }
 
+        /// <summary>
+        /// Parses BA manifest from the given stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
         public static IBundleInfo ParseBundleFromStream(Stream stream)
         {
             XPathDocument manifest = new XPathDocument(stream);
@@ -34,6 +50,11 @@ namespace WixToolset.Mba.Core
             return ParseBundleFromXml(root);
         }
 
+        /// <summary>
+        /// Parses BA manifest from the given <see cref="XPathNavigator"/>.
+        /// </summary>
+        /// <param name="root">The root of the BA manifest.</param>
+        /// <returns></returns>
         public static IBundleInfo ParseBundleFromXml(XPathNavigator root)
         {
             BundleInfo bundle = new BundleInfo();

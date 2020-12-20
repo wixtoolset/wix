@@ -6,6 +6,9 @@ namespace WixToolset.Mba.Core
     using System.ComponentModel;
     using System.Security;
 
+    /// <summary>
+    /// High level abstraction over the <see cref="IBootstrapperEngine"/> interface.
+    /// </summary>
     public interface IEngine
     {
         /// <summary>

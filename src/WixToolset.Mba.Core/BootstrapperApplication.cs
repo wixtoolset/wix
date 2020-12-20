@@ -34,347 +34,202 @@ namespace WixToolset.Mba.Core
             this.asyncExecution = true;
         }
 
-        /// <summary>
-        /// Fired when the engine is starting up the bootstrapper application.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<StartupEventArgs> Startup;
 
-        /// <summary>
-        /// Fired when the engine is shutting down the bootstrapper application.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ShutdownEventArgs> Shutdown;
 
-        /// <summary>
-        /// Fired when the system is shutting down or user is logging off.
-        /// </summary>
-        /// <remarks>
-        /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
-        /// true; otherwise, set it to false.</para>
-        /// <para>By default setup will prevent shutting down or logging off between
-        /// <see cref="BootstrapperApplication.ApplyBegin"/> and <see cref="BootstrapperApplication.ApplyComplete"/>.
-        /// Derivatives can change this behavior by overriding <see cref="BootstrapperApplication.OnSystemShutdown"/>
-        /// or handling <see cref="BootstrapperApplication.SystemShutdown"/>.</para>
-        /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
-        /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
-        /// critical operations before being closed by the operating system.</para>
-        /// <para>This event may be fired on a different thread.</para>
-        /// </remarks>
+        /// <inheritdoc/>
         public event EventHandler<SystemShutdownEventArgs> SystemShutdown;
 
-        /// <summary>
-        /// Fired when the overall detection phase has begun.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectBeginEventArgs> DetectBegin;
 
-        /// <summary>
-        /// Fired when a forward compatible bundle is detected.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectForwardCompatibleBundleEventArgs> DetectForwardCompatibleBundle;
 
-        /// <summary>
-        /// Fired when the update detection phase has begun.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectUpdateBeginEventArgs> DetectUpdateBegin;
 
-        /// <summary>
-        /// Fired when the update detection has found a potential update candidate.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectUpdateEventArgs> DetectUpdate;
 
-        /// <summary>
-        /// Fired when the update detection phase has completed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectUpdateCompleteEventArgs> DetectUpdateComplete;
 
-        /// <summary>
-        /// Fired when a related bundle has been detected for a bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectRelatedBundleEventArgs> DetectRelatedBundle;
 
-        /// <summary>
-        /// Fired when the detection for a specific package has begun.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectPackageBeginEventArgs> DetectPackageBegin;
 
-        /// <summary>
-        /// Fired when a package was not detected but a package using the same provider key was.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectCompatibleMsiPackageEventArgs> DetectCompatibleMsiPackage;
-
-        /// <summary>
-        /// Fired when a related MSI package has been detected for a package.
-        /// </summary>
+        
+        /// <inheritdoc/>
         public event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
 
-        /// <summary>
-        /// Fired when an MSP package detects a target MSI has been detected.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectTargetMsiPackageEventArgs> DetectTargetMsiPackage;
 
-        /// <summary>
-        /// Fired when a feature in an MSI package has been detected.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectMsiFeatureEventArgs> DetectMsiFeature;
 
-        /// <summary>
-        /// Fired when the detection for a specific package has completed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectPackageCompleteEventArgs> DetectPackageComplete;
 
-        /// <summary>
-        /// Fired when the detection phase has completed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DetectCompleteEventArgs> DetectComplete;
 
-        /// <summary>
-        /// Fired when the engine has begun planning the installation.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanBeginEventArgs> PlanBegin;
 
-        /// <summary>
-        /// Fired when the engine has begun planning for a related bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
-        /// <summary>
-        /// Fired when the engine has begun planning the installation of a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
 
-        /// <summary>
-        /// Fired when the engine plans a new, compatible package using the same provider key.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanCompatibleMsiPackageBeginEventArgs> PlanCompatibleMsiPackageBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed planning the installation of a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> PlanCompatibleMsiPackageComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to plan the target MSI of a MSP package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanTargetMsiPackageEventArgs> PlanTargetMsiPackage;
 
-        /// <summary>
-        /// Fired when the engine is about to plan a feature in an MSI package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanMsiFeatureEventArgs> PlanMsiFeature;
 
-        /// <summary>
-        /// Fired when the engine is planning an MSI or MSP package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanMsiPackageEventArgs> PlanMsiPackage;
 
-        /// <summary>
-        /// Fired when the engine has completed planning the installation of a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanPackageCompleteEventArgs> PlanPackageComplete;
 
-        /// <summary>
-        /// Fired when the engine has completed planning the installation.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PlanCompleteEventArgs> PlanComplete;
 
-        /// <summary>
-        /// Fired when the engine has begun installing the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ApplyBeginEventArgs> ApplyBegin;
 
-        /// <summary>
-        /// Fired when the engine is about to start the elevated process.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ElevateBeginEventArgs> ElevateBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed starting the elevated process.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ElevateCompleteEventArgs> ElevateComplete;
 
-        /// <summary>
-        /// Fired when the engine has changed progress for the bundle installation.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ProgressEventArgs> Progress;
 
-        /// <summary>
-        /// Fired when the engine has encountered an error.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ErrorEventArgs> Error;
 
-        /// <summary>
-        /// Fired when the engine has begun registering the location and visibility of the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<RegisterBeginEventArgs> RegisterBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed registering the location and visibility of the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<RegisterCompleteEventArgs> RegisterComplete;
 
-        /// <summary>
-        /// Fired when the engine has begun removing the registration for the location and visibility of the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<UnregisterBeginEventArgs> UnregisterBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed removing the registration for the location and visibility of the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<UnregisterCompleteEventArgs> UnregisterComplete;
 
-        /// <summary>
-        /// Fired when the engine has begun caching the installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheBeginEventArgs> CacheBegin;
 
-        /// <summary>
-        /// Fired when the engine has begun caching a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CachePackageBeginEventArgs> CachePackageBegin;
 
-        /// <summary>
-        /// Fired when the engine has begun acquiring the installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheAcquireBeginEventArgs> CacheAcquireBegin;
 
-        /// <summary>
-        /// Fired when the engine has progress acquiring the installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheAcquireProgressEventArgs> CacheAcquireProgress;
 
-        /// <summary>
-        /// Fired by the engine to allow the BA to change the source
-        /// using <see cref="M:Engine.SetLocalSource"/> or <see cref="M:Engine.SetDownloadSource"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ResolveSourceEventArgs> ResolveSource;
 
-        /// <summary>
-        /// Fired when the engine has completed the acquisition of the installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
 
-        /// <summary>
-        /// Fired when the engine begins the verification of the acquired installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheVerifyBeginEventArgs> CacheVerifyBegin;
 
-        /// <summary>
-        /// Fired when the engine complete the verification of the acquired installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheVerifyCompleteEventArgs> CacheVerifyComplete;
 
-        /// <summary>
-        /// Fired when the engine has completed caching a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CachePackageCompleteEventArgs> CachePackageComplete;
 
-        /// <summary>
-        /// Fired after the engine has cached the installation sources.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CacheCompleteEventArgs> CacheComplete;
 
-        /// <summary>
-        /// Fired when the engine has begun installing packages.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecuteBeginEventArgs> ExecuteBegin;
 
-        /// <summary>
-        /// Fired when the engine has begun installing a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecutePackageBeginEventArgs> ExecutePackageBegin;
 
-        /// <summary>
-        /// Fired when the engine executes one or more patches targeting a product.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecutePatchTargetEventArgs> ExecutePatchTarget;
 
-        /// <summary>
-        /// Fired when Windows Installer sends an installation message.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecuteMsiMessageEventArgs> ExecuteMsiMessage;
 
-        /// <summary>
-        /// Fired when Windows Installer sends a files in use installation message.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecuteFilesInUseEventArgs> ExecuteFilesInUse;
 
-        /// <summary>
-        /// Fired when the engine has completed installing a specific package.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecutePackageCompleteEventArgs> ExecutePackageComplete;
 
-        /// <summary>
-        /// Fired when the engine has completed installing packages.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecuteCompleteEventArgs> ExecuteComplete;
 
-        /// <summary>
-        /// Fired when the engine has completed installing the bundle.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ApplyCompleteEventArgs> ApplyComplete;
 
-        /// <summary>
-        /// Fired by the engine while executing on payload.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExecuteProgressEventArgs> ExecuteProgress;
 
-        /// <summary>
-        /// Fired when the engine is about to launch the preapproved executable.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<LaunchApprovedExeBeginEventArgs> LaunchApprovedExeBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed launching the preapproved executable.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<LaunchApprovedExeCompleteEventArgs> LaunchApprovedExeComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to begin an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<BeginMsiTransactionBeginEventArgs> BeginMsiTransactionBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed beginning an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<BeginMsiTransactionCompleteEventArgs> BeginMsiTransactionComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to commit an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CommitMsiTransactionBeginEventArgs> CommitMsiTransactionBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed comitting an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<CommitMsiTransactionCompleteEventArgs> CommitMsiTransactionComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to rollback an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<RollbackMsiTransactionBeginEventArgs> RollbackMsiTransactionBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed rolling back an MSI transaction.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<RollbackMsiTransactionCompleteEventArgs> RollbackMsiTransactionComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to pause Windows automatic updates.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PauseAutomaticUpdatesBeginEventArgs> PauseAutomaticUpdatesBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed pausing Windows automatic updates.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<PauseAutomaticUpdatesCompleteEventArgs> PauseAutomaticUpdatesComplete;
 
-        /// <summary>
-        /// Fired when the engine is about to take a system restore point.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<SystemRestorePointBeginEventArgs> SystemRestorePointBegin;
 
-        /// <summary>
-        /// Fired when the engine has completed taking a system restore point.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<SystemRestorePointCompleteEventArgs> SystemRestorePointComplete;
 
         /// <summary>
@@ -383,7 +238,7 @@ namespace WixToolset.Mba.Core
         protected abstract void Run();
 
         /// <summary>
-        /// Called by the engine on startup of the bootstrapper application.
+        /// Called by the engine, raises the <see cref="Startup"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnStartup(StartupEventArgs args)
@@ -410,7 +265,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine to uninitialize the BA.
+        /// Called by the engine, raises the <see cref="Shutdown"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnShutdown(ShutdownEventArgs args)
@@ -423,21 +278,9 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the system is shutting down or the user is logging off.
+        /// Called by the engine, raises the <see cref="SystemShutdown"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        /// <remarks>
-        /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
-        /// true; otherwise, set it to false.</para>
-        /// <para>By default setup will prevent shutting down or logging off between
-        /// <see cref="BootstrapperApplication.ApplyBegin"/> and <see cref="BootstrapperApplication.ApplyComplete"/>.
-        /// Derivatives can change this behavior by overriding <see cref="BootstrapperApplication.OnSystemShutdown"/>
-        /// or handling <see cref="BootstrapperApplication.SystemShutdown"/>.</para>
-        /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
-        /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
-        /// critical operations before being closed by the operating system.</para>
-        /// <para>This method may be called on a different thread.</para>
-        /// </remarks>
         protected virtual void OnSystemShutdown(SystemShutdownEventArgs args)
         {
             EventHandler<SystemShutdownEventArgs> handler = this.SystemShutdown;
@@ -454,7 +297,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the overall detection phase has begun.
+        /// Called by the engine, raises the <see cref="DetectBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectBegin(DetectBeginEventArgs args)
@@ -467,7 +310,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the update detection phase has begun.
+        /// Called by the engine, raises the <see cref="DetectForwardCompatibleBundle"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectForwardCompatibleBundle(DetectForwardCompatibleBundleEventArgs args)
@@ -480,7 +323,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the update detection phase has begun.
+        /// Called by the engine, raises the <see cref="DetectUpdateBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)
@@ -493,7 +336,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Fired when the update detection has found a potential update candidate.
+        /// Called by the engine, raises the <see cref="DetectUpdate"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectUpdate(DetectUpdateEventArgs args)
@@ -506,7 +349,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the update detection phase has completed.
+        /// Called by the engine, raises the <see cref="DetectUpdateComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectUpdateComplete(DetectUpdateCompleteEventArgs args)
@@ -519,7 +362,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when a related bundle has been detected for a bundle.
+        /// Called by the engine, raises the <see cref="DetectRelatedBundle"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectRelatedBundle(DetectRelatedBundleEventArgs args)
@@ -532,7 +375,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the detection for a specific package has begun.
+        /// Called by the engine, raises the <see cref="DetectPackageBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectPackageBegin(DetectPackageBeginEventArgs args)
@@ -545,7 +388,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when a package was not detected but a package using the same provider key was.
+        /// Called by the engine, raises the <see cref="DetectCompatibleMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectCompatibleMsiPackage(DetectCompatibleMsiPackageEventArgs args)
@@ -558,7 +401,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when a related MSI package has been detected for a package.
+        /// Called by the engine, raises the <see cref="DetectRelatedMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectRelatedMsiPackage(DetectRelatedMsiPackageEventArgs args)
@@ -571,7 +414,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when an MSP package detects a target MSI has been detected.
+        /// Called by the engine, raises the <see cref="DetectTargetMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectTargetMsiPackage(DetectTargetMsiPackageEventArgs args)
@@ -584,7 +427,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when an MSI feature has been detected for a package.
+        /// Called by the engine, raises the <see cref="DetectMsiFeature"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectMsiFeature(DetectMsiFeatureEventArgs args)
@@ -597,7 +440,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the detection for a specific package has completed.
+        /// Called by the engine, raises the <see cref="DetectPackageComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectPackageComplete(DetectPackageCompleteEventArgs args)
@@ -610,7 +453,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the detection phase has completed.
+        /// Called by the engine, raises the <see cref="DetectComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnDetectComplete(DetectCompleteEventArgs args)
@@ -623,7 +466,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun planning the installation.
+        /// Called by the engine, raises the <see cref="PlanBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanBegin(PlanBeginEventArgs args)
@@ -636,7 +479,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun planning for a prior bundle.
+        /// Called by the engine, raises the <see cref="PlanRelatedBundle"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanRelatedBundle(PlanRelatedBundleEventArgs args)
@@ -649,7 +492,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun planning the installation of a specific package.
+        /// Called by the engine, raises the <see cref="PlanPackageBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanPackageBegin(PlanPackageBeginEventArgs args)
@@ -662,7 +505,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine plans a new, compatible package using the same provider key.
+        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanCompatibleMsiPackageBegin(PlanCompatibleMsiPackageBeginEventArgs args)
@@ -675,7 +518,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed planning the installation of a specific package.
+        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanCompatibleMsiPackageComplete(PlanCompatibleMsiPackageCompleteEventArgs args)
@@ -688,7 +531,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine is about to plan the target MSI of a MSP package.
+        /// Called by the engine, raises the <see cref="PlanTargetMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanTargetMsiPackage(PlanTargetMsiPackageEventArgs args)
@@ -701,7 +544,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine is about to plan an MSI feature of a specific package.
+        /// Called by the engine, raises the <see cref="PlanMsiFeature"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanMsiFeature(PlanMsiFeatureEventArgs args)
@@ -714,7 +557,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine is planning an MSI or MSP package.
+        /// Called by the engine, raises the <see cref="PlanMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanMsiPackage(PlanMsiPackageEventArgs args)
@@ -727,7 +570,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when then engine has completed planning the installation of a specific package.
+        /// Called by the engine, raises the <see cref="PlanPackageComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanPackageComplete(PlanPackageCompleteEventArgs args)
@@ -740,7 +583,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed planning the installation.
+        /// Called by the engine, raises the <see cref="PlanComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPlanComplete(PlanCompleteEventArgs args)
@@ -753,7 +596,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun installing the bundle.
+        /// Called by the engine, raises the <see cref="ApplyBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnApplyBegin(ApplyBeginEventArgs args)
@@ -766,7 +609,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine is about to start the elevated process.
+        /// Called by the engine, raises the <see cref="ElevateBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnElevateBegin(ElevateBeginEventArgs args)
@@ -779,7 +622,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed starting the elevated process.
+        /// Called by the engine, raises the <see cref="ElevateComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnElevateComplete(ElevateCompleteEventArgs args)
@@ -792,7 +635,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has changed progress for the bundle installation.
+        /// Called by the engine, raises the <see cref="Progress"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnProgress(ProgressEventArgs args)
@@ -805,7 +648,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has encountered an error.
+        /// Called by the engine, raises the <see cref="Error"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnError(ErrorEventArgs args)
@@ -818,7 +661,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun registering the location and visibility of the bundle.
+        /// Called by the engine, raises the <see cref="RegisterBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnRegisterBegin(RegisterBeginEventArgs args)
@@ -831,7 +674,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed registering the location and visilibity of the bundle.
+        /// Called by the engine, raises the <see cref="RegisterComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnRegisterComplete(RegisterCompleteEventArgs args)
@@ -844,7 +687,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun removing the registration for the location and visibility of the bundle.
+        /// Called by the engine, raises the <see cref="UnregisterBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnUnregisterBegin(UnregisterBeginEventArgs args)
@@ -857,7 +700,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed removing the registration for the location and visibility of the bundle.
+        /// Called by the engine, raises the <see cref="UnregisterComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnUnregisterComplete(UnregisterCompleteEventArgs args)
@@ -870,7 +713,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine begins to cache the installation sources.
+        /// Called by the engine, raises the <see cref="CacheBegin"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheBegin(CacheBeginEventArgs args)
@@ -883,7 +726,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine when it begins to cache a specific package.
+        /// Called by the engine, raises the <see cref="CachePackageBegin"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCachePackageBegin(CachePackageBeginEventArgs args)
@@ -896,7 +739,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine begins to cache the container or payload.
+        /// Called by the engine, raises the <see cref="CacheAcquireBegin"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheAcquireBegin(CacheAcquireBeginEventArgs args)
@@ -909,7 +752,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has progressed on caching the container or payload.
+        /// Called by the engine, raises the <see cref="CacheAcquireProgress"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheAcquireProgress(CacheAcquireProgressEventArgs args)
@@ -922,8 +765,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine to allow the BA to change the source
-        /// using <see cref="M:Engine.SetLocalSource"/> or <see cref="M:Engine.SetDownloadSource"/>.
+        /// Called by the engine, raises the <see cref="ResolveSource"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnResolveSource(ResolveSourceEventArgs args)
@@ -936,7 +778,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine completes caching of the container or payload.
+        /// Called by the engine, raises the <see cref="CacheAcquireComplete"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheAcquireComplete(CacheAcquireCompleteEventArgs args)
@@ -949,7 +791,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has started verify the payload.
+        /// Called by the engine, raises the <see cref="CacheVerifyBegin"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheVerifyBegin(CacheVerifyBeginEventArgs args)
@@ -962,7 +804,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine completes verification of the payload.
+        /// Called by the engine, raises the <see cref="CacheVerifyComplete"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCacheVerifyComplete(CacheVerifyCompleteEventArgs args)
@@ -975,7 +817,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine completes caching a specific package.
+        /// Called by the engine, raises the <see cref="CachePackageComplete"/> event.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnCachePackageComplete(CachePackageCompleteEventArgs args)
@@ -988,7 +830,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called after the engine has cached the installation sources.
+        /// Called by the engine, raises the <see cref="CacheComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCacheComplete(CacheCompleteEventArgs args)
@@ -1001,7 +843,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun installing packages.
+        /// Called by the engine, raises the <see cref="ExecuteBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecuteBegin(ExecuteBeginEventArgs args)
@@ -1014,7 +856,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has begun installing a specific package.
+        /// Called by the engine, raises the <see cref="ExecutePackageBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecutePackageBegin(ExecutePackageBeginEventArgs args)
@@ -1027,7 +869,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine executes one or more patches targeting a product.
+        /// Called by the engine, raises the <see cref="ExecutePatchTarget"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecutePatchTarget(ExecutePatchTargetEventArgs args)
@@ -1040,7 +882,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when Windows Installer sends an installation message.
+        /// Called by the engine, raises the <see cref="ExecuteMsiMessage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecuteMsiMessage(ExecuteMsiMessageEventArgs args)
@@ -1053,7 +895,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when Windows Installer sends a file in use installation message.
+        /// Called by the engine, raises the <see cref="ExecuteFilesInUse"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecuteFilesInUse(ExecuteFilesInUseEventArgs args)
@@ -1066,7 +908,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed installing a specific package.
+        /// Called by the engine, raises the <see cref="ExecutePackageComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecutePackageComplete(ExecutePackageCompleteEventArgs args)
@@ -1079,7 +921,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed installing packages.
+        /// Called by the engine, raises the <see cref="ExecuteComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecuteComplete(ExecuteCompleteEventArgs args)
@@ -1092,7 +934,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called when the engine has completed installing the bundle.
+        /// Called by the engine, raises the <see cref="ApplyComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnApplyComplete(ApplyCompleteEventArgs args)
@@ -1105,7 +947,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine while executing on payload.
+        /// Called by the engine, raises the <see cref="ExecuteProgress"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnExecuteProgress(ExecuteProgressEventArgs args)
@@ -1118,7 +960,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before trying to launch the preapproved executable.
+        /// Called by the engine, raises the <see cref="LaunchApprovedExeBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnLaunchApprovedExeBegin(LaunchApprovedExeBeginEventArgs args)
@@ -1131,7 +973,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after trying to launch the preapproved executable.
+        /// Called by the engine, raises the <see cref="LaunchApprovedExeComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnLaunchApprovedExeComplete(LaunchApprovedExeCompleteEventArgs args)
@@ -1144,7 +986,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before beginning an MSI transaction.
+        /// Called by the engine, raises the <see cref="BeginMsiTransactionBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnBeginMsiTransactionBegin(BeginMsiTransactionBeginEventArgs args)
@@ -1157,7 +999,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after beginning an MSI transaction.
+        /// Called by the engine, raises the <see cref="BeginMsiTransactionComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnBeginMsiTransactionComplete(BeginMsiTransactionCompleteEventArgs args)
@@ -1170,7 +1012,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before committing an MSI transaction.
+        /// Called by the engine, raises the <see cref="CommitMsiTransactionBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCommitMsiTransactionBegin(CommitMsiTransactionBeginEventArgs args)
@@ -1183,7 +1025,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after committing an MSI transaction.
+        /// Called by the engine, raises the <see cref="CommitMsiTransactionComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnCommitMsiTransactionComplete(CommitMsiTransactionCompleteEventArgs args)
@@ -1196,7 +1038,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before rolling back an MSI transaction.
+        /// Called by the engine, raises the <see cref="RollbackMsiTransactionBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnRollbackMsiTransactionBegin(RollbackMsiTransactionBeginEventArgs args)
@@ -1209,7 +1051,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after rolling back an MSI transaction.
+        /// Called by the engine, raises the <see cref="RollbackMsiTransactionComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnRollbackMsiTransactionComplete(RollbackMsiTransactionCompleteEventArgs args)
@@ -1222,7 +1064,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before pausing Windows automatic updates.
+        /// Called by the engine, raises the <see cref="PauseAutomaticUpdatesBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPauseAutomaticUpdatesBegin(PauseAutomaticUpdatesBeginEventArgs args)
@@ -1235,7 +1077,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after pausing Windows automatic updates.
+        /// Called by the engine, raises the <see cref="PauseAutomaticUpdatesComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnPauseAutomaticUpdatesComplete(PauseAutomaticUpdatesCompleteEventArgs args)
@@ -1248,7 +1090,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine before taking a system restore point.
+        /// Called by the engine, raises the <see cref="SystemRestorePointBegin"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnSystemRestorePointBegin(SystemRestorePointBeginEventArgs args)
@@ -1261,7 +1103,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine after taking a system restore point.
+        /// Called by the engine, raises the <see cref="SystemRestorePointComplete"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
         protected virtual void OnSystemRestorePointComplete(SystemRestorePointCompleteEventArgs args)

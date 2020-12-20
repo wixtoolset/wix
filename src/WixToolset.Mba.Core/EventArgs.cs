@@ -163,7 +163,7 @@ namespace WixToolset.Mba.Core
     /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
     /// true; otherwise, set it to false.</para>
     /// <para>By default setup will prevent shutting down or logging off between
-    /// <see cref="BootstrapperApplication.ApplyBegin"/> and <see cref="BootstrapperApplication.ApplyComplete"/>.</para>
+    /// <see cref="IDefaultBootstrapperApplication.ApplyBegin"/> and <see cref="IDefaultBootstrapperApplication.ApplyComplete"/>.</para>
     /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
     /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
     /// critical operations before being closed by the operating system.</para>
@@ -1950,6 +1950,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class LaunchApprovedExeBeginEventArgs : CancellableHResultEventArgs
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancelRecommendation"></param>
         public LaunchApprovedExeBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1964,6 +1968,11 @@ namespace WixToolset.Mba.Core
     {
         private int processId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hrStatus"></param>
+        /// <param name="processId"></param>
         public LaunchApprovedExeCompleteEventArgs(int hrStatus, int processId)
             : base(hrStatus)
         {
@@ -1988,6 +1997,11 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <param name="cancelRecommendation"></param>
         public BeginMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2011,6 +2025,11 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <param name="hrStatus"></param>
         public BeginMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
@@ -2034,6 +2053,11 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <param name="cancelRecommendation"></param>
         public CommitMsiTransactionBeginEventArgs(string transactionId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2057,6 +2081,11 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <param name="hrStatus"></param>
         public CommitMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
@@ -2080,6 +2109,10 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
         public RollbackMsiTransactionBeginEventArgs(string transactionId)
         {
             this.transactionId = transactionId;
@@ -2102,6 +2135,11 @@ namespace WixToolset.Mba.Core
     {
         private string transactionId;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <param name="hrStatus"></param>
         public RollbackMsiTransactionCompleteEventArgs(string transactionId, int hrStatus)
             : base(hrStatus)
         {
@@ -2123,6 +2161,9 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PauseAutomaticUpdatesBeginEventArgs : HResultEventArgs
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public PauseAutomaticUpdatesBeginEventArgs()
         {
         }
@@ -2134,6 +2175,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PauseAutomaticUpdatesCompleteEventArgs : StatusEventArgs
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hrStatus"></param>
         public PauseAutomaticUpdatesCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -2146,6 +2191,9 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class SystemRestorePointBeginEventArgs : HResultEventArgs
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public SystemRestorePointBeginEventArgs()
         {
         }
@@ -2157,6 +2205,10 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class SystemRestorePointCompleteEventArgs : StatusEventArgs
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hrStatus"></param>
         public SystemRestorePointCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {

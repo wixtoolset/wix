@@ -9,7 +9,7 @@ namespace WixToolset.Mba.Core
     using System.Text;
 
     /// <summary>
-    /// Container class for the <see cref="IBootstrapperEngine"/> interface.
+    /// Default implementation of <see cref="IEngine"/>.
     /// </summary>
     public sealed class Engine : IEngine
     {
@@ -28,6 +28,7 @@ namespace WixToolset.Mba.Core
             this.engine = engine;
         }
 
+        /// <inheritdoc/>
         public int PackageCount
         {
             get
@@ -39,22 +40,26 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public void Apply(IntPtr hwndParent)
         {
             this.engine.Apply(hwndParent);
         }
 
+        /// <inheritdoc/>
         public void CloseSplashScreen()
         {
             this.engine.CloseSplashScreen();
         }
 
+        /// <inheritdoc/>
         public int CompareVersions(string version1, string version2)
         {
             this.engine.CompareVersions(version1, version2, out var result);
             return result;
         }
 
+        /// <inheritdoc/>
         public bool ContainsVariable(string name)
         {
             int capacity = 0;
@@ -62,16 +67,19 @@ namespace WixToolset.Mba.Core
             return NativeMethods.E_NOTFOUND != ret;
         }
 
+        /// <inheritdoc/>
         public void Detect()
         {
             this.Detect(IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public void Detect(IntPtr hwndParent)
         {
             this.engine.Detect(hwndParent);
         }
 
+        /// <inheritdoc/>
         public bool Elevate(IntPtr hwndParent)
         {
             int ret = this.engine.Elevate(hwndParent);
@@ -90,6 +98,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public string EscapeString(string input)
         {
             int capacity = InitialBufferSize;
@@ -111,6 +120,7 @@ namespace WixToolset.Mba.Core
             return sb.ToString();
         }
 
+        /// <inheritdoc/>
         public bool EvaluateCondition(string condition)
         {
             bool value;
@@ -119,6 +129,7 @@ namespace WixToolset.Mba.Core
             return value;
         }
 
+        /// <inheritdoc/>
         public string FormatString(string format)
         {
             int capacity = InitialBufferSize;
@@ -140,6 +151,7 @@ namespace WixToolset.Mba.Core
             return sb.ToString();
         }
 
+        /// <inheritdoc/>
         public long GetVariableNumeric(string name)
         {
             int ret = this.engine.GetVariableNumeric(name, out long value);
@@ -151,6 +163,7 @@ namespace WixToolset.Mba.Core
             return value;
         }
 
+        /// <inheritdoc/>
         public SecureString GetVariableSecureString(string name)
         {
             var pUniString = this.getStringVariable(name, out var length);
@@ -167,6 +180,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public string GetVariableString(string name)
         {
             int length;
@@ -184,6 +198,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public string GetVariableVersion(string name)
         {
             int length;
@@ -201,46 +216,55 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public void LaunchApprovedExe(IntPtr hwndParent, string approvedExeForElevationId, string arguments)
         {
             this.LaunchApprovedExe(hwndParent, approvedExeForElevationId, arguments, 0);
         }
 
+        /// <inheritdoc/>
         public void LaunchApprovedExe(IntPtr hwndParent, string approvedExeForElevationId, string arguments, int waitForInputIdleTimeout)
         {
             this.engine.LaunchApprovedExe(hwndParent, approvedExeForElevationId, arguments, waitForInputIdleTimeout);
         }
+        /// <inheritdoc/>
 
         public void Log(LogLevel level, string message)
         {
             this.engine.Log(level, message);
         }
 
+        /// <inheritdoc/>
         public void Plan(LaunchAction action)
         {
             this.engine.Plan(action);
         }
 
+        /// <inheritdoc/>
         public void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, byte[] hash)
         {
             this.engine.SetUpdate(localSource, downloadSource, size, hashType, hash, null == hash ? 0 : hash.Length);
         }
 
+        /// <inheritdoc/>
         public void SetLocalSource(string packageOrContainerId, string payloadId, string path)
         {
             this.engine.SetLocalSource(packageOrContainerId, payloadId, path);
         }
 
+        /// <inheritdoc/>
         public void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password)
         {
             this.engine.SetDownloadSource(packageOrContainerId, payloadId, url, user, password);
         }
 
+        /// <inheritdoc/>
         public void SetVariableNumeric(string name, long value)
         {
             this.engine.SetVariableNumeric(name, value);
         }
 
+        /// <inheritdoc/>
         public void SetVariableString(string name, SecureString value, bool formatted)
         {
             IntPtr pValue = Marshal.SecureStringToCoTaskMemUnicode(value);
@@ -254,6 +278,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public void SetVariableString(string name, string value, bool formatted)
         {
             IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
@@ -267,6 +292,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public void SetVariableVersion(string name, string value)
         {
             IntPtr pValue = Marshal.StringToCoTaskMemUni(value);
@@ -280,6 +306,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <inheritdoc/>
         public int SendEmbeddedError(int errorCode, string message, int uiHint)
         {
             int result = 0;
@@ -287,6 +314,7 @@ namespace WixToolset.Mba.Core
             return result;
         }
 
+        /// <inheritdoc/>
         public int SendEmbeddedProgress(int progressPercentage, int overallPercentage)
         {
             int result = 0;
@@ -294,6 +322,7 @@ namespace WixToolset.Mba.Core
             return result;
         }
 
+        /// <inheritdoc/>
         public void Quit(int exitCode)
         {
             this.engine.Quit(exitCode);
@@ -423,6 +452,11 @@ namespace WixToolset.Mba.Core
             return value;
         }
 
+        /// <summary>
+        /// Utility method for converting a <see cref="Version"/> into a <see cref="long"/>.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public static long VersionToLong(Version version)
         {
             // In Windows, each version component has a max value of 65535,
@@ -435,6 +469,11 @@ namespace WixToolset.Mba.Core
             return major | minor | build | revision;
         }
 
+        /// <summary>
+        /// Utility method for converting a <see cref="long"/> into a <see cref="Version"/>.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public static Version LongToVersion(long version)
         {
             int major = (int)((version & ((long)0xffff << 48)) >> 48);
@@ -446,7 +485,7 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Verifies that VersionVariables can pass on the given Version to the engine.
+        /// Verifies that Version can be represented in a <see cref="long"/>.
         /// If the Build or Revision fields are undefined, they are set to zero.
         /// </summary>
         public static Version NormalizeVersion(Version version)

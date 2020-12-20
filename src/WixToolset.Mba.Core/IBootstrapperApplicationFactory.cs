@@ -6,12 +6,20 @@ namespace WixToolset.Mba.Core
     using System.CodeDom.Compiler;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Interface used by WixToolset.Mba.Host to dynamically load the BA.
+    /// </summary>
     [ComVisible(true)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [Guid("2965A12F-AC7B-43A0-85DF-E4B2168478A4")]
     [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
     public interface IBootstrapperApplicationFactory
     {
+        /// <summary>
+        /// Low level method called by the native host.
+        /// </summary>
+        /// <param name="pArgs"></param>
+        /// <param name="pResults"></param>
         void Create(
             IntPtr pArgs,
             IntPtr pResults
@@ -21,7 +29,7 @@ namespace WixToolset.Mba.Core
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
-    public struct Command
+    internal struct Command
     {
         // Strings must be declared as pointers so that Marshaling doesn't free them.
         [MarshalAs(UnmanagedType.I4)] internal int cbSize;
@@ -53,27 +61,6 @@ namespace WixToolset.Mba.Core
                 Marshal.PtrToStringUni(this.wzLayoutDirectory),
                 Marshal.PtrToStringUni(this.wzBootstrapperWorkingFolder),
                 Marshal.PtrToStringUni(this.wzBootstrapperApplicationDataPath));
-        }
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
-    public struct BootstrapperCreateArgs
-    {
-        [MarshalAs(UnmanagedType.I4)] public readonly int cbSize;
-        [MarshalAs(UnmanagedType.I8)] public readonly long qwEngineAPIVersion;
-        public readonly IntPtr pfnBootstrapperEngineProc;
-        public readonly IntPtr pvBootstrapperEngineProcContext;
-        public readonly IntPtr pCommand;
-
-        public BootstrapperCreateArgs(long version, IntPtr pEngineProc, IntPtr pEngineContext, IntPtr pCommand)
-        {
-            this.cbSize = Marshal.SizeOf(typeof(BootstrapperCreateArgs));
-            this.qwEngineAPIVersion = version;
-            this.pfnBootstrapperEngineProc = pEngineProc;
-            this.pvBootstrapperEngineProcContext = pEngineContext;
-            this.pCommand = pCommand;
         }
     }
 }

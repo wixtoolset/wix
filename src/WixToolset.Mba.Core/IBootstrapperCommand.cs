@@ -33,6 +33,9 @@ namespace WixToolset.Mba.Core
         /// <exception type="Win32Exception">The command line could not be parsed into an array.</exception>
         string[] CommandLineArgs { get; }
 
+        /// <summary>
+        /// Hint for the initial visibility of the window.
+        /// </summary>
         int CmdShow { get; }
 
         /// <summary>

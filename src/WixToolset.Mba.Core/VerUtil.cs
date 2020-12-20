@@ -6,6 +6,9 @@ namespace WixToolset.Mba.Core
     using System.Runtime.InteropServices;
     using System.Text;
 
+    /// <summary>
+    /// Managed wrapper for verutil.
+    /// </summary>
     public static class VerUtil
     {
         [DllImport("mbanative.dll", ExactSpelling = true, PreserveSig = false)]
@@ -105,18 +108,34 @@ namespace WixToolset.Mba.Core
             return VerCompareStringVersions(version1, version2, strict);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public static VerUtilVersion CopyVersion(VerUtilVersion version)
         {
             var handle = VerCopyVersion(version.GetHandle());
             return new VerUtilVersion(handle);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="strict">Whether to throw exception on invalid version.</param>
+        /// <returns></returns>
         public static VerUtilVersion ParseVersion(string version, bool strict)
         {
             var handle = VerParseVersion(version, 0, strict);
             return new VerUtilVersion(handle);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public static VerUtilVersion VersionFromQword(long version)
         {
             var handle = VerVersionFromQword(version);

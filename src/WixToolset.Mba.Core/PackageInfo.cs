@@ -7,46 +7,133 @@ namespace WixToolset.Mba.Core
     using System.Xml;
     using System.Xml.XPath;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum CacheType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         No,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Yes,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Always,
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum PackageType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Unknown,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Exe,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Msi,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Msp,
+
+        /// <summary>
+        /// 
+        /// </summary>
         Msu,
+
+        /// <summary>
+        /// 
+        /// </summary>
         UpgradeBundle,
+
+        /// <summary>
+        /// 
+        /// </summary>
         AddonBundle,
+
+        /// <summary>
+        /// 
+        /// </summary>
         PatchBundle,
     }
 
+    /// <summary>
+    /// Default implementation of <see cref="IPackageInfo"/>.
+    /// </summary>
     public class PackageInfo : IPackageInfo
     {
+        /// <inheritdoc/>
         public string Id { get; internal set; }
+
+        /// <inheritdoc/>
         public string DisplayName { get; internal set; }
+
+        /// <inheritdoc/>
         public string Description { get; internal set; }
+
+        /// <inheritdoc/>
         public PackageType Type { get; internal set; }
+
+        /// <inheritdoc/>
         public bool Permanent { get; internal set; }
+
+        /// <inheritdoc/>
         public bool Vital { get; internal set; }
+
+        /// <inheritdoc/>
         public string DisplayInternalUICondition { get; internal set; }
+
+        /// <inheritdoc/>
         public string ProductCode { get; internal set; }
+
+        /// <inheritdoc/>
         public string UpgradeCode { get; internal set; }
+
+        /// <inheritdoc/>
         public string Version { get; internal set; }
+
+        /// <inheritdoc/>
         public string InstallCondition { get; internal set; }
+
+        /// <inheritdoc/>
         public CacheType CacheType { get; internal set; }
+
+        /// <inheritdoc/>
         public bool PrereqPackage { get; internal set; }
+
+        /// <inheritdoc/>
         public string PrereqLicenseFile { get; internal set; }
+
+        /// <inheritdoc/>
         public string PrereqLicenseUrl { get; internal set; }
+
+        /// <inheritdoc/>
         public object CustomData { get; set; }
 
         internal PackageInfo() { }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
         public static IDictionary<string, IPackageInfo> ParsePackagesFromXml(XPathNavigator root)
         {
             var packagesById = new Dictionary<string, IPackageInfo>();
@@ -105,6 +192,12 @@ namespace WixToolset.Mba.Core
             return packagesById;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="attributeName"></param>
+        /// <returns></returns>
         public static CacheType? GetCacheTypeAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = BootstrapperApplicationData.GetAttribute(node, attributeName);
@@ -128,6 +221,12 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="attributeName"></param>
+        /// <returns></returns>
         public static PackageType? GetPackageTypeAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = BootstrapperApplicationData.GetAttribute(node, attributeName);
@@ -159,6 +258,14 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="relationType"></param>
+        /// <param name="perMachine"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public static IPackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, string version)
         {
             PackageInfo package = new PackageInfo();

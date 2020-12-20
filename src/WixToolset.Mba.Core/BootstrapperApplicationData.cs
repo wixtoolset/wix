@@ -6,12 +6,29 @@ namespace WixToolset.Mba.Core
     using System.IO;
     using System.Xml.XPath;
 
+    /// <summary>
+    /// Utility class for reading BootstrapperApplicationData.xml.
+    /// </summary>
     public class BootstrapperApplicationData : IBootstrapperApplicationData
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public const string DefaultFileName = "BootstrapperApplicationData.xml";
+
+        /// <summary>
+        /// 
+        /// </summary>
         public const string XMLNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
 
+        /// <summary>
+        /// The default path of where the BA was extracted to.
+        /// </summary>
         public static readonly DirectoryInfo DefaultFolder;
+
+        /// <summary>
+        /// The default path to BootstrapperApplicationData.xml.
+        /// </summary>
         public static readonly FileInfo DefaultFile;
 
         static BootstrapperApplicationData()
@@ -20,12 +37,21 @@ namespace WixToolset.Mba.Core
             DefaultFile = new FileInfo(Path.Combine(DefaultFolder.FullName, DefaultFileName));
         }
 
+        /// <inheritdoc/>
         public FileInfo BADataFile { get; private set; }
 
+        /// <inheritdoc/>
         public IBundleInfo Bundle { get; private set; }
 
+        /// <summary>
+        /// Uses the default location for BootstrapperApplicationData.xml.
+        /// </summary>
         public BootstrapperApplicationData() : this(DefaultFile) { }
 
+        /// <summary>
+        /// Uses the given file for BootstrapperApplicationData.xml.
+        /// </summary>
+        /// <param name="baDataFile"></param>
         public BootstrapperApplicationData(FileInfo baDataFile)
         {
             this.BADataFile = baDataFile;
@@ -36,6 +62,12 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Utility method for parsing BootstrapperApplicationData.xml.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="attributeName"></param>
+        /// <returns></returns>
         public static string GetAttribute(XPathNavigator node, string attributeName)
         {
             XPathNavigator attribute = node.SelectSingleNode("@" + attributeName);
@@ -48,6 +80,12 @@ namespace WixToolset.Mba.Core
             return attribute.Value;
         }
 
+        /// <summary>
+        /// Utility method for parsing BootstrapperApplicationData.xml.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="attributeName"></param>
+        /// <returns></returns>
         public static bool? GetYesNoAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = GetAttribute(node, attributeName);

@@ -103,6 +103,25 @@ namespace WixToolsetTest.Mba.Core
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        public struct BootstrapperCreateArgs
+        {
+            [MarshalAs(UnmanagedType.I4)] public readonly int cbSize;
+            [MarshalAs(UnmanagedType.I8)] public readonly long qwEngineAPIVersion;
+            public readonly IntPtr pfnBootstrapperEngineProc;
+            public readonly IntPtr pvBootstrapperEngineProcContext;
+            public readonly IntPtr pCommand;
+
+            public BootstrapperCreateArgs(long version, IntPtr pEngineProc, IntPtr pEngineContext, IntPtr pCommand)
+            {
+                this.cbSize = Marshal.SizeOf(typeof(BootstrapperCreateArgs));
+                this.qwEngineAPIVersion = version;
+                this.pfnBootstrapperEngineProc = pEngineProc;
+                this.pvBootstrapperEngineProcContext = pEngineContext;
+                this.pCommand = pCommand;
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         public struct TestCreateResults
         {
             public int cbSize;
