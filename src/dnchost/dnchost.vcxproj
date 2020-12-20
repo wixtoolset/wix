@@ -72,6 +72,9 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(BaseOutputPath)obj;$(NetHostPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>      
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Dnc.Host\WixToolset.Dnc.Host.csproj">

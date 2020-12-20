@@ -8,7 +8,7 @@
   <ItemGroup>
     <BindInputPaths Include="..\wixstdba\Resources\" />
     <BindInputPaths Include="$(OutputPath)netcoreapp3.1" />
-    <BindInputPaths Include="$(OutputPath)" />
+    <BindInputPaths Include="$(OutputPath)net20" />
     <BindInputPaths Include="$(OutputPath)x86" BindName="x86" />
     <BindInputPaths Include="$(OutputPath)x64" BindName="x64" />
     <BindInputPaths Include="$(OutputPath)arm64" BindName="arm64" />

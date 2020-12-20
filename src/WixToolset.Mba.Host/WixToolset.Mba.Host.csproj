@@ -1,62 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.props')" />
-  <Import Project="..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.props')" />
-  <Import Project="..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{F2BA1935-70FA-4156-B161-FD03850B4FAA}</ProjectGuid>
     <AssemblyName>WixToolset.Mba.Host</AssemblyName>
-    <OutputType>Library</OutputType>
     <RootNamespace>WixToolset.Mba.Host</RootNamespace>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworks>net20</TargetFrameworks>
     <Description>Managed Bootstrapper Application entry point</Description>
     <DebugType>embedded</DebugType>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>true</Optimize>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="BootstrapperApplicationFactory.cs" />
-    <Compile Include="BootstrapperSectionGroup.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="HostSection.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SupportedFrameworkElementCollection.cs" />
-    <Compile Include="SupportedFrameworkElement.cs" />
+    <None Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="WixToolset.Mba.Host.config" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WixToolset.Mba.Core">
-      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.45\lib\net20\WixToolset.Mba.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <HeaderPath Include="$(BaseOutputPath)obj\$(AssemblyName).h">
       <Visible>False</Visible>
     </HeaderPath>
   </ItemGroup>
-
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 
   <Target Name="GenerateIdentityHeader" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="@(HeaderPath)">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
@@ -74,24 +44,10 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack $(AssemblyName).nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=$(AssemblyName);Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
-  </Target>
-
-  <Import Project="..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.targets')" />
-  <Import Project="..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.targets')" />
-  <Import Project="..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets')" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+  <Target Name="SetNuspecProperties" AfterTargets="GetBuildVersion">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+      <NuspecProperties>Id=$(AssemblyName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl)</NuspecProperties>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Build.Tasks.Git.1.0.0\build\Microsoft.Build.Tasks.Git.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.SourceLink.Common.1.0.0\build\Microsoft.SourceLink.Common.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.SourceLink.GitHub.1.0.0\build\Microsoft.SourceLink.GitHub.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
 </Project>

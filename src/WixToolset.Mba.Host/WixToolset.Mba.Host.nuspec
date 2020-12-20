@@ -17,7 +17,7 @@
   </metadata>
 
   <files>
-    <file src="$id$.config" target="samples" />
-    <file src="..\..\build\$configuration$\$id$.dll" target="lib\net20" />
+    <file src="net20\$id$.config" target="samples" />
+    <file src="net20\$id$.dll" target="lib\net20" />
   </files>
 </package>
