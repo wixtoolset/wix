@@ -19,6 +19,8 @@
 
     <file src="netstandard2.0\$id$.dll" target="tools" />
 
-    <file src="Win32\*.pdb" target="pdbs\Win32" />
+    <file src="x86\*.pdb" target="pdbs\x86" />
+    <file src="x64\*.pdb" target="pdbs\x64" />
+    <file src="ARM64\*.pdb" target="pdbs\ARM64" />
   </files>
 </package>

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\bal.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+    <ProjectReference Include="..\wixlib\bal.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' and '$(SkipReferencesToPack)'!='true' " />
   </ItemGroup>
 
   <ItemGroup>

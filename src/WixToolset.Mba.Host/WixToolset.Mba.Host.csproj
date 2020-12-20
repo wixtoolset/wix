@@ -9,6 +9,7 @@
     <Description>Managed Bootstrapper Application entry point</Description>
     <DebugType>embedded</DebugType>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
