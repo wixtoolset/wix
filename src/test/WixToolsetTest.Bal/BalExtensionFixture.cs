@@ -42,6 +42,8 @@ namespace WixToolsetTest.Bal
                 var balPackageInfos = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
                 var balPackageInfo = (XmlNode)Assert.Single(balPackageInfos);
                 Assert.Equal("<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='1' />", balPackageInfo.GetTestXml());
+
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
             }
         }
 

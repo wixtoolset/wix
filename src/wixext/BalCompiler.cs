@@ -549,8 +549,6 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateBARef(section, sourceLineNumbers, node, "WixStandardBootstrapperApplication");
-
                 if (!String.IsNullOrEmpty(launchTarget))
                 {
                     section.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "LaunchTarget"))
@@ -674,30 +672,27 @@ namespace WixToolset.Bal
                     }
                 }
 
-                string themePayloadGroup = null;
+                var baId = "WixStandardBootstrapperApplication";
                 switch (theme)
                 {
                     case WixStandardBootstrapperApplicationTheme.HyperlinkLargeLicense:
-                        themePayloadGroup = "WixStdbaHyperlinkLargeLicensePayloads";
+                        baId = "WixStandardBootstrapperApplication.HyperlinkLargeLicense";
                         break;
                     case WixStandardBootstrapperApplicationTheme.HyperlinkLicense:
-                        themePayloadGroup = "WixStdbaHyperlinkLicensePayloads";
+                        baId = "WixStandardBootstrapperApplication.HyperlinkLicense";
                         break;
                     case WixStandardBootstrapperApplicationTheme.HyperlinkSidebarLicense:
-                        themePayloadGroup = "WixStdbaHyperlinkSidebarLicensePayloads";
+                        baId = "WixStandardBootstrapperApplication.HyperlinkSidebarLicense";
                         break;
                     case WixStandardBootstrapperApplicationTheme.RtfLargeLicense:
-                        themePayloadGroup = "WixStdbaRtfLargeLicensePayloads";
+                        baId = "WixStandardBootstrapperApplication.RtfLargeLicense";
                         break;
                     case WixStandardBootstrapperApplicationTheme.RtfLicense:
-                        themePayloadGroup = "WixStdbaRtfLicensePayloads";
+                        baId = "WixStandardBootstrapperApplication.RtfLicense";
                         break;
                 }
 
-                if (themePayloadGroup != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
-                }
+                this.CreateBARef(section, sourceLineNumbers, node, baId);
             }
         }
 
@@ -759,8 +754,6 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateBARef(section, sourceLineNumbers, node, "WixManagedBootstrapperApplicationHost");
-
                 if (!String.IsNullOrEmpty(logoFile))
                 {
                     section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaLogo"))
@@ -785,18 +778,15 @@ namespace WixToolset.Bal
                     });
                 }
 
-                string themePayloadGroup = null;
+                var baId = "WixManagedBootstrapperApplicationHost";
                 switch (theme)
                 {
                     case WixManagedBootstrapperApplicationHostTheme.Standard:
-                        themePayloadGroup = "MbaPreqStandardPayloads";
+                        baId = "WixManagedBootstrapperApplicationHost.Standard";
                         break;
                 }
 
-                if (themePayloadGroup != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
-                }
+                this.CreateBARef(section, sourceLineNumbers, node, baId);
             }
         }
 
@@ -867,8 +857,6 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateBARef(section, sourceLineNumbers, node, "WixDotNetCoreBootstrapperApplicationHost");
-
                 if (!String.IsNullOrEmpty(logoFile))
                 {
                     section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaLogo"))
@@ -901,18 +889,15 @@ namespace WixToolset.Bal
                     });
                 }
 
-                string themePayloadGroup = null;
+                var baId = "WixDotNetCoreBootstrapperApplicationHost";
                 switch (theme)
                 {
                     case WixDotNetCoreBootstrapperApplicationHostTheme.Standard:
-                        themePayloadGroup = "DncPreqStandardPayloads";
+                        baId = "WixDotNetCoreBootstrapperApplicationHost.Standard";
                         break;
                 }
 
-                if (themePayloadGroup != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, themePayloadGroup);
-                }
+                this.CreateBARef(section, sourceLineNumbers, node, baId);
             }
         }
 

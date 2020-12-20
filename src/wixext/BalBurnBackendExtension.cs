@@ -34,7 +34,7 @@ namespace WixToolset.Bal
             var intermediate = this.Context.IntermediateRepresentation;
             var section = intermediate.Sections.Single();
 
-            var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationSymbol>().SingleOrDefault();
+            var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
             var baId = baSymbol?.Id?.Id;
             if (null == baId)
             {
@@ -77,8 +77,8 @@ namespace WixToolset.Bal
             {
                 foreach (var payloadPropertiesSymbol in payloadPropertiesSymbols)
                 {
-                    // TODO: Make core WiX canonicalize Name (this won't catch '.\bafunctions.dll').
-                    if (string.Equals(payloadPropertiesSymbol.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(payloadPropertiesSymbol.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase) &&
+                        BurnConstants.BurnUXContainerName == payloadPropertiesSymbol.ContainerRef)
                     {
                         this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesSymbol.SourceLineNumbers));
                     }
