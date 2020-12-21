@@ -1774,9 +1774,24 @@ namespace WixToolset.Core
                         break;
                     case "Behavior":
                         var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (!Enum.TryParse(behaviorString, true, out behavior))
+                        switch (behaviorString)
                         {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                            case "error":
+                                behavior = ExitCodeBehaviorType.Error;
+                                break;
+                            case "forceReboot":
+                                behavior = ExitCodeBehaviorType.ForceReboot;
+                                break;
+                            case "scheduleReboot":
+                                behavior = ExitCodeBehaviorType.ScheduleReboot;
+                                break;
+                            case "success":
+                                behavior = ExitCodeBehaviorType.Success;
+                                break;
+                            default:
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                                behavior = ExitCodeBehaviorType.Success; // set value to avoid ExpectedAttribute below.
+                                break;
                         }
                         break;
                     default:
