@@ -11,8 +11,16 @@ namespace WixToolset.Core
     /// <summary>
     /// Unbinder core of the WiX toolset.
     /// </summary>
-    internal sealed class Unbinder
+    internal sealed class Unbinder : IUnbinder
     {
+        public Unbinder(IWixToolsetServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+            this.BackendFactories = extensionManager.GetServices<IBackendFactory>();
+        }
+
         public IEnumerable<IBackendFactory> BackendFactories { get; }
 
         /// <summary>

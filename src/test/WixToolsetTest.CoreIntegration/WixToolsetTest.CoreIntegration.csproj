@@ -32,6 +32,7 @@
     <Content Include="TestData\BundleExtension\BundleExtensionSearches.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleExtension\BundleWithSearches.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleExtension\SimpleBundleExtension.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithDetachedContainer\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleWithPackageGroupRef\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleWithPackageGroupRef\MinimalPackageGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\DecompiledOldClassTableDef.wxs" CopyToOutputDirectory="PreserveNewest" />

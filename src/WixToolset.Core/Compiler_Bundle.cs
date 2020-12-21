@@ -566,9 +566,17 @@ namespace WixToolset.Core
                         break;
                     case "Type":
                         var typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (!Enum.TryParse<ContainerType>(typeString, out type))
+                        switch (typeString)
                         {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
+                            case "attached":
+                                type = ContainerType.Attached;
+                                break;
+                            case "detached":
+                                type = ContainerType.Detached;
+                                break;
+                            default:
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
+                                break;
                         }
                         break;
                     default:

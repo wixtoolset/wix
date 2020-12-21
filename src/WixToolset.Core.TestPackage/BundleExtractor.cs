@@ -45,6 +45,23 @@ namespace WixToolset.Core.TestPackage
         }
 
         /// <summary>
+        /// Extracts the attached container.
+        /// </summary>
+        /// <param name="messaging"></param>
+        /// <param name="bundleFilePath">Path to the bundle.</param>
+        /// <param name="destinationFolderPath">Path to extract to.</param>
+        /// <param name="tempFolderPath">Temp path for extraction.</param>
+        /// <returns>True if there was an attached container.</returns>
+        public static bool ExtractAttachedContainer(IMessaging messaging, string bundleFilePath, string destinationFolderPath, string tempFolderPath)
+        {
+            Directory.CreateDirectory(tempFolderPath);
+            using (var burnReader = BurnReader.Open(messaging, bundleFilePath))
+            {
+                return burnReader.ExtractAttachedContainer(destinationFolderPath, tempFolderPath);
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="XmlNamespaceManager"/> for BootstrapperApplicationData.xml with the given prefix assigned to the root namespace.
         /// </summary>
         /// <param name="document"></param>

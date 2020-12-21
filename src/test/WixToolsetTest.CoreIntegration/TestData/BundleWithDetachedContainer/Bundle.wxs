@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="MinimalPackageGroup"/>
+        </PackageGroup>
+        <Container Id="_1" Type="detached">
+            <PackageGroupRef Id="MinimalPackageGroup"/>
+        </Container>
+    </Fragment>
+</Wix>

@@ -62,8 +62,9 @@ namespace WixToolset.Core.Burn
         {
             var uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
             var acExtractPath = Path.Combine(context.ExportBasePath, "AttachedContainer");
+            var messaging = context.ServiceProvider.GetService<IMessaging>();
 
-            using (var reader = BurnReader.Open(context.InputFilePath))
+            using (var reader = BurnReader.Open(messaging, context.InputFilePath))
             {
                 reader.ExtractUXContainer(uxExtractPath, context.IntermediateFolder);
                 reader.ExtractAttachedContainer(acExtractPath, context.IntermediateFolder);

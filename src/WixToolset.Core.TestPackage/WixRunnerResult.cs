@@ -28,8 +28,18 @@ namespace WixToolset.Core.TestPackage
         /// <returns></returns>
         public WixRunnerResult AssertSuccess()
         {
-            Assert.True(0 == this.ExitCode, $"\r\n\r\nWixRunner failed with exit code: {this.ExitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(this.Messages))}\r\n");
+            AssertSuccess(this.ExitCode, this.Messages);
             return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exitCode"></param>
+        /// <param name="messages"></param>
+        public static void AssertSuccess(int exitCode, IEnumerable<Message> messages)
+        {
+            Assert.True(0 == exitCode, $"\r\n\r\nWixRunner failed with exit code: {exitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(messages))}\r\n");
         }
 
         private static IEnumerable<string> FormatMessages(IEnumerable<Message> messages)
