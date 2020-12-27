@@ -31,6 +31,7 @@
       <CallingConvention Condition="'$(Platform)'=='Win32'">StdCall</CallingConvention>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ExceptionHandling>false</ExceptionHandling>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
       <AdditionalOptions>-YlprecompDefine</AdditionalOptions>
       <AdditionalOptions Condition=" $(PlatformToolset.StartsWith('v14')) ">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation Condition=" $(NUMBER_OF_PROCESSORS) &gt; 4 ">true</MultiProcessorCompilation>
@@ -80,6 +81,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition=" '$(Configuration)'=='Debug' and '$(CLRSupport)'=='true' ">
     <ClCompile>
+      <ControlFlowGuard></ControlFlowGuard>
       <BasicRuntimeChecks></BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
     </ClCompile>
@@ -99,6 +101,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition=" '$(Configuration)'=='Release' and '$(CLRSupport)'=='true' ">
     <ClCompile>
+      <ControlFlowGuard></ControlFlowGuard>
       <BasicRuntimeChecks></BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
     </ClCompile>
