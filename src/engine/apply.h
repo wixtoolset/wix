@@ -89,7 +89,7 @@ HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_opt HANDLE hCacheThread,
     __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfKeepRegistration,
+    __inout BOOL* pfKeepRegistration,
     __out BOOL* pfRollback,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart

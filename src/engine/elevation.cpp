@@ -107,7 +107,7 @@ static HRESULT ProcessApplyInitializeMessages(
     );
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
-    __in_opt LPVOID pvContext,
+    __in LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessMsiPackageMessages(
@@ -1425,7 +1425,7 @@ LExit:
 
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
-    __in_opt LPVOID pvContext,
+    __in LPVOID pvContext,
     __out DWORD* pdwResult
     )
 {

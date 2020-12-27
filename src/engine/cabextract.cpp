@@ -543,7 +543,7 @@ static INT_PTR CopyFileCallback(
 
     // copy stream name
     hr = StrAllocStringAnsi(pContext->Cabinet.psczStreamName, pFDINotify->psz1, 0, CP_UTF8);
-    ExitOnFailure(hr, "Failed to copy stream name: %ls", pFDINotify->psz1);
+    ExitOnFailure(hr, "Failed to copy stream name: %hs", pFDINotify->psz1);
 
     // set operation complete event
     if (!::SetEvent(pContext->Cabinet.hOperationCompleteEvent))

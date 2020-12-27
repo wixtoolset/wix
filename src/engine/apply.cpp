@@ -291,10 +291,12 @@ extern "C" void ApplyReset(
 
 extern "C" HRESULT ApplyLock(
     __in BOOL /*fPerMachine*/,
-    __out HANDLE* /*phLock*/
+    __out HANDLE* phLock
     )
 {
     HRESULT hr = S_OK;
+    *phLock = NULL;
+
 #if 0 // eventually figure out the correct way to support this. In its current form, embedded bundles (including related bundles) are hosed.
     DWORD er = ERROR_SUCCESS;
     HANDLE hLock = NULL;
@@ -458,6 +460,8 @@ extern "C" HRESULT ApplyCache(
     // Allow us to retry and skip packages.
     DWORD iPackageStartAction = BURN_PLAN_INVALID_ACTION_INDEX;
     DWORD iPackageCompleteAction = BURN_PLAN_INVALID_ACTION_INDEX;
+
+    *pfRollback = FALSE;
 
     hr = UserExperienceOnCacheBegin(pUX);
     ExitOnRootFailure(hr, "BA aborted cache.");
@@ -732,7 +736,7 @@ extern "C" HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_opt HANDLE hCacheThread,
     __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfKeepRegistration,
+    __inout BOOL* pfKeepRegistration,
     __out BOOL* pfRollback,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -748,6 +752,9 @@ extern "C" HRESULT ApplyExecute(
     context.pUX = &pEngineState->userExperience;
     context.cExecutePackagesTotal = pEngineState->plan.cExecutePackagesTotal;
     context.pcOverallProgressTicks = pcOverallProgressTicks;
+
+    *pfRollback = FALSE;
+    *pfSuspend = FALSE;
 
     // Send execute begin to BA.
     hr = UserExperienceOnExecuteBegin(&pEngineState->userExperience, pEngineState->plan.cExecutePackagesTotal);

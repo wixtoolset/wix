@@ -36,7 +36,7 @@ static HRESULT ParseCommandLine(
     __out_z LPWSTR* psczSanitizedCommandLine
     );
 static HRESULT ParsePipeConnection(
-    __in LPWSTR* rgArgs,
+    __in_ecount(3) LPWSTR* rgArgs,
     __in BURN_PIPE_CONNECTION* pConnection
     );
 static HRESULT DetectPackage(
