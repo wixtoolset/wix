@@ -194,7 +194,7 @@ HRESULT ExternalEngineSendEmbeddedError(
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
-    DWORD cbData = 0;
+    SIZE_T cbData = 0;
     DWORD dwResult = *pnResult = 0;
 
     if (BURN_MODE_EMBEDDED != pEngineState->mode)
@@ -232,7 +232,7 @@ HRESULT ExternalEngineSendEmbeddedProgress(
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
-    DWORD cbData = 0;
+    SIZE_T cbData = 0;
     DWORD dwResult = *pnResult = 0;
 
     if (BURN_MODE_EMBEDDED != pEngineState->mode)

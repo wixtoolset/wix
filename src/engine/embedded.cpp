@@ -147,7 +147,7 @@ static HRESULT OnEmbeddedErrorMessage(
     )
 {
     HRESULT hr = S_OK;
-    DWORD iData = 0;
+    SIZE_T iData = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
     LPWSTR sczMessage = NULL;
 
@@ -181,7 +181,7 @@ static HRESULT OnEmbeddedProgress(
     )
 {
     HRESULT hr = S_OK;
-    DWORD iData = 0;
+    SIZE_T iData = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;

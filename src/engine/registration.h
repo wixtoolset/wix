@@ -196,12 +196,12 @@ HRESULT RegistrationSessionEnd(
 HRESULT RegistrationSaveState(
     __in BURN_REGISTRATION* pRegistration,
     __in_bcount_opt(cbBuffer) BYTE* pbBuffer,
-    __in_opt DWORD cbBuffer
+    __in_opt SIZE_T cbBuffer
     );
 HRESULT RegistrationLoadState(
     __in BURN_REGISTRATION* pRegistration,
     __out_bcount(*pcbBuffer) BYTE** ppbBuffer,
-    __out DWORD* pcbBuffer
+    __out SIZE_T* pcbBuffer
     );
 HRESULT RegistrationGetResumeCommandLine(
     __in const BURN_REGISTRATION* pRegistration,

@@ -53,7 +53,7 @@ static HRESULT FormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
-    __out_opt DWORD* pcchOut,
+    __out_opt SIZE_T* pcchOut,
     __in BOOL fObfuscateHiddenVariables,
     __out BOOL* pfContainsHiddenVariable
     );
@@ -704,7 +704,7 @@ extern "C" HRESULT VariableFormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
-    __out_opt DWORD* pcchOut
+    __out_opt SIZE_T* pcchOut
     )
 {
     return FormatString(pVariables, wzIn, psczOut, pcchOut, FALSE, NULL);
@@ -714,7 +714,7 @@ extern "C" HRESULT VariableFormatStringObfuscated(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
-    __out_opt DWORD* pcchOut
+    __out_opt SIZE_T* pcchOut
     )
 {
     return FormatString(pVariables, wzIn, psczOut, pcchOut, TRUE, NULL);
@@ -1085,7 +1085,7 @@ static HRESULT FormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,
     __out_z_opt LPWSTR* psczOut,
-    __out_opt DWORD* pcchOut,
+    __out_opt SIZE_T* pcchOut,
     __in BOOL fObfuscateHiddenVariables,
     __out BOOL* pfContainsHiddenVariable
     )

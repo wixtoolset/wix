@@ -17,7 +17,7 @@ typedef struct _BURN_PIPE_CONNECTION
     HANDLE hCachePipe;
 } BURN_PIPE_CONNECTION;
 
-typedef enum _BURN_PIPE_MESSAGE_TYPE
+typedef enum _BURN_PIPE_MESSAGE_TYPE : DWORD
 {
     BURN_PIPE_MESSAGE_TYPE_LOG = 0xF0000001,
     BURN_PIPE_MESSAGE_TYPE_COMPLETE = 0xF0000002,
@@ -58,7 +58,7 @@ HRESULT PipeSendMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __in_opt PFN_PIPE_MESSAGE_CALLBACK pfnCallback,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult

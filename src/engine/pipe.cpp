@@ -12,9 +12,9 @@ static const LPCWSTR CACHE_PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls.Cache";
 static HRESULT AllocatePipeMessage(
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out_bcount(cb) LPVOID* ppvMessage,
-    __out DWORD* cbMessage
+    __out SIZE_T* cbMessage
     );
 static void FreePipeMessage(
     __in BURN_PIPE_MESSAGE *pMsg
@@ -23,7 +23,7 @@ static HRESULT WritePipeMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT GetPipeMessage(
     __in HANDLE hPipe,
@@ -77,7 +77,7 @@ extern "C" HRESULT PipeSendMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __in_opt PFN_PIPE_MESSAGE_CALLBACK pfnCallback,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
@@ -665,14 +665,14 @@ LExit:
 static HRESULT AllocatePipeMessage(
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out_bcount(cb) LPVOID* ppvMessage,
-    __out DWORD* cbMessage
+    __out SIZE_T* cbMessage
     )
 {
     HRESULT hr = S_OK;
     LPVOID pv = NULL;
-    DWORD cb = 0;
+    SIZE_T cb = 0;
 
     // If no data was provided, ensure the count of bytes is zero.
     if (!pvData)
@@ -716,22 +716,22 @@ static HRESULT WritePipeMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessage,
     __in_bcount_opt(cbData) LPVOID pvData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
     LPVOID pv = NULL;
-    DWORD cb = 0;
+    SIZE_T cb = 0;
 
     hr = AllocatePipeMessage(dwMessage, pvData, cbData, &pv, &cb);
     ExitOnFailure(hr, "Failed to allocate message to write.");
 
     // Write the message.
     DWORD cbWrote = 0;
-    DWORD cbTotalWritten = 0;
+    SIZE_T cbTotalWritten = 0;
     while (cbTotalWritten < cb)
     {
-        if (!::WriteFile(hPipe, pv, cb - cbTotalWritten, &cbWrote, NULL))
+        if (!::WriteFile(hPipe, pv, (DWORD)(cb - cbTotalWritten), &cbWrote, NULL))
         {
             ExitWithLastError(hr, "Failed to write message type to pipe.");
         }

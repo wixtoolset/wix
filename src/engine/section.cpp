@@ -51,7 +51,7 @@ extern "C" HRESULT SectionInitialize(
     DWORD dwSignatureOffset = 0;
     DWORD cbSignature = 0;
     IMAGE_SECTION_HEADER sectionHeader = { };
-    DWORD dwOriginalChecksumAndSignatureOffset = 0;
+    DWORD_PTR dwOriginalChecksumAndSignatureOffset = 0;
     BURN_SECTION_HEADER* pBurnSectionHeader = NULL;
 
     pSection->hEngineFile = hEngineFile;

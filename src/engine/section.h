@@ -20,7 +20,7 @@ typedef struct _BURN_SECTION
 
     DWORD dwChecksumOffset;
     DWORD dwCertificateTableOffset;
-    DWORD dwOriginalChecksumAndSignatureOffset;
+    DWORD_PTR dwOriginalChecksumAndSignatureOffset;
 
     DWORD dwOriginalChecksum;
     DWORD dwOriginalSignatureOffset;

@@ -865,7 +865,7 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->msiPackage.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)hwndParent);
+    hr = BuffWritePointer(&pbData, &cbData, (DWORD_PTR)hwndParent);
     ExitOnFailure(hr, "Failed to write parent hwnd to message buffer.");
 
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->msiPackage.sczLogPath);
@@ -944,7 +944,7 @@ extern "C" HRESULT ElevationExecuteMspPackage(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->mspTarget.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)hwndParent);
+    hr = BuffWritePointer(&pbData, &cbData, (DWORD_PTR)hwndParent);
     ExitOnFailure(hr, "Failed to write parent hwnd to message buffer.");
 
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->mspTarget.sczTargetProductCode);
@@ -2322,7 +2322,7 @@ static HRESULT OnExecuteMsiPackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.msiPackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&hwndParent);
+    hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
     ExitOnFailure(hr, "Failed to read parent hwnd.");
 
     hr = BuffReadString(pbData, cbData, &iData, &executeAction.msiPackage.sczLogPath);
@@ -2420,7 +2420,7 @@ static HRESULT OnExecuteMspPackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.mspTarget.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&hwndParent);
+    hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
     ExitOnFailure(hr, "Failed to read parent hwnd.");
 
     executeAction.mspTarget.fPerMachineTarget = TRUE; // we're in the elevated process, clearly we're targeting a per-machine product.

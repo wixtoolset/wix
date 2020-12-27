@@ -196,7 +196,7 @@ static LRESULT CALLBACK WndProc(
         BOOL fRet = FALSE;
 
         // Always block shutdown in the elevated process, but ask the BA in the non-elevated.
-        UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongW(hWnd, GWLP_USERDATA));
+        UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
         if (!pInfo->fElevated)
         {
             // TODO: instead of recommending canceling all non-critical shutdowns, maybe we should only recommend cancel

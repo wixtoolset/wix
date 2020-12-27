@@ -982,7 +982,7 @@ LExit:
 extern "C" HRESULT RegistrationLoadState(
     __in BURN_REGISTRATION* pRegistration,
     __out_bcount(*pcbBuffer) BYTE** ppbBuffer,
-    __out DWORD* pcbBuffer
+    __out SIZE_T* pcbBuffer
     )
 {
     // read data from file

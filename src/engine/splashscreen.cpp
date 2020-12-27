@@ -196,7 +196,7 @@ static LRESULT CALLBACK WndProc(
     )
 {
     LRESULT lres = 0;
-    SPLASHSCREEN_INFO* pSplashScreen = reinterpret_cast<SPLASHSCREEN_INFO*>(::GetWindowLongW(hWnd, GWLP_USERDATA));
+    SPLASHSCREEN_INFO* pSplashScreen = reinterpret_cast<SPLASHSCREEN_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
     switch (uMsg)
     {
