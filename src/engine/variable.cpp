@@ -157,10 +157,6 @@ static HRESULT InitializeVariableNumeric(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     );
-static HRESULT InitializeVariableRegistryFolder(
-    __in DWORD_PTR dwpData,
-    __inout BURN_VARIANT* pValue
-    );
 static HRESULT InitializeVariable6432Folder(
         __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -189,6 +185,13 @@ static HRESULT Get64bitFolderFromRegistry(
     __in int nFolder,
     __deref_out_z LPWSTR* psczPath
     );
+
+#if !defined(_WIN64)
+static HRESULT InitializeVariableRegistryFolder(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+    );
+#endif
 
 
 // function definitions
@@ -1101,13 +1104,17 @@ static HRESULT FormatString(
     LPWSTR* rgVariables = NULL;
     DWORD cVariables = 0;
     DWORD cch = 0;
+    size_t cchIn = 0;
     BOOL fHidden = FALSE;
     MSIHANDLE hRecord = NULL;
 
     ::EnterCriticalSection(&pVariables->csAccess);
 
     // allocate buffer for format string
-    hr = StrAlloc(&sczFormat, lstrlenW(wzIn) + 1);
+    hr = ::StringCchLengthW(wzIn, STRSAFE_MAX_CCH - 1, &cchIn);
+    ExitOnFailure(hr, "Failed to length of format string.");
+
+    hr = StrAlloc(&sczFormat, cchIn + 1);
     ExitOnFailure(hr, "Failed to allocate buffer for format string.");
 
     // read out variables from the unformatted string and build a format string
@@ -1133,7 +1140,7 @@ static HRESULT FormatString(
             ExitOnFailure(hr, "Failed to append string.");
             break;
         }
-        cch = wzClose - wzOpen - 1;
+        cch = (DWORD)(wzClose - wzOpen - 1);
 
         if (0 == cch)
         {
@@ -2170,6 +2177,7 @@ LExit:
     return hr;
 }
 
+#if !defined(_WIN64)
 static HRESULT InitializeVariableRegistryFolder(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -2179,7 +2187,6 @@ static HRESULT InitializeVariableRegistryFolder(
     int nFolder = (int)dwpData;
     LPWSTR sczPath = NULL;
 
-#if !defined(_WIN64)
     BOOL fIsWow64 = FALSE;
 
     ProcWow64(::GetCurrentProcess(), &fIsWow64);
@@ -2187,7 +2194,6 @@ static HRESULT InitializeVariableRegistryFolder(
     {
         ExitFunction();
     }
-#endif
 
     hr = Get64bitFolderFromRegistry(nFolder, &sczPath);
     ExitOnFailure(hr, "Failed to get 64-bit folder.");
@@ -2201,6 +2207,7 @@ LExit:
 
     return hr;
 }
+#endif
 
 static HRESULT InitializeVariable6432Folder(
         __in DWORD_PTR dwpData,

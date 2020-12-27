@@ -93,6 +93,7 @@ extern "C" HRESULT EngineRun(
     BOOL fRegInitialized = FALSE;
     BOOL fWiuInitialized = FALSE;
     BOOL fXmlInitialized = FALSE;
+    SYSTEM_INFO si = { };
     OSVERSIONINFOEXW ovix = { };
     LPWSTR sczExePath = NULL;
     BOOL fRunNormal = FALSE;
@@ -155,8 +156,34 @@ extern "C" HRESULT EngineRun(
         ExitWithLastError(hr, "Failed to get OS info.");
     }
 
+#if defined(_M_ARM64)
+    LPCSTR szBurnPlatform = "ARM64";
+#elif defined(_M_AMD64)
+    LPCSTR szBurnPlatform = "x64";
+#else
+    LPCSTR szBurnPlatform = "x86";
+#endif
+
+    LPCSTR szMachinePlatform = "unknown architecture";
+    ::GetNativeSystemInfo(&si);
+    switch (si.wProcessorArchitecture)
+    {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        szMachinePlatform = "x64";
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM:
+        szMachinePlatform = "ARM";
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM64:
+        szMachinePlatform = "ARM64";
+        break;
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        szMachinePlatform = "x86";
+        break;
+    }
+
     PathForCurrentProcess(&sczExePath, NULL); // Ignore failure.
-    LogId(REPORT_STANDARD, MSG_BURN_INFO, szVerMajorMinorBuild, ovix.dwMajorVersion, ovix.dwMinorVersion, ovix.dwBuildNumber, ovix.wServicePackMajor, sczExePath);
+    LogId(REPORT_STANDARD, MSG_BURN_INFO, szVerMajorMinorBuild, ovix.dwMajorVersion, ovix.dwMinorVersion, ovix.dwBuildNumber, ovix.wServicePackMajor, sczExePath, szBurnPlatform, szMachinePlatform);
     ReleaseNullStr(sczExePath);
 
     // initialize core

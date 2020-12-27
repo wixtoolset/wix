@@ -16,5 +16,9 @@
     <file src="$projectFolder$$id$.props" target="buildTransitive" />
     <file src="Win32\burn.exe" target="tools\x86" />
     <file src="Win32\burn.pdb" target="tools\x86" />
+    <file src="x64\burn.exe" target="tools\x64" />
+    <file src="x64\burn.pdb" target="tools\x64" />
+    <file src="arm64\burn.exe" target="tools\arm64" />
+    <file src="arm64\burn.pdb" target="tools\arm64" />
   </files>
 </package>

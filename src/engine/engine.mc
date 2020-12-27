@@ -33,7 +33,7 @@ MessageId=1
 Severity=Success
 SymbolicName=MSG_BURN_INFO
 Language=English
-Burn v%1!hs!, Windows v%2!d!.%3!d! (Build %4!d!: Service Pack %5!d!), path: %6!ls!
+Burn %7!hs! v%1!hs!, Windows v%2!d!.%3!d! %8!hs! (Build %4!d!: Service Pack %5!d!), path: %6!ls!
 .
 
 MessageId=2

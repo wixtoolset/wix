@@ -6,9 +6,17 @@
   <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props')" />
   <Import Project="..\..\..\packages\WixToolset.DUtil.4.0.59\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\packages\WixToolset.DUtil.4.0.59\build\WixToolset.DUtil.props')" />
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
