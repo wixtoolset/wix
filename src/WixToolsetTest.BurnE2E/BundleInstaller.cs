@@ -15,6 +15,8 @@ namespace WixToolsetTest.BurnE2E
     {
         public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
         public const string BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH = "BundleCachePath";
+        public const string FULL_BURN_POLICY_REGISTRY_PATH = "SOFTWARE\\WOW6432Node\\Policies\\WiX\\Burn";
+        public const string PACKAGE_CACHE_FOLDER_NAME = "Package Cache";
 
         public BundleInstaller(WixTestContext testContext, string name)
         {
@@ -27,6 +29,8 @@ namespace WixToolsetTest.BurnE2E
         public string Bundle { get; }
 
         public string BundlePdb { get; }
+
+        private WixBundleSymbol BundleSymbol { get; set; }
 
         public string TestGroupName { get; }
 
@@ -142,37 +146,63 @@ namespace WixToolsetTest.BurnE2E
             return logFile;
         }
 
+        private WixBundleSymbol GetBundleSymbol()
+        {
+            if (this.BundleSymbol == null)
+            {
+                using var wixOutput = WixOutput.Read(this.BundlePdb);
+                var intermediate = Intermediate.Load(wixOutput);
+                var section = intermediate.Sections.Single();
+                this.BundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            }
+
+            return this.BundleSymbol;
+        }
+
+        public string GetExpectedCachedBundlePath()
+        {
+            var bundleSymbol = this.GetBundleSymbol();
+
+            using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
+            var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
+            var cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
+            return Path.Combine(cachePath, bundleSymbol.BundleId, Path.GetFileName(this.Bundle));
+        }
+
         public string VerifyRegisteredAndInPackageCache()
         {
-            using var wixOutput = WixOutput.Read(this.BundlePdb);
-            var intermediate = Intermediate.Load(wixOutput);
-            var section = intermediate.Sections.Single();
-            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            var bundleSymbol = this.GetBundleSymbol();
             var bundleId = bundleSymbol.BundleId;
             var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
 
-            using var testKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
-            Assert.NotNull(testKey);
+            using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
+            Assert.NotNull(registrationKey);
 
-            var cachePathValue = testKey.GetValue(BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH);
+            var cachePathValue = registrationKey.GetValue(BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH);
             Assert.NotNull(cachePathValue);
             var cachePath = Assert.IsType<string>(cachePathValue);
             Assert.True(File.Exists(cachePath));
 
+            var expectedCachePath = this.GetExpectedCachedBundlePath();
+            Assert.Equal(expectedCachePath, cachePath, StringComparer.OrdinalIgnoreCase);
+
             return cachePath;
+        }
+
+        public void VerifyUnregisteredAndRemovedFromPackageCache()
+        {
+            var cachedBundlePath = this.GetExpectedCachedBundlePath();
+            this.VerifyUnregisteredAndRemovedFromPackageCache(cachedBundlePath);
         }
 
         public void VerifyUnregisteredAndRemovedFromPackageCache(string cachedBundlePath)
         {
-            using var wixOutput = WixOutput.Read(this.BundlePdb);
-            var intermediate = Intermediate.Load(wixOutput);
-            var section = intermediate.Sections.Single();
-            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            var bundleSymbol = this.GetBundleSymbol();
             var bundleId = bundleSymbol.BundleId;
             var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
 
-            using var testKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
-            Assert.Null(testKey);
+            using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
+            Assert.Null(registrationKey);
 
             Assert.False(File.Exists(cachedBundlePath));
         }
