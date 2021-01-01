@@ -4,18 +4,29 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Text;
+    using Microsoft.Win32;
+    using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using Xunit;
 
     public class BundleInstaller : IDisposable
     {
+        public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+        public const string BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH = "BundleCachePath";
+
         public BundleInstaller(WixTestContext testContext, string name)
         {
             this.Bundle = Path.Combine(testContext.TestDataFolder, $"{name}.exe");
+            this.BundlePdb = Path.Combine(testContext.TestDataFolder, $"{name}.wixpdb");
             this.TestGroupName = testContext.TestGroupName;
             this.TestName = testContext.TestName;
         }
 
         public string Bundle { get; }
+
+        public string BundlePdb { get; }
 
         public string TestGroupName { get; }
 
@@ -66,15 +77,27 @@ namespace WixToolsetTest.BurnE2E
         }
 
         /// <summary>
+        /// Uninstalls the bundle at the given path with optional arguments.
+        /// </summary>
+        /// <param name="bundlePath">This should be the bundle in the package cache.</param>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string Uninstall(string bundlePath, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Uninstall, arguments, bundlePath: bundlePath);
+        }
+
+        /// <summary>
         /// Executes the bundle with optional arguments.
         /// </summary>
         /// <param name="expectedExitCode">Expected exit code.</param>
         /// <param name="mode">Install mode.</param>
         /// <param name="arguments">Optional arguments to pass to the tool.</param>
         /// <returns>Path to the generated log file.</returns>
-        private string RunBundleWithArguments(int expectedExitCode, MSIExec.MSIExecMode mode, string[] arguments, bool assertOnError = true)
+        private string RunBundleWithArguments(int expectedExitCode, MSIExec.MSIExecMode mode, string[] arguments, bool assertOnError = true, string bundlePath = null)
         {
-            TestTool bundle = new TestTool(this.Bundle);
+            TestTool bundle = new TestTool(bundlePath ?? this.Bundle);
             var sb = new StringBuilder();
 
             // Be sure to run silent.
@@ -117,6 +140,41 @@ namespace WixToolsetTest.BurnE2E
 
             // Return the log file name.
             return logFile;
+        }
+
+        public string VerifyRegisteredAndInPackageCache()
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            var bundleId = bundleSymbol.BundleId;
+            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
+
+            using var testKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
+            Assert.NotNull(testKey);
+
+            var cachePathValue = testKey.GetValue(BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH);
+            Assert.NotNull(cachePathValue);
+            var cachePath = Assert.IsType<string>(cachePathValue);
+            Assert.True(File.Exists(cachePath));
+
+            return cachePath;
+        }
+
+        public void VerifyUnregisteredAndRemovedFromPackageCache(string cachedBundlePath)
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            var bundleId = bundleSymbol.BundleId;
+            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
+
+            using var testKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
+            Assert.Null(testKey);
+
+            Assert.False(File.Exists(cachedBundlePath));
         }
 
         public void Dispose()

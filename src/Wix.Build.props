@@ -2,6 +2,7 @@
 <Project>
   <PropertyGroup>
     <TestGroupName Condition=" '$(TestGroupName)'=='' ">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))</TestGroupName>
+    <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(TestGroupName)\$(ProjectName)\</BaseIntermediateOutputPath>
     <OutputPath>$(OutputPath)$(TestGroupName)\</OutputPath>
   </PropertyGroup>
 </Project>
