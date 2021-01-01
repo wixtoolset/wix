@@ -4,6 +4,7 @@
   <PropertyGroup>
     <PackageName Condition=" '$(PackageName)' == '' ">$(MSBuildProjectName)</PackageName>
     <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition=" '$(CabPrefix)' != '' ">CabPrefix=$(CabPrefix);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(UpgradeCode)' != '' ">UpgradeCode=$(UpgradeCode);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(Version)' != '' ">Version=$(Version);$(DefineConstants)</DefineConstants>
   </PropertyGroup>

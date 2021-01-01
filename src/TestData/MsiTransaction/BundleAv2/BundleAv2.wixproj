@@ -6,13 +6,11 @@
     <Version>2.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
     <ProjectReference Include="..\PackageBv2\PackageBv2.wixproj" />
     <ProjectReference Include="..\PackageCv2\PackageCv2.wixproj" />
     <ProjectReference Include="..\PackageD\PackageD.wixproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.77" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.56" />
   </ItemGroup>
 </Project>
