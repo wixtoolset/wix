@@ -5,7 +5,7 @@
 <?endif?>
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Bundle Name="~$(var.TestGroupName) - Bundle B" Version="$(var.Version)" UpgradeCode="{552FD011-4DD6-42B2-A4C6-AD1417C829B2}" Compressed="yes">
+  <Bundle Name="~$(var.TestGroupName) - Bundle B" Version="$(var.Version)" UpgradeCode="{157A1FBA-3825-4AAA-B13D-F45435A79D64}" Compressed="yes">
     <Log Prefix="~$(var.TestGroupName)_BundleB" />
 
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />

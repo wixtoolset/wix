@@ -3,22 +3,21 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net35</TargetFramework>
+    <TargetFrameworks>net35;net5.0-windows</TargetFrameworks>
     <AssemblyName>TestBA</AssemblyName>
     <RootNamespace>WixToolset.Test.BA</RootNamespace>
     <DebugType>embedded</DebugType>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)'=='net35' ">
     <Content Include="TestBA.BootstrapperCore.config" CopyToOutputDirectory="PreserveNewest" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Mba.Core" Version="4.0.45" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
   <?include BundleB.wxi ?>
   <Fragment>
     <PackageGroup Id="BundlePackages">
+      <PackageGroupRef Id="TestBA" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageBv1.TargetPath)" />
     </PackageGroup>
   </Fragment>
