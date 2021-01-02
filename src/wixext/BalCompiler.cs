@@ -750,6 +750,11 @@ namespace WixToolset.Bal
                 }
             }
 
+            if (!theme.HasValue)
+            {
+                theme = WixManagedBootstrapperApplicationHostTheme.Standard;
+            }
+
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             if (!this.Messaging.EncounteredError)
