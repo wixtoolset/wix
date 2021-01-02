@@ -6,8 +6,8 @@
     <Cultures>en-us</Cultures>
   </PropertyGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)..\net35\win-x86" BindName="net2x86" />
-    <BindInputPaths Include="$(OutputPath)..\net5.0-windows\win-x86" BindName="dnc5x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x86" BindName="net2x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x86" BindName="dnc5x86" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Utilities\TestBA\TestBA.csproj" />

@@ -4,7 +4,7 @@
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)..\net5.0-windows\win-x86" BindName="dnc5x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x86" BindName="dnc5x86" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />

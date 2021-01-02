@@ -2,15 +2,13 @@
 
 namespace WixToolsetTest.BurnE2E
 {
-    using System;
-    using System.IO;
     using Xunit.Abstractions;
 
     public abstract class WixTestBase
     {
-        protected WixTestBase(ITestOutputHelper testOutputHelper, string testGroupName)
+        protected WixTestBase(ITestOutputHelper testOutputHelper)
         {
-            this.TestContext = new WixTestContext(testOutputHelper, testGroupName);
+            this.TestContext = new WixTestContext(testOutputHelper);
         }
 
         /// <summary>

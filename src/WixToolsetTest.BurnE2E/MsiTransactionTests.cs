@@ -9,7 +9,7 @@ namespace WixToolsetTest.BurnE2E
 
     public class MsiTransactionTests : BurnE2ETests
     {
-        public MsiTransactionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper, "MsiTransaction") { }
+        public MsiTransactionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
         public void CanUpgradeBundleWithMsiTransaction()

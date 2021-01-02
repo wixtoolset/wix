@@ -3,6 +3,6 @@
   <PropertyGroup>
     <TestGroupName Condition=" '$(TestGroupName)'=='' ">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))</TestGroupName>
     <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(TestGroupName)\$(ProjectName)\</BaseIntermediateOutputPath>
-    <OutputPath>$(OutputPath)$(TestGroupName)\</OutputPath>
+    <OutputPath>$(OutputPath)netcoreapp3.1\TestData\$(TestGroupName)\</OutputPath>
   </PropertyGroup>
 </Project>

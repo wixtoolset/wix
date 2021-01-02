@@ -9,7 +9,7 @@ namespace WixToolsetTest.BurnE2E
 
     public class PrereqBaTests : BurnE2ETests
     {
-        public PrereqBaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper, "PrereqBa") { }
+        public PrereqBaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <summary>
         /// This bundle purposely provides a .runtimeconfig.json file that requires a version of .NET Core that doesn't exist,

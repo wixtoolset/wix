@@ -9,7 +9,7 @@ namespace WixToolsetTest.BurnE2E
 
     public class BasicFunctionalityTests : BurnE2ETests
     {
-        public BasicFunctionalityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper, "BasicFunctionality") { }
+        public BasicFunctionalityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
         public void CanInstallAndUninstallSimpleBundle()

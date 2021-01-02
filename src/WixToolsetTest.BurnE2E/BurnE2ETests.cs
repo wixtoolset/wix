@@ -10,7 +10,7 @@ namespace WixToolsetTest.BurnE2E
     [Collection("BurnE2E")]
     public abstract class BurnE2ETests : WixTestBase, IDisposable
     {
-        protected BurnE2ETests(ITestOutputHelper testOutputHelper, string testGroupName) : base(testOutputHelper, testGroupName) { }
+        protected BurnE2ETests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         private Queue<IDisposable> Installers { get; } = new Queue<IDisposable>();
 

@@ -9,7 +9,7 @@ namespace WixToolsetTest.BurnE2E
 
     public class RollbackBoundaryTests : BurnE2ETests
     {
-        public RollbackBoundaryTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper, "RollbackBoundary") { }
+        public RollbackBoundaryTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         /// <summary>
         /// Installs 1 bundle:

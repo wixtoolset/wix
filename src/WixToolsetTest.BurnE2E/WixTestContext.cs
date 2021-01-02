@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using Microsoft.Win32;
     using WixBuildTools.TestSupport;
@@ -11,15 +12,17 @@ namespace WixToolsetTest.BurnE2E
 
     public class WixTestContext
     {
-        static readonly string RootDataPath = Path.GetFullPath(TestData.Get(".."));
+        static readonly string RootDataPath = Path.GetFullPath(TestData.Get("TestData"));
 
-        public WixTestContext(ITestOutputHelper testOutputHelper, string testGroupName)
+        public WixTestContext(ITestOutputHelper testOutputHelper)
         {
             var test = GetTest(testOutputHelper);
+            var splitClassName = test.TestCase.TestMethod.TestClass.Class.Name.Split('.');
 
-            this.TestDataFolder = Path.Combine(RootDataPath, testGroupName);
-            this.TestGroupName = testGroupName;
+            this.TestGroupName = splitClassName.Last();
             this.TestName = test.TestCase.TestMethod.Method.Name;
+
+            this.TestDataFolder = Path.Combine(RootDataPath, this.TestGroupName);
         }
 
         public string TestDataFolder { get; }

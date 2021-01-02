@@ -4,7 +4,7 @@
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)..\net35\win-x86" BindName="net2x86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x86" BindName="net2x86" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageB\PackageB.wixproj" />
