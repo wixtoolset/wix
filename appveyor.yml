@@ -18,5 +18,5 @@ test: off
 skip_tags: true
 
 on_finish:
-  - ps: 7z a logs.zip $env:TEMP\*.log $env:TEMP\..\*.log
-  - ps: Push-AppveyorArtifact logs.zip
+  - ps: 7z a ('logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') $env:TEMP\*.log $env:TEMP\..\*.log
+  - ps: Push-AppveyorArtifact logs_*.zip
