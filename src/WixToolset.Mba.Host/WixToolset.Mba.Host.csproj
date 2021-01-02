@@ -45,7 +45,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="SetNuspecProperties" AfterTargets="GetBuildVersion">
+  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion">
     <PropertyGroup>
       <NuspecBasePath>$(OutputPath)</NuspecBasePath>
       <NuspecProperties>Id=$(AssemblyName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl)</NuspecProperties>
