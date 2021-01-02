@@ -2,7 +2,12 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
+    <BA>hyperlinkLicense</BA>
+    <UpgradeCode>{8C7E2C47-1EE7-4BBE-99A2-EAB7F3693F48}</UpgradeCode>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>

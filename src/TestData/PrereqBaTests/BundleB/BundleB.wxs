@@ -2,16 +2,17 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
-  <?include BundleB.wxi ?>
   <Fragment>
-    <BootstrapperApplication>
+    <BootstrapperApplication Id="BrokenMba">
       <Payload Name="WixToolset.Mba.Host.config" SourceFile="bad.config" />
       <Payload SourceFile="!(bindpath.net2x86)\TestBA.dll" />
       <Payload SourceFile="!(bindpath.net2x86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.net2x86)\WixToolset.Mba.Core.dll" />
       <bal:WixManagedBootstrapperApplicationHost />
     </BootstrapperApplication>
+  </Fragment>
 
+  <Fragment>
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageB.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
       <MsiPackage Id="PackageF" SourceFile="$(var.PackageF.TargetPath)" />

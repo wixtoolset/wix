@@ -2,7 +2,12 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
+    <BA>BrokenDnc</BA>
+    <UpgradeCode>{A4456636-916A-43A0-87BF-A897C2717A00}</UpgradeCode>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
   <ItemGroup>
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x86" BindName="dnc5x86" />
   </ItemGroup>

@@ -2,10 +2,8 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <?include BundleB.wxi ?>
   <Fragment>
     <PackageGroup Id="BundlePackages">
-      <PackageGroupRef Id="TestBA" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageBv1.TargetPath)" />
     </PackageGroup>
   </Fragment>

@@ -2,7 +2,12 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
+    <BA>BrokenMba</BA>
+    <UpgradeCode>{157A1FBA-3825-4AAA-B13D-F45435A79D64}</UpgradeCode>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
   <ItemGroup>
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x86" BindName="net2x86" />
   </ItemGroup>

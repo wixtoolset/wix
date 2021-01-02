@@ -2,10 +2,8 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <?include ..\BundleBv1\BundleB.wxi ?>
   <Fragment>
     <PackageGroup Id="BundlePackages">
-      <PackageGroupRef Id="TestBAdnc" />
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" />
       <RollbackBoundary Transaction="yes" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageBv2.TargetPath)" />

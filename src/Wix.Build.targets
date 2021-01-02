@@ -2,8 +2,10 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Project>
   <PropertyGroup>
+    <BundleName Condition=" '$(BundleName)' == '' ">$(MSBuildProjectName)</BundleName>
     <PackageName Condition=" '$(PackageName)' == '' ">$(MSBuildProjectName)</PackageName>
-    <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);$(DefineConstants)</DefineConstants>
+    <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);BundleName=$(BundleName);$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition=" '$(BA)' != '' ">BA=$(BA);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(CabPrefix)' != '' ">CabPrefix=$(CabPrefix);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(UpgradeCode)' != '' ">UpgradeCode=$(UpgradeCode);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(Version)' != '' ">Version=$(Version);$(DefineConstants)</DefineConstants>
