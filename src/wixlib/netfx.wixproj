@@ -27,4 +27,10 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
 
+  <!-- Workaround for bug in ProjectReferenceDefineConstants, they're not needed for this project anyway -->
+  <Target Name="ClearProjectReferenceDefineConstants" AfterTargets="CalculateDefineConstants">
+    <PropertyGroup>
+      <ProjectReferenceDefineConstants></ProjectReferenceDefineConstants>
+    </PropertyGroup>
+  </Target>
 </Project>
