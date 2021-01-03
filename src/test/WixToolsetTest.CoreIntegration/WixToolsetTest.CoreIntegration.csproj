@@ -27,6 +27,7 @@
     <Content Include="TestData\BadInput\UnscheduledRollbackBoundary.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BindVariables\DefaultedVariable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BindVariables\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BootstrapperApplication\DpiAwareness.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleCustomTable\BundleCustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleExtension\BundleExtension.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\BundleExtension\BundleExtensionSearches.wxs" CopyToOutputDirectory="PreserveNewest" />

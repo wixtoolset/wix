@@ -1404,7 +1404,7 @@ namespace WixToolset.Core
                         enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "DpiAwareness":
-                        if (node.Name.LocalName != "BootstrapperApplication")
+                        if (node.Name.LocalName != "BootstrapperApplicationDll")
                         {
                             this.Core.UnexpectedAttribute(node, attrib);
                         }
