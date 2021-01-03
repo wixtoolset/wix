@@ -112,7 +112,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             var bundleFileName = Path.GetFileName(outputPath);
             var bundleAssemblyVersion = windowsAssemblyVersion.ToString();
-            var bundlePlatform = bundleSymbol.Platform.ToString().ToLower();
+            var bundlePlatform = bundleSymbol.Platform == Platform.X64 ? "amd64" : bundleSymbol.Platform.ToString().ToLower();
             var bundleDescription = bundleSymbol.Name;
 
             using (var memoryStream = new MemoryStream())

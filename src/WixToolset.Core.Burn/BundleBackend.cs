@@ -36,6 +36,7 @@ namespace WixToolset.Core.Burn
             {
                 extension.PostBackendBind(result);
             }
+
             return result;
         }
 
