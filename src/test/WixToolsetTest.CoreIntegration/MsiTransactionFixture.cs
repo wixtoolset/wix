@@ -26,6 +26,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-sw1151", // this is expected for this test
                     Path.Combine(folder, "MsiTransaction", "X64AfterX86Bundle.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
@@ -55,6 +56,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-sw1151", // this is expected for this test
                     Path.Combine(folder, "MsiTransaction", "X86AfterX64Bundle.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),

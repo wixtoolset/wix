@@ -55,6 +55,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-sw1008", // this is expected for this test
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),

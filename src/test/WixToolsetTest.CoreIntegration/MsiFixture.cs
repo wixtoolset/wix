@@ -162,6 +162,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-sw1079", // TODO: why does this test need to create a second cab which is empty?
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),

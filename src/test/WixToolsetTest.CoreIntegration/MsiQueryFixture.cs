@@ -357,6 +357,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-sw1031", // this is expected for this test
                     Path.Combine(folder, "DefaultDir", "DefaultDir.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),

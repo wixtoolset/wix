@@ -49,7 +49,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),

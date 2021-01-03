@@ -61,7 +61,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
                 {
                     "build",
                     Path.Combine(folder, "CanonicalizeName.wxs"),

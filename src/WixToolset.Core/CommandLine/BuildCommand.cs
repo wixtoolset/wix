@@ -549,8 +549,8 @@ namespace WixToolset.Core.CommandLine
             {
                 if (parser.IsSwitch(arg))
                 {
-                    var parameter = arg.Substring(1);
-                    switch (parameter.ToLowerInvariant())
+                    var parameter = arg.Substring(1).ToLowerInvariant();
+                    switch (parameter)
                     {
                         case "?":
                         case "h":
@@ -583,7 +583,7 @@ namespace WixToolset.Core.CommandLine
                                 this.BindPaths.Add(bindPath);
                                 return true;
                             }
-                            break;
+                            return false;
                         }
 
                         case "cc":
@@ -649,7 +649,7 @@ namespace WixToolset.Core.CommandLine
                                     this.PdbType = pdbType;
                                     return true;
                                 }
-                                break;
+                                return false;
                             }
 
                         case "nologo":
@@ -664,16 +664,22 @@ namespace WixToolset.Core.CommandLine
                         case "sval":
                             // todo: implement
                             return true;
+                    }
 
-                        case "sw":
-                        case "suppresswarning":
-                            var warning = parser.GetNextArgumentOrError(arg);
-                            if (!String.IsNullOrEmpty(warning))
-                            {
-                                var warningNumber = Convert.ToInt32(warning);
-                                this.Messaging.SuppressWarningMessage(warningNumber);
-                            }
-                            return true;
+                    if (parameter.StartsWith("sw"))
+                    {
+                        this.ParseSuppressWarning(parameter, "sw".Length, parser);
+                        return true;
+                    }
+                    else if (parameter.StartsWith("suppresswarning"))
+                    {
+                        this.ParseSuppressWarning(parameter, "suppresswarning".Length, parser);
+                        return true;
+                    }
+                    else if (parameter.StartsWith("wx"))
+                    {
+                        this.ParseWarningAsError(parameter, "wx".Length, parser);
+                        return true;
                     }
 
                     return false;
@@ -820,6 +826,42 @@ namespace WixToolset.Core.CommandLine
                 }
 
                 return true;
+            }
+
+            private void ParseSuppressWarning(string parameter, int offset, ICommandLineParser parser)
+            {
+                var paramArg = parameter.Substring(offset);
+                if (paramArg.Length == 0)
+                {
+                    this.Messaging.SuppressAllWarnings = true;
+                }
+                else if (Int32.TryParse(paramArg, out var suppressWarning) && suppressWarning > 0)
+                {
+                    this.Messaging.SuppressWarningMessage(suppressWarning);
+                }
+                else
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalSuppressWarningId(paramArg));
+                    parser.ErrorArgument = parameter;
+                }
+            }
+
+            private void ParseWarningAsError(string parameter, int offset, ICommandLineParser parser)
+            {
+                var paramArg = parameter.Substring(offset);
+                if (paramArg.Length == 0)
+                {
+                    this.Messaging.WarningsAsError = true;
+                }
+                else if (Int32.TryParse(paramArg, out var elevateWarning) && elevateWarning > 0)
+                {
+                    this.Messaging.SuppressWarningMessage(elevateWarning);
+                }
+                else
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalSuppressWarningId(paramArg));
+                    parser.ErrorArgument = parameter;
+                }
             }
         }
     }
