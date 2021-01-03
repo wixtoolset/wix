@@ -133,6 +133,52 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildX64Bundle()
+        {
+            var folder = TestData.Get(@"TestData\SimpleBundle");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "Bundle.wxs"),
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+                Assert.Empty(result.Messages.Where(m => m.Level == MessageLevel.Warning));
+
+                Assert.True(File.Exists(exePath));
+                Assert.True(File.Exists(pdbPath));
+
+                var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
+                manifestResource.Load(exePath);
+                var actualManifestData = Encoding.UTF8.GetString(manifestResource.Data);
+                Assert.Equal("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                    "<assembly manifestVersion=\"1.0\" xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
+                    "<assemblyIdentity name=\"test.exe\" version=\"1.0.0.0\" processorArchitecture=\"amd64\" type=\"win32\" />" +
+                    "<description>~TestBundle</description>" +
+                    "<dependency><dependentAssembly><assemblyIdentity name=\"Microsoft.Windows.Common-Controls\" version=\"6.0.0.0\" processorArchitecture=\"amd64\" publicKeyToken=\"6595b64144ccf1df\" language=\"*\" type=\"win32\" /></dependentAssembly></dependency>" +
+                    "<compatibility xmlns=\"urn:schemas-microsoft-com:compatibility.v1\"><application><supportedOS Id=\"{e2011457-1546-43c5-a5fe-008deee3d3f0}\" /><supportedOS Id=\"{35138b9a-5d96-4fbd-8e2d-a2440225f93a}\" /><supportedOS Id=\"{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}\" /><supportedOS Id=\"{1f676c76-80e1-4239-95bb-83d0f6d0da78}\" /><supportedOS Id=\"{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}\" /></application></compatibility>" +
+                    "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\" /></requestedPrivileges></security></trustInfo>" +
+                    "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings><dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware><dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor</dpiAwareness></windowsSettings></application>" +
+                    "</assembly>", actualManifestData);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleBundleUsingExtensionBA()
         {
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
