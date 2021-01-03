@@ -138,9 +138,10 @@ namespace WixToolset.Core.CommandLine
         {
             var result = this.TryGetNextSwitchOrArgument(out arg);
 
-            if (!result && !this.IsSwitch(arg))
+            if (!result || this.IsSwitch(arg))
             {
                 this.ErrorArgument = arg ?? CommandLineParser.ExpectedArgument;
+                return false;
             }
 
             return result;

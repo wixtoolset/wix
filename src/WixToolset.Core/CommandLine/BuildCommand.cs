@@ -578,7 +578,7 @@ namespace WixToolset.Core.CommandLine
                         case "bindpath":
                         {
                             var value = parser.GetNextArgumentOrError(arg);
-                            if (this.TryParseBindPath(value, out var bindPath))
+                            if (value != null && this.TryParseBindPath(value, out var bindPath))
                             {
                                 this.BindPaths.Add(bindPath);
                                 return true;

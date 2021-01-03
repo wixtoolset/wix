@@ -6,10 +6,54 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
     using Xunit;
 
     public class BadInputFixture
     {
+        [Fact]
+        public void SwitchIsNotConsideredAnArgument()
+        {
+            var result = WixRunner.Execute(new[]
+            {
+                "build",
+                "-bindpath", "-thisisaswitchnotanarg",
+            });
+
+            Assert.Single(result.Messages, m => m.Id == (int)ErrorMessages.Ids.ExpectedArgument);
+            // TODO: when CantBuildSingleExeBundleWithInvalidArgument is fixed, uncomment:
+            //Assert.Equal((int)ErrorMessages.Ids.ExpectedArgument, result.ExitCode);
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void CantBuildSingleExeBundleWithInvalidArgument()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SingleExeBundle", "SingleExePackageGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                    "-nonexistentswitch", "param",
+                });
+
+                Assert.NotEqual(0, result.ExitCode);
+
+                Assert.False(File.Exists(exePath));
+            }
+        }
+
         [Fact]
         public void RegistryKeyWithoutAttributesDoesntCrash()
         {
