@@ -6,10 +6,18 @@
     <Platform Condition=" '$(Platform)' == '' OR '$(Platform)' == 'AnyCPU' ">Win32</Platform>
     <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(Platform)\</IntDir>
     <OutDir>$(OutputPath)$(Platform)\</OutDir>
+
+    <!-- NBGV properties -->
+    <AssemblyCompany>$(Company)</AssemblyCompany>
+    <AssemblyCopyright>$(Copyright)</AssemblyCopyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' AND '$(VisualStudioVersion)'>='15.0'">
     <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemDefinitionGroup>

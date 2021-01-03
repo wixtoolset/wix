@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Customized Microsoft Native Recommended Rules" Description="Microsoft Native Recommended Rules, -C26812" ToolsVersion="16.0">
+  <Include Path="nativerecommendedrules.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.NativeCodeAnalysis" RuleNamespace="Microsoft.Rules.Native">
+    <!-- We need C style enums since we support BAs written in C -->
+    <Rule Id="C26812" Action="None" />
+  </Rules>
+</RuleSet>
