@@ -38,6 +38,8 @@
     <Content Include="TestData\Class\DecompiledOldClassTableDef.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Container\HarvestIntoDetachedContainer.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Container\MultipleAttachedContainers.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CopyFile\CopyFile.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\SimpleCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\CustomActionCycle.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -72,6 +74,7 @@
     <Content Include="TestData\MsiTransaction\X86AfterX64Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Payload\AbsoluteName.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Payload\CanonicalizeName.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Payload\SharedBAAndPackagePayloadBundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Payload\ValidName.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PatchFamilyFilter\.data\Av1.0.0.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\PatchFamilyFilter\.data\Av1.0.1.txt" CopyToOutputDirectory="PreserveNewest" />
@@ -187,6 +190,7 @@
     <Content Include="TestData\OverridableActions\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\OverridableActions\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\OverridableActions\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\RollbackBoundary\BeginningOfChain.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TextStyle\ColorNull.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TextStyle\SizeLocalized.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TextStyle\SizeLocalized.wxs" CopyToOutputDirectory="PreserveNewest" />

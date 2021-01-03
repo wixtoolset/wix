@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
@@ -112,6 +113,32 @@ namespace WixToolsetTest.CoreIntegration
                 var expectedPayloadMustBeRelativeToCache = 2;
                 Assert.Equal(expectedIllegalRelativeLongFileName, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.IllegalRelativeLongFilename).Count());
                 Assert.Equal(expectedPayloadMustBeRelativeToCache, result.Messages.Where(m => m.Id == (int)ErrorMessages.Ids.PayloadMustBeRelativeToCache).Count());
+            }
+        }
+
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/5273")]
+        public void RejectsPayloadSharedBetweenPackageAndBA()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Payload", "SharedBAAndPackagePayloadBundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                Assert.InRange(result.ExitCode, 2, int.MaxValue);
             }
         }
     }

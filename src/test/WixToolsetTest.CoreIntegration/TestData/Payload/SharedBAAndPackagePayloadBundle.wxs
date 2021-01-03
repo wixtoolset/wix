@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage SourceFile="burn.exe">
+                <PayloadGroupRef Id="Shared" />
+            </ExePackage>
+        </PackageGroup>
+        <BootstrapperApplication>
+            <PayloadGroupRef Id="Shared" />
+        </BootstrapperApplication>
+        <PayloadGroup Id="Shared">
+            <Payload SourceFile="$(sys.SOURCEFILEPATH)" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

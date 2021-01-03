@@ -216,7 +216,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/4628
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/4628")]
         public void CantBuildWithDuplicateCacheIds()
         {
             var folder = TestData.Get(@"TestData");
@@ -242,7 +242,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/4574
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/4574")]
         public void CantBuildWithDuplicatePayloadNames()
         {
             var folder = TestData.Get(@"TestData");
@@ -268,7 +268,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/6291
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6291")]
         public void CantBuildWithUnscheduledPackage()
         {
             var folder = TestData.Get(@"TestData");
@@ -294,7 +294,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")] //https://github.com/wixtoolset/issues/issues/6291
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6291")]
         public void CantBuildWithUnscheduledRollbackBoundary()
         {
             var folder = TestData.Get(@"TestData");
