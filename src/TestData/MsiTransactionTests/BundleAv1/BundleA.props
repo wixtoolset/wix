@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Project>
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
@@ -10,6 +10,6 @@
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.77" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.80" />
   </ItemGroup>
 </Project>
