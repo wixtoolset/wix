@@ -112,10 +112,10 @@ namespace WixToolset.BuildTasks
         protected virtual void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
             commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
-            commandLineBuilder.AppendArrayIfNotNull("-sw ", this.SuppressSpecificWarnings);
+            commandLineBuilder.AppendArrayIfNotNull("-sw", this.SuppressSpecificWarnings);
             commandLineBuilder.AppendIfTrue("-sw", this.SuppressAllWarnings);
             commandLineBuilder.AppendIfTrue("-v", this.VerboseOutput);
-            commandLineBuilder.AppendArrayIfNotNull("-wx ", this.TreatSpecificWarningsAsErrors);
+            commandLineBuilder.AppendArrayIfNotNull("-wx", this.TreatSpecificWarningsAsErrors);
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
         }
 
