@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "TablesAndTuples": {
+    "TablesAndSymbols": {
       "commandName": "Project",
       "commandLineArgs": "E:\\src\\wixtoolset\\Core\\src\\WixToolset.Core\\Data\\messages.xml E:\\src\\wixtoolset\\Data\\src\\WixToolset.Data",
       "workingDirectory": "E:\\src\\wixtoolset\\Core\\src\\WixToolset.Core\\"

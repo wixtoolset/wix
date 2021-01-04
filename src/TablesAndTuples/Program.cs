@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using SimpleJson;
 
-namespace TablesAndTuples
+namespace TablesAndSymbols
 {
     class Program
     {
@@ -65,11 +65,11 @@ namespace TablesAndTuples
 
             foreach (var tableDefinition in tableDefinitions)
             {
-                if (tableDefinition.Tupleless)
+                if (tableDefinition.Symbolless)
                 {
                     continue;
                 }
-                var tupleType = tableDefinition.TupleDefinitionName;
+                var symbolType = tableDefinition.SymbolDefinitionName;
 
                 var fields = new JsonArray();
                 var firstField = true;
@@ -79,7 +79,7 @@ namespace TablesAndTuples
                     if (firstField)
                     {
                         firstField = false;
-                        if (tableDefinition.TupleIdIsPrimaryKey)
+                        if (tableDefinition.SymbolIdIsPrimaryKey)
                         {
                             continue;
                         }
@@ -121,12 +121,12 @@ namespace TablesAndTuples
 
                 var obj = new JsonObject
                 {
-                    { tupleType, fields }
+                    { symbolType, fields }
                 };
                 array.Add(obj);
             }
 
-            array.Sort(CompareTupleDefinitions);
+            array.Sort(CompareSymbolDefinitions);
 
             var strat = new PocoJsonSerializerStrategy();
             var json = SimpleJson.SimpleJson.SerializeObject(array, strat);
@@ -147,28 +147,28 @@ namespace TablesAndTuples
         private static void ReadJsonWriteCs(string inputPath, string outputFolder, string prefix)
         {
             var json = File.ReadAllText(inputPath);
-            var tuples = SimpleJson.SimpleJson.DeserializeObject(json) as JsonArray;
+            var symbols = SimpleJson.SimpleJson.DeserializeObject(json) as JsonArray;
 
-            var tupleNames = new List<string>();
+            var symbolNames = new List<string>();
 
-            foreach (var tupleDefinition in tuples.Cast<JsonObject>())
+            foreach (var symbolDefinition in symbols.Cast<JsonObject>())
             {
-                var tupleName = tupleDefinition.Keys.Single();
-                var fields = tupleDefinition.Values.Single() as JsonArray;
+                var symbolName = symbolDefinition.Keys.Single();
+                var fields = symbolDefinition.Values.Single() as JsonArray;
 
                 var list = GetFields(fields).ToList();
 
-                tupleNames.Add(tupleName);
+                symbolNames.Add(symbolName);
 
-                var text = GenerateTupleFileText(prefix, tupleName, list);
+                var text = GenerateSymbolFileText(prefix, symbolName, list);
 
-                var pathTuple = Path.Combine(outputFolder, tupleName + "Tuple.cs");
-                Console.WriteLine("Writing: {0}", pathTuple);
-                File.WriteAllText(pathTuple, text);
+                var pathSymbol = Path.Combine(outputFolder, symbolName + "Symbol.cs");
+                Console.WriteLine("Writing: {0}", pathSymbol);
+                File.WriteAllText(pathSymbol, text);
             }
 
-            var content = TupleNamesFileContent(prefix, tupleNames);
-            var pathNames = Path.Combine(outputFolder, String.Concat(prefix, "TupleDefinitions.cs"));
+            var content = SymbolNamesFileContent(prefix, symbolNames);
+            var pathNames = Path.Combine(outputFolder, String.Concat(prefix, "SymbolDefinitions.cs"));
             Console.WriteLine("Writing: {0}", pathNames);
             File.WriteAllText(pathNames, content);
         }
@@ -215,7 +215,7 @@ namespace TablesAndTuples
             var unrealDef =
                 "            unreal: true,";
             var endTableDef = String.Join(Environment.NewLine,
-                "            tupleIdIsPrimaryKey: {1}",
+                "            symbolIdIsPrimaryKey: {1}",
                 "        );",
                 "");
             var startAllTablesDef = String.Join(Environment.NewLine,
@@ -234,8 +234,8 @@ namespace TablesAndTuples
             sb.AppendLine(startClassDef.Replace("{1}", ns).Replace("{2}", prefix));
             foreach (var tableDefinition in tableDefinitions)
             {
-                var tupleDefinition = tableDefinition.Tupleless ? "null" : $"{prefix}TupleDefinitions.{tableDefinition.TupleDefinitionName}";
-                sb.AppendLine(startTableDef.Replace("{1}", tableDefinition.VariableName).Replace("{2}", tableDefinition.Name).Replace("{3}", tupleDefinition));
+                var symbolDefinition = tableDefinition.Symbolless ? "null" : $"{prefix}SymbolDefinitions.{tableDefinition.SymbolDefinitionName}";
+                sb.AppendLine(startTableDef.Replace("{1}", tableDefinition.VariableName).Replace("{2}", tableDefinition.Name).Replace("{3}", symbolDefinition));
                 foreach (var columnDefinition in tableDefinition.Columns)
                 {
                     sb.Append(columnDef.Replace("{1}", columnDefinition.Name).Replace("{2}", columnDefinition.Type.ToString()).Replace("{3}", columnDefinition.Length.ToString())
@@ -287,7 +287,7 @@ namespace TablesAndTuples
                 {
                     sb.AppendLine(unrealDef);
                 }
-                sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
+                sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.SymbolIdIsPrimaryKey.ToString().ToLower()));
             }
             sb.AppendLine(startAllTablesDef);
             foreach (var tableDefinition in tableDefinitions)
@@ -300,7 +300,7 @@ namespace TablesAndTuples
             return sb.ToString();
         }
 
-        private static string GenerateTupleFileText(string prefix, string tupleName, List<(string Name, string Type, string ClrType, string AsFunction)> tupleFields)
+        private static string GenerateSymbolFileText(string prefix, string symbolName, List<(string Name, string Type, string ClrType, string AsFunction)> symbolFields)
         {
             var ns = prefix ?? "Data";
             var toString = String.IsNullOrEmpty(prefix) ? null : ".ToString()";
@@ -312,52 +312,52 @@ namespace TablesAndTuples
                 "{");
             var usingDataDef =
                 "    using WixToolset.Data;";
-            var startTupleDef = String.Join(Environment.NewLine,
-                "    using WixToolset.{2}.Tuples;",
+            var startSymbolDef = String.Join(Environment.NewLine,
+                "    using WixToolset.{2}.Symbols;",
                 "",
-                "    public static partial class {3}TupleDefinitions",
+                "    public static partial class {3}SymbolDefinitions",
                 "    {",
-                "        public static readonly IntermediateTupleDefinition {1} = new IntermediateTupleDefinition(",
-                "            {3}TupleDefinitionType.{1}{4},",
+                "        public static readonly IntermediateSymbolDefinition {1} = new IntermediateSymbolDefinition(",
+                "            {3}SymbolDefinitionType.{1}{4},",
                 "            new{5}[]",
                 "            {");
             var fieldDef =
-                "                new IntermediateFieldDefinition(nameof({1}TupleFields.{2}), IntermediateFieldType.{3}),";
-            var endTupleDef = String.Join(Environment.NewLine,
+                "                new IntermediateFieldDefinition(nameof({1}SymbolFields.{2}), IntermediateFieldType.{3}),";
+            var endSymbolDef = String.Join(Environment.NewLine,
                 "            },",
-                "            typeof({1}Tuple));",
+                "            typeof({1}Symbol));",
                 "    }",
                 "}",
                 "",
-                "namespace WixToolset.{2}.Tuples",
+                "namespace WixToolset.{2}.Symbols",
                 "{");
             var startEnumDef = String.Join(Environment.NewLine,
-                "    public enum {1}TupleFields",
+                "    public enum {1}SymbolFields",
                 "    {");
             var fieldEnum =
                 "        {2},";
-            var startTuple = String.Join(Environment.NewLine,
+            var startSymbol = String.Join(Environment.NewLine,
                 "    }",
                 "",
-                "    public class {1}Tuple : IntermediateTuple",
+                "    public class {1}Symbol : IntermediateSymbol",
                 "    {",
-                "        public {1}Tuple() : base({3}TupleDefinitions.{1}, null, null)",
+                "        public {1}Symbol() : base({3}SymbolDefinitions.{1}, null, null)",
                 "        {",
                 "        }",
                 "",
-                "        public {1}Tuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base({3}TupleDefinitions.{1}, sourceLineNumber, id)",
+                "        public {1}Symbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base({3}SymbolDefinitions.{1}, sourceLineNumber, id)",
                 "        {",
                 "        }",
                 "",
-                "        public IntermediateField this[{1}TupleFields index] => this.Fields[(int)index];");
+                "        public IntermediateField this[{1}SymbolFields index] => this.Fields[(int)index];");
             var fieldProp = String.Join(Environment.NewLine,
                 "",
                 "        public {4} {2}",
                 "        {",
-                "            get => {6}this.Fields[(int){1}TupleFields.{2}]{5};",
-                "            set => this.Set((int){1}TupleFields.{2}, value);",
+                "            get => {6}this.Fields[(int){1}SymbolFields.{2}]{5};",
+                "            set => this.Set((int){1}SymbolFields.{2}, value);",
                 "        }");
-            var endTuple = String.Join(Environment.NewLine,
+            var endSymbol = String.Join(Environment.NewLine,
                 "    }",
                 "}");
 
@@ -368,36 +368,36 @@ namespace TablesAndTuples
             {
                 sb.AppendLine(usingDataDef);
             }
-            sb.AppendLine(startTupleDef.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix).Replace("{4}", toString).Replace("{5}", tupleFields.Any() ? null : " IntermediateFieldDefinition"));
-            foreach (var field in tupleFields)
+            sb.AppendLine(startSymbolDef.Replace("{1}", symbolName).Replace("{2}", ns).Replace("{3}", prefix).Replace("{4}", toString).Replace("{5}", symbolFields.Any() ? null : " IntermediateFieldDefinition"));
+            foreach (var field in symbolFields)
             {
-                sb.AppendLine(fieldDef.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type));
+                sb.AppendLine(fieldDef.Replace("{1}", symbolName).Replace("{2}", field.Name).Replace("{3}", field.Type));
             }
-            sb.AppendLine(endTupleDef.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
+            sb.AppendLine(endSymbolDef.Replace("{1}", symbolName).Replace("{2}", ns).Replace("{3}", prefix));
             if (ns != "Data")
             {
                 sb.AppendLine(usingDataDef);
                 sb.AppendLine();
             }
-            sb.AppendLine(startEnumDef.Replace("{1}", tupleName));
-            foreach (var field in tupleFields)
+            sb.AppendLine(startEnumDef.Replace("{1}", symbolName));
+            foreach (var field in symbolFields)
             {
-                sb.AppendLine(fieldEnum.Replace("{1}", tupleName).Replace("{2}", field.Name));
+                sb.AppendLine(fieldEnum.Replace("{1}", symbolName).Replace("{2}", field.Name));
             }
-            sb.AppendLine(startTuple.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
-            foreach (var field in tupleFields)
+            sb.AppendLine(startSymbol.Replace("{1}", symbolName).Replace("{2}", ns).Replace("{3}", prefix));
+            foreach (var field in symbolFields)
             {
                 var useCast = ns == "Data" && field.AsFunction != "AsPath()";
                 var cast = useCast ? $"({field.ClrType})" : null;
                 var asFunction = useCast ? null : $".{field.AsFunction}";
-                sb.AppendLine(fieldProp.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", asFunction).Replace("{6}", cast));
+                sb.AppendLine(fieldProp.Replace("{1}", symbolName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", asFunction).Replace("{6}", cast));
             }
-            sb.Append(endTuple);
+            sb.Append(endSymbol);
 
             return sb.ToString();
         }
 
-        private static string TupleNamesFileContent(string prefix, List<string> tupleNames)
+        private static string SymbolNamesFileContent(string prefix, List<string> symbolNames)
         {
             var ns = prefix ?? "Data";
 
@@ -409,20 +409,20 @@ namespace TablesAndTuples
                 "    using System;",
                 "    using WixToolset.Data;",
                 "",
-                "    public enum {3}TupleDefinitionType",
+                "    public enum {3}SymbolDefinitionType",
                 "    {");
             var namesFormat =
                 "        {1},";
             var midpoint = String.Join(Environment.NewLine,
                 "    }",
                 "",
-                "    public static partial class {3}TupleDefinitions",
+                "    public static partial class {3}SymbolDefinitions",
                 "    {",
                 "        public static readonly Version Version = new Version(\"4.0.0\");",
                 "",
-                "        public static IntermediateTupleDefinition ByName(string name)",
+                "        public static IntermediateSymbolDefinition ByName(string name)",
                 "        {",
-                "            if (!Enum.TryParse(name, out {3}TupleDefinitionType type))",
+                "            if (!Enum.TryParse(name, out {3}SymbolDefinitionType type))",
                 "            {",
                 "                return null;",
                 "            }",
@@ -430,14 +430,14 @@ namespace TablesAndTuples
                 "            return ByType(type);",
                 "        }",
                 "",
-                "        public static IntermediateTupleDefinition ByType({3}TupleDefinitionType type)",
+                "        public static IntermediateSymbolDefinition ByType({3}SymbolDefinitionType type)",
                 "        {",
                 "            switch (type)",
                 "            {");
 
             var caseFormat = String.Join(Environment.NewLine,
-                "                case {3}TupleDefinitionType.{1}:",
-                "                    return {3}TupleDefinitions.{1};",
+                "                case {3}SymbolDefinitionType.{1}:",
+                "                    return {3}SymbolDefinitions.{1};",
                 "");
 
             var footer = String.Join(Environment.NewLine,
@@ -451,14 +451,14 @@ namespace TablesAndTuples
             var sb = new StringBuilder();
 
             sb.AppendLine(header.Replace("{2}", ns).Replace("{3}", prefix));
-            foreach (var tupleName in tupleNames)
+            foreach (var symbolName in symbolNames)
             {
-                sb.AppendLine(namesFormat.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
+                sb.AppendLine(namesFormat.Replace("{1}", symbolName).Replace("{2}", ns).Replace("{3}", prefix));
             }
             sb.AppendLine(midpoint.Replace("{2}", ns).Replace("{3}", prefix));
-            foreach (var tupleName in tupleNames)
+            foreach (var symbolName in symbolNames)
             {
-                sb.AppendLine(caseFormat.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
+                sb.AppendLine(caseFormat.Replace("{1}", symbolName).Replace("{2}", ns).Replace("{3}", prefix));
             }
             sb.AppendLine(footer);
 
@@ -514,7 +514,7 @@ namespace TablesAndTuples
             throw new ArgumentException(fieldType);
         }
 
-        private static int CompareTupleDefinitions(object x, object y)
+        private static int CompareSymbolDefinitions(object x, object y)
         {
             var first = (JsonObject)x;
             var second = (JsonObject)y;

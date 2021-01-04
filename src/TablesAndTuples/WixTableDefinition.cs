@@ -2,43 +2,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 
-namespace TablesAndTuples
+namespace TablesAndSymbols
 {
     class WixTableDefinition
     {
-        public WixTableDefinition(string name, IEnumerable<WixColumnDefinition> columns, bool unreal, bool tupleless, string tupleDefinitionName, bool? tupleIdIsPrimaryKey)
+        public WixTableDefinition(string name, IEnumerable<WixColumnDefinition> columns, bool unreal, bool symbolless, string symbolDefinitionName, bool? symbolIdIsPrimaryKey)
         {
             this.Name = name;
             this.VariableName = name.Replace("_", "");
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
-            this.Tupleless = tupleless;
-            this.TupleDefinitionName = tupleless ? null : tupleDefinitionName ?? this.VariableName;
-            this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey ?? DeriveTupleIdIsPrimaryKey(this.Columns);
+            this.Symbolless = symbolless;
+            this.SymbolDefinitionName = symbolless ? null : symbolDefinitionName ?? this.VariableName;
+            this.SymbolIdIsPrimaryKey = symbolIdIsPrimaryKey ?? DeriveSymbolIdIsPrimaryKey(this.Columns);
         }
 
         public string Name { get; }
 
         public string VariableName { get; }
 
-        public string TupleDefinitionName { get; }
+        public string SymbolDefinitionName { get; }
 
         public bool Unreal { get; }
 
         public WixColumnDefinition[] Columns { get; }
 
-        public bool TupleIdIsPrimaryKey { get; }
+        public bool SymbolIdIsPrimaryKey { get; }
 
-        public bool Tupleless { get; }
+        public bool Symbolless { get; }
 
         static WixTableDefinition Read(XmlReader reader)
         {
             var empty = reader.IsEmptyElement;
             string name = null;
-            string tupleDefinitionName = null;
+            string symbolDefinitionName = null;
             var unreal = false;
-            bool? tupleIdIsPrimaryKey = null;
-            var tupleless = false;
+            bool? symbolIdIsPrimaryKey = null;
+            var symbolless = false;
 
             while (reader.MoveToNextAttribute())
             {
@@ -47,14 +47,14 @@ namespace TablesAndTuples
                     case "name":
                         name = reader.Value;
                         break;
-                    case "tupleDefinitionName":
-                        tupleDefinitionName = reader.Value;
+                    case "symbolDefinitionName":
+                        symbolDefinitionName = reader.Value;
                         break;
-                    case "tupleIdIsPrimaryKey":
-                        tupleIdIsPrimaryKey = reader.Value.Equals("yes");
+                    case "symbolIdIsPrimaryKey":
+                        symbolIdIsPrimaryKey = reader.Value.Equals("yes");
                         break;
-                    case "tupleless":
-                        tupleless = reader.Value.Equals("yes");
+                    case "symbolless":
+                        symbolless = reader.Value.Equals("yes");
                         break;
                     case "unreal":
                         unreal = reader.Value.Equals("yes");
@@ -101,10 +101,10 @@ namespace TablesAndTuples
                 }
             }
 
-            return new WixTableDefinition(name, columns.ToArray(), unreal, tupleless, tupleDefinitionName, tupleIdIsPrimaryKey);
+            return new WixTableDefinition(name, columns.ToArray(), unreal, symbolless, symbolDefinitionName, symbolIdIsPrimaryKey);
         }
 
-        static bool DeriveTupleIdIsPrimaryKey(WixColumnDefinition[] columns)
+        static bool DeriveSymbolIdIsPrimaryKey(WixColumnDefinition[] columns)
         {
             return columns[0].PrimaryKey &&
                    columns[0].Type == ColumnType.String &&

@@ -1,7 +1,7 @@
 using System;
 using System.Xml;
 
-namespace TablesAndTuples
+namespace TablesAndSymbols
 {
     class WixColumnDefinition
     {

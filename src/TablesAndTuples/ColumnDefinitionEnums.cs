@@ -1,4 +1,4 @@
-namespace TablesAndTuples
+namespace TablesAndSymbols
 {
     public enum ColumnCategory
     {
