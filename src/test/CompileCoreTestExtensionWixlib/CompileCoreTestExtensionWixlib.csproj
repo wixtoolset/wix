@@ -4,10 +4,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ExtensionWxs Include="..\Example.Extension\Data\example.wxs">
+      <WixlibPath>$(BaseOutputPath)TestData\$(Configuration)\example.wixlib</WixlibPath>
+    </ExtensionWxs>
+  </ItemGroup>
+
+  <Target Name="BuildExtensionWixlibs"
+          AfterTargets="AfterBuild"
+          Inputs="@(ExtensionWxs)"
+          Outputs="%(ExtensionWxs.WixlibPath)"
+          Condition=" '$(NCrunch)'!='1' ">
+
+    <Exec Command="dotnet @(TargetPathWithTargetPlatformMoniker) &quot;$(IntermediateOutputPath) &quot; &quot;%(ExtensionWxs.WixlibPath)&quot; &quot;%(ExtensionWxs.Filename)%(ExtensionWxs.Extension)&quot;"
+          WorkingDirectory="%(ExtensionWxs.RelativeDir)" />
+
+    <Message Importance="high" Text="@(ExtensionWxs) -&gt; %(ExtensionWxs.WixlibPath)" />
+  </Target>
 </Project>

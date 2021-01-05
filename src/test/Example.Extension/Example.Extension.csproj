@@ -6,39 +6,19 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
-    <CompileWixlibDllPath>$(OutputPath)netcoreapp2.1\CompileCoreTestExtensionWixlib.dll</CompileWixlibDllPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Try to hack around VS up-to-date detection -->
-    <Content Include="$(CompileWixlibDllPath)" CopyToOutputDirectory="PreserveNewest">
-      <Visible>false</Visible>
-    </Content>
-    <Content Include="Data\example.wxs" CopyToOutputDirectory="PreserveNewest">
-      <Visible>false</Visible>
-    </Content>
-    <ExtensionWxs Include="Data\example.wxs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+    <!-- This .wixlib is built by CompileCoreTestExtensionWixlib.csproj -->
+    <EmbeddedResource Include="$(BaseOutputPath)TestData\$(Configuration)\Example.wixlib" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj" />
   </ItemGroup>
 
-  <Target Name="SetExtensionWixlib">
-    <PropertyGroup>
-      <WixlibPath>$(IntermediateOutputPath)Example.wixlib</WixlibPath>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="$(WixlibPath)" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="ResolveProjectReferences;SetExtensionWixlib" Inputs="@(ExtensionWxs);$(CompileWixlibDllPath)" Outputs="$(WixlibPath)">
-    <Exec Command='dotnet $(CompileWixlibDllPath) "$(IntermediateOutputPath) " "$(WixlibPath)" "@(ExtensionWxs)"' />
-  </Target>
 </Project>

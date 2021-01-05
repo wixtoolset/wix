@@ -341,8 +341,6 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-
-
         [Fact]
         public void PopulatesDirectoryTableWithValidDefaultDir()
         {
