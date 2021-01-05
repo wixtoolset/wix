@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void Execute()
         {
             var directories = this.Section.Symbols.OfType<DirectorySymbol>().ToList();
-            var directoriesById = directories.ToDictionary(d => d.Id.Id);
+            var directoryIds = new SortedSet<string>(directories.Select(d => d.Id.Id));
 
             foreach (var directory in directories)
             {
@@ -42,20 +42,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    this.EnsureStandardDirectoryAdded(directoriesById, parentDirectoryId, directory.SourceLineNumbers);
+                    this.EnsureStandardDirectoryAdded(directoryIds, parentDirectoryId, directory.SourceLineNumbers);
                 }
             }
 
-            if (!directoriesById.ContainsKey("TARGETDIR") && WindowsInstallerStandard.TryGetStandardDirectory("TARGETDIR", out var targetDir))
+            if (!directoryIds.Contains("TARGETDIR") && WindowsInstallerStandard.TryGetStandardDirectory("TARGETDIR", out var targetDir))
             {
-                directoriesById.Add(targetDir.Id.Id, targetDir);
+                directoryIds.Add(targetDir.Id.Id);
                 this.Section.AddSymbol(targetDir);
             }
         }
 
-        private void EnsureStandardDirectoryAdded(Dictionary<string, DirectorySymbol> directoriesById, string directoryId, SourceLineNumber sourceLineNumbers)
+        private void EnsureStandardDirectoryAdded(ISet<string> directoryIds, string directoryId, SourceLineNumber sourceLineNumbers)
         {
-            if (!directoriesById.ContainsKey(directoryId) && WindowsInstallerStandard.TryGetStandardDirectory(directoryId, out var standardDirectory))
+            if (!directoryIds.Contains(directoryId) && WindowsInstallerStandard.TryGetStandardDirectory(directoryId, out var standardDirectory))
             {
                 var parentDirectoryId = this.GetStandardDirectoryParent(directoryId);
 
@@ -65,12 +65,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     ParentDirectoryRef = parentDirectoryId,
                 };
 
-                directoriesById.Add(directory.Id.Id, directory);
+                directoryIds.Add(directory.Id.Id);
                 this.Section.AddSymbol(directory);
 
                 if (!String.IsNullOrEmpty(parentDirectoryId))
                 {
-                    this.EnsureStandardDirectoryAdded(directoriesById, parentDirectoryId, sourceLineNumbers);
+                    this.EnsureStandardDirectoryAdded(directoryIds, parentDirectoryId, sourceLineNumbers);
                 }
             }
         }

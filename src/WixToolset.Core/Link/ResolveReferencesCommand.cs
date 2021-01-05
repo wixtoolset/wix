@@ -170,9 +170,9 @@ namespace WixToolset.Core.Link
                 case AccessModifier.Public:
                     return true;
                 case AccessModifier.Internal:
-                    return symbolWithSection.Section.CompilationId.Equals(referencingSection.CompilationId) || (null != symbolWithSection.Section.LibraryId && symbolWithSection.Section.LibraryId.Equals(referencingSection.LibraryId));
+                    return symbolWithSection.Section.CompilationId == referencingSection.CompilationId || (null != symbolWithSection.Section.LibraryId && symbolWithSection.Section.LibraryId == referencingSection.LibraryId);
                 case AccessModifier.Protected:
-                    return symbolWithSection.Section.CompilationId.Equals(referencingSection.CompilationId);
+                    return symbolWithSection.Section.CompilationId == referencingSection.CompilationId;
                 case AccessModifier.Private:
                     return referencingSection == symbolWithSection.Section;
                 default:

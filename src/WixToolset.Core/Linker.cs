@@ -226,6 +226,11 @@ namespace WixToolset.Core
 
                     foreach (var symbol in section.Symbols)
                     {
+                        if (find.RedundantSymbols.Contains(symbol))
+                        {
+                            continue;
+                        }
+
                         var copySymbol = true; // by default, copy symbols.
 
                         // handle special tables

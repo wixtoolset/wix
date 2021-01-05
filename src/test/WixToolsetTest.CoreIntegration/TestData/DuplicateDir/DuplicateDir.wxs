@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="GroupA" />
+            <ComponentGroupRef Id="GroupB" />
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="GroupA" Directory="INSTALLFOLDER:\dupe">
+            <Component>
+                <File Name="a.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="GroupB" Directory="INSTALLFOLDER:\dupe">
+            <Component>
+                <File Name="b.txt" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -38,10 +38,17 @@ namespace WixToolset.Core.Link
         /// </summary>
         public IEnumerable<SymbolWithSection> PossibleConflicts { get; private set; }
 
+        /// <summary>
+        /// Gets the collection of redundant symbols that should not be included
+        /// in the final output.
+        /// </summary>
+        public ISet<IntermediateSymbol> RedundantSymbols { get; private set; }
+
         public void Execute()
         {
             var symbolsByName = new Dictionary<string, SymbolWithSection>();
             var possibleConflicts = new HashSet<SymbolWithSection>();
+            var redundantSymbols = new HashSet<IntermediateSymbol>();
 
             if (!Enum.TryParse(this.ExpectedOutputType.ToString(), out SectionType expectedEntrySectionType))
             {
@@ -91,13 +98,13 @@ namespace WixToolset.Core.Link
                             // Ensure identical symbol's symbol is marked redundant to ensure (should the symbol be
                             // referenced into the final output) it will not add duplicate primary keys during
                             // the .IDT importing.
-                            //symbol.Row.Redundant = true; - TODO: remove this
                             existingSymbol.AddRedundant(symbolWithSection);
+                            redundantSymbols.Add(symbolWithSection.Symbol);
                         }
                         else
                         {
                             existingSymbol.AddPossibleConflict(symbolWithSection);
-                            possibleConflicts.Add(existingSymbol);
+                            possibleConflicts.Add(symbolWithSection);
                         }
                     }
                 }
@@ -105,6 +112,7 @@ namespace WixToolset.Core.Link
 
             this.SymbolsByName = symbolsByName;
             this.PossibleConflicts = possibleConflicts;
+            this.RedundantSymbols = redundantSymbols;
         }
     }
 }

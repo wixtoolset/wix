@@ -85,5 +85,44 @@ namespace WixToolsetTest.CoreIntegration
                 }, dirSymbols.Select(d => d.Id.Id).ToArray());
             }
         }
+
+        [Fact]
+        public void CanGetDuplicateDir()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "DuplicateDir", "DuplicateDir.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                Assert.Equal(new[]
+                {
+                    "dirZsSsu81KcG46xXTwc4mTSZO5Zx4",
+                    "INSTALLFOLDER",
+                    "ProgramFiles6432Folder",
+                    "ProgramFiles64Folder",
+                    "TARGETDIR"
+                }, dirSymbols.Select(d => d.Id.Id).ToArray());
+            }
+        }
     }
 }
