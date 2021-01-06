@@ -26,6 +26,7 @@ namespace WixToolset.Core
         private void ParsePackageElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var compressed = YesNoDefaultType.Default;
             var sourceBits = 0;
             var codepage = 65001;
             var productCode = "*";
@@ -55,10 +56,7 @@ namespace WixToolset.Core
                         codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
                         break;
                     case "Compressed":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits |= 2;
-                        }
+                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                         break;
                     case "InstallerVersion":
                         msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
@@ -158,6 +156,11 @@ namespace WixToolset.Core
             else if (!CompilerCore.IsValidProductVersion(version))
             {
                 this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
+            }
+
+            if (compressed != YesNoDefaultType.No)
+            {
+                sourceBits |= 2;
             }
 
             if (this.Core.EncounteredError)
