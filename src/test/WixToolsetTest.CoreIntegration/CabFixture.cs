@@ -42,7 +42,7 @@ namespace WixToolsetTest.CoreIntegration
                 var fileRows = fileTable.Select(r => new FileRow(r)).OrderBy(f => f.Sequence).ToList();
 
                 Assert.Equal(new[] { 1, 2 }, fileRows.Select(f => f.Sequence).ToArray());
-                Assert.Equal(new[] { "test.txt", "Notepad.exe" }, fileRows.Select(f => f.Name).ToArray());
+                Assert.Equal(new[] { "Notepad.exe", "test.txt" }, fileRows.Select(f => f.Name).ToArray());
 
                 var files = Query.GetCabinetFiles(cabPath);
                 Assert.Equal(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());

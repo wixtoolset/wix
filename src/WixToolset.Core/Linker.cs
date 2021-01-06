@@ -198,8 +198,10 @@ namespace WixToolset.Core
                 }
 
                 // Report duplicates that would ultimately end up being primary key collisions.
-                var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
-                reportDupes.Execute();
+                {
+                    var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
+                    reportDupes.Execute();
+                }
 
                 if (this.Messaging.EncounteredError)
                 {

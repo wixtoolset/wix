@@ -364,7 +364,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             Dictionary<MediaSymbol, IEnumerable<FileFacade>> filesByCabinetMedia;
             IEnumerable<FileFacade> uncompressedFiles;
             {
-                var order = new OptimizeFileFacadesOrderCommand(fileFacades);
+                var order = new OptimizeFileFacadesOrderCommand(this.BackendHelper, this.PathResolver, section, platform, fileFacades);
                 order.Execute();
 
                 fileFacades = order.FileFacades;

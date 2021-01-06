@@ -1,0 +1,28 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="~MultiMedia" Codepage="1252" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation"
+             UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127">
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <Media Id="1" Cabinet="cab1.cab" />
+        <Media Id="2" Cabinet="cab2.cab" />
+        
+        <Feature Id="ProductFeature" Title="MsiPackageTitle">
+            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="1">
+                <File Source="a1.txt" />
+            </Component>
+
+            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="1">
+                <File Source="a2.txt" />
+            </Component>
+
+            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="2">
+                <File Source="b2.txt" />
+            </Component>
+
+            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="2">
+                <File Source="b1.txt" />
+            </Component>
+        </Feature>
+    </Package>
+</Wix>
