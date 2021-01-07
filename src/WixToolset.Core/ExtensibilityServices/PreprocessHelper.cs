@@ -386,6 +386,14 @@ namespace WixToolset.Core.ExtensibilityServices
                         }
                     }
 
+                    // Environment variables may contain parens so if it looks
+                    // like a function, check to see if the environment variable
+                    // prefix was explicitly provided.
+                    if (isFunction && remainder.StartsWith("(env.", StringComparison.Ordinal))
+                    {
+                        isFunction = false;
+                    }
+
                     // move the currentPosition to the closing paren
                     currentPosition += closingParenPosition;
 

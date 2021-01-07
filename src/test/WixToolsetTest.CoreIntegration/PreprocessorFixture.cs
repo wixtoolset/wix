@@ -40,6 +40,24 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        /// <remarks>
+        /// This test will fail on 32-bit operating systems because it depends on "CommonProgramFiles(x86)"
+        /// which is only defined on 64-bit Windows.
+        /// </remarks>
+        public void SupportParensInEnvironmentVariables()
+        {
+            var folder = TestData.Get(@"TestData", "Preprocessor");
+
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+            var context = serviceProvider.GetService<IPreprocessContext>();
+            context.SourcePath = Path.Combine(folder, "EnvParens.wxs");
+
+            var preprocessor = serviceProvider.GetService<IPreprocessor>();
+            var result = preprocessor.Preprocess(context);
+            Assert.NotNull(result.Document);
+        }
+
+        [Fact]
         public void VariableRedefinitionIsAWarning()
         {
             var folder = TestData.Get(@"TestData\Variables");
