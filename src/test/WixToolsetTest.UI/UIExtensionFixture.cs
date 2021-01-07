@@ -80,9 +80,31 @@ namespace WixToolsetTest.UI
             }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
         }
 
+        [Fact]
+        public void CanBuildUsingWixUIMondoLocalized()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Mondo");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(BuildInGerman, "Control");
+            Assert.Equal(new[]
+            {
+                "&Ja",
+            }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)
+                                  .AssertSuccess();
+        }
+
+        private static void BuildInGerman(string[] args)
+        {
+            var localizedArgs = args.Append("-culture").Append("de-DE").ToArray();
+
+            var result = WixRunner.Execute(localizedArgs)
                                   .AssertSuccess();
         }
     }
