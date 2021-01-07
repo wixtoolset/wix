@@ -493,7 +493,6 @@ namespace WixToolset.Core
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="emptyRule">A rule for the contents of the value. If the contents do not follow the rule, an error is thrown.</param>
         /// <returns>The attribute's value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule = EmptyRule.CanBeWhitespaceOnly)
         {
             return this.parseHelper.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
@@ -505,7 +504,6 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>A valid code page integer value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public int GetAttributeCodePageValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             if (null == attribute)
@@ -535,7 +533,6 @@ namespace WixToolset.Core
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="onlyAnsi">Whether to allow Unicode (UCS) or UTF code pages.</param>
         /// <returns>A valid code page integer value or variable expression.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeLocalizableCodePageValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool onlyAnsi = false)
         {
             if (null == attribute)
@@ -577,7 +574,6 @@ namespace WixToolset.Core
         /// <param name="minimum">The minimum legal value.</param>
         /// <param name="maximum">The maximum legal value.</param>
         /// <returns>The attribute's integer value or a special value if an error occurred during conversion.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public int GetAttributeIntegerValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, int minimum, int maximum)
         {
             return this.parseHelper.GetAttributeIntegerValue(sourceLineNumbers, attribute, minimum, maximum);
@@ -602,7 +598,6 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>Int representation of the date time.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public int GetAttributeDateTimeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             if (null == attribute)
@@ -748,7 +743,6 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's YesNoDefaultType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public YesNoDefaultType GetAttributeYesNoDefaultValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             return this.parseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attribute);
@@ -793,7 +787,6 @@ namespace WixToolset.Core
         /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
         /// <param name="allowRelative">true if relative paths are allowed in the filename.</param>
         /// <returns>The attribute's long filename value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false, bool allowRelative = false)
         {
             return this.parseHelper.GetAttributeLongFilename(sourceLineNumbers, attribute, allowWildcards, allowRelative);
@@ -817,7 +810,6 @@ namespace WixToolset.Core
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="allowHkmu">Whether HKMU is returned as -1 (true), or treated as an error (false).</param>
         /// <returns>The attribute's RegisitryRootType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
             return this.parseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
@@ -829,7 +821,6 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeBundleVariableValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             string value = this.GetAttributeValue(sourceLineNumbers, attribute);
@@ -852,7 +843,6 @@ namespace WixToolset.Core
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeMsiPropertyNameValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             string value = this.GetAttributeValue(sourceLineNumbers, attribute);
@@ -885,7 +875,6 @@ namespace WixToolset.Core
         /// <param name="prefix">Three letter or less prefix for generated row identifier.</param>
         /// <param name="args">Information to hash.</param>
         /// <returns>The generated identifier.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1303:DoNotPassLiteralsAsLocalizedParameters", MessageId = "System.InvalidOperationException.#ctor(System.String)")]
         public Identifier CreateIdentifier(string prefix, params string[] args)
         {
             return this.parseHelper.CreateIdentifier(prefix, args);

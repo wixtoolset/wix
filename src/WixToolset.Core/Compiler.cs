@@ -676,7 +676,6 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <returns>Identifier for the new row.</returns>
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private Identifier ParseBinaryElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -2102,7 +2101,6 @@ namespace WixToolset.Core
         /// <param name="diskId">Optional disk id inherited from parent directory.</param>
         /// <param name="directoryId">Optional identifier for component's directory.</param>
         /// <param name="srcPath">Optional source path for files up to this point.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseComponentElement(XElement node, ComplexReferenceParentType parentType, string parentId, string parentLanguage, int diskId, string directoryId, string srcPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -2573,7 +2571,6 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType"></param>
         /// <param name="parentId"></param>
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseComponentGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -4135,7 +4132,6 @@ namespace WixToolset.Core
         /// <param name="parentId">Optional identifier of parent directory.</param>
         /// <param name="diskId">Disk id inherited from parent directory.</param>
         /// <param name="fileSource">Path to source file as of yet.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength")]
         private void ParseDirectoryElement(XElement node, string parentId, int diskId, string fileSource)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -4363,7 +4359,6 @@ namespace WixToolset.Core
         /// Parses a directory reference element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseDirectoryRefElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -4711,7 +4706,6 @@ namespace WixToolset.Core
         /// <param name="parentId">Optional identifer for parent feature.</param>
         /// <param name="lastDisplay">Display value for last feature used to get the features to display in the same order as specified
         /// in the source code.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseFeatureElement(XElement node, ComplexReferenceParentType parentType, string parentId, ref int lastDisplay)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -4935,7 +4929,6 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">The type of parent.</param>
         /// <param name="parentId">Optional identifier for parent feature.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseFeatureRefElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -5029,7 +5022,6 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType"></param>
         /// <param name="parentId"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private void ParseFeatureGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -5484,7 +5476,6 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="componentGuid"></param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);

@@ -1523,9 +1523,6 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
         private YesNoType ParseRegistryKeyElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out string possibleKeyPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -1718,9 +1715,6 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
         private YesNoType ParseRegistryValueElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out string possibleKeyPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -1994,9 +1988,6 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">The element to parse.</param>
         /// <param name="componentId">The component identifier of the parent element.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
         private void ParseRemoveRegistryKeyElement(XElement node, string componentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -2097,9 +2088,6 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">The element to parse.</param>
         /// <param name="componentId">The component identifier of the parent element.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
         private void ParseRemoveRegistryValueElement(XElement node, string componentId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
