@@ -25,6 +25,29 @@ namespace WixToolsetTest.CoreIntegration
             //Assert.Equal((int)ErrorMessages.Ids.ExpectedArgument, result.ExitCode);
         }
 
+        [Fact]
+        public void HandleInvalidIds()
+        {
+            var folder = TestData.Get(@"TestData\BadInput");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "InvalidIds.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                Assert.Equal(330, result.ExitCode);
+            }
+        }
+
         [Fact(Skip = "Test demonstrates failure")]
         public void CantBuildSingleExeBundleWithInvalidArgument()
         {

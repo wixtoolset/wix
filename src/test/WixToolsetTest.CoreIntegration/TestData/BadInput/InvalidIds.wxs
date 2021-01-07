@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <Component Id="@#$" Guid="{2F18F52A-9E24-4ebe-A5FC-974089AA03D2}" Directory="WixTestFolder">
+            <CreateFolder Directory="WixTestFolder" />
+        </Component>
+    </Fragment>
+</Wix>
