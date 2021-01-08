@@ -232,6 +232,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DiscouragedAllUsersValue, "Bundles require a package to be either per-machine or per-user. The MSI '{0}' ALLUSERS Property is set to '2' which may change from per-user to per-machine at install time. The Bundle will assume the package is per-{1} and will not work correctly if that changes. If possible, remove the Property with Id='ALLUSERS' and use Package/@InstallScope attribute instead.", path, machineOrUser);
         }
 
+        public static Message DetectConditionRecommended(SourceLineNumber sourceLineNumbers, string elementName)
+        {
+            return Message(sourceLineNumbers, Ids.DetectConditionRecommended, "The {0}/@DetectCondition attribute is recommended so the package is only installed when absent.", elementName);
+        }
+
         public static Message DownloadUrlNotSupportedForAttachedContainers(SourceLineNumber sourceLineNumbers, string containerId)
         {
             return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForAttachedContainers, "The Container '{0}' is attached but included a @DownloadUrl attribute. Attached Containers cannot be downloaded so the download URL is being ignored.", containerId);
@@ -792,6 +797,7 @@ namespace WixToolset.Data
             SymbolNotTranslatedToOutput = 1150,
             MsiTransactionLimitations = 1151,
             PathCanonicalized = 1152,
+            DetectConditionRecommended = 1153,
         }
     }
 }

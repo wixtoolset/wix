@@ -438,6 +438,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedAttributeInElementOrParent, "The {0}/@{1} attribute was not found or empty; it is required, or it can be specified in the parent {2}/@{3} attribute.", elementName, attributeName, parentElementName, parentAttributeName);
         }
 
+        public static Message ExpectedAttributeWithValueWithOtherAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeName2)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeWithValueWithOtherAttribute, "The {0}/@{1} attribute is required to have a value when attribute {2} is present.", elementName, attributeName, attributeName2);
+        }
+
         public static Message ExpectedAttributeOrElement(SourceLineNumber sourceLineNumbers, string parentElement, string attribute, string childElement)
         {
             return Message(sourceLineNumbers, Ids.ExpectedAttributeOrElement, "Element '{0}' missing attribute '{1}' or child element '{2}'. Exactly one of those is required.", parentElement, attribute, childElement);
@@ -2692,6 +2697,7 @@ namespace WixToolset.Data
             CircularSearchReference = 398,
             UnknownSymbolType = 399,
             IllegalInnerText = 400,
+            ExpectedAttributeWithValueWithOtherAttribute = 401,
         }
     }
 }
