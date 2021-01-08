@@ -161,7 +161,7 @@ namespace WixToolset.Converters
                 { WixConverter.FirewallRemoteAddressElementName, this.ConvertFirewallRemoteAddressElement },
                 { WixConverter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
                 { WixConverter.ErrorElementName, this.ConvertErrorElement },
-                { WixConverter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.ExePackageElementName, this.ConvertExePackageElement },
                 { WixConverter.ModuleElementName, this.ConvertModuleElement },
                 { WixConverter.MsiPackageElementName, this.ConvertWindowsInstallerPackageElement },
                 { WixConverter.MspPackageElementName, this.ConvertWindowsInstallerPackageElement },
@@ -842,6 +842,24 @@ namespace WixToolset.Converters
         private void ConvertEmbeddedChainerElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
 
         private void ConvertErrorElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
+
+        private void ConvertExePackageElement(XElement element)
+        {
+            this.ConvertSuppressSignatureValidation(element);
+
+            foreach (var attributeName in new[] { "InstallCommand", "RepairCommand", "UninstallCommand" })
+            {
+                var newName = attributeName.Replace("Command", "Arguments");
+                var attribute = element.Attribute(attributeName);
+
+                if (attribute != null &&
+                    this.OnError(ConverterTestType.RenameExePackageCommandToArguments, element, "The {0} element {1} attribute has been renamed {2}.", element.Name.LocalName, attribute.Name.LocalName, newName))
+                {
+                    element.Add(new XAttribute(newName, attribute.Value));
+                    attribute.Remove();
+                }
+            }
+        }
 
         private void ConvertPermissionExElement(XElement element)
         {
@@ -1691,6 +1709,11 @@ namespace WixToolset.Converters
             /// The custom elements for built-in BAs are now required.
             /// </summary>
             BalBootstrapperApplicationRefToElement,
+
+            /// <summary>
+            /// The ExePackage elements "XxxCommand" attributes have been renamed to "XxxArguments".
+            /// </summary>
+            RenameExePackageCommandToArguments,
         }
     }
 }
