@@ -104,7 +104,7 @@ namespace WixToolset.Converters
                         }
                         catch
                         {
-                            parser.ErrorArgument = parameter; //  $"Invalid numeric argument: {parameter}";
+                            parser.ReportErrorArgument(parameter); //  $"Invalid numeric argument: {parameter}";
                         }
                         return true;
                     }
