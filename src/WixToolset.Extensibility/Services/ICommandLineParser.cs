@@ -3,11 +3,12 @@
 namespace WixToolset.Extensibility.Services
 {
     using System.Collections.Generic;
+    using WixToolset.Data;
 
 #pragma warning disable 1591 // TODO: add documentation
     public interface ICommandLineParser
     {
-        string ErrorArgument { get; set; }
+        string ErrorArgument { get; }
 
         /// <summary>
         /// Validates that a valid switch (starts with "/" or "-"), and returns a bool indicating its validity
@@ -31,6 +32,8 @@ namespace WixToolset.Extensibility.Services
         string GetNextArgumentAsFilePathOrError(string commandLineSwitch);
 
         bool GetNextArgumentAsFilePathOrError(string commandLineSwitch, string fileType, IList<string> paths);
+
+        void ReportErrorArgument(string argument, Message message = null);
 
         bool TryGetNextSwitchOrArgument(out string arg);
     }
