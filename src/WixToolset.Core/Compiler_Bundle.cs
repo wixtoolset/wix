@@ -2112,9 +2112,9 @@ namespace WixToolset.Core
             var permanent = YesNoType.NotSet;
             var visible = YesNoType.NotSet;
             var vital = YesNoType.Yes;
-            string installCommand = null;
-            string repairCommand = null;
-            string uninstallCommand = null;
+            string installArguments = null;
+            string repairArguments = null;
+            string uninstallArguments = null;
             var perMachine = YesNoDefaultType.NotSet;
             string detectCondition = null;
             string protocol = null;
@@ -2215,16 +2215,16 @@ namespace WixToolset.Core
                     case "Vital":
                         vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
-                    case "InstallCommand":
-                        installCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                    case "InstallArguments":
+                        installArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
-                    case "RepairCommand":
-                        repairCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                    case "RepairArguments":
+                        repairArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
-                    case "UninstallCommand":
-                        uninstallCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                    case "UninstallArguments":
+                        uninstallArguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "PerMachine":
@@ -2371,19 +2371,19 @@ namespace WixToolset.Core
             {
                 foreach (var expectedArgument in expectedNetFx4Args)
                 {
-                    if (null == installCommand || -1 == installCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    if (null == installArguments || -1 == installArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallCommand", installCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallArguments", installArguments, expectedArgument, "Protocol", "netfx4"));
                     }
 
-                    if (!String.IsNullOrEmpty(repairCommand) && -1 == repairCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    if (!String.IsNullOrEmpty(repairArguments) && -1 == repairArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairCommand", repairCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairArguments", repairArguments, expectedArgument, "Protocol", "netfx4"));
                     }
 
-                    if (!String.IsNullOrEmpty(uninstallCommand) && -1 == uninstallCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    if (!String.IsNullOrEmpty(uninstallArguments) && -1 == uninstallArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallCommand", uninstallCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
                     }
                 }
             }
@@ -2398,13 +2398,13 @@ namespace WixToolset.Core
             // (depending on whether uninstall arguments were provided).
             if ((packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu) && String.IsNullOrEmpty(detectCondition))
             {
-                if (String.IsNullOrEmpty(uninstallCommand))
+                if (String.IsNullOrEmpty(uninstallArguments))
                 {
                     this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
                 }
                 else
                 {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallCommand"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallArguments"));
                 }
             }
 
@@ -2526,9 +2526,9 @@ namespace WixToolset.Core
                     {
                         Attributes = WixBundleExePackageAttributes.None,
                         DetectCondition = detectCondition,
-                        InstallCommand = installCommand,
-                        RepairCommand = repairCommand,
-                        UninstallCommand = uninstallCommand,
+                        InstallCommand = installArguments,
+                        RepairCommand = repairArguments,
+                        UninstallCommand = uninstallArguments,
                         ExeProtocol = protocol
                     });
                     break;

@@ -3,8 +3,8 @@
     <Fragment>
         <PackageGroup Id="TestPackageGroup">
             <ExePackage DetectCondition=""
-                        InstallCommand="-install"
-                        UninstallCommand="-uninstall"
+                        InstallArguments="-install"
+                        UninstallArguments="-uninstall"
                         SourceFile="testsetup.exe" />
         </PackageGroup>
     </Fragment>
