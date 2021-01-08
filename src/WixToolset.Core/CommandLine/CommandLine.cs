@@ -97,19 +97,19 @@ namespace WixToolset.Core.CommandLine
                 {
                     if (!this.TryParseCommand(arg, parser, extensions, out command))
                     {
-                        parser.ErrorArgument = arg;
+                        parser.ReportErrorArgument(arg);
                     }
                 }
                 else if (parser.IsSwitch(arg))
                 {
                     if (!command.TryParseArgument(parser, arg) && !TryParseCommandLineArgumentWithExtension(arg, parser, extensions))
                     {
-                        parser.ErrorArgument = arg;
+                        parser.ReportErrorArgument(arg);
                     }
                 }
                 else if (!TryParseCommandLineArgumentWithExtension(arg, parser, extensions) && !command.TryParseArgument(parser, arg))
                 {
-                    parser.ErrorArgument = arg;
+                    parser.ReportErrorArgument(arg);
                 }
             }
 

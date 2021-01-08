@@ -12,7 +12,7 @@ namespace WixToolset.Core.CommandLine
     {
         private const string ExpectedArgument = "expected argument";
 
-        public string ErrorArgument { get; set; }
+        public string ErrorArgument { get; private set; }
 
         private Queue<string> RemainingArguments { get; }
 
@@ -120,6 +120,12 @@ namespace WixToolset.Core.CommandLine
 
             this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
             return false;
+        }
+
+        public void ReportErrorArgument(string argument, Message message = null)
+        {
+            this.Messaging.Write(message ?? ErrorMessages.AdditionalArgumentUnexpected(argument));
+            this.ErrorArgument = argument;
         }
 
         public bool TryGetNextSwitchOrArgument(out string arg)

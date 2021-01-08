@@ -841,8 +841,7 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalSuppressWarningId(paramArg));
-                    parser.ErrorArgument = parameter;
+                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
                 }
             }
 
@@ -859,8 +858,7 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalSuppressWarningId(paramArg));
-                    parser.ErrorArgument = parameter;
+                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
                 }
             }
         }

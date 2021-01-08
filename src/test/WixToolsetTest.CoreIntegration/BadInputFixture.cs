@@ -48,7 +48,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CantBuildSingleExeBundleWithInvalidArgument()
         {
             var folder = TestData.Get(@"TestData");
@@ -72,7 +72,6 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 Assert.NotEqual(0, result.ExitCode);
-
                 Assert.False(File.Exists(exePath));
             }
         }
