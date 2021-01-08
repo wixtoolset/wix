@@ -139,6 +139,12 @@ namespace WixToolset.Core.CommandLine
                         }
                         return true;
                     }
+
+                    if (parameter.StartsWith("wx"))
+                    {
+                        this.ParseWarningAsError(parameter, "wx".Length, parser);
+                        return true;
+                    }
                 }
                 else
                 {
@@ -210,6 +216,23 @@ namespace WixToolset.Core.CommandLine
             public string CalculateOutputPath()
             {
                 return String.IsNullOrEmpty(this.OutputFile) ? Path.ChangeExtension(this.DecompileFilePath, ".wxs") : this.OutputFile;
+            }
+
+            private void ParseWarningAsError(string parameter, int offset, ICommandLineParser parser)
+            {
+                var paramArg = parameter.Substring(offset);
+                if (paramArg.Length == 0)
+                {
+                    this.Messaging.WarningsAsError = true;
+                }
+                else if (Int32.TryParse(paramArg, out var elevateWarning) && elevateWarning > 0)
+                {
+                    this.Messaging.SuppressWarningMessage(elevateWarning);
+                }
+                else
+                {
+                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
+                }
             }
         }
     }
