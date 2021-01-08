@@ -2232,7 +2232,7 @@ namespace WixToolset.Core
                         allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msp);
                         break;
                     case "DetectCondition":
-                        detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
                         break;
                     case "Protocol":
@@ -2392,6 +2392,20 @@ namespace WixToolset.Core
             if ((WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msp == packageType) && YesNoDefaultType.NotSet == perMachine)
             {
                 perMachine = YesNoDefaultType.Default;
+            }
+
+            // Detect condition is recommended or required for Exe and Msu packages
+            // (depending on whether uninstall arguments were provided).
+            if ((packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu) && String.IsNullOrEmpty(detectCondition))
+            {
+                if (String.IsNullOrEmpty(uninstallCommand))
+                {
+                    this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
+                }
+                else
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributeWithValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DetectCondition", "UninstallCommand"));
+                }
             }
 
             // Now that the package ID is known, we can parse the extension attributes...

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
-        <PackageGroup Id="BundlePackages">
-            <ExePackage DetectCondition="DetectedSomething" SourceFile="burn.exe" />
+        <PackageGroup Id="TestPackageGroup">
+            <ExePackage InstallCommand="-install"
+                        SourceFile="testsetup.exe" />
         </PackageGroup>
     </Fragment>
 </Wix>
