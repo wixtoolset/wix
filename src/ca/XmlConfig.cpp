@@ -30,10 +30,10 @@ enum eXmlPreserveDate
 };
 
 LPCWSTR vcsXmlConfigQuery =
-    L"SELECT `Wix4XmlConfig`.`Wix4XmlConfig`, `Wix4XmlConfig`.`File`, `Wix4XmlConfig`.`ElementPath`, `Wix4XmlConfig`.`VerifyPath`, `Wix4XmlConfig`.`Name`, "
+    L"SELECT `Wix4XmlConfig`.`Wix4XmlConfig`, `Wix4XmlConfig`.`File`, `Wix4XmlConfig`.`ElementId`, `Wix4XmlConfig`.`ElementPath`, `Wix4XmlConfig`.`VerifyPath`, `Wix4XmlConfig`.`Name`, "
     L"`Wix4XmlConfig`.`Value`, `Wix4XmlConfig`.`Flags`, `Wix4XmlConfig`.`Component_`, `Component`.`Attributes` "
     L"FROM `Wix4XmlConfig`,`Component` WHERE `Wix4XmlConfig`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
-enum eXmlConfigQuery { xfqXmlConfig = 1, xfqFile, xfqElementPath, xfqVerifyPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };
+enum eXmlConfigQuery { xfqXmlConfig = 1, xfqFile, xfqElementId, xfqElementPath, xfqVerifyPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };
 
 struct XML_CONFIG_CHANGE
 {
@@ -44,6 +44,7 @@ struct XML_CONFIG_CHANGE
     INSTALLSTATE isAction;
 
     WCHAR wzFile[MAX_PATH];
+    LPWSTR pwzElementId;
     LPWSTR pwzElementPath;
     LPWSTR pwzVerifyPath;
     WCHAR wzName[MAX_DARWIN_COLUMN];
@@ -72,26 +73,32 @@ static HRESULT FreeXmlConfigChangeList(
         pxfcDelete = pxfcList;
         pxfcList = pxfcList->pxfcNext;
 
+        if (pxfcDelete->pwzElementId)
+        {
+            hr = MemFree(pxfcDelete->pwzElementId);
+            ExitOnFailure(hr, "failed to free xml config element id in change list item");
+        }
+
         if (pxfcDelete->pwzElementPath)
         {
             hr = MemFree(pxfcDelete->pwzElementPath);
-            ExitOnFailure(hr, "failed to free xml file element path in change list item");
+            ExitOnFailure(hr, "failed to free xml config element path in change list item");
         }
 
         if (pxfcDelete->pwzVerifyPath)
         {
             hr = MemFree(pxfcDelete->pwzVerifyPath);
-            ExitOnFailure(hr, "failed to free xml file verify path in change list item");
+            ExitOnFailure(hr, "failed to free xml config verify path in change list item");
         }
 
         if (pxfcDelete->pwzValue)
         {
             hr = MemFree(pxfcDelete->pwzValue);
-            ExitOnFailure(hr, "failed to free xml file value in change list item");
+            ExitOnFailure(hr, "failed to free xml config value in change list item");
         }
 
         hr = MemFree(pxfcDelete);
-        ExitOnFailure(hr, "failed to free xml file change list item");
+        ExitOnFailure(hr, "failed to free xml config change list item");
     }
 
 LExit:
@@ -191,6 +198,10 @@ static HRESULT ReadXmlConfigTable(
         hr = WcaGetRecordInteger(hRec, xfqXmlFlags, &(*ppxfcTail)->iXmlFlags);
         ExitOnFailure(hr, "failed to get Wix4XmlConfig flags for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
+        // Get the Element Id
+        hr = WcaGetRecordFormattedString(hRec, xfqElementId, &(*ppxfcTail)->pwzElementId);
+        ExitOnFailure(hr, "failed to get Element Id for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
+
         // Get the Element Path
         hr = WcaGetRecordFormattedString(hRec, xfqElementPath, &(*ppxfcTail)->pwzElementPath);
         ExitOnFailure(hr, "failed to get Element Path for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
@@ -259,45 +270,55 @@ static HRESULT ProcessChanges(
         pxfcCheck = *ppxfcHead;
         while (pxfcCheck)
         {
-            if (0 == lstrcmpW(pxfc->pwzElementPath, pxfcCheck->wzId) && 0 == pxfc->iXmlFlags
-                && XMLCONFIG_CREATE & pxfcCheck->iXmlFlags && XMLCONFIG_ELEMENT & pxfcCheck->iXmlFlags)
+            if (pxfc->pwzElementId)
             {
-                // We found a match.  First, take it out of the current list
-                if (pxfc->pxfcPrev)
+                if (0 == lstrcmpW(pxfc->pwzElementId, pxfcCheck->wzId)
+                    && 0 == pxfc->iXmlFlags
+                    && XMLCONFIG_CREATE & pxfcCheck->iXmlFlags
+                    && XMLCONFIG_ELEMENT & pxfcCheck->iXmlFlags)
                 {
-                    pxfc->pxfcPrev->pxfcNext = pxfc->pxfcNext;
-                }
-                else // it was the head.  Update the head
-                {
-                    *ppxfcHead = pxfc->pxfcNext;
-                }
+                    // We found a match.  First, take it out of the current list
+                    if (pxfc->pxfcPrev)
+                    {
+                        pxfc->pxfcPrev->pxfcNext = pxfc->pxfcNext;
+                    }
+                    else // it was the head.  Update the head
+                    {
+                        *ppxfcHead = pxfc->pxfcNext;
+                    }
 
-                if (pxfc->pxfcNext)
-                {
-                    pxfc->pxfcNext->pxfcPrev = pxfc->pxfcPrev;
-                }
+                    if (pxfc->pxfcNext)
+                    {
+                        pxfc->pxfcNext->pxfcPrev = pxfc->pxfcPrev;
+                    }
 
-                pxfc->pxfcNext = NULL;
-                pxfc->pxfcPrev = NULL;
+                    pxfc->pxfcNext = NULL;
+                    pxfc->pxfcPrev = NULL;
 
-                // Now, add this node to the end of the matched node's additional changes list
-                if (!pxfcCheck->pxfcAdditionalChanges)
-                {
-                    pxfcCheck->pxfcAdditionalChanges = pxfc;
-                    pxfcCheck->cAdditionalChanges = 1;
+                    // Now, add this node to the end of the matched node's additional changes list
+                    if (!pxfcCheck->pxfcAdditionalChanges)
+                    {
+                        pxfcCheck->pxfcAdditionalChanges = pxfc;
+                        pxfcCheck->cAdditionalChanges = 1;
+                    }
+                    else
+                    {
+                        pxfcLast = pxfcCheck->pxfcAdditionalChanges;
+                        cAdditionalChanges = 1;
+                        while (pxfcLast->pxfcNext)
+                        {
+                            pxfcLast = pxfcLast->pxfcNext;
+                            ++cAdditionalChanges;
+                        }
+                        pxfcLast->pxfcNext = pxfc;
+                        pxfc->pxfcPrev = pxfcLast;
+                        pxfcCheck->cAdditionalChanges = ++cAdditionalChanges;
+                    }
                 }
                 else
                 {
-                    pxfcLast = pxfcCheck->pxfcAdditionalChanges;
-                    cAdditionalChanges = 1;
-                    while (pxfcLast->pxfcNext)
-                    {
-                        pxfcLast = pxfcLast->pxfcNext;
-                        ++cAdditionalChanges;
-                    }
-                    pxfcLast->pxfcNext = pxfc;
-                    pxfc->pxfcPrev = pxfcLast;
-                    pxfcCheck->cAdditionalChanges = ++cAdditionalChanges;
+                    hr = E_NOTFOUND;
+                    ExitOnRootFailure(hr, "failed to find matching ElementId: %ls", pxfc->pwzElementId);
                 }
             }
 
@@ -381,9 +402,10 @@ static HRESULT WriteChangeData(
 
     HRESULT hr = S_OK;
     XML_CONFIG_CHANGE* pxfcAdditionalChanges = NULL;
+    LPCWSTR wzElementPath = pxfc->pwzElementId ? pxfc->pwzElementId : pxfc->pwzElementPath;
 
-    hr = WcaWriteStringToCaData(pxfc->pwzElementPath, ppwzCustomActionData);
-    ExitOnFailure(hr, "failed to write ElementPath to custom action data: %ls", pxfc->pwzElementPath);
+    hr = WcaWriteStringToCaData(wzElementPath, ppwzCustomActionData);
+    ExitOnFailure(hr, "failed to write ElementPath to custom action data: %ls", wzElementPath);
 
     hr = WcaWriteStringToCaData(pxfc->pwzVerifyPath, ppwzCustomActionData);
     ExitOnFailure(hr, "failed to write VerifyPath to custom action data: %ls", pxfc->pwzVerifyPath);
@@ -1111,4 +1133,3 @@ LExit:
     }
     return WcaFinalize(er);
 }
-

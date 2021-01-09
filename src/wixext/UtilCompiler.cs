@@ -3706,13 +3706,15 @@ namespace WixToolset.Util
                 var symbol = section.AddSymbol(new XmlConfigSymbol(sourceLineNumbers, id)
                 {
                     File = file,
-                    ElementPath = elementId ?? elementPath,
+                    ElementId = elementId,
+                    ElementPath = elementPath,
                     VerifyPath = verifyPath,
                     Name = name,
                     Value = value,
                     Flags = flags,
                     ComponentRef = componentId,
                 });
+
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
                     symbol.Sequence = sequence;

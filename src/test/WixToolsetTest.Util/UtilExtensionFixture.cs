@@ -173,6 +173,33 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildWithXmlConfig()
+        {
+            var folder = TestData.Get(@"TestData", "XmlConfig");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Wix4XmlConfig");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Wix4XmlConfig:DelElement\t[INSTALLFOLDER]my.xml\t\t//root/sub\txxx\t\t\t289\tDel\t1",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildModuleWithXmlConfig()
+        {
+            var folder = TestData.Get(@"TestData", "XmlConfigModule");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Wix4XmlConfig");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Wix4XmlConfig:AddElement.047730A5_30FE_4A62_A520_DA9381B8226A\t[my.xml.047730A5_30FE_4A62_A520_DA9381B8226A]\t\t//root/sub\txxx\t\t\t273\tParent.047730A5_30FE_4A62_A520_DA9381B8226A\t1",
+                "Wix4XmlConfig:ChildElement.047730A5_30FE_4A62_A520_DA9381B8226A\t[my.xml.047730A5_30FE_4A62_A520_DA9381B8226A]\tAddElement.047730A5_30FE_4A62_A520_DA9381B8226A\t\txxx\t\t\t0\tChild.047730A5_30FE_4A62_A520_DA9381B8226A\t1",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildBundleWithSearches()
         {
             var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");

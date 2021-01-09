@@ -12,6 +12,7 @@ namespace WixToolset.Util
             new[]
             {
                 new IntermediateFieldDefinition(nameof(XmlConfigSymbolFields.File), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlConfigSymbolFields.ElementId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigSymbolFields.ElementPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigSymbolFields.VerifyPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigSymbolFields.Name), IntermediateFieldType.String),
@@ -31,6 +32,7 @@ namespace WixToolset.Util.Symbols
     public enum XmlConfigSymbolFields
     {
         File,
+        ElementId,
         ElementPath,
         VerifyPath,
         Name,
@@ -56,6 +58,12 @@ namespace WixToolset.Util.Symbols
         {
             get => this.Fields[(int)XmlConfigSymbolFields.File].AsString();
             set => this.Set((int)XmlConfigSymbolFields.File, value);
+        }
+
+        public string ElementId
+        {
+            get => this.Fields[(int)XmlConfigSymbolFields.ElementId].AsString();
+            set => this.Set((int)XmlConfigSymbolFields.ElementId, value);
         }
 
         public string ElementPath

@@ -12,41 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\.Data\burn.exe" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\data\fakeba.dll" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\data\MsiPackage\Shared.dll" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\data\MsiPackage\test.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\data\test.msi" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\Bundle.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\BundleWithSearches\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFileShare\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFileShare\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFileShare\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFileShare\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\CloseApplication\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\CloseApplication\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\CloseApplication\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\CloseApplication\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcut\Package.ico" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcut\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcut\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcut\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcutModule\Package.ico" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcutModule\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcutModule\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\InternetShortcutModule\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\PermissionEx\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\PermissionEx\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\PermissionEx\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\PermissionEx\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\EventManifest\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\EventManifest\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\EventManifest\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\EventManifest\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\Queries\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\Queries\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\Queries\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\Queries\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

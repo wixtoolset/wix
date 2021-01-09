@@ -1,0 +1,34 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Module Id="XmlConfigModule" Language="1033" Version="1.0.0.0" Guid="047730a5-30fe-4a62-a520-da9381b8226a">
+
+        <Component Id="Parent" Directory="INSTALLFOLDER">
+            <File Id="my.xml" Source="my.xml" />
+            <util:XmlConfig
+                Id="AddElement"
+                File="[my.xml]"
+                Action="create"
+                Node="element"
+                VerifyPath="xxx"
+                ElementPath="//root/sub"
+                On="install"
+                Sequence="1" />
+        </Component>
+
+        <Component Id="Child" Directory="INSTALLFOLDER" Guid="4613414c-11f5-40fa-a1f1-a0ba722a6895">
+            <util:XmlConfig
+                Id="ChildElement"
+                File="[my.xml]"
+                VerifyPath="xxx"
+                ElementId="AddElement"
+                Sequence="1" />
+        </Component>
+    </Module>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+            </Directory>
+        </Directory>
+    </Fragment>
+</Wix>
