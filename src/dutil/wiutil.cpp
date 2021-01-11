@@ -42,6 +42,11 @@ static PFN_MSIGETPATCHINFOEXW vpfnMsiGetPatchInfoExWFromLibrary = NULL;
 static PFN_MSIGETPRODUCTINFOEXW vpfnMsiGetProductInfoExWFromLibrary = NULL;
 static PFN_MSISETEXTERNALUIRECORD vpfnMsiSetExternalUIRecordFromLibrary = NULL;
 static PFN_MSISOURCELISTADDSOURCEEXW vpfnMsiSourceListAddSourceExWFromLibrary = NULL;
+
+// MSI Transactions v4.5+
+static PFN_MSIBEGINTRANSACTIONW vpfnMsiBeginTransaction = NULL;
+static PFN_MSIENDTRANSACTION vpfnMsiEndTransaction = NULL;
+
 static BOOL vfWiuInitialized = FALSE;
 
 // globals
@@ -176,6 +181,17 @@ extern "C" HRESULT DAPI WiuInitialize(
         vpfnMsiSourceListAddSourceExW = vpfnMsiSourceListAddSourceExWFromLibrary;
     }
 
+    // MSI Transaction functions
+    if (NULL == vpfnMsiBeginTransaction)
+    {
+        vpfnMsiBeginTransaction = reinterpret_cast<PFN_MSIBEGINTRANSACTIONW>(::GetProcAddress(vhMsiDll, "MsiBeginTransactionW"));
+    }
+
+    if (NULL == vpfnMsiEndTransaction)
+    {
+        vpfnMsiEndTransaction = reinterpret_cast<PFN_MSIENDTRANSACTION>(::GetProcAddress(vhMsiDll, "MsiEndTransaction"));
+    }
+
     vfWiuInitialized = TRUE;
 
 LExit:
@@ -202,6 +218,8 @@ extern "C" void DAPI WiuUninitialize(
         vpfnMsiDetermineApplicablePatchesWFromLibrary = NULL;
         vpfnMsiDeterminePatchSequenceWFromLibrary = NULL;
         vpfnMsiSourceListAddSourceExWFromLibrary = NULL;
+        vpfnMsiBeginTransaction = NULL;
+        vpfnMsiEndTransaction = NULL;
     }
 
     vfWiuInitialized = FALSE;
@@ -881,6 +899,63 @@ extern "C" HRESULT DAPI WiuSourceListAddSourceEx(
 
     er = vpfnMsiSourceListAddSourceExW(wzProductCodeOrPatchCode, wzUserSid, dwContext, MSISOURCETYPE_NETWORK | dwCode, wzSource, dwIndex);
     ExitOnWin32Error(er, hr, "Failed to add source.");
+
+LExit:
+    return hr;
+}
+
+extern "C" BOOL DAPI WiuIsMsiTransactionSupported(
+    )
+{
+    return vpfnMsiBeginTransaction && vpfnMsiEndTransaction;
+}
+
+extern "C" HRESULT DAPI WiuBeginTransaction(
+    __in_z LPCWSTR szName,
+    __in DWORD dwTransactionAttributes,
+    __out MSIHANDLE * phTransactionHandle,
+    __out HANDLE * phChangeOfOwnerEvent,
+    __in DWORD dwLogMode,
+    __in_z LPCWSTR szLogPath
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+
+    if (!WiuIsMsiTransactionSupported())
+    {
+        ExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
+    }
+
+    hr = WiuEnableLog(dwLogMode, szLogPath, INSTALLLOGATTRIBUTES_APPEND);
+    ExitOnFailure(hr, "Failed to enable logging for MSI transaction");
+
+    er = vpfnMsiBeginTransaction(szName, dwTransactionAttributes, phTransactionHandle, phChangeOfOwnerEvent);
+    ExitOnWin32Error(er, hr, "Failed to begin transaction.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT DAPI WiuEndTransaction(
+    __in DWORD dwTransactionState,
+    __in DWORD dwLogMode,
+    __in_z LPCWSTR szLogPath
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+
+    if (!WiuIsMsiTransactionSupported())
+    {
+        ExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
+    }
+
+    hr = WiuEnableLog(dwLogMode, szLogPath, INSTALLLOGATTRIBUTES_APPEND);
+    ExitOnFailure(hr, "Failed to enable logging for MSI transaction");
+
+    er = vpfnMsiEndTransaction(dwTransactionState);
+    ExitOnWin32Error(er, hr, "Failed to end transaction.");
 
 LExit:
     return hr;
