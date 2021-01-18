@@ -10,6 +10,7 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <UseWindowsForms>true</UseWindowsForms>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)'=='net35' ">
