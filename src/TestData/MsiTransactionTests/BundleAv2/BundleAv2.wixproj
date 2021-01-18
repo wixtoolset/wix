@@ -9,4 +9,7 @@
     <ProjectReference Include="..\PackageCv2\PackageCv2.wixproj" />
     <ProjectReference Include="..\PackageD\PackageD.wixproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.80" />
+  </ItemGroup>
 </Project>

@@ -9,7 +9,4 @@
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.80" />
-  </ItemGroup>
 </Project>
