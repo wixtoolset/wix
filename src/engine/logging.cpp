@@ -301,18 +301,12 @@ extern "C" LPCSTR LoggingActionStateToString(
         return "Uninstall";
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
         return "Install";
-    case BOOTSTRAPPER_ACTION_STATE_ADMIN_INSTALL:
-        return "AdminInstall";
     case BOOTSTRAPPER_ACTION_STATE_MODIFY:
         return "Modify";
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
         return "Repair";
     case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
         return "MinorUpgrade";
-    case BOOTSTRAPPER_ACTION_STATE_MAJOR_UPGRADE:
-        return "MajorUpgrade";
-    case BOOTSTRAPPER_ACTION_STATE_PATCH:
-        return "Patch";
     default:
         return "Invalid";
     }

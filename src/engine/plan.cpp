@@ -306,11 +306,6 @@ extern "C" void PlanUninitializeExecuteAction(
         ReleaseStr(pExecuteAction->msuPackage.sczLogPath);
         break;
 
-    case BURN_EXECUTE_ACTION_TYPE_SERVICE_STOP: __fallthrough;
-    case BURN_EXECUTE_ACTION_TYPE_SERVICE_START:
-        ReleaseStr(pExecuteAction->service.sczServiceName);
-        break;
-
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
         ReleaseStr(pExecuteAction->packageDependency.sczBundleProviderKey);
         break;
@@ -1958,7 +1953,6 @@ static void ResetPlannedPackageState(
     )
 {
     // Reset package state that is a result of planning.
-    pPackage->expected = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
     pPackage->defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
     pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
     pPackage->fAcquire = FALSE;

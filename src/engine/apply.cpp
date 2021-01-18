@@ -1743,8 +1743,6 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute commit MSI transaction action.");
             break;
 
-        case BURN_EXECUTE_ACTION_TYPE_SERVICE_STOP: __fallthrough;
-        case BURN_EXECUTE_ACTION_TYPE_SERVICE_START: __fallthrough;
         default:
             hr = E_UNEXPECTED;
             ExitOnFailure(hr, "Invalid execute action.");
@@ -1854,8 +1852,6 @@ static HRESULT DoRollbackActions(
                 IgnoreRollbackError(hr, "Failed to uncache package for rollback.");
                 break;
 
-            case BURN_EXECUTE_ACTION_TYPE_SERVICE_STOP: __fallthrough;
-            case BURN_EXECUTE_ACTION_TYPE_SERVICE_START: __fallthrough;
             default:
                 hr = E_UNEXPECTED;
                 ExitOnFailure(hr, "Invalid rollback action: %d.", pRollbackAction->type);

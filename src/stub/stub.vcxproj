@@ -55,7 +55,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\engine\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;gdiplus.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;wuguid.lib;engine.lib;engine.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;wuguid.lib;engine.lib;engine.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemDefinitionGroup>

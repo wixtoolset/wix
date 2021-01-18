@@ -856,7 +856,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     // Calculate the rollback action if there is an execute action.
     if (BOOTSTRAPPER_ACTION_STATE_NONE != execute && !fInsideMsiTransaction)
     {
-        switch (BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN != pPackage->expected ? pPackage->expected : pPackage->currentState)
+        switch (pPackage->currentState)
         {
         case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
@@ -1322,12 +1322,6 @@ extern "C" HRESULT MsiEngineExecutePackage(
     //
     switch (pExecuteAction->msiPackage.action)
     {
-    case BOOTSTRAPPER_ACTION_STATE_ADMIN_INSTALL:
-        hr = StrAllocConcatSecure(&sczProperties, L" ACTION=ADMIN", 0);
-        ExitOnFailure(hr, "Failed to add ADMIN property on admin install.");
-         __fallthrough;
-
-    case BOOTSTRAPPER_ACTION_STATE_MAJOR_UPGRADE: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
         hr = StrAllocConcatSecure(&sczProperties, L" REBOOT=ReallySuppress", 0);
         ExitOnFailure(hr, "Failed to add reboot suppression property on install.");

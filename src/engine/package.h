@@ -67,6 +67,17 @@ enum BURN_PATCH_TARGETCODE_TYPE
     BURN_PATCH_TARGETCODE_TYPE_UPGRADE,
 };
 
+enum BOOTSTRAPPER_FEATURE_ACTION
+{
+    BOOTSTRAPPER_FEATURE_ACTION_NONE,
+    BOOTSTRAPPER_FEATURE_ACTION_ADDLOCAL,
+    BOOTSTRAPPER_FEATURE_ACTION_ADDSOURCE,
+    BOOTSTRAPPER_FEATURE_ACTION_ADDDEFAULT,
+    BOOTSTRAPPER_FEATURE_ACTION_REINSTALL,
+    BOOTSTRAPPER_FEATURE_ACTION_ADVERTISE,
+    BOOTSTRAPPER_FEATURE_ACTION_REMOVE,
+};
+
 // structs
 
 typedef struct _BURN_EXE_EXIT_CODE
@@ -188,7 +199,6 @@ typedef struct _BURN_PACKAGE
 
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
     BURN_CACHE_STATE cache;                     // only valid after Detect.
-    BOOTSTRAPPER_PACKAGE_STATE expected;        // only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.
     BOOL fAcquire;                              // only valid during Plan.

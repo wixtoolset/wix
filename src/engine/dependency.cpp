@@ -922,8 +922,6 @@ static void CalculateDependencyActionStates(
         case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_MAJOR_UPGRADE: __fallthrough;
-        case BOOTSTRAPPER_ACTION_STATE_PATCH:
             *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
             break;
         }

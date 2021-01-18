@@ -332,7 +332,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
         // Calculate the rollback action if there is an execute action.
         if (BOOTSTRAPPER_ACTION_STATE_NONE != execute && !fInsideMsiTransaction)
         {
-            switch (BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN != pPackage->expected ? pPackage->expected : pPackage->currentState)
+            switch (pPackage->currentState)
             {
             case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
                 switch (requested)
