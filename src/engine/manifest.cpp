@@ -10,8 +10,8 @@ static HRESULT ParseFromXml(
 
 // function definitions
 
-extern "C" HRESULT ManifestLoadXml(
-    __in LPCWSTR wzDocument,
+extern "C" HRESULT ManifestLoadXmlFromFile(
+    __in LPCWSTR wzPath,
     __in BURN_ENGINE_STATE* pEngineState
     )
 {
@@ -19,7 +19,7 @@ extern "C" HRESULT ManifestLoadXml(
     IXMLDOMDocument* pixdDocument = NULL;
 
     // load xml document
-    hr = XmlLoadDocument(wzDocument, &pixdDocument);
+    hr = XmlLoadDocumentFromFile(wzPath, &pixdDocument);
     ExitOnFailure(hr, "Failed to load manifest as XML document.");
 
     hr = ParseFromXml(pixdDocument, pEngineState);

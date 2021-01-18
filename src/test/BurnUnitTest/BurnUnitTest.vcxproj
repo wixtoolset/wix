@@ -61,6 +61,10 @@
     <ResourceCompile Include="BurnUnitTest.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestData\PlanTest\BasicFunctionality_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\MsiTransaction_BundleAv1_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="WixBuildTools.TestSupport">

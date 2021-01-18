@@ -11,8 +11,8 @@ extern "C" {
 
 // function declarations
 
-HRESULT ManifestLoadXml(
-    __in LPCWSTR wzDocument,
+HRESULT ManifestLoadXmlFromFile(
+    __in LPCWSTR wzPath,
     __in BURN_ENGINE_STATE* pEngineState
     );
 
