@@ -20,7 +20,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
                 var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
 
-                var result = WixRunner.Execute(false, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "decompile",
                     Path.Combine(folder, msiName),

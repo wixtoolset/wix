@@ -128,19 +128,19 @@ namespace WixToolset.Core.CommandLine
                     case "verbose":
                         this.Messaging.ShowVerboseMessages = true;
                         return true;
-
-                    case "sw":
-                    case "suppresswarning":
-                        var warning = parser.GetNextArgumentOrError(arg);
-                        if (!String.IsNullOrEmpty(warning))
-                        {
-                            var warningNumber = Convert.ToInt32(warning);
-                            this.Messaging.SuppressWarningMessage(warningNumber);
-                        }
-                        return true;
                     }
 
-                    if (parameter.StartsWith("wx"))
+                    if (parameter.StartsWith("sw"))
+                    {
+                        this.ParseSuppressWarning(parameter, "sw".Length, parser);
+                        return true;
+                    }
+                    else if (parameter.StartsWith("suppresswarning"))
+                    {
+                        this.ParseSuppressWarning(parameter, "suppresswarning".Length, parser);
+                        return true;
+                    }
+                    else if (parameter.StartsWith("wx"))
                     {
                         this.ParseWarningAsError(parameter, "wx".Length, parser);
                         return true;
@@ -216,6 +216,23 @@ namespace WixToolset.Core.CommandLine
             public string CalculateOutputPath()
             {
                 return String.IsNullOrEmpty(this.OutputFile) ? Path.ChangeExtension(this.DecompileFilePath, ".wxs") : this.OutputFile;
+            }
+
+            private void ParseSuppressWarning(string parameter, int offset, ICommandLineParser parser)
+            {
+                var paramArg = parameter.Substring(offset);
+                if (paramArg.Length == 0)
+                {
+                    this.Messaging.SuppressAllWarnings = true;
+                }
+                else if (Int32.TryParse(paramArg, out var suppressWarning) && suppressWarning > 0)
+                {
+                    this.Messaging.SuppressWarningMessage(suppressWarning);
+                }
+                else
+                {
+                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
+                }
             }
 
             private void ParseWarningAsError(string parameter, int offset, ICommandLineParser parser)

@@ -216,9 +216,10 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
                 Assert.True(File.Exists(msiPath));
 
-                result = WixRunner.Execute(false, new[]
+                result = WixRunner.Execute(new[]
                 {
                     "decompile", msiPath,
+                    "-sw1060",
                     "-intermediateFolder", intermediateFolder,
                     "-o", decompiledWxsPath
                 });
