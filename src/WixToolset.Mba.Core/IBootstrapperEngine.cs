@@ -313,11 +313,6 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
-        AdminInstall,
-
-        /// <summary>
-        /// 
-        /// </summary>
         Modify,
 
         /// <summary>
@@ -329,16 +324,6 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         MinorUpgrade,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        MajorUpgrade,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Patch,
     }
 
     /// <summary>
@@ -545,46 +530,5 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         Source,
-    }
-
-    /// <summary>
-    /// Indicates the action for a feature.
-    /// </summary>
-    public enum FeatureAction
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        AddLocal,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        AddSource,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        AddDefault,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Reinstall,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Advertise,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Remove,
     }
 }
