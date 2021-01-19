@@ -4,6 +4,10 @@
 
 #include <windows.h>
 
+#include <dutilsources.h>
+
+#define DUTIL_SOURCE_DEFAULT DUTIL_SOURCE_EXTERNAL
+
 #include <dutil.h>
 #include <apputil.h>
 #include <strutil.h>
