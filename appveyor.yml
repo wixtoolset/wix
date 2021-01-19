@@ -10,6 +10,11 @@ environment:
   RuntimeTestsEnabled: true
   WIX_COMPRESSION_LEVEL: none
 
+
+install:
+  - reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
+  - reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
+
 build_script:
   - appveyor.cmd
 
