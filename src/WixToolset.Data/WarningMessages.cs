@@ -282,6 +282,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedForeignRow, "The {0} table contains a row with primary key(s) '{1}' whose {2} and {4} columns contain the values, '{3}' and '{5}', which specify a foreign key relationship with the {6} table.  However, since the expected foreign row specified by this value does not exist, this will result in some information being left out of the decompiled output.", tableName, primaryKey, columnName1, columnValue1, columnName2, columnValue2, foreignTableName);
         }
 
+        public static Message ExperimentalBundlePlatform(string platform)
+        {
+            return Message(null, Ids.ExperimentalBundlePlatform, "The platform {0} is experimental for bundles. Use the x86 platform instead.", platform);
+        }
+
         public static Message ExternalCabsAreNotSigned(string databaseFile)
         {
             return Message(null, Ids.ExternalCabsAreNotSigned, "The installer database '{0}' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to run the insignia tool as part of your build.", databaseFile);
@@ -798,6 +803,7 @@ namespace WixToolset.Data
             MsiTransactionLimitations = 1151,
             PathCanonicalized = 1152,
             DetectConditionRecommended = 1153,
+            ExperimentalBundlePlatform = 1154,
         }
     }
 }
