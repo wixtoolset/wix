@@ -146,7 +146,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(false, new[] // TODO: go back to elevating warnings as errors.
                 {
                     "build",
                     "-arch", "x64",
@@ -158,7 +158,8 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
-                Assert.Empty(result.Messages.Where(m => m.Level == MessageLevel.Warning));
+                var warning = Assert.Single(result.Messages.Where(m => m.Level == MessageLevel.Warning));
+                Assert.Equal((int)WarningMessages.Ids.ExperimentalBundlePlatform, warning.Id);
 
                 Assert.True(File.Exists(exePath));
                 Assert.True(File.Exists(pdbPath));

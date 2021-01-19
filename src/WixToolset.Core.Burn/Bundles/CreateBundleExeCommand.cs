@@ -56,6 +56,11 @@ namespace WixToolset.Core.Burn.Bundles
             var stubPlatform = this.BundleSymbol.Platform.ToString();
             var stubFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), stubPlatform, "burn.exe");
 
+            if (stubPlatform != "X86")
+            {
+                this.Messaging.Write(WarningMessages.ExperimentalBundlePlatform(stubPlatform));
+            }
+
             var bundleTempPath = Path.Combine(this.IntermediateFolder, bundleFilename);
 
             this.Messaging.Write(VerboseMessages.GeneratingBundle(bundleTempPath, stubFile));
