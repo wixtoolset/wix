@@ -30,6 +30,7 @@ Use the `updatepackage.ps1` script from https://github.com/wixtoolset/Home.
 For example:
 
 * updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Bal.wixext -NewVersion 4.0.80
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Data -NewVersion 4.0.180
 * updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Mba.Core -NewVersion 4.0.45
 * updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.NetFx.wixext -NewVersion 4.0.57
 * updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Util.wixext -NewVersion 4.0.67
