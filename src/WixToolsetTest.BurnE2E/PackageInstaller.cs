@@ -6,29 +6,23 @@ namespace WixToolsetTest.BurnE2E
     using System.IO;
     using static WixToolsetTest.BurnE2E.MSIExec;
 
-    public class PackageInstaller : IDisposable
+    public partial class PackageInstaller : IDisposable
     {
         public PackageInstaller(WixTestContext testContext, string name)
         {
             this.Package = Path.Combine(testContext.TestDataFolder, $"{name}.msi");
+            this.PackagePdb = Path.Combine(testContext.TestDataFolder, $"{name}.wixpdb");
             this.PackageName = name;
             this.TestContext = testContext;
         }
 
         public string Package { get; }
 
-        private string PackageName { get; }
-
         private WixTestContext TestContext { get; }
 
         public string TestGroupName => this.TestContext.TestGroupName;
 
         public string TestName => this.TestContext.TestName;
-
-        public string GetInstalledFilePath(string filename)
-        {
-            return this.TestContext.GetTestInstallFolder(Path.Combine(this.PackageName, filename));
-        }
 
         /// <summary>
         /// Installs a .msi file

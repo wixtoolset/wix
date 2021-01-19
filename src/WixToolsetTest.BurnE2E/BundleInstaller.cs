@@ -4,20 +4,10 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Text;
-    using Microsoft.Win32;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
-    using Xunit;
 
-    public class BundleInstaller : IDisposable
+    public partial class BundleInstaller : IDisposable
     {
-        public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-        public const string BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH = "BundleCachePath";
-        public const string FULL_BURN_POLICY_REGISTRY_PATH = "SOFTWARE\\WOW6432Node\\Policies\\WiX\\Burn";
-        public const string PACKAGE_CACHE_FOLDER_NAME = "Package Cache";
-
         public BundleInstaller(WixTestContext testContext, string name)
         {
             this.Bundle = Path.Combine(testContext.TestDataFolder, $"{name}.exe");
@@ -27,10 +17,6 @@ namespace WixToolsetTest.BurnE2E
         }
 
         public string Bundle { get; }
-
-        public string BundlePdb { get; }
-
-        private WixBundleSymbol BundleSymbol { get; set; }
 
         public string TestGroupName { get; }
 
@@ -144,67 +130,6 @@ namespace WixToolsetTest.BurnE2E
 
             // Return the log file name.
             return logFile;
-        }
-
-        private WixBundleSymbol GetBundleSymbol()
-        {
-            if (this.BundleSymbol == null)
-            {
-                using var wixOutput = WixOutput.Read(this.BundlePdb);
-                var intermediate = Intermediate.Load(wixOutput);
-                var section = intermediate.Sections.Single();
-                this.BundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-            }
-
-            return this.BundleSymbol;
-        }
-
-        public string GetExpectedCachedBundlePath()
-        {
-            var bundleSymbol = this.GetBundleSymbol();
-
-            using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
-            var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
-            var cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
-            return Path.Combine(cachePath, bundleSymbol.BundleId, Path.GetFileName(this.Bundle));
-        }
-
-        public string VerifyRegisteredAndInPackageCache()
-        {
-            var bundleSymbol = this.GetBundleSymbol();
-            var bundleId = bundleSymbol.BundleId;
-            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
-
-            using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
-            Assert.NotNull(registrationKey);
-
-            var cachePathValue = registrationKey.GetValue(BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH);
-            Assert.NotNull(cachePathValue);
-            var cachePath = Assert.IsType<string>(cachePathValue);
-            Assert.True(File.Exists(cachePath));
-
-            var expectedCachePath = this.GetExpectedCachedBundlePath();
-            Assert.Equal(expectedCachePath, cachePath, StringComparer.OrdinalIgnoreCase);
-
-            return cachePath;
-        }
-
-        public void VerifyUnregisteredAndRemovedFromPackageCache()
-        {
-            var cachedBundlePath = this.GetExpectedCachedBundlePath();
-            this.VerifyUnregisteredAndRemovedFromPackageCache(cachedBundlePath);
-        }
-
-        public void VerifyUnregisteredAndRemovedFromPackageCache(string cachedBundlePath)
-        {
-            var bundleSymbol = this.GetBundleSymbol();
-            var bundleId = bundleSymbol.BundleId;
-            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
-
-            using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
-            Assert.Null(registrationKey);
-
-            Assert.False(File.Exists(cachedBundlePath));
         }
 
         public void Dispose()

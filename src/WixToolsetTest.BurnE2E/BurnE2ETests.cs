@@ -28,6 +28,13 @@ namespace WixToolsetTest.BurnE2E
             return installer;
         }
 
+        protected TestBAController CreateTestBAController()
+        {
+            var controller = new TestBAController(this.TestContext);
+            this.Installers.Enqueue(controller);
+            return controller;
+        }
+
         public void Dispose()
         {
             while (this.Installers.TryDequeue(out var installer))
