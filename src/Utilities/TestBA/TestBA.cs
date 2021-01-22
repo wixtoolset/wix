@@ -29,6 +29,8 @@ namespace WixToolset.Test.BA
         private int cancelCacheAtProgress;
         private int sleepDuringExecute;
         private int cancelExecuteAtProgress;
+        private string cancelExecuteActionName;
+        private int cancelOnProgressAtProgress;
         private int retryExecuteFilesInUse;
 
         private IBootstrapperCommand Command { get; }
@@ -227,11 +229,19 @@ namespace WixToolset.Test.BA
             {
                 this.sleepDuringCache = 0;
             }
+            else
+            {
+                this.Log("    SlowCache: {0}", this.sleepDuringCache);
+            }
 
             string cancelCache = this.ReadPackageAction(args.PackageId, "CancelCacheAtProgress");
             if (String.IsNullOrEmpty(cancelCache) || !Int32.TryParse(cancelCache, out this.cancelCacheAtProgress))
             {
                 this.cancelCacheAtProgress = -1;
+            }
+            else
+            {
+                this.Log("    CancelCacheAtProgress: {0}", this.cancelCacheAtProgress);
             }
         }
 
@@ -239,12 +249,14 @@ namespace WixToolset.Test.BA
         {
             this.Log("OnCacheAcquireProgress() - container/package: {0}, payload: {1}, progress: {2}, total: {3}, overall progress: {4}%", args.PackageOrContainerId, args.PayloadId, args.Progress, args.Total, args.OverallPercentage);
 
-            if (this.cancelCacheAtProgress > 0 && this.cancelCacheAtProgress <= args.Progress)
+            if (this.cancelCacheAtProgress >= 0 && this.cancelCacheAtProgress <= args.Progress)
             {
                 args.Cancel = true;
+                this.Log("OnCacheAcquireProgress(cancel)");
             }
             else if (this.sleepDuringCache > 0)
             {
+                this.Log("OnCacheAcquireProgress(sleep {0})", this.sleepDuringCache);
                 Thread.Sleep(this.sleepDuringCache);
             }
         }
@@ -258,17 +270,45 @@ namespace WixToolset.Test.BA
             {
                 this.sleepDuringExecute = 0;
             }
+            else
+            {
+                this.Log("    SlowExecute: {0}", this.sleepDuringExecute);
+            }
 
             string cancelExecute = this.ReadPackageAction(args.PackageId, "CancelExecuteAtProgress");
             if (String.IsNullOrEmpty(cancelExecute) || !Int32.TryParse(cancelExecute, out this.cancelExecuteAtProgress))
             {
                 this.cancelExecuteAtProgress = -1;
             }
+            else
+            {
+                this.Log("    CancelExecuteAtProgress: {0}", this.cancelExecuteAtProgress);
+            }
+
+            this.cancelExecuteActionName = this.ReadPackageAction(args.PackageId, "CancelExecuteAtActionStart");
+            if (!String.IsNullOrEmpty(this.cancelExecuteActionName))
+            {
+                this.Log("    CancelExecuteAtActionState: {0}", this.cancelExecuteActionName);
+            }
+
+            string cancelOnProgressAtProgress = this.ReadPackageAction(args.PackageId, "CancelOnProgressAtProgress");
+            if (String.IsNullOrEmpty(cancelOnProgressAtProgress) || !Int32.TryParse(cancelOnProgressAtProgress, out this.cancelOnProgressAtProgress))
+            {
+                this.cancelOnProgressAtProgress = -1;
+            }
+            else
+            {
+                this.Log("    CancelOnProgressAtProgress: {0}", this.cancelOnProgressAtProgress);
+            }
 
             string retryBeforeCancel = this.ReadPackageAction(args.PackageId, "RetryExecuteFilesInUse");
             if (String.IsNullOrEmpty(retryBeforeCancel) || !Int32.TryParse(retryBeforeCancel, out this.retryExecuteFilesInUse))
             {
                 this.retryExecuteFilesInUse = 0;
+            }
+            else
+            {
+                this.Log("    RetryExecuteFilesInUse: {0}", this.retryExecuteFilesInUse);
             }
         }
 
@@ -287,16 +327,30 @@ namespace WixToolset.Test.BA
             }
         }
 
+        protected override void OnExecuteMsiMessage(ExecuteMsiMessageEventArgs args)
+        {
+            this.Log("OnExecuteMsiMessage() - MessageType: {0}, Message: {1}, Data: '{2}'", args.MessageType, args.Message, String.Join("','", args.Data.ToArray()));
+
+            if (!String.IsNullOrEmpty(this.cancelExecuteActionName) && args.MessageType == InstallMessage.ActionStart &&
+                args.Data.Count > 0 && args.Data[0] == this.cancelExecuteActionName)
+            {
+                this.Log("OnExecuteMsiMessage(cancelNextProgress)");
+                this.cancelExecuteAtProgress = 0;
+            }
+        }
+
         protected override void OnExecuteProgress(ExecuteProgressEventArgs args)
         {
             this.Log("OnExecuteProgress() - package: {0}, progress: {1}%, overall progress: {2}%", args.PackageId, args.ProgressPercentage, args.OverallPercentage);
 
-            if (this.cancelExecuteAtProgress > 0 && this.cancelExecuteAtProgress <= args.ProgressPercentage)
+            if (this.cancelExecuteAtProgress >= 0 && this.cancelExecuteAtProgress <= args.ProgressPercentage)
             {
                 args.Cancel = true;
+                this.Log("OnExecuteProgress(cancel)");
             }
             else if (this.sleepDuringExecute > 0)
             {
+                this.Log("OnExecuteProgress(sleep {0})", this.sleepDuringExecute);
                 Thread.Sleep(this.sleepDuringExecute);
             }
         }
@@ -313,6 +367,12 @@ namespace WixToolset.Test.BA
             {
                 this.Engine.SendEmbeddedProgress(args.ProgressPercentage, args.OverallPercentage);
             }
+
+            if (this.cancelOnProgressAtProgress >= 0 && this.cancelOnProgressAtProgress <= args.OverallPercentage)
+            {
+                args.Cancel = true;
+                this.Log("OnProgress(cancel)");
+            }
         }
 
         protected override void OnResolveSource(ResolveSourceEventArgs args)
@@ -321,6 +381,13 @@ namespace WixToolset.Test.BA
             {
                 args.Action = BOOTSTRAPPER_RESOLVESOURCE_ACTION.Download;
             }
+        }
+
+        protected override void OnApplyBegin(ApplyBeginEventArgs args)
+        {
+            this.cancelOnProgressAtProgress = -1;
+            this.cancelExecuteAtProgress = -1;
+            this.cancelCacheAtProgress = -1;
         }
 
         protected override void OnApplyComplete(ApplyCompleteEventArgs args)

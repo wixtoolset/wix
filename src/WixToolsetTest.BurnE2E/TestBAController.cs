@@ -81,6 +81,26 @@ namespace WixToolsetTest.BurnE2E
         }
 
         /// <summary>
+        /// Cancels the execute of a package at the next progess after the specified MSI action start.
+        /// </summary>
+        /// <param name="packageId">Package identity.</param>
+        /// <param name="actionName">Sets or removes the cancel progress on a package being executed.</param>
+        public void SetPackageCancelExecuteAtActionStart(string packageId, string actionName)
+        {
+            this.SetPackageState(packageId, "CancelExecuteAtActionStart", actionName);
+        }
+
+        /// <summary>
+        /// Cancels the execute of a package at a particular OnProgress point.
+        /// </summary>
+        /// <param name="packageId">Package identity.</param>
+        /// <param name="cancelPoint">Sets or removes the cancel OnProgress point on a package being executed.</param>
+        public void SetPackageCancelOnProgressAtProgress(string packageId, int? cancelPoint)
+        {
+            this.SetPackageState(packageId, "CancelOnProgressAtProgress", cancelPoint.HasValue ? cancelPoint.ToString() : null);
+        }
+
+        /// <summary>
         /// Sets the requested state for a package that the TestBA will return to the engine during plan.
         /// </summary>
         /// <param name="packageId">Package identity.</param>

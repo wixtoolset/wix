@@ -44,5 +44,23 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(false);
             packageB.VerifyInstalled(false);
         }
+
+        [Fact]
+        public void CanCancelMsiPackageInOnProgress()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+
+            // Cancel package B during its OnProgress message.
+            testBAController.SetPackageCancelOnProgressAtProgress("PackageB", 100);
+
+            bundleA.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+        }
     }
 }
