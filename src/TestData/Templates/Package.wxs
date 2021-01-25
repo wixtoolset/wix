@@ -15,7 +15,6 @@
     <MediaTemplate CabinetTemplate="{0}$(var.CabPrefix).cab" />
     <?endif?>
 
-    <Property Id="MsiLogging" Value="voicewarmup" />
     <PropertyRef Id="TestVersion" />
 
     <Feature Id="Complete" Level="1">

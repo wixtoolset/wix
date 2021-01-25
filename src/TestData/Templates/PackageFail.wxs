@@ -11,7 +11,6 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <Property Id="MsiLogging" Value="voicewarmup" />
     <PropertyRef Id="TestVersion" />
 
     <Feature Id="Complete" Level="1">
