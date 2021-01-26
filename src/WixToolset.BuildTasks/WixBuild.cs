@@ -59,7 +59,9 @@ namespace WixToolset.BuildTasks
         public ITaskItem BindBuiltOutputsFile { get; set; }
 
         public string CabinetCachePath { get; set; }
+
         public int CabinetCreationThreadCount { get; set; }
+
         public string DefaultCompressionLevel { get; set; }
 
         [Output]
@@ -69,7 +71,9 @@ namespace WixToolset.BuildTasks
         public string[] WixVariables { get; set; }
 
         public bool SuppressValidation { get; set; }
+
         public string[] SuppressIces { get; set; }
+
         public string AdditionalCub { get; set; }
 
         protected override string ToolName => "wix.exe";
@@ -95,6 +99,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-contentsfile ", this.BindContentsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
+            commandLineBuilder.AppendSwitchIfNotNull("-defaultcompressionlevel ", this.DefaultCompressionLevel);
 
             base.BuildCommandLine(commandLineBuilder);
 

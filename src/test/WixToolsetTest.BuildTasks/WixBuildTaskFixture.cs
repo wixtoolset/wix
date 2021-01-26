@@ -45,6 +45,7 @@ namespace WixToolsetTest.BuildTasks
                     OutputFile = new TaskItem(Path.Combine(baseFolder, @"bin\test.msi")),
                     PdbType = "Full",
                     PdbFile = new TaskItem(pdbPath),
+                    DefaultCompressionLevel = "nOnE",
                 };
 
                 var result = task.Execute();
