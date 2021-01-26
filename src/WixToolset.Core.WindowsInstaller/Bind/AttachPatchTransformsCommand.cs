@@ -687,7 +687,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             keptRows += ReduceTransformSequenceTable(sequenceList, oldSections, newSections, customActionTable);
 
             // Delete tables that are empty.
-            var tablesToDelete = transform.Tables.Where(t => t.Rows.Count == 0).Select(t => t.Name);
+            var tablesToDelete = transform.Tables.Where(t => t.Rows.Count == 0).Select(t => t.Name).ToList();
 
             foreach (var tableName in tablesToDelete)
             {
