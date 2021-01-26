@@ -64,7 +64,7 @@ namespace WixToolset.Core.Burn.Bundles
             files.AddRange(this.Payloads.Select(p => new CabinetCompressFile(p.SourceFile.Path, p.EmbeddedId)));
 
             var cab = new Cabinet(cabinetPath);
-            cab.Compress(files, this.CompressionLevel ?? Data.CompressionLevel.Mszip);
+            cab.Compress(files, this.CompressionLevel ?? Data.CompressionLevel.Medium);
 
             // Now that the container is created, set the outputs of the command.
             var fileInfo = new FileInfo(cabinetPath);

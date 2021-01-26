@@ -50,6 +50,8 @@ namespace WixToolset.Core.CommandLine
 
         private string OutputFile { get; set; }
 
+        private CompressionLevel? DefaultCompressionLevel { get; set; }
+
         private string ContentsFile { get; set; }
 
         private string OutputsFile { get; set; }
@@ -81,6 +83,8 @@ namespace WixToolset.Core.CommandLine
             this.OutputsFile = this.commandLine.OutputsFile;
 
             this.BuiltOutputsFile = this.commandLine.BuiltOutputsFile;
+
+            this.DefaultCompressionLevel = this.commandLine.DefaultCompressionLevel;
 
             var preprocessorVariables = this.commandLine.GatherPreprocessorVariables();
 
@@ -335,7 +339,7 @@ namespace WixToolset.Core.CommandLine
                     //context.CabbingThreadCount = this.CabbingThreadCount;
                     context.CabCachePath = cabCachePath;
                     context.Codepage = resolveResult.Codepage;
-                    //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
+                    context.DefaultCompressionLevel = this.DefaultCompressionLevel;
                     context.DelayedFields = resolveResult.DelayedFields;
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
                     context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
@@ -529,6 +533,8 @@ namespace WixToolset.Core.CommandLine
 
             public string OutputType { get; private set; }
 
+            public CompressionLevel? DefaultCompressionLevel { get; private set; }
+
             public string ContentsFile { get; private set; }
 
             public string OutputsFile { get; private set; }
@@ -610,6 +616,18 @@ namespace WixToolset.Core.CommandLine
                         case "define":
                             parser.GetNextArgumentOrError(arg, this.Defines);
                             return true;
+
+                        case "dcl":
+                        case "defaultcompressionlevel":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (Enum.TryParse(value, true, out CompressionLevel compressionLevel))
+                            {
+                                this.DefaultCompressionLevel = compressionLevel;
+                                return true;
+                            }
+                            return false;
+                        }
 
                         case "i":
                         case "includepath":

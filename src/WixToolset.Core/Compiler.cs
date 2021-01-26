@@ -7319,7 +7319,7 @@ namespace WixToolset.Core
             string volumeLabel = null;
             int? maximumUncompressedMediaSize = null;
             int? maximumCabinetSizeForLargeFileSplitting = null;
-            CompressionLevel? compressionLevel = null; // this defaults to mszip in Binder
+            CompressionLevel? compressionLevel = null; // this defaults to 'medium' in the MSI and Burn backends
 
             var embedCab = patch ? YesNoType.Yes : YesNoType.NotSet;
 

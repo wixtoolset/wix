@@ -4958,7 +4958,7 @@ namespace WixToolset.Core
             case "":
                 break;
             default:
-                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attribute.Name.LocalName, compressionLevel, "high", "low", "medium", "mszip", "none"));
+                this.Core.Write(ErrorMessages.IllegalCompressionLevel(sourceLineNumbers, compressionLevel));
                 break;
             }
 
