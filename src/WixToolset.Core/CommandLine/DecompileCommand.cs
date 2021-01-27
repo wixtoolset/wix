@@ -244,11 +244,11 @@ namespace WixToolset.Core.CommandLine
                 }
                 else if (Int32.TryParse(paramArg, out var elevateWarning) && elevateWarning > 0)
                 {
-                    this.Messaging.SuppressWarningMessage(elevateWarning);
+                    this.Messaging.ElevateWarningMessage(elevateWarning);
                 }
                 else
                 {
-                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
+                    parser.ReportErrorArgument(parameter, ErrorMessages.IllegalWarningIdAsError(paramArg));
                 }
             }
         }
