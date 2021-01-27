@@ -5,7 +5,8 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-    internal interface ILibrarian
+#pragma warning disable 1591 // TODO: add documentation
+    public interface ILibrarian
     {
         Intermediate Combine(ILibraryContext context);
     }

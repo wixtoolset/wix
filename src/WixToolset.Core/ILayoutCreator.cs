@@ -4,7 +4,8 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    internal interface ILayoutCreator
+#pragma warning disable 1591 // TODO: add documentation
+    public interface ILayoutCreator
     {
         void Layout(ILayoutContext context);
     }

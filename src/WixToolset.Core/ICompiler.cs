@@ -5,7 +5,8 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-    internal interface ICompiler
+#pragma warning disable 1591 // TODO: add documentation
+    public interface ICompiler
     {
         Intermediate Compile(ICompileContext context);
     }

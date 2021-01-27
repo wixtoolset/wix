@@ -5,7 +5,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: add documentation, move into Extensibility
+#pragma warning disable 1591 // TODO: add documentation
     public interface ILinker
     {
         Intermediate Link(ILinkContext context);

@@ -4,7 +4,8 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    internal interface IResolver
+#pragma warning disable 1591 // TODO: add documentation
+    public interface IResolver
     {
         IResolveResult Resolve(IResolveContext context);
     }
