@@ -2,6 +2,8 @@
 
 #include "precomp.h"
 
+#define PlanDumpLevel REPORT_DEBUG
+
 // internal struct definitions
 
 struct PLAN_NONPERMANENT_PACKAGE_INDICES
@@ -3041,9 +3043,6 @@ LExit:
     return hr;
 }
 
-
-#ifdef DEBUG
-
 static void CacheActionLog(
     __in DWORD iAction,
     __in BURN_CACHE_ACTION* pAction,
@@ -3054,59 +3053,59 @@ static void CacheActionLog(
     switch (pAction->type)
     {
     case BURN_CACHE_ACTION_TYPE_ACQUIRE_CONTAINER:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: ACQUIRE_CONTAINER id: %ls, source path: %ls, working path: %ls, skip until retried: %hs", wzBase, iAction, pAction->resolveContainer.pContainer->sczId, pAction->resolveContainer.pContainer->sczSourcePath, pAction->resolveContainer.sczUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ACQUIRE_CONTAINER id: %ls, source path: %ls, working path: %ls, skip until retried: %hs", wzBase, iAction, pAction->resolveContainer.pContainer->sczId, pAction->resolveContainer.pContainer->sczSourcePath, pAction->resolveContainer.sczUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_ACQUIRE_PAYLOAD:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: ACQUIRE_PAYLOAD package id: %ls, payload id: %ls, source path: %ls, working path: %ls, skip until retried: %hs", wzBase, iAction, pAction->resolvePayload.pPackage ? pAction->resolvePayload.pPackage->sczId : L"", pAction->resolvePayload.pPayload->sczKey, pAction->resolvePayload.pPayload->sczSourcePath, pAction->resolvePayload.sczUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ACQUIRE_PAYLOAD package id: %ls, payload id: %ls, source path: %ls, working path: %ls, skip until retried: %hs", wzBase, iAction, pAction->resolvePayload.pPackage ? pAction->resolvePayload.pPackage->sczId : L"", pAction->resolvePayload.pPayload->sczKey, pAction->resolvePayload.pPayload->sczSourcePath, pAction->resolvePayload.sczUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_CACHE_PAYLOAD:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: CACHE_PAYLOAD package id: %ls, payload id: %ls, working path: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->cachePayload.pPackage->sczId, pAction->cachePayload.pPayload->sczKey, pAction->cachePayload.sczUnverifiedPath, pAction->cachePayload.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->cachePayload.iTryAgainAction);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: CACHE_PAYLOAD package id: %ls, payload id: %ls, working path: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->cachePayload.pPackage->sczId, pAction->cachePayload.pPayload->sczKey, pAction->cachePayload.sczUnverifiedPath, pAction->cachePayload.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->cachePayload.iTryAgainAction);
         break;
 
     case BURN_CACHE_ACTION_TYPE_CHECKPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: CHECKPOINT id: %u", wzBase, iAction, pAction->checkpoint.dwId);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: CHECKPOINT id: %u", wzBase, iAction, pAction->checkpoint.dwId);
         break;
 
     case BURN_CACHE_ACTION_TYPE_EXTRACT_CONTAINER:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: EXTRACT_CONTAINER id: %ls, working path: %ls, skip until retried: %hs, skip until acquired by action: %u", wzBase, iAction, pAction->extractContainer.pContainer->sczId, pAction->extractContainer.sczContainerUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried), pAction->extractContainer.iSkipUntilAcquiredByAction);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: EXTRACT_CONTAINER id: %ls, working path: %ls, skip until retried: %hs, skip until acquired by action: %u", wzBase, iAction, pAction->extractContainer.pContainer->sczId, pAction->extractContainer.sczContainerUnverifiedPath, LoggingBoolToString(pAction->fSkipUntilRetried), pAction->extractContainer.iSkipUntilAcquiredByAction);
         for (DWORD j = 0; j < pAction->extractContainer.cPayloads; j++)
         {
-            LogStringLine(REPORT_STANDARD, "      extract package id: %ls, payload id: %ls, working path: %ls", pAction->extractContainer.rgPayloads[j].pPackage->sczId, pAction->extractContainer.rgPayloads[j].pPayload->sczKey, pAction->extractContainer.rgPayloads[j].sczUnverifiedPath);
+            LogStringLine(PlanDumpLevel, "      extract package id: %ls, payload id: %ls, working path: %ls", pAction->extractContainer.rgPayloads[j].pPackage->sczId, pAction->extractContainer.rgPayloads[j].pPayload->sczKey, pAction->extractContainer.rgPayloads[j].sczUnverifiedPath);
         }
         break;
 
     case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: LAYOUT_BUNDLE working path: %ls, layout directory: %ls, exe name: %ls, skip until retried: %hs", wzBase, iAction, pAction->bundleLayout.sczUnverifiedPath, pAction->bundleLayout.sczLayoutDirectory, pAction->bundleLayout.sczExecutableName, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: LAYOUT_BUNDLE working path: %ls, layout directory: %ls, exe name: %ls, skip until retried: %hs", wzBase, iAction, pAction->bundleLayout.sczUnverifiedPath, pAction->bundleLayout.sczLayoutDirectory, pAction->bundleLayout.sczExecutableName, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_LAYOUT_CONTAINER:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: LAYOUT_CONTAINER package id: %ls, container id: %ls, working path: %ls, layout directory: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->layoutContainer.pPackage ? pAction->layoutContainer.pPackage->sczId : L"", pAction->layoutContainer.pContainer->sczId, pAction->layoutContainer.sczUnverifiedPath, pAction->layoutContainer.sczLayoutDirectory, pAction->layoutContainer.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->layoutContainer.iTryAgainAction);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: LAYOUT_CONTAINER package id: %ls, container id: %ls, working path: %ls, layout directory: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->layoutContainer.pPackage ? pAction->layoutContainer.pPackage->sczId : L"", pAction->layoutContainer.pContainer->sczId, pAction->layoutContainer.sczUnverifiedPath, pAction->layoutContainer.sczLayoutDirectory, pAction->layoutContainer.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->layoutContainer.iTryAgainAction);
         break;
 
     case BURN_CACHE_ACTION_TYPE_LAYOUT_PAYLOAD:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: LAYOUT_PAYLOAD package id: %ls, payload id: %ls, working path: %ls, layout directory: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->layoutPayload.pPackage ? pAction->layoutPayload.pPackage->sczId : L"", pAction->layoutPayload.pPayload->sczKey, pAction->layoutPayload.sczUnverifiedPath, pAction->layoutPayload.sczLayoutDirectory, pAction->layoutPayload.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->layoutPayload.iTryAgainAction);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: LAYOUT_PAYLOAD package id: %ls, payload id: %ls, working path: %ls, layout directory: %ls, operation: %ls, skip until retried: %hs, retry action: %u", wzBase, iAction, pAction->layoutPayload.pPackage ? pAction->layoutPayload.pPackage->sczId : L"", pAction->layoutPayload.pPayload->sczKey, pAction->layoutPayload.sczUnverifiedPath, pAction->layoutPayload.sczLayoutDirectory, pAction->layoutPayload.fMove ? L"move" : L"copy", LoggingBoolToString(pAction->fSkipUntilRetried), pAction->layoutPayload.iTryAgainAction);
         break;
 
     case BURN_CACHE_ACTION_TYPE_PACKAGE_START:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_START id: %ls, plan index for skip: %u, payloads to cache: %u, bytes to cache: %llu, skip until retried: %hs", wzBase, iAction, pAction->packageStart.pPackage->sczId, pAction->packageStart.iPackageCompleteAction, pAction->packageStart.cCachePayloads, pAction->packageStart.qwCachePayloadSizeTotal, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_START id: %ls, plan index for skip: %u, payloads to cache: %u, bytes to cache: %llu, skip until retried: %hs", wzBase, iAction, pAction->packageStart.pPackage->sczId, pAction->packageStart.iPackageCompleteAction, pAction->packageStart.cCachePayloads, pAction->packageStart.qwCachePayloadSizeTotal, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_PACKAGE_STOP:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_STOP id: %ls, skip until retried: %hs", wzBase, iAction, pAction->packageStop.pPackage->sczId, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_STOP id: %ls, skip until retried: %hs", wzBase, iAction, pAction->packageStop.pPackage->sczId, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_ROLLBACK_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: ROLLBACK_PACKAGE id: %ls, skip until retried: %hs", wzBase, iAction, pAction->rollbackPackage.pPackage->sczId, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_PACKAGE id: %ls, skip until retried: %hs", wzBase, iAction, pAction->rollbackPackage.pPackage->sczId, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: SIGNAL_SYNCPOINT event handle: 0x%p, skip until retried: %hs", wzBase, iAction, pAction->syncpoint.hEvent, LoggingBoolToString(pAction->fSkipUntilRetried));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: SIGNAL_SYNCPOINT event handle: 0x%p, skip until retried: %hs", wzBase, iAction, pAction->syncpoint.hEvent, LoggingBoolToString(pAction->fSkipUntilRetried));
         break;
 
     case BURN_CACHE_ACTION_TYPE_TRANSACTION_BOUNDARY:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: TRANSACTION_BOUNDARY id: %ls, event handle: 0x%p, vital: %ls, transaction: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.hEvent, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no", pAction->rollbackBoundary.pRollbackBoundary->fTransaction ? L"yes" : L"no");
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: TRANSACTION_BOUNDARY id: %ls, event handle: 0x%p, vital: %ls, transaction: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.hEvent, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no", pAction->rollbackBoundary.pRollbackBoundary->fTransaction ? L"yes" : L"no");
         break;
 
     default:
@@ -3125,67 +3124,67 @@ static void ExecuteActionLog(
     switch (pAction->type)
     {
     case BURN_EXECUTE_ACTION_TYPE_CHECKPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: CHECKPOINT id: %u, msi transaction id: %ls", wzBase, iAction, pAction->checkpoint.dwId, pAction->checkpoint.pActiveRollbackBoundary && pAction->checkpoint.pActiveRollbackBoundary->fTransaction ? pAction->checkpoint.pActiveRollbackBoundary->sczId : L"(none)");
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: CHECKPOINT id: %u, msi transaction id: %ls", wzBase, iAction, pAction->checkpoint.dwId, pAction->checkpoint.pActiveRollbackBoundary && pAction->checkpoint.pActiveRollbackBoundary->fTransaction ? pAction->checkpoint.pActiveRollbackBoundary->sczId : L"(none)");
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls, action: %hs", wzBase, iAction, pAction->packageProvider.pPackage->sczId, LoggingDependencyActionToString(pAction->packageProvider.action));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_PROVIDER package id: %ls, action: %hs", wzBase, iAction, pAction->packageProvider.pPackage->sczId, LoggingDependencyActionToString(pAction->packageProvider.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %hs", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, LoggingDependencyActionToString(pAction->packageDependency.action));
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls, action: %hs", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey, LoggingDependencyActionToString(pAction->packageDependency.action));
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: EXE_PACKAGE package id: %ls, action: %hs, ignore dependencies: %ls", wzBase, iAction, pAction->exePackage.pPackage->sczId, LoggingActionStateToString(pAction->exePackage.action), pAction->exePackage.sczIgnoreDependencies);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: EXE_PACKAGE package id: %ls, action: %hs, ignore dependencies: %ls", wzBase, iAction, pAction->exePackage.pPackage->sczId, LoggingActionStateToString(pAction->exePackage.action), pAction->exePackage.sczIgnoreDependencies);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
         for (DWORD j = 0; j < pAction->msiPackage.cPatches; ++j)
         {
-            LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
+            LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
         }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
         {
-            LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
+            LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
         }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSU_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSU_PACKAGE package id: %ls, action: %hs, log path: %ls", wzBase, iAction, pAction->msuPackage.pPackage->sczId, LoggingActionStateToString(pAction->msuPackage.action), pAction->msuPackage.sczLogPath);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSU_PACKAGE package id: %ls, action: %hs, log path: %ls", wzBase, iAction, pAction->msuPackage.pPackage->sczId, LoggingActionStateToString(pAction->msuPackage.action), pAction->msuPackage.sczLogPath);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_REGISTRATION:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: REGISTRATION keep: %ls", wzBase, iAction, pAction->registration.fKeep ? L"yes" : L"no");
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: REGISTRATION keep: %ls", wzBase, iAction, pAction->registration.fKeep ? L"yes" : L"no");
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: ROLLBACK_BOUNDARY id: %ls, vital: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no");
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_BOUNDARY id: %ls, vital: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no");
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: WAIT_SYNCPOINT event handle: 0x%p", wzBase, iAction, pAction->syncpoint.hEvent);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: WAIT_SYNCPOINT event handle: 0x%p", wzBase, iAction, pAction->syncpoint.hEvent);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: UNCACHE_PACKAGE id: %ls", wzBase, iAction, pAction->uncachePackage.pPackage->sczId);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: UNCACHE_PACKAGE id: %ls", wzBase, iAction, pAction->uncachePackage.pPackage->sczId);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: COMPATIBLE_PACKAGE reference id: %ls, installed ProductCode: %ls", wzBase, iAction, pAction->compatiblePackage.pReferencePackage->sczId, pAction->compatiblePackage.sczInstalledProductCode);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: COMPATIBLE_PACKAGE reference id: %ls, installed ProductCode: %ls", wzBase, iAction, pAction->compatiblePackage.pReferencePackage->sczId, pAction->compatiblePackage.sczInstalledProductCode);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: BEGIN_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: BEGIN_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: COMMIT_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: COMMIT_MSI_TRANSACTION id: %ls", wzBase, iAction, pAction->msiTransaction.pRollbackBoundary->sczId);
         break;
 
     default:
@@ -3198,15 +3197,15 @@ extern "C" void PlanDump(
     __in BURN_PLAN* pPlan
     )
 {
-    LogStringLine(REPORT_STANDARD, "--- Begin plan dump ---");
+    LogStringLine(PlanDumpLevel, "--- Begin plan dump ---");
 
-    LogStringLine(REPORT_STANDARD, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
-    LogStringLine(REPORT_STANDARD, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
-    LogStringLine(REPORT_STANDARD, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
-    LogStringLine(REPORT_STANDARD, "     keep registration by default: %hs", LoggingTrueFalseToString(pPlan->fKeepRegistrationDefault));
-    LogStringLine(REPORT_STANDARD, "     estimated size: %llu", pPlan->qwEstimatedSize);
+    LogStringLine(PlanDumpLevel, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
+    LogStringLine(PlanDumpLevel, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
+    LogStringLine(PlanDumpLevel, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
+    LogStringLine(PlanDumpLevel, "     keep registration by default: %hs", LoggingTrueFalseToString(pPlan->fKeepRegistrationDefault));
+    LogStringLine(PlanDumpLevel, "     estimated size: %llu", pPlan->qwEstimatedSize);
 
-    LogStringLine(REPORT_STANDARD, "Plan cache size: %llu", pPlan->qwCacheSizeTotal);
+    LogStringLine(PlanDumpLevel, "Plan cache size: %llu", pPlan->qwCacheSizeTotal);
     for (DWORD i = 0; i < pPlan->cCacheActions; ++i)
     {
         CacheActionLog(i, pPlan->rgCacheActions + i, FALSE);
@@ -3217,8 +3216,8 @@ extern "C" void PlanDump(
         CacheActionLog(i, pPlan->rgRollbackCacheActions + i, TRUE);
     }
 
-    LogStringLine(REPORT_STANDARD, "Plan execute package count: %u", pPlan->cExecutePackagesTotal);
-    LogStringLine(REPORT_STANDARD, "     overall progress ticks: %u", pPlan->cOverallProgressTicksTotal);
+    LogStringLine(PlanDumpLevel, "Plan execute package count: %u", pPlan->cExecutePackagesTotal);
+    LogStringLine(PlanDumpLevel, "     overall progress ticks: %u", pPlan->cOverallProgressTicksTotal);
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
         ExecuteActionLog(i, pPlan->rgExecuteActions + i, FALSE);
@@ -3231,15 +3230,13 @@ extern "C" void PlanDump(
 
     for (DWORD i = 0; i < pPlan->cCleanActions; ++i)
     {
-        LogStringLine(REPORT_STANDARD, "   Clean action[%u]: CLEAN_PACKAGE package id: %ls", i, pPlan->rgCleanActions[i].pPackage->sczId);
+        LogStringLine(PlanDumpLevel, "   Clean action[%u]: CLEAN_PACKAGE package id: %ls", i, pPlan->rgCleanActions[i].pPackage->sczId);
     }
 
     for (DWORD i = 0; i < pPlan->cPlannedProviders; ++i)
     {
-        LogStringLine(REPORT_STANDARD, "   Dependency action[%u]: PLANNED_PROVIDER key: %ls, name: %ls", i, pPlan->rgPlannedProviders[i].sczKey, pPlan->rgPlannedProviders[i].sczName);
+        LogStringLine(PlanDumpLevel, "   Dependency action[%u]: PLANNED_PROVIDER key: %ls, name: %ls", i, pPlan->rgPlannedProviders[i].sczKey, pPlan->rgPlannedProviders[i].sczName);
     }
 
-    LogStringLine(REPORT_STANDARD, "--- End plan dump ---");
+    LogStringLine(PlanDumpLevel, "--- End plan dump ---");
 }
-
-#endif

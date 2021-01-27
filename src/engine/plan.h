@@ -550,12 +550,9 @@ HRESULT PlanSetResumeCommand(
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_LOGGING* pLog
     );
-
-#ifdef DEBUG
 void PlanDump(
     __in BURN_PLAN* pPlan
     );
-#endif
 
 #if defined(__cplusplus)
 }

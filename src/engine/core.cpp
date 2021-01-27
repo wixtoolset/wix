@@ -491,9 +491,7 @@ extern "C" HRESULT CorePlan(
     // Finally, display all packages and related bundles in the log.
     LogPackages(pUpgradeBundlePackage, pForwardCompatibleBundlePackage, &pEngineState->packages, &pEngineState->registration.relatedBundles, action);
 
-#ifdef DEBUG
     PlanDump(&pEngineState->plan);
-#endif
 
 LExit:
     if (fActivated)
