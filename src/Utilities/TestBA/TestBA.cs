@@ -25,6 +25,7 @@ namespace WixToolset.Test.BA
 
         private string updateBundlePath;
 
+        private int redetectCount;
         private int sleepDuringCache;
         private int cancelCacheAtProgress;
         private int sleepDuringExecute;
@@ -105,18 +106,14 @@ namespace WixToolset.Test.BA
             this.dummyWindow.CreateControl();
             this.appContext = new ApplicationContext();
 
-            int redetectCount = 0;
+            this.redetectCount = 0;
             string redetect = this.ReadPackageAction(null, "RedetectCount");
-            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out redetectCount))
+            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out this.redetectCount))
             {
-                redetectCount = 0;
+                this.redetectCount = 0;
             }
 
-            do
-            {
-                this.Engine.Detect();
-                this.Log("Completed detection phase: {0} re-runs remaining", redetectCount);
-            } while (0 < redetectCount--);
+            this.Engine.Detect();
 
             Application.Run(this.appContext);
             this.Engine.Quit(this.result & 0xFFFF); // return plain old Win32 error, not HRESULT.
@@ -125,7 +122,7 @@ namespace WixToolset.Test.BA
         protected override void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)
         {
             this.Log("OnDetectUpdateBegin");
-            if ((LaunchAction.UpdateReplaceEmbedded == this.action)|(LaunchAction.UpdateReplace == this.action))
+            if (LaunchAction.UpdateReplaceEmbedded == this.action || LaunchAction.UpdateReplace == this.action)
             {
                 args.Skip = false;
             }
@@ -167,9 +164,18 @@ namespace WixToolset.Test.BA
         {
             this.result = args.Status;
 
-            if (Hresult.Succeeded(this.result) && (this.UpdateAvailable | (!((LaunchAction.UpdateReplaceEmbedded == this.action) | (LaunchAction.UpdateReplace == this.action)))))
-            {                
-                this.Engine.Plan(this.action);
+            if (Hresult.Succeeded(this.result) &&
+                (this.UpdateAvailable || LaunchAction.UpdateReplaceEmbedded != this.action && LaunchAction.UpdateReplace != this.action))
+            {
+                if (this.redetectCount > 0)
+                {
+                    this.Log("Completed detection phase: {0} re-runs remaining", this.redetectCount--);
+                    this.Engine.Detect();
+                }
+                else
+                {
+                    this.Engine.Plan(this.action);
+                }
             }
             else
             {
