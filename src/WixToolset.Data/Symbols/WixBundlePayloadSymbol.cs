@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.UnresolvedSourceFile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.FileSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.FileSize), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContainerRef), IntermediateFieldType.String),
@@ -111,9 +111,9 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePayloadSymbolFields.Description, value);
         }
 
-        public int? FileSize
+        public long? FileSize
         {
-            get => (int?)this.Fields[(int)WixBundlePayloadSymbolFields.FileSize];
+            get => (long?)this.Fields[(int)WixBundlePayloadSymbolFields.FileSize];
             set => this.Set((int)WixBundlePayloadSymbolFields.FileSize, value);
         }
 
