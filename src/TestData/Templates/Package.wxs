@@ -6,8 +6,12 @@
 <?define Version = 1.0.0.0?>
 <?endif?>
 
+<?ifndef ProductCode?>
+<?define ProductCode = *?>
+<?endif?>
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.UpgradeCode)" Compressed="yes">
+  <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" ProductCode="$(var.ProductCode)">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <?ifndef CabPrefix?>
     <MediaTemplate EmbedCab="yes" />
@@ -20,6 +24,9 @@
     <Feature Id="Complete" Level="1">
       <ComponentRef Id="FileComponent" />
       <ComponentRef Id="RegistryComponent" />
+      <?ifdef var.ProductComponents?>
+      <ComponentGroupRef Id="ProductComponents" />
+      <?endif?>
     </Feature>
   </Package>
 

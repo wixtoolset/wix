@@ -12,15 +12,13 @@ namespace WixToolsetTest.BurnE2E
 
     public partial class PackageInstaller
     {
-        private string PackageName { get; }
-
         public string PackagePdb { get; }
 
         private WindowsInstallerData WiData { get; set; }
 
         public string GetInstalledFilePath(string filename)
         {
-            return this.TestContext.GetTestInstallFolder(Path.Combine(this.PackageName, filename));
+            return this.TestContext.GetTestInstallFolder(Path.Combine(this.GetInstallFolderName(), filename));
         }
 
         private WindowsInstallerData GetWindowsInstallerData()
@@ -34,6 +32,19 @@ namespace WixToolsetTest.BurnE2E
             return this.WiData;
         }
 
+        public string GetInstallFolderName()
+        {
+            var wiData = this.GetWindowsInstallerData();
+            var row = wiData.Tables["Directory"].Rows.Single(r => r.FieldAsString(0) == "INSTALLFOLDER");
+            var value = row.FieldAsString(2);
+            var longNameIndex = value.IndexOf('|') + 1;
+            if (longNameIndex > 0)
+            {
+                return value.Substring(longNameIndex);
+            }
+            return value;
+        }
+
         public string GetProperty(string name)
         {
             var wiData = this.GetWindowsInstallerData();
@@ -45,6 +56,22 @@ namespace WixToolsetTest.BurnE2E
         {
             var productCode = this.GetProperty("ProductCode");
             Assert.Equal(installed, MsiUtilities.IsProductInstalled(productCode));
+        }
+
+        public void VerifyTestRegistryRootDeleted()
+        {
+            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot();
+            Assert.Null(testRegistryRoot);
+        }
+
+        public void VerifyTestRegistryValue(string name, string expectedValue)
+        {
+            using (var root = this.TestContext.GetTestRegistryRoot())
+            {
+                Assert.NotNull(root);
+                var actualValue = root.GetValue(name) as string;
+                Assert.Equal(expectedValue, actualValue);
+            }
         }
     }
 }

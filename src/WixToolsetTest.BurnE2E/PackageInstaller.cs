@@ -8,11 +8,10 @@ namespace WixToolsetTest.BurnE2E
 
     public partial class PackageInstaller : IDisposable
     {
-        public PackageInstaller(WixTestContext testContext, string name)
+        public PackageInstaller(WixTestContext testContext, string filename)
         {
-            this.Package = Path.Combine(testContext.TestDataFolder, $"{name}.msi");
-            this.PackagePdb = Path.Combine(testContext.TestDataFolder, $"{name}.wixpdb");
-            this.PackageName = name;
+            this.Package = Path.Combine(testContext.TestDataFolder, $"{filename}.msi");
+            this.PackagePdb = Path.Combine(testContext.TestDataFolder, $"{filename}.wixpdb");
             this.TestContext = testContext;
         }
 

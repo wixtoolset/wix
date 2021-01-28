@@ -21,9 +21,9 @@ namespace WixToolsetTest.BurnE2E
             return installer;
         }
 
-        protected PackageInstaller CreatePackageInstaller(string name)
+        protected PackageInstaller CreatePackageInstaller(string filename)
         {
-            var installer = new PackageInstaller(this.TestContext, name);
+            var installer = new PackageInstaller(this.TestContext, filename);
             this.Installers.Enqueue(installer);
             return installer;
         }
