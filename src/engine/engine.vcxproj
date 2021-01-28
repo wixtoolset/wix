@@ -119,6 +119,7 @@
     <ClInclude Include="EngineForExtension.h" />
     <ClInclude Include="exeengine.h" />
     <ClInclude Include="externalengine.h" />
+    <ClInclude Include="inc\burnsources.h" />
     <ClInclude Include="inc\engine.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="manifest.h" />

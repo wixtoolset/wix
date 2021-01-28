@@ -20,8 +20,7 @@
 #include <stddef.h>
 
 #include <dutilsources.h>
-
-#define DUTIL_SOURCE_DEFAULT DUTIL_SOURCE_EXTERNAL
+#include <burnsources.h>
 
 #include <dutil.h>
 #include <verutil.h>

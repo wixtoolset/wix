@@ -87,7 +87,19 @@ static void CALLBACK BurnTraceError(
     __in va_list args
     )
 {
-    if (DUTIL_SOURCE_DEFAULT == source)
+    BOOL fLog = FALSE;
+
+    switch (source)
+    {
+    case DUTIL_SOURCE_DEFAULT:
+        fLog = TRUE;
+        break;
+    default:
+        fLog = REPORT_VERBOSE < LogGetLevel();
+        break;
+    }
+
+    if (fLog)
     {
         LogErrorStringArgs(hrError, szFormat, args);
     }
