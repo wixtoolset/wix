@@ -67,7 +67,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     if (registryKeyRows.TryGetValue(componentSymbol.KeyPath, out var foundRow))
                     {
                         var bitness = componentSymbol.Win64 ? "64" : String.Empty;
-                        var regkey = String.Concat(bitness, foundRow.AsString(1), "\\", foundRow.AsString(2), "\\", foundRow.AsString(3));
+                        var regkey = String.Concat(bitness, foundRow.Root, "\\", foundRow.Key, "\\", foundRow.Name);
                         componentSymbol.ComponentId = this.BackendHelper.CreateGuid(BindDatabaseCommand.WixComponentGuidNamespace, regkey.ToLowerInvariant());
                     }
                 }

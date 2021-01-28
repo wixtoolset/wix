@@ -1,0 +1,14 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Patch AllowRemoval="yes" Classification="Update" ClientPatchId="PatchB" Description="Patch B" DisplayName="Patch B" Manufacturer="Example Corporation" MinorUpdateTargetRTM="yes">
+        <Media Id="100" Cabinet="B" EmbedCab="yes">
+            <PatchBaseline Id="PatchB" BaselineFile="Baseline.wixpdb" UpdateFile="Update.wixpdb">
+                <Validate ProductId="no" />
+            </PatchBaseline>
+        </Media>
+
+        <PatchFamily Id="B" Version="$(var.V)" Supersede="yes">
+          <ComponentRef Id="RegistryComponent" />
+          <PropertyRef Id="TestVersion" />
+        </PatchFamily>
+    </Patch>
+</Wix>

@@ -1,0 +1,46 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package ProductCode="26309973-0A5E-4979-B142-98A6E064EDC0" Name="PackageA" Language="1033" Version="$(var.V)" Manufacturer="Example Corporation"
+           UpgradeCode="32B0396A-CE36-4570-B16E-F88FA42DC409" Scope="perMachine" Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <PropertyRef Id="TestVersion"/>
+
+    <Feature Id="Complete" Level="1">
+      <ComponentRef Id="FileComponent"/>
+      <ComponentRef Id="RegistryComponent"/>
+      <ComponentRef Id="RegistryComponent2" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="~Test A" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="FileComponent" Directory="INSTALLFOLDER">
+      <File Source="$(sys.SOURCEFILEPATH)"/>
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="RegistryComponent" Directory="INSTALLFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\WiX\Tests\$(var.A)" Name="A" Value="!(bind.Property.TestVersion)" Type="string" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="RegistryComponent2" Directory="INSTALLFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\WiX\Tests\$(var.B)" Name="A2" Value="!(bind.Property.TestVersion)" Type="string" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Property Id="TestVersion" Value="$(var.V)"/>
+  </Fragment>
+</Wix>
