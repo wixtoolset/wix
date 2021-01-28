@@ -20,7 +20,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PerMachine), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RollbackLogPathVariable), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Size), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Size), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.InstallSize), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Language), IntermediateFieldType.Number),
@@ -153,9 +153,9 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePackageSymbolFields.RollbackLogPathVariable, value);
         }
 
-        public int Size
+        public long Size
         {
-            get => (int)this.Fields[(int)WixBundlePackageSymbolFields.Size];
+            get => (long)this.Fields[(int)WixBundlePackageSymbolFields.Size];
             set => this.Set((int)WixBundlePackageSymbolFields.Size, value);
         }
 
