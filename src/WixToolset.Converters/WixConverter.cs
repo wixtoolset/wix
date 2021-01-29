@@ -964,9 +964,17 @@ namespace WixToolset.Converters
                         this.OnError(ConverterTestType.InstallerVersionBehaviorChange, element, "Breaking change: The default value for Package/@InstallerVersion has been changed to '500' regardless of build platform. If you need a lower version, set it manually in the Package element.");
                     }
 
+                    if (xSummaryInformation.Attribute("Compressed") == null)
+                    {
+                        xPackage.SetAttributeValue("Compressed", "no");
+                    }
+                    else
+                    {
+                        MoveAttribute(xSummaryInformation, "Compressed", xPackage, defaultValue: "yes");
+                    }
+
                     RemoveAttribute(xSummaryInformation, "AdminImage");
                     RemoveAttribute(xSummaryInformation, "Comments");
-                    MoveAttribute(xSummaryInformation, "Compressed", xPackage, defaultValue: "no");
                     RemoveAttribute(xSummaryInformation, "Id");
                     MoveAttribute(xSummaryInformation, "InstallerVersion", xPackage, defaultValue: "500");
                     MoveAttribute(xSummaryInformation, "InstallScope", xPackage, "Scope", defaultValue: "perMachine");

@@ -233,7 +233,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package>",
+                "  <Package Compressed=\"no\">",
                 "  ",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
                 "    <Launch Condition=\"1=2\" Message=\"Do not stop\" />",

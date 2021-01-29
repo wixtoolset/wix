@@ -14,7 +14,7 @@ namespace WixToolsetTest.Converters
     public class ProductPackageFixture : BaseConverterFixture
     {
         [Fact]
-        public void FixesCompressed()
+        public void FixesCompressedWhenYes()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
@@ -27,7 +27,53 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package Compressed=\"yes\">",
+                "  <Package>",
+                "    ",
+                "  </Package>",
+                "</Wix>"
+            };
+
+            AssertSuccess(parse, 4, expected);
+        }
+
+        [Fact]
+        public void FixesCompressedWhenNo()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Product>",
+                "    <Package Compressed='no' />",
+                "  </Product>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Package Compressed=\"no\">",
+                "    ",
+                "  </Package>",
+                "</Wix>"
+            };
+
+            AssertSuccess(parse, 4, expected);
+        }
+
+        [Fact]
+        public void FixesCompressedWhenOmitted()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Product>",
+                "    <Package />",
+                "  </Product>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Package Compressed=\"no\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -64,7 +110,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package InstallerVersion=\"666\">",
+                "  <Package Compressed=\"no\" InstallerVersion=\"666\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -87,7 +133,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package>",
+                "  <Package Compressed=\"no\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -110,7 +156,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package>",
+                "  <Package Compressed=\"no\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -133,7 +179,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package InstallerVersion=\"200\">",
+                "  <Package Compressed=\"no\" InstallerVersion=\"200\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -156,7 +202,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package Scope=\"perUser\">",
+                "  <Package Compressed=\"no\" Scope=\"perUser\">",
                 "    ",
                 "  </Package>",
                 "</Wix>"
@@ -180,7 +226,7 @@ namespace WixToolsetTest.Converters
             var expected = new[]
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Package>",
+                "  <Package Compressed=\"no\">",
                 "    ",
                 "    ",
                 "  </Package>",
