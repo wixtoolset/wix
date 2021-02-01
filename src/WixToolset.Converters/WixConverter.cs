@@ -648,7 +648,7 @@ namespace WixToolset.Converters
 
         private void ConvertCatalogElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The elkement will be removed."))
+            if (this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The element will be removed."))
             {
                 element.Remove();
             }
