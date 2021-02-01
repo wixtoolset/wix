@@ -18,7 +18,6 @@ static HRESULT FindEmbeddedBySourcePath(
 extern "C" HRESULT PayloadsParseFromXml(
     __in BURN_PAYLOADS* pPayloads,
     __in_opt BURN_CONTAINERS* pContainers,
-    __in_opt BURN_CATALOGS* pCatalogs,
     __in IXMLDOMNode* pixnBundle
     )
 {
@@ -130,42 +129,12 @@ extern "C" HRESULT PayloadsParseFromXml(
             ExitOnFailure(hr, "Failed to parse @FileSize.");
         }
 
-        // @CertificateAuthorityKeyIdentifier
-        hr = XmlGetAttributeEx(pixnNode, L"CertificateRootPublicKeyIdentifier", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @CertificateRootPublicKeyIdentifier.");
-
-            hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootPublicKeyIdentifier, &pPayload->cbCertificateRootPublicKeyIdentifier);
-            ExitOnFailure(hr, "Failed to hex decode @CertificateRootPublicKeyIdentifier.");
-        }
-
-        // @CertificateThumbprint
-        hr = XmlGetAttributeEx(pixnNode, L"CertificateRootThumbprint", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @CertificateRootThumbprint.");
-
-            hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootThumbprint, &pPayload->cbCertificateRootThumbprint);
-            ExitOnFailure(hr, "Failed to hex decode @CertificateRootThumbprint.");
-        }
-
         // @Hash
         hr = XmlGetAttributeEx(pixnNode, L"Hash", &scz);
         ExitOnFailure(hr, "Failed to get @Hash.");
 
         hr = StrAllocHexDecode(scz, &pPayload->pbHash, &pPayload->cbHash);
         ExitOnFailure(hr, "Failed to hex decode the Payload/@Hash.");
-
-        // @Catalog
-        hr = XmlGetAttributeEx(pixnNode, L"Catalog", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Catalog.");
-
-            hr = CatalogFindById(pCatalogs, scz, &pPayload->pCatalog);
-            ExitOnFailure(hr, "Failed to find catalog.");
-        }
 
         // prepare next iteration
         ReleaseNullObject(pixnNode);
@@ -194,8 +163,6 @@ extern "C" void PayloadsUninitialize(
             ReleaseStr(pPayload->sczKey);
             ReleaseStr(pPayload->sczFilePath);
             ReleaseMem(pPayload->pbHash);
-            ReleaseMem(pPayload->pbCertificateRootThumbprint);
-            ReleaseMem(pPayload->pbCertificateRootPublicKeyIdentifier);
             ReleaseStr(pPayload->sczSourcePath);
             ReleaseStr(pPayload->sczLocalFilePath);
             ReleaseStr(pPayload->downloadSource.sczUrl);

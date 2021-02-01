@@ -132,10 +132,6 @@ static HRESULT ParseFromXml(
     hr = SearchesParseFromXml(&pEngineState->searches, &pEngineState->extensions, pixeBundle);
     ExitOnFailure(hr, "Failed to parse searches.");
 
-    // parse catalog files
-    hr = CatalogsParseFromXml(&pEngineState->catalogs, pixeBundle);
-    ExitOnFailure(hr, "Failed to parse catalog files.");
-
     // parse registration
     hr = RegistrationParseFromXml(&pEngineState->registration, pixeBundle);
     ExitOnFailure(hr, "Failed to parse registration.");
@@ -149,7 +145,7 @@ static HRESULT ParseFromXml(
     ExitOnFailure(hr, "Failed to parse containers.");
 
     // parse payloads
-    hr = PayloadsParseFromXml(&pEngineState->payloads, &pEngineState->containers, &pEngineState->catalogs, pixeBundle);
+    hr = PayloadsParseFromXml(&pEngineState->payloads, &pEngineState->containers, pixeBundle);
     ExitOnFailure(hr, "Failed to parse payloads.");
 
     // parse packages

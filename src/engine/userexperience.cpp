@@ -55,7 +55,7 @@ extern "C" HRESULT UserExperienceParseFromXml(
     }
 
     // parse payloads
-    hr = PayloadsParseFromXml(&pUserExperience->payloads, NULL, NULL, pixnUserExperienceNode);
+    hr = PayloadsParseFromXml(&pUserExperience->payloads, NULL, pixnUserExperienceNode);
     ExitOnFailure(hr, "Failed to parse user experience payloads.");
 
     // make sure we have at least one payload

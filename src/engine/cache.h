@@ -16,7 +16,7 @@ HRESULT CacheInitialize(
     __in_z_opt LPCWSTR wzSourceProcessPath
     );
 HRESULT CacheEnsureWorkingFolder(
-    __in LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleId,
     __deref_out_z_opt LPWSTR* psczWorkingFolder
     );
 HRESULT CacheCalculateBundleWorkingPath(
@@ -133,11 +133,6 @@ HRESULT CacheRemovePackage(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCacheId
-    );
-HRESULT CacheVerifyPayloadSignature(
-    __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
     );
 void CacheCleanup(
     __in BOOL fPerMachine,

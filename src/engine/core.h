@@ -98,7 +98,6 @@ typedef struct _BURN_ENGINE_STATE
     BURN_USER_EXPERIENCE userExperience;
     BURN_REGISTRATION registration;
     BURN_CONTAINERS containers;
-    BURN_CATALOGS catalogs;
     BURN_PAYLOADS payloads;
     BURN_PACKAGES packages;
     BURN_UPDATE update;

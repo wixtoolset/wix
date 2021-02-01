@@ -68,7 +68,6 @@
 #include "section.h"
 #include "approvedexe.h"
 #include "container.h"
-#include "catalog.h"
 #include "payload.h"
 #include "cabextract.h"
 #include "burnextension.h"

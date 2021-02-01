@@ -400,7 +400,6 @@ static void UninitializeEngineState(
     RegistrationUninitialize(&pEngineState->registration);
     PayloadsUninitialize(&pEngineState->payloads);
     PackagesUninitialize(&pEngineState->packages);
-    CatalogUninitialize(&pEngineState->catalogs);
     SectionUninitialize(&pEngineState->section);
     ContainersUninitialize(&pEngineState->containers);
 

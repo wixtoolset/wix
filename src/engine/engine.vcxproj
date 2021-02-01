@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\packages\WixToolset.DUtil.4.0.59\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.59\build\WixToolset.DUtil.props')" />
-
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -30,7 +28,6 @@
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8119537D-E1D9-6591-D51A-49768A2F9C37}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -39,22 +36,17 @@
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-
   <ImportGroup Label="Shared">
   </ImportGroup>
-
   <ItemGroup>
     <ClCompile Include="apply.cpp" />
     <ClCompile Include="approvedexe.cpp" />
     <ClCompile Include="bitsengine.cpp" />
     <ClCompile Include="burnextension.cpp" />
-    <ClCompile Include="catalog.cpp" />
     <ClCompile Include="detect.cpp" />
     <ClCompile Include="embedded.cpp" />
     <ClCompile Include="EngineForApplication.cpp" />
@@ -95,7 +87,6 @@
     <ClCompile Include="variable.cpp" />
     <ClCompile Include="variant.cpp" />
   </ItemGroup>
-
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
@@ -107,7 +98,6 @@
     <ClInclude Include="burnextension.h" />
     <ClInclude Include="cabextract.h" />
     <ClInclude Include="cache.h" />
-    <ClInclude Include="catalog.h" />
     <ClInclude Include="condition.h" />
     <ClInclude Include="container.h" />
     <ClInclude Include="core.h" />
@@ -145,11 +135,9 @@
     <ClInclude Include="variable.h" />
     <ClInclude Include="variant.h" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  
   <ItemGroup>
     <CustomBuild Include="engine.mc">
       <Message>Compiling message file...</Message>
@@ -158,10 +146,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <Outputs>$(IntDir)engine.messages.h;$(IntDir)engine.messages.rc;$(OutDir)engine.res</Outputs>
     </CustomBuild>
   </ItemGroup>
-
-  <Target Name="SetWixVersion"
-          DependsOnTargets="GetBuildVersion"
-          BeforeTargets="ClCompile">
+  <Target Name="SetWixVersion" DependsOnTargets="GetBuildVersion" BeforeTargets="ClCompile">
     <PropertyGroup>
       <rmj>$(MajorMinorVersion.Split(`.`)[0])</rmj>
       <rmm>$(MajorMinorVersion.Split(`.`)[1])</rmm>
@@ -176,7 +161,6 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       </ClCompile>
     </ItemGroup>
   </Target>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

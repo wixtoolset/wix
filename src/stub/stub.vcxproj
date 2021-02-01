@@ -63,14 +63,14 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\engine\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wintrust.lib;wuguid.lib;engine.lib;engine.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wuguid.lib;engine.lib;engine.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
     <Link>
       <SwapRunFromCD>true</SwapRunFromCD>
       <SwapRunFromNET>true</SwapRunFromNET>
-      <DelayLoadDLLs>cabinet.dll;crypt32.dll;msi.dll;shlwapi.dll;version.dll;wininet.dll;wintrust.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>cabinet.dll;crypt32.dll;msi.dll;shlwapi.dll;version.dll;wininet.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
 

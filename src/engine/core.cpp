@@ -151,10 +151,6 @@ extern "C" HRESULT CoreInitialize(
         hr = PayloadExtractFromContainer(&pEngineState->userExperience.payloads, NULL, &containerContext, pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to extract bootstrapper application payloads.");
 
-        // Load the catalog files as soon as they are extracted.
-        hr = CatalogLoadFromPayload(&pEngineState->catalogs, &pEngineState->userExperience.payloads);
-        ExitOnFailure(hr, "Failed to load catalog files.");
-
         hr = PathConcat(pEngineState->userExperience.sczTempDirectory, L"BootstrapperApplicationData.xml", &pEngineState->command.wzBootstrapperApplicationDataPath);
         ExitOnFailure(hr, "Failed to get BootstrapperApplicationDataPath.");
 

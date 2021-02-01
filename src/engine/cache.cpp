@@ -94,15 +94,6 @@ static HRESULT VerifyHash(
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile
     );
-static HRESULT VerifyPayloadWithCatalog(
-    __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
-    );
-static HRESULT VerifyPayloadAgainstChain(
-    __in BURN_PAYLOAD* pPayload,
-    __in PCCERT_CHAIN_CONTEXT pChainContext
-    );
 
 
 extern "C" HRESULT CacheInitialize(
@@ -189,7 +180,7 @@ LExit:
 }
 
 extern "C" HRESULT CacheEnsureWorkingFolder(
-    __in_z LPCWSTR wzBundleId,
+    __in_z_opt LPCWSTR wzBundleId,
     __deref_out_z_opt LPWSTR* psczWorkingFolder
     )
 {
@@ -964,56 +955,6 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CacheVerifyPayloadSignature(
-    __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
-    )
-{
-    HRESULT hr = S_OK;
-    LONG er = ERROR_SUCCESS;
-
-    GUID guidAuthenticode = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-    WINTRUST_FILE_INFO wfi = { };
-    WINTRUST_DATA wtd = { };
-    CRYPT_PROVIDER_DATA* pProviderData = NULL;
-    CRYPT_PROVIDER_SGNR* pSigner = NULL;
-
-    // Verify the payload assuming online.
-    wfi.cbStruct = sizeof(wfi);
-    wfi.pcwszFilePath = wzUnverifiedPayloadPath;
-    wfi.hFile = hFile;
-
-    wtd.cbStruct = sizeof(wtd);
-    wtd.dwUnionChoice = WTD_CHOICE_FILE;
-    wtd.pFile = &wfi;
-    wtd.dwStateAction = WTD_STATEACTION_VERIFY;
-    wtd.dwProvFlags = WTD_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
-    wtd.dwUIChoice = WTD_UI_NONE;
-
-    er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &guidAuthenticode, &wtd);
-    if (er)
-    {
-        // Verify the payload assuming offline.
-        wtd.dwProvFlags |= WTD_CACHE_ONLY_URL_RETRIEVAL;
-
-        er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &guidAuthenticode, &wtd);
-        ExitOnWin32Error(er, hr, "Failed authenticode verification of payload: %ls", wzUnverifiedPayloadPath);
-    }
-
-    pProviderData = WTHelperProvDataFromStateData(wtd.hWVTStateData);
-    ExitOnNullWithLastError(pProviderData, hr, "Failed to get provider state from authenticode certificate.");
-
-    pSigner = WTHelperGetProvSignerFromChain(pProviderData, 0, FALSE, 0);
-    ExitOnNullWithLastError(pSigner, hr, "Failed to get signer chain from authenticode certificate.");
-
-    hr = VerifyPayloadAgainstChain(pPayload, pSigner->pChainContext);
-    ExitOnFailure(hr, "Failed to verify expected payload against actual certificate chain.");
-
-LExit:
-    return hr;
-}
-
 extern "C" void CacheCleanup(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzBundleId
@@ -1098,7 +1039,7 @@ extern "C" void CacheUninitialize()
 // Internal functions.
 
 static HRESULT CalculateWorkingFolder(
-    __in_z LPCWSTR /*wzBundleId*/,
+    __in_z_opt LPCWSTR /*wzBundleId*/,
     __deref_out_z LPWSTR* psczWorkingFolder
     )
 {
@@ -1387,18 +1328,7 @@ static HRESULT VerifyThenTransferPayload(
         ExitWithLastError(hr, "Failed to open payload in working path: %ls", wzUnverifiedPayloadPath);
     }
 
-    // If the payload has a certificate root public key identifier provided, verify the certificate.
-    if (pPayload->pbCertificateRootPublicKeyIdentifier)
-    {
-        hr = CacheVerifyPayloadSignature(pPayload, wzUnverifiedPayloadPath, hFile);
-        ExitOnFailure(hr, "Failed to verify payload signature: %ls", wzCachedPath);
-    }
-    else if (pPayload->pCatalog) // If catalog files are specified, attempt to verify the file with a catalog file
-    {
-        hr = VerifyPayloadWithCatalog(pPayload, wzUnverifiedPayloadPath, hFile);
-        ExitOnFailure(hr, "Failed to verify payload signature: %ls", wzCachedPath);
-    }
-    else if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
+    if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
         hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, wzUnverifiedPayloadPath, hFile);
         ExitOnFailure(hr, "Failed to verify payload hash: %ls", wzCachedPath);
@@ -1466,18 +1396,7 @@ static HRESULT VerifyFileAgainstPayload(
         ExitOnRootFailure(hr, "Failed to open payload at path: %ls", wzVerifyPath);
     }
 
-    // If the payload has a certificate root public key identifier provided, verify the certificate.
-    if (pPayload->pbCertificateRootPublicKeyIdentifier)
-    {
-        hr = CacheVerifyPayloadSignature(pPayload, wzVerifyPath, hFile);
-        ExitOnFailure(hr, "Failed to verify signature of payload: %ls", pPayload->sczKey);
-    }
-    else if (pPayload->pCatalog) // If catalog files are specified, attempt to verify the file with a catalog file
-    {
-        hr = VerifyPayloadWithCatalog(pPayload, wzVerifyPath, hFile);
-        ExitOnFailure(hr, "Failed to verify catalog signature of payload: %ls", pPayload->sczKey);
-    }
-    else if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
+    if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
         hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, wzVerifyPath, hFile);
         ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
@@ -1517,7 +1436,7 @@ LExit:
 
 static HRESULT ResetPathPermissions(
     __in BOOL fPerMachine,
-    __in LPCWSTR wzPath
+    __in_z LPCWSTR wzPath
     )
 {
     HRESULT hr = S_OK;
@@ -1860,167 +1779,6 @@ static HRESULT VerifyHash(
 LExit:
     ReleaseStr(pszActual);
     ReleaseStr(pszExpected);
-
-    return hr;
-}
-
-static HRESULT VerifyPayloadWithCatalog(
-    __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
-    )
-{
-    HRESULT hr = S_FALSE;
-    DWORD er = ERROR_SUCCESS;
-    WINTRUST_DATA WinTrustData = { };
-    WINTRUST_CATALOG_INFO WinTrustCatalogInfo = { };
-    GUID gSubSystemDriver = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-    LPWSTR sczLowerCaseFile = NULL;
-    LPWSTR pCurrent = NULL;
-    LPWSTR sczName = NULL;
-    DWORD dwHashSize = 0;
-    DWORD dwTagSize;
-    LPBYTE pbHash = NULL;
-
-    // Get lower case file name.  Older operating systems need a lower case file
-    // to match in the catalog
-    hr = StrAllocString(&sczLowerCaseFile, wzUnverifiedPayloadPath, 0);
-    ExitOnFailure(hr, "Failed to allocate memory");
-
-    // Go through each character doing the lower case of each letter
-    pCurrent = sczLowerCaseFile;
-    while ('\0' != *pCurrent)
-    {
-        *pCurrent = (WCHAR)_tolower(*pCurrent);
-        pCurrent++;
-    }
-
-    // Get file hash
-    CryptCATAdminCalcHashFromFileHandle(hFile, &dwHashSize, pbHash, 0);
-    er = ::GetLastError();
-    if (ERROR_INSUFFICIENT_BUFFER == er)
-    {
-        pbHash = (LPBYTE)MemAlloc(dwHashSize, TRUE);
-        if (!CryptCATAdminCalcHashFromFileHandle(hFile, &dwHashSize, pbHash, 0))
-        {
-            ExitWithLastError(hr, "Failed to get file hash.");
-        }
-    }
-    else
-    {
-        ExitOnWin32Error(er, hr, "Failed to get file hash.");
-    }
-
-    // Make the hash into a string.  This is the member tag for the catalog
-    dwTagSize = (dwHashSize * 2) + 1;
-    hr = StrAlloc(&sczName, dwTagSize);
-    ExitOnFailure(hr, "Failed to allocate string.");
-    hr = StrHexEncode(pbHash, dwHashSize, sczName, dwTagSize);
-    ExitOnFailure(hr, "Failed to encode file hash.");
-
-    // Set up the WinVerifyTrust structures assuming online.
-    WinTrustData.cbStruct = sizeof(WINTRUST_DATA);
-    WinTrustData.dwUIChoice = WTD_UI_NONE;
-    WinTrustData.dwUnionChoice = WTD_CHOICE_CATALOG;
-    WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
-    WinTrustData.dwProvFlags = WTD_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
-    WinTrustData.pCatalog = &WinTrustCatalogInfo;
-
-    WinTrustCatalogInfo.cbStruct = sizeof(WINTRUST_CATALOG_INFO);
-    WinTrustCatalogInfo.pbCalculatedFileHash = pbHash;
-    WinTrustCatalogInfo.cbCalculatedFileHash = dwHashSize;
-    WinTrustCatalogInfo.hMemberFile = hFile;
-    WinTrustCatalogInfo.pcwszMemberTag = sczName;
-    WinTrustCatalogInfo.pcwszMemberFilePath = sczLowerCaseFile;
-    WinTrustCatalogInfo.pcwszCatalogFilePath = pPayload->pCatalog->sczLocalFilePath;
-
-    hr = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &gSubSystemDriver, &WinTrustData);
-    if (hr)
-    {
-        // Set up the WinVerifyTrust structures assuming online.
-        WinTrustData.dwProvFlags |= WTD_CACHE_ONLY_URL_RETRIEVAL;
-
-        er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &gSubSystemDriver, &WinTrustData);
-
-        // WinVerifyTrust returns 0 for success, a few different Win32 error codes if it can't
-        // find the provider, and any other error code is provider specific, so may not
-        // be an actual Win32 error code
-        ExitOnWin32Error(er, hr, "Could not verify file %ls.", wzUnverifiedPayloadPath);
-    }
-
-    // Need to close the WinVerifyTrust action
-    WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
-    er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &gSubSystemDriver, &WinTrustData);
-    ExitOnWin32Error(er, hr, "Could not close verify handle.");
-
-LExit:
-    ReleaseStr(sczLowerCaseFile);
-    ReleaseStr(sczName);
-    ReleaseMem(pbHash);
-
-    return hr;
-}
-
-static HRESULT VerifyPayloadAgainstChain(
-    __in BURN_PAYLOAD* pPayload,
-    __in PCCERT_CHAIN_CONTEXT pChainContext
-    )
-{
-    HRESULT hr = S_OK;
-    PCCERT_CONTEXT pChainElementCertContext = NULL;
-
-    BYTE rgbPublicKeyIdentifier[SHA1_HASH_LEN] = { };
-    DWORD cbPublicKeyIdentifier = sizeof(rgbPublicKeyIdentifier);
-    BYTE* pbThumbprint = NULL;
-    DWORD cbThumbprint = 0;
-
-    // Walk up the chain looking for a certificate in the chain that matches our expected public key identifier
-    // and thumbprint (if a thumbprint was provided).
-    HRESULT hrChainVerification = E_NOTFOUND; // assume we won't find a match.
-    for (DWORD i = 0; i < pChainContext->rgpChain[0]->cElement; ++i)
-    {
-        pChainElementCertContext = pChainContext->rgpChain[0]->rgpElement[i]->pCertContext;
-
-        // Get the certificate's public key identifier.
-        if (!::CryptHashPublicKeyInfo(NULL, CALG_SHA1, 0, X509_ASN_ENCODING, &pChainElementCertContext->pCertInfo->SubjectPublicKeyInfo, rgbPublicKeyIdentifier, &cbPublicKeyIdentifier))
-        {
-            ExitWithLastError(hr, "Failed to get certificate public key identifier.");
-        }
-
-        // Compare the certificate's public key identifier with the payload's public key identifier. If they
-        // match, we're one step closer to the a positive result.
-        if (pPayload->cbCertificateRootPublicKeyIdentifier == cbPublicKeyIdentifier &&
-            0 == memcmp(pPayload->pbCertificateRootPublicKeyIdentifier, rgbPublicKeyIdentifier, cbPublicKeyIdentifier))
-        {
-            // If the payload specified a thumbprint for the certificate, verify it.
-            if (pPayload->pbCertificateRootThumbprint)
-            {
-                hr = CertReadProperty(pChainElementCertContext, CERT_SHA1_HASH_PROP_ID, &pbThumbprint, &cbThumbprint);
-                ExitOnFailure(hr, "Failed to read certificate thumbprint.");
-
-                if (pPayload->cbCertificateRootThumbprint == cbThumbprint &&
-                    0 == memcmp(pPayload->pbCertificateRootThumbprint, pbThumbprint, cbThumbprint))
-                {
-                    // If we got here, we found that our payload public key identifier and thumbprint
-                    // matched an element in the certficate chain.
-                    hrChainVerification = S_OK;
-                    break;
-                }
-
-                ReleaseNullMem(pbThumbprint);
-            }
-            else // no thumbprint match necessary so we're good to go.
-            {
-                hrChainVerification = S_OK;
-                break;
-            }
-        }
-    }
-    hr = hrChainVerification;
-    ExitOnFailure(hr, "Failed to find expected public key in certificate chain.");
-
-LExit:
-    ReleaseMem(pbThumbprint);
 
     return hr;
 }
