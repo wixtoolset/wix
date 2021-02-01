@@ -158,16 +158,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.CannotReundefineVariable, "The variable '{0}' cannot be undefined because its already undefined.", variableName);
         }
 
-        public static Message CatalogFileHashFailed(string fileName, int errorCode)
-        {
-            return Message(null, Ids.CatalogFileHashFailed, "Could not get hash of file '{0}'.  Error: {2}.", fileName, errorCode);
-        }
-
-        public static Message CatalogVerificationFailed(string fileName)
-        {
-            return Message(null, Ids.CatalogVerificationFailed, "File '{0}' could not be verified with a catalog file.", fileName);
-        }
-
         public static Message CheckBoxValueOnlyValidWithCheckBox(SourceLineNumber sourceLineNumbers, string elementName, string controlType)
         {
             return Message(sourceLineNumbers, Ids.CheckBoxValueOnlyValidWithCheckBox, "A {0} element was specified with Type='{1}' and a CheckBoxValue. Check box values can only be specified with Type='CheckBox'.", elementName, controlType);
@@ -2656,8 +2646,6 @@ namespace WixToolset.Data
             MediaTableCollision = 357,
             InvalidCabinetTemplate = 358,
             MaximumUncompressedMediaSizeTooLarge = 359,
-            CatalogVerificationFailed = 360,
-            CatalogFileHashFailed = 361,
             ReservedNamespaceViolation = 362,
             PerUserButAllUsersEquals1 = 363,
             UnsupportedAllUsersValue = 364,

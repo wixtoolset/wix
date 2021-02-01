@@ -119,7 +119,6 @@ namespace WixToolset.Data
         WixBootstrapperApplicationDll,
         WixBuildInfo,
         WixBundle,
-        WixBundleCatalog,
         WixBundleContainer,
         WixBundleCustomData,
         WixBundleCustomDataAttribute,
@@ -542,9 +541,6 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixBundle:
                     return SymbolDefinitions.WixBundle;
-
-                case SymbolDefinitionType.WixBundleCatalog:
-                    return SymbolDefinitions.WixBundleCatalog;
 
                 case SymbolDefinitionType.WixBundleContainer:
                     return SymbolDefinitions.WixBundleContainer;

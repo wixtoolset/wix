@@ -17,13 +17,11 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.UnresolvedSourceFile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.EnableSignatureValidation), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.FileSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.PublicKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Thumbprint), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.CatalogRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContainerRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContentFile), IntermediateFieldType.Bool),
@@ -49,13 +47,11 @@ namespace WixToolset.Data.Symbols
         UnresolvedSourceFile,
         DisplayName,
         Description,
-        EnableSignatureValidation,
         FileSize,
         Version,
         Hash,
         PublicKey,
         Thumbprint,
-        CatalogRef,
         ContainerRef,
         PackageRef,
         ContentFile,
@@ -119,12 +115,6 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePayloadSymbolFields.Description, value);
         }
 
-        public bool EnableSignatureValidation
-        {
-            get => (bool)this.Fields[(int)WixBundlePayloadSymbolFields.EnableSignatureValidation];
-            set => this.Set((int)WixBundlePayloadSymbolFields.EnableSignatureValidation, value);
-        }
-
         public int? FileSize
         {
             get => (int?)this.Fields[(int)WixBundlePayloadSymbolFields.FileSize];
@@ -141,24 +131,6 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Hash];
             set => this.Set((int)WixBundlePayloadSymbolFields.Hash, value);
-        }
-
-        public string PublicKey
-        {
-            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.PublicKey];
-            set => this.Set((int)WixBundlePayloadSymbolFields.PublicKey, value);
-        }
-
-        public string Thumbprint
-        {
-            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.Thumbprint];
-            set => this.Set((int)WixBundlePayloadSymbolFields.Thumbprint, value);
-        }
-
-        public string CatalogRef
-        {
-            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.CatalogRef];
-            set => this.Set((int)WixBundlePayloadSymbolFields.CatalogRef, value);
         }
 
         public string ContainerRef
