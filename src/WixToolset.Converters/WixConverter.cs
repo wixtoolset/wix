@@ -44,6 +44,7 @@ namespace WixToolset.Converters
         private static readonly XName BootstrapperApplicationDllElementName = WixNamespace + "BootstrapperApplicationDll";
         private static readonly XName BootstrapperApplicationRefElementName = WixNamespace + "BootstrapperApplicationRef";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
+        private static readonly XName CatalogElementName = WixNamespace + "Catalog";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
         private static readonly XName ControlElementName = WixNamespace + "Control";
@@ -71,6 +72,7 @@ namespace WixToolset.Converters
         private static readonly XName ProgressTextElementName = WixNamespace + "ProgressText";
         private static readonly XName PublishElementName = WixNamespace + "Publish";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
+        private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
         private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
         private static readonly XName ServiceArgumentElementName = WixNamespace + "ServiceArgument";
         private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
@@ -149,6 +151,7 @@ namespace WixToolset.Converters
                 { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.BootstrapperApplicationElementName, this.ConvertBootstrapperApplicationElement },
                 { WixConverter.BootstrapperApplicationRefElementName, this.ConvertBootstrapperApplicationRefElement },
+                { WixConverter.CatalogElementName, this.ConvertCatalogElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.ControlElementName, this.ConvertControlElement },
@@ -172,6 +175,7 @@ namespace WixToolset.Converters
                 { WixConverter.ProgressTextElementName, this.ConvertProgressTextElement },
                 { WixConverter.PublishElementName, this.ConvertPublishElement },
                 { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
+                { WixConverter.RemotePayloadElementName, this.ConvertRemotePayloadElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
                 { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
                 { WixConverter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
@@ -642,6 +646,14 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertCatalogElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The Catalog element is obsolete. Signature validation is no longer supported. The elkement will be removed."))
+            {
+                element.Remove();
+            }
+        }
+
         private void ConvertColumnElement(XElement element)
         {
             var category = element.Attribute("Category");
@@ -1044,6 +1056,21 @@ namespace WixToolset.Converters
 
         private void ConvertMultiStringValueElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
+        private void ConvertRemotePayloadElement(XElement element)
+        {
+            RemoveIfPresent(element.Attribute("CertificatePublicKey"));
+            RemoveIfPresent(element.Attribute("CertificateThumbprint"));
+
+            void RemoveIfPresent(XAttribute xAttribute)
+            {
+                if (null != xAttribute
+                    && this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", xAttribute.Name))
+                {
+                    xAttribute.Remove();
+                }
+            }
+        }
+
         private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
 
         private void ConvertRowElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
@@ -1070,16 +1097,9 @@ namespace WixToolset.Converters
         {
             var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
 
-            if (null != suppressSignatureValidation)
+            if (null != suppressSignatureValidation
+                && this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", suppressSignatureValidation.Name))
             {
-                if (this.OnError(ConverterTestType.SuppressSignatureValidationDeprecated, element, "The chain package element contains deprecated '{0}' attribute. Use the 'EnableSignatureValidation' attribute instead.", suppressSignatureValidation.Name))
-                {
-                    if ("no" == suppressSignatureValidation.Value)
-                    {
-                        element.Add(new XAttribute("EnableSignatureValidation", "yes"));
-                    }
-                }
-
                 suppressSignatureValidation.Remove();
             }
         }
@@ -1579,9 +1599,9 @@ namespace WixToolset.Converters
             AssignAnonymousFileId,
 
             /// <summary>
-            /// SuppressSignatureValidation attribute is deprecated and replaced with EnableSignatureValidation.
+            /// SuppressSignatureValidation attribute is obsolete and corresponding functionality removed.
             /// </summary>
-            SuppressSignatureValidationDeprecated,
+            BundleSignatureValidationObsolete,
 
             /// <summary>
             /// WixCA Binary/@Id has been renamed to UtilCA.
