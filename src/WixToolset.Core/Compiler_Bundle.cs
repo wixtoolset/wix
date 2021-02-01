@@ -292,9 +292,6 @@ namespace WixToolset.Core
                     case "OptionalUpdateRegistration":
                         this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
                         break;
-                    case "Catalog":
-                        this.ParseCatalogElement(child);
-                        break;
                     case "Chain":
                         if (chainSeen)
                         {
@@ -482,59 +479,6 @@ namespace WixToolset.Core
             this.Core.ParseForExtensionElements(node);
 
             return YesNoType.Yes == disableLog ? null : String.Join(":", variable, logPrefix, logExtension);
-        }
-
-        /// <summary>
-        /// Parse a Catalog element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseCatalogElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string sourceFile = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == sourceFile)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            // Create catalog row
-            if (!this.Core.EncounteredError)
-            {
-                this.CreatePayloadRow(sourceLineNumbers, id, Path.GetFileName(sourceFile), sourceFile, null, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, ComplexReferenceChildType.Unknown, null, YesNoDefaultType.Yes, YesNoType.Yes, null, null, null);
-
-                this.Core.AddSymbol(new WixBundleCatalogSymbol(sourceLineNumbers, id)
-                {
-                    PayloadRef = id.Id,
-                });
-            }
         }
 
         /// <summary>
@@ -1369,7 +1313,6 @@ namespace WixToolset.Core
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compressed = YesNoDefaultType.Default;
-            var enableSignatureVerification = YesNoType.No;
             id = null;
             string name = null;
             string sourceFile = null;
@@ -1399,9 +1342,6 @@ namespace WixToolset.Core
                         break;
                     case "DownloadUrl":
                         downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "EnableSignatureVerification":
-                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "DpiAwareness":
                         if (node.Name.LocalName != "BootstrapperApplicationDll")
@@ -1457,7 +1397,7 @@ namespace WixToolset.Core
                 return false;
             }
 
-            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, null);
+            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, null, null, null);
 
             return true;
         }
@@ -1473,12 +1413,6 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "CertificatePublicKey":
-                        remotePayload.CertificatePublicKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CertificateThumbprint":
-                        remotePayload.CertificateThumbprint = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
                     case "Description":
                         remotePayload.Description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
@@ -1546,13 +1480,12 @@ namespace WixToolset.Core
         /// <param name="previousType"></param>
         /// <param name="previousId"></param>
         /// <param name="compressed"></param>
-        /// <param name="enableSignatureVerification"></param>
         /// <param name="displayName"></param>
         /// <param name="description"></param>
         /// <param name="remotePayload"></param>
         /// <returns></returns>
         private WixBundlePayloadSymbol CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
-            Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, YesNoDefaultType compressed, YesNoType enableSignatureVerification, string displayName, string description,
+            Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId, YesNoDefaultType compressed, string displayName, string description,
             RemotePayload remotePayload)
         {
             WixBundlePayloadSymbol symbol = null;
@@ -1568,7 +1501,6 @@ namespace WixToolset.Core
                     UnresolvedSourceFile = sourceFile, // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
                     DisplayName = displayName,
                     Description = description,
-                    EnableSignatureValidation = (YesNoType.Yes == enableSignatureVerification)
                 });
 
                 if (null != remotePayload)
@@ -1576,8 +1508,6 @@ namespace WixToolset.Core
                     symbol.Description = remotePayload.Description;
                     symbol.DisplayName = remotePayload.ProductName;
                     symbol.Hash = remotePayload.Hash;
-                    symbol.PublicKey = remotePayload.CertificatePublicKey;
-                    symbol.Thumbprint = remotePayload.CertificateThumbprint;
                     symbol.FileSize = remotePayload.Size;
                     symbol.Version = remotePayload.Version;
                 }
@@ -2120,7 +2050,6 @@ namespace WixToolset.Core
             string protocol = null;
             var installSize = CompilerConstants.IntegerNotSet;
             string msuKB = null;
-            var enableSignatureVerification = YesNoType.No;
             var compressed = YesNoDefaultType.Default;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
@@ -2248,9 +2177,6 @@ namespace WixToolset.Core
                         break;
                     case "Compressed":
                         compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "EnableSignatureVerification":
-                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "Slipstream":
                         slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2480,7 +2406,7 @@ namespace WixToolset.Core
             {
                 // We create the package contents as a payload with this package as the parent
                 this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, ComplexReferenceParentType.Package, id,
-                    ComplexReferenceChildType.Unknown, null, compressed, enableSignatureVerification, displayName, description, remotePayload);
+                    ComplexReferenceChildType.Unknown, null, compressed, displayName, description, remotePayload);
 
                 this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
@@ -3301,10 +3227,6 @@ namespace WixToolset.Core
 
         private class RemotePayload
         {
-            public string CertificatePublicKey { get; set; }
-
-            public string CertificateThumbprint { get; set; }
-
             public string Description { get; set; }
 
             public string Hash { get; set; }

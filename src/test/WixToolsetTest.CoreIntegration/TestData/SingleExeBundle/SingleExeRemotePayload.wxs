@@ -18,8 +18,6 @@
                 Compressed="no"
                 Name="NDP462-KB3151802-Web.exe">
                 <RemotePayload
-                  CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0"
-                  CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC"
                   Description="Microsoft .NET Framework 4.6.2 Setup"
                   Hash="C42E6ED280290648BBD59F664008852F4CFE4548"
                   ProductName="Microsoft .NET Framework 4.6.2"

@@ -18,7 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, IEnumerable<WixBundleCatalogSymbol> catalogs, string intermediateFolder)
+        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendExtensions = backendExtensions;
@@ -32,7 +32,6 @@ namespace WixToolset.Core.Burn.Bundles
             this.UXContainerPayloads = uxPayloads;
             this.Payloads = allPayloadsById;
             this.OrderedSearches = orderedSearches;
-            this.Catalogs = catalogs;
             this.IntermediateFolder = intermediateFolder;
         }
 
@@ -61,8 +60,6 @@ namespace WixToolset.Core.Burn.Bundles
         private IEnumerable<WixBundleContainerSymbol> Containers { get; }
 
         private IEnumerable<WixBundlePayloadSymbol> UXContainerPayloads { get; }
-
-        private IEnumerable<WixBundleCatalogSymbol> Catalogs { get; }
 
         private string IntermediateFolder { get; }
 
@@ -178,18 +175,6 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 writer.WriteEndElement(); // </UX>
-
-                // write the catalog elements
-                if (this.Catalogs.Any())
-                {
-                    foreach (var catalog in this.Catalogs)
-                    {
-                        writer.WriteStartElement("Catalog");
-                        writer.WriteAttributeString("Id", catalog.Id.Id);
-                        writer.WriteAttributeString("Payload", catalog.PayloadRef);
-                        writer.WriteEndElement();
-                    }
-                }
 
                 foreach (var container in this.Containers)
                 {
@@ -698,16 +683,6 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("LayoutOnly", "yes");
             }
 
-            if (!String.IsNullOrEmpty(payload.PublicKey))
-            {
-                writer.WriteAttributeString("CertificateRootPublicKeyIdentifier", payload.PublicKey);
-            }
-
-            if (!String.IsNullOrEmpty(payload.Thumbprint))
-            {
-                writer.WriteAttributeString("CertificateRootThumbprint", payload.Thumbprint);
-            }
-
             switch (payload.Packaging)
             {
                 case PackagingType.Embedded: // this means it's in a container.
@@ -741,11 +716,6 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("Packaging", "external");
                     writer.WriteAttributeString("SourcePath", payload.Name);
                     break;
-            }
-
-            if (!String.IsNullOrEmpty(payload.CatalogRef))
-            {
-                writer.WriteAttributeString("Catalog", payload.CatalogRef);
             }
         }
 

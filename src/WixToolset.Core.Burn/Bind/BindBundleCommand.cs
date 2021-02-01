@@ -340,15 +340,6 @@ namespace WixToolset.Core.Burn
                 command.Execute();
             }
 
-            // If catalog files exist, non-embedded payloads should validate with the catalogs.
-            var catalogs = section.Symbols.OfType<WixBundleCatalogSymbol>().ToList();
-
-            if (catalogs.Count > 0)
-            {
-                var command = new VerifyPayloadsWithCatalogCommand(this.Messaging, catalogs, payloadSymbols.Values);
-                command.Execute();
-            }
-
             if (this.Messaging.EncounteredError)
             {
                 return;
@@ -456,7 +447,7 @@ namespace WixToolset.Core.Burn
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, orderedSearches, catalogs, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;

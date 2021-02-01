@@ -6,9 +6,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Security.Cryptography;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Text;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
@@ -123,37 +120,6 @@ namespace WixToolset.Core.Burn.Bundles
                 payload.FileSize = (int)fileInfo.Length;
 
                 payload.Hash = BundleHashAlgorithm.Hash(fileInfo);
-
-                // Try to get the certificate if the payload is a signed file and we're not suppressing signature validation.
-                if (payload.EnableSignatureValidation)
-                {
-                    X509Certificate2 certificate = null;
-                    try
-                    {
-                        certificate = new X509Certificate2(fileInfo.FullName);
-                    }
-                    catch (CryptographicException) // we don't care about non-signed files.
-                    {
-                    }
-
-                    // If there is a certificate, remember its hashed public key identifier and thumbprint.
-                    if (null != certificate)
-                    {
-                        byte[] publicKeyIdentifierHash = new byte[128];
-                        uint publicKeyIdentifierHashSize = (uint)publicKeyIdentifierHash.Length;
-
-                        Native.NativeMethods.HashPublicKeyInfo(certificate.Handle, publicKeyIdentifierHash, ref publicKeyIdentifierHashSize);
-
-                        var sb = new StringBuilder(((int)publicKeyIdentifierHashSize + 1) * 2);
-                        for (var i = 0; i < publicKeyIdentifierHashSize; ++i)
-                        {
-                            sb.AppendFormat("{0:X2}", publicKeyIdentifierHash[i]);
-                        }
-
-                        payload.PublicKey = sb.ToString();
-                        payload.Thumbprint = certificate.Thumbprint;
-                    }
-                }
             }
             else
             {

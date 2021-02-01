@@ -406,7 +406,6 @@ namespace WixToolset.Core.Burn.Bundles
                                 PackageRef = packagePayload.PackageRef,
                                 ContainerRef = packagePayload.ContainerRef,
                                 ContentFile = true,
-                                EnableSignatureValidation = packagePayload.EnableSignatureValidation,
                                 Packaging = packagePayload.Packaging,
                                 ParentPackagePayloadRef = packagePayload.Id.Id,
                             });
@@ -484,7 +483,6 @@ namespace WixToolset.Core.Burn.Bundles
                                         PackageRef = packagePayload.PackageRef,
                                         ContainerRef = packagePayload.ContainerRef,
                                         ContentFile = true,
-                                        EnableSignatureValidation = packagePayload.EnableSignatureValidation,
                                         Packaging = packagePayload.Packaging,
                                         ParentPackagePayloadRef = packagePayload.Id.Id,
                                     });
