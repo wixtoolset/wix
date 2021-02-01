@@ -45,9 +45,9 @@
 
     <PackageGroup Id="$(var.NetFx40WebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40"
           Id="$(var.NetFx40WebId)"
@@ -62,8 +62,6 @@
             Version="4.0.30319.1"
             ProductName="Microsoft .NET Framework 4"
             Description="Microsoft .NET Framework 4 Setup"
-            CertificatePublicKey="672605E36DD71EC6B8325B91C5FE6971390CB6B6"
-            CertificateThumbprint="9617094A1CFB59AE7C1F7DFDB6739E4E7C40508F"
             Hash="06BECADB92A5FCCA2529C0B93687C2A0C6D0D610"/>
       </ExePackage>
     </PackageGroup>
@@ -82,9 +80,9 @@
 
     <PackageGroup Id="$(var.NetFx40RedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40"
           Id="$(var.NetFx40RedistId)"
@@ -99,8 +97,6 @@
             Version="4.0.30319.1"
             ProductName="Microsoft .NET Framework 4"
             Description="Microsoft .NET Framework 4 Setup"
-            CertificatePublicKey="672605E36DD71EC6B8325B91C5FE6971390CB6B6"
-            CertificateThumbprint="9617094A1CFB59AE7C1F7DFDB6739E4E7C40508F"
             Hash="58DA3D74DB353AAD03588CBB5CEA8234166D8B99"/>
       </ExePackage>
     </PackageGroup>
@@ -129,9 +125,9 @@
 
     <PackageGroup Id="$(var.NetFx40ClientWebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40CLIENT"
           Id="$(var.NetFx40ClientWebId)"
@@ -146,8 +142,6 @@
             Version="4.0.30319.1"
             ProductName="Microsoft .NET Framework 4 Client Profile"
             Description="Microsoft .NET Framework 4 Client Profile Setup"
-            CertificatePublicKey="672605E36DD71EC6B8325B91C5FE6971390CB6B6"
-            CertificateThumbprint="9617094A1CFB59AE7C1F7DFDB6739E4E7C40508F"
             Hash="E15AD80FC74277EF2048312E9A71AF56B2EBA622"/>
       </ExePackage>
     </PackageGroup>
@@ -166,9 +160,9 @@
 
     <PackageGroup Id="$(var.NetFx40ClientRedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40CLIENT"
           Id="$(var.NetFx40ClientRedistId)"
@@ -183,8 +177,6 @@
             Version="4.0.30319.1"
             ProductName="Microsoft .NET Framework 4 Client Profile"
             Description="Microsoft .NET Framework 4 Client Profile Setup"
-            CertificatePublicKey="672605E36DD71EC6B8325B91C5FE6971390CB6B6"
-            CertificateThumbprint="9617094A1CFB59AE7C1F7DFDB6739E4E7C40508F"
             Hash="4CD67F609F89D617D2B206341B8C211E1B88B287"/>
       </ExePackage>
     </PackageGroup>

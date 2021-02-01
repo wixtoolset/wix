@@ -33,9 +33,9 @@
 
     <PackageGroup Id="$(var.NetFx472WebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472WebLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx472WebDetectCondition)"
           InstallCondition="!(wix.NetFx472WebInstallCondition)"
@@ -48,8 +48,6 @@
           Compressed="no"
           Name="!(wix.NetFx472WebPackageDirectory)NDP472-KB4054531-Web.exe">
         <RemotePayload
-          CertificatePublicKey="C090C1A2CAFA9B967D9C87C7FE02F7C01FBDE4F2"
-          CertificateThumbprint="5EAD300DC7E4D637948ECB0ED829A072BD152E17"
           Description="Microsoft .NET Framework 4.7.2 Setup"
           Hash="CEDBBF404B166A5E72D035760BCB0FA508E4F4CB"
           ProductName="Microsoft .NET Framework 4.7.2"
@@ -76,9 +74,9 @@
 
     <PackageGroup Id="$(var.NetFx472RedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx472RedistLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx472RedistDetectCondition)"
           InstallCondition="!(wix.NetFx472RedistInstallCondition)"
@@ -91,8 +89,6 @@
           Compressed="no"
           Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe">
         <RemotePayload
-          CertificatePublicKey="C090C1A2CAFA9B967D9C87C7FE02F7C01FBDE4F2"
-          CertificateThumbprint="5EAD300DC7E4D637948ECB0ED829A072BD152E17"
           Description="Microsoft .NET Framework 4.7.2 Setup"
           Hash="31FC0D305A6F651C9E892C98EB10997AE885EB1E"
           ProductName="Microsoft .NET Framework 4.7.2"

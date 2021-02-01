@@ -36,9 +36,9 @@
 
     <PackageGroup Id="$(var.NetFx451WebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx451WebDetectCondition)"
           InstallCondition="!(wix.NetFx451WebInstallCondition)"
@@ -55,8 +55,6 @@
             Version="4.5.50938.18408"
             ProductName="Microsoft .NET Framework 4.5.1"
             Description="Microsoft .NET Framework 4.5.1 Setup"
-            CertificatePublicKey="A260A870BE1145ED71E2BB5AA19463A4FE9DCC41"
-            CertificateThumbprint="108E2BA23632620C427C570B6D9DB51AC31387FE"
             Hash="4CBEA1E408DB5B423E130931B9478972E6798431" />
       </ExePackage>
     </PackageGroup>
@@ -79,9 +77,9 @@
 
     <PackageGroup Id="$(var.NetFx451RedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx451RedistDetectCondition)"
           InstallCondition="!(wix.NetFx451RedistInstallCondition)"
@@ -98,8 +96,6 @@
             Version="4.5.50938.18408"
             ProductName="Microsoft .NET Framework 4.5.1"
             Description="Microsoft .NET Framework 4.5.1 Setup"
-            CertificatePublicKey="A260A870BE1145ED71E2BB5AA19463A4FE9DCC41"
-            CertificateThumbprint="108E2BA23632620C427C570B6D9DB51AC31387FE"
             Hash="5934DD101414BBC0B7F1EE2780D2FC8B9BEC5C4D" />
       </ExePackage>
     </PackageGroup>

@@ -36,9 +36,9 @@
 
     <PackageGroup Id="$(var.NetFx46WebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx46WebDetectCondition)"
           InstallCondition="!(wix.NetFx46WebInstallCondition)"
@@ -51,8 +51,6 @@
           Compressed="no"
           Name="!(wix.NetFx46WebPackageDirectory)NDP46-KB3045560-Web.exe">
         <RemotePayload 
-          CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0" 
-          CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC" 
           Description="Microsoft .NET Framework 4.6 Setup" 
           Hash="480CA134B9E3F2437DF10719D5A8C77DDEC0A4F1" 
           ProductName="Microsoft .NET Framework 4.6" 
@@ -79,9 +77,9 @@
 
     <PackageGroup Id="$(var.NetFx46RedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx46FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx46RedistDetectCondition)"
           InstallCondition="!(wix.NetFx46RedistInstallCondition)"
@@ -94,8 +92,6 @@
           Compressed="no"
           Name="!(wix.NetFx46RedistPackageDirectory)NDP46-KB3045557-x86-x64-AllOS-ENU.exe">
         <RemotePayload
-          CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0" 
-          CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC" 
           Description="Microsoft .NET Framework 4.6 Setup" 
           Hash="3049A85843EAF65E89E2336D5FE6E85E416797BE" 
           ProductName="Microsoft .NET Framework 4.6" 

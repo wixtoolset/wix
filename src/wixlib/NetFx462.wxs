@@ -35,9 +35,9 @@
 
     <PackageGroup Id="$(var.NetFx462WebId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx462WebDetectCondition)"
           InstallCondition="!(wix.NetFx462WebInstallCondition)"
@@ -50,8 +50,6 @@
           Compressed="no"
           Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe">
         <RemotePayload 
-          CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0" 
-          CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC" 
           Description="Microsoft .NET Framework 4.6.2 Setup" 
           Hash="C42E6ED280290648BBD59F664008852F4CFE4548" 
           ProductName="Microsoft .NET Framework 4.6.2" 
@@ -78,9 +76,9 @@
 
     <PackageGroup Id="$(var.NetFx462RedistId)">
       <ExePackage
-          InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx462RedistDetectCondition)"
           InstallCondition="!(wix.NetFx462RedistInstallCondition)"
@@ -93,8 +91,6 @@
           Compressed="no"
           Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe">
         <RemotePayload
-          CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0" 
-          CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC" 
           Description="Microsoft .NET Framework 4.6.2 Setup" 
           Hash="A70F856BDA33D45AD0A8AD035F73092441715431" 
           ProductName="Microsoft .NET Framework 4.6.2" 
