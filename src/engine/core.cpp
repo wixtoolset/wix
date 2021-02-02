@@ -97,13 +97,16 @@ extern "C" HRESULT CoreInitialize(
     ExitOnFailure(hr, "Failed to load manifest.");
 
     hr = ContainersInitialize(&pEngineState->containers, &pEngineState->section);
-    ExitOnFailure(hr, "Failed to intialize containers.");
+    ExitOnFailure(hr, "Failed to initialize containers.");
 
     // Parse command line.
     hr = ParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->variables, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &sczSourceProcessPath, &sczOriginalSource, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &sczSanitizedCommandLine);
     ExitOnFailure(hr, "Failed to parse command line.");
 
     LogId(REPORT_STANDARD, MSG_BURN_COMMAND_LINE, sczSanitizedCommandLine ? sczSanitizedCommandLine : L"");
+
+    hr = DependencyInitialize(&pEngineState->registration, pEngineState->sczIgnoreDependencies);
+    ExitOnFailure(hr, "Failed to initialize dependency data.");
 
     // Retain whether bundle was initially run elevated.
     ProcElevated(::GetCurrentProcess(), &fElevated);
@@ -332,6 +335,9 @@ extern "C" HRESULT CoreDetect(
         }
     }
 
+    hr = DependencyDetect(pEngineState);
+    ExitOnFailure(hr, "Failed to detect the dependencies.");
+
     // Log the detected states.
     for (DWORD iPackage = 0; iPackage < pEngineState->packages.cPackages; ++iPackage)
     {
@@ -419,7 +425,7 @@ extern "C" HRESULT CorePlan(
     hr = PlanSetResumeCommand(&pEngineState->registration, action, &pEngineState->command, &pEngineState->log);
     ExitOnFailure(hr, "Failed to set resume command");
 
-    hr = DependencyPlanInitialize(pEngineState, &pEngineState->plan);
+    hr = DependencyPlanInitialize(&pEngineState->registration, &pEngineState->plan);
     ExitOnFailure(hr, "Failed to initialize the dependencies for the plan.");
 
     if (BOOTSTRAPPER_ACTION_LAYOUT == action)
@@ -457,7 +463,7 @@ extern "C" HRESULT CorePlan(
         BOOL fContinuePlanning = TRUE; // assume we'll be able to keep planning after registration.
         pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
 
-        hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, pEngineState->sczIgnoreDependencies, &fContinuePlanning);
+        hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
         ExitOnFailure(hr, "Failed to plan registration.");
 
         if (fContinuePlanning)

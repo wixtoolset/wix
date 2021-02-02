@@ -552,7 +552,21 @@ namespace Bootstrapper
                 ReleaseStr(sczFilePath);
             }
 
+            DependencyInitialize(&pEngineState->registration, NULL);
+
             pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
+        }
+
+        void PlanTestDetect(BURN_ENGINE_STATE* pEngineState)
+        {
+            HRESULT hr = S_OK;
+            BURN_REGISTRATION* pRegistration = &pEngineState->registration;
+
+            DetectReset(pRegistration, &pEngineState->packages);
+            PlanReset(&pEngineState->plan, &pEngineState->packages);
+
+            hr = DepDependencyArrayAlloc(&pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
+            NativeAssert::Succeeded(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
         }
 
         void DetectAttachedContainerAsAttached(BURN_ENGINE_STATE* pEngineState)
@@ -585,8 +599,7 @@ namespace Bootstrapper
 
         void DetectPackagesAsAbsent(BURN_ENGINE_STATE* pEngineState)
         {
-            DetectReset(&pEngineState->registration, &pEngineState->packages);
-            PlanReset(&pEngineState->plan, &pEngineState->packages);
+            PlanTestDetect(pEngineState);
 
             for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
             {
@@ -597,8 +610,7 @@ namespace Bootstrapper
 
         void DetectPackagesAsPresentAndCached(BURN_ENGINE_STATE* pEngineState)
         {
-            DetectReset(&pEngineState->registration, &pEngineState->packages);
-            PlanReset(&pEngineState->plan, &pEngineState->packages);
+            PlanTestDetect(pEngineState);
 
             pEngineState->registration.fInstalled = TRUE;
 
@@ -611,8 +623,7 @@ namespace Bootstrapper
 
         void DetectPermanentPackagesAsPresentAndCached(BURN_ENGINE_STATE* pEngineState)
         {
-            DetectReset(&pEngineState->registration, &pEngineState->packages);
-            PlanReset(&pEngineState->plan, &pEngineState->packages);
+            PlanTestDetect(pEngineState);
 
             pEngineState->registration.fInstalled = TRUE;
 

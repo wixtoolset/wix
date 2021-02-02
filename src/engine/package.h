@@ -159,6 +159,9 @@ typedef struct _BURN_DEPENDENCY_PROVIDER
     LPWSTR sczVersion;
     LPWSTR sczDisplayName;
     BOOL fImported;
+
+    DEPENDENCY* rgDependents; // only valid after Detect.
+    UINT cDependents;         // only valid after Detect.
 } BURN_DEPENDENCY_PROVIDER;
 
 typedef struct _BURN_ROLLBACK_BOUNDARY
@@ -199,6 +202,7 @@ typedef struct _BURN_PACKAGE
 
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
     BURN_CACHE_STATE cache;                     // only valid after Detect.
+    BOOL fPackageProviderExists;                // only valid after Detect.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.
     BOOL fAcquire;                              // only valid during Plan.

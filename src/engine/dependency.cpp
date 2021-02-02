@@ -10,6 +10,12 @@ const LPCWSTR vcszIgnoreDependenciesDelim = L";";
 
 // internal function declarations
 
+static HRESULT DetectPackageDependents(
+    __in BURN_PACKAGE* pPackage,
+    __in STRINGDICT_HANDLE sdIgnoredDependents,
+    __in const BURN_REGISTRATION* pRegistration
+    );
+
 static HRESULT SplitIgnoreDependencies(
     __in_z LPCWSTR wzIgnoreDependencies,
     __deref_inout_ecount_opt(*pcDependencies) DEPENDENCY** prgDependencies,
@@ -28,11 +34,9 @@ static HRESULT GetIgnoredDependents(
     __deref_inout STRINGDICT_HANDLE* psdIgnoredDependents
     );
 
-static HRESULT GetProviderInformation(
+static BOOL GetProviderExists(
     __in HKEY hkRoot,
-    __in_z LPCWSTR wzProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczId
+    __in_z LPCWSTR wzProviderKey
     );
 
 static void CalculateDependencyActionStates(
@@ -70,20 +74,18 @@ static void UnregisterPackageDependency(
     __in_z LPCWSTR wzDependentProviderKey
     );
 
-static BOOL PackageProviderExists(
-    __in const BURN_PACKAGE* pPackage
-    );
-
 
 // functions
 
-extern "C" void DependencyUninitialize(
+extern "C" void DependencyUninitializeProvider(
     __in BURN_DEPENDENCY_PROVIDER* pProvider
     )
 {
     ReleaseStr(pProvider->sczKey);
     ReleaseStr(pProvider->sczVersion);
     ReleaseStr(pProvider->sczDisplayName);
+    ReleaseDependencyArray(pProvider->rgDependents, pProvider->cDependents);
+
     memset(pProvider, 0, sizeof(BURN_DEPENDENCY_PROVIDER));
 }
 
@@ -167,45 +169,33 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT DependencyDetectProviderKeyPackageId(
-    __in const BURN_PACKAGE* pPackage,
-    __deref_opt_out_z_opt LPWSTR* psczProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczId
+extern "C" HRESULT DependencyInitialize(
+    __in BURN_REGISTRATION* pRegistration,
+    __in_z_opt LPCWSTR wzIgnoreDependencies
     )
 {
-    HRESULT hr = E_NOTFOUND;
-    LPWSTR wzProviderKey = NULL;
-    HKEY hkRoot = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    HRESULT hr = S_OK;
 
-    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+    // If no parent was specified at all, use the bundle id as the self dependent.
+    if (!pRegistration->sczActiveParent)
     {
-        const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-
-        // Find the first package id registered for the provider key.
-        hr = GetProviderInformation(hkRoot, pProvider->sczKey, psczProviderKey, psczId);
-        if (E_NOTFOUND == hr)
-        {
-            continue;
-        }
-        ExitOnFailure(hr, "Failed to get the package provider information.");
-
-        ExitFunction();
+        pRegistration->wzSelfDependent = pRegistration->sczId;
     }
-
-    // Older bundles may not have written the id so try the default.
-    if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
+    else if (*pRegistration->sczActiveParent) // if parent was specified use that as the self dependent.
     {
-        wzProviderKey = pPackage->Msi.sczProductCode;
+        pRegistration->wzSelfDependent = pRegistration->sczActiveParent;
     }
+    // else parent:none was used which means we should not register a dependency on ourself.
 
-    if (wzProviderKey)
+    // The current bundle provider key should always be ignored for dependency checks.
+    hr = DepDependencyArrayAlloc(&pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
+    ExitOnFailure(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
+
+    // Add the list of dependencies to ignore.
+    if (wzIgnoreDependencies)
     {
-        hr = GetProviderInformation(hkRoot, wzProviderKey, psczProviderKey, psczId);
-        if (E_NOTFOUND == hr)
-        {
-            ExitFunction();
-        }
-        ExitOnFailure(hr, "Failed to get the package default provider information.");
+        hr = SplitIgnoreDependencies(wzIgnoreDependencies, &pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies);
+        ExitOnFailure(hr, "Failed to split the list of dependencies to ignore.");
     }
 
 LExit:
@@ -236,23 +226,77 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT DependencyDetect(
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_REGISTRATION* pRegistration = &pEngineState->registration;
+    STRINGDICT_HANDLE sdIgnoredDependents = NULL;
+    BURN_PACKAGE* pPackage = NULL;
+
+    // Always leave this empty so that all dependents get detected. Plan will ignore dependents based on its own logic.
+    hr = DictCreateStringList(&sdIgnoredDependents, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
+    ExitOnFailure(hr, "Failed to create the string dictionary.");
+
+    hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, sdIgnoredDependents, &pRegistration->rgDependents, &pRegistration->cDependents);
+    if (E_FILENOTFOUND != hr)
+    {
+        ExitOnFailure(hr, "Failed dependents check on bundle");
+    }
+    else
+    {
+        hr = S_OK;
+    }
+
+    for (DWORD iPackage = 0; iPackage < pEngineState->packages.cPackages; ++iPackage)
+    {
+        pPackage = pEngineState->packages.rgPackages + iPackage;
+        hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
+        ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
+    }
+
+    for (DWORD iRelatedBundle = 0; iRelatedBundle < pEngineState->registration.relatedBundles.cRelatedBundles; ++iRelatedBundle)
+    {
+        pPackage = &pEngineState->registration.relatedBundles.rgRelatedBundles[iRelatedBundle].package;
+        hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
+        ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
+    }
+
+    if (pRegistration->wzSelfDependent)
+    {
+        for (DWORD i = 0; i < pRegistration->cDependents; ++i)
+        {
+            DEPENDENCY* pDependent = pRegistration->rgDependents + i;
+
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->wzSelfDependent, -1, pDependent->sczKey, -1))
+            {
+                pRegistration->fSelfRegisteredAsDependent = TRUE;
+                break;
+            }
+        }
+    }
+
+LExit:
+    ReleaseDict(sdIgnoredDependents);
+
+    return hr;
+}
+
 extern "C" HRESULT DependencyPlanInitialize(
-    __in const BURN_ENGINE_STATE* pEngineState,
+    __in const BURN_REGISTRATION* pRegistration,
     __in BURN_PLAN* pPlan
     )
 {
     HRESULT hr = S_OK;
 
-    // The current bundle provider key should always be ignored for dependency checks.
-    hr = DepDependencyArrayAlloc(&pPlan->rgPlannedProviders, &pPlan->cPlannedProviders, pEngineState->registration.sczProviderKey, NULL);
-    ExitOnFailure(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
-
-    // Add the list of dependencies to ignore to the plan.
-    if (pEngineState->sczIgnoreDependencies)
+    // TODO: After adding enumeration to STRINGDICT, a single STRINGDICT_HANDLE can be used everywhere.
+    for (DWORD i = 0; i < pRegistration->cIgnoredDependencies; ++i)
     {
-        // TODO: After adding enumeration to STRINGDICT, a single STRINGDICT_HANDLE can be used everywhere.
-        hr = SplitIgnoreDependencies(pEngineState->sczIgnoreDependencies, &pPlan->rgPlannedProviders, &pPlan->cPlannedProviders);
-        ExitOnFailure(hr, "Failed to split the list of dependencies to ignore.");
+        DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + i;
+
+        hr = DepDependencyArrayAlloc(&pPlan->rgPlannedProviders, &pPlan->cPlannedProviders, pDependency->sczKey, pDependency->sczName);
+        ExitOnFailure(hr, "Failed to add the detected provider to the list of dependencies to ignore.");
     }
 
 LExit:
@@ -323,9 +367,6 @@ extern "C" HRESULT DependencyPlanPackageBegin(
 {
     HRESULT hr = S_OK;
     STRINGDICT_HANDLE sdIgnoredDependents = NULL;
-    DEPENDENCY* rgDependents = NULL;
-    UINT cDependents = 0;
-    HKEY hkHive = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
     BURN_DEPENDENCY_ACTION dependencyExecuteAction = BURN_DEPENDENCY_ACTION_NONE;
     BURN_DEPENDENCY_ACTION dependencyRollbackAction = BURN_DEPENDENCY_ACTION_NONE;
 
@@ -361,18 +402,31 @@ extern "C" HRESULT DependencyPlanPackageBegin(
         }
         else
         {
+            hr = S_OK;
+
             for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
             {
-                const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+                const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + i;
 
-                hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, sdIgnoredDependents, &rgDependents, &cDependents);
-                if (E_FILENOTFOUND != hr)
+                for (DWORD j = 0; j < pProvider->cDependents; ++j)
                 {
-                    ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
-                }
-                else
-                {
-                    hr = S_OK;
+                    const DEPENDENCY* pDependency = pProvider->rgDependents + j;
+
+                    hr = DictKeyExists(sdIgnoredDependents, pDependency->sczKey);
+                    if (E_NOTFOUND == hr)
+                    {
+                        hr = S_OK;
+
+                        if (!pPackage->fDependencyManagerWasHere)
+                        {
+                            pPackage->fDependencyManagerWasHere = TRUE;
+
+                            LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS, pPackage->sczId);
+                        }
+
+                        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_DEPENDENT, pDependency->sczKey, LoggingStringOrUnknownIfNull(pDependency->sczName));
+                    }
+                    ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
                 }
             }
         }
@@ -382,52 +436,46 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     CalculateDependencyActionStates(pPackage, pPlan->action, &dependencyExecuteAction, &dependencyRollbackAction);
 
     // If dependents were found, change the action to not uninstall the package.
-    if (0 < cDependents)
+    if (pPackage->fDependencyManagerWasHere)
     {
-        LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS, pPackage->sczId, cDependents);
-
-        for (DWORD i = 0; i < cDependents; ++i)
-        {
-            const DEPENDENCY* pDependency = &rgDependents[i];
-            LogId(REPORT_VERBOSE, MSG_DEPENDENCY_PACKAGE_DEPENDENT, pDependency->sczKey, LoggingStringOrUnknownIfNull(pDependency->sczName));
-        }
-
-        pPackage->fDependencyManagerWasHere = TRUE;
         pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
-    // Use the calculated dependency actions as the provider actions if there
-    // are any non-imported providers that need to be registered and the package
-    // is current (not obsolete).
-    else if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE != pPackage->currentState)
+    else
     {
-        BOOL fAllImportedProviders = TRUE; // assume all providers were imported.
-        for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+        // Use the calculated dependency actions as the provider actions if there
+        // are any non-imported providers that need to be registered and the package
+        // is current (not obsolete).
+        if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE != pPackage->currentState)
         {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-            if (!pProvider->fImported)
+            BOOL fAllImportedProviders = TRUE; // assume all providers were imported.
+            for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
             {
-                fAllImportedProviders = FALSE;
-                break;
+                const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+                if (!pProvider->fImported)
+                {
+                    fAllImportedProviders = FALSE;
+                    break;
+                }
+            }
+
+            if (!fAllImportedProviders)
+            {
+                pPackage->providerExecute = dependencyExecuteAction;
+                pPackage->providerRollback = dependencyRollbackAction;
             }
         }
 
-        if (!fAllImportedProviders)
+        // If the package will be removed, add its providers to the growing list in the plan.
+        if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
         {
-            pPackage->providerExecute = dependencyExecuteAction;
-            pPackage->providerRollback = dependencyRollbackAction;
-        }
-    }
+            for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+            {
+                const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
 
-    // If the package will be removed, add its providers to the growing list in the plan.
-    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
-    {
-        for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
-        {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
-
-            hr = DepDependencyArrayAlloc(&pPlan->rgPlannedProviders, &pPlan->cPlannedProviders, pProvider->sczKey, NULL);
-            ExitOnFailure(hr, "Failed to add the package provider key \"%ls\" to the planned list.", pProvider->sczKey);
+                hr = DepDependencyArrayAlloc(&pPlan->rgPlannedProviders, &pPlan->cPlannedProviders, pProvider->sczKey, NULL);
+                ExitOnFailure(hr, "Failed to add the package provider key \"%ls\" to the planned list.", pProvider->sczKey);
+            }
         }
     }
 
@@ -435,7 +483,6 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     pPackage->dependencyRollback = dependencyRollbackAction;
 
 LExit:
-    ReleaseDependencyArray(rgDependents, cDependents);
     ReleaseDict(sdIgnoredDependents);
 
     return hr;
@@ -652,6 +699,58 @@ extern "C" void DependencyUnregisterBundle(
 
 // internal functions
 
+
+static HRESULT DetectPackageDependents(
+    __in BURN_PACKAGE* pPackage,
+    __in STRINGDICT_HANDLE sdIgnoredDependents,
+    __in const BURN_REGISTRATION* pRegistration
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkHive = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+    // There's currently no point in getting the dependents if the scope doesn't match,
+    // because they will just get ignored.
+    if (pRegistration->fPerMachine != pPackage->fPerMachine)
+    {
+        ExitFunction();
+    }
+
+    for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
+    {
+        BURN_DEPENDENCY_PROVIDER* pProvider = &pPackage->rgDependencyProviders[i];
+
+        hr = DepCheckDependents(hkHive, pProvider->sczKey, 0, sdIgnoredDependents, &pProvider->rgDependents, &pProvider->cDependents);
+        if (E_FILENOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed dependents check on package provider: %ls", pProvider->sczKey);
+
+            if (!pPackage->fPackageProviderExists && (0 < pProvider->cDependents || GetProviderExists(hkHive, pProvider->sczKey)))
+            {
+                pPackage->fPackageProviderExists = TRUE;
+            }
+        }
+        else
+        {
+            hr = S_OK;
+
+            if (!pPackage->fPackageProviderExists && GetProviderExists(hkHive, pProvider->sczKey))
+            {
+                pPackage->fPackageProviderExists = TRUE;
+            }
+        }
+    }
+
+    // Older bundles may not have written the id so try the default.
+    if (!pPackage->fPackageProviderExists && BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.sczProductCode && GetProviderExists(hkHive, pPackage->Msi.sczProductCode))
+    {
+        pPackage->fPackageProviderExists = TRUE;
+    }
+
+LExit:
+    return hr;
+}
+
 /********************************************************************
  SplitIgnoreDependencies - Splits a semicolon-delimited
   string into a list of unique dependencies to ignore.
@@ -803,52 +902,16 @@ LExit:
 }
 
 /********************************************************************
- GetProviderId - Gets the ID of the package given the provider key.
+ GetProviderExists - Gets whether the provider key is registered.
 
 *********************************************************************/
-static HRESULT GetProviderInformation(
+static BOOL GetProviderExists(
     __in HKEY hkRoot,
-    __in_z LPCWSTR wzProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczId
+    __in_z LPCWSTR wzProviderKey
     )
 {
-    HRESULT hr = S_OK;
-    LPWSTR sczId = NULL;
-
-    hr = DepGetProviderInformation(hkRoot, wzProviderKey, &sczId, NULL, NULL);
-    if (E_NOTFOUND == hr)
-    {
-        ExitFunction();
-    }
-    ExitOnFailure(hr, "Failed to get the provider key package id.");
-
-    // If the id was registered return it and exit.
-    if (sczId && *sczId)
-    {
-        if (psczProviderKey)
-        {
-            hr = StrAllocString(psczProviderKey, wzProviderKey, 0);
-            ExitOnFailure(hr, "Failed to copy the provider key.");
-        }
-
-        if (psczId)
-        {
-            *psczId = sczId;
-            sczId = NULL;
-        }
-
-        ExitFunction();
-    }
-    else
-    {
-        hr = E_NOTFOUND;
-    }
-
-LExit:
-    ReleaseStr(sczId);
-
-    return hr;
+    HRESULT hr = DepGetProviderInformation(hkRoot, wzProviderKey, NULL, NULL, NULL);
+    return SUCCEEDED(hr);
 }
 
 /********************************************************************
@@ -886,7 +949,7 @@ static void CalculateDependencyActionStates(
                 switch (pPackage->currentState)
                 {
                 case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE:
-                    if (!PackageProviderExists(pPackage))
+                    if (!pPackage->fPackageProviderExists)
                     {
                         break;
                     }
@@ -902,7 +965,7 @@ static void CalculateDependencyActionStates(
                 switch (pPackage->currentState)
                 {
                 case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE:
-                    if (!PackageProviderExists(pPackage))
+                    if (!pPackage->fPackageProviderExists)
                     {
                         break;
                     }
@@ -1180,16 +1243,4 @@ static void UnregisterPackageDependency(
             }
         }
     }
-}
-
-/********************************************************************
- PackageProviderExists - Checks if a package provider is registered.
-
-*********************************************************************/
-static BOOL PackageProviderExists(
-    __in const BURN_PACKAGE* pPackage
-    )
-{
-    HRESULT hr = DependencyDetectProviderKeyPackageId(pPackage, NULL, NULL);
-    return SUCCEEDED(hr);
 }

@@ -41,12 +41,28 @@ extern "C" void DetectReset(
     ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
     pRegistration->fEnabledForwardCompatibleBundle = FALSE;
     PackageUninitialize(&pRegistration->forwardCompatibleBundle);
+    pRegistration->fSelfRegisteredAsDependent = FALSE;
+
+    if (pRegistration->rgIgnoredDependencies)
+    {
+        ReleaseDependencyArray(pRegistration->rgIgnoredDependencies, pRegistration->cIgnoredDependencies);
+    }
+    pRegistration->rgIgnoredDependencies = NULL;
+    pRegistration->cIgnoredDependencies = 0;
+
+    if (pRegistration->rgDependents)
+    {
+        ReleaseDependencyArray(pRegistration->rgDependents, pRegistration->cDependents);
+    }
+    pRegistration->rgDependents = NULL;
+    pRegistration->cDependents = 0;
 
     for (DWORD iPackage = 0; iPackage < pPackages->cPackages; ++iPackage)
     {
         BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
 
         pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
+        pPackage->fPackageProviderExists = FALSE;
 
         pPackage->cache = BURN_CACHE_STATE_NONE;
         for (DWORD iPayload = 0; iPayload < pPackage->cPayloads; ++iPayload)
@@ -68,6 +84,18 @@ extern "C" void DetectReset(
         {
             ReleaseNullMem(pPackage->Msp.rgTargetProducts);
             pPackage->Msp.cTargetProductCodes = 0;
+        }
+
+        for (DWORD iProvider = 0; iProvider < pPackage->cDependencyProviders; ++iProvider)
+        {
+            BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders + iProvider;
+
+            if (pProvider->rgDependents)
+            {
+                ReleaseDependencyArray(pProvider->rgDependents, pProvider->cDependents);
+            }
+            pProvider->rgDependents = NULL;
+            pProvider->cDependents = 0;
         }
     }
 

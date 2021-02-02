@@ -139,8 +139,13 @@ typedef struct _BURN_REGISTRATION
     // Update registration
     BURN_UPDATE_REGISTRATION update;
 
-    // Only valid after detect.
-    BURN_RELATED_BUNDLES relatedBundles;
+    BURN_RELATED_BUNDLES relatedBundles; // Only valid after detect.
+    DEPENDENCY* rgIgnoredDependencies;   // Only valid after detect.
+    UINT cIgnoredDependencies;           // Only valid after detect.
+    DEPENDENCY* rgDependents;            // Only valid after detect.
+    UINT cDependents;                    // Only valid after detect.
+    LPCWSTR wzSelfDependent;             // Only valid after detect.
+    BOOL fSelfRegisteredAsDependent;     // Only valid after detect.
 
     LPWSTR sczDetectedProviderKeyBundleId;
     LPWSTR sczAncestors;

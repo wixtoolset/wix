@@ -418,7 +418,6 @@ HRESULT PlanRegistration(
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RESUME_TYPE resumeType,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in_z_opt LPCWSTR wzIgnoreDependencies,
     __out BOOL* pfContinuePlanning
     );
 HRESULT PlanPassThroughBundle(

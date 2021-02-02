@@ -574,15 +574,12 @@ extern "C" HRESULT PlanRegistration(
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RESUME_TYPE resumeType,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in_z_opt LPCWSTR wzIgnoreDependencies,
     __out BOOL* pfContinuePlanning
     )
 {
     HRESULT hr = S_OK;
-    LPCWSTR wzSelfDependent = NULL;
+    STRINGDICT_HANDLE sdBundleDependents = NULL;
     STRINGDICT_HANDLE sdIgnoreDependents = NULL;
-    DEPENDENCY* rgDependencies = NULL;
-    UINT cDependencies = 0;
 
     pPlan->fRegister = TRUE; // register the bundle since we're modifying machine state.
 
@@ -590,17 +587,6 @@ extern "C" HRESULT PlanRegistration(
     pPlan->fKeepRegistrationDefault = (pRegistration->fInstalled || BOOTSTRAPPER_RESUME_TYPE_REBOOT == resumeType);
 
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
-
-    // If no parent was specified at all, use the bundle id as the self dependent.
-    if (!pRegistration->sczActiveParent)
-    {
-        wzSelfDependent = pRegistration->sczId;
-    }
-    else if (*pRegistration->sczActiveParent) // if parent was specified use that as the self dependent.
-    {
-        wzSelfDependent = pRegistration->sczActiveParent;
-    }
-    // else parent:none was used which means we should not register a dependency on ourself.
 
     if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
     {
@@ -622,12 +608,12 @@ extern "C" HRESULT PlanRegistration(
 
         // If the self-dependent dependent exists, plan its removal. If we did not do this, we
         // would prevent self-removal.
-        if (wzSelfDependent && DependencyDependentExists(pRegistration, wzSelfDependent))
+        if (pRegistration->fSelfRegisteredAsDependent)
         {
-            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, wzSelfDependent, pRegistration->sczId);
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pRegistration->wzSelfDependent, pRegistration->sczId);
             ExitOnFailure(hr, "Failed to allocate registration action.");
 
-            hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, wzSelfDependent);
+            hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pRegistration->wzSelfDependent);
             ExitOnFailure(hr, "Failed to add self-dependent to ignore dependents.");
         }
 
@@ -637,10 +623,20 @@ extern "C" HRESULT PlanRegistration(
         if (BOOTSTRAPPER_RELATION_UPGRADE != relationType)
         {
             // If there were other dependencies to ignore, add them.
-            if (wzIgnoreDependencies && *wzIgnoreDependencies)
+            for (DWORD iDependency = 0; iDependency < pRegistration->cIgnoredDependencies; ++iDependency)
             {
-                hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, wzIgnoreDependencies);
-                ExitOnFailure(hr, "Failed to add dependents ignored from command-line.");
+                DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + iDependency;
+
+                hr = DictKeyExists(sdIgnoreDependents, pDependency->sczKey);
+                if (E_NOTFOUND != hr)
+                {
+                    ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+                }
+                else
+                {
+                    hr = DictAddKey(sdIgnoreDependents, pDependency->sczKey);
+                    ExitOnFailure(hr, "Failed to add dependent key to ignored dependents.");
+                }
             }
 
             // For addon or patch bundles, dependent related bundles should be ignored. This allows
@@ -661,22 +657,29 @@ extern "C" HRESULT PlanRegistration(
                 }
             }
 
-            // If there are any (non-ignored and not-planned-to-be-removed) dependents left, uninstall.
-            hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, sdIgnoreDependents, &rgDependencies, &cDependencies);
-            if (E_FILENOTFOUND == hr)
+            // If there are any (non-ignored and not-planned-to-be-removed) dependents left, skip planning.
+            for (DWORD iDependent = 0; iDependent < pRegistration->cDependents; ++iDependent)
             {
-                hr = S_OK;
-            }
-            else if (SUCCEEDED(hr) && cDependencies)
-            {
-                // TODO: callback to the BA and let it have the option to ignore any of these dependents?
+                DEPENDENCY* pDependent = pRegistration->rgDependents + iDependent;
 
-                 pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
-                 *pfContinuePlanning = FALSE; // skip the rest of planning.
+                hr = DictKeyExists(sdIgnoreDependents, pDependent->sczKey);
+                if (E_NOTFOUND == hr)
+                {
+                    hr = S_OK;
 
-                 LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS, cDependencies);
+                    // TODO: callback to the BA and let it have the option to ignore this dependent?
+                    if (!pPlan->fDisallowRemoval)
+                    {
+                        pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
+                        *pfContinuePlanning = FALSE; // skip the rest of planning.
+
+                        LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS);
+                    }
+
+                    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_DEPENDENT, pDependent->sczKey, LoggingStringOrUnknownIfNull(pDependent->sczName));
+                }
+                ExitOnFailure(hr, "Failed to check for remaining dependents during planning.");
             }
-            ExitOnFailure(hr, "Failed to check for remaining dependents during planning.");
         }
     }
     else
@@ -707,6 +710,23 @@ extern "C" HRESULT PlanRegistration(
         // if broken.
         pPlan->dependencyRegistrationAction = BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER;
 
+        // Create the dictionary of bundle dependents.
+        hr = DictCreateStringList(&sdBundleDependents, 5, DICT_FLAG_CASEINSENSITIVE);
+        ExitOnFailure(hr, "Failed to create the string dictionary.");
+
+        for (DWORD iDependent = 0; iDependent < pRegistration->cDependents; ++iDependent)
+        {
+            DEPENDENCY* pDependent = pRegistration->rgDependents + iDependent;
+
+            hr = DictKeyExists(sdBundleDependents, pDependent->sczKey);
+            if (E_NOTFOUND == hr)
+            {
+                hr = DictAddKey(sdBundleDependents, pDependent->sczKey);
+                ExitOnFailure(hr, "Failed to add dependent key to bundle dependents.");
+            }
+            ExitOnFailure(hr, "Failed to check the dictionary of bundle dependents.");
+        }
+
         // Register each dependent related bundle. The ensures that addons and patches are reference
         // counted and stick around until the last targeted bundle is removed.
         for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
@@ -719,11 +739,16 @@ extern "C" HRESULT PlanRegistration(
                 {
                     const BURN_DEPENDENCY_PROVIDER* pProvider = pRelatedBundle->package.rgDependencyProviders + j;
 
-                    if (!DependencyDependentExists(pRegistration, pProvider->sczKey))
+                    hr = DictKeyExists(sdBundleDependents, pProvider->sczKey);
+                    if (E_NOTFOUND == hr)
                     {
+                        hr = DictAddKey(sdBundleDependents, pProvider->sczKey);
+                        ExitOnFailure(hr, "Failed to add new dependent key to bundle dependents.");
+
                         hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pProvider->sczKey, pRelatedBundle->package.sczId);
                         ExitOnFailure(hr, "Failed to add registration action for dependent related bundle.");
                     }
+                    ExitOnFailure(hr, "Failed to check the dictionary of bundle dependents.");
                 }
             }
         }
@@ -731,19 +756,16 @@ extern "C" HRESULT PlanRegistration(
         // Only do the following if we decided there was a dependent self to register. If so and and an explicit parent was
         // provided, register dependent self. Otherwise, if this bundle is not an addon or patch bundle then self-regisiter
         // as our own dependent.
-        if (wzSelfDependent && (pRegistration->sczActiveParent || !fAddonOrPatchBundle))
+        if (pRegistration->wzSelfDependent && !pRegistration->fSelfRegisteredAsDependent && (pRegistration->sczActiveParent || !fAddonOrPatchBundle))
         {
-            if (!DependencyDependentExists(pRegistration, wzSelfDependent))
-            {
-                hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, wzSelfDependent, pRegistration->sczId);
-                ExitOnFailure(hr, "Failed to add registration action for self dependent.");
-            }
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pRegistration->wzSelfDependent, pRegistration->sczId);
+            ExitOnFailure(hr, "Failed to add registration action for self dependent.");
         }
     }
 
 LExit:
+    ReleaseDict(sdBundleDependents);
     ReleaseDict(sdIgnoreDependents);
-    ReleaseDependencyArray(rgDependencies, cDependencies);
 
     return hr;
 }

@@ -14,11 +14,11 @@ const LPCWSTR DEPENDENCY_IGNOREDEPENDENCIES = L"IGNOREDEPENDENCIES";
 // function declarations
 
 /********************************************************************
- DependencyUninitialize - Frees and zeros memory allocated in the
-  dependency.
+ DependencyUninitializeProvider - Frees and zeros memory allocated in
+  the dependency provider.
 
 *********************************************************************/
-void DependencyUninitialize(
+void DependencyUninitializeProvider(
     __in BURN_DEPENDENCY_PROVIDER* pProvider
     );
 
@@ -32,16 +32,9 @@ HRESULT DependencyParseProvidersFromXml(
     __in IXMLDOMNode* pixnPackage
     );
 
-/********************************************************************
- DependencyDetectProviderKeyPackageId - Detect if the provider key is
-  registered and if so what package code is registered.
-
- Note: Returns E_NOTFOUND if the provider key is not registered.
-*********************************************************************/
-HRESULT DependencyDetectProviderKeyPackageId(
-    __in const BURN_PACKAGE* pPackage,
-    __deref_opt_out_z_opt LPWSTR* psczProviderKey,
-    __deref_opt_out_z_opt LPWSTR* psczId
+HRESULT DependencyInitialize(
+    __in BURN_REGISTRATION* pRegistration,
+    __in_z_opt LPCWSTR wzIgnoreDependencies
     );
 
 /********************************************************************
@@ -55,11 +48,19 @@ HRESULT DependencyDetectProviderKeyBundleId(
     );
 
 /********************************************************************
+ DependencyDetect - Detects dependency information.
+
+*********************************************************************/
+HRESULT DependencyDetect(
+    __in BURN_ENGINE_STATE* pEngineState
+    );
+
+/********************************************************************
  DependencyPlanInitialize - Initializes the plan.
 
 *********************************************************************/
 HRESULT DependencyPlanInitialize(
-    __in const BURN_ENGINE_STATE* pEngineState,
+    __in const BURN_REGISTRATION* pRegistration,
     __in BURN_PLAN* pPlan
     );
 

@@ -459,7 +459,7 @@ static HRESULT LoadRelatedBundleFromKey(
     ExitOnFailure(hr, "Failed to initialize related bundle to represent bundle: %ls", wzRelatedBundleId);
 
 LExit:
-    DependencyUninitialize(&dependencyProvider);
+    DependencyUninitializeProvider(&dependencyProvider);
     ReleaseStr(sczCachePath);
     ReleaseStr(sczBundleVersion);
 

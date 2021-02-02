@@ -356,7 +356,7 @@ MessageId=210
 Severity=Warning
 SymbolicName=MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS
 Language=English
-Plan skipped due to %1!u! remaining dependents
+Plan skipped due to remaining dependents:
 .
 
 MessageId=211
@@ -595,7 +595,7 @@ MessageId=327
 Severity=Warning
 SymbolicName=MSG_DEPENDENCY_PACKAGE_HASDEPENDENTS
 Language=English
-Will not uninstall package: %1!ls!, found dependents: %2!d!
+Will not uninstall package: %1!ls!, found dependents:
 .
 
 MessageId=328
@@ -638,6 +638,13 @@ Severity=Warning
 SymbolicName=MSG_DEPENDENCY_BUNDLE_UNREGISTERED_FAILED
 Language=English
 Could not remove bundle dependency provider: %1!ls!, error: 0x%2!x!
+.
+
+MessageId=334
+Severity=Warning
+SymbolicName=MSG_DEPENDENCY_BUNDLE_DEPENDENT
+Language=English
+Found dependent: %1!ls!, name: %2!ls!
 .
 
 MessageId=335

@@ -323,7 +323,7 @@ extern "C" void PackageUninitialize(
     {
         for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
         {
-            DependencyUninitialize(pPackage->rgDependencyProviders + i);
+            DependencyUninitializeProvider(pPackage->rgDependencyProviders + i);
         }
         MemFree(pPackage->rgDependencyProviders);
     }
