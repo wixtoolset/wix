@@ -63,8 +63,6 @@ extern "C" void DetectReset(
 
                 pFeature->currentState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
             }
-
-            pPackage->Msi.fCompatibleInstalled = FALSE;
         }
         else if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
         {

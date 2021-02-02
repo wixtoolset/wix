@@ -24,7 +24,6 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY,
-    BURN_ELEVATION_MESSAGE_TYPE_LOAD_COMPATIBLE_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_EMBEDDED_CHILD,
     BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE,
@@ -94,11 +93,6 @@ static DWORD WINAPI ElevatedChildCacheThreadProc(
 static HRESULT WaitForElevatedChildCacheThread(
     __in HANDLE hCacheThread,
     __in DWORD dwExpectedExitCode
-    );
-static HRESULT OnLoadCompatiblePackage(
-    __in BURN_PACKAGES* pPackages,
-    __in BYTE* pbData,
-    __in DWORD cbData
     );
 static HRESULT ProcessApplyInitializeMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
@@ -1115,45 +1109,6 @@ LExit:
 }
 
 /*******************************************************************
- ElevationLoadCompatiblePackageAction - Load compatible package
-  information from the referenced package.
-
-*******************************************************************/
-extern "C" HRESULT ElevationLoadCompatiblePackageAction(
-    __in HANDLE hPipe,
-    __in BURN_EXECUTE_ACTION* pExecuteAction
-    )
-{
-    HRESULT hr = S_OK;
-    BYTE* pbData = NULL;
-    SIZE_T cbData = 0;
-    DWORD dwResult = 0;
-    BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
-
-    // Serialize message data.
-    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->compatiblePackage.pReferencePackage->sczId);
-    ExitOnFailure(hr, "Failed to write package id to message buffer.");
-
-    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->compatiblePackage.sczInstalledProductCode);
-    ExitOnFailure(hr, "Failed to write installed ProductCode to message buffer.");
-
-    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->compatiblePackage.pInstalledVersion->sczVersion);
-    ExitOnFailure(hr, "Failed to write installed version to message buffer.");
-
-    // Send the message.
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_LOAD_COMPATIBLE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
-    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_LOAD_COMPATIBLE_PACKAGE message to per-machine process.");
-
-    // Ignore the restart since this action only loads data into memory.
-    hr = ProcessResult(dwResult, &restart);
-
-LExit:
-    ReleaseBuffer(pbData);
-
-    return hr;
-}
-
-/*******************************************************************
  ElevationCleanPackage - 
 
 *******************************************************************/
@@ -1717,10 +1672,6 @@ static HRESULT ProcessElevatedChildMessage(
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY:
         hrResult = OnExecutePackageDependencyAction(pContext->pPackages, &pContext->pRegistration->relatedBundles, (BYTE*)pMsg->pvData, pMsg->cbData);
-        break;
-
-    case BURN_ELEVATION_MESSAGE_TYPE_LOAD_COMPATIBLE_PACKAGE:
-        hrResult = OnLoadCompatiblePackage(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE:
@@ -2630,55 +2581,6 @@ static HRESULT OnExecutePackageDependencyAction(
     ExitOnFailure(hr, "Failed to execute package dependency action.");
 
 LExit:
-    ReleaseStr(sczPackage);
-    PlanUninitializeExecuteAction(&executeAction);
-
-    return hr;
-}
-
-static HRESULT OnLoadCompatiblePackage(
-    __in BURN_PACKAGES* pPackages,
-    __in BYTE* pbData,
-    __in DWORD cbData
-    )
-{
-    HRESULT hr = S_OK;
-    SIZE_T iData = 0;
-    LPWSTR sczPackage = NULL;
-    LPWSTR sczVersion = NULL;
-    BURN_EXECUTE_ACTION executeAction = { };
-
-    executeAction.type = BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE;
-
-    // Deserialize the message data.
-    hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
-    ExitOnFailure(hr, "Failed to read package id from message buffer.");
-
-    // Find the reference package.
-    hr = PackageFindById(pPackages, sczPackage, &executeAction.compatiblePackage.pReferencePackage);
-    ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
-
-    hr = BuffReadString(pbData, cbData, &iData, &executeAction.compatiblePackage.sczInstalledProductCode);
-    ExitOnFailure(hr, "Failed to read installed ProductCode from message buffer.");
-
-    hr = BuffReadString(pbData, cbData, &iData, &sczVersion);
-    ExitOnFailure(hr, "Failed to read installed version from message buffer.");
-
-    hr = VerParseVersion(sczVersion, 0, FALSE, &executeAction.compatiblePackage.pInstalledVersion);
-    ExitOnFailure(hr, "Failed to parse installed version from compatible package.");
-
-    // Copy the installed data to the reference package.
-    hr = StrAllocString(&executeAction.compatiblePackage.pReferencePackage->Msi.sczInstalledProductCode, executeAction.compatiblePackage.sczInstalledProductCode, 0);
-    ExitOnFailure(hr, "Failed to copy installed ProductCode.");
-
-    executeAction.compatiblePackage.pReferencePackage->Msi.pInstalledVersion = executeAction.compatiblePackage.pInstalledVersion;
-
-    // Load the compatible package and add it to the list.
-    hr = MsiEngineAddCompatiblePackage(pPackages, executeAction.compatiblePackage.pReferencePackage, NULL);
-    ExitOnFailure(hr, "Failed to load compatible package.");
-
-LExit:
-    ReleaseStr(sczVersion);
     ReleaseStr(sczPackage);
     PlanUninitializeExecuteAction(&executeAction);
 

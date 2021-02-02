@@ -65,7 +65,6 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY,
     BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY,
     BURN_EXECUTE_ACTION_TYPE_REGISTRATION,
-    BURN_EXECUTE_ACTION_TYPE_COMPATIBLE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION,
     BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION,
 };
@@ -300,12 +299,6 @@ typedef struct _BURN_EXECUTE_ACTION
             LPWSTR sczBundleProviderKey;
             BURN_DEPENDENCY_ACTION action;
         } packageDependency;
-        struct
-        {
-            BURN_PACKAGE* pReferencePackage;
-            LPWSTR sczInstalledProductCode;
-            VERUTIL_VERSION* pInstalledVersion;
-        } compatiblePackage;
         struct
         {
             BURN_ROLLBACK_BOUNDARY* pRollbackBoundary;

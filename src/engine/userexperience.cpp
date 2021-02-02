@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 11, 17, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 1, 30, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -737,36 +737,6 @@ EXTERN_C BAAPI UserExperienceOnDetectBegin(
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnDetectBegin failed.");
-
-    if (results.fCancel)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
-    }
-
-LExit:
-    return hr;
-}
-
-EXTERN_C BAAPI UserExperienceOnDetectCompatibleMsiPackage(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in VERUTIL_VERSION* pCompatiblePackageVersion
-    )
-{
-    HRESULT hr = S_OK;
-    BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS args = { };
-    BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS results = { };
-
-    args.cbSize = sizeof(args);
-    args.wzPackageId = wzPackageId;
-    args.wzCompatiblePackageId = wzCompatiblePackageId;
-    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
-
-    results.cbSize = sizeof(results);
-
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE, &args, &results);
-    ExitOnFailure(hr, "BA OnDetectCompatibleMsiPackage failed.");
 
     if (results.fCancel)
     {
@@ -1550,73 +1520,6 @@ EXTERN_C BAAPI UserExperienceOnPlanBegin(
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
-
-LExit:
-    return hr;
-}
-
-EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in VERUTIL_VERSION* pCompatiblePackageVersion,
-    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
-    )
-{
-    HRESULT hr = S_OK;
-    BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS args = { };
-    BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS results = { };
-
-    args.cbSize = sizeof(args);
-    args.wzPackageId = wzPackageId;
-    args.wzCompatiblePackageId = wzCompatiblePackageId;
-    args.wzCompatiblePackageVersion = pCompatiblePackageVersion->sczVersion;
-    args.recommendedState = *pRequestedState;
-
-    results.cbSize = sizeof(results);
-    results.requestedState = *pRequestedState;
-
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN, &args, &results);
-    ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageBegin failed.");
-
-    if (results.fCancel)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
-    }
-    *pRequestedState = results.requestedState;
-
-LExit:
-    return hr;
-}
-
-EXTERN_C BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in HRESULT hrStatus,
-    __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BOOTSTRAPPER_REQUEST_STATE requested,
-    __in BOOTSTRAPPER_ACTION_STATE execute,
-    __in BOOTSTRAPPER_ACTION_STATE rollback
-    )
-{
-    HRESULT hr = S_OK;
-    BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS args = { };
-    BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS results = { };
-
-    args.cbSize = sizeof(args);
-    args.wzPackageId = wzPackageId;
-    args.wzCompatiblePackageId = wzCompatiblePackageId;
-    args.hrStatus = hrStatus;
-    args.state = state;
-    args.requested = requested;
-    args.execute = execute;
-    args.rollback = rollback;
-
-    results.cbSize = sizeof(results);
-
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, &args, &results);
-    ExitOnFailure(hr, "BA OnPlanCompatibleMsiPackageComplete failed.");
 
 LExit:
     return hr;

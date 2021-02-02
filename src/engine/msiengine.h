@@ -48,11 +48,6 @@ HRESULT MsiEnginePlanAddPackage(
     __in_opt HANDLE hCacheEvent,
     __in BOOL fPlanPackageCacheRollback
     );
-HRESULT MsiEngineAddCompatiblePackage(
-    __in BURN_PACKAGES* pPackages,
-    __in const BURN_PACKAGE* pPackage,
-    __out_opt BURN_PACKAGE** ppCompatiblePackage
-    );
 HRESULT MsiEngineBeginTransaction(
     __in LPCWSTR wzName
     );

@@ -369,15 +369,6 @@ extern "C" void PackagesUninitialize(
         MemFree(pPackages->rgPackages);
     }
 
-    if (pPackages->rgCompatiblePackages)
-    {
-        for (DWORD i = 0; i < pPackages->cCompatiblePackages; ++i)
-        {
-            PackageUninitialize(pPackages->rgCompatiblePackages + i);
-        }
-        MemFree(pPackages->rgCompatiblePackages);
-    }
-
     if (pPackages->rgPatchTargetCodes)
     {
         for (DWORD i = 0; i < pPackages->cPatchTargetCodes; ++i)
@@ -406,17 +397,6 @@ extern "C" HRESULT PackageFindById(
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
     {
         pPackage = &pPackages->rgPackages[i];
-
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
-        {
-            *ppPackage = pPackage;
-            ExitFunction1(hr = S_OK);
-        }
-    }
-
-    for (DWORD i = 0; i < pPackages->cCompatiblePackages; ++i)
-    {
-        pPackage = &pPackages->rgCompatiblePackages[i];
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
         {
@@ -504,22 +484,6 @@ extern "C" HRESULT PackageGetProperty(
 
             ExitFunction1(hr = S_OK);
         }
-    }
-
-LExit:
-    return hr;
-}
-
-HRESULT PackageEnsureCompatiblePackagesArray(
-    __in BURN_PACKAGES* pPackages
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (!pPackages->rgCompatiblePackages)
-    {
-        pPackages->rgCompatiblePackages = (BURN_PACKAGE*)MemAlloc(sizeof(BURN_PACKAGE) * pPackages->cPackages, TRUE);
-        ExitOnNull(pPackages->rgCompatiblePackages, hr, E_OUTOFMEMORY, "Failed to allocate memory for compatible packages.");
     }
 
 LExit:

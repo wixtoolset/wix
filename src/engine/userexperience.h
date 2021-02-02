@@ -185,12 +185,6 @@ BAAPI UserExperienceOnDetectBegin(
     __in BOOL fInstalled,
     __in DWORD cPackages
     );
-BAAPI UserExperienceOnDetectCompatibleMsiPackage(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in VERUTIL_VERSION* pCompatiblePackageVersion
-    );
 BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
@@ -353,23 +347,6 @@ BAAPI UserExperienceOnPauseAUComplete(
 BAAPI UserExperienceOnPlanBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD cPackages
-    );
-BAAPI UserExperienceOnPlanCompatibleMsiPackageBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in VERUTIL_VERSION* pCompatiblePackageVersion,
-    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
-    );
-BAAPI UserExperienceOnPlanCompatibleMsiPackageComplete(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzCompatiblePackageId,
-    __in HRESULT hrStatus,
-    __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BOOTSTRAPPER_REQUEST_STATE requested,
-    __in BOOTSTRAPPER_ACTION_STATE execute,
-    __in BOOTSTRAPPER_ACTION_STATE rollback
     );
 BAAPI UserExperienceOnPlanComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
