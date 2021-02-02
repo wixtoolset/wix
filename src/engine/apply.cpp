@@ -366,7 +366,7 @@ extern "C" HRESULT ApplyRegister(
     hr = CoreSaveEngineState(pEngineState);
     if (FAILED(hr))
     {
-        LogErrorId(hr, MSG_STATE_NOT_SAVED, NULL, NULL, NULL);
+        LogErrorId(hr, MSG_STATE_NOT_SAVED);
         hr = S_OK;
     }
 
@@ -1348,8 +1348,6 @@ static HRESULT PromptForSource(
     HRESULT hr = S_OK;
     BOOTSTRAPPER_RESOLVESOURCE_ACTION action = BOOTSTRAPPER_RESOLVESOURCE_ACTION_NONE;
 
-    UserExperienceDeactivateEngine(pUX);
-
     hr = UserExperienceOnResolveSource(pUX, wzPackageOrContainerId, wzPayloadId, wzLocalSource, wzDownloadSource, &action);
     if (FAILED(hr))
     {
@@ -1376,7 +1374,6 @@ static HRESULT PromptForSource(
     }
 
 LExit:
-    UserExperienceActivateEngine(pUX, NULL);
     return hr;
 }
 

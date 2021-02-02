@@ -77,11 +77,6 @@ enum BURN_AU_PAUSE_ACTION
 
 typedef struct _BURN_ENGINE_STATE
 {
-    // synchronization
-    CRITICAL_SECTION csActive; // Any call from the UX that reads or alters the engine state
-                               // needs to be syncronized through this critical section.
-                               // Note: The engine must never do a UX callback while in this critical section.
-
     // UX flow control
     //BOOL fSuspend;             // Is TRUE when UX made Suspend() call on core.
     //BOOL fForcedReboot;        // Is TRUE when UX made Reboot() call on core.

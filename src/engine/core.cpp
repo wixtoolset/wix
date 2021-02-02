@@ -236,15 +236,11 @@ extern "C" HRESULT CoreDetect(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fActivated = FALSE;
     BOOL fDetectBegan = FALSE;
     BURN_PACKAGE* pPackage = NULL;
     HRESULT hrFirstPackageFailure = S_OK;
 
     LogId(REPORT_STANDARD, MSG_DETECT_BEGIN, pEngineState->packages.cPackages);
-
-    hr = UserExperienceActivateEngine(&pEngineState->userExperience, &fActivated);
-    ExitOnFailure(hr, "Engine cannot start detect because it is busy with another action.");
 
     // Detect if bundle installed state has changed since start up. This
     // only happens if Apply() changed the state of bundle (installed or
@@ -369,11 +365,6 @@ LExit:
         hr = hrFirstPackageFailure;
     }
 
-    if (fActivated)
-    {
-        UserExperienceDeactivateEngine(&pEngineState->userExperience);
-    }
-
     if (fDetectBegan)
     {
         UserExperienceOnDetectComplete(&pEngineState->userExperience, hr);
@@ -392,7 +383,6 @@ extern "C" HRESULT CorePlan(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fActivated = FALSE;
     BOOL fPlanBegan = FALSE;
     LPWSTR sczLayoutDirectory = NULL;
     HANDLE hSyncpointEvent = NULL;
@@ -400,9 +390,6 @@ extern "C" HRESULT CorePlan(
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
 
     LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
-
-    hr = UserExperienceActivateEngine(&pEngineState->userExperience, &fActivated);
-    ExitOnFailure(hr, "Engine cannot start plan because it is busy with another action.");
 
     fPlanBegan = TRUE;
     hr = UserExperienceOnPlanBegin(&pEngineState->userExperience, pEngineState->packages.cPackages);
@@ -496,11 +483,6 @@ extern "C" HRESULT CorePlan(
     PlanDump(&pEngineState->plan);
 
 LExit:
-    if (fActivated)
-    {
-        UserExperienceDeactivateEngine(&pEngineState->userExperience);
-    }
-
     if (fPlanBegan)
     {
         UserExperienceOnPlanComplete(&pEngineState->userExperience, hr);
@@ -551,10 +533,10 @@ extern "C" HRESULT CoreApply(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fActivated = FALSE;
     HANDLE hLock = NULL;
     DWORD cOverallProgressTicks = 0;
     HANDLE hCacheThread = NULL;
+    BOOL fApplyInitialize = FALSE;
     BOOL fElevated = FALSE;
     BOOL fRegistered = FALSE;
     BOOL fKeepRegistration = pEngineState->plan.fKeepRegistrationDefault;
@@ -566,9 +548,6 @@ extern "C" HRESULT CoreApply(
     BOOTSTRAPPER_APPLYCOMPLETE_ACTION applyCompleteAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_NONE;
 
     LogId(REPORT_STANDARD, MSG_APPLY_BEGIN);
-
-    hr = UserExperienceActivateEngine(&pEngineState->userExperience, &fActivated);
-    ExitOnFailure(hr, "Engine cannot start apply because it is busy with another action.");
 
     // Ensure any previous attempts to execute are reset.
     ApplyReset(&pEngineState->userExperience, &pEngineState->packages);
@@ -599,6 +578,7 @@ extern "C" HRESULT CoreApply(
     ExitOnFailure(hr, "Another per-user setup is already executing.");
 
     // Initialize only after getting a lock.
+    fApplyInitialize = TRUE;
     ApplyInitialize();
 
     pEngineState->userExperience.hwndApply = hwndParent;
@@ -627,7 +607,7 @@ extern "C" HRESULT CoreApply(
         ExitOnFailure(hr, "Failed to elevate.");
 
         hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->userExperience, &pEngineState->variables, pEngineState->plan.action, pEngineState->automaticUpdates, !pEngineState->fDisableSystemRestore);
-        ExitOnFailure(hr, "Another per-machine setup is already executing.");
+        ExitOnFailure(hr, "Failed to initialize apply in elevated process.");
 
         fElevated = TRUE;
     }
@@ -704,17 +684,15 @@ LExit:
 
     pEngineState->userExperience.hwndApply = NULL;
 
-    ApplyUninitialize();
+    if (fApplyInitialize)
+    {
+        ApplyUninitialize();
+    }
 
     if (hLock)
     {
         ::ReleaseMutex(hLock);
         ::CloseHandle(hLock);
-    }
-
-    if (fActivated)
-    {
-        UserExperienceDeactivateEngine(&pEngineState->userExperience);
     }
 
     ReleaseHandle(hCacheThread);
@@ -736,13 +714,9 @@ extern "C" HRESULT CoreLaunchApprovedExe(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fActivated = FALSE;
     DWORD dwProcessId = 0;
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_BEGIN, pLaunchApprovedExe->sczId);
-
-    hr = UserExperienceActivateEngine(&pEngineState->userExperience, &fActivated);
-    ExitOnFailure(hr, "Engine cannot start LaunchApprovedExe because it is busy with another action.");
 
     hr = UserExperienceOnLaunchApprovedExeBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted LaunchApprovedExe begin.");
@@ -755,11 +729,6 @@ extern "C" HRESULT CoreLaunchApprovedExe(
     hr = ElevationLaunchApprovedExe(pEngineState->companionConnection.hPipe, pLaunchApprovedExe, &dwProcessId);
 
 LExit:
-    if (fActivated)
-    {
-        UserExperienceDeactivateEngine(&pEngineState->userExperience);
-    }
-
     UserExperienceOnLaunchApprovedExeComplete(&pEngineState->userExperience, hr, dwProcessId);
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_COMPLETE, hr, dwProcessId);
@@ -782,7 +751,7 @@ extern "C" HRESULT CoreQuit(
         hr = CoreSaveEngineState(pEngineState);
         if (FAILED(hr))
         {
-            LogErrorId(hr, MSG_STATE_NOT_SAVED, NULL, NULL, NULL);
+            LogErrorId(hr, MSG_STATE_NOT_SAVED);
             hr = S_OK;
         }
     }

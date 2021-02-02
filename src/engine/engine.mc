@@ -938,7 +938,7 @@ MessageId=501
 Severity=Warning
 SymbolicName=MSG_STATE_NOT_SAVED
 Language=English
-The state file could not be saved, error: 0x%1!x!. Continuing...
+The state file could not be saved. Continuing...
 .
 
 MessageId=600

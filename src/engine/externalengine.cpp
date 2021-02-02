@@ -276,7 +276,9 @@ HRESULT ExternalEngineSetUpdate(
     WCHAR wzGuid[39];
     RPC_STATUS rs = RPC_S_OK;
 
-    ::EnterCriticalSection(&pEngineState->csActive);
+    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
+    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
     if ((!wzLocalSource || !*wzLocalSource) && (!wzDownloadSource || !*wzDownloadSource))
     {
@@ -332,7 +334,7 @@ HRESULT ExternalEngineSetUpdate(
     }
 
 LExit:
-    ::LeaveCriticalSection(&pEngineState->csActive);
+    ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
 
     ReleaseStr(sczCommandline);
     ReleaseStr(sczLocalSource);
@@ -351,7 +353,7 @@ HRESULT ExternalEngineSetLocalSource(
     BURN_CONTAINER* pContainer = NULL;
     BURN_PAYLOAD* pPayload = NULL;
 
-    ::EnterCriticalSection(&pEngineState->csActive);
+    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
     hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
@@ -387,7 +389,7 @@ HRESULT ExternalEngineSetLocalSource(
     }
 
 LExit:
-    ::LeaveCriticalSection(&pEngineState->csActive);
+    ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
 
     return hr;
 }
@@ -406,7 +408,7 @@ HRESULT ExternalEngineSetDownloadSource(
     BURN_PAYLOAD* pPayload = NULL;
     DOWNLOAD_SOURCE* pDownloadSource = NULL;
 
-    ::EnterCriticalSection(&pEngineState->csActive);
+    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
     hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
@@ -470,7 +472,7 @@ HRESULT ExternalEngineSetDownloadSource(
     }
 
 LExit:
-    ::LeaveCriticalSection(&pEngineState->csActive);
+    ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
 
     return hr;
 }
@@ -686,7 +688,7 @@ HRESULT ExternalEngineLaunchApprovedExe(
     pLaunchApprovedExe = (BURN_LAUNCH_APPROVED_EXE*)MemAlloc(sizeof(BURN_LAUNCH_APPROVED_EXE), TRUE);
     ExitOnNull(pLaunchApprovedExe, hr, E_OUTOFMEMORY, "Failed to alloc BURN_LAUNCH_APPROVED_EXE");
 
-    ::EnterCriticalSection(&pEngineState->csActive);
+    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
     fLeaveCriticalSection = TRUE;
     hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
@@ -698,9 +700,6 @@ HRESULT ExternalEngineLaunchApprovedExe(
 
     hr = ApprovedExesFindById(&pEngineState->approvedExes, wzApprovedExeForElevationId, &pApprovedExe);
     ExitOnFailure(hr, "BA requested unknown approved exe with id: %ls", wzApprovedExeForElevationId);
-
-    ::LeaveCriticalSection(&pEngineState->csActive);
-    fLeaveCriticalSection = FALSE;
 
     hr = StrAllocString(&pLaunchApprovedExe->sczId, wzApprovedExeForElevationId, NULL);
     ExitOnFailure(hr, "Failed to copy the id.");
@@ -723,7 +722,7 @@ HRESULT ExternalEngineLaunchApprovedExe(
 LExit:
     if (fLeaveCriticalSection)
     {
-        ::LeaveCriticalSection(&pEngineState->csActive);
+        ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
     }
 
     if (FAILED(hr))

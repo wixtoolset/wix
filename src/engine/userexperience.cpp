@@ -24,6 +24,13 @@ static HRESULT SendBAMessage(
     __inout LPVOID pvResults
     );
 
+static HRESULT SendBAMessageFromInactiveEngine(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    );
+
 
 // function definitions
 
@@ -230,51 +237,31 @@ extern "C" int UserExperienceSendError(
     return nResult;
 }
 
-extern "C" HRESULT UserExperienceActivateEngine(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __out_opt BOOL* pfActivated
+extern "C" void UserExperienceActivateEngine(
+    __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
-    HRESULT hr = S_OK;
-    BOOL fActivated;
-
     ::EnterCriticalSection(&pUserExperience->csEngineActive);
-    if (InterlockedCompareExchange(reinterpret_cast<LONG*>(&pUserExperience->fEngineActive), TRUE, FALSE))
-    {
-        AssertSz(FALSE, "Engine should have been deactivated before activating it.");
-
-        fActivated = FALSE;
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_STATE);
-    }
-    else
-    {
-        fActivated = TRUE;
-    }
+    AssertSz(!pUserExperience->fEngineActive, "Engine should have been deactivated before activating it.");
+    pUserExperience->fEngineActive = TRUE;
     ::LeaveCriticalSection(&pUserExperience->csEngineActive);
-
-    if (pfActivated)
-    {
-        *pfActivated = fActivated;
-    }
-    ExitOnRootFailure(hr, "Engine active cannot be changed because it was already in that state.");
-
-LExit:
-    return hr;
 }
 
 extern "C" void UserExperienceDeactivateEngine(
     __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
-    BOOL fActive = InterlockedExchange(reinterpret_cast<LONG*>(&pUserExperience->fEngineActive), FALSE);
-    fActive = fActive; // prevents warning in "ship" build.
-    AssertSz(fActive, "Engine should have be active before deactivating it.");
+    ::EnterCriticalSection(&pUserExperience->csEngineActive);
+    AssertSz(pUserExperience->fEngineActive, "Engine should have been active before deactivating it.");
+    pUserExperience->fEngineActive = FALSE;
+    ::LeaveCriticalSection(&pUserExperience->csEngineActive);
 }
 
 extern "C" HRESULT UserExperienceEnsureEngineInactive(
     __in BURN_USER_EXPERIENCE* pUserExperience
     )
 {
+    // Make a slight optimization here by ignoring the critical section, because all callers should have needed to enter it for their operation anyway.
     HRESULT hr = pUserExperience->fEngineActive ? HRESULT_FROM_WIN32(ERROR_BUSY) : S_OK;
     ExitOnRootFailure(hr, "Engine is active, cannot proceed.");
 
@@ -346,7 +333,7 @@ EXTERN_C BAAPI UserExperienceOnApplyComplete(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYCOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONAPPLYCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnApplyComplete failed.");
 
     *pAction = results.action;
@@ -761,7 +748,7 @@ EXTERN_C BAAPI UserExperienceOnDetectComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectComplete failed.");
 
 LExit:
@@ -990,7 +977,7 @@ LExit:
 
 EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzUpdateLocation,
+    __in_z_opt LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
     __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,
@@ -1016,7 +1003,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdate(
     results.cbSize = sizeof(results);
     results.fStopProcessingUpdates = *pfStopProcessingUpdates;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdate failed.");
 
     if (results.fCancel)
@@ -1045,7 +1032,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdateBegin(
     results.cbSize = sizeof(results);
     results.fSkip = *pfSkip;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATEBEGIN, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdateBegin failed.");
 
     if (results.fCancel)
@@ -1074,7 +1061,7 @@ EXTERN_C BAAPI UserExperienceOnDetectUpdateComplete(
     results.cbSize = sizeof(results);
     results.fIgnoreError = *pfIgnoreError;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATECOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTUPDATECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectUpdateComplete failed.");
 
     if (FAILED(hrStatus))
@@ -1124,7 +1111,7 @@ EXTERN_C BAAPI UserExperienceOnElevateComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATECOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONELEVATECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnElevateComplete failed.");
 
 LExit:
@@ -1452,7 +1439,7 @@ EXTERN_C BAAPI UserExperienceOnLaunchApprovedExeComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnLaunchApprovedExeComplete failed.");
 
 LExit:
@@ -1571,7 +1558,7 @@ EXTERN_C BAAPI UserExperienceOnPlanComplete(
 
     results.cbSize = sizeof(results);
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanComplete failed.");
 
 LExit:
@@ -1831,7 +1818,7 @@ EXTERN_C BAAPI UserExperienceOnResolveSource(
     results.cbSize = sizeof(results);
     results.action = *pAction;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE, &args, &results);
     ExitOnFailure(hr, "BA OnResolveSource failed.");
 
     if (results.fCancel)
@@ -2314,6 +2301,24 @@ static HRESULT SendBAMessage(
     {
         hr = S_OK;
     }
+
+    return hr;
+}
+
+static HRESULT SendBAMessageFromInactiveEngine(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    )
+{
+    HRESULT hr = S_OK;
+
+    UserExperienceDeactivateEngine(pUserExperience);
+
+    hr = SendBAMessage(pUserExperience, message, pvArgs, pvResults);
+
+    UserExperienceActivateEngine(pUserExperience);
 
     return hr;
 }

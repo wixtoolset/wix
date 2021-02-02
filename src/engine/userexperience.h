@@ -82,13 +82,17 @@ int UserExperienceSendError(
     __in DWORD uiFlags,
     __in int nRecommendation
     );
-HRESULT UserExperienceActivateEngine(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __out_opt BOOL* pfActivated
+void UserExperienceActivateEngine(
+    __in BURN_USER_EXPERIENCE* pUserExperience
     );
 void UserExperienceDeactivateEngine(
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
+/********************************************************************
+ UserExperienceEnsureEngineInactive - Verifies the engine is inactive.
+   The caller MUST enter the csActive critical section before calling.
+
+*********************************************************************/
 HRESULT UserExperienceEnsureEngineInactive(
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
@@ -240,7 +244,7 @@ BAAPI UserExperienceOnDetectTargetMsiPackage(
     );
 BAAPI UserExperienceOnDetectUpdate(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzUpdateLocation,
+    __in_z_opt LPCWSTR wzUpdateLocation,
     __in DWORD64 dw64Size,
     __in VERUTIL_VERSION* pVersion,
     __in_z_opt LPCWSTR wzTitle,

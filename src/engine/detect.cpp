@@ -9,7 +9,7 @@ typedef struct _DETECT_AUTHENTICATION_REQUIRED_DATA
 } DETECT_AUTHENTICATION_REQUIRED_DATA;
 
 // internal function definitions
-static HRESULT AuthenticationRequired(
+static HRESULT WINAPI AuthenticationRequired(
     __in LPVOID pData,
     __in HINTERNET hUrl,
     __in long lHttpCode,
@@ -288,7 +288,7 @@ LExit:
     return hr;
 }
 
-static HRESULT AuthenticationRequired(
+static HRESULT WINAPI AuthenticationRequired(
     __in LPVOID pData,
     __in HINTERNET hUrl,
     __in long lHttpCode,

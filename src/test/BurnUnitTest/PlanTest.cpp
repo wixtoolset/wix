@@ -529,7 +529,6 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             LPWSTR sczFilePath = NULL;
 
-            ::InitializeCriticalSection(&pEngineState->csActive);
             ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
 
             hr = VariableInitialize(&pEngineState->variables);
@@ -567,6 +566,8 @@ namespace Bootstrapper
 
             hr = DepDependencyArrayAlloc(&pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
             NativeAssert::Succeeded(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
+
+            pEngineState->userExperience.fEngineActive = TRUE;
         }
 
         void DetectAttachedContainerAsAttached(BURN_ENGINE_STATE* pEngineState)

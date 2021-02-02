@@ -330,7 +330,6 @@ static HRESULT InitializeEngineState(
 
     pEngineState->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     pEngineState->dwElevatedLoggingTlsId = TLS_OUT_OF_INDEXES;
-    ::InitializeCriticalSection(&pEngineState->csActive);
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
     PipeConnectionInitialize(&pEngineState->companionConnection);
     PipeConnectionInitialize(&pEngineState->embeddedConnection);
@@ -417,8 +416,6 @@ static void UninitializeEngineState(
     {
         ::TlsFree(pEngineState->dwElevatedLoggingTlsId);
     }
-
-    ::DeleteCriticalSection(&pEngineState->csActive);
 
     // clear struct
     memset(pEngineState, 0, sizeof(BURN_ENGINE_STATE));
@@ -805,6 +802,8 @@ static HRESULT ProcessMessage(
 {
     HRESULT hr = S_OK;
 
+    UserExperienceActivateEngine(&pEngineState->userExperience);
+
     switch (pmsg->message)
     {
     case WM_BURN_DETECT:
@@ -831,6 +830,8 @@ static HRESULT ProcessMessage(
         hr = CoreQuit(pEngineState, static_cast<int>(pmsg->wParam));
         break;
     }
+
+    UserExperienceDeactivateEngine(&pEngineState->userExperience);
 
     return hr;
 }
