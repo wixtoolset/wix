@@ -804,6 +804,12 @@ static HRESULT ProcessMessage(
 
     UserExperienceActivateEngine(&pEngineState->userExperience);
 
+    if (pEngineState->fQuit)
+    {
+        LogId(REPORT_WARNING, MSG_IGNORE_OPERATION_AFTER_QUIT, LoggingBurnMessageToString(pmsg->message));
+        ExitFunction1(hr = E_INVALIDSTATE);
+    }
+
     switch (pmsg->message)
     {
     case WM_BURN_DETECT:
@@ -831,6 +837,7 @@ static HRESULT ProcessMessage(
         break;
     }
 
+LExit:
     UserExperienceDeactivateEngine(&pEngineState->userExperience);
 
     return hr;

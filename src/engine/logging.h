@@ -65,6 +65,10 @@ LPCSTR LoggingBurnActionToString(
     __in BOOTSTRAPPER_ACTION action
     );
 
+LPCSTR LoggingBurnMessageToString(
+    __in UINT message
+    );
+
 LPCSTR LoggingActionStateToString(
     __in BOOTSTRAPPER_ACTION_STATE actionState
     );

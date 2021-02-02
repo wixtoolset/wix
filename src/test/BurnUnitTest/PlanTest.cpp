@@ -568,6 +568,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
 
             pEngineState->userExperience.fEngineActive = TRUE;
+            pEngineState->fDetected = TRUE;
         }
 
         void DetectAttachedContainerAsAttached(BURN_ENGINE_STATE* pEngineState)

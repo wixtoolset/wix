@@ -170,6 +170,13 @@ Language=English
 Condition '%1!ls!' contains invalid version string '%2!ls!'.
 .
 
+MessageId=58
+Severity=Warning
+SymbolicName=MSG_IGNORE_OPERATION_AFTER_QUIT
+Language=English
+Bootstrapper application already requested to quit, ignoring request: '%1!hs!'.
+.
+
 MessageId=100
 Severity=Success
 SymbolicName=MSG_DETECT_BEGIN

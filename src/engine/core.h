@@ -78,6 +78,10 @@ enum BURN_AU_PAUSE_ACTION
 typedef struct _BURN_ENGINE_STATE
 {
     // UX flow control
+    BOOL fDetected;
+    BOOL fPlanned;
+    BOOL fApplied;
+    BOOL fQuit;
     //BOOL fSuspend;             // Is TRUE when UX made Suspend() call on core.
     //BOOL fForcedReboot;        // Is TRUE when UX made Reboot() call on core.
     //BOOL fCancelled;           // Is TRUE when UX return cancel on UX OnXXX() methods.

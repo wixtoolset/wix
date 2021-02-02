@@ -242,6 +242,13 @@ extern "C" HRESULT CoreDetect(
 
     LogId(REPORT_STANDARD, MSG_DETECT_BEGIN, pEngineState->packages.cPackages);
 
+    // Always reset the detect state which means the plan should be reset too.
+    pEngineState->fDetected = FALSE;
+    pEngineState->fPlanned = FALSE;
+    pEngineState->fApplied = FALSE;
+    DetectReset(&pEngineState->registration, &pEngineState->packages);
+    PlanReset(&pEngineState->plan, &pEngineState->packages);
+
     // Detect if bundle installed state has changed since start up. This
     // only happens if Apply() changed the state of bundle (installed or
     // uninstalled). In that case, Detect() can be used here to reset
@@ -265,10 +272,6 @@ extern "C" HRESULT CoreDetect(
     ExitOnRootFailure(hr, "UX aborted detect begin.");
 
     pEngineState->userExperience.hwndDetect = hwndParent;
-
-    // Always reset the detect state which means the plan should be reset too.
-    DetectReset(&pEngineState->registration, &pEngineState->packages);
-    PlanReset(&pEngineState->plan, &pEngineState->packages);
 
     hr = SearchesExecute(&pEngineState->searches, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to execute searches.");
@@ -365,6 +368,11 @@ LExit:
         hr = hrFirstPackageFailure;
     }
 
+    if (SUCCEEDED(hr))
+    {
+        pEngineState->fDetected = TRUE;
+    }
+
     if (fDetectBegan)
     {
         UserExperienceOnDetectComplete(&pEngineState->userExperience, hr);
@@ -388,6 +396,7 @@ extern "C" HRESULT CorePlan(
     HANDLE hSyncpointEvent = NULL;
     BURN_PACKAGE* pUpgradeBundlePackage = NULL;
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
+    BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
 
     LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
 
@@ -395,7 +404,17 @@ extern "C" HRESULT CorePlan(
     hr = UserExperienceOnPlanBegin(&pEngineState->userExperience, pEngineState->packages.cPackages);
     ExitOnRootFailure(hr, "BA aborted plan begin.");
 
+    if (!pEngineState->fDetected)
+    {
+        ExitOnFailure(hr = E_INVALIDSTATE, "Plan cannot be done without a successful Detect.");
+    }
+    else if (pEngineState->fApplied)
+    {
+        ExitOnFailure(hr = E_INVALIDSTATE, "Plan requires a new successful Detect after calling Apply.");
+    }
+
     // Always reset the plan.
+    pEngineState->fPlanned = FALSE;
     PlanReset(&pEngineState->plan, &pEngineState->packages);
 
     // Remember the overall action state in the plan since it shapes the changes
@@ -447,7 +466,6 @@ extern "C" HRESULT CorePlan(
     }
     else // doing an action that modifies the machine state.
     {
-        BOOL fContinuePlanning = TRUE; // assume we'll be able to keep planning after registration.
         pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
 
         hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
@@ -477,12 +495,20 @@ extern "C" HRESULT CorePlan(
     hr = PlanFinalizeActions(&pEngineState->plan);
     ExitOnFailure(hr, "Failed to remove unnecessary actions from plan.");
 
-    // Finally, display all packages and related bundles in the log.
-    LogPackages(pUpgradeBundlePackage, pForwardCompatibleBundlePackage, &pEngineState->packages, &pEngineState->registration.relatedBundles, action);
+    if (fContinuePlanning)
+    {
+        // Finally, display all packages and related bundles in the log.
+        LogPackages(pUpgradeBundlePackage, pForwardCompatibleBundlePackage, &pEngineState->packages, &pEngineState->registration.relatedBundles, action);
+    }
 
     PlanDump(&pEngineState->plan);
 
 LExit:
+    if (SUCCEEDED(hr))
+    {
+        pEngineState->fPlanned = TRUE;
+    }
+
     if (fPlanBegan)
     {
         UserExperienceOnPlanComplete(&pEngineState->userExperience, hr);
@@ -549,6 +575,15 @@ extern "C" HRESULT CoreApply(
 
     LogId(REPORT_STANDARD, MSG_APPLY_BEGIN);
 
+    if (!pEngineState->fPlanned)
+    {
+        ExitOnFailure(hr = E_INVALIDSTATE, "Apply cannot be done without a successful Plan.");
+    }
+    else if (pEngineState->fApplied)
+    {
+        ExitOnFailure(hr = E_INVALIDSTATE, "Plans cannot be applied multiple times.");
+    }
+
     // Ensure any previous attempts to execute are reset.
     ApplyReset(&pEngineState->userExperience, &pEngineState->packages);
 
@@ -563,6 +598,8 @@ extern "C" HRESULT CoreApply(
 
     hr = UserExperienceOnApplyBegin(&pEngineState->userExperience, dwPhaseCount);
     ExitOnRootFailure(hr, "BA aborted apply begin.");
+
+    pEngineState->fApplied = TRUE;
 
     // Abort if this bundle already requires a restart.
     if (BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
@@ -757,6 +794,8 @@ extern "C" HRESULT CoreQuit(
     }
 
     LogId(REPORT_STANDARD, MSG_QUIT, nExitCode);
+
+    pEngineState->fQuit = TRUE;
 
     ::PostQuitMessage(nExitCode); // go bye-bye.
 

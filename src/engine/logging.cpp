@@ -289,6 +289,29 @@ extern "C" LPCSTR LoggingBurnActionToString(
     }
 }
 
+LPCSTR LoggingBurnMessageToString(
+    __in UINT message
+    )
+{
+    switch (message)
+    {
+    case WM_BURN_APPLY:
+        return "Apply";
+    case WM_BURN_DETECT:
+        return "Detect";
+    case WM_BURN_ELEVATE:
+        return "Elevate";
+    case WM_BURN_LAUNCH_APPROVED_EXE:
+        return "LaunchApprovedExe";
+    case WM_BURN_PLAN:
+        return "Plan";
+    case WM_BURN_QUIT:
+        return "Quit";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingActionStateToString(
     __in BOOTSTRAPPER_ACTION_STATE actionState
     )
