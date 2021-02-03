@@ -317,7 +317,7 @@ namespace Bootstrapper
             dwIndex = 0;
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
-            Assert::Equal(0ull, pPlan->qwEstimatedSize);
+            Assert::Equal(33743ull, pPlan->qwEstimatedSize);
             Assert::Equal(33743ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;

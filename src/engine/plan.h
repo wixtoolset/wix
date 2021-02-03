@@ -380,6 +380,7 @@ HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __in BOOL fPermanent,
+    __in BURN_CACHE_TYPE cacheType,
     __in BOOTSTRAPPER_ACTION action,
     __in BURN_VARIABLES* pVariables,
     __in_z_opt LPCWSTR wzInstallCondition,
@@ -438,14 +439,6 @@ HRESULT PlanLayoutPackage(
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
     __in_z_opt LPCWSTR wzLayoutDirectory
-    );
-HRESULT PlanCachePackage(
-    __in BOOL fPerMachine,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage,
-    __in BURN_VARIABLES* pVariables,
-    __out HANDLE* phSyncpointEvent
     );
 HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
