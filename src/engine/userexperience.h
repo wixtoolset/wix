@@ -191,7 +191,8 @@ BAAPI UserExperienceOnDetectBegin(
     );
 BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in HRESULT hrStatus
+    __in HRESULT hrStatus,
+    __in BOOL fEligibleForCleanup
     );
 BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,

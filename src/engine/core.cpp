@@ -300,7 +300,7 @@ extern "C" HRESULT CoreDetect(
     ExitOnFailure(hr, "Failed to detect provider key bundle id.");
 
     // Report the related bundles.
-    hr = DetectReportRelatedBundles(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, pEngineState->command.action);
+    hr = DetectReportRelatedBundles(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, pEngineState->command.action, &pEngineState->registration.fEligibleForCleanup);
     ExitOnFailure(hr, "Failed to report detected related bundles.");
 
     // Do update detection.
@@ -344,6 +344,14 @@ extern "C" HRESULT CoreDetect(
     {
         pPackage = pEngineState->packages.rgPackages + iPackage;
 
+        // If any packages that can affect registration are present, then the bundle should not automatically be uninstalled.
+        if (pEngineState->registration.fEligibleForCleanup && pPackage->fCanAffectRegistration &&
+            (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState ||
+             BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState))
+        {
+            pEngineState->registration.fEligibleForCleanup = FALSE;
+        }
+
         LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingCacheStateToString(pPackage->cache), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
@@ -377,12 +385,12 @@ LExit:
 
     if (fDetectBegan)
     {
-        UserExperienceOnDetectComplete(&pEngineState->userExperience, hr);
+        UserExperienceOnDetectComplete(&pEngineState->userExperience, hr, pEngineState->registration.fEligibleForCleanup);
     }
 
     pEngineState->userExperience.hwndDetect = NULL;
 
-    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr);
+    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr, !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fInstalled), FAILED(hr) ? "(failed)" : LoggingBoolToString(pEngineState->registration.fEligibleForCleanup));
 
     return hr;
 }
@@ -1050,6 +1058,54 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
 LExit:
     ReleaseFileHandle(hExecutableFile);
 
+    return hr;
+}
+
+extern "C" HRESULT CoreCleanup(
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+    LONGLONG llValue = 0;
+    BOOL fNeedsElevation = pEngineState->registration.fPerMachine && INVALID_HANDLE_VALUE == pEngineState->companionConnection.hPipe;
+
+    if (fNeedsElevation)
+    {
+        hr = VariableGetNumeric(&pEngineState->variables, BURN_BUNDLE_ELEVATED, &llValue);
+        ExitOnFailure(hr, "Failed to get value of WixBundleElevated variable during cleanup");
+
+        if (llValue)
+        {
+            fNeedsElevation = FALSE;
+        }
+    }
+
+    if (pEngineState->fApplied && BOOTSTRAPPER_ACTION_LAYOUT < pEngineState->plan.action && BOOTSTRAPPER_ACTION_UPDATE_REPLACE > pEngineState->plan.action ||
+        fNeedsElevation)
+    {
+        ExitFunction();
+    }
+
+    if (!pEngineState->fDetected)
+    {
+        hr = CoreDetect(pEngineState, pEngineState->hMessageWindow);
+        ExitOnFailure(hr, "Detect during cleanup failed");
+    }
+
+    if (!pEngineState->registration.fEligibleForCleanup)
+    {
+        ExitFunction();
+    }
+
+    hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+    ExitOnFailure(hr, "Plan during cleanup failed");
+
+    hr = CoreApply(pEngineState, pEngineState->hMessageWindow);
+    ExitOnFailure(hr, "Apply during cleanup failed");
+
+    // Need to think about cache=always
+
+LExit:
     return hr;
 }
 

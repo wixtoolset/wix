@@ -39,7 +39,8 @@ static HRESULT RunRunOnce(
     );
 static HRESULT RunApplication(
     __in BURN_ENGINE_STATE* pEngineState,
-    __out BOOL* pfReloadApp
+    __out BOOL* pfReloadApp,
+    __out BOOL* pfSkipCleanup
     );
 static HRESULT ProcessMessage(
     __in BURN_ENGINE_STATE* pEngineState,
@@ -529,6 +530,7 @@ static HRESULT RunNormal(
     HANDLE hPipesCreatedEvent = NULL;
     BOOL fContinueExecution = TRUE;
     BOOL fReloadApp = FALSE;
+    BOOL fSkipCleanup = FALSE;
     BURN_EXTENSION_ENGINE_CONTEXT extensionEngineContext = { };
 
     // Initialize logging.
@@ -584,10 +586,17 @@ static HRESULT RunNormal(
     do
     {
         fReloadApp = FALSE;
+        pEngineState->fQuit = FALSE;
 
-        hr = RunApplication(pEngineState, &fReloadApp);
+        hr = RunApplication(pEngineState, &fReloadApp, &fSkipCleanup);
         ExitOnFailure(hr, "Failed while running ");
     } while (fReloadApp);
+
+    if (!fSkipCleanup)
+    {
+        hr = CoreCleanup(pEngineState);
+        ExitOnFailure(hr, "Failed to cleanup before shutting down");
+    }
 
 LExit:
     BurnExtensionUnload(&pEngineState->extensions);
@@ -732,7 +741,8 @@ LExit:
 
 static HRESULT RunApplication(
     __in BURN_ENGINE_STATE* pEngineState,
-    __out BOOL* pfReloadApp
+    __out BOOL* pfReloadApp,
+    __out BOOL* pfSkipCleanup
     )
 {
     HRESULT hr = S_OK;
@@ -786,6 +796,11 @@ LExit:
         {
             LogId(REPORT_STANDARD, MSG_BA_REQUESTED_RELOAD);
             *pfReloadApp = TRUE;
+        }
+        else if (BOOTSTRAPPER_SHUTDOWN_ACTION_SKIP_CLEANUP == shutdownAction)
+        {
+            LogId(REPORT_STANDARD, MSG_BA_REQUESTED_SKIP_CLEANUP);
+            *pfSkipCleanup = TRUE;
         }
     }
 

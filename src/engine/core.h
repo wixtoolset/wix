@@ -204,6 +204,9 @@ HRESULT CoreAppendFileHandleSelfToCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
     );
+HRESULT CoreCleanup(
+    __in BURN_ENGINE_STATE* pEngineState
+    );
 
 #if defined(__cplusplus)
 }

@@ -121,6 +121,13 @@ Language=English
 The manifest contains an invalid version string: '%1!ls!'
 .
 
+MessageId=14
+Severity=Success
+SymbolicName=MSG_BA_REQUESTED_SKIP_CLEANUP
+Language=English
+Bootstrapper application opted out of any engine behavior to automatically uninstall the bundle during shutdown.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
@@ -286,7 +293,7 @@ MessageId=199
 Severity=Success
 SymbolicName=MSG_DETECT_COMPLETE
 Language=English
-Detect complete, result: 0x%1!x!
+Detect complete, result: 0x%1!x!, installed: %2!hs!, eligible for cleanup: %3!hs!
 .
 
 MessageId=200

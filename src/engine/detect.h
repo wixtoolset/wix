@@ -30,7 +30,8 @@ HRESULT DetectReportRelatedBundles(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOTSTRAPPER_ACTION action
+    __in BOOTSTRAPPER_ACTION action,
+    __out BOOL* pfEligibleForCleanup
     );
 
 HRESULT DetectUpdate(

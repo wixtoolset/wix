@@ -736,7 +736,8 @@ LExit:
 
 EXTERN_C BAAPI UserExperienceOnDetectComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in HRESULT hrStatus
+    __in HRESULT hrStatus,
+    __in BOOL fEligibleForCleanup
     )
 {
     HRESULT hr = S_OK;
@@ -745,6 +746,7 @@ EXTERN_C BAAPI UserExperienceOnDetectComplete(
 
     args.cbSize = sizeof(args);
     args.hrStatus = hrStatus;
+    args.fEligibleForCleanup = fEligibleForCleanup;
 
     results.cbSize = sizeof(results);
 
@@ -2296,12 +2298,18 @@ static HRESULT SendBAMessage(
 {
     HRESULT hr = S_OK;
 
+    if (!pUserExperience->hUXModule)
+    {
+        ExitFunction();
+    }
+
     hr = pUserExperience->pfnBAProc(message, pvArgs, pvResults, pUserExperience->pvBAProcContext);
     if (hr == E_NOTIMPL)
     {
         hr = S_OK;
     }
 
+LExit:
     return hr;
 }
 
@@ -2314,11 +2322,17 @@ static HRESULT SendBAMessageFromInactiveEngine(
 {
     HRESULT hr = S_OK;
 
+    if (!pUserExperience->hUXModule)
+    {
+        ExitFunction();
+    }
+
     UserExperienceDeactivateEngine(pUserExperience);
 
     hr = SendBAMessage(pUserExperience, message, pvArgs, pvResults);
 
     UserExperienceActivateEngine(pUserExperience);
 
+LExit:
     return hr;
 }

@@ -146,6 +146,7 @@ typedef struct _BURN_REGISTRATION
     UINT cDependents;                    // Only valid after detect.
     LPCWSTR wzSelfDependent;             // Only valid after detect.
     BOOL fSelfRegisteredAsDependent;     // Only valid after detect.
+    BOOL fEligibleForCleanup;            // Only valid after detect.
 
     LPWSTR sczDetectedProviderKeyBundleId;
     LPWSTR sczAncestors;

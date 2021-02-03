@@ -42,6 +42,7 @@ extern "C" void DetectReset(
     pRegistration->fEnabledForwardCompatibleBundle = FALSE;
     PackageUninitialize(&pRegistration->forwardCompatibleBundle);
     pRegistration->fSelfRegisteredAsDependent = FALSE;
+    pRegistration->fEligibleForCleanup = FALSE;
 
     if (pRegistration->rgIgnoredDependencies)
     {
@@ -184,11 +185,14 @@ extern "C" HRESULT DetectReportRelatedBundles(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOTSTRAPPER_ACTION action
+    __in BOOTSTRAPPER_ACTION action,
+    __out BOOL* pfEligibleForCleanup
     )
 {
     HRESULT hr = S_OK;
     int nCompareResult = 0;
+    BOOTSTRAPPER_REQUEST_STATE uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+    *pfEligibleForCleanup = pRegistration->fInstalled;
 
     for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {
@@ -201,7 +205,7 @@ extern "C" HRESULT DetectReportRelatedBundles(
             if (BOOTSTRAPPER_RELATION_UPGRADE != relationType && BOOTSTRAPPER_ACTION_UNINSTALL < action)
             {
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
-                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion, pRelatedBundle->pVersion);
+                ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion->sczVersion, pRelatedBundle->pVersion->sczVersion);
 
                 if (nCompareResult < 0)
                 {
@@ -244,6 +248,19 @@ extern "C" HRESULT DetectReportRelatedBundles(
 
         hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, operation);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
+
+        // For now, if any related bundles will be executed during uninstall by default then never automatically clean up the bundle.
+        if (*pfEligibleForCleanup)
+        {
+            uninstallRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+            hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, BOOTSTRAPPER_ACTION_UNINSTALL, pRegistration->pVersion, pRelatedBundle->pVersion, &uninstallRequestState);
+            ExitOnFailure(hr, "Failed to get the default request state for related bundle for calculating fEligibleForCleanup");
+
+            if (BOOTSTRAPPER_REQUEST_STATE_NONE != uninstallRequestState)
+            {
+                *pfEligibleForCleanup = FALSE;
+            }
+        }
     }
 
 LExit:

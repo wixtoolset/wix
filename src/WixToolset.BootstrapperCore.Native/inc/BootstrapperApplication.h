@@ -221,6 +221,9 @@ enum BOOTSTRAPPER_SHUTDOWN_ACTION
     // restart the engine which will load the bootstrapper application again.
     // Typically used to switch from a native bootstrapper application to a managed one.
     BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER,
+    // Opts out of the engine behavior of trying to uninstall itself
+    // when no non-permanent packages are installed.
+    BOOTSTRAPPER_SHUTDOWN_ACTION_SKIP_CLEANUP,
 };
 
 enum BURN_MSI_PROPERTY
@@ -470,6 +473,7 @@ struct BA_ONDETECTCOMPLETE_ARGS
 {
     DWORD cbSize;
     HRESULT hrStatus;
+    BOOL fEligibleForCleanup;
 };
 
 struct BA_ONDETECTCOMPLETE_RESULTS
