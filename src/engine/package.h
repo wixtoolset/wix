@@ -78,6 +78,14 @@ enum BOOTSTRAPPER_FEATURE_ACTION
     BOOTSTRAPPER_FEATURE_ACTION_REMOVE,
 };
 
+enum BURN_PACKAGE_REGISTRATION_STATE
+{
+    BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN,
+    BURN_PACKAGE_REGISTRATION_STATE_IGNORED,
+    BURN_PACKAGE_REGISTRATION_STATE_ABSENT,
+    BURN_PACKAGE_REGISTRATION_STATE_PRESENT,
+};
+
 // structs
 
 typedef struct _BURN_EXE_EXIT_CODE
@@ -106,6 +114,9 @@ typedef struct _BURN_MSPTARGETPRODUCT
     BOOTSTRAPPER_PACKAGE_STATE patchPackageState; // only valid after Detect.
     BOOTSTRAPPER_ACTION_STATE execute;            // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;           // only valid during Plan.
+
+    BURN_PACKAGE_REGISTRATION_STATE registrationState;           // initialized during Detect, updated during Apply.
+    BURN_PACKAGE_REGISTRATION_STATE transactionRegistrationState;// only valid during Apply inside an MSI transaction.
 } BURN_MSPTARGETPRODUCT;
 
 typedef struct _BURN_MSIPROPERTY
@@ -190,6 +201,7 @@ typedef struct _BURN_PACKAGE
     BOOL fPerMachine;
     BOOL fUninstallable;
     BOOL fVital;
+    BOOL fCanAffectRegistration;
 
     BURN_CACHE_TYPE cacheType;
     LPWSTR sczCacheId;
@@ -215,6 +227,12 @@ typedef struct _BURN_PACKAGE
     BURN_DEPENDENCY_ACTION dependencyRollback;  // only valid during Plan.
     BOOL fDependencyManagerWasHere;             // only valid during Plan.
     HRESULT hrCacheResult;                      // only valid during Apply.
+
+    BURN_PACKAGE_REGISTRATION_STATE cacheRegistrationState;          // initialized during Detect, updated during Apply.
+    BURN_PACKAGE_REGISTRATION_STATE installRegistrationState;        // initialized during Detect, updated during Apply.
+    BURN_PACKAGE_REGISTRATION_STATE expectedCacheRegistrationState;  // only valid after Plan.
+    BURN_PACKAGE_REGISTRATION_STATE expectedInstallRegistrationState;// only valid after Plan.
+    BURN_PACKAGE_REGISTRATION_STATE transactionRegistrationState;    // only valid during Apply inside an MSI transaction.
 
     BURN_PACKAGE_PAYLOAD* rgPayloads;
     DWORD cPayloads;

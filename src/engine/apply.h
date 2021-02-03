@@ -72,7 +72,6 @@ HRESULT ApplyRegister(
 HRESULT ApplyUnregister(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BOOL fFailedOrRollback,
-    __in BOOL fRollback,
     __in BOOL fSuspend,
     __in BOOTSTRAPPER_APPLY_RESTART restart
     );
@@ -83,13 +82,12 @@ HRESULT ApplyCache(
     __in BURN_PLAN* pPlan,
     __in HANDLE hPipe,
     __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfRollback
+    __inout BOOL* pfRollback
     );
 HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_opt HANDLE hCacheThread,
     __inout DWORD* pcOverallProgressTicks,
-    __inout BOOL* pfKeepRegistration,
     __out BOOL* pfRollback,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart

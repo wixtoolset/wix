@@ -399,6 +399,31 @@ extern "C" LPCSTR LoggingPackageStateToString(
     }
 }
 
+extern "C" LPCSTR LoggingPackageRegistrationStateToString(
+    __in BOOL fCanAffectRegistration,
+    __in BURN_PACKAGE_REGISTRATION_STATE registrationState
+    )
+{
+    if (!fCanAffectRegistration)
+    {
+        return "(permanent)";
+    }
+
+    switch (registrationState)
+    {
+    case BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN:
+        return "Unknown";
+    case BURN_PACKAGE_REGISTRATION_STATE_IGNORED:
+        return "Ignored";
+    case BURN_PACKAGE_REGISTRATION_STATE_ABSENT:
+        return "Absent";
+    case BURN_PACKAGE_REGISTRATION_STATE_PRESENT:
+        return "Present";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingCacheStateToString(
     __in BURN_CACHE_STATE cacheState
     )

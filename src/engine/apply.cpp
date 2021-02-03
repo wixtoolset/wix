@@ -46,6 +46,10 @@ static HRESULT WINAPI AuthenticationRequired(
     __out BOOL* pfRetry
     );
 
+static void CalculateKeepRegistration(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __inout BOOL* pfKeepRegistration
+    );
 static HRESULT ExecuteDependentRegistrationActions(
     __in HANDLE hPipe,
     __in const BURN_REGISTRATION* pRegistration,
@@ -141,7 +145,6 @@ static HRESULT DoExecuteAction(
     __in BURN_EXECUTE_CONTEXT* pContext,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
-    __out BOOL* pfKeepRegistration,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
@@ -149,7 +152,6 @@ static HRESULT DoRollbackActions(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_CONTEXT* pContext,
     __in DWORD dwCheckpoint,
-    __out BOOL* pfKeepRegistration,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
 static HRESULT ExecuteExePackage(
@@ -165,6 +167,7 @@ static HRESULT ExecuteMsiPackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fInsideMsiTransaction,
     __in BOOL fRollback,
     __out BOOL* pfRetry,
     __out BOOL* pfSuspend,
@@ -174,6 +177,7 @@ static HRESULT ExecuteMspPackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fInsideMsiTransaction,
     __in BOOL fRollback,
     __out BOOL* pfRetry,
     __out BOOL* pfSuspend,
@@ -213,6 +217,10 @@ static HRESULT ExecuteMsiRollbackTransaction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
     __in BURN_EXECUTE_CONTEXT* pContext
+    );
+static void ResetTransactionRegistrationState(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BOOL fCommit
     );
 static HRESULT CleanPackage(
     __in HANDLE hElevatedPipe,
@@ -282,6 +290,7 @@ extern "C" void ApplyReset(
     {
         BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
         pPackage->hrCacheResult = S_OK;
+        pPackage->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
     }
 }
 
@@ -380,13 +389,15 @@ LExit:
 extern "C" HRESULT ApplyUnregister(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BOOL fFailedOrRollback,
-    __in BOOL fKeepRegistration,
     __in BOOL fSuspend,
     __in BOOTSTRAPPER_APPLY_RESTART restart
     )
 {
     HRESULT hr = S_OK;
     BURN_RESUME_MODE resumeMode = BURN_RESUME_MODE_NONE;
+    BOOL fKeepRegistration = pEngineState->plan.fDisallowRemoval;
+
+    CalculateKeepRegistration(pEngineState, &fKeepRegistration);
 
     hr = UserExperienceOnUnregisterBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted unregister begin.");
@@ -443,7 +454,7 @@ extern "C" HRESULT ApplyCache(
     __in BURN_PLAN* pPlan,
     __in HANDLE hPipe,
     __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfRollback
+    __inout BOOL* pfRollback
     )
 {
     HRESULT hr = S_OK;
@@ -732,7 +743,6 @@ extern "C" HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_opt HANDLE hCacheThread,
     __inout DWORD* pcOverallProgressTicks,
-    __inout BOOL* pfKeepRegistration,
     __out BOOL* pfRollback,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -779,7 +789,7 @@ extern "C" HRESULT ApplyExecute(
         }
 
         // Execute the action.
-        hr = DoExecuteAction(pEngineState, pExecuteAction, hCacheThread, &context, &pRollbackBoundary, &pCheckpoint, pfKeepRegistration, pfSuspend, pRestart);
+        hr = DoExecuteAction(pEngineState, pExecuteAction, hCacheThread, &context, &pRollbackBoundary, &pCheckpoint, pfSuspend, pRestart);
 
         if (*pfSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
         {
@@ -821,7 +831,7 @@ extern "C" HRESULT ApplyExecute(
             // The action failed, roll back to previous rollback boundary.
             if (pCheckpoint)
             {
-                hrRollback = DoRollbackActions(pEngineState, &context, pCheckpoint->dwId, pfKeepRegistration, pRestart);
+                hrRollback = DoRollbackActions(pEngineState, &context, pCheckpoint->dwId, pRestart);
                 IgnoreRollbackError(hrRollback, "Failed rollback actions");
             }
 
@@ -855,13 +865,45 @@ extern "C" void ApplyClean(
     for (DWORD i = 0; i < pPlan->cCleanActions; ++i)
     {
         BURN_CLEAN_ACTION* pCleanAction = pPlan->rgCleanActions + i;
+        BURN_PACKAGE* pPackage = pCleanAction->pPackage;
 
-        hr = CleanPackage(hPipe, pCleanAction->pPackage);
+        hr = CleanPackage(hPipe, pPackage);
     }
 }
 
 
 // internal helper functions
+
+static void CalculateKeepRegistration(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __inout BOOL* pfKeepRegistration
+    )
+{
+    LogId(REPORT_STANDARD, MSG_POST_APPLY_CALCULATE_REGISTRATION);
+
+    for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
+
+        LogId(REPORT_STANDARD, MSG_POST_APPLY_PACKAGE, pPackage->sczId, LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
+
+        if (!pPackage->fCanAffectRegistration)
+        {
+            continue;
+        }
+
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
+        {
+            MspEngineFinalizeInstallRegistrationState(pPackage);
+        }
+
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState ||
+            BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
+        {
+            *pfKeepRegistration = TRUE;
+        }
+    }
+}
 
 static HRESULT ExecuteDependentRegistrationActions(
     __in HANDLE hPipe,
@@ -1255,6 +1297,15 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     LARGE_INTEGER liContainerOrPayloadSize = { };
     LARGE_INTEGER liZero = { };
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
+    BOOL fCanAffectRegistration = FALSE;
+
+    if (!wzLayoutDirectory)
+    {
+        Assert(!pContainer);
+        Assert(pPackage);
+
+        fCanAffectRegistration = pPackage->fCanAffectRegistration;
+    }
 
     liContainerOrPayloadSize.QuadPart = pContainer ? pContainer->qwFileSize : pPayload->qwFileSize;
 
@@ -1297,9 +1348,6 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         }
         else // complete the payload.
         {
-            Assert(!pContainer);
-            Assert(pPackage);
-
             hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove);
         }
 
@@ -1307,6 +1355,11 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         // will get.
         if (SUCCEEDED(hr))
         {
+            if (fCanAffectRegistration)
+            {
+                pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+
             CacheProgressRoutine(liContainerOrPayloadSize, liContainerOrPayloadSize, liZero, liZero, 0, 0, INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE, &progress);
             if (progress.fCancel)
             {
@@ -1639,7 +1692,6 @@ static HRESULT DoExecuteAction(
     __in BURN_EXECUTE_CONTEXT* pContext,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
-    __out BOOL* pfKeepRegistration,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
@@ -1651,11 +1703,14 @@ static HRESULT DoExecuteAction(
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
     BOOL fRetry = FALSE;
     BOOL fStopWusaService = FALSE;
+    BOOL fInsideMsiTransaction = FALSE;
 
     pContext->fRollback = FALSE;
 
     do
     {
+        fInsideMsiTransaction = *ppRollbackBoundary && (*ppRollbackBoundary)->fActiveTransaction;
+
         switch (pExecuteAction->type)
         {
         case BURN_EXECUTE_ACTION_TYPE_CHECKPOINT:
@@ -1695,12 +1750,12 @@ static HRESULT DoExecuteAction(
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-            hr = ExecuteMsiPackage(pEngineState, pExecuteAction, pContext, FALSE, &fRetry, pfSuspend, &restart);
+            hr = ExecuteMsiPackage(pEngineState, pExecuteAction, pContext, fInsideMsiTransaction, FALSE, &fRetry, pfSuspend, &restart);
             ExitOnFailure(hr, "Failed to execute MSI package.");
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-            hr = ExecuteMspPackage(pEngineState, pExecuteAction, pContext, FALSE, &fRetry, pfSuspend, &restart);
+            hr = ExecuteMspPackage(pEngineState, pExecuteAction, pContext, fInsideMsiTransaction, FALSE, &fRetry, pfSuspend, &restart);
             ExitOnFailure(hr, "Failed to execute MSP package.");
             break;
 
@@ -1720,8 +1775,6 @@ static HRESULT DoExecuteAction(
             ExitOnFailure(hr, "Failed to execute dependency action.");
             break;
 
-        case BURN_EXECUTE_ACTION_TYPE_REGISTRATION:
-            *pfKeepRegistration = pExecuteAction->registration.fKeep;
             break;
 
         case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
@@ -1757,7 +1810,6 @@ static HRESULT DoRollbackActions(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_CONTEXT* pContext,
     __in DWORD dwCheckpoint,
-    __out BOOL* pfKeepRegistration,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
 {
@@ -1811,12 +1863,12 @@ static HRESULT DoRollbackActions(
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-                hr = ExecuteMsiPackage(pEngineState, pRollbackAction, pContext, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
+                hr = ExecuteMsiPackage(pEngineState, pRollbackAction, pContext, FALSE, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
                 IgnoreRollbackError(hr, "Failed to rollback MSI package.");
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-                hr = ExecuteMspPackage(pEngineState, pRollbackAction, pContext, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
+                hr = ExecuteMspPackage(pEngineState, pRollbackAction, pContext, FALSE, TRUE, &fRetryIgnored, &fSuspendIgnored, &restart);
                 IgnoreRollbackError(hr, "Failed to rollback MSP package.");
                 break;
 
@@ -1833,10 +1885,6 @@ static HRESULT DoRollbackActions(
             case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
                 hr = ExecuteDependencyAction(pEngineState, pRollbackAction, pContext);
                 IgnoreRollbackError(hr, "Failed to rollback dependency action.");
-                break;
-
-            case BURN_EXECUTE_ACTION_TYPE_REGISTRATION:
-                *pfKeepRegistration = pRollbackAction->registration.fKeep;
                 break;
 
             case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
@@ -1878,19 +1926,21 @@ static HRESULT ExecuteExePackage(
     GENERIC_EXECUTE_MESSAGE message = { };
     int nResult = 0;
     BOOL fBeginCalled = FALSE;
+    BOOL fExecuted = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
 
-    if (FAILED(pExecuteAction->exePackage.pPackage->hrCacheResult))
+    if (FAILED(pPackage->hrCacheResult))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pExecuteAction->exePackage.pPackage->sczId, pExecuteAction->exePackage.pPackage->hrCacheResult);
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pExecuteAction->exePackage.pPackage;
+    pContext->pExecutingPackage = pPackage;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->exePackage.pPackage->sczId, !fRollback, pExecuteAction->exePackage.action, INSTALLUILEVEL_NOCHANGE, FALSE);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->exePackage.action, INSTALLUILEVEL_NOCHANGE, FALSE);
     ExitOnRootFailure(hr, "BA aborted execute EXE package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -1900,8 +1950,10 @@ static HRESULT ExecuteExePackage(
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
     ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
+    fExecuted = TRUE;
+
     // Execute package.
-    if (pExecuteAction->exePackage.pPackage->fPerMachine)
+    if (pPackage->fPerMachine)
     {
         hrExecute = ElevationExecuteExePackage(pEngineState->companionConnection.hPipe, pExecuteAction, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-machine EXE package.");
@@ -1926,9 +1978,14 @@ static HRESULT ExecuteExePackage(
     ExitOnRootFailure(hr, "BA aborted EXE package execute progress.");
 
 LExit:
+    if (fExecuted)
+    {
+        ExeEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute);
+    }
+
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pExecuteAction->exePackage.pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -1938,6 +1995,7 @@ static HRESULT ExecuteMsiPackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fInsideMsiTransaction,
     __in BOOL fRollback,
     __out BOOL* pfRetry,
     __out BOOL* pfSuspend,
@@ -1947,23 +2005,27 @@ static HRESULT ExecuteMsiPackage(
     HRESULT hr = S_OK;
     HRESULT hrExecute = S_OK;
     BOOL fBeginCalled = FALSE;
+    BOOL fExecuted = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->msiPackage.pPackage;
 
-    if (FAILED(pExecuteAction->msiPackage.pPackage->hrCacheResult))
+    if (FAILED(pPackage->hrCacheResult))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pExecuteAction->msiPackage.pPackage->sczId, pExecuteAction->msiPackage.pPackage->hrCacheResult);
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pExecuteAction->msiPackage.pPackage;
+    pContext->pExecutingPackage = pPackage;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msiPackage.pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.uiLevel, pExecuteAction->msiPackage.fDisableExternalUiHandler);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.uiLevel, pExecuteAction->msiPackage.fDisableExternalUiHandler);
     ExitOnRootFailure(hr, "BA aborted execute MSI package begin.");
 
+    fExecuted = TRUE;
+
     // execute package
-    if (pExecuteAction->msiPackage.pPackage->fPerMachine)
+    if (pPackage->fPerMachine)
     {
         hrExecute = ElevationExecuteMsiPackage(pEngineState->companionConnection.hPipe, pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-machine MSI package.");
@@ -1981,9 +2043,14 @@ static HRESULT ExecuteMsiPackage(
     ExitOnRootFailure(hr, "BA aborted MSI package execute progress.");
 
 LExit:
+    if (fExecuted)
+    {
+        MsiEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute, fInsideMsiTransaction);
+    }
+
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pExecuteAction->msiPackage.pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -1993,6 +2060,7 @@ static HRESULT ExecuteMspPackage(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
     __in BURN_EXECUTE_CONTEXT* pContext,
+    __in BOOL fInsideMsiTransaction,
     __in BOOL fRollback,
     __out BOOL* pfRetry,
     __out BOOL* pfSuspend,
@@ -2002,19 +2070,21 @@ static HRESULT ExecuteMspPackage(
     HRESULT hr = S_OK;
     HRESULT hrExecute = S_OK;
     BOOL fBeginCalled = FALSE;
+    BOOL fExecuted = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->mspTarget.pPackage;
 
-    if (FAILED(pExecuteAction->mspTarget.pPackage->hrCacheResult))
+    if (FAILED(pPackage->hrCacheResult))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pExecuteAction->mspTarget.pPackage->sczId, pExecuteAction->mspTarget.pPackage->hrCacheResult);
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pExecuteAction->mspTarget.pPackage;
+    pContext->pExecutingPackage = pPackage;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->mspTarget.pPackage->sczId, !fRollback, pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.uiLevel, pExecuteAction->mspTarget.fDisableExternalUiHandler);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.uiLevel, pExecuteAction->mspTarget.fDisableExternalUiHandler);
     ExitOnRootFailure(hr, "BA aborted execute MSP package begin.");
 
     // Now send all the patches that target this product code.
@@ -2025,6 +2095,8 @@ static HRESULT ExecuteMspPackage(
         hr = UserExperienceOnExecutePatchTarget(&pEngineState->userExperience, pMspPackage->sczId, pExecuteAction->mspTarget.sczTargetProductCode);
         ExitOnRootFailure(hr, "BA aborted execute MSP target.");
     }
+
+    fExecuted = TRUE;
 
     // execute package
     if (pExecuteAction->mspTarget.fPerMachineTarget)
@@ -2045,9 +2117,14 @@ static HRESULT ExecuteMspPackage(
     ExitOnRootFailure(hr, "BA aborted MSP package execute progress.");
 
 LExit:
+    if (fExecuted)
+    {
+        MspEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute, fInsideMsiTransaction);
+    }
+
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pExecuteAction->mspTarget.pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2069,19 +2146,21 @@ static HRESULT ExecuteMsuPackage(
     GENERIC_EXECUTE_MESSAGE message = { };
     int nResult = 0;
     BOOL fBeginCalled = FALSE;
+    BOOL fExecuted = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->msuPackage.pPackage;
 
-    if (FAILED(pExecuteAction->msuPackage.pPackage->hrCacheResult))
+    if (FAILED(pPackage->hrCacheResult))
     {
-        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pExecuteAction->msuPackage.pPackage->sczId, pExecuteAction->msuPackage.pPackage->hrCacheResult);
+        LogId(REPORT_STANDARD, MSG_APPLY_SKIPPED_FAILED_CACHED_PACKAGE, pPackage->sczId, pPackage->hrCacheResult);
         ExitFunction1(hr = S_OK);
     }
 
     Assert(pContext->fRollback == fRollback);
-    pContext->pExecutingPackage = pExecuteAction->msuPackage.pPackage;
+    pContext->pExecutingPackage = pPackage;
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msuPackage.pPackage->sczId, !fRollback, pExecuteAction->msuPackage.action, INSTALLUILEVEL_NOCHANGE, FALSE);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pPackage->sczId, !fRollback, pExecuteAction->msuPackage.action, INSTALLUILEVEL_NOCHANGE, FALSE);
     ExitOnRootFailure(hr, "BA aborted execute MSU package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -2091,8 +2170,10 @@ static HRESULT ExecuteMsuPackage(
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
     ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
+    fExecuted = TRUE;
+
     // execute package
-    if (pExecuteAction->msuPackage.pPackage->fPerMachine)
+    if (pPackage->fPerMachine)
     {
         hrExecute = ElevationExecuteMsuPackage(pEngineState->companionConnection.hPipe, pExecuteAction, fRollback, fStopWusaService, GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-machine MSU package.");
@@ -2117,9 +2198,14 @@ static HRESULT ExecuteMsuPackage(
     ExitOnRootFailure(hr, "BA aborted MSU package execute progress.");
 
 LExit:
+    if (fExecuted)
+    {
+        MsuEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute);
+    }
+
     if (fBeginCalled)
     {
-        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pExecuteAction->msuPackage.pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
+        hr = ExecutePackageComplete(&pEngineState->userExperience, &pEngineState->variables, pPackage, hr, hrExecute, fRollback, pRestart, pfRetry, pfSuspend);
     }
 
     return hr;
@@ -2167,6 +2253,32 @@ static HRESULT ExecuteDependencyAction(
         ExitOnFailure(hr, "Failed to register the dependency on per-user package.");
     }
 
+    if (pAction->packageDependency.pPackage->fCanAffectRegistration)
+    {
+        if (BURN_DEPENDENCY_ACTION_REGISTER == pAction->packageDependency.action)
+        {
+            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->cacheRegistrationState)
+            {
+                pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->installRegistrationState)
+            {
+                pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+        }
+        else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pAction->packageDependency.action)
+        {
+            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->cacheRegistrationState)
+            {
+                pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+            }
+            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->installRegistrationState)
+            {
+                pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+            }
+        }
+    }
+
 LExit:
     return hr;
 }
@@ -2202,6 +2314,8 @@ static HRESULT ExecuteMsiBeginTransaction(
     if (SUCCEEDED(hr))
     {
         pRollbackBoundary->fActiveTransaction = TRUE;
+
+        ResetTransactionRegistrationState(pEngineState, FALSE);
     }
 
 LExit:
@@ -2244,6 +2358,8 @@ static HRESULT ExecuteMsiCommitTransaction(
     if (SUCCEEDED(hr))
     {
         pRollbackBoundary->fActiveTransaction = FALSE;
+
+        ResetTransactionRegistrationState(pEngineState, TRUE);
     }
 
 LExit:
@@ -2285,12 +2401,46 @@ static HRESULT ExecuteMsiRollbackTransaction(
 LExit:
     pRollbackBoundary->fActiveTransaction = FALSE;
 
+    ResetTransactionRegistrationState(pEngineState, FALSE);
+
     if (fBeginCalled)
     {
         UserExperienceOnRollbackMsiTransactionComplete(&pEngineState->userExperience, pRollbackBoundary->sczId, hr);
     }
 
     return hr;
+}
+
+static void ResetTransactionRegistrationState(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in BOOL fCommit
+    )
+{
+    for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
+
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
+        {
+            for (DWORD j = 0; j < pPackage->Msp.cTargetProductCodes; ++j)
+            {
+                BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + j;
+
+                if (fCommit && BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN != pTargetProduct->transactionRegistrationState)
+                {
+                    pTargetProduct->registrationState = pTargetProduct->transactionRegistrationState;
+                }
+
+                pTargetProduct->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+            }
+        }
+        else if (fCommit && BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN != pPackage->transactionRegistrationState)
+        {
+            pPackage->installRegistrationState = pPackage->transactionRegistrationState;
+        }
+
+        pPackage->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+    }
 }
 
 static HRESULT CleanPackage(
@@ -2307,6 +2457,11 @@ static HRESULT CleanPackage(
     else
     {
         hr = CacheRemovePackage(FALSE, pPackage->sczId, pPackage->sczCacheId);
+    }
+
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
     return hr;

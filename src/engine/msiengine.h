@@ -88,6 +88,11 @@ HRESULT MsiEngineCalculateInstallUiLevel(
     __out INSTALLUILEVEL* pUiLevel,
     __out BOOL* pfDisableExternalUiHandler
     );
+void MsiEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute,
+    __in BOOL fInsideMsiTransaction
+    );
 
 #if defined(__cplusplus)
 }

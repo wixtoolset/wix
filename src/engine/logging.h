@@ -89,6 +89,11 @@ LPCSTR LoggingPackageStateToString(
     __in BOOTSTRAPPER_PACKAGE_STATE packageState
     );
 
+LPCSTR LoggingPackageRegistrationStateToString(
+    __in BOOL fCanAffectRegistration,
+    __in BURN_PACKAGE_REGISTRATION_STATE registrationState
+    );
+
 LPCSTR LoggingCacheStateToString(
     __in BURN_CACHE_STATE cacheState
     );

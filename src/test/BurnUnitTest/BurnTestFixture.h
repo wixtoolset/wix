@@ -35,6 +35,8 @@ namespace Bootstrapper
 
             LogInitialize(::GetModuleHandleW(NULL));
 
+            LogSetLevel(REPORT_DEBUG, FALSE);
+
             hr = LogOpen(NULL, L"BurnUnitTest", NULL, L"txt", FALSE, FALSE, NULL);
             TestThrowOnFailure(hr, L"Failed to open log.");
         }

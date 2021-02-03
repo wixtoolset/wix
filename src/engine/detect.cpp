@@ -63,6 +63,8 @@ extern "C" void DetectReset(
 
         pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
         pPackage->fPackageProviderExists = FALSE;
+        pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
         pPackage->cache = BURN_CACHE_STATE_NONE;
         for (DWORD iPayload = 0; iPayload < pPackage->cPayloads; ++iPayload)

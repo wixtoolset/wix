@@ -156,6 +156,7 @@ extern "C" HRESULT PackagesParseFromXml(
         hr = XmlGetYesNoAttribute(pixnNode, L"Permanent", &pPackage->fUninstallable);
         ExitOnFailure(hr, "Failed to get @Permanent.");
         pPackage->fUninstallable = !pPackage->fUninstallable; // TODO: change "Uninstallable" variable name to permanent, until then Uninstallable is the opposite of Permanent so fix the variable.
+        pPackage->fCanAffectRegistration = pPackage->fUninstallable;
 
         // @Vital
         hr = XmlGetYesNoAttribute(pixnNode, L"Vital", &pPackage->fVital);

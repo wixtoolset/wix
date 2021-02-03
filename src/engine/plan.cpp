@@ -6,13 +6,6 @@
 
 // internal struct definitions
 
-struct PLAN_NONPERMANENT_PACKAGE_INDICES
-{
-    DWORD iAfterExecuteFirstNonPermanentPackage;
-    DWORD iBeforeRollbackFirstNonPermanentPackage;
-    DWORD iAfterExecuteLastNonPermanentPackage;
-    DWORD iAfterRollbackLastNonPermanentPackage;
-};
 
 // internal function definitions
 
@@ -39,8 +32,7 @@ static HRESULT ProcessPackage(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
-    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
-    __in_opt PLAN_NONPERMANENT_PACKAGE_INDICES* pNonpermanentPackageIndices
+    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
     );
 static HRESULT ProcessPackageRollbackBoundary(
     __in BURN_PLAN* pPlan,
@@ -479,7 +471,7 @@ extern "C" HRESULT PlanPackages(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOL fBundleInstalled,
+    __in BOOL /*fBundleInstalled*/,
     __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
@@ -489,12 +481,6 @@ extern "C" HRESULT PlanPackages(
     HRESULT hr = S_OK;
     BOOL fBundlePerMachine = pPlan->fPerMachine; // bundle is per-machine if plan starts per-machine.
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
-
-    PLAN_NONPERMANENT_PACKAGE_INDICES nonpermanentPackageIndices;
-    nonpermanentPackageIndices.iAfterExecuteFirstNonPermanentPackage = BURN_PLAN_INVALID_ACTION_INDEX;
-    nonpermanentPackageIndices.iBeforeRollbackFirstNonPermanentPackage = BURN_PLAN_INVALID_ACTION_INDEX;
-    nonpermanentPackageIndices.iAfterExecuteLastNonPermanentPackage = BURN_PLAN_INVALID_ACTION_INDEX;
-    nonpermanentPackageIndices.iAfterRollbackLastNonPermanentPackage = BURN_PLAN_INVALID_ACTION_INDEX;
 
     // Plan the packages.
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
@@ -518,32 +504,8 @@ extern "C" HRESULT PlanPackages(
             }
         }
 
-        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
+        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary);
         ExitOnFailure(hr, "Failed to process package.");
-    }
-
-    // Insert the "keep registration" and "remove registration" actions in the plan when installing the first time and anytime we are uninstalling respectively.
-    if (!fBundleInstalled && (BOOTSTRAPPER_ACTION_INSTALL == pPlan->action || BOOTSTRAPPER_ACTION_MODIFY == pPlan->action || BOOTSTRAPPER_ACTION_REPAIR == pPlan->action))
-    {
-        if (BURN_PLAN_INVALID_ACTION_INDEX == nonpermanentPackageIndices.iAfterExecuteFirstNonPermanentPackage)
-        {
-            nonpermanentPackageIndices.iAfterExecuteFirstNonPermanentPackage = pPlan->cExecuteActions;
-            nonpermanentPackageIndices.iBeforeRollbackFirstNonPermanentPackage = pPlan->cRollbackActions;
-        }
-
-        hr = PlanKeepRegistration(pPlan, nonpermanentPackageIndices.iAfterExecuteFirstNonPermanentPackage, nonpermanentPackageIndices.iBeforeRollbackFirstNonPermanentPackage);
-        ExitOnFailure(hr, "Failed to plan install keep registration.");
-    }
-    else if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
-    {
-        if (BURN_PLAN_INVALID_ACTION_INDEX == nonpermanentPackageIndices.iAfterExecuteLastNonPermanentPackage)
-        {
-            nonpermanentPackageIndices.iAfterExecuteLastNonPermanentPackage = pPlan->cExecuteActions;
-            nonpermanentPackageIndices.iAfterRollbackLastNonPermanentPackage = pPlan->cRollbackActions;
-        }
-
-        hr = PlanRemoveRegistration(pPlan, nonpermanentPackageIndices.iAfterExecuteLastNonPermanentPackage, nonpermanentPackageIndices.iAfterRollbackLastNonPermanentPackage);
-        ExitOnFailure(hr, "Failed to plan uninstall remove registration.");
     }
 
     // If we still have an open rollback boundary, complete it.
@@ -572,9 +534,9 @@ LExit:
 extern "C" HRESULT PlanRegistration(
     __in BURN_PLAN* pPlan,
     __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_RESUME_TYPE resumeType,
+    __in BOOTSTRAPPER_RESUME_TYPE /*resumeType*/,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __out BOOL* pfContinuePlanning
+    __inout BOOL* pfContinuePlanning
     )
 {
     HRESULT hr = S_OK;
@@ -582,9 +544,6 @@ extern "C" HRESULT PlanRegistration(
     STRINGDICT_HANDLE sdIgnoreDependents = NULL;
 
     pPlan->fRegister = TRUE; // register the bundle since we're modifying machine state.
-
-    // Keep the registration if the bundle was already installed or we are planning after a restart.
-    pPlan->fKeepRegistrationDefault = (pRegistration->fInstalled || BOOTSTRAPPER_RESUME_TYPE_REBOOT == resumeType);
 
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
 
@@ -692,7 +651,7 @@ extern "C" HRESULT PlanRegistration(
             pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
             pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
         }
-        else if (BOOTSTRAPPER_ACTION_REPAIR == pPlan->action && !CacheBundleRunningFromCache()) // repairing but not not running from the cache.
+        else if (BOOTSTRAPPER_ACTION_REPAIR == pPlan->action && !CacheBundleRunningFromCache()) // repairing but not running from the cache.
         {
             pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
             pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
@@ -786,7 +745,7 @@ extern "C" HRESULT PlanPassThroughBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan passthrough package.
-    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to process passthrough package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -820,7 +779,7 @@ extern "C" HRESULT PlanUpdateBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan update package.
-    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to process update package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -849,8 +808,7 @@ static HRESULT ProcessPackage(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
-    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
-    __in_opt PLAN_NONPERMANENT_PACKAGE_INDICES* pNonpermanentPackageIndices
+    __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
     )
 {
     HRESULT hr = S_OK;
@@ -871,6 +829,12 @@ static HRESULT ProcessPackage(
     hr = ProcessPackageRollbackBoundary(pPlan, pEffectiveRollbackBoundary, ppRollbackBoundary);
     ExitOnFailure(hr, "Failed to process package rollback boundary.");
 
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->expectedCacheRegistrationState = pPackage->cacheRegistrationState;
+        pPackage->expectedInstallRegistrationState = pPackage->installRegistrationState;
+    }
+
     // If the package is in a requested state, plan it.
     if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
     {
@@ -881,26 +845,19 @@ static HRESULT ProcessPackage(
         }
         else
         {
-            if (pPackage->fUninstallable && pNonpermanentPackageIndices)
-            {
-                if (BURN_PLAN_INVALID_ACTION_INDEX == pNonpermanentPackageIndices->iBeforeRollbackFirstNonPermanentPackage)
-                {
-                    pNonpermanentPackageIndices->iBeforeRollbackFirstNonPermanentPackage = pPlan->cRollbackActions;
-                }
-            }
-
             hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
             ExitOnFailure(hr, "Failed to plan execute package.");
 
-            if (pPackage->fUninstallable && pNonpermanentPackageIndices)
+            if (pPackage->fCanAffectRegistration)
             {
-                if (BURN_PLAN_INVALID_ACTION_INDEX == pNonpermanentPackageIndices->iAfterExecuteFirstNonPermanentPackage)
+                if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pPackage->execute)
                 {
-                    pNonpermanentPackageIndices->iAfterExecuteFirstNonPermanentPackage = pPlan->cExecuteActions - 1;
+                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
                 }
-
-                pNonpermanentPackageIndices->iAfterExecuteLastNonPermanentPackage = pPlan->cExecuteActions;
-                pNonpermanentPackageIndices->iAfterRollbackLastNonPermanentPackage = pPlan->cRollbackActions;
+                else if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+                {
+                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+                }
             }
         }
     }
@@ -917,6 +874,32 @@ static HRESULT ProcessPackage(
             // Make sure the package is properly ref-counted even if no plan is requested.
             hr = PlanDependencyActions(fBundlePerMachine, pPlan, pPackage);
             ExitOnFailure(hr, "Failed to plan dependency actions for package: %ls", pPackage->sczId);
+        }
+    }
+
+    if (pPackage->fCanAffectRegistration)
+    {
+        if (BURN_DEPENDENCY_ACTION_REGISTER == pPackage->dependencyExecute)
+        {
+            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedCacheRegistrationState)
+            {
+                pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedInstallRegistrationState)
+            {
+                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+        }
+        else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pPackage->dependencyExecute)
+        {
+            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedCacheRegistrationState)
+            {
+                pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+            }
+            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedInstallRegistrationState)
+            {
+                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+            }
         }
     }
 
@@ -1572,6 +1555,11 @@ extern "C" HRESULT PlanCleanPackage(
         pCleanAction->pPackage = pPackage;
 
         pPackage->fUncache = TRUE;
+
+        if (pPackage->fCanAffectRegistration)
+        {
+            pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+        }
     }
 
 LExit:
@@ -1703,68 +1691,6 @@ extern "C" HRESULT PlanAppendRollbackAction(
 
     *ppRollbackAction = pPlan->rgRollbackActions + pPlan->cRollbackActions;
     ++pPlan->cRollbackActions;
-
-LExit:
-    return hr;
-}
-
-extern "C" HRESULT PlanKeepRegistration(
-    __in BURN_PLAN* pPlan,
-    __in DWORD iAfterExecutePackageAction,
-    __in DWORD iBeforeRollbackPackageAction
-    )
-{
-    HRESULT hr = S_OK;
-    BURN_EXECUTE_ACTION* pAction = NULL;
-
-    if (BURN_PLAN_INVALID_ACTION_INDEX != iAfterExecutePackageAction)
-    {
-        hr = PlanInsertExecuteAction(iAfterExecutePackageAction, pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to insert keep registration execute action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_REGISTRATION;
-        pAction->registration.fKeep = TRUE;
-    }
-
-    if (BURN_PLAN_INVALID_ACTION_INDEX != iBeforeRollbackPackageAction)
-    {
-        hr = PlanInsertRollbackAction(iBeforeRollbackPackageAction, pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to insert keep registration rollback action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_REGISTRATION;
-        pAction->registration.fKeep = FALSE;
-    }
-
-LExit:
-    return hr;
-}
-
-extern "C" HRESULT PlanRemoveRegistration(
-    __in BURN_PLAN* pPlan,
-    __in DWORD iAfterExecutePackageAction,
-    __in DWORD iAfterRollbackPackageAction
-    )
-{
-    HRESULT hr = S_OK;
-    BURN_EXECUTE_ACTION* pAction = NULL;
-
-    if (BURN_PLAN_INVALID_ACTION_INDEX != iAfterExecutePackageAction)
-    {
-        hr = PlanInsertExecuteAction(iAfterExecutePackageAction, pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to insert remove registration execute action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_REGISTRATION;
-        pAction->registration.fKeep = FALSE;
-    }
-
-    if (BURN_PLAN_INVALID_ACTION_INDEX != iAfterRollbackPackageAction)
-    {
-        hr = PlanInsertRollbackAction(iAfterRollbackPackageAction, pPlan, &pAction);
-        ExitOnFailure(hr, "Failed to insert remove registration rollback action.");
-
-        pAction->type = BURN_EXECUTE_ACTION_TYPE_REGISTRATION;
-        pAction->registration.fKeep = TRUE;
-    }
 
 LExit:
     return hr;
@@ -1925,6 +1851,8 @@ static void ResetPlannedPackageState(
     pPackage->dependencyExecute = BURN_DEPENDENCY_ACTION_NONE;
     pPackage->dependencyRollback = BURN_DEPENDENCY_ACTION_NONE;
     pPackage->fDependencyManagerWasHere = FALSE;
+    pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
     if (BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.rgFeatures)
     {
@@ -2197,6 +2125,11 @@ static HRESULT AddCachePackageHelper(
     // If the package was not already fully cached then note that we planned the cache here. Otherwise, we only
     // did cache operations to verify the cache is valid so we did not plan the acquisition of the package.
     pPackage->fAcquire = (BURN_CACHE_STATE_COMPLETE != pPackage->cache);
+
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+    }
 
 LExit:
     return hr;
@@ -3118,10 +3051,6 @@ static void ExecuteActionLog(
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSU_PACKAGE package id: %ls, action: %hs, log path: %ls", wzBase, iAction, pAction->msuPackage.pPackage->sczId, LoggingActionStateToString(pAction->msuPackage.action), pAction->msuPackage.sczLogPath);
         break;
 
-    case BURN_EXECUTE_ACTION_TYPE_REGISTRATION:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: REGISTRATION keep: %ls", wzBase, iAction, pAction->registration.fKeep ? L"yes" : L"no");
-        break;
-
     case BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: ROLLBACK_BOUNDARY id: %ls, vital: %ls", wzBase, iAction, pAction->rollbackBoundary.pRollbackBoundary->sczId, pAction->rollbackBoundary.pRollbackBoundary->fVital ? L"yes" : L"no");
         break;
@@ -3157,7 +3086,6 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
     LogStringLine(PlanDumpLevel, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
     LogStringLine(PlanDumpLevel, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));
-    LogStringLine(PlanDumpLevel, "     keep registration by default: %hs", LoggingTrueFalseToString(pPlan->fKeepRegistrationDefault));
     LogStringLine(PlanDumpLevel, "     estimated size: %llu", pPlan->qwEstimatedSize);
 
     LogStringLine(PlanDumpLevel, "Plan cache size: %llu", pPlan->qwCacheSizeTotal);

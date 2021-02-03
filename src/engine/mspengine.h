@@ -62,6 +62,14 @@ void MspEngineSlipstreamUpdateState(
     __in BOOTSTRAPPER_ACTION_STATE execute,
     __in BOOTSTRAPPER_ACTION_STATE rollback
     );
+void MspEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute,
+    __in BOOL fInsideMsiTransaction
+    );
+void MspEngineFinalizeInstallRegistrationState(
+    __in BURN_PACKAGE* pPackage
+    );
 
 
 #if defined(__cplusplus)

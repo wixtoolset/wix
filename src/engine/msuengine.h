@@ -41,6 +41,10 @@ HRESULT MsuEngineExecutePackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+void MsuEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute
+    );
 
 
 #if defined(__cplusplus)

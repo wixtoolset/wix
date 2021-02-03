@@ -708,6 +708,9 @@ static HRESULT DetectPackageDependents(
 {
     HRESULT hr = S_OK;
     HKEY hkHive = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    BOOL fCanIgnorePresence = pPackage->fCanAffectRegistration && 0 < pPackage->cDependencyProviders &&
+                              (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState || BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState);
+    BOOL fBundleRegisteredAsDependent = FALSE;
 
     // There's currently no point in getting the dependents if the scope doesn't match,
     // because they will just get ignored.
@@ -729,6 +732,20 @@ static HRESULT DetectPackageDependents(
             {
                 pPackage->fPackageProviderExists = TRUE;
             }
+
+            if (fCanIgnorePresence && !fBundleRegisteredAsDependent)
+            {
+                for (DWORD iDependent = 0; iDependent < pProvider->cDependents; ++iDependent)
+                {
+                    DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
+
+                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pDependent->sczKey, -1))
+                    {
+                        fBundleRegisteredAsDependent = TRUE;
+                        break;
+                    }
+                }
+            }
         }
         else
         {
@@ -745,6 +762,18 @@ static HRESULT DetectPackageDependents(
     if (!pPackage->fPackageProviderExists && BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.sczProductCode && GetProviderExists(hkHive, pPackage->Msi.sczProductCode))
     {
         pPackage->fPackageProviderExists = TRUE;
+    }
+
+    if (fCanIgnorePresence && !fBundleRegisteredAsDependent)
+    {
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
+        {
+            pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+        }
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState)
+        {
+            pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+        }
     }
 
 LExit:

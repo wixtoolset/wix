@@ -64,7 +64,6 @@ enum BURN_EXECUTE_ACTION_TYPE
     BURN_EXECUTE_ACTION_TYPE_PACKAGE_PROVIDER,
     BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY,
     BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY,
-    BURN_EXECUTE_ACTION_TYPE_REGISTRATION,
     BURN_EXECUTE_ACTION_TYPE_BEGIN_MSI_TRANSACTION,
     BURN_EXECUTE_ACTION_TYPE_COMMIT_MSI_TRANSACTION,
 };
@@ -282,10 +281,6 @@ typedef struct _BURN_EXECUTE_ACTION
         } msuPackage;
         struct
         {
-            BOOL fKeep;
-        } registration;
-        struct
-        {
             BURN_ROLLBACK_BOUNDARY* pRollbackBoundary;
         } rollbackBoundary;
         struct
@@ -319,7 +314,6 @@ typedef struct _BURN_PLAN
     BOOL fPerMachine;
     BOOL fRegister;
     DWORD dwRegistrationOperations;
-    BOOL fKeepRegistrationDefault;
     BOOL fDisallowRemoval;
     BOOL fDisableRollback;
 
@@ -418,7 +412,7 @@ HRESULT PlanRegistration(
     __in BURN_REGISTRATION* pRegistration,
     __in BOOTSTRAPPER_RESUME_TYPE resumeType,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __out BOOL* pfContinuePlanning
+    __inout BOOL* pfContinuePlanning
     );
 HRESULT PlanPassThroughBundle(
     __in BURN_USER_EXPERIENCE* pUX,
@@ -518,16 +512,6 @@ HRESULT PlanAppendExecuteAction(
 HRESULT PlanAppendRollbackAction(
     __in BURN_PLAN* pPlan,
     __out BURN_EXECUTE_ACTION** ppExecuteAction
-    );
-HRESULT PlanKeepRegistration(
-    __in BURN_PLAN* pPlan,
-    __in DWORD iAfterExecutePackageAction,
-    __in DWORD iBeforeRollbackPackageAction
-    );
-HRESULT PlanRemoveRegistration(
-    __in BURN_PLAN* pPlan,
-    __in DWORD iAfterExecutePackageAction,
-    __in DWORD iAfterRollbackPackageAction
     );
 HRESULT PlanRollbackBoundaryBegin(
     __in BURN_PLAN* pPlan,

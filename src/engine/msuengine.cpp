@@ -69,6 +69,11 @@ extern "C" HRESULT MsuEngineDetectPackage(
     // update detect state
     pPackage->currentState = fDetected ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
 
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+
 LExit:
     return hr;
 }
@@ -422,6 +427,31 @@ LExit:
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, NULL, TRUE, FALSE);
 
     return hr;
+}
+
+extern "C" void MsuEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute
+    )
+{
+    BURN_PACKAGE* pPackage = pAction->msuPackage.pPackage;
+
+    if (FAILED(hrExecute) || !pPackage->fCanAffectRegistration)
+    {
+        ExitFunction();
+    }
+
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pAction->msuPackage.action)
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+    else
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+    }
+
+LExit:
+    return;
 }
 
 static HRESULT EnsureWUServiceEnabled(

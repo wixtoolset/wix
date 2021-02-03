@@ -331,6 +331,8 @@ extern "C" HRESULT CoreDetect(
             }
 
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
+            pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+            pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
         }
     }
 
@@ -342,7 +344,7 @@ extern "C" HRESULT CoreDetect(
     {
         pPackage = pEngineState->packages.rgPackages + iPackage;
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingCacheStateToString(pPackage->cache));
+        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingCacheStateToString(pPackage->cache), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {
@@ -565,7 +567,6 @@ extern "C" HRESULT CoreApply(
     BOOL fApplyInitialize = FALSE;
     BOOL fElevated = FALSE;
     BOOL fRegistered = FALSE;
-    BOOL fKeepRegistration = pEngineState->plan.fKeepRegistrationDefault;
     BOOL fRollback = FALSE;
     BOOL fSuspend = FALSE;
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
@@ -652,9 +653,9 @@ extern "C" HRESULT CoreApply(
     // Register.
     if (pEngineState->plan.fRegister)
     {
+        fRegistered = TRUE;
         hr = ApplyRegister(pEngineState);
         ExitOnFailure(hr, "Failed to register bundle.");
-        fRegistered = TRUE;
     }
 
     // Cache.
@@ -681,7 +682,7 @@ extern "C" HRESULT CoreApply(
     // Execute.
     if (pEngineState->plan.cExecuteActions)
     {
-        hr = ApplyExecute(pEngineState, hCacheThread, &cOverallProgressTicks, &fKeepRegistration, &fRollback, &fSuspend, &restart);
+        hr = ApplyExecute(pEngineState, hCacheThread, &cOverallProgressTicks, &fRollback, &fSuspend, &restart);
         UserExperienceExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that execute completed.
     }
 
@@ -711,7 +712,7 @@ LExit:
     // Unregister.
     if (fRegistered)
     {
-        ApplyUnregister(pEngineState, FAILED(hr) || fRollback, fKeepRegistration || pEngineState->plan.fDisallowRemoval, fSuspend, restart);
+        ApplyUnregister(pEngineState, FAILED(hr) || fRollback, fSuspend, restart);
     }
 
     if (fElevated)
@@ -1611,6 +1612,11 @@ static HRESULT DetectPackagePayloadsCached(
 
     pPackage->cache = cache;
 
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->cacheRegistrationState = BURN_CACHE_STATE_NONE < pPackage->cache ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+
 LExit:
     ReleaseStr(sczPayloadCachePath);
     ReleaseStr(sczCachePath);
@@ -1703,7 +1709,7 @@ static void LogPackages(
             const DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == action) ? pPackages->cPackages - 1 - i : i;
             const BURN_PACKAGE* pPackage = &pPackages->rgPackages[iPackage];
 
-            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingBoolToString(pPackage->fAcquire), LoggingBoolToString(pPackage->fUncache), LoggingDependencyActionToString(pPackage->dependencyExecute));
+            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingBoolToString(pPackage->fAcquire), LoggingBoolToString(pPackage->fUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
         }
 
         // Display related bundles last if caching, installing, modifying, or repairing.

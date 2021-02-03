@@ -188,7 +188,7 @@ MessageId=101
 Severity=Success
 SymbolicName=MSG_DETECTED_PACKAGE
 Language=English
-Detected package: %1!ls!, state: %2!hs!, cached: %3!hs!
+Detected package: %1!ls!, state: %2!hs!, cached: %3!hs!, install registration state: %4!hs!, cache registration state: %5!hs!
 .
 
 MessageId=102
@@ -300,7 +300,7 @@ MessageId=201
 Severity=Success
 SymbolicName=MSG_PLANNED_PACKAGE
 Language=English
-Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, cache: %7!hs!, uncache: %8!hs!, dependency: %9!hs!
+Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, cache: %7!hs!, uncache: %8!hs!, dependency: %9!hs!, expected install registration state: %10!hs!, expected cache registration state: %11!hs!
 .
 
 MessageId=202
@@ -827,6 +827,21 @@ Severity=Success
 SymbolicName=MSG_SESSION_END
 Language=English
 Session end, registration key: %1!ls!, resume: %2!hs!, restart: %3!hs!, disable resume: %4!hs!
+.
+
+MessageId=373
+Severity=Success
+SymbolicName=MSG_POST_APPLY_CALCULATE_REGISTRATION
+Language=English
+Calculating whether to keep registration
+.
+
+
+MessageId=374
+Severity=Success
+SymbolicName=MSG_POST_APPLY_PACKAGE
+Language=English
+  package: %1!ls!, install registration state: %2!hs!, cache registration state: %3!hs!
 .
 
 MessageId=380

@@ -200,20 +200,26 @@ extern "C" HRESULT MspEngineDetectPackage(
     HRESULT hr = S_OK;
     LPWSTR sczState = NULL;
 
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+
     if (0 == pPackage->Msp.cTargetProductCodes)
     {
         pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
     }
     else
     {
-        // Start the package state at the the highest state then loop through all the
+        // Start the package state at the highest state then loop through all the
         // target product codes and end up setting the current state to the lowest
-        // package state applied to the the target product codes.
+        // package state applied to the target product codes.
         pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
 
         for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
         {
             BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+            BOOL fInstalled = FALSE;
 
             hr = WiuGetPatchInfoEx(pPackage->Msp.sczPatchCode, pTargetProduct->wzTargetProductCode, NULL, pTargetProduct->context, INSTALLPROPERTY_PATCHSTATE, &sczState);
             if (SUCCEEDED(hr))
@@ -221,14 +227,17 @@ extern "C" HRESULT MspEngineDetectPackage(
                 switch (*sczState)
                 {
                 case '1':
+                    fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
                     break;
 
                 case '2':
+                    fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
                     break;
 
                 case '4':
+                    fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
                     break;
 
@@ -247,6 +256,16 @@ extern "C" HRESULT MspEngineDetectPackage(
             if (pPackage->currentState > pTargetProduct->patchPackageState)
             {
                 pPackage->currentState = pTargetProduct->patchPackageState;
+            }
+
+            if (pPackage->fCanAffectRegistration)
+            {
+                pTargetProduct->registrationState = fInstalled ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+
+                if (fInstalled)
+                {
+                    pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                }
             }
 
             hr = UserExperienceOnDetectTargetMsiPackage(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, pTargetProduct->patchPackageState);
@@ -638,6 +657,92 @@ extern "C" void MspEngineSlipstreamUpdateState(
         if (pPackage->rollback < rollback)
         {
             pPackage->rollback = rollback;
+        }
+    }
+}
+
+extern "C" void MspEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute,
+    __in BOOL fInsideMsiTransaction
+    )
+{
+    BURN_PACKAGE_REGISTRATION_STATE newState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+
+    if (FAILED(hrExecute))
+    {
+        ExitFunction();
+    }
+
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pAction->mspTarget.action)
+    {
+        newState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+    else
+    {
+        newState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+    }
+
+    for (DWORD i = 0; i < pAction->mspTarget.cOrderedPatches; ++i)
+    {
+        BURN_ORDERED_PATCHES* pOrderedPatches = pAction->mspTarget.rgOrderedPatches + i;
+        BURN_PACKAGE* pPackage = pOrderedPatches->pPackage;
+        BURN_MSPTARGETPRODUCT* pTargetProduct = NULL;
+
+        Assert(BURN_PACKAGE_TYPE_MSP == pPackage->type);
+
+        if (!pPackage->fCanAffectRegistration)
+        {
+            continue;
+        }
+
+        for (DWORD j = 0; j < pPackage->Msp.cTargetProductCodes; ++j)
+        {
+            pTargetProduct = pPackage->Msp.rgTargetProducts + j;
+            if (pAction->mspTarget.fPerMachineTarget == (MSIINSTALLCONTEXT_MACHINE == pTargetProduct->context) &&
+                CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pAction->mspTarget.sczTargetProductCode, -1, pTargetProduct->wzTargetProductCode, -1))
+            {
+                break;
+            }
+
+            pTargetProduct = NULL;
+        }
+
+        if (!pTargetProduct)
+        {
+            AssertSz(pTargetProduct, "Ordered patch didn't have corresponding target product");
+            continue;
+        }
+
+        if (fInsideMsiTransaction)
+        {
+            pTargetProduct->transactionRegistrationState = newState;
+        }
+        else
+        {
+            pTargetProduct->registrationState = newState;
+        }
+    }
+
+LExit:
+    return;
+}
+
+extern "C" void MspEngineFinalizeInstallRegistrationState(
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    Assert(pPackage->fCanAffectRegistration);
+    pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+
+    for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
+    {
+        BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pTargetProduct->registrationState)
+        {
+            pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            break;
         }
     }
 }

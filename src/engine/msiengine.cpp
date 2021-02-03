@@ -661,6 +661,11 @@ extern "C" HRESULT MsiEngineDetectPackage(
         }
     }
 
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+
 LExit:
     ReleaseStr(sczInstalledLanguage);
     ReleaseStr(sczInstalledVersion);
@@ -1395,6 +1400,42 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
     }
 
     return UserExperienceOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler);
+}
+
+extern "C" void MsiEngineUpdateInstallRegistrationState(
+    __in BURN_EXECUTE_ACTION* pAction,
+    __in HRESULT hrExecute,
+    __in BOOL fInsideMsiTransaction
+    )
+{
+    BURN_PACKAGE_REGISTRATION_STATE newState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
+    BURN_PACKAGE* pPackage = pAction->msiPackage.pPackage;
+
+    if (FAILED(hrExecute) || !pPackage->fCanAffectRegistration)
+    {
+        ExitFunction();
+    }
+
+    if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pAction->msiPackage.action)
+    {
+        newState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+    else
+    {
+        newState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+    }
+
+    if (fInsideMsiTransaction)
+    {
+        pPackage->transactionRegistrationState = newState;
+    }
+    else
+    {
+        pPackage->installRegistrationState = newState;
+    }
+
+LExit:
+    return;
 }
 
 
