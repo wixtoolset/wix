@@ -111,7 +111,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/4753")]
+        [Fact]
         public void PopulatesRegistryTableWithoutExtraBackslash()
         {
             var folder = TestData.Get(@"TestData");

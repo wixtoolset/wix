@@ -1576,6 +1576,7 @@ namespace WixToolset.Core
                         {
                             key = Path.Combine(parentKey, key);
                         }
+                        key = key?.TrimEnd('\\');
                         break;
                     case "Root":
                         if (root.HasValue)
