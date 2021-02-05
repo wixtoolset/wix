@@ -90,11 +90,6 @@ namespace WixToolset.Mba.Core
         event EventHandler<DetectBeginEventArgs> DetectBegin;
 
         /// <summary>
-        /// Fired when a package was not detected but a package using the same provider key was.
-        /// </summary>
-        event EventHandler<DetectCompatibleMsiPackageEventArgs> DetectCompatibleMsiPackage;
-
-        /// <summary>
         /// Fired when the detection phase has completed.
         /// </summary>
         event EventHandler<DetectCompleteEventArgs> DetectComplete;
@@ -228,16 +223,6 @@ namespace WixToolset.Mba.Core
         /// Fired when the engine has begun planning the installation.
         /// </summary>
         event EventHandler<PlanBeginEventArgs> PlanBegin;
-
-        /// <summary>
-        /// Fired when the engine plans a new, compatible package using the same provider key.
-        /// </summary>
-        event EventHandler<PlanCompatibleMsiPackageBeginEventArgs> PlanCompatibleMsiPackageBegin;
-
-        /// <summary>
-        /// Fired when the engine has completed planning the installation of a specific package.
-        /// </summary>
-        event EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> PlanCompatibleMsiPackageComplete;
 
         /// <summary>
         /// Fired when the engine has completed planning the installation.

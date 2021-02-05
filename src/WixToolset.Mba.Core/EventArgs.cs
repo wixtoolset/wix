@@ -489,43 +489,6 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when a package was not found but a newer package using the same provider key was.
-    /// </summary>
-    [Serializable]
-    public class DetectCompatibleMsiPackageEventArgs : CancellableHResultEventArgs
-    {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectCompatibleMsiPackageEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that was not detected.</param>
-        /// <param name="compatiblePackageId">The identity of the compatible package that was detected.</param>
-        /// <param name="compatiblePackageVersion">The version of the compatible package that was detected.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectCompatibleMsiPackageEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, bool cancelRecommendation)
-            : base(cancelRecommendation)
-        {
-            this.PackageId = packageId;
-            this.CompatiblePackageId = compatiblePackageId;
-            this.CompatiblePackageVersion = compatiblePackageVersion;
-        }
-
-        /// <summary>
-        /// Gets the identity of the package that was not detected.
-        /// </summary>
-        public string PackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the identity of the compatible package that was detected.
-        /// </summary>
-        public string CompatiblePackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the version of the compatible package that was detected.
-        /// </summary>
-        public string CompatiblePackageVersion { get; private set; }
-    }
-
-    /// <summary>
     /// Additional arguments used when a related MSI package has been detected for a package.
     /// </summary>
     [Serializable]
@@ -695,10 +658,17 @@ namespace WixToolset.Mba.Core
         /// Creates a new instance of the <see cref="DetectCompleteEventArgs"/> class.
         /// </summary>
         /// <param name="hrStatus">The return code of the operation.</param>
-        public DetectCompleteEventArgs(int hrStatus)
+        /// <param name="eligibleForCleanup"></param>
+        public DetectCompleteEventArgs(int hrStatus, bool eligibleForCleanup)
             : base(hrStatus)
         {
+            this.EligibleForCleanup = eligibleForCleanup;
         }
+
+        /// <summary>
+        /// Indicates whether the engine will uninstall the bundle if shutdown without running Apply.
+        /// </summary>
+        public bool EligibleForCleanup { get; private set; }
     }
 
     /// <summary>
@@ -796,115 +766,6 @@ namespace WixToolset.Mba.Core
         /// Gets or sets the requested state for the package.
         /// </summary>
         public RequestState State { get; set; }
-    }
-
-    /// <summary>
-    /// Additional arguments used when the engine is about to plan a newer package using the same provider key.
-    /// </summary>
-    [Serializable]
-    public class PlanCompatibleMsiPackageBeginEventArgs : CancellableHResultEventArgs
-    {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanCompatibleMsiPackageBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that was not detected.</param>
-        /// <param name="compatiblePackageId">The identity of the compatible package that was detected.</param>
-        /// <param name="compatiblePackageVersion">The version of the compatible package that was detected.</param>
-        /// <param name="recommendedState">The recommended request state for the compatible package.</param>
-        /// <param name="state">The requested state for the compatible package.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public PlanCompatibleMsiPackageBeginEventArgs(string packageId, string compatiblePackageId, string compatiblePackageVersion, RequestState recommendedState, RequestState state, bool cancelRecommendation)
-            : base(cancelRecommendation)
-        {
-            this.PackageId = packageId;
-            this.CompatiblePackageId = compatiblePackageId;
-            this.CompatiblePackageVersion = compatiblePackageVersion;
-            this.RecommendedState = recommendedState;
-            this.State = state;
-        }
-
-        /// <summary>
-        /// Gets the identity of the package that was not detected.
-        /// </summary>
-        public string PackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the identity of the compatible package detected.
-        /// </summary>
-        public string CompatiblePackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the version of the compatible package detected.
-        /// </summary>
-        public string CompatiblePackageVersion { get; private set; }
-
-        /// <summary>
-        /// Gets the recommended state to use for the compatible package for planning.
-        /// </summary>
-        public RequestState RecommendedState { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the state to use for the compatible package for planning.
-        /// </summary>
-        public RequestState State { get; set; }
-    }
-
-    /// <summary>
-    /// Additional arguments used when the engine has completed planning the installation of a specific package.
-    /// </summary>
-    [Serializable]
-    public class PlanCompatibleMsiPackageCompleteEventArgs : StatusEventArgs
-    {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanCompatibleMsiPackageCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package planned for.</param>
-        /// <param name="compatiblePackageId">The identity of the compatible package that was detected.</param>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="state">The current state of the package.</param>
-        /// <param name="requested">The requested state for the package</param>
-        /// <param name="execute">The execution action to take.</param>
-        /// <param name="rollback">The rollback action to take.</param>
-        public PlanCompatibleMsiPackageCompleteEventArgs(string packageId, string compatiblePackageId, int hrStatus, PackageState state, RequestState requested, ActionState execute, ActionState rollback)
-            : base(hrStatus)
-        {
-            this.PackageId = packageId;
-            this.CompatiblePackageId = compatiblePackageId;
-            this.State = state;
-            this.Requested = requested;
-            this.Execute = execute;
-            this.Rollback = rollback;
-        }
-
-        /// <summary>
-        /// Gets the identity of the package planned for.
-        /// </summary>
-        public string PackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the identity of the compatible package detected.
-        /// </summary>
-        public string CompatiblePackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the current state of the package.
-        /// </summary>
-        public PackageState State { get; private set; }
-
-        /// <summary>
-        /// Gets the requested state for the package.
-        /// </summary>
-        public RequestState Requested { get; private set; }
-
-        /// <summary>
-        /// Gets the execution action to take.
-        /// </summary>
-        public ActionState Execute { get; private set; }
-
-        /// <summary>
-        /// Gets the rollback action to take.
-        /// </summary>
-        public ActionState Rollback { get; private set; }
     }
 
     /// <summary>

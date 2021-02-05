@@ -63,9 +63,6 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<DetectPackageBeginEventArgs> DetectPackageBegin;
-
-        /// <inheritdoc/>
-        public event EventHandler<DetectCompatibleMsiPackageEventArgs> DetectCompatibleMsiPackage;
         
         /// <inheritdoc/>
         public event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
@@ -90,12 +87,6 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
-
-        /// <inheritdoc/>
-        public event EventHandler<PlanCompatibleMsiPackageBeginEventArgs> PlanCompatibleMsiPackageBegin;
-
-        /// <inheritdoc/>
-        public event EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> PlanCompatibleMsiPackageComplete;
 
         /// <inheritdoc/>
         public event EventHandler<PlanTargetMsiPackageEventArgs> PlanTargetMsiPackage;
@@ -388,19 +379,6 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine, raises the <see cref="DetectCompatibleMsiPackage"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnDetectCompatibleMsiPackage(DetectCompatibleMsiPackageEventArgs args)
-        {
-            EventHandler<DetectCompatibleMsiPackageEventArgs> handler = this.DetectCompatibleMsiPackage;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-        }
-
-        /// <summary>
         /// Called by the engine, raises the <see cref="DetectRelatedMsiPackage"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
@@ -498,32 +476,6 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanPackageBegin(PlanPackageBeginEventArgs args)
         {
             EventHandler<PlanPackageBeginEventArgs> handler = this.PlanPackageBegin;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-        }
-
-        /// <summary>
-        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageBegin"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnPlanCompatibleMsiPackageBegin(PlanCompatibleMsiPackageBeginEventArgs args)
-        {
-            EventHandler<PlanCompatibleMsiPackageBeginEventArgs> handler = this.PlanCompatibleMsiPackageBegin;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-        }
-
-        /// <summary>
-        /// Called by the engine, raises the <see cref="PlanCompatibleMsiPackageComplete"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnPlanCompatibleMsiPackageComplete(PlanCompatibleMsiPackageCompleteEventArgs args)
-        {
-            EventHandler<PlanCompatibleMsiPackageCompleteEventArgs> handler = this.PlanCompatibleMsiPackageComplete;
             if (null != handler)
             {
                 handler(this, args);
@@ -1209,15 +1161,6 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectCompatibleMsiPackage(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, ref bool fCancel)
-        {
-            DetectCompatibleMsiPackageEventArgs args = new DetectCompatibleMsiPackageEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, fCancel);
-            this.OnDetectCompatibleMsiPackage(args);
-
-            fCancel = args.Cancel;
-            return args.HResult;
-        }
-
         int IBootstrapperApplication.OnDetectRelatedMsiPackage(string wzPackageId, string wzUpgradeCode, string wzProductCode, bool fPerMachine, string wzVersion, RelatedOperation operation, ref bool fCancel)
         {
             DetectRelatedMsiPackageEventArgs args = new DetectRelatedMsiPackageEventArgs(wzPackageId, wzUpgradeCode, wzProductCode, fPerMachine, wzVersion, operation, fCancel);
@@ -1253,9 +1196,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectComplete(int hrStatus)
+        int IBootstrapperApplication.OnDetectComplete(int hrStatus, bool fEligibleForCleanup)
         {
-            DetectCompleteEventArgs args = new DetectCompleteEventArgs(hrStatus);
+            DetectCompleteEventArgs args = new DetectCompleteEventArgs(hrStatus, fEligibleForCleanup);
             this.OnDetectComplete(args);
 
             return args.HResult;
@@ -1287,24 +1230,6 @@ namespace WixToolset.Mba.Core
 
             pRequestedState = args.State;
             fCancel = args.Cancel;
-            return args.HResult;
-        }
-
-        int IBootstrapperApplication.OnPlanCompatibleMsiPackageBegin(string wzPackageId, string wzCompatiblePackageId, string wzCompatiblePackageVersion, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
-        {
-            PlanCompatibleMsiPackageBeginEventArgs args = new PlanCompatibleMsiPackageBeginEventArgs(wzPackageId, wzCompatiblePackageId, wzCompatiblePackageVersion, recommendedState, pRequestedState, fCancel);
-            this.OnPlanCompatibleMsiPackageBegin(args);
-
-            pRequestedState = args.State;
-            fCancel = args.Cancel;
-            return args.HResult;
-        }
-
-        int IBootstrapperApplication.OnPlanCompatibleMsiPackageComplete(string wzPackageId, string wzCompatiblePackageId, int hrStatus, PackageState state, RequestState requested, ActionState execute, ActionState rollback)
-        {
-            PlanCompatibleMsiPackageCompleteEventArgs args = new PlanCompatibleMsiPackageCompleteEventArgs(wzPackageId, wzCompatiblePackageId, hrStatus, state, requested, execute, rollback);
-            this.OnPlanCompatibleMsiPackageComplete(args);
-
             return args.HResult;
         }
 

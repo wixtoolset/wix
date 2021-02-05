@@ -80,14 +80,6 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnDetectCompatibleMsiPackage - called when the engine detects that a package is not installed but a newer package using the same provider key is.
-    STDMETHOD(OnDetectCompatibleMsiPackage)(
-        __in_z LPCWSTR wzPackageId,
-        __in_z LPCWSTR wzCompatiblePackageId,
-        __in_z LPCWSTR wzCompatiblePackageVersion,
-        __inout BOOL* pfCancel
-        ) = 0;
-
     // OnDetectRelatedMsiPackage - called when the engine begins detects a related package.
     STDMETHOD(OnDetectRelatedMsiPackage)(
         __in_z LPCWSTR wzPackageId,
@@ -127,7 +119,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnDetectPackageComplete - called after the engine completes detection.
     //
     STDMETHOD(OnDetectComplete)(
-        __in HRESULT hrStatus
+        __in HRESULT hrStatus,
+        __in BOOL fEligibleForCleanup
         ) = 0;
 
     // OnPlanBegin - called when the engine begins planning.
@@ -150,28 +143,6 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
         __inout BOOL* pfCancel
-        ) = 0;
-
-    // OnPlanCompatibleMsiPackageBegin - called when the engine plans a newer, compatible package using the same provider key.
-    STDMETHOD(OnPlanCompatibleMsiPackageBegin)(
-        __in_z LPCWSTR wzPackageId,
-        __in_z LPCWSTR wzCompatiblePackageId,
-        __in_z LPCWSTR wzCompatiblePackageVersion,
-        __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
-        __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
-        __inout BOOL* pfCancel
-        ) = 0;
-
-    // OnPlanCompatibleMsiPackageComplete - called after the engine plans the package.
-    //
-    STDMETHOD(OnPlanCompatibleMsiPackageComplete)(
-        __in_z LPCWSTR wzPackageId,
-        __in_z LPCWSTR wzCompatiblePackageId,
-        __in HRESULT hrStatus,
-        __in BOOTSTRAPPER_PACKAGE_STATE state,
-        __in BOOTSTRAPPER_REQUEST_STATE requested,
-        __in BOOTSTRAPPER_ACTION_STATE execute,
-        __in BOOTSTRAPPER_ACTION_STATE rollback
         ) = 0;
 
     // OnPlanTargetMsiPackage - called when the engine plans an MSP package

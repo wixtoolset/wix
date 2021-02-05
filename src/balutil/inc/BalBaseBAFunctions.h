@@ -164,16 +164,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnDetectCompatibleMsiPackage(
-        __in_z LPCWSTR /*wzPackageId*/,
-        __in_z LPCWSTR /*wzCompatiblePackageId*/,
-        __in LPCWSTR /*wzCompatiblePackageVersion*/,
-        __inout BOOL* /*pfCancel*/
-        )
-    {
-        return S_OK;
-    }
-
     virtual STDMETHODIMP OnDetectRelatedMsiPackage(
         __in_z LPCWSTR /*wzPackageId*/,
         __in_z LPCWSTR /*wzUpgradeCode*/,
@@ -217,7 +207,8 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnDetectComplete(
-        __in HRESULT /*hrStatus*/
+        __in HRESULT /*hrStatus*/,
+        __in BOOL /*fEligibleForCleanup*/
         )
     {
         return S_OK;
@@ -246,31 +237,6 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
         __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestState*/,
         __inout BOOL* /*pfCancel*/
-        )
-    {
-        return S_OK;
-    }
-
-    virtual STDMETHODIMP OnPlanCompatibleMsiPackageBegin(
-        __in_z LPCWSTR /*wzPackageId*/,
-        __in_z LPCWSTR /*wzCompatiblePackageId*/,
-        __in LPCWSTR /*wzCompatiblePackageVersion*/,
-        __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
-        __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestedState*/,
-        __inout BOOL* /*pfCancel*/
-        )
-    {
-        return S_OK;
-    }
-
-    virtual STDMETHODIMP OnPlanCompatibleMsiPackageComplete(
-        __in_z LPCWSTR /*wzPackageId*/,
-        __in_z LPCWSTR /*wzCompatiblePackageId*/,
-        __in HRESULT /*hrStatus*/,
-        __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,
-        __in BOOTSTRAPPER_REQUEST_STATE /*requested*/,
-        __in BOOTSTRAPPER_ACTION_STATE /*execute*/,
-        __in BOOTSTRAPPER_ACTION_STATE /*rollback*/
         )
     {
         return S_OK;

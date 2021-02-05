@@ -171,23 +171,6 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.DetectCompatibleMsiPackage"/>.
-        /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzCompatiblePackageId"></param>
-        /// <param name="wzCompatiblePackageVersion"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnDetectCompatibleMsiPackage(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
-            );
-
-        /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectRelatedMsiPackage"/>.
         /// </summary>
         /// <param name="wzPackageId"></param>
@@ -263,11 +246,13 @@ namespace WixToolset.Mba.Core
         /// See <see cref="IDefaultBootstrapperApplication.DetectComplete"/>.
         /// </summary>
         /// <param name="hrStatus"></param>
+        /// <param name="fEligibleForCleanup"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectComplete(
-            int hrStatus
+            int hrStatus,
+            [MarshalAs(UnmanagedType.Bool)] bool fEligibleForCleanup
             );
 
         /// <summary>
@@ -315,50 +300,6 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
-            );
-
-        /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageBegin"/>.
-        /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzCompatiblePackageId"></param>
-        /// <param name="wzCompatiblePackageVersion"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="pRequestedState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnPlanCompatibleMsiPackageBegin(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageVersion,
-            [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
-            [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
-            );
-
-        /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.PlanCompatibleMsiPackageComplete"/>.
-        /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzCompatiblePackageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="state"></param>
-        /// <param name="requested"></param>
-        /// <param name="execute"></param>
-        /// <param name="rollback"></param>
-        /// <returns></returns>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnPlanCompatibleMsiPackageComplete(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzCompatiblePackageId,
-            int hrStatus,
-            [MarshalAs(UnmanagedType.U4)] PackageState state,
-            [MarshalAs(UnmanagedType.U4)] RequestState requested,
-            [MarshalAs(UnmanagedType.U4)] ActionState execute,
-            [MarshalAs(UnmanagedType.U4)] ActionState rollback
             );
 
         /// <summary>
@@ -1697,6 +1638,11 @@ namespace WixToolset.Mba.Core
         /// Typically used to switch from a native bootstrapper application to a managed one.
         /// </summary>
         ReloadBootstrapper,
+
+        /// <summary>
+        /// Opts out of the engine behavior of trying to uninstall itself when no non-permanent packages are installed.
+        /// </summary>
+        SkipCleanup,
     }
 
     /// <summary>
