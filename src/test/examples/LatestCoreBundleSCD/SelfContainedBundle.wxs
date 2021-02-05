@@ -5,7 +5,7 @@
             <PayloadGroupRef Id="publish.Example.LatestCoreMBA.scd" />
         </BootstrapperApplication>
         <Chain>
-            <ExePackage SourceFile="c:\windows\system32\kernel32.dll" PerMachine="yes" />
+            <ExePackage Permanent="yes" SourceFile="c:\windows\system32\kernel32.dll" PerMachine="yes" />
         </Chain>
     </Bundle>
 </Wix>

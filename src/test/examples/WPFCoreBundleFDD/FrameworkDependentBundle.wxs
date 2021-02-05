@@ -10,7 +10,7 @@
             <bal:WixDotNetCoreBootstrapperApplicationHost />
         </BootstrapperApplication>
         <Chain>
-            <ExePackage SourceFile="c:\windows\system32\kernel32.dll" bal:PrereqPackage="yes" />
+            <ExePackage Permanent="yes" SourceFile="c:\windows\system32\kernel32.dll" bal:PrereqPackage="yes" />
         </Chain>
     </Bundle>
 </Wix>

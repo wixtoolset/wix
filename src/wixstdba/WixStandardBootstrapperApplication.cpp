@@ -307,7 +307,8 @@ public: // IBootstrapperApplication
 
 
     virtual STDMETHODIMP OnDetectComplete(
-        __in HRESULT hrStatus
+        __in HRESULT hrStatus,
+        __in BOOL /*fEligibleForCleanup*/
         )
     {
         HRESULT hr = S_OK;
@@ -1142,9 +1143,6 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPACKAGEBEGIN:
             OnDetectPackageBeginFallback(reinterpret_cast<BA_ONDETECTPACKAGEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTPACKAGEBEGIN_RESULTS*>(pvResults));
             break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE:
-            OnDetectCompatibleMsiPackageFallback(reinterpret_cast<BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS*>(pvResults));
-            break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDMSIPACKAGE:
             OnDetectRelatedMsiPackageFallback(reinterpret_cast<BA_ONDETECTRELATEDMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTRELATEDMSIPACKAGE_RESULTS*>(pvResults));
             break;
@@ -1162,12 +1160,6 @@ public: // IBootstrapperApplication
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN:
             OnPlanPackageBeginFallback(reinterpret_cast<BA_ONPLANPACKAGEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANPACKAGEBEGIN_RESULTS*>(pvResults));
-            break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN:
-            OnPlanCompatibleMsiPackageBeginFallback(reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS*>(pvResults));
-            break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE:
-            OnPlanCompatibleMsiPackageCompleteFallback(reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANTARGETMSIPACKAGE:
             OnPlanTargetMsiPackageFallback(reinterpret_cast<BA_ONPLANTARGETMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANTARGETMSIPACKAGE_RESULTS*>(pvResults));
@@ -1408,14 +1400,6 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTPACKAGEBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
-    void OnDetectCompatibleMsiPackageFallback(
-        __in BA_ONDETECTCOMPATIBLEMSIPACKAGE_ARGS* pArgs,
-        __inout BA_ONDETECTCOMPATIBLEMSIPACKAGE_RESULTS* pResults
-        )
-    {
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTCOMPATIBLEMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
-    }
-
     void OnDetectRelatedMsiPackageFallback(
         __in BA_ONDETECTRELATEDMSIPACKAGE_ARGS* pArgs,
         __inout BA_ONDETECTRELATEDMSIPACKAGE_RESULTS* pResults
@@ -1466,24 +1450,6 @@ private: // privates
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANPACKAGEBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_PACKAGE, m_hModule, pArgs->wzPackageId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
-    }
-
-    void OnPlanCompatibleMsiPackageBeginFallback(
-        __in BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_ARGS* pArgs,
-        __inout BA_ONPLANCOMPATIBLEMSIPACKAGEBEGIN_RESULTS* pResults
-        )
-    {
-        BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGEBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_COMPATIBLE_MSI_PACKAGE, m_hModule, pArgs->wzPackageId, pArgs->wzCompatiblePackageId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
-    }
-
-    void OnPlanCompatibleMsiPackageCompleteFallback(
-        __in BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_ARGS* pArgs,
-        __inout BA_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE_RESULTS* pResults
-        )
-    {
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANCOMPATIBLEMSIPACKAGECOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     void OnPlanTargetMsiPackageFallback(

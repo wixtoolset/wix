@@ -50,13 +50,6 @@ Language=English
 WIXSTDBA: Planned related bundle: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
 .
 
-MessageId=4
-Severity=Success
-SymbolicName=MSG_WIXSTDBA_PLANNED_COMPATIBLE_MSI_PACKAGE
-Language=English
-WIXSTDBA: Planned compatible package: %2!ls! for %1!ls!, wixstdba requested: %3!hs!, bafunctions requested: %4!hs!
-.
-
 MessageId=5
 Severity=Success
 SymbolicName=MSG_WIXSTDBA_PLANNED_TARGET_MSI_PACKAGE
