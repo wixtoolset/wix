@@ -732,7 +732,11 @@ extern "C" void MspEngineFinalizeInstallRegistrationState(
     __in BURN_PACKAGE* pPackage
     )
 {
-    Assert(pPackage->fCanAffectRegistration);
+    if (!pPackage->fCanAffectRegistration)
+    {
+        ExitFunction();
+    }
+
     pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
 
     for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
@@ -745,6 +749,9 @@ extern "C" void MspEngineFinalizeInstallRegistrationState(
             break;
         }
     }
+
+LExit:
+    return;
 }
 
 

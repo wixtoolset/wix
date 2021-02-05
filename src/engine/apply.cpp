@@ -885,16 +885,16 @@ static void CalculateKeepRegistration(
     {
         BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
 
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
+        {
+            MspEngineFinalizeInstallRegistrationState(pPackage);
+        }
+
         LogId(REPORT_STANDARD, MSG_POST_APPLY_PACKAGE, pPackage->sczId, LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
 
         if (!pPackage->fCanAffectRegistration)
         {
             continue;
-        }
-
-        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
-        {
-            MspEngineFinalizeInstallRegistrationState(pPackage);
         }
 
         if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState ||

@@ -1103,8 +1103,6 @@ extern "C" HRESULT CoreCleanup(
     hr = CoreApply(pEngineState, pEngineState->hMessageWindow);
     ExitOnFailure(hr, "Apply during cleanup failed");
 
-    // Need to think about cache=always
-
 LExit:
     return hr;
 }
