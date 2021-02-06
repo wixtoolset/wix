@@ -16,7 +16,7 @@
   <Fragment>
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
-      <MsiPackage Id="PackageF" SourceFile="$(var.PackageF.TargetPath)" />
+      <MsiPackage Id="PackageF" SourceFile="$(var.PackageF.TargetPath)" Cache="always" />
     </PackageGroup>
   </Fragment>
 </Wix>

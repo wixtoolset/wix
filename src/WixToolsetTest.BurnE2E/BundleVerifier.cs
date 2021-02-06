@@ -33,14 +33,19 @@ namespace WixToolsetTest.BurnE2E
             return this.BundleSymbol;
         }
 
-        public string GetExpectedCachedBundlePath()
+        public string GetPackageCachePathForCacheId(string cacheId)
         {
-            var bundleSymbol = this.GetBundleSymbol();
-
             using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
             var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
             var cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
-            return Path.Combine(cachePath, bundleSymbol.BundleId, Path.GetFileName(this.Bundle));
+            return Path.Combine(cachePath, cacheId);
+        }
+
+        public string GetExpectedCachedBundlePath()
+        {
+            var bundleSymbol = this.GetBundleSymbol();
+            var cachePath = this.GetPackageCachePathForCacheId(bundleSymbol.BundleId);
+            return Path.Combine(cachePath, Path.GetFileName(this.Bundle));
         }
 
         public bool TryGetPerMachineRegistration(out BundleRegistration registration)
@@ -73,6 +78,19 @@ namespace WixToolsetTest.BurnE2E
         {
             Assert.False(this.TryGetPerMachineRegistration(out _));
             Assert.False(File.Exists(cachedBundlePath));
+        }
+
+        public void RemovePackageFromCache(string packageId)
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
+            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId);
+            if (Directory.Exists(cachePath))
+            {
+                Directory.Delete(cachePath, true);
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ namespace WixToolsetTest.BurnE2E
         /// <param name="expectedExitCode">Expected exit code</param>
         /// <param name="otherArguments">Other arguments to pass to MSIExec.</param>
         /// <returns>MSIExec log File</returns>
-        public string UninstallProduct(MSIExecReturnCode expectedExitCode, params string[] otherArguments)
+        public string UninstallProduct(MSIExecReturnCode expectedExitCode = MSIExecReturnCode.SUCCESS, params string[] otherArguments)
         {
             return this.RunMSIExec(MSIExecMode.Uninstall, otherArguments, expectedExitCode);
         }
@@ -51,7 +51,7 @@ namespace WixToolsetTest.BurnE2E
         /// <param name="expectedExitCode">Expected exit code</param>
         /// <param name="otherArguments">Other arguments to pass to msiexe.exe.</param>
         /// <returns>MSIExec log File</returns>
-        public string RepairProduct(MSIExecReturnCode expectedExitCode, params string[] otherArguments)
+        public string RepairProduct(MSIExecReturnCode expectedExitCode = MSIExecReturnCode.SUCCESS, params string[] otherArguments)
         {
             return this.RunMSIExec(MSIExecMode.Repair, otherArguments, expectedExitCode);
         }

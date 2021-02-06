@@ -40,6 +40,16 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
+        public void SetImmediatelyQuit(string value = "true")
+        {
+            this.SetBurnTestValue("ImmediatelyQuit", value);
+        }
+
+        public void SetQuitAfterDetect(string value = "true")
+        {
+            this.SetBurnTestValue("QuitAfterDetect", value);
+        }
+
         /// <summary>
         /// Slows the cache progress of a package.
         /// </summary>

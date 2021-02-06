@@ -18,14 +18,17 @@ namespace WixToolset.Test.BA
     {
         private const string BurnBundleVersionVariable = "WixBundleVersion";
 
-        private ApplicationContext appContext;
         private Form dummyWindow;
+        private IntPtr windowHandle;
         private LaunchAction action;
+        private ManualResetEvent wait;
         private int result;
 
         private string updateBundlePath;
 
-        private int redetectCount;
+        private bool immediatelyQuit;
+        private bool quitAfterDetect;
+        private int redetectRemaining;
         private int sleepDuringCache;
         private int cancelCacheAtProgress;
         private int sleepDuringExecute;
@@ -45,6 +48,7 @@ namespace WixToolset.Test.BA
             : base(engine)
         {
             this.Command = bootstrapperCommand;
+            this.wait = new ManualResetEvent(false);
         }
 
         /// <summary>
@@ -60,8 +64,17 @@ namespace WixToolset.Test.BA
         /// <summary>
         /// UI Thread entry point for TestUX.
         /// </summary>
-        protected override void Run()
+        protected override void OnStartup(StartupEventArgs args)
         {
+            string immediatelyQuit = this.ReadPackageAction(null, "ImmediatelyQuit");
+            if (!String.IsNullOrEmpty(immediatelyQuit) && Boolean.TryParse(immediatelyQuit, out this.immediatelyQuit) && this.immediatelyQuit)
+            {
+                this.Engine.Quit(0);
+                return;
+            }
+
+            base.OnStartup(args);
+
             this.action = this.Command.Action;
             this.TestVariables();
 
@@ -102,20 +115,46 @@ namespace WixToolset.Test.BA
                 return;
             }
 
-            this.dummyWindow = new Form();
-            this.dummyWindow.CreateControl();
-            this.appContext = new ApplicationContext();
-
-            this.redetectCount = 0;
+            int redetectCount;
             string redetect = this.ReadPackageAction(null, "RedetectCount");
-            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out this.redetectCount))
+            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out redetectCount))
             {
-                this.redetectCount = 0;
+                redetectCount = 0;
             }
 
-            this.Engine.Detect();
+            string quitAfterDetect = this.ReadPackageAction(null, "QuitAfterDetect");
+            if (String.IsNullOrEmpty(quitAfterDetect) || !Boolean.TryParse(quitAfterDetect, out this.quitAfterDetect))
+            {
+                this.quitAfterDetect = false;
+            }
 
-            Application.Run(this.appContext);
+            this.wait.WaitOne();
+
+            this.redetectRemaining = redetectCount;
+            for (int i = -1; i < redetectCount; i++)
+            {
+                this.Engine.Detect(this.windowHandle);
+            }
+        }
+
+        protected override void Run()
+        {
+            this.dummyWindow = new Form();
+            this.windowHandle = this.dummyWindow.Handle;
+
+            this.Log("Running TestBA application");
+            this.wait.Set();
+            Application.Run();
+        }
+
+        private void ShutdownUiThread()
+        {
+            if (this.dummyWindow != null)
+            {
+                this.dummyWindow.Invoke(new Action(Application.ExitThread));
+                this.dummyWindow.Dispose();
+            }
+
             this.Engine.Quit(this.result & 0xFFFF); // return plain old Win32 error, not HRESULT.
         }
 
@@ -167,10 +206,13 @@ namespace WixToolset.Test.BA
             if (Hresult.Succeeded(this.result) &&
                 (this.UpdateAvailable || LaunchAction.UpdateReplaceEmbedded != this.action && LaunchAction.UpdateReplace != this.action))
             {
-                if (this.redetectCount > 0)
+                if (this.redetectRemaining > 0)
                 {
-                    this.Log("Completed detection phase: {0} re-runs remaining", this.redetectCount--);
-                    this.Engine.Detect();
+                    this.Log("Completed detection phase: {0} re-runs remaining", this.redetectRemaining--);
+                }
+                else if (this.quitAfterDetect)
+                {
+                    this.ShutdownUiThread();
                 }
                 else
                 {
@@ -179,7 +221,7 @@ namespace WixToolset.Test.BA
             }
             else
             {
-                this.appContext.ExitThread();
+                this.ShutdownUiThread();
             }
         }
 
@@ -218,11 +260,11 @@ namespace WixToolset.Test.BA
             this.result = args.Status;
             if (Hresult.Succeeded(this.result))
             {
-                this.Engine.Apply(this.dummyWindow.Handle);
+                this.Engine.Apply(this.windowHandle);
             }
             else
             {
-                this.appContext.ExitThread();
+                this.ShutdownUiThread();
             }
         }
 
@@ -402,7 +444,7 @@ namespace WixToolset.Test.BA
             this.Log("After elevation: WixBundleElevated = {0}", this.Engine.GetVariableNumeric("WixBundleElevated"));
 
             this.result = args.Status;
-            this.appContext.ExitThread();
+            this.ShutdownUiThread();
         }
 
         protected override void OnSystemShutdown(SystemShutdownEventArgs args)
@@ -411,7 +453,7 @@ namespace WixToolset.Test.BA
             this.Log("Disallowed system request to shut down the bootstrapper application.");
             args.Cancel = true;
 
-            this.appContext.ExitThread();
+            this.ShutdownUiThread();
         }
 
         private void TestVariables()

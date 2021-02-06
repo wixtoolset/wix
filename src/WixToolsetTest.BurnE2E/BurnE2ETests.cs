@@ -12,32 +12,32 @@ namespace WixToolsetTest.BurnE2E
     {
         protected BurnE2ETests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
-        private Queue<IDisposable> Installers { get; } = new Queue<IDisposable>();
+        private Stack<IDisposable> Installers { get; } = new Stack<IDisposable>();
 
         protected BundleInstaller CreateBundleInstaller(string name)
         {
             var installer = new BundleInstaller(this.TestContext, name);
-            this.Installers.Enqueue(installer);
+            this.Installers.Push(installer);
             return installer;
         }
 
         protected PackageInstaller CreatePackageInstaller(string filename)
         {
             var installer = new PackageInstaller(this.TestContext, filename);
-            this.Installers.Enqueue(installer);
+            this.Installers.Push(installer);
             return installer;
         }
 
         protected TestBAController CreateTestBAController()
         {
             var controller = new TestBAController(this.TestContext);
-            this.Installers.Enqueue(controller);
+            this.Installers.Push(controller);
             return controller;
         }
 
         public void Dispose()
         {
-            while (this.Installers.TryDequeue(out var installer))
+            while (this.Installers.TryPop(out var installer))
             {
                 try
                 {
