@@ -592,13 +592,12 @@ static HRESULT RunNormal(
         ExitOnFailure(hr, "Failed while running ");
     } while (fReloadApp);
 
+LExit:
     if (!fSkipCleanup)
     {
-        hr = CoreCleanup(pEngineState);
-        ExitOnFailure(hr, "Failed to cleanup before shutting down");
+        CoreCleanup(pEngineState);
     }
 
-LExit:
     BurnExtensionUnload(&pEngineState->extensions);
 
     // If the message window is still around, close it.

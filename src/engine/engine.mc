@@ -967,7 +967,35 @@ MessageId=501
 Severity=Warning
 SymbolicName=MSG_STATE_NOT_SAVED
 Language=English
-The state file could not be saved. Continuing...
+The state file could not be saved, error: %1!ls!. Continuing...
+.
+
+MessageId=502
+Severity=Success
+SymbolicName=MSG_CLEANUP_BEGIN
+Language=English
+Cleanup begin.
+.
+
+MessageId=503
+Severity=Success
+SymbolicName=MSG_CLEANUP_SKIPPED_APPLY
+Language=English
+Cleanup not required due to running Apply.
+.
+
+MessageId=504
+Severity=Success
+SymbolicName=MSG_CLEANUP_SKIPPED_ELEVATION_REQUIRED
+Language=English
+Cleanup check skipped since this per-machine bundle would require elevation.
+.
+
+MessageId=599
+Severity=Success
+SymbolicName=MSG_CLEANUP_COMPLETE
+Language=English
+Cleanup complete, result: 0x%1!x!
 .
 
 MessageId=600

@@ -1061,13 +1061,21 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CoreCleanup(
+extern "C" void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState
     )
 {
     HRESULT hr = S_OK;
     LONGLONG llValue = 0;
     BOOL fNeedsElevation = pEngineState->registration.fPerMachine && INVALID_HANDLE_VALUE == pEngineState->companionConnection.hPipe;
+
+    LogId(REPORT_STANDARD, MSG_CLEANUP_BEGIN);
+
+    if (pEngineState->fApplied && BOOTSTRAPPER_ACTION_LAYOUT < pEngineState->plan.action && BOOTSTRAPPER_ACTION_UPDATE_REPLACE > pEngineState->plan.action)
+    {
+        LogId(REPORT_STANDARD, MSG_CLEANUP_SKIPPED_APPLY);
+        ExitFunction();
+    }
 
     if (fNeedsElevation)
     {
@@ -1078,12 +1086,11 @@ extern "C" HRESULT CoreCleanup(
         {
             fNeedsElevation = FALSE;
         }
-    }
-
-    if (pEngineState->fApplied && BOOTSTRAPPER_ACTION_LAYOUT < pEngineState->plan.action && BOOTSTRAPPER_ACTION_UPDATE_REPLACE > pEngineState->plan.action ||
-        fNeedsElevation)
-    {
-        ExitFunction();
+        else
+        {
+            LogId(REPORT_STANDARD, MSG_CLEANUP_SKIPPED_ELEVATION_REQUIRED);
+            ExitFunction();
+        }
     }
 
     if (!pEngineState->fDetected)
@@ -1104,7 +1111,7 @@ extern "C" HRESULT CoreCleanup(
     ExitOnFailure(hr, "Apply during cleanup failed");
 
 LExit:
-    return hr;
+    LogId(REPORT_STANDARD, MSG_CLEANUP_COMPLETE, hr);
 }
 
 // internal helper functions
