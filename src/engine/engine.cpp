@@ -776,6 +776,12 @@ static HRESULT RunApplication(
         }
         else
         {
+            // When the BA makes a request from its own thread, it's common for the PostThreadMessage in externalengine.cpp
+            // to block until this thread waits on something. It's also common for Detect and Plan to never wait on something.
+            // In the extreme case, the engine could be elevating in Apply before the Detect call returned to the BA.
+            // This helps to avoid that situation, which could be blocking a UI thread.
+            ::Sleep(0);
+
             ProcessMessage(pEngineState, &msg);
         }
     }
