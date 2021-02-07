@@ -83,10 +83,7 @@
     <ClCompile Include="memutil.cpp" />
     <ClCompile Include="metautil.cpp" />
     <ClCompile Include="monutil.cpp" />
-    <ClCompile Include="osutil.cpp">
-      <!-- turn off deprecation warning -->
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-    </ClCompile>
+    <ClCompile Include="osutil.cpp" />
     <ClCompile Include="path2utl.cpp" />
     <ClCompile Include="pathutil.cpp" />
     <ClCompile Include="perfutil.cpp" />

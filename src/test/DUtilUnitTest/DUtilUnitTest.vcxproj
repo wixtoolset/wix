@@ -70,7 +70,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\dutil\dutil.vcxproj" />
+    <ProjectReference Include="..\..\dutil\dutil.vcxproj">
+      <Project>{1244E671-F108-4334-BA52-8A7517F26ECD}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets')" />
