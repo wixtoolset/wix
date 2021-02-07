@@ -33,6 +33,9 @@ HRESULT DAPI OsIsRunningPrivileged(
 HRESULT DAPI OsIsUacEnabled(
     __out BOOL* pfUacEnabled
     );
+HRESULT DAPI OsRtlGetVersion(
+    __inout RTL_OSVERSIONINFOEXW* pOvix
+    );
 
 #ifdef __cplusplus
 }

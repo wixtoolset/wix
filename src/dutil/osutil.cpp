@@ -2,8 +2,11 @@
 
 #include "precomp.h"
 
+typedef NTSTATUS(NTAPI* PFN_RTL_GET_VERSION)(_Out_ PRTL_OSVERSIONINFOEXW lpVersionInformation);
+
 OS_VERSION vOsVersion = OS_VERSION_UNKNOWN;
 DWORD vdwOsServicePack = 0;
+RTL_OSVERSIONINFOEXW vovix = { };
 
 /********************************************************************
  OsGetVersion
@@ -183,6 +186,44 @@ extern "C" HRESULT DAPI OsIsUacEnabled(
 
 LExit:
     ReleaseRegKey(hk);
+
+    return hr;
+}
+
+HRESULT DAPI OsRtlGetVersion(
+    __inout RTL_OSVERSIONINFOEXW* pOvix
+    )
+{
+    HRESULT hr = S_OK;
+    HMODULE hNtdll = NULL;
+    PFN_RTL_GET_VERSION pfnRtlGetVersion = NULL;
+
+    if (vovix.dwOSVersionInfoSize)
+    {
+        ExitFunction();
+    }
+
+    vovix.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOEXW);
+
+    hr = LoadSystemLibrary(L"ntdll.dll", &hNtdll);
+    if (E_MODNOTFOUND == hr)
+    {
+        ExitOnRootFailure(hr = E_NOTIMPL, "Failed to load ntdll.dll");
+    }
+    ExitOnFailure(hr, "Failed to load ntdll.dll.");
+
+    pfnRtlGetVersion = reinterpret_cast<PFN_RTL_GET_VERSION>(::GetProcAddress(hNtdll, "RtlGetVersion"));
+    ExitOnNullWithLastError(pfnRtlGetVersion, hr, "Failed to locate RtlGetVersion.");
+
+    hr = static_cast<HRESULT>(pfnRtlGetVersion(&vovix));
+
+LExit:
+    memcpy(pOvix, &vovix, sizeof(RTL_OSVERSIONINFOEXW));
+
+    if (hNtdll)
+    {
+        ::FreeLibrary(hNtdll);
+    }
 
     return hr;
 }
