@@ -83,7 +83,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\engine\engine.vcxproj" />
+    <ProjectReference Include="..\..\engine\engine.vcxproj">
+      <Project>{8119537D-E1D9-6591-D51A-49768A2F9C37}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets')" />

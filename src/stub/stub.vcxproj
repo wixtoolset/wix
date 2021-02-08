@@ -63,7 +63,7 @@
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\engine\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wuguid.lib;engine.lib;engine.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;wuguid.lib;engine.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
@@ -92,7 +92,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\engine\engine.vcxproj" />
+    <ProjectReference Include="..\engine\engine.vcxproj">
+      <Project>{8119537D-E1D9-6591-D51A-49768A2F9C37}</Project>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
