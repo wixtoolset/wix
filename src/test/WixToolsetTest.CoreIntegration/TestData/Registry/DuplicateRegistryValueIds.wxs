@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <RegistryKey Root="HKLM" Key="Software\Acme\Foobar 1.0">
+                    <RegistryValue Type="string" Name="InstallDir" Value="[TARGETDIR]" />
+                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+                    <RegistryValue Type="string" Name="InstallDir" Value="[ProgramFilesFolder]" />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

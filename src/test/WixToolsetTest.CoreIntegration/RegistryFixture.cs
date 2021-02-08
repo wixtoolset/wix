@@ -80,6 +80,32 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void DuplicateRegistryValueIdsAreDetectedSmoothly()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Registry", "DuplicateRegistryValueIds.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                }, out var messages);
+
+                Assert.Equal(2, messages.Where(m => m.Id == (int)ErrorMessages.Ids.DuplicateSymbol).Count());
+                Assert.Equal(2, messages.Where(m => m.Id == (int)ErrorMessages.Ids.DuplicateSymbol2).Count());
+            }
+        }
+
+        [Fact]
         public void PopulatesRegistryTableFromRemoveRegistryKey()
         {
             var folder = TestData.Get(@"TestData");

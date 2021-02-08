@@ -103,6 +103,7 @@ namespace WixToolset.Core.Link
                         }
                         else
                         {
+                            symbolWithSection.AddPossibleConflict(existingSymbol);
                             existingSymbol.AddPossibleConflict(symbolWithSection);
                             possibleConflicts.Add(symbolWithSection);
                         }
