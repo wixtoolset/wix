@@ -40,6 +40,7 @@ const DWORD GROW_FONT_INSTANCES = 3;
 const DWORD GROW_WINDOW_TEXT = 250;
 const LPCWSTR THEME_WC_HYPERLINK = L"ThemeHyperLink";
 const LPCWSTR THEME_WC_PANEL = L"ThemePanel";
+const LPCWSTR THEME_WC_STATICOWNERDRAW = L"ThemeStaticOwnerDraw";
 
 static Gdiplus::GdiplusStartupInput vgsi;
 static Gdiplus::GdiplusStartupOutput vgso = { };
@@ -47,6 +48,8 @@ static ULONG_PTR vgdiToken = 0;
 static ULONG_PTR vgdiHookToken = 0;
 static HMODULE vhHyperlinkRegisteredModule = NULL;
 static HMODULE vhPanelRegisteredModule = NULL;
+static HMODULE vhStaticOwnerDrawRegisteredModule = NULL;
+static WNDPROC vpfnStaticOwnerDrawBaseWndProc = NULL;
 static HMODULE vhModuleMsftEdit = NULL;
 static HMODULE vhModuleRichEd = NULL;
 static HCURSOR vhCursorHand = NULL;
@@ -348,6 +351,12 @@ static LRESULT CALLBACK PanelWndProc(
     __in WPARAM wParam,
     __in LPARAM lParam
     );
+static LRESULT CALLBACK StaticOwnerDrawWndProc(
+    __in HWND hWnd,
+    __in UINT uMsg,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    );
 static HRESULT LocalizeControls(
     __in DWORD cControls,
     __in THEME_CONTROL* rgControls,
@@ -477,6 +486,13 @@ DAPI_(void) ThemeUninitialize()
     {
         ::UnregisterClassW(THEME_WC_PANEL, vhPanelRegisteredModule);
         vhPanelRegisteredModule = NULL;
+    }
+
+    if (vhStaticOwnerDrawRegisteredModule)
+    {
+        ::UnregisterClassW(THEME_WC_STATICOWNERDRAW, vhStaticOwnerDrawRegisteredModule);
+        vhStaticOwnerDrawRegisteredModule = NULL;
+        vpfnStaticOwnerDrawBaseWndProc = NULL;
     }
 
     if (vgdiToken)
@@ -1598,6 +1614,8 @@ static HRESULT RegisterWindowClasses(
     HRESULT hr = S_OK;
     WNDCLASSW wcHyperlink = { };
     WNDCLASSW wcPanel = { };
+    WNDCLASSW wcStaticOwnerDraw = { };
+    WNDPROC pfnStaticOwnerDrawBaseWndProc = NULL;
 
     vhCursorHand = ::LoadCursorA(NULL, IDC_HAND);
 
@@ -1629,6 +1647,22 @@ static HRESULT RegisterWindowClasses(
         ThmExitWithLastError(hr, "Failed to register window.");
     }
     vhPanelRegisteredModule = hModule;
+
+    if (!::GetClassInfoW(NULL, WC_STATICW, &wcStaticOwnerDraw))
+    {
+        ThmExitWithLastError(hr, "Failed to get static window class.");
+    }
+
+    pfnStaticOwnerDrawBaseWndProc = wcStaticOwnerDraw.lpfnWndProc;
+    wcStaticOwnerDraw.lpfnWndProc = StaticOwnerDrawWndProc;
+    wcStaticOwnerDraw.hInstance = hModule;
+    wcStaticOwnerDraw.lpszClassName = THEME_WC_STATICOWNERDRAW;
+    if (!::RegisterClassW(&wcStaticOwnerDraw))
+    {
+        ThmExitWithLastError(hr, "Failed to register OwnerDraw window class.");
+    }
+    vhStaticOwnerDrawRegisteredModule = hModule;
+    vpfnStaticOwnerDrawBaseWndProc = pfnStaticOwnerDrawBaseWndProc;
 
 
 LExit:
@@ -4919,6 +4953,21 @@ static LRESULT CALLBACK PanelWndProc(
     return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
 }
 
+static LRESULT CALLBACK StaticOwnerDrawWndProc(
+    __in HWND hWnd,
+    __in UINT uMsg,
+    __in WPARAM wParam,
+    __in LPARAM lParam
+    )
+{
+    switch (uMsg)
+    {
+    case WM_UPDATEUISTATE:
+        return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+    default:
+        return (*vpfnStaticOwnerDrawBaseWndProc)(hWnd, uMsg, wParam, lParam);
+    }
+}
 
 static HRESULT LoadControls(
     __in THEME* pTheme,
@@ -5011,7 +5060,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_IMAGE: // images are basically just owner drawn static controls (so we can draw .jpgs and .pngs instead of just bitmaps).
             if (pControl->hImage || (pTheme->hImage && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
             {
-                wzWindowClass = WC_STATICW;
+                wzWindowClass = THEME_WC_STATICOWNERDRAW;
                 dwWindowBits |= SS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
             }
@@ -5038,7 +5087,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_PROGRESSBAR:
             if (pControl->hImage || (pTheme->hImage && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
             {
-                wzWindowClass = WC_STATICW; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
+                wzWindowClass = THEME_WC_STATICOWNERDRAW; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
                 dwWindowBits |= SS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
             }
