@@ -1638,33 +1638,17 @@ LExit:
     return hr;
 }
 
-extern "C" typedef NTSTATUS (NTAPI *RTL_GET_VERSION)(_Out_  PRTL_OSVERSIONINFOEXW lpVersionInformation);
-
 static HRESULT InitializeVariableVersionNT(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     )
 {
     HRESULT hr = S_OK;
-    HMODULE ntdll = NULL;
-    RTL_GET_VERSION rtlGetVersion = NULL;
     RTL_OSVERSIONINFOEXW ovix = { };
     BURN_VARIANT value = { };
     VERUTIL_VERSION* pVersion = NULL;
 
-    if (!::GetModuleHandleExW(0, L"ntdll", &ntdll))
-    {
-        ExitWithLastError(hr, "Failed to locate NTDLL.");
-    }
-
-    rtlGetVersion = reinterpret_cast<RTL_GET_VERSION>(::GetProcAddress(ntdll, "RtlGetVersion"));
-    if (NULL == rtlGetVersion)
-    {
-        ExitWithLastError(hr, "Failed to locate RtlGetVersion.");
-    }
-
-    ovix.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOEXW);
-    hr = static_cast<HRESULT>(rtlGetVersion(&ovix));
+    hr = OsRtlGetVersion(&ovix);
     ExitOnFailure(hr, "Failed to get OS info.");
 
     switch ((OS_INFO_VARIABLE)dwpData)
@@ -1712,11 +1696,6 @@ static HRESULT InitializeVariableVersionNT(
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
-    if (NULL != ntdll)
-    {
-        FreeLibrary(ntdll);
-    }
-
     ReleaseVerutilVersion(pVersion);
 
     return hr;
@@ -1728,15 +1707,11 @@ static HRESULT InitializeVariableOsInfo(
     )
 {
     HRESULT hr = S_OK;
-    OSVERSIONINFOEXW ovix = { };
+    RTL_OSVERSIONINFOEXW ovix = { };
     BURN_VARIANT value = { };
 
-    ovix.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
-    #pragma warning(suppress: 4996)
-    if (!::GetVersionExW((LPOSVERSIONINFOW)&ovix))
-    {
-        ExitWithLastError(hr, "Failed to get OS info.");
-    }
+    hr = OsRtlGetVersion(&ovix);
+    ExitOnFailure(hr, "Failed to get OS info.");
 
     switch ((OS_INFO_VARIABLE)dwpData)
     {

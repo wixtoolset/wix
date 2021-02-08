@@ -187,13 +187,9 @@ extern "C" HRESULT ConditionGlobalCheck(
     HRESULT hr = S_OK;
     BOOL fSuccess = TRUE;
     HRESULT hrError = HRESULT_FROM_WIN32(ERROR_OLD_WIN_VERSION);
-    OS_VERSION osv = OS_VERSION_UNKNOWN;
-    DWORD dwServicePack = 0;
 
-    OsGetVersion(&osv, &dwServicePack);
-
-    // Always error on Windows 2000 or lower
-    if (OS_VERSION_WIN2000 >= osv)
+    // Only run on Windows Vista SP2 or newer, or Windows Server 2008 SP2 or newer.
+    if (!::IsWindowsVistaSP2OrGreater())
     {
         fSuccess = FALSE;
     }

@@ -95,7 +95,7 @@ extern "C" HRESULT EngineRun(
     BOOL fWiuInitialized = FALSE;
     BOOL fXmlInitialized = FALSE;
     SYSTEM_INFO si = { };
-    OSVERSIONINFOEXW ovix = { };
+    RTL_OSVERSIONINFOEXW ovix = { };
     LPWSTR sczExePath = NULL;
     BOOL fRunNormal = FALSE;
     BOOL fRestart = FALSE;
@@ -150,12 +150,8 @@ extern "C" HRESULT EngineRun(
     ExitOnFailure(hr, "Failed to initialize XML util.");
     fXmlInitialized = TRUE;
 
-    ovix.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
-    #pragma warning(suppress: 4996)
-    if (!::GetVersionExW((LPOSVERSIONINFOW)&ovix))
-    {
-        ExitWithLastError(hr, "Failed to get OS info.");
-    }
+    hr = OsRtlGetVersion(&ovix);
+    ExitOnFailure(hr, "Failed to get OS info.");
 
 #if defined(_M_ARM64)
     LPCSTR szBurnPlatform = "ARM64";

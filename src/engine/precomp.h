@@ -18,6 +18,7 @@
 #include <lmcons.h>
 #include <wininet.h>
 #include <stddef.h>
+#include <VersionHelpers.h>
 
 #include <dutilsources.h>
 #include <burnsources.h>

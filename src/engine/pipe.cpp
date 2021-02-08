@@ -391,16 +391,13 @@ extern "C" HRESULT PipeLaunchChildProcess(
     HRESULT hr = S_OK;
     DWORD dwCurrentProcessId = ::GetCurrentProcessId();
     LPWSTR sczParameters = NULL;
-    OS_VERSION osVersion = OS_VERSION_UNKNOWN;
-    DWORD dwServicePack = 0;
     LPCWSTR wzVerb = NULL;
     HANDLE hProcess = NULL;
 
     hr = StrAllocFormatted(&sczParameters, L"-q -%ls %ls %ls %u", BURN_COMMANDLINE_SWITCH_ELEVATED, pConnection->sczName, pConnection->sczSecret, dwCurrentProcessId);
     ExitOnFailure(hr, "Failed to allocate parameters for elevated process.");
 
-    OsGetVersion(&osVersion, &dwServicePack);
-    wzVerb = (OS_VERSION_VISTA > osVersion) || !fElevate ? L"open" : L"runas";
+    wzVerb = !fElevate ? L"open" : L"runas";
 
     // Since ShellExecuteEx doesn't support passing inherited handles, don't bother with CoreAppendFileHandleSelfToCommandLine.
     // We could fallback to using ::DuplicateHandle to inject the file handle later if necessary.

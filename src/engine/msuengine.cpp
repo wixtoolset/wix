@@ -90,14 +90,10 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOL fBARequestedCache = FALSE;
-
     BOOL fAllowUninstall = FALSE;
-    OS_VERSION osVersion = OS_VERSION_UNKNOWN;
-    DWORD dwServicePack = 0;
 
     // We can only uninstall MSU packages if they have a KB and we are on Win7 or newer.
-    OsGetVersion(&osVersion, &dwServicePack);
-    fAllowUninstall = (pPackage->Msu.sczKB && *pPackage->Msu.sczKB) && OS_VERSION_WIN7 <= osVersion;
+    fAllowUninstall = pPackage->Msu.sczKB && *pPackage->Msu.sczKB && ::IsWindows7OrGreater();
 
     // execute action
     switch (pPackage->currentState)

@@ -1178,19 +1178,8 @@ static HRESULT UpdateResumeMode(
     HKEY hkRun = NULL;
     LPWSTR sczResumeCommandLine = NULL;
     LPCWSTR sczResumeKey = REGISTRY_RUN_ONCE_KEY;
-    OS_VERSION osv = OS_VERSION_UNKNOWN;
-    DWORD dwServicePack = 0;
 
     LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume));
-
-    // On Windows XP and Server 2003, write the resume information to the Run key
-    // instead of RunOnce. That avoids the problem that driver installation might
-    // trigger RunOnce commands to be executed before the reboot.
-    OsGetVersion(&osv, &dwServicePack);
-    if (osv < OS_VERSION_VISTA)
-    {
-        sczResumeKey = REGISTRY_RUN_KEY;
-    }
 
     // write resume information
     if (hkRegistration)
