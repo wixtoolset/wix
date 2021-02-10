@@ -83,6 +83,33 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildBundleWithSlipstreamPatch()
+        {
+            var folder = TestData.Get(@"TestData\PatchSingle");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var tempFolder = fs.GetFolder();
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1");
+                var bundleAPdb = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
+
+                using (var wixOutput = WixOutput.Read(bundleAPdb))
+                {
+                    var manifestData = wixOutput.GetData(BurnConstants.BurnManifestWixOutputStreamName);
+                    var doc = new XmlDocument();
+                    doc.LoadXml(manifestData);
+                    var nsmgr = BundleExtractor.GetBurnNamespaceManager(doc, "w");
+                    var slipstreamMspNodes = doc.SelectNodes("/w:BurnManifest/w:Chain/w:MsiPackage/w:SlipstreamMsp", nsmgr);
+                    Assert.Equal(1, slipstreamMspNodes.Count);
+                    Assert.Equal("<SlipstreamMsp Id='PatchA' />", slipstreamMspNodes[0].GetTestXml());
+                }
+            }
+        }
+
         private static void VerifyPatchTargetCodes(string pdbPath, string[] expected)
         {
             using (var wixOutput = WixOutput.Read(pdbPath))

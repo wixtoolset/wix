@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="Baseline.msi">
+        <SlipstreamMsp Id="PatchA" />
+      </MsiPackage>
+      <MspPackage Id="PatchA" SourceFile="Patch1.msp" />
+    </PackageGroup>
+  </Fragment>
+</Wix>
