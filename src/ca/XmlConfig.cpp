@@ -346,7 +346,7 @@ static HRESULT BeginChangeFile(
     BOOL fIs64Bit = iCompAttributes & msidbComponentAttributes64bit;
 
     LPBYTE pbData = NULL;
-    DWORD cbData = 0;
+    SIZE_T cbData = 0;
 
     LPWSTR pwzRollbackCustomActionData = NULL;
 

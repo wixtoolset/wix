@@ -213,7 +213,7 @@ static HRESULT BeginChangeFile(
     BOOL fIs64Bit = pxfc->iCompAttributes & msidbComponentAttributes64bit;
     BOOL fUseXPath = pxfc->iXmlFlags & XMLFILE_USE_XPATH;
     LPBYTE pbData = NULL;
-    DWORD cbData = 0;
+    SIZE_T cbData = 0;
 
     LPWSTR pwzRollbackCustomActionData = NULL;
 
