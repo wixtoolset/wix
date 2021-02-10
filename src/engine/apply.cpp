@@ -1509,26 +1509,13 @@ static HRESULT DownloadPayload(
     cacheCallback.pfnCancel = NULL; // TODO: set this
     cacheCallback.pv = pProgress;
    
-    // If the protocol is specially marked, "bits" let's use that.
-    if (L'b' == pDownloadSource->sczUrl[0] &&
-        L'i' == pDownloadSource->sczUrl[1] &&
-        L't' == pDownloadSource->sczUrl[2] &&
-        L's' == pDownloadSource->sczUrl[3] &&
-        (L':' == pDownloadSource->sczUrl[4] || (L's' == pDownloadSource->sczUrl[4] && L':' == pDownloadSource->sczUrl[5]))
-        )
-    {
-        hr = BitsDownloadUrl(&cacheCallback, pDownloadSource, wzDestinationPath);
-    }
-    else // wininet handles everything else.
-    {
-        authenticationData.pUX = pProgress->pUX;
-        authenticationData.wzPackageOrContainerId = wzPackageOrContainerId;
-        authenticationData.wzPayloadId = wzPayloadId;
-        authenticationCallback.pv =  static_cast<LPVOID>(&authenticationData);
-        authenticationCallback.pfnAuthenticate = &AuthenticationRequired;
+    authenticationData.pUX = pProgress->pUX;
+    authenticationData.wzPackageOrContainerId = wzPackageOrContainerId;
+    authenticationData.wzPayloadId = wzPayloadId;
+    authenticationCallback.pv =  static_cast<LPVOID>(&authenticationData);
+    authenticationCallback.pfnAuthenticate = &AuthenticationRequired;
         
-        hr = DownloadUrl(pDownloadSource, qwDownloadSize, wzDestinationPath, &cacheCallback, &authenticationCallback);
-    }
+    hr = DownloadUrl(pDownloadSource, qwDownloadSize, wzDestinationPath, &cacheCallback, &authenticationCallback);
     ExitOnFailure(hr, "Failed attempt to download URL: '%ls' to: '%ls'", pDownloadSource->sczUrl, wzDestinationPath);
 
 LExit:
