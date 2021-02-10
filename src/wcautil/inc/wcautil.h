@@ -232,7 +232,7 @@ HRESULT WIXAPI WcaGetRecordFormattedString(
 
 HRESULT WIXAPI WcaAllocStream(
     __deref_out_bcount_part(cbData, 0) BYTE** ppbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 HRESULT WIXAPI WcaFreeStream(
     __in BYTE* pbData
@@ -287,7 +287,7 @@ HRESULT WIXAPI WcaWriteIntegerToCaData(
     );
 HRESULT WIXAPI WcaWriteStreamToCaData(
     __in_bcount(cbData) const BYTE* pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __deref_inout_z_opt LPWSTR* ppwzCustomActionData
     );
 
