@@ -27,6 +27,9 @@ namespace WixToolsetTest.Converters
                 "    <Component Win64='yes'>",
                 "        <File Source='64bit.exe' />",
                 "    </Component>",
+                "    <Component Win64='$(var.Win64)'>",
+                "        <File Source='unconvert.exe' />",
+                "    </Component>",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -43,6 +46,9 @@ namespace WixToolsetTest.Converters
                 "    <Component Bitness=\"always64\">",
                 "        <File Id=\"_64bit.exe\" Source=\"64bit.exe\" />",
                 "    </Component>",
+                "    <Component Bitness=\"$(var.Win64)\">",
+                "        <File Id=\"unconvert.exe\" Source=\"unconvert.exe\" />",
+                "    </Component>",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -53,7 +59,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(7, errors);
+            Assert.Equal(10, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);

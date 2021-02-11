@@ -636,8 +636,8 @@ namespace WixToolset.Converters
                 var win64 = element.Attribute("Win64");
                 if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
                 {
-                    var value = win64.Value;
-                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    var value = this.UpdateWin64ValueToBitnessValue(win64);
+                    element.Add(new XAttribute("Bitness", value));
                     win64.Remove();
                 }
             }
@@ -755,8 +755,8 @@ namespace WixToolset.Converters
             var win64 = element.Attribute("Win64");
             if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
             {
-                var value = win64.Value;
-                element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                var value = this.UpdateWin64ValueToBitnessValue(win64);
+                element.Add(new XAttribute("Bitness", value));
                 win64.Remove();
             }
         }
@@ -1104,8 +1104,8 @@ namespace WixToolset.Converters
                 var win64 = element.Attribute("Win64");
                 if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
                 {
-                    var value = win64.Value;
-                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    var value = this.UpdateWin64ValueToBitnessValue(win64);
+                    element.Add(new XAttribute("Bitness", value));
                     win64.Remove();
                 }
             }
@@ -1296,8 +1296,8 @@ namespace WixToolset.Converters
                 var win64 = element.Attribute("Win64");
                 if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
                 {
-                    var value = win64.Value;
-                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    var value = this.UpdateWin64ValueToBitnessValue(win64);
+                    element.Add(new XAttribute("Bitness", value));
                     win64.Remove();
                 }
 
@@ -1338,6 +1338,21 @@ namespace WixToolset.Converters
             {
                 element.Add(new XAttribute(attributeName, text));
                 RemoveChildren(element);
+            }
+        }
+
+        private string UpdateWin64ValueToBitnessValue(XAttribute xWin64Attribute)
+        {
+            var value = xWin64Attribute.Value ?? String.Empty;
+            switch (value)
+            {
+                case "yes":
+                    return "always64";
+                case "no":
+                    return "always32";
+                default:
+                    this.OnError(ConverterTestType.Win64AttributeRenameCannotBeAutomatic, xWin64Attribute, "Breaking change: The Win64 attribute's value '{0}' cannot be converted automatically to the new Bitness attribute.", value);
+                    return value;
             }
         }
 
@@ -1795,6 +1810,11 @@ namespace WixToolset.Converters
             /// The Win64 attribute has been renamed. Use the Bitness attribute instead.
             /// </summary>
             Win64AttributeRenamed,
+
+            /// <summary>
+            /// Breaking change: The Win64 attribute's value '{0}' cannot be converted automatically to the new Bitness attribute.
+            /// </summary>
+            Win64AttributeRenameCannotBeAutomatic,
         }
     }
 }
