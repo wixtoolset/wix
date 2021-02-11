@@ -88,6 +88,5 @@ namespace WixToolset.Tools
             var command = commandLine.CreateCommand(args);
             return command?.ExecuteAsync(cancellationToken) ?? Task.FromResult(1);
         }
-
     }
 }
