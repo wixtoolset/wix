@@ -8,13 +8,24 @@ namespace WixToolset.Extensibility.Data
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Context provided to the compiler.
+    /// </summary>
     public interface ICompileContext
     {
+        /// <summary>
+        /// Service provider made available to the compiler and its extensions.
+        /// </summary>
         IWixToolsetServiceProvider ServiceProvider { get; }
 
+        /// <summary>
+        /// Unique identifier for the compilation.
+        /// </summary>
         string CompilationId { get; set; }
 
+        /// <summary>
+        /// Set of extensions provided to the compiler.
+        /// </summary>
         IEnumerable<ICompilerExtension> Extensions { get; set; }
 
         /// <summary>
@@ -23,8 +34,19 @@ namespace WixToolset.Extensibility.Data
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
         Platform Platform { get; set; }
 
+        /// <summary>
+        /// Calculates whether the target platform for the compilation is 64-bit or not.
+        /// </summary>
+        bool IsCurrentPlatform64Bit { get; }
+
+        /// <summary>
+        /// Source document being compiled.
+        /// </summary>
         XDocument Source { get; set; }
 
+        /// <summary>
+        /// Cancellation token to abort cancellation.
+        /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
 }
