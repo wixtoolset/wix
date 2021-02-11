@@ -1,9 +1,9 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0" ProductCode="{33C58183-7333-4257-AEFD-6705DA66E617}">
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="ykd0udtb">
-          <Component Id="test.txt" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
+          <Component Id="test.txt" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always32">
             <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
           </Component>
         </Directory>
@@ -15,10 +15,10 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <Media Id="1" />
     <Property Id="SAMPLEREGFOUND">
-      <RegistrySearch Id="RegSearch" Root="HKLM" Key="Reg" Type="raw" Win64="no" />
+      <RegistrySearch Id="RegSearch" Root="HKLM" Key="Reg" Type="raw" Bitness="always32" />
     </Property>
     <Property Id="NESTEDDIRFOUND">
-      <RegistrySearch Id="ARegKeySearch" Root="HKLM" Key="ARegKey" Type="raw" Win64="no">
+      <RegistrySearch Id="ARegKeySearch" Root="HKLM" Key="ARegKey" Type="raw" Bitness="always32">
         <DirectorySearch Id="TopDirSearch" Path="TopDir">
           <DirectorySearch Id="SecondDirSearch" Path="SecondDir">
             <DirectorySearch Id="ThirdDirSearch" Path="ThirdDir">
@@ -29,12 +29,12 @@
       </RegistrySearch>
     </Property>
     <Property Id="SAMPLENESTEDDIRFOUND">
-      <RegistrySearch Id="NestedRegSearch" Root="HKLM" Key="NestedReg" Type="raw" Win64="no">
+      <RegistrySearch Id="NestedRegSearch" Root="HKLM" Key="NestedReg" Type="raw" Bitness="always32">
         <DirectorySearch Id="SampleNestedDirSearch" Path="NestedDir" />
       </RegistrySearch>
     </Property>
     <Property Id="SAMPLEDIRFOUND">
-      <RegistrySearch Id="SubRegSearch" Root="HKLM" Key="SampleReg" Type="raw" Win64="no">
+      <RegistrySearch Id="SubRegSearch" Root="HKLM" Key="SampleReg" Type="raw" Bitness="always32">
         <DirectorySearch Id="SampleDirSearch" Path="SampleDir">
           <DirectorySearch Id="SubDirSearch" Path="Subdir" />
         </DirectorySearch>

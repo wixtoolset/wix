@@ -25,6 +25,8 @@ namespace WixToolset.Core
 
         public Platform Platform { get; set; }
 
+        public bool IsCurrentPlatform64Bit => this.Platform == Platform.ARM64 || this.Platform == Platform.X64;
+
         public XDocument Source { get; set; }
 
         public CancellationToken CancellationToken { get; set; }

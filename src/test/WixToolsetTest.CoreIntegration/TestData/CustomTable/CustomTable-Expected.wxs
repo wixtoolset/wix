@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0" ProductCode="{83F9C623-26FE-42AB-951E-170022117F54}">
     <CustomTable Id="CustomTable1">
       <Column Id="Column1" PrimaryKey="yes" Type="string" Width="0" Category="text" Description="The first custom column." />
@@ -16,7 +16,7 @@
       <Directory Id="ProgramFilesFolder" Name="PFiles">
         <Directory Id="ProgramFiles6432Folder">
           <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="1egc1laj">
-            <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
+            <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always32">
               <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\PFiles\\MsiPackage\test.txt" />
             </Component>
           </Directory>

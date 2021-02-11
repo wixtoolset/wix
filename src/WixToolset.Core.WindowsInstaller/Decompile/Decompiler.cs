@@ -3950,12 +3950,12 @@ namespace WixToolset.Core.WindowsInstaller
 
                 if (WindowsInstallerConstants.MsidbCustomActionType64BitScript == (type & WindowsInstallerConstants.MsidbCustomActionType64BitScript))
                 {
-                    xCustomAction.SetAttributeValue("Win64", "yes");
+                    xCustomAction.SetAttributeValue("Bitness", "always64");
                 }
                 else if (WindowsInstallerConstants.MsidbCustomActionTypeVBScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeVBScript) ||
                     WindowsInstallerConstants.MsidbCustomActionTypeJScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeJScript))
                 {
-                    xCustomAction.SetAttributeValue("Win64", "no");
+                    xCustomAction.SetAttributeValue("Bitness", "always32");
                 }
 
                 switch (type & WindowsInstallerConstants.MsidbCustomActionTypeExecuteBits)
@@ -4191,11 +4191,11 @@ namespace WixToolset.Core.WindowsInstaller
 
                 if (WindowsInstallerConstants.MsidbComponentAttributes64bit == (attributes & WindowsInstallerConstants.MsidbComponentAttributes64bit))
                 {
-                    xComponent.SetAttributeValue("Win64", "yes");
+                    xComponent.SetAttributeValue("Bitness", "always64");
                 }
                 else
                 {
-                    xComponent.SetAttributeValue("Win64", "no");
+                    xComponent.SetAttributeValue("Bitness", "always32");
                 }
 
                 if (WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection == (attributes & WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection))
@@ -6479,12 +6479,12 @@ namespace WixToolset.Core.WindowsInstaller
 
                     if (WindowsInstallerConstants.MsidbLocatorType64bit == (type & WindowsInstallerConstants.MsidbLocatorType64bit))
                     {
-                        xRegistrySearch.SetAttributeValue("Win64", "yes");
+                        xRegistrySearch.SetAttributeValue("Bitness", "always64");
                         type &= ~WindowsInstallerConstants.MsidbLocatorType64bit;
                     }
                     else
                     {
-                        xRegistrySearch.SetAttributeValue("Win64", "no");
+                        xRegistrySearch.SetAttributeValue("Bitness", "always32");
                     }
 
                     switch (type)

@@ -1,9 +1,9 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0" ProductCode="{6CA94D1D-B568-4ED6-9EBC-3534C85970BB}">
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="ykd0udtb">
-          <Component Id="ShortcutComp" Guid="{5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8}" Win64="no">
+          <Component Id="ShortcutComp" Guid="{5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8}" Bitness="always32">
             <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
             <Shortcut Id="FileTargetShortcut" Directory="INSTALLFOLDER" Name="FileTargetShortcut" ShortName="lm2tdtqp" Target="[#test.txt]" />
             <Shortcut Id="CustomTargetShortcut" Directory="INSTALLFOLDER" Name="CustomTargetShortcut" ShortName="treusbt_" Target="[INSTALLFOLDER]custom.target" />

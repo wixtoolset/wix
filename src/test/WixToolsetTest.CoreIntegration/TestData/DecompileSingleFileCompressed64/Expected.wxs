@@ -1,9 +1,9 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Codepage="65001" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{047730A5-30FE-4A62-A520-DA9381B8226A}" Version="1.0.0.0" Compressed="yes" ProductCode="{C51B773A-B3BE-4F29-A8A9-549AAF7FF6EC}">
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="oekcr5lq">
-          <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="yes">
+          <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always64">
             <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\File\filcV1yrx0x8wJWj4qMzcH21jwkPko" />
           </Component>
         </Directory>

@@ -1,10 +1,10 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0" ProductCode="{74C29381-1915-4948-B8B4-5646806A0BD4}">
     <CustomAction Id="CustomAction2" Property="TestAdvtExecuteSequenceProperty" Value="1" />
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="ykd0udtb">
-          <Component Id="test.txt" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
+          <Component Id="test.txt" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always32">
             <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
           </Component>
         </Directory>

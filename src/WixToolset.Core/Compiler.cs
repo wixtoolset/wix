@@ -59,12 +59,8 @@ namespace WixToolset.Core
 
         internal Compiler(IWixToolsetServiceProvider serviceProvider)
         {
-            this.ServiceProvider = serviceProvider;
-
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
-
-        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; }
 
@@ -77,12 +73,6 @@ namespace WixToolset.Core
         /// </summary>
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
         public Platform CurrentPlatform => this.Context.Platform;
-
-        /// <summary>
-        /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
-        /// </summary>
-        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
-        public bool IsCurrentPlatform64Bit => this.Context.Platform == Platform.ARM64 || this.Context.Platform == Platform.X64;
 
         /// <summary>
         /// Gets or sets the option to show pedantic messages.
@@ -1724,14 +1714,12 @@ namespace WixToolset.Core
         private string ParseRegistrySearchElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var explicitWin64 = false;
             Identifier id = null;
             string key = null;
             string name = null;
-            string signature = null;
             RegistryRootType? root = null;
             RegLocatorType? type = null;
-            var search64bit = false;
+            var search64bit = this.Context.IsCurrentPlatform64Bit;
 
             foreach (var attrib in node.Attributes())
             {
@@ -1741,6 +1729,24 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Bitness":
+                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (bitnessValue)
+                        {
+                        case "always32":
+                            search64bit = false;
+                            break;
+                        case "always64":
+                            search64bit = true;
+                            break;
+                        case "default":
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            break;
+                        }
                         break;
                     case "Key":
                         key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1771,10 +1777,6 @@ namespace WixToolset.Core
                             break;
                         }
                         break;
-                    case "Win64":
-                        explicitWin64 = true;
-                        search64bit = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
                         break;
@@ -1784,11 +1786,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
-            }
-
-            if (!explicitWin64 && this.IsCurrentPlatform64Bit)
-            {
-                search64bit = true;
             }
 
             if (null == id)
@@ -1811,7 +1808,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
             }
 
-            signature = id.Id;
+            var signature = id.Id;
             var oneChild = false;
             foreach (var child in node.Elements())
             {
@@ -2125,8 +2122,7 @@ namespace WixToolset.Core
             var sharedDllRefCount = false;
             var transitive = false;
             var uninstallWhenSuperseded = false;
-            var explicitWin64 = false;
-            var win64 = false;
+            var win64 = this.Context.IsCurrentPlatform64Bit;
 
             var multiInstance = false;
             var symbols = new List<string>();
@@ -2140,6 +2136,24 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Bitness":
+                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (bitnessValue)
+                        {
+                        case "always32":
+                            win64 = false;
+                            break;
+                        case "always64":
+                            win64 = true;
+                            break;
+                        case "default":
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            break;
+                        }
                         break;
                     case "ComPlusFlags":
                         comPlusBits = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -2240,15 +2254,6 @@ namespace WixToolset.Core
                         //    bits |= MsiInterop.MsidbComponentAttributesUninstallOnSupersedence;
                         //}
                         break;
-                    case "Win64":
-                        explicitWin64 = true;
-                        win64 = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributes64bit;
-                        //    win64 = true;
-                        //}
-                        break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
                         break;
@@ -2258,12 +2263,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
-            }
-
-            if (!explicitWin64 && this.IsCurrentPlatform64Bit)
-            {
-                //bits |= MsiInterop.MsidbComponentAttributes64bit;
-                win64 = true;
             }
 
             if (id == null)
@@ -3157,6 +3156,26 @@ namespace WixToolset.Core
                         sourceType = CustomActionSourceType.Binary;
                         this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
+                    case "Bitness":
+                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (bitnessValue)
+                        {
+                        case "always32":
+                            explicitWin64 = true;
+                            win64 = false;
+                            break;
+                        case "always64":
+                            explicitWin64 = true;
+                            win64 = true;
+                            break;
+                        case "default":
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            break;
+                        }
+                        break;
                     case "Directory":
                         if (null != source)
                         {
@@ -3345,10 +3364,6 @@ namespace WixToolset.Core
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                         targetType = CustomActionTargetType.VBScript;
                         break;
-                    case "Win64":
-                        explicitWin64 = true;
-                        win64 = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
                         break;
@@ -3366,7 +3381,7 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            if (!explicitWin64 && this.IsCurrentPlatform64Bit && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType))
+            if (!explicitWin64 && this.Context.IsCurrentPlatform64Bit && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType))
             {
                 win64 = true;
             }

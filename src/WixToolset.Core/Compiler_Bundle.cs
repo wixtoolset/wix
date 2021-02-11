@@ -33,7 +33,7 @@ namespace WixToolset.Core
             Identifier id = null;
             string key = null;
             string valueName = null;
-            var win64 = YesNoType.NotSet;
+            var win64 = this.Context.IsCurrentPlatform64Bit;
 
             foreach (var attrib in node.Attributes())
             {
@@ -44,14 +44,29 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
+                    case "Bitness":
+                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (bitnessValue)
+                        {
+                        case "always32":
+                            win64 = false;
+                            break;
+                        case "always64":
+                            win64 = true;
+                            break;
+                        case "default":
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            break;
+                        }
+                        break;
                     case "Key":
                         key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Value":
                         valueName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Win64":
-                        win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -76,7 +91,7 @@ namespace WixToolset.Core
 
             var attributes = WixApprovedExeForElevationAttributes.None;
 
-            if (win64 == YesNoType.Yes)
+            if (win64)
             {
                 attributes |= WixApprovedExeForElevationAttributes.Win64;
             }
