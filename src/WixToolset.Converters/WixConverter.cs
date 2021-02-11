@@ -43,6 +43,7 @@ namespace WixToolset.Converters
         private static readonly XName BootstrapperApplicationElementName = WixNamespace + "BootstrapperApplication";
         private static readonly XName BootstrapperApplicationDllElementName = WixNamespace + "BootstrapperApplicationDll";
         private static readonly XName BootstrapperApplicationRefElementName = WixNamespace + "BootstrapperApplicationRef";
+        private static readonly XName ApprovedExeForElevationElementName = WixNamespace + "ApprovedExeForElevation";
         private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName CatalogElementName = WixNamespace + "Catalog";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
@@ -73,6 +74,7 @@ namespace WixToolset.Converters
         private static readonly XName PublishElementName = WixNamespace + "Publish";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
         private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
+        private static readonly XName RegistrySearchElementName = WixNamespace + "RegistrySearch";
         private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
         private static readonly XName ServiceArgumentElementName = WixNamespace + "ServiceArgument";
         private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
@@ -151,6 +153,7 @@ namespace WixToolset.Converters
                 { WixConverter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
                 { WixConverter.BootstrapperApplicationElementName, this.ConvertBootstrapperApplicationElement },
                 { WixConverter.BootstrapperApplicationRefElementName, this.ConvertBootstrapperApplicationRefElement },
+                { WixConverter.ApprovedExeForElevationElementName, this.ConvertApprovedExeForElevationElement },
                 { WixConverter.CatalogElementName, this.ConvertCatalogElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
                 { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
@@ -175,6 +178,7 @@ namespace WixToolset.Converters
                 { WixConverter.ProgressTextElementName, this.ConvertProgressTextElement },
                 { WixConverter.PublishElementName, this.ConvertPublishElement },
                 { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
+                { WixConverter.RegistrySearchElementName, this.ConvertRegistrySearchElement },
                 { WixConverter.RemotePayloadElementName, this.ConvertRemotePayloadElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
                 { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
@@ -625,6 +629,20 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertApprovedExeForElevationElement(XElement element)
+        {
+            if (this.SourceVersion < 4)
+            {
+                var win64 = element.Attribute("Win64");
+                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
+                {
+                    var value = win64.Value;
+                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    win64.Remove();
+                }
+            }
+        }
+
         private void ConvertBalBootstrapperApplicationRef(XElement element, string theme, XName balBAElementName, XName oldBalBAElementName = null)
         {
             var xBalBa = element.Element(oldBalBAElementName ?? balBAElementName);
@@ -732,6 +750,14 @@ namespace WixToolset.Converters
                     element.Add(new XAttribute("Condition", text));
                     xCondition.Remove();
                 }
+            }
+
+            var win64 = element.Attribute("Win64");
+            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
+            {
+                var value = win64.Value;
+                element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                win64.Remove();
             }
         }
 
@@ -1071,6 +1097,20 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertRegistrySearchElement(XElement element)
+        {
+            if (this.SourceVersion < 4)
+            {
+                var win64 = element.Attribute("Win64");
+                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
+                {
+                    var value = win64.Value;
+                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    win64.Remove();
+                }
+            }
+        }
+
         private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
 
         private void ConvertRowElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
@@ -1241,7 +1281,7 @@ namespace WixToolset.Converters
                 var inheritable = element.Parent.Name == CreateFolderElementName;
                 if (!inheritable)
                 {
-                    if (this.OnError(ConverterTestType.AssignPermissionExInheritable, element, "The PermissionEx Inheritable attribute is being set to 'no' to ensure it remains the same as the v3 default"))
+                    if (this.OnError(ConverterTestType.AssignPermissionExInheritable, element, "The PermissionEx Inheritable attribute is being set to 'no' to ensure it remains the same as the v3 default."))
                     {
                         element.Add(new XAttribute("Inheritable", "no"));
                     }
@@ -1253,6 +1293,14 @@ namespace WixToolset.Converters
         {
             if (this.SourceVersion < 4)
             {
+                var win64 = element.Attribute("Win64");
+                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
+                {
+                    var value = win64.Value;
+                    element.Add(new XAttribute("Bitness", value == "yes" ? "always64" : "always32"));
+                    win64.Remove();
+                }
+
                 var result = element.Attribute("Result")?.Value;
                 if (result == null || result == "value")
                 {
@@ -1742,6 +1790,11 @@ namespace WixToolset.Converters
             /// The ExePackage elements "XxxCommand" attributes have been renamed to "XxxArguments".
             /// </summary>
             RenameExePackageCommandToArguments,
+
+            /// <summary>
+            /// The Win64 attribute has been renamed. Use the Bitness attribute instead.
+            /// </summary>
+            Win64AttributeRenamed,
         }
     }
 }
