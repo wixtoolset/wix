@@ -2684,7 +2684,7 @@ namespace WixToolset.Util
             string key = null;
             string value = null;
             var expand = YesNoType.NotSet;
-            var win64 = YesNoType.NotSet;
+            var win64 = this.Context.IsCurrentPlatform64Bit;
             var attributes = WixRegistrySearchAttributes.Raw | WixRegistrySearchAttributes.WantValue;
 
             foreach (var attrib in element.Attributes())
@@ -2698,6 +2698,24 @@ namespace WixToolset.Util
                         case "Condition":
                         case "After":
                             this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
+                            break;
+                        case "Bitness":
+                            var bitnessValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                            case "always32":
+                                win64 = false;
+                                break;
+                            case "always64":
+                                win64 = true;
+                                break;
+                            case "default":
+                            case "":
+                                break;
+                            default:
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                break;
+                            }
                             break;
                         case "Root":
                             root = this.ParseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
@@ -2741,9 +2759,6 @@ namespace WixToolset.Util
                                     break;
                             }
                             break;
-                        case "Win64":
-                            win64 = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                            break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
@@ -2780,7 +2795,7 @@ namespace WixToolset.Util
                 attributes |= WixRegistrySearchAttributes.ExpandEnvironmentVariables;
             }
 
-            if (win64 == YesNoType.Yes)
+            if (win64)
             {
                 attributes |= WixRegistrySearchAttributes.Win64;
             }

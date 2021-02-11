@@ -243,7 +243,7 @@ namespace WixToolsetTest.Util
                     "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
 
                 var utilSearches = extractResult.SelectManifestNodes("/burn:BurnManifest/*[self::burn:ExtensionSearch or self::burn:FileSearch or self::burn:MsiProductSearch or self::burn:RegistrySearch]");
-                Assert.Equal(4, utilSearches.Count);
+                Assert.Equal(5, utilSearches.Count);
                 Assert.Equal("<ExtensionSearch Id='DetectSHA2SupportId' Variable='IsSHA2Supported' " +
                     "ExtensionId='Wix4UtilBundleExtension_X86' />", utilSearches[0].GetTestXml());
                 Assert.Equal("<FileSearch Id='FileSearchId' Variable='FileSearchVariable' " +
@@ -252,6 +252,8 @@ namespace WixToolsetTest.Util
                     "UpgradeCode='{738D02BF-E231-4370-8209-E9FD4E1BE2A1}' Type='version' />", utilSearches[2].GetTestXml());
                 Assert.Equal("<RegistrySearch Id='RegistrySearchId' Variable='RegistrySearchVariable' " +
                     @"Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' Value='Release' Type='value' VariableType='string' />", utilSearches[3].GetTestXml());
+                Assert.Equal("<RegistrySearch Id='RegistrySearchId64' Variable='RegistrySearchVariable64' " +
+                    @"Root='HKLM' Key='SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' Value='Release' Type='value' Win64='yes' VariableType='string' />", utilSearches[4].GetTestXml());
             }
         }
 

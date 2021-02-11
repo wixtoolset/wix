@@ -1,10 +1,11 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
     <Bundle Name="!(loc.BundleName)" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
         <BootstrapperApplication>
             <BootstrapperApplicationDll SourceFile="fakeba.dll" />
         </BootstrapperApplication>
 
         <util:RegistrySearchRef Id="RegistrySearchId" />
+        <util:RegistrySearchRef Id="RegistrySearchId64" />
         <util:ProductSearchRef Id="ProductSearchId" />
         <util:FileSearchRef Id="FileSearchId" />
         <util:WindowsFeatureSearchRef Id="DetectSHA2SupportId" />
@@ -24,6 +25,17 @@
             Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
             Value="Release"
             Result="value" />
+    </Fragment>
+
+    <Fragment>
+        <util:RegistrySearch
+            Id="RegistrySearchId64"
+            Variable="RegistrySearchVariable64"
+            Root="HKLM"
+            Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+            Value="Release"
+            Result="value"
+            Bitness="always64" />
     </Fragment>
 
     <Fragment>
