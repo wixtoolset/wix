@@ -14,7 +14,7 @@
         Key="SOFTWARE\dotnet\Setup\InstalledVersions\$(var.PLATFORM)"
         Value="InstallLocation"
         Result="value"
-        Win64="no" />
+        Bitness="always32" />
   </Fragment>
   <?endforeach?>
 </Wix>

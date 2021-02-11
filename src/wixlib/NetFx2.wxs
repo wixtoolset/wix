@@ -38,7 +38,7 @@
     <!-- Location of .NET Framework 2.0 (64-bit) redistributable install root directory -->
     <Fragment>
         <Property Id="NETFRAMEWORK20INSTALLROOTDIR64" Secure="yes">
-            <RegistrySearch Id="NetFxInstallRootForNetfx20Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Win64="yes">
+            <RegistrySearch Id="NetFxInstallRootForNetfx20Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Bitness="always64">
                 <DirectorySearch Id="NetFx20InstallRootSearch64" Path="v2.0.50727" Depth="0" />
             </RegistrySearch>
         </Property>

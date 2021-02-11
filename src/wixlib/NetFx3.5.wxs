@@ -50,7 +50,7 @@
     <!-- Location of .NET Framework 3.5 (64-bit) redistributable install root directory -->
     <Fragment>
         <Property Id="NETFRAMEWORK35INSTALLROOTDIR64" Secure="yes">
-            <RegistrySearch Id="NetFxInstallRootForNetfx35Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Win64="yes">
+            <RegistrySearch Id="NetFxInstallRootForNetfx35Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Bitness="always64">
                 <DirectorySearch Id="NetFx35InstallRootSearch64" Path="v3.5" Depth="0" />
             </RegistrySearch>
         </Property>

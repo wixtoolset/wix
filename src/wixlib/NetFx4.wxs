@@ -214,7 +214,7 @@
   <!-- Location of .NET Framework 4.0 client (64-bit) redistributable install root directory -->
   <Fragment>
     <Property Id="NETFRAMEWORK40CLIENTINSTALLROOTDIR64" Secure="yes">
-      <RegistrySearch Id="NetFxInstallRootForNetfx40Client64" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Client" Name="InstallPath" Type="raw" Win64="yes" />
+      <RegistrySearch Id="NetFxInstallRootForNetfx40Client64" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Client" Name="InstallPath" Type="raw" Bitness="always64" />
     </Property>
   </Fragment>
 
@@ -242,7 +242,7 @@
   <!-- Location of .NET Framework 4.0 full (64-bit) redistributable install root directory -->
   <Fragment>
     <Property Id="NETFRAMEWORK40FULLINSTALLROOTDIR64" Secure="yes">
-      <RegistrySearch Id="NetFxInstallRootForNetfx40Full64" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full" Name="InstallPath" Type="raw" Win64="yes" />
+      <RegistrySearch Id="NetFxInstallRootForNetfx40Full64" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full" Name="InstallPath" Type="raw" Bitness="always64" />
     </Property>
   </Fragment>
 

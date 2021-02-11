@@ -39,7 +39,7 @@
     <!-- Location of .NET Framework 3.0 (64-bit) redistributable install root directory -->
     <Fragment>
         <Property Id="NETFRAMEWORK30INSTALLROOTDIR64" Secure="yes">
-            <RegistrySearch Id="NetFxInstallRootForNetfx30Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Win64="yes">
+            <RegistrySearch Id="NetFxInstallRootForNetfx30Search64" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" Bitness="always64">
                 <DirectorySearch Id="NetFx30InstallRootSearch64" Path="v3.0" Depth="0" />
             </RegistrySearch>
         </Property>
