@@ -53,6 +53,13 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.FullyResolved(IntermediateSection)"/>
+        /// </summary>
+        public virtual void FullyResolved(IntermediateSection section)
+        {
+        }
+
+        /// <summary>
         /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
         public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files) => null;
