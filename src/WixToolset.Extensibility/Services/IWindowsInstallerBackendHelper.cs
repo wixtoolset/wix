@@ -8,7 +8,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// Interface provided to help Windows Installer backend extensions.
     /// </summary>
-    public interface IWindowsInstallerBackendHelper
+    public interface IWindowsInstallerBackendHelper : IBackendHelper
     {
         /// <summary>
         /// Creates a <see cref="Row"/> in the specified table.

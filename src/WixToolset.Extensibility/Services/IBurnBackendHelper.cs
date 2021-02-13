@@ -7,7 +7,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// Interface provided to help Burn backend extensions.
     /// </summary>
-    public interface IBurnBackendHelper
+    public interface IBurnBackendHelper : IBackendHelper
     {
         /// <summary>
         /// Adds the given XML to the BootstrapperApplicationData manifest.
