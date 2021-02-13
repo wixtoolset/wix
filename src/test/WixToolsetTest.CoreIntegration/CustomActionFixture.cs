@@ -11,7 +11,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class CustomActionFixture
     {
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6201")]
+        [Fact]
         public void CanDetectCustomActionCycle()
         {
             var folder = TestData.Get(@"TestData");
@@ -22,8 +22,8 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
 
-                var result = WixRunner.Execute(new[]
-                {
+                var exception = Assert.Throws<WixException>(() => WixRunner.Execute(new[]
+                    {
                     "build",
                     Path.Combine(folder, "CustomAction", "CustomActionCycle.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
@@ -31,10 +31,35 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
-                });
+                }));
 
-                var warnings = result.Messages.Where(m => m.Level == MessageLevel.Warning).ToArray();
-                Assert.False(result.ExitCode == 0 && warnings.Length == 0);
+                Assert.Equal("The InstallExecuteSequence table contains an action 'Action1' that is scheduled to come before or after action 'Action3', which is also scheduled to come before or after action 'Action1'.  Please remove this circular dependency by changing the Before or After attribute for one of the actions.", exception.Message);
+            }
+        }
+
+        [Fact]
+        public void CanDetectCustomActionCycleWithTail()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var exception = Assert.Throws<WixException>(() => WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "CustomAction", "CustomActionCycleWithTail.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                }));
+
+                Assert.Equal("The InstallExecuteSequence table contains an action 'Action2' that is scheduled to come before or after action 'Action4', which is also scheduled to come before or after action 'Action2'.  Please remove this circular dependency by changing the Before or After attribute for one of the actions.", exception.Message);
             }
         }
 

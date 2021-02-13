@@ -67,7 +67,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else // not a supported unscheduled action.
                         {
-                            throw new InvalidOperationException("Found an action with no Sequence, Before, or After column set.");
+                            throw new InvalidOperationException($"Found an action [{actionSymbol.Id.Id}] at [{actionSymbol.SourceLineNumbers}] with no Sequence, Before, or After column set.");
                         }
                     }
 
@@ -129,6 +129,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            // A dictionary used for detecting cyclic references among action symbols.
+            var firstReference = new Dictionary<WixActionSymbol, WixActionSymbol>();
+            
             // Build up dependency trees of the relatively scheduled actions.
             // Use ToList() to create a copy of the required action symbols so that new symbols can
             // be added while enumerating.
@@ -142,7 +145,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                     }
 
-                    this.SequenceActionSymbol(actionSymbol, requiredActionSymbols);
+                    this.SequenceActionSymbol(actionSymbol, requiredActionSymbols, firstReference);
                 }
                 else if (SectionType.Module == this.Section.Type && 0 < actionSymbol.Sequence && !WindowsInstallerStandard.IsStandardAction(actionSymbol.Action)) // check for custom actions and dialogs that have a sequence number
                 {
@@ -566,7 +569,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <param name="actionSymbol">The action symbol to be sequenced.</param>
         /// <param name="requiredActionSymbols">Collection of actions which must be included.</param>
-        private void SequenceActionSymbol(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols)
+        private void SequenceActionSymbol(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols, Dictionary<WixActionSymbol, WixActionSymbol> firstReference)
         {
             var after = false;
 
@@ -576,7 +579,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (actionSymbol.Before == null)
             {
-                throw new InvalidOperationException("Found an action with no Sequence, Before, or After column set.");
+                throw new InvalidOperationException($"Found an action [{actionSymbol.Id.Id}] at [{actionSymbol.SourceLineNumbers}] with no Sequence, Before, or After column set.");
             }
 
             var parentActionName = (after ? actionSymbol.After : actionSymbol.Before);
@@ -597,10 +600,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an action with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
                 }
             }
-            else if (actionSymbol == parentActionSymbol || this.ContainsChildActionSymbol(actionSymbol, parentActionSymbol)) // cycle detected
-            {
-                throw new WixException(ErrorMessages.ActionCircularDependency(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, parentActionSymbol.Action));
-            }
+
+            this.CheckForCircularActionReference(actionSymbol, requiredActionSymbols, firstReference);
 
             // Add this action to the appropriate list of dependent action symbols.
             var relativeActions = this.GetRelativeActions(parentActionSymbol);
@@ -608,19 +609,66 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             relatedSymbols.Add(actionSymbol);
         }
 
-        private bool ContainsChildActionSymbol(WixActionSymbol childSymbol, WixActionSymbol parentSymbol)
+        /// <summary>
+        /// Check the specified action symbol to see if it leads to a cycle.
+        /// </summary>
+        /// <para> Use the provided dictionary to note the initial action symbol that first led to each action
+        /// symbol. Any action symbol encountered that has already been encountered starting from a different
+        /// initial action symbol inherits the loop characteristics of that initial action symbol, and thus is
+        /// also not part of a cycle. However, any action symbol encountered that has already been encountered
+        /// starting from the same initial action symbol is an indication that the current action symbol is
+        /// part of a cycle.
+        /// </para>
+        /// <param name="actionSymbol">The action symbol to be checked.</param>
+        /// <param name="requiredActionSymbols">Collection of actions which must be included.</param>
+        /// <param name="firstReference">The first encountered action symbol that led to each action symbol.</param>
+        private void CheckForCircularActionReference(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols, Dictionary<WixActionSymbol, WixActionSymbol> firstReference)
         {
-            var result = false;
+            WixActionSymbol currentActionSymbol = null;
+            var parentActionSymbol = actionSymbol;
 
-            if (this.RelativeActionsForActions.TryGetValue(childSymbol.Id.Id, out var relativeActions))
+            do
             {
-                result = relativeActions.NextActions.Any(a => a.SequenceTable == parentSymbol.SequenceTable && a.Id.Id == parentSymbol.Id.Id) ||
-                     relativeActions.PreviousActions.Any(a => a.SequenceTable == parentSymbol.SequenceTable && a.Id.Id == parentSymbol.Id.Id);
-            }
+                var previousActionSymbol = currentActionSymbol ?? parentActionSymbol;
+                currentActionSymbol = parentActionSymbol;
 
-            return result;
+                if (!firstReference.TryGetValue(currentActionSymbol, out var existingInitialActionSymbol))
+                {
+                    firstReference[currentActionSymbol] = actionSymbol;
+                }
+                else if (existingInitialActionSymbol == actionSymbol)
+                {
+                    throw new WixException(ErrorMessages.ActionCircularDependency(currentActionSymbol.SourceLineNumbers, currentActionSymbol.SequenceTable.ToString(), currentActionSymbol.Action, previousActionSymbol.Action));
+                }
+
+                parentActionSymbol = this.GetParentActionSymbol(currentActionSymbol, requiredActionSymbols);
+            } while (null != parentActionSymbol);
         }
 
+        /// <summary>
+        /// Get the action symbol that is the parent of the given action symbol.
+        /// </summary>
+        /// <param name="actionSymbol">The given action symbol.</param>
+        /// <param name="requiredActionSymbols">Collection of actions which must be included.</param>
+        /// <returns>Null if there is no parent. Used for loop termination.</returns>
+        private WixActionSymbol GetParentActionSymbol(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols)
+        {
+            if (null == actionSymbol.Before && null == actionSymbol.After)
+            {
+                return null;
+            }
+
+            var parentActionKey = actionSymbol.SequenceTable.ToString() + "/" + (actionSymbol.After ?? actionSymbol.Before);
+
+            if (!requiredActionSymbols.TryGetValue(parentActionKey, out var parentActionSymbol))
+            {
+                WindowsInstallerStandard.TryGetStandardAction(parentActionKey, out parentActionSymbol);
+            }
+
+            return parentActionSymbol;
+        }
+    
+        
         private RelativeActions GetRelativeActions(WixActionSymbol action)
         {
             if (!this.RelativeActionsForActions.TryGetValue(action.Id.Id, out var relativeActions))
