@@ -268,8 +268,8 @@ extern "C" HRESULT MspEngineDetectPackage(
                 }
             }
 
-            hr = UserExperienceOnDetectTargetMsiPackage(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, pTargetProduct->patchPackageState);
-            ExitOnRootFailure(hr, "BA aborted detect target MSI package.");
+            hr = UserExperienceOnDetectPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, pTargetProduct->patchPackageState);
+            ExitOnRootFailure(hr, "BA aborted detect patch target.");
         }
     }
 
@@ -300,8 +300,8 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
         BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
 
-        hr = UserExperienceOnPlanTargetMsiPackage(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &requested);
-        ExitOnRootFailure(hr, "BA aborted plan target MSI package.");
+        hr = UserExperienceOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &requested);
+        ExitOnRootFailure(hr, "BA aborted plan patch target.");
 
         // Calculate the execute action.
         switch (pTargetProduct->patchPackageState)

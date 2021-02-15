@@ -237,7 +237,7 @@ BAAPI UserExperienceOnDetectRelatedMsiPackage(
     __in VERUTIL_VERSION* pVersion,
     __in BOOTSTRAPPER_RELATED_OPERATION operation
     );
-BAAPI UserExperienceOnDetectTargetMsiPackage(
+BAAPI UserExperienceOnDetectPatchTarget(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzProductCode,
@@ -391,7 +391,7 @@ BAAPI UserExperienceOnPlanRelatedBundle(
     __in_z LPCWSTR wzBundleId,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     );
-BAAPI UserExperienceOnPlanTargetMsiPackage(
+BAAPI UserExperienceOnPlanPatchTarget(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzProductCode,

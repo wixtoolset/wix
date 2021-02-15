@@ -947,7 +947,7 @@ LExit:
     return hr;
 }
 
-EXTERN_C BAAPI UserExperienceOnDetectTargetMsiPackage(
+EXTERN_C BAAPI UserExperienceOnDetectPatchTarget(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzProductCode,
@@ -955,8 +955,8 @@ EXTERN_C BAAPI UserExperienceOnDetectTargetMsiPackage(
     )
 {
     HRESULT hr = S_OK;
-    BA_ONDETECTTARGETMSIPACKAGE_ARGS args = { };
-    BA_ONDETECTTARGETMSIPACKAGE_RESULTS results = { };
+    BA_ONDETECTPATCHTARGET_ARGS args = { };
+    BA_ONDETECTPATCHTARGET_RESULTS results = { };
 
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
@@ -965,8 +965,8 @@ EXTERN_C BAAPI UserExperienceOnDetectTargetMsiPackage(
 
     results.cbSize = sizeof(results);
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTTARGETMSIPACKAGE, &args, &results);
-    ExitOnFailure(hr, "BA OnDetectTargetMsiPackage failed.");
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPATCHTARGET, &args, &results);
+    ExitOnFailure(hr, "BA OnDetectPatchTarget failed.");
 
     if (results.fCancel)
     {
@@ -1697,7 +1697,7 @@ LExit:
     return hr;
 }
 
-EXTERN_C BAAPI UserExperienceOnPlanTargetMsiPackage(
+EXTERN_C BAAPI UserExperienceOnPlanPatchTarget(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzProductCode,
@@ -1705,8 +1705,8 @@ EXTERN_C BAAPI UserExperienceOnPlanTargetMsiPackage(
     )
 {
     HRESULT hr = S_OK;
-    BA_ONPLANTARGETMSIPACKAGE_ARGS args = { };
-    BA_ONPLANTARGETMSIPACKAGE_RESULTS results = { };
+    BA_ONPLANPATCHTARGET_ARGS args = { };
+    BA_ONPLANPATCHTARGET_RESULTS results = { };
 
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
@@ -1716,8 +1716,8 @@ EXTERN_C BAAPI UserExperienceOnPlanTargetMsiPackage(
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANTARGETMSIPACKAGE, &args, &results);
-    ExitOnFailure(hr, "BA OnPlanTargetMsiPackage failed.");
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPATCHTARGET, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanPatchTarget failed.");
 
     if (results.fCancel)
     {
