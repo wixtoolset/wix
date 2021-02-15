@@ -29,8 +29,8 @@ HRESULT PseudoBundleInitializePassthrough(
     __in BURN_PACKAGE* pPassthroughPackage,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in_z_opt LPCWSTR wzAppendLogPath,
-    __in_z_opt LPWSTR wzActiveParent,
-    __in_z_opt LPWSTR wzAncestors,
+    __in_z_opt LPCWSTR wzActiveParent,
+    __in_z_opt LPCWSTR wzAncestors,
     __in BURN_PACKAGE* pPackage
     );
 

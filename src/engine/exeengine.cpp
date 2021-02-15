@@ -105,7 +105,6 @@ extern "C" void ExeEnginePackageUninitialize(
     ReleaseStr(pPackage->Exe.sczRepairArguments);
     ReleaseStr(pPackage->Exe.sczUninstallArguments);
     ReleaseStr(pPackage->Exe.sczIgnoreDependencies);
-    ReleaseStr(pPackage->Exe.sczAncestors);
     //ReleaseStr(pPackage->Exe.sczProgressSwitch);
     ReleaseMem(pPackage->Exe.rgExitCodes);
 
@@ -334,9 +333,9 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
             ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
         }
 
-        if (pPackage->Exe.sczAncestors)
+        if (pPackage->Exe.wzAncestors)
         {
-            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.sczAncestors, 0);
+            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
             ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
         }
 
@@ -359,9 +358,9 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
             ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
         }
 
-        if (pPackage->Exe.sczAncestors)
+        if (pPackage->Exe.wzAncestors)
         {
-            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.sczAncestors, 0);
+            hr = StrAllocString(&pAction->exePackage.sczAncestors, pPackage->Exe.wzAncestors, 0);
             ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
         }
 

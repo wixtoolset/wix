@@ -475,7 +475,7 @@ LExit:
 }
 
 extern "C" HRESULT PlanPackages(
-    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_REGISTRATION* /*pRegistration*/,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PLAN* pPlan,
@@ -497,22 +497,6 @@ extern "C" HRESULT PlanPackages(
     {
         DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? pPackages->cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
-
-        // Support passing Ancestors to embedded burn bundles
-        if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
-        {
-            // Pass along any ancestors and ourself to prevent infinite loops.
-            if (pRegistration->sczAncestors && *pRegistration->sczAncestors)
-            {
-                hr = StrAllocFormatted(&pPackage->Exe.sczAncestors, L"%ls;%ls", pRegistration->sczAncestors, pRegistration->sczId);
-                ExitOnFailure(hr, "Failed to copy ancestors and self to related bundle ancestors.");
-            }
-            else
-            {
-                hr = StrAllocString(&pPackage->Exe.sczAncestors, pRegistration->sczId, 0);
-                ExitOnFailure(hr, "Failed to copy self to related bundle ancestors.");
-            }
-        }
 
         hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary);
         ExitOnFailure(hr, "Failed to process package.");
@@ -1230,16 +1214,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
         }
 
         // Pass along any ancestors and ourself to prevent infinite loops.
-        if (pRegistration->sczAncestors && *pRegistration->sczAncestors)
-        {
-            hr = StrAllocFormatted(&pRelatedBundle->package.Exe.sczAncestors, L"%ls;%ls", pRegistration->sczAncestors, pRegistration->sczId);
-            ExitOnFailure(hr, "Failed to copy ancestors and self to related bundle ancestors.");
-        }
-        else
-        {
-            hr = StrAllocString(&pRelatedBundle->package.Exe.sczAncestors, pRegistration->sczId, 0);
-            ExitOnFailure(hr, "Failed to copy self to related bundle ancestors.");
-        }
+        pRelatedBundle->package.Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
 
         hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, pPlan->action, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->package.requested);
         ExitOnFailure(hr, "Failed to get default request state for related bundle.");

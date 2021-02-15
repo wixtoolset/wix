@@ -396,6 +396,7 @@ extern "C" void RegistrationUninitialize(
 
     ReleaseStr(pRegistration->sczDetectedProviderKeyBundleId);
     ReleaseStr(pRegistration->sczAncestors);
+    ReleaseStr(pRegistration->sczBundlePackageAncestors);
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
 
     // clear struct

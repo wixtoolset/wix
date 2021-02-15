@@ -138,6 +138,9 @@ typedef struct _BURN_ENGINE_STATE
 HRESULT CoreInitialize(
     __in BURN_ENGINE_STATE* pEngineState
     );
+HRESULT CoreInitializeConstants(
+    __in BURN_ENGINE_STATE* pEngineState
+    );
 HRESULT CoreSerializeEngineState(
     __in BURN_ENGINE_STATE* pEngineState,
     __inout BYTE** ppbBuffer,

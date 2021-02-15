@@ -104,9 +104,9 @@ extern "C" HRESULT CoreInitialize(
     ExitOnFailure(hr, "Failed to parse command line.");
 
     LogId(REPORT_STANDARD, MSG_BURN_COMMAND_LINE, sczSanitizedCommandLine ? sczSanitizedCommandLine : L"");
-
-    hr = DependencyInitialize(&pEngineState->registration, pEngineState->sczIgnoreDependencies);
-    ExitOnFailure(hr, "Failed to initialize dependency data.");
+    
+    hr = CoreInitializeConstants(pEngineState);
+    ExitOnFailure(hr, "Failed to initialize contants.");
 
     // Retain whether bundle was initially run elevated.
     ProcElevated(::GetCurrentProcess(), &fElevated);
@@ -170,6 +170,43 @@ LExit:
     ReleaseStr(sczSanitizedCommandLine);
     ReleaseMem(pbBuffer);
 
+    return hr;
+}
+
+extern "C" HRESULT CoreInitializeConstants(
+    __in BURN_ENGINE_STATE* pEngineState
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_REGISTRATION* pRegistration = &pEngineState->registration;
+
+    hr = DependencyInitialize(pRegistration, pEngineState->sczIgnoreDependencies);
+    ExitOnFailure(hr, "Failed to initialize dependency data.");
+
+    // Support passing Ancestors to embedded burn bundles.
+    if (pRegistration->sczAncestors && *pRegistration->sczAncestors)
+    {
+        hr = StrAllocFormatted(&pRegistration->sczBundlePackageAncestors, L"%ls;%ls", pRegistration->sczAncestors, pRegistration->sczId);
+        ExitOnFailure(hr, "Failed to copy ancestors and self to bundle package ancestors.");
+    }
+    else
+    {
+        hr = StrAllocString(&pRegistration->sczBundlePackageAncestors, pRegistration->sczId, 0);
+        ExitOnFailure(hr, "Failed to copy self to bundle package ancestors.");
+    }
+    
+    for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
+        
+        if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol) // TODO: Don't assume exePackages with burn protocol are bundles.
+        {
+            // Pass along any ancestors and ourself to prevent infinite loops.
+            pPackage->Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
+        }
+    }
+
+LExit:
     return hr;
 }
 

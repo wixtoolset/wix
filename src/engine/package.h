@@ -250,7 +250,7 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczRepairArguments;
             LPWSTR sczUninstallArguments;
             LPWSTR sczIgnoreDependencies;
-            LPWSTR sczAncestors;
+            LPCWSTR wzAncestors; // points directly into engine state.
 
             BOOL fPseudoBundle;
 

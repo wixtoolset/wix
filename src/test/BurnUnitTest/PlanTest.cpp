@@ -679,7 +679,8 @@ namespace Bootstrapper
                 ReleaseStr(sczFilePath);
             }
 
-            DependencyInitialize(&pEngineState->registration, NULL);
+            hr = CoreInitializeConstants(pEngineState);
+            NativeAssert::Succeeded(hr, "Failed to initialize core constants");
 
             pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
         }
