@@ -117,7 +117,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (null != fileInfo)
             {
-                payload.FileSize = (int)fileInfo.Length;
+                payload.FileSize = fileInfo.Length;
 
                 payload.Hash = BundleHashAlgorithm.Hash(fileInfo);
             }
