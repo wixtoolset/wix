@@ -28,6 +28,7 @@ namespace WixToolset.Test.BA
 
         private bool immediatelyQuit;
         private bool quitAfterDetect;
+        private bool explicitlyElevateAndPlanFromOnElevateBegin;
         private int redetectRemaining;
         private int sleepDuringCache;
         private int cancelCacheAtProgress;
@@ -122,6 +123,12 @@ namespace WixToolset.Test.BA
                 redetectCount = 0;
             }
 
+            string explicitlyElevateAndPlanFromOnElevateBegin = this.ReadPackageAction(null, "ExplicitlyElevateAndPlanFromOnElevateBegin");
+            if (String.IsNullOrEmpty(explicitlyElevateAndPlanFromOnElevateBegin) || !Boolean.TryParse(explicitlyElevateAndPlanFromOnElevateBegin, out this.explicitlyElevateAndPlanFromOnElevateBegin))
+            {
+                this.explicitlyElevateAndPlanFromOnElevateBegin = false;
+            }
+
             string quitAfterDetect = this.ReadPackageAction(null, "QuitAfterDetect");
             if (String.IsNullOrEmpty(quitAfterDetect) || !Boolean.TryParse(quitAfterDetect, out this.quitAfterDetect))
             {
@@ -214,6 +221,10 @@ namespace WixToolset.Test.BA
                 {
                     this.ShutdownUiThread();
                 }
+                else if (this.explicitlyElevateAndPlanFromOnElevateBegin)
+                {
+                    this.Engine.Elevate(this.windowHandle);
+                }
                 else
                 {
                     this.Engine.Plan(this.action);
@@ -222,6 +233,17 @@ namespace WixToolset.Test.BA
             else
             {
                 this.ShutdownUiThread();
+            }
+        }
+
+        protected override void OnElevateBegin(ElevateBeginEventArgs args)
+        {
+            if (this.explicitlyElevateAndPlanFromOnElevateBegin)
+            {
+                this.Engine.Plan(this.action);
+
+                // Simulate showing some UI since these tests won't actually show the UAC prompt.
+                MessagePump.ProcessMessages(10);
             }
         }
 
