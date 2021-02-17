@@ -7,6 +7,6 @@
     <Compile Include="..\..\Templates\PackageFail.wxs" Link="PackageFail.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.69" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.72" />
   </ItemGroup>
 </Project>
