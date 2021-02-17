@@ -10,7 +10,7 @@
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x86" BindName="dnc5x86" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Utilities\TestBA\TestBA.csproj" />
+    <ProjectReference Include="..\..\..\TestBA\TestBA.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.83" />

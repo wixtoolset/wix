@@ -1,10 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.BurnE2E
+namespace WixTestTools
 {
     using System;
     using System.IO;
-    using static WixToolsetTest.BurnE2E.MSIExec;
+    using static WixTestTools.MSIExec;
 
     public partial class PackageInstaller : IDisposable
     {

@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using Microsoft.Win32;
+    using WixTestTools;
     using WixToolset.Mba.Core;
 
     public class TestBAController : IDisposable

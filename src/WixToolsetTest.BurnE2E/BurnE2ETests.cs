@@ -4,6 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using System.Collections.Generic;
+    using WixTestTools;
     using Xunit;
     using Xunit.Abstractions;
 
