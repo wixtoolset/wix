@@ -63,5 +63,50 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(false);
             packageB.VerifyInstalled(false);
         }
+
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/5750")]
+        public void CanCancelExecuteWhileCaching()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleB = this.CreateBundleInstaller("BundleB");
+            var testBAController = this.CreateTestBAController();
+
+            // Slow the caching of package B to ensure that package A starts installing and cancels.
+            testBAController.SetPackageCancelExecuteAtProgress("PackageA", 50);
+            testBAController.SetPackageSlowCache("PackageB", 2000);
+
+            bundleB.Install((int)MSIExec.MSIExecReturnCode.ERROR_INSTALL_USEREXIT);
+            bundleB.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+        }
+
+        /// <summary>
+        /// BundleC has non-vital PackageA and vital PackageB.
+        /// PackageA is not compressed in the bundle and has a Name different from the source file. The Name points to a file that does not exist.
+        /// BundleC should be able to install successfully by ignoring the missing PackageA and installing PackageB.
+        /// </summary>
+        [Fact]
+        public void CanInstallWhenMissingNonVitalPackage()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var packageB = this.CreatePackageInstaller("PackageB");
+            var bundleC = this.CreateBundleInstaller("BundleC");
+
+            var bundleCInstallLogFilePath = bundleC.Install();
+            bundleC.VerifyRegisteredAndInPackageCache();
+            Assert.True(LogVerifier.MessageInLogFileRegex(bundleCInstallLogFilePath, "Skipping apply of package: PackageA due to cache error: 0x80070002. Continuing..."));
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(true);
+
+            bundleC.Uninstall();
+            bundleC.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageA.VerifyInstalled(false);
+            packageB.VerifyInstalled(false);
+        }
     }
 }
