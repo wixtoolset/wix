@@ -326,5 +326,28 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyInstalled(false);
             packageAv1.VerifyTestRegistryRootDeleted();
         }
+
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3897")]
+        public void RespectsSlipstreamedPatchInstallCondition()
+        {
+            var testRegistryValue = "PackageA";
+
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var bundleD = this.CreateBundleInstaller("BundleD");
+
+            var packageAv1SourceCodeInstalled = packageAv1.GetInstalledFilePath("Package.wxs");
+            Assert.False(File.Exists(packageAv1SourceCodeInstalled), $"PackageAv1 payload should not be there on test start: {packageAv1SourceCodeInstalled}");
+
+            bundleD.Install();
+            bundleD.VerifyRegisteredAndInPackageCache();
+            Assert.True(File.Exists(packageAv1SourceCodeInstalled), String.Concat("Should have found PackageAv1 payload installed at: ", packageAv1SourceCodeInstalled));
+            // The patch was not supposed to be installed.
+            packageAv1.VerifyTestRegistryValue(testRegistryValue, V100);
+
+            bundleD.Uninstall();
+            bundleD.VerifyUnregisteredAndRemovedFromPackageCache();
+            Assert.False(File.Exists(packageAv1SourceCodeInstalled), String.Concat("PackageAv1 payload should have been removed by uninstall from: ", packageAv1SourceCodeInstalled));
+            packageAv1.VerifyTestRegistryRootDeleted();
+        }
     }
 }
