@@ -58,6 +58,15 @@ namespace WixTestTools
             Assert.Equal(installed, MsiUtilities.IsProductInstalled(productCode));
         }
 
+        public void DeleteTestRegistryValue(string name)
+        {
+            using (var root = this.TestContext.GetTestRegistryRoot())
+            {
+                Assert.NotNull(root);
+                root.DeleteValue(name);
+            }
+        }
+
         public void VerifyTestRegistryRootDeleted()
         {
             using var testRegistryRoot = this.TestContext.GetTestRegistryRoot();

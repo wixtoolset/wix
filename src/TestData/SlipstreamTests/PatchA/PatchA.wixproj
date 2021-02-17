@@ -1,0 +1,12 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <OutputType>PatchCreation</OutputType>
+    <TargetExt>.msp</TargetExt>
+    <SuppressSpecificWarnings>1079</SuppressSpecificWarnings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackageAv1\PackageAv1.wixproj" />
+    <ProjectReference Include="..\PackageAv1_0_1\PackageAv1_0_1.wixproj" />
+  </ItemGroup>
+</Project>
