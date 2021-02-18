@@ -157,25 +157,12 @@ LExit:
 // PlanCalculate - calculates the execute and rollback state for the requested package state.
 //
 extern "C" HRESULT ExeEnginePlanCalculatePackage(
-    __in BURN_PACKAGE* pPackage,
-    __out_opt BOOL* pfBARequestedCache
+    __in BURN_PACKAGE* pPackage
     )
 {
     HRESULT hr = S_OK;
-    //BOOL fCondition = FALSE;
-    //BOOTSTRAPPER_PACKAGE_STATE expected = BOOTSTRAPPER_PACKAGE_STATE_UNKNOWN;
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-    BOOL fBARequestedCache = FALSE;
-
-    //// evaluate rollback install condition
-    //if (pPackage->sczRollbackInstallCondition)
-    //{
-    //    hr = ConditionEvaluate(pVariables, pPackage->sczRollbackInstallCondition, &fCondition);
-    //    ExitOnFailure(hr, "Failed to evaluate rollback install condition.");
-
-    //    expected = fCondition ? BOOTSTRAPPER_PACKAGE_STATE_PRESENT : BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
-    //}
 
     // execute action
     switch (pPackage->currentState)
@@ -208,10 +195,6 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-            break;
-        case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            fBARequestedCache = TRUE;
             break;
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -272,11 +255,6 @@ extern "C" HRESULT ExeEnginePlanCalculatePackage(
     // return values
     pPackage->execute = execute;
     pPackage->rollback = rollback;
-
-    if (pfBARequestedCache)
-    {
-        *pfBARequestedCache = fBARequestedCache;
-    }
 
 LExit:
     return hr;

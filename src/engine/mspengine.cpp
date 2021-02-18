@@ -305,12 +305,10 @@ LExit:
 //
 extern "C" HRESULT MspEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BOOL fInsideMsiTransaction,
-    __out BOOL* pfBARequestedCache
+    __in BOOL fInsideMsiTransaction
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBARequestedCache = FALSE;
 
     for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
     {
@@ -350,11 +348,6 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-                break;
-
-            case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-                execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-                fBARequestedCache = TRUE;
                 break;
 
             default:
@@ -417,11 +410,6 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
         {
             pPackage->rollback = rollback;
         }
-    }
-
-    if (pfBARequestedCache)
-    {
-        *pfBARequestedCache = fBARequestedCache;
     }
 
     return hr;

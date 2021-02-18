@@ -714,8 +714,7 @@ LExit:
 //
 extern "C" HRESULT MsiEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BOOL fInsideMsiTransaction,
-    __out_opt BOOL* pfBARequestedCache
+    __in BOOL fInsideMsiTransaction
     )
 {
     Trace(REPORT_STANDARD, "Planning MSI package 0x%p", pPackage);
@@ -728,7 +727,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOL fFeatureActionDelta = FALSE;
     BOOL fRollbackFeatureActionDelta = FALSE;
-    BOOL fBARequestedCache = FALSE;
 
     if (pPackage->Msi.cFeatures)
     {
@@ -813,11 +811,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
             break;
 
-        case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            fBARequestedCache = TRUE;
-            break;
-
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             break;
@@ -879,11 +872,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     // return values
     pPackage->execute = execute;
     pPackage->rollback = rollback;
-
-    if (pfBARequestedCache)
-    {
-        *pfBARequestedCache = fBARequestedCache;
-    }
 
 LExit:
     return hr;

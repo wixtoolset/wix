@@ -201,7 +201,6 @@ typedef struct _BURN_PACKAGE
     LPWSTR sczRollbackLogPathVariable;  // name of the variable that will be set to the rollback path.
 
     LPWSTR sczInstallCondition;
-    LPWSTR sczRollbackInstallCondition;
     BOOL fPerMachine;
     BOOL fUninstallable;
     BOOL fVital;

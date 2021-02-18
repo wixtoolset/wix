@@ -38,8 +38,7 @@ HRESULT MsiEnginePlanInitializePackage(
     );
 HRESULT MsiEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BOOL fInsideMsiTransaction,
-    __out_opt BOOL* pfBARequestedCache
+    __in BOOL fInsideMsiTransaction
     );
 HRESULT MsiEnginePlanAddPackage(
     __in BOOTSTRAPPER_DISPLAY display,

@@ -166,11 +166,11 @@ static HRESULT PlanDependencyActions(
     );
 static HRESULT CalculateExecuteActions(
     __in BURN_PACKAGE* pPackage,
-    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
-    __out_opt BOOL* pfBARequestedCache
+    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary
     );
 static BOOL NeedsCache(
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fExecute
     );
 static HRESULT CreateContainerProgress(
     __in BURN_PLAN* pPlan,
@@ -1081,24 +1081,24 @@ extern "C" HRESULT PlanExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBARequestedCache = FALSE;
+    BOOL fRequestedCache = BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested ||
+                           BOOTSTRAPPER_REQUEST_STATE_ABSENT < pPackage->requested && BURN_CACHE_TYPE_ALWAYS == pPackage->cacheType;
 
-    hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary, &fBARequestedCache);
+    hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary);
     ExitOnFailure(hr, "Failed to calculate plan actions for package: %ls", pPackage->sczId);
 
     // Calculate package states based on reference count and plan certain dependency actions prior to planning the package execute action.
     hr = DependencyPlanPackageBegin(fPerMachine, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to begin plan dependency actions for package: %ls", pPackage->sczId);
 
-    if (fBARequestedCache || NeedsCache(pPackage))
+    if (fRequestedCache || NeedsCache(pPackage, TRUE))
     {
         hr = AddCachePackage(pPlan, pPackage, phSyncpointEvent);
         ExitOnFailure(hr, "Failed to plan cache package.");
     }
-    else if (BURN_CACHE_STATE_COMPLETE != pPackage->cache && // if the package is not in the cache, disable any rollback that would require the package from the cache.
-             (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pPackage->rollback || (BURN_PACKAGE_TYPE_EXE == pPackage->type && BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->rollback))
-            )
+    else if (BURN_CACHE_STATE_COMPLETE != pPackage->cache && NeedsCache(pPackage, FALSE))
     {
+        // If the package is not in the cache, disable any rollback that would require the package from the cache.
         LogId(REPORT_STANDARD, MSG_PLAN_DISABLING_ROLLBACK_NO_CACHE, pPackage->sczId, LoggingCacheStateToString(pPackage->cache), LoggingActionStateToString(pPackage->rollback));
         pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
@@ -1431,7 +1431,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
         if (BOOTSTRAPPER_REQUEST_STATE_NONE != pRelatedBundle->package.requested)
         {
-            hr = ExeEnginePlanCalculatePackage(&pRelatedBundle->package, NULL);
+            hr = ExeEnginePlanCalculatePackage(&pRelatedBundle->package);
             ExitOnFailure(hr, "Failed to calcuate plan for related bundle: %ls", pRelatedBundle->package.sczId);
 
             // Calculate package states based on reference count for addon and patch related bundles.
@@ -2819,8 +2819,7 @@ LExit:
 
 static HRESULT CalculateExecuteActions(
     __in BURN_PACKAGE* pPackage,
-    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
-    __out_opt BOOL* pfBARequestedCache
+    __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary
     )
 {
     HRESULT hr = S_OK;
@@ -2830,19 +2829,19 @@ static HRESULT CalculateExecuteActions(
     switch (pPackage->type)
     {
     case BURN_PACKAGE_TYPE_EXE:
-        hr = ExeEnginePlanCalculatePackage(pPackage, pfBARequestedCache);
+        hr = ExeEnginePlanCalculatePackage(pPackage);
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction, pfBARequestedCache);
+        hr = MsiEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction, pfBARequestedCache);
+        hr = MspEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:
-        hr = MsuEnginePlanCalculatePackage(pPackage, pfBARequestedCache);
+        hr = MsuEnginePlanCalculatePackage(pPackage);
         break;
 
     default:
@@ -2855,16 +2854,18 @@ LExit:
 }
 
 static BOOL NeedsCache(
-    __in BURN_PACKAGE* pPackage
+    __in BURN_PACKAGE* pPackage,
+    __in BOOL fExecute
     )
 {
+    BOOTSTRAPPER_ACTION_STATE action = fExecute ? pPackage->execute : pPackage->rollback;
     if (BURN_PACKAGE_TYPE_EXE == pPackage->type) // Exe packages require the package for all operations (even uninstall).
     {
-        return BOOTSTRAPPER_ACTION_STATE_NONE != pPackage->execute;
+        return BOOTSTRAPPER_ACTION_STATE_NONE != action;
     }
     else // The other package types can uninstall without the original package.
     {
-        return BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pPackage->execute;
+        return BOOTSTRAPPER_ACTION_STATE_UNINSTALL < action;
     }
 }
 

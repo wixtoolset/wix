@@ -317,7 +317,6 @@ extern "C" void PackageUninitialize(
     ReleaseStr(pPackage->sczLogPathVariable);
     ReleaseStr(pPackage->sczRollbackLogPathVariable);
     ReleaseStr(pPackage->sczInstallCondition);
-    ReleaseStr(pPackage->sczRollbackInstallCondition);
     ReleaseStr(pPackage->sczCacheId);
 
     if (pPackage->rgDependencyProviders)

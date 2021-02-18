@@ -82,14 +82,12 @@ LExit:
 // PlanCalculate - calculates the execute and rollback state for the requested package state.
 //
 extern "C" HRESULT MsuEnginePlanCalculatePackage(
-    __in BURN_PACKAGE* pPackage,
-    __out_opt BOOL* pfBARequestedCache
+    __in BURN_PACKAGE* pPackage
     )
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-    BOOL fBARequestedCache = FALSE;
     BOOL fAllowUninstall = FALSE;
 
     // We can only uninstall MSU packages if they have a KB and we are on Win7 or newer.
@@ -128,10 +126,6 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
             break;
-
-        case BOOTSTRAPPER_REQUEST_STATE_CACHE:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            fBARequestedCache = TRUE;
 
         default:
             execute = BOOTSTRAPPER_ACTION_STATE_NONE;
@@ -186,11 +180,6 @@ extern "C" HRESULT MsuEnginePlanCalculatePackage(
     // return values
     pPackage->execute = execute;
     pPackage->rollback = rollback;
-
-    if (pfBARequestedCache)
-    {
-        *pfBARequestedCache = fBARequestedCache;
-    }
 
 LExit:
     return hr;

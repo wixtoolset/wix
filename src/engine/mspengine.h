@@ -38,8 +38,7 @@ HRESULT MspEnginePlanInitializePackage(
     );
 HRESULT MspEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BOOL fInsideMsiTransaction,
-    __out_opt BOOL* pfBARequestedCache
+    __in BOOL fInsideMsiTransaction
     );
 HRESULT MspEnginePlanAddPackage(
     __in BOOTSTRAPPER_DISPLAY display,
