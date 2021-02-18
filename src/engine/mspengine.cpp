@@ -279,12 +279,32 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT MspEnginePlanInitializePackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    )
+{
+    HRESULT hr = S_OK;
+
+    for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
+    {
+        BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+
+        pTargetProduct->requested = pPackage->requested;
+
+        hr = UserExperienceOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &pTargetProduct->requested);
+        ExitOnRootFailure(hr, "BA aborted plan patch target.");
+    }
+
+LExit:
+    return hr;
+}
+
 //
 // PlanCalculate - calculates the execute and rollback state for the requested package state.
 //
 extern "C" HRESULT MspEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fInsideMsiTransaction,
     __out BOOL* pfBARequestedCache
     )
@@ -296,18 +316,14 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
     {
         BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
 
-        BOOTSTRAPPER_REQUEST_STATE requested = pPackage->requested;
         BOOTSTRAPPER_ACTION_STATE execute = BOOTSTRAPPER_ACTION_STATE_NONE;
         BOOTSTRAPPER_ACTION_STATE rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
-
-        hr = UserExperienceOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &requested);
-        ExitOnRootFailure(hr, "BA aborted plan patch target.");
 
         // Calculate the execute action.
         switch (pTargetProduct->patchPackageState)
         {
         case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
-            switch (requested)
+            switch (pTargetProduct->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 execute = BOOTSTRAPPER_ACTION_STATE_REPAIR;
@@ -329,7 +345,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             break;
 
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
-            switch (requested)
+            switch (pTargetProduct->requested)
             {
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
@@ -354,7 +370,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             switch (pPackage->currentState)
             {
             case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
-                switch (requested)
+                switch (pTargetProduct->requested)
                 {
                 case BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT: __fallthrough;
                 case BOOTSTRAPPER_REQUEST_STATE_ABSENT:
@@ -369,7 +385,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
 
             case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
             case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-                switch (requested)
+                switch (pTargetProduct->requested)
                 {
                 case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
                 case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
@@ -407,8 +423,6 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
     {
         *pfBARequestedCache = fBARequestedCache;
     }
-
-LExit:
 
     return hr;
 }

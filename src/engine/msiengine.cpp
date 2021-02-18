@@ -674,13 +674,46 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT MsiEnginePlanInitializePackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_VARIABLES* pVariables,
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (pPackage->Msi.cFeatures)
+    {
+        // get feature request states
+        for (DWORD i = 0; i < pPackage->Msi.cFeatures; ++i)
+        {
+            BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[i];
+
+            // Evaluate feature conditions.
+            hr = EvaluateActionStateConditions(pVariables, pFeature->sczAddLocalCondition, pFeature->sczAddSourceCondition, pFeature->sczAdvertiseCondition, &pFeature->defaultRequested);
+            ExitOnFailure(hr, "Failed to evaluate requested state conditions.");
+
+            hr = EvaluateActionStateConditions(pVariables, pFeature->sczRollbackAddLocalCondition, pFeature->sczRollbackAddSourceCondition, pFeature->sczRollbackAdvertiseCondition, &pFeature->expectedState);
+            ExitOnFailure(hr, "Failed to evaluate expected state conditions.");
+
+            // Remember the default feature requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
+            pFeature->requested = pFeature->defaultRequested;
+
+            // Send plan MSI feature message to BA.
+            hr = UserExperienceOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &pFeature->requested);
+            ExitOnRootFailure(hr, "BA aborted plan MSI feature.");
+        }
+    }
+
+LExit:
+    return hr;
+}
+
 //
 // PlanCalculate - calculates the execute and rollback state for the requested package state.
 //
 extern "C" HRESULT MsiEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fInsideMsiTransaction,
     __out_opt BOOL* pfBARequestedCache
     )
@@ -702,38 +735,17 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         // If the package is present and we're repairing it.
         BOOL fRepairingPackage = (BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested);
 
-        LogId(REPORT_STANDARD, MSG_PLAN_MSI_FEATURES, pPackage->Msi.cFeatures, pPackage->sczId);
-
         // plan features
         for (DWORD i = 0; i < pPackage->Msi.cFeatures; ++i)
         {
             BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[i];
-            BOOTSTRAPPER_FEATURE_STATE defaultFeatureRequestedState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
-            BOOTSTRAPPER_FEATURE_STATE featureRequestedState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
-            BOOTSTRAPPER_FEATURE_STATE featureExpectedState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
-
-            // Evaluate feature conditions.
-            hr = EvaluateActionStateConditions(pVariables, pFeature->sczAddLocalCondition, pFeature->sczAddSourceCondition, pFeature->sczAdvertiseCondition, &defaultFeatureRequestedState);
-            ExitOnFailure(hr, "Failed to evaluate requested state conditions.");
-
-            hr = EvaluateActionStateConditions(pVariables, pFeature->sczRollbackAddLocalCondition, pFeature->sczRollbackAddSourceCondition, pFeature->sczRollbackAdvertiseCondition, &featureExpectedState);
-            ExitOnFailure(hr, "Failed to evaluate expected state conditions.");
-
-            // Remember the default feature requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
-            featureRequestedState = defaultFeatureRequestedState;
-
-            // Send plan MSI feature message to BA.
-            hr = UserExperienceOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &featureRequestedState);
-            ExitOnRootFailure(hr, "BA aborted plan MSI feature.");
 
             // Calculate feature actions.
-            hr = CalculateFeatureAction(pFeature->currentState, featureRequestedState, fRepairingPackage, &pFeature->execute, &fFeatureActionDelta);
+            hr = CalculateFeatureAction(pFeature->currentState, pFeature->requested, fRepairingPackage, &pFeature->execute, &fFeatureActionDelta);
             ExitOnFailure(hr, "Failed to calculate execute feature state.");
 
-            hr = CalculateFeatureAction(featureRequestedState, BOOTSTRAPPER_FEATURE_ACTION_NONE == pFeature->execute ? featureExpectedState : pFeature->currentState, FALSE, &pFeature->rollback, &fRollbackFeatureActionDelta);
+            hr = CalculateFeatureAction(pFeature->requested, BOOTSTRAPPER_FEATURE_ACTION_NONE == pFeature->execute ? pFeature->expectedState : pFeature->currentState, FALSE, &pFeature->rollback, &fRollbackFeatureActionDelta);
             ExitOnFailure(hr, "Failed to calculate rollback feature state.");
-
-            LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURE, pFeature->sczId, LoggingMsiFeatureStateToString(pFeature->currentState), LoggingMsiFeatureStateToString(defaultFeatureRequestedState), LoggingMsiFeatureStateToString(featureRequestedState), LoggingMsiFeatureActionToString(pFeature->execute), LoggingMsiFeatureActionToString(pFeature->rollback));
         }
     }
 

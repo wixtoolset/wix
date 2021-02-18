@@ -32,9 +32,12 @@ HRESULT MspEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
+HRESULT MspEnginePlanInitializePackage(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    );
 HRESULT MspEnginePlanCalculatePackage(
     __in BURN_PACKAGE* pPackage,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fInsideMsiTransaction,
     __out_opt BOOL* pfBARequestedCache
     );

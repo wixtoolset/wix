@@ -31,10 +31,13 @@ HRESULT MsiEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
-HRESULT MsiEnginePlanCalculatePackage(
+HRESULT MsiEnginePlanInitializePackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BURN_USER_EXPERIENCE* pUserExperience
+    );
+HRESULT MsiEnginePlanCalculatePackage(
+    __in BURN_PACKAGE* pPackage,
     __in BOOL fInsideMsiTransaction,
     __out_opt BOOL* pfBARequestedCache
     );

@@ -326,7 +326,7 @@ Planned feature: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested:
 
 MessageId=204
 Severity=Success
-SymbolicName=MSG_PLAN_MSI_FEATURES
+SymbolicName=MSG_PLANNED_MSI_FEATURES
 Language=English
 Plan %1!u! msi features for package: %2!ls!
 .

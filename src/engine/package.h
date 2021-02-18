@@ -112,6 +112,7 @@ typedef struct _BURN_MSPTARGETPRODUCT
     BOOL fSlipstream;
 
     BOOTSTRAPPER_PACKAGE_STATE patchPackageState; // only valid after Detect.
+    BOOTSTRAPPER_REQUEST_STATE requested;         // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE execute;            // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;           // only valid during Plan.
 
@@ -137,9 +138,12 @@ typedef struct _BURN_MSIFEATURE
     LPWSTR sczRollbackAddSourceCondition;
     LPWSTR sczRollbackAdvertiseCondition;
 
-    BOOTSTRAPPER_FEATURE_STATE currentState;   // only valid after Detect.
-    BOOTSTRAPPER_FEATURE_ACTION execute;       // only valid during Plan.
-    BOOTSTRAPPER_FEATURE_ACTION rollback;      // only valid during Plan.
+    BOOTSTRAPPER_FEATURE_STATE currentState;       // only valid after Detect.
+    BOOTSTRAPPER_FEATURE_STATE expectedState;      // only valid during Plan.
+    BOOTSTRAPPER_FEATURE_STATE defaultRequested;   // only valid during Plan.
+    BOOTSTRAPPER_FEATURE_STATE requested;          // only valid during Plan.
+    BOOTSTRAPPER_FEATURE_ACTION execute;           // only valid during Plan.
+    BOOTSTRAPPER_FEATURE_ACTION rollback;          // only valid during Plan.
 } BURN_MSIFEATURE;
 
 typedef struct _BURN_RELATED_MSI

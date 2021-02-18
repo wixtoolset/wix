@@ -21,6 +21,26 @@ static void ResetPlannedPackageState(
 static void ResetPlannedRollbackBoundaryState(
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
+static HRESULT PlanPackagesHelper(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages,
+    __in BOOL fPlanCleanPackages,
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in_z_opt LPCWSTR wzLayoutDirectory,
+    __inout HANDLE* phSyncpointEvent
+    );
+static HRESULT InitializePackage(
+    __in BURN_PLAN* pPlan,
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_VARIABLES* pVariables,
+    __in BURN_PACKAGE* pPackage,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    );
 static HRESULT ProcessPackage(
     __in BOOL fBundlePerMachine,
     __in BURN_USER_EXPERIENCE* pUX,
@@ -29,7 +49,6 @@ static HRESULT ProcessPackage(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
@@ -146,9 +165,7 @@ static HRESULT PlanDependencyActions(
     __in BURN_PACKAGE* pPackage
     );
 static HRESULT CalculateExecuteActions(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_VARIABLES* pVariables,
     __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
     __out_opt BOOL* pfBARequestedCache
     );
@@ -324,15 +341,13 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
     __in BOOL fPermanent,
     __in BURN_CACHE_TYPE cacheType,
     __in BOOTSTRAPPER_ACTION action,
-    __in BURN_VARIABLES* pVariables,
-    __in_z_opt LPCWSTR wzInstallCondition,
+    __in BOOL fInstallCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     )
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_REQUEST_STATE defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    BOOL fCondition = FALSE;
     BOOL fFallbackToCache = BURN_CACHE_TYPE_ALWAYS == cacheType && BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_PACKAGE_STATE_CACHED > currentState;
 
     // If doing layout, then always default to requesting the file be cached.
@@ -373,14 +388,11 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
         hr = GetActionDefaultRequestState(action, fPermanent, currentState, &defaultRequestState);
         ExitOnFailure(hr, "Failed to get default request state for action.");
 
-        // If there is an install condition (and we're doing an install) evaluate the condition
+        // If we're doing an install, use the install condition
         // to determine whether to use the default request state or make the package absent.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && wzInstallCondition && *wzInstallCondition)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && !fInstallCondition)
         {
-            hr = ConditionEvaluate(pVariables, wzInstallCondition, &fCondition);
-            ExitOnFailure(hr, "Failed to evaluate install condition.");
-
-            *pRequestState = fCondition ? defaultRequestState : BOOTSTRAPPER_REQUEST_STATE_ABSENT;
+            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         }
         else // just set the package to the default request state.
         {
@@ -475,13 +487,11 @@ LExit:
 }
 
 extern "C" HRESULT PlanPackages(
-    __in BURN_REGISTRATION* /*pRegistration*/,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOL /*fBundleInstalled*/,
     __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
@@ -489,39 +499,9 @@ extern "C" HRESULT PlanPackages(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBundlePerMachine = pPlan->fPerMachine; // bundle is per-machine if plan starts per-machine.
-    BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
+    
+    hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, TRUE, pUX, pPlan, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent);
 
-    // Plan the packages.
-    for (DWORD i = 0; i < pPackages->cPackages; ++i)
-    {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? pPackages->cPackages - 1 - i : i;
-        BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
-
-        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary);
-        ExitOnFailure(hr, "Failed to process package.");
-    }
-
-    // If we still have an open rollback boundary, complete it.
-    if (pRollbackBoundary)
-    {
-        hr = PlanRollbackBoundaryComplete(pPlan);
-        ExitOnFailure(hr, "Failed to plan rollback boundary begin.");
-
-        pRollbackBoundary = NULL;
-    }
-
-    // Plan clean up of packages.
-    for (DWORD i = 0; i < pPackages->cPackages; ++i)
-    {
-        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? pPackages->cPackages - 1 - i : i;
-        BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
-
-        hr = PlanCleanPackage(pPlan, pPackage);
-        ExitOnFailure(hr, "Failed to plan clean package.");
-    }
-
-LExit:
     return hr;
 }
 
@@ -735,23 +715,12 @@ extern "C" HRESULT PlanPassThroughBundle(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBundlePerMachine = pPlan->fPerMachine; // bundle is per-machine if plan starts per-machine.
-    BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan passthrough package.
-    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary);
+    // Passthrough packages are never cleaned up by the calling bundle (they delete themselves when appropriate)
+    // so we don't need to plan clean up.
+    hr = PlanPackagesHelper(pPackage, 1, FALSE, pUX, pPlan, pLog, pVariables, display, relationType, NULL, phSyncpointEvent);
     ExitOnFailure(hr, "Failed to process passthrough package.");
-
-    // If we still have an open rollback boundary, complete it.
-    if (pRollbackBoundary)
-    {
-        hr = PlanRollbackBoundaryComplete(pPlan);
-        ExitOnFailure(hr, "Failed to plan rollback boundary for passthrough package.");
-    }
-
-    // Notice that the PlanCleanPackage() function is purposefully missing here. Passthrough packages
-    // are never cleaned up by the calling bundle (they delete themselves when appropriate) so we don't
-    // need to plan clean up.
 
 LExit:
     return hr;
@@ -769,25 +738,149 @@ extern "C" HRESULT PlanUpdateBundle(
     )
 {
     HRESULT hr = S_OK;
+
+    // Plan update package.
+    hr = PlanPackagesHelper(pPackage, 1, TRUE, pUX, pPlan, pLog, pVariables, display, relationType, NULL, phSyncpointEvent);
+    ExitOnFailure(hr, "Failed to process update package.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT PlanPackagesHelper(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages,
+    __in BOOL fPlanCleanPackages,
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in_z_opt LPCWSTR wzLayoutDirectory,
+    __inout HANDLE* phSyncpointEvent
+    )
+{
+    HRESULT hr = S_OK;
     BOOL fBundlePerMachine = pPlan->fPerMachine; // bundle is per-machine if plan starts per-machine.
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
-    // Plan update package.
-    hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary);
-    ExitOnFailure(hr, "Failed to process update package.");
+    // Initialize the packages.
+    for (DWORD i = 0; i < cPackages; ++i)
+    {
+        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        BURN_PACKAGE* pPackage = rgPackages + iPackage;
+
+        hr = InitializePackage(pPlan, pUX, pVariables, pPackage, relationType);
+        ExitOnFailure(hr, "Failed to initialize package.");
+    }
+
+    // Initialize the patch targets after all packages, since they could rely on the requested state of packages that are after the patch's package in the chain.
+    for (DWORD i = 0; i < cPackages; ++i)
+    {
+        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        BURN_PACKAGE* pPackage = rgPackages + iPackage;
+
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
+        {
+            hr = MspEnginePlanInitializePackage(pPackage, pUX);
+            ExitOnFailure(hr, "Failed to initialize plan package: %ls", pPackage->sczId);
+        }
+    }
+
+    // Plan the packages.
+    for (DWORD i = 0; i < cPackages; ++i)
+    {
+        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        BURN_PACKAGE* pPackage = rgPackages + iPackage;
+
+        hr = ProcessPackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, display, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary);
+        ExitOnFailure(hr, "Failed to process package.");
+    }
 
     // If we still have an open rollback boundary, complete it.
     if (pRollbackBoundary)
     {
         hr = PlanRollbackBoundaryComplete(pPlan);
-        ExitOnFailure(hr, "Failed to plan rollback boundary for update package.");
+        ExitOnFailure(hr, "Failed to plan final rollback boundary complete.");
+
+        pRollbackBoundary = NULL;
     }
 
-    // Plan clean up of update package.
-    hr = PlanCleanPackage(pPlan, pPackage);
-    ExitOnFailure(hr, "Failed to plan clean of update package.");
+    if (fPlanCleanPackages)
+    {
+        // Plan clean up of packages.
+        for (DWORD i = 0; i < cPackages; ++i)
+        {
+            DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+            BURN_PACKAGE* pPackage = rgPackages + iPackage;
+
+            hr = PlanCleanPackage(pPlan, pPackage);
+            ExitOnFailure(hr, "Failed to plan clean package.");
+        }
+    }
+
+    // Remove unnecessary actions.
+    hr = PlanFinalizeActions(pPlan);
+    ExitOnFailure(hr, "Failed to remove unnecessary actions from plan.");
+
+    // Let the BA know the actions that were planned.
+    for (DWORD i = 0; i < cPackages; ++i)
+    {
+        DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
+        BURN_PACKAGE* pPackage = rgPackages + iPackage;
+        
+        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback);
+    }
 
 LExit:
+    return hr;
+}
+
+static HRESULT InitializePackage(
+    __in BURN_PLAN* pPlan,
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_VARIABLES* pVariables,
+    __in BURN_PACKAGE* pPackage,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fInstallCondition = FALSE;
+    BOOL fBeginCalled = FALSE;
+
+    if (pPackage->sczInstallCondition && *pPackage->sczInstallCondition)
+    {
+        hr = ConditionEvaluate(pVariables, pPackage->sczInstallCondition, &fInstallCondition);
+        ExitOnFailure(hr, "Failed to evaluate install condition.");
+    }
+    else
+    {
+        fInstallCondition = TRUE;
+    }
+
+    // Remember the default requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
+    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, !pPackage->fUninstallable, pPackage->cacheType, pPlan->action, fInstallCondition, relationType, &pPackage->defaultRequested);
+    ExitOnFailure(hr, "Failed to set default package state.");
+
+    pPackage->requested = pPackage->defaultRequested;
+    fBeginCalled = TRUE;
+
+    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, fInstallCondition, &pPackage->requested);
+    ExitOnRootFailure(hr, "BA aborted plan package begin.");
+
+    if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
+    {
+        hr = MsiEnginePlanInitializePackage(pPackage, pVariables, pUX);
+        ExitOnFailure(hr, "Failed to initialize plan package: %ls", pPackage->sczId);
+    }
+
+LExit:
+    if (fBeginCalled)
+    {
+        UserExperienceOnPlanPackageComplete(pUX, pPackage->sczId, hr, pPackage->requested);
+    }
+
     return hr;
 }
 
@@ -799,7 +892,6 @@ static HRESULT ProcessPackage(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
@@ -807,17 +899,6 @@ static HRESULT ProcessPackage(
 {
     HRESULT hr = S_OK;
     BURN_ROLLBACK_BOUNDARY* pEffectiveRollbackBoundary = NULL;
-    BOOL fPlanPackageBegan = FALSE;
-
-    // Remember the default requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
-    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, !pPackage->fUninstallable, pPackage->cacheType, pPlan->action, pVariables, pPackage->sczInstallCondition, relationType, &pPackage->defaultRequested);
-    ExitOnFailure(hr, "Failed to set default package state.");
-
-    pPackage->requested = pPackage->defaultRequested;
-    fPlanPackageBegan = TRUE;
-
-    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, &pPackage->requested);
-    ExitOnRootFailure(hr, "BA aborted plan package begin.");
 
     pEffectiveRollbackBoundary = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? pPackage->pRollbackBoundaryBackward : pPackage->pRollbackBoundaryForward;
     hr = ProcessPackageRollbackBoundary(pPlan, pEffectiveRollbackBoundary, ppRollbackBoundary);
@@ -896,11 +977,6 @@ static HRESULT ProcessPackage(
     }
 
 LExit:
-    if (fPlanPackageBegan)
-    {
-        UserExperienceOnPlanPackageComplete(pUX, pPackage->sczId, hr, pPackage->currentState, pPackage->requested, pPackage->execute, pPackage->rollback);
-    }
-
     return hr;
 }
 
@@ -1007,7 +1083,7 @@ extern "C" HRESULT PlanExecutePackage(
     HRESULT hr = S_OK;
     BOOL fBARequestedCache = FALSE;
 
-    hr = CalculateExecuteActions(pUserExperience, pPackage, pVariables, pPlan->pActiveRollbackBoundary, &fBARequestedCache);
+    hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary, &fBARequestedCache);
     ExitOnFailure(hr, "Failed to calculate plan actions for package: %ls", pPackage->sczId);
 
     // Calculate package states based on reference count and plan certain dependency actions prior to planning the package execute action.
@@ -1801,6 +1877,9 @@ static void ResetPlannedPackageState(
         {
             BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[i];
 
+            pFeature->expectedState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
+            pFeature->defaultRequested = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
+            pFeature->requested = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
             pFeature->execute = BOOTSTRAPPER_FEATURE_ACTION_NONE;
             pFeature->rollback = BOOTSTRAPPER_FEATURE_ACTION_NONE;
         }
@@ -1811,6 +1890,7 @@ static void ResetPlannedPackageState(
         {
             BURN_MSPTARGETPRODUCT* pTargetProduct = &pPackage->Msp.rgTargetProducts[i];
 
+            pTargetProduct->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
             pTargetProduct->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             pTargetProduct->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
         }
@@ -2738,9 +2818,7 @@ LExit:
 }
 
 static HRESULT CalculateExecuteActions(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_VARIABLES* pVariables,
     __in_opt BURN_ROLLBACK_BOUNDARY* pActiveRollbackBoundary,
     __out_opt BOOL* pfBARequestedCache
     )
@@ -2756,11 +2834,11 @@ static HRESULT CalculateExecuteActions(
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEnginePlanCalculatePackage(pPackage, pVariables, pUserExperience, fInsideMsiTransaction, pfBARequestedCache);
+        hr = MsiEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction, pfBARequestedCache);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEnginePlanCalculatePackage(pPackage, pUserExperience, fInsideMsiTransaction, pfBARequestedCache);
+        hr = MspEnginePlanCalculatePackage(pPackage, fInsideMsiTransaction, pfBARequestedCache);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:
