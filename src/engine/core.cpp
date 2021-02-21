@@ -1153,9 +1153,15 @@ static HRESULT ParseCommandLine(
         if (argv[i][0] == L'-' || argv[i][0] == L'/')
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"l", -1) ||
-                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"log", -1))
+                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"log", -1) ||
+                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"xlog", -1))
             {
                 *pdwLoggingAttributes &= ~BURN_LOGGING_ATTRIBUTE_APPEND;
+
+                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], 1, L"x", 1))
+                {
+                    *pdwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_VERBOSE | BURN_LOGGING_ATTRIBUTE_EXTRADEBUG;
+                }
 
                 if (i + 1 >= argc)
                 {
