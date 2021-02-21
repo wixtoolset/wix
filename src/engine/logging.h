@@ -114,6 +114,11 @@ LPCWSTR LoggingBurnMsiPropertyToString(
     __in BURN_MSI_PROPERTY burnMsiProperty
     );
 
+LPCSTR LoggingMspTargetActionToString(
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in BURN_PATCH_SKIP_STATE skipState
+    );
+
 LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
     );

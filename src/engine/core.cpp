@@ -1822,6 +1822,17 @@ static void LogPackages(
                     LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURE, pFeature->sczId, LoggingMsiFeatureStateToString(pFeature->currentState), LoggingMsiFeatureStateToString(pFeature->defaultRequested), LoggingMsiFeatureStateToString(pFeature->requested), LoggingMsiFeatureActionToString(pFeature->execute), LoggingMsiFeatureActionToString(pFeature->rollback));
                 }
             }
+            else if (BURN_PACKAGE_TYPE_MSP == pPackage->type && pPackage->Msp.cTargetProductCodes)
+            {
+                LogId(REPORT_STANDARD, MSG_PLANNED_MSP_TARGETS, pPackage->Msp.cTargetProductCodes, pPackage->sczId);
+
+                for (DWORD j = 0; j < pPackage->Msp.cTargetProductCodes; ++j)
+                {
+                    const BURN_MSPTARGETPRODUCT* pTargetProduct = &pPackage->Msp.rgTargetProducts[j];
+
+                    LogId(REPORT_STANDARD, MSG_PLANNED_MSP_TARGET, pTargetProduct->wzTargetProductCode, LoggingPackageStateToString(pTargetProduct->patchPackageState), LoggingRequestStateToString(pTargetProduct->defaultRequested), LoggingRequestStateToString(pTargetProduct->requested), LoggingMspTargetActionToString(pTargetProduct->execute, pTargetProduct->executeSkip), LoggingMspTargetActionToString(pTargetProduct->rollback, pTargetProduct->rollbackSkip));
+                }
+            }
         }
 
         // Display related bundles last if caching, installing, modifying, or repairing.

@@ -855,7 +855,6 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     DWORD dwResult = 0;
 
     // serialize message data
-    // TODO: for patching we might not have a package
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->msiPackage.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
@@ -964,9 +963,6 @@ extern "C" HRESULT ElevationExecuteMspPackage(
 
     for (DWORD i = 0; i < pExecuteAction->mspTarget.cOrderedPatches; ++i)
     {
-        hr = BuffWriteNumber(&pbData, &cbData, pExecuteAction->mspTarget.rgOrderedPatches[i].dwOrder);
-        ExitOnFailure(hr, "Failed to write ordered patch order to message buffer.");
-
         hr = BuffWriteString(&pbData, &cbData, pExecuteAction->mspTarget.rgOrderedPatches[i].pPackage->sczId);
         ExitOnFailure(hr, "Failed to write ordered patch id to message buffer.");
     }
@@ -2404,9 +2400,6 @@ static HRESULT OnExecuteMspPackage(
 
         for (DWORD i = 0; i < executeAction.mspTarget.cOrderedPatches; ++i)
         {
-            hr = BuffReadNumber(pbData, cbData, &iData, &executeAction.mspTarget.rgOrderedPatches[i].dwOrder);
-            ExitOnFailure(hr, "Failed to read ordered patch order number.");
-
             hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
             ExitOnFailure(hr, "Failed to read ordered patch package id.");
 

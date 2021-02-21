@@ -208,8 +208,9 @@ typedef struct _BURN_CACHE_ACTION
 
 typedef struct _BURN_ORDERED_PATCHES
 {
-    DWORD dwOrder;
     BURN_PACKAGE* pPackage;
+
+    BURN_MSPTARGETPRODUCT* pTargetProduct; // only valid in the unelevated engine.
 } BURN_ORDERED_PATCHES;
 
 typedef struct _BURN_EXECUTE_ACTION_CHECKPOINT
@@ -253,9 +254,6 @@ typedef struct _BURN_EXECUTE_ACTION
 
             BOOTSTRAPPER_FEATURE_ACTION* rgFeatures;
             BOOTSTRAPPER_ACTION_STATE* rgSlipstreamPatches;
-
-            BURN_ORDERED_PATCHES* rgOrderedPatches;
-            DWORD cPatches;
         } msiPackage;
         struct
         {

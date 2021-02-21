@@ -290,7 +290,7 @@ extern "C" HRESULT MspEnginePlanInitializePackage(
     {
         BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
 
-        pTargetProduct->requested = pPackage->requested;
+        pTargetProduct->defaultRequested = pTargetProduct->requested = pPackage->requested;
 
         hr = UserExperienceOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &pTargetProduct->requested);
         ExitOnRootFailure(hr, "BA aborted plan patch target.");
@@ -1086,14 +1086,14 @@ static HRESULT PlanTargetProduct(
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pAction->mspTarget.rgOrderedPatches), pAction->mspTarget.cOrderedPatches + 1, sizeof(BURN_ORDERED_PATCHES), 2);
     ExitOnFailure(hr, "Failed grow array of ordered patches.");
 
-    pAction->mspTarget.rgOrderedPatches[pAction->mspTarget.cOrderedPatches].dwOrder = pTargetProduct->dwOrder;
+    pAction->mspTarget.rgOrderedPatches[pAction->mspTarget.cOrderedPatches].pTargetProduct = pTargetProduct;
     pAction->mspTarget.rgOrderedPatches[pAction->mspTarget.cOrderedPatches].pPackage = pPackage;
     ++pAction->mspTarget.cOrderedPatches;
 
     // Insertion sort to keep the patches ordered.
     for (DWORD i = pAction->mspTarget.cOrderedPatches - 1; i > 0; --i)
     {
-        if (pAction->mspTarget.rgOrderedPatches[i].dwOrder < pAction->mspTarget.rgOrderedPatches[i - 1].dwOrder)
+        if (pAction->mspTarget.rgOrderedPatches[i].pTargetProduct->dwOrder < pAction->mspTarget.rgOrderedPatches[i - 1].pTargetProduct->dwOrder)
         {
             BURN_ORDERED_PATCHES temp = pAction->mspTarget.rgOrderedPatches[i - 1];
             pAction->mspTarget.rgOrderedPatches[i - 1] = pAction->mspTarget.rgOrderedPatches[i];

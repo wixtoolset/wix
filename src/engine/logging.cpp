@@ -531,6 +531,24 @@ extern "C" LPCWSTR LoggingBurnMsiPropertyToString(
     }
 }
 
+extern "C" LPCSTR LoggingMspTargetActionToString(
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in BURN_PATCH_SKIP_STATE skipState
+    )
+{
+    switch (skipState)
+    {
+    case BURN_PATCH_SKIP_STATE_NONE:
+        return LoggingActionStateToString(action);
+    case BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL:
+        return "Skipped (target uninstall)";
+    case BURN_PATCH_SKIP_STATE_SLIPSTREAM:
+        return "Skipped (slipstream)";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
     )

@@ -149,7 +149,7 @@ static BURN_CACHE_ACTION* ProcessSharedPayload(
     __in BURN_PLAN* pPlan,
     __in BURN_PAYLOAD* pPayload
     );
-static HRESULT RemoveUnnecessaryActions(
+static void RemoveUnnecessaryActions(
     __in BOOL fExecute,
     __in BURN_EXECUTE_ACTION* rgActions,
     __in DWORD cActions
@@ -302,7 +302,6 @@ extern "C" void PlanUninitializeExecuteAction(
         ReleaseStr(pExecuteAction->msiPackage.sczLogPath);
         ReleaseMem(pExecuteAction->msiPackage.rgFeatures);
         ReleaseMem(pExecuteAction->msiPackage.rgSlipstreamPatches);
-        ReleaseMem(pExecuteAction->msiPackage.rgOrderedPatches);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
@@ -1499,11 +1498,9 @@ extern "C" HRESULT PlanFinalizeActions(
 {
     HRESULT hr = S_OK;
 
-    hr = RemoveUnnecessaryActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
-    ExitOnFailure(hr, "Failed to remove unnecessary execute actions.");
+    RemoveUnnecessaryActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
 
-    hr = RemoveUnnecessaryActions(FALSE, pPlan->rgRollbackActions, pPlan->cRollbackActions);
-    ExitOnFailure(hr, "Failed to remove unnecessary execute actions.");
+    RemoveUnnecessaryActions(FALSE, pPlan->rgRollbackActions, pPlan->cRollbackActions);
 
     hr = FinalizeSlipstreamPatchActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
     ExitOnFailure(hr, "Failed to finalize slipstream execute actions.");
@@ -1890,9 +1887,12 @@ static void ResetPlannedPackageState(
         {
             BURN_MSPTARGETPRODUCT* pTargetProduct = &pPackage->Msp.rgTargetProducts[i];
 
+            pTargetProduct->defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
             pTargetProduct->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
             pTargetProduct->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
             pTargetProduct->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
+            pTargetProduct->executeSkip = BURN_PATCH_SKIP_STATE_NONE;
+            pTargetProduct->rollbackSkip = BURN_PATCH_SKIP_STATE_NONE;
         }
     }
 }
@@ -2704,13 +2704,12 @@ static BURN_CACHE_ACTION* ProcessSharedPayload(
     return pAcquireAction;
 }
 
-static HRESULT RemoveUnnecessaryActions(
+static void RemoveUnnecessaryActions(
     __in BOOL fExecute,
     __in BURN_EXECUTE_ACTION* rgActions,
     __in DWORD cActions
     )
 {
-    HRESULT hr = S_OK;
     LPCSTR szExecuteOrRollback = fExecute ? "execute" : "rollback";
 
     for (DWORD i = 0; i < cActions; ++i)
@@ -2722,10 +2721,11 @@ static HRESULT RemoveUnnecessaryActions(
         if (BURN_EXECUTE_ACTION_TYPE_MSP_TARGET == pAction->type && pAction->mspTarget.pChainedTargetPackage)
         {
             BOOTSTRAPPER_ACTION_STATE chainedTargetPackageAction = fExecute ? pAction->mspTarget.pChainedTargetPackage->execute : pAction->mspTarget.pChainedTargetPackage->rollback;
+            BURN_PATCH_SKIP_STATE skipState = BURN_PATCH_SKIP_STATE_NONE;
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == chainedTargetPackageAction)
             {
+                skipState = BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL;
                 LogId(REPORT_STANDARD, MSG_PLAN_SKIP_PATCH_ACTION, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.pChainedTargetPackage->sczId, LoggingActionStateToString(chainedTargetPackageAction), szExecuteOrRollback);
-                pAction->fDeleted = TRUE;
             }
             else if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < chainedTargetPackageAction && pAction->mspTarget.fSlipstream && BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pAction->mspTarget.action)
             {
@@ -2737,14 +2737,31 @@ static HRESULT RemoveUnnecessaryActions(
                 // is already on the machine. The slipstream must be installed standalone if the MSI is being repaired.
                 if (BOOTSTRAPPER_ACTION_STATE_REPAIR != chainedTargetPackageAction || BOOTSTRAPPER_ACTION_STATE_REPAIR == pAction->mspTarget.action)
                 {
+                    skipState = BURN_PATCH_SKIP_STATE_SLIPSTREAM;
                     LogId(REPORT_STANDARD, MSG_PLAN_SKIP_SLIPSTREAM_ACTION, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.pChainedTargetPackage->sczId, LoggingActionStateToString(chainedTargetPackageAction), szExecuteOrRollback);
-                    pAction->fDeleted = TRUE;
+                }
+            }
+
+            if (BURN_PATCH_SKIP_STATE_NONE != skipState)
+            {
+                pAction->fDeleted = TRUE;
+
+                for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
+                {
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->mspTarget.rgOrderedPatches[j].pTargetProduct;
+
+                    if (fExecute)
+                    {
+                        pTargetProduct->executeSkip = skipState;
+                    }
+                    else
+                    {
+                        pTargetProduct->rollbackSkip = skipState;
+                    }
                 }
             }
         }
     }
-
-    return hr;
 }
 
 static HRESULT FinalizeSlipstreamPatchActions(
@@ -3047,17 +3064,13 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
-        for (DWORD j = 0; j < pAction->msiPackage.cPatches; ++j)
-        {
-            LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
-        }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", LoggingBurnMsiPropertyToString(pAction->mspTarget.actionMsiProperty), pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
         {
-            LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
+            LogStringLine(PlanDumpLevel, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].pTargetProduct->dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);
         }
         break;
 
@@ -3088,6 +3101,11 @@ static void ExecuteActionLog(
     default:
         AssertSz(FALSE, "Unknown execute action type.");
         break;
+    }
+
+    if (pAction->fDeleted)
+    {
+        LogStringLine(PlanDumpLevel, "      (deleted action)");
     }
 }
 

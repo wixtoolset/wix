@@ -415,6 +415,20 @@ Language=English
 Plan skipped dependent bundle repair: %1!ls!, type: %2!hs!, because no packages are being executed during this uninstall operation.
 .
 
+MessageId=218
+Severity=Success
+SymbolicName=MSG_PLANNED_MSP_TARGETS
+Language=English
+Plan %1!u! patch targets for package: %2!ls!
+.
+
+MessageId=219
+Severity=Success
+SymbolicName=MSG_PLANNED_MSP_TARGET
+Language=English
+Planned patch target: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!
+.
+
 MessageId=299
 Severity=Success
 SymbolicName=MSG_PLAN_COMPLETE

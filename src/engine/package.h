@@ -86,6 +86,13 @@ enum BURN_PACKAGE_REGISTRATION_STATE
     BURN_PACKAGE_REGISTRATION_STATE_PRESENT,
 };
 
+enum BURN_PATCH_SKIP_STATE
+{
+    BURN_PATCH_SKIP_STATE_NONE,
+    BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL,
+    BURN_PATCH_SKIP_STATE_SLIPSTREAM,
+};
+
 // structs
 
 typedef struct _BURN_EXE_EXIT_CODE
@@ -112,9 +119,12 @@ typedef struct _BURN_MSPTARGETPRODUCT
     BOOL fSlipstream;
 
     BOOTSTRAPPER_PACKAGE_STATE patchPackageState; // only valid after Detect.
+    BOOTSTRAPPER_REQUEST_STATE defaultRequested;  // only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;         // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE execute;            // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;           // only valid during Plan.
+    BURN_PATCH_SKIP_STATE executeSkip;            // only valid during Plan.
+    BURN_PATCH_SKIP_STATE rollbackSkip;           // only valid during Plan.
 
     BURN_PACKAGE_REGISTRATION_STATE registrationState;           // initialized during Detect, updated during Apply.
     BURN_PACKAGE_REGISTRATION_STATE transactionRegistrationState;// only valid during Apply inside an MSI transaction.
