@@ -213,8 +213,8 @@ extern "C" HRESULT MsiEngineParsePackageFromXml(
 
     if (cNodes)
     {
-        pPackage->Msi.rgpSlipstreamMspPackages = reinterpret_cast<BURN_PACKAGE**>(MemAlloc(sizeof(BURN_PACKAGE*) * cNodes, TRUE));
-        ExitOnNull(pPackage->Msi.rgpSlipstreamMspPackages, hr, E_OUTOFMEMORY, "Failed to allocate memory for slipstream MSP packages.");
+        pPackage->Msi.rgSlipstreamMsps = reinterpret_cast<BURN_SLIPSTREAM_MSP*>(MemAlloc(sizeof(BURN_SLIPSTREAM_MSP) * cNodes, TRUE));
+        ExitOnNull(pPackage->Msi.rgSlipstreamMsps, hr, E_OUTOFMEMORY, "Failed to allocate memory for slipstream MSP packages.");
 
         pPackage->Msi.rgsczSlipstreamMspPackageIds = reinterpret_cast<LPWSTR*>(MemAlloc(sizeof(LPWSTR*) * cNodes, TRUE));
         ExitOnNull(pPackage->Msi.rgsczSlipstreamMspPackageIds, hr, E_OUTOFMEMORY, "Failed to allocate memory for slipstream MSP ids.");
@@ -383,13 +383,50 @@ extern "C" void MsiEnginePackageUninitialize(
         MemFree(pPackage->Msi.rgsczSlipstreamMspPackageIds);
     }
 
-    if (pPackage->Msi.rgpSlipstreamMspPackages)
+    if (pPackage->Msi.rgSlipstreamMsps)
     {
-        MemFree(pPackage->Msi.rgpSlipstreamMspPackages);
+        MemFree(pPackage->Msi.rgSlipstreamMsps);
+    }
+
+    if (pPackage->Msi.rgChainedPatches)
+    {
+        MemFree(pPackage->Msi.rgChainedPatches);
     }
 
     // clear struct
     memset(&pPackage->Msi, 0, sizeof(pPackage->Msi));
+}
+
+extern "C" HRESULT MsiEngineDetectInitialize(
+    __in BURN_PACKAGES* pPackages
+    )
+{
+    AssertSz(pPackages->cPatchInfo, "MsiEngineDetectInitialize() should only be called if there are MSP packages.");
+
+    HRESULT hr = S_OK;
+
+    // Add target products for slipstream MSIs that weren't detected.
+    for (DWORD iPackage = 0; iPackage < pPackages->cPackages; ++iPackage)
+    {
+        BURN_PACKAGE* pMsiPackage = pPackages->rgPackages + iPackage;
+        if (BURN_PACKAGE_TYPE_MSI == pMsiPackage->type)
+        {
+            for (DWORD j = 0; j < pMsiPackage->Msi.cSlipstreamMspPackages; ++j)
+            {
+                BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pMsiPackage->Msi.rgSlipstreamMsps + j;
+                Assert(pSlipstreamMsp->pMspPackage && BURN_PACKAGE_TYPE_MSP == pSlipstreamMsp->pMspPackage->type);
+
+                if (pSlipstreamMsp->pMspPackage && BURN_PACKAGE_INVALID_PATCH_INDEX == pSlipstreamMsp->dwMsiChainedPatchIndex)
+                {
+                    hr = MspEngineAddMissingSlipstreamTarget(pMsiPackage, pSlipstreamMsp);
+                    ExitOnFailure(hr, "Failed to add slipstreamed target product code to package: %ls", pSlipstreamMsp->pMspPackage->sczId);
+                }
+            }
+        }
+    }
+
+LExit:
+    return hr;
 }
 
 extern "C" HRESULT MsiEngineDetectPackage(
@@ -969,15 +1006,6 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
         pAction->msiPackage.dwLoggingAttributes = pLog->dwAttributes;
-    }
-
-    // Update any slipstream patches' state.
-    for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
-    {
-        BURN_PACKAGE* pMspPackage = pPackage->Msi.rgpSlipstreamMspPackages[i];
-        AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
-
-        MspEngineSlipstreamUpdateState(pMspPackage, pPackage->execute, pPackage->rollback);
     }
 
 LExit:
@@ -1897,7 +1925,7 @@ static HRESULT ConcatPatchProperty(
     {
         for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
         {
-            BURN_PACKAGE* pMspPackage = pPackage->Msi.rgpSlipstreamMspPackages[i];
+            BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[i].pMspPackage;
             AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
 
             BOOTSTRAPPER_ACTION_STATE patchExecuteAction = rgSlipstreamPatchActions[i];

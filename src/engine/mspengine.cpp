@@ -30,18 +30,23 @@ static HRESULT AddPossibleTargetProduct(
     __inout DWORD* pcPossibleTargetProducts
     );
 static HRESULT AddDetectedTargetProduct(
-    __in BURN_PACKAGES* pPackages,
     __in BURN_PACKAGE* pPackage,
     __in DWORD dwOrder,
     __in_z LPCWSTR wzProductCode,
-    __in MSIINSTALLCONTEXT context
+    __in MSIINSTALLCONTEXT context,
+    __out DWORD* pdwTargetProductIndex
     );
-static void DeterminePatchChainedTarget(
+static HRESULT AddMsiChainedPatch(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PACKAGE* pMspPackage,
+    __in DWORD dwMspTargetProductIndex,
+    __out DWORD* pdwChainedPatchIndex
+    );
+static HRESULT DeterminePatchChainedTarget(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PACKAGE* pMspPackage,
     __in LPCWSTR wzTargetProductCode,
-    __out BURN_PACKAGE** ppChainedTargetPackage,
-    __out BOOL* pfSlipstreamed
+    __in DWORD dwMspTargetProductIndex
     );
 static HRESULT PlanTargetProduct(
     __in BOOTSTRAPPER_DISPLAY display,
@@ -159,16 +164,20 @@ extern "C" HRESULT MspEngineDetectInitialize(
         {
             for (DWORD iPatchInfo = 0; iPatchInfo < pPackages->cPatchInfo; ++iPatchInfo)
             {
-                if (ERROR_SUCCESS == pPackages->rgPatchInfo[iPatchInfo].uStatus)
-                {
-                    BURN_PACKAGE* pMspPackage = pPackages->rgPatchInfoToPackage[iPatchInfo];
-                    Assert(BURN_PACKAGE_TYPE_MSP == pMspPackage->type);
+                hr = HRESULT_FROM_WIN32(pPackages->rgPatchInfo[iPatchInfo].uStatus);
+                BURN_PACKAGE* pMspPackage = pPackages->rgPatchInfoToPackage[iPatchInfo];
+                Assert(BURN_PACKAGE_TYPE_MSP == pMspPackage->type);
 
+                if (S_OK == hr)
+                {
                     // Note that we do add superseded and obsolete MSP packages. Package Detect and Plan will sort them out later.
-                    hr = AddDetectedTargetProduct(pPackages, pMspPackage, pPackages->rgPatchInfo[iPatchInfo].dwOrder, pPossibleTargetProduct->wzProductCode, pPossibleTargetProduct->context);
+                    hr = MspEngineAddDetectedTargetProduct(pPackages, pMspPackage, pPackages->rgPatchInfo[iPatchInfo].dwOrder, pPossibleTargetProduct->wzProductCode, pPossibleTargetProduct->context);
                     ExitOnFailure(hr, "Failed to add target product code to package: %ls", pMspPackage->sczId);
                 }
-                // TODO: should we log something for this error case?
+                else
+                {
+                    LogStringLine(REPORT_DEBUG, "      0x%x: Patch applicability failed for package: %ls", hr, pMspPackage->sczId);
+                }
             }
         }
         else
@@ -189,6 +198,54 @@ LExit:
         MemFree(rgPossibleTargetProducts);
     }
 
+    return hr;
+}
+
+extern "C" HRESULT MspEngineAddDetectedTargetProduct(
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_PACKAGE* pPackage,
+    __in DWORD dwOrder,
+    __in_z LPCWSTR wzProductCode,
+    __in MSIINSTALLCONTEXT context
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwTargetProductIndex = 0;
+
+    hr = AddDetectedTargetProduct(pPackage, dwOrder, wzProductCode, context, &dwTargetProductIndex);
+    ExitOnFailure(hr, "Failed to add detected target product.");
+
+    hr = DeterminePatchChainedTarget(pPackages, pPackage, wzProductCode, dwTargetProductIndex);
+    ExitOnFailure(hr, "Failed to determine patch chained target.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT MspEngineAddMissingSlipstreamTarget(
+    __in BURN_PACKAGE* pMsiPackage,
+    __in BURN_SLIPSTREAM_MSP* pSlipstreamMsp
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwTargetProductIndex = 0;
+    BURN_MSPTARGETPRODUCT* pTargetProduct = NULL;
+    DWORD dwChainedPatchIndex = 0;
+
+    hr = AddDetectedTargetProduct(pSlipstreamMsp->pMspPackage, 0, pMsiPackage->Msi.sczProductCode, pMsiPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, &dwTargetProductIndex);
+    ExitOnFailure(hr, "Failed to add missing slipstream target.");
+
+    pTargetProduct = pSlipstreamMsp->pMspPackage->Msp.rgTargetProducts + dwTargetProductIndex;
+    pTargetProduct->fSlipstream = TRUE;
+    pTargetProduct->fSlipstreamRequired = TRUE;
+    pTargetProduct->pChainedTargetPackage = pMsiPackage;
+
+    hr = AddMsiChainedPatch(pMsiPackage, pSlipstreamMsp->pMspPackage, dwTargetProductIndex, &dwChainedPatchIndex);
+    ExitOnFailure(hr, "Failed to add chained patch.");
+
+    pSlipstreamMsp->dwMsiChainedPatchIndex = dwChainedPatchIndex;
+
+LExit:
     return hr;
 }
 
@@ -219,7 +276,6 @@ extern "C" HRESULT MspEngineDetectPackage(
         for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
         {
             BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
-            BOOL fInstalled = FALSE;
 
             hr = WiuGetPatchInfoEx(pPackage->Msp.sczPatchCode, pTargetProduct->wzTargetProductCode, NULL, pTargetProduct->context, INSTALLPROPERTY_PATCHSTATE, &sczState);
             if (SUCCEEDED(hr))
@@ -227,17 +283,17 @@ extern "C" HRESULT MspEngineDetectPackage(
                 switch (*sczState)
                 {
                 case '1':
-                    fInstalled = TRUE;
+                    pTargetProduct->fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
                     break;
 
                 case '2':
-                    fInstalled = TRUE;
+                    pTargetProduct->fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
                     break;
 
                 case '4':
-                    fInstalled = TRUE;
+                    pTargetProduct->fInstalled = TRUE;
                     pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
                     break;
 
@@ -246,7 +302,7 @@ extern "C" HRESULT MspEngineDetectPackage(
                     break;
                 }
             }
-            else if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PATCH) == hr)
+            else if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PATCH) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr)
             {
                 pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT;
                 hr = S_OK;
@@ -260,9 +316,9 @@ extern "C" HRESULT MspEngineDetectPackage(
 
             if (pPackage->fCanAffectRegistration)
             {
-                pTargetProduct->registrationState = fInstalled ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+                pTargetProduct->registrationState = pTargetProduct->fInstalled ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
 
-                if (fInstalled)
+                if (pTargetProduct->fInstalled)
                 {
                     pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
                 }
@@ -289,6 +345,13 @@ extern "C" HRESULT MspEnginePlanInitializePackage(
     for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
     {
         BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+
+        if (!pTargetProduct->fInstalled && pTargetProduct->fSlipstreamRequired && BOOTSTRAPPER_REQUEST_STATE_PRESENT > pTargetProduct->pChainedTargetPackage->requested)
+        {
+            // There's no way to apply the patch if the target isn't installed.
+            pTargetProduct->defaultRequested = pTargetProduct->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
+            continue;
+        }
 
         pTargetProduct->defaultRequested = pTargetProduct->requested = pPackage->requested;
 
@@ -637,32 +700,6 @@ LExit:
     return hr;
 }
 
-extern "C" void MspEngineSlipstreamUpdateState(
-    __in BURN_PACKAGE* pPackage,
-    __in BOOTSTRAPPER_ACTION_STATE execute,
-    __in BOOTSTRAPPER_ACTION_STATE rollback
-    )
-{
-    Assert(BURN_PACKAGE_TYPE_MSP == pPackage->type);
-
-    // If the dependency manager set our state then that means something else
-    // is dependent on our package. That trumps whatever the slipstream update
-    // state might set.
-    if (!pPackage->fDependencyManagerWasHere)
-    {
-        // The highest aggregate action state found will be returned.
-        if (pPackage->execute < execute)
-        {
-            pPackage->execute = execute;
-        }
-
-        if (pPackage->rollback < rollback)
-        {
-            pPackage->rollback = rollback;
-        }
-    }
-}
-
 extern "C" void MspEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,
     __in HRESULT hrExecute,
@@ -926,43 +963,68 @@ LExit:
 }
 
 static HRESULT AddDetectedTargetProduct(
-    __in BURN_PACKAGES* pPackages,
     __in BURN_PACKAGE* pPackage,
     __in DWORD dwOrder,
     __in_z LPCWSTR wzProductCode,
-    __in MSIINSTALLCONTEXT context
+    __in MSIINSTALLCONTEXT context,
+    __out DWORD* pdwTargetProductIndex
     )
 {
     HRESULT hr = S_OK;
+    BURN_MSPTARGETPRODUCT* pTargetProduct = NULL;
+
+    *pdwTargetProductIndex = BURN_PACKAGE_INVALID_PATCH_INDEX;
 
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPackage->Msp.rgTargetProducts), pPackage->Msp.cTargetProductCodes + 1, sizeof(BURN_MSPTARGETPRODUCT), 5);
     ExitOnFailure(hr, "Failed to ensure enough target product codes were allocated.");
 
-    hr = ::StringCchCopyW(pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].wzTargetProductCode, countof(pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].wzTargetProductCode), wzProductCode);
+    pTargetProduct = pPackage->Msp.rgTargetProducts + pPackage->Msp.cTargetProductCodes;
+
+    hr = ::StringCchCopyW(pTargetProduct->wzTargetProductCode, countof(pTargetProduct->wzTargetProductCode), wzProductCode);
     ExitOnFailure(hr, "Failed to copy target product code.");
 
-    DeterminePatchChainedTarget(pPackages, pPackage, wzProductCode,
-                                &pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].pChainedTargetPackage,
-                                &pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].fSlipstream);
+    pTargetProduct->context = context;
+    pTargetProduct->dwOrder = dwOrder;
 
-    pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].context = context;
-    pPackage->Msp.rgTargetProducts[pPackage->Msp.cTargetProductCodes].dwOrder = dwOrder;
+    *pdwTargetProductIndex = pPackage->Msp.cTargetProductCodes;
     ++pPackage->Msp.cTargetProductCodes;
 
 LExit:
     return hr;
 }
 
-static void DeterminePatchChainedTarget(
+static HRESULT AddMsiChainedPatch(
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PACKAGE* pMspPackage,
+    __in DWORD dwMspTargetProductIndex,
+    __out DWORD* pdwChainedPatchIndex
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pPackage->Msi.rgChainedPatches), pPackage->Msi.cChainedPatches + 1, sizeof(BURN_CHAINED_PATCH), 5);
+    ExitOnFailure(hr, "Failed to ensure enough chained patches were allocated.");
+
+    BURN_CHAINED_PATCH* pChainedPatch = pPackage->Msi.rgChainedPatches + pPackage->Msi.cChainedPatches;
+    pChainedPatch->pMspPackage = pMspPackage;
+    pChainedPatch->dwMspTargetProductIndex = dwMspTargetProductIndex;
+
+    *pdwChainedPatchIndex = pPackage->Msi.cChainedPatches;
+    ++pPackage->Msi.cChainedPatches;
+LExit:
+    return hr;
+}
+
+static HRESULT DeterminePatchChainedTarget(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PACKAGE* pMspPackage,
     __in LPCWSTR wzTargetProductCode,
-    __out BURN_PACKAGE** ppChainedTargetPackage,
-    __out BOOL* pfSlipstreamed
+    __in DWORD dwMspTargetProductIndex
     )
 {
-    BURN_PACKAGE* pTargetMsiPackage = NULL;
-    BOOL fSlipstreamed = FALSE;
+    HRESULT hr = S_OK;
+    DWORD dwChainedPatchIndex = 0;
+    BURN_MSPTARGETPRODUCT* pTargetProduct = pMspPackage->Msp.rgTargetProducts + dwMspTargetProductIndex;
 
     for (DWORD iPackage = 0; iPackage < pPackages->cPackages; ++iPackage)
     {
@@ -970,15 +1032,19 @@ static void DeterminePatchChainedTarget(
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzTargetProductCode, -1, pPackage->Msi.sczProductCode, -1))
         {
-            pTargetMsiPackage = pPackage;
+            pTargetProduct->pChainedTargetPackage = pPackage;
+
+            hr = AddMsiChainedPatch(pPackage, pMspPackage, dwMspTargetProductIndex, &dwChainedPatchIndex);
+            ExitOnFailure(hr, "Failed to add chained patch.");
 
             for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
             {
-                BURN_PACKAGE* pSlipstreamMsp = pPackage->Msi.rgpSlipstreamMspPackages[j];
-                if (pSlipstreamMsp == pMspPackage)
+                BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + j;
+                if (pSlipstreamMsp->pMspPackage == pMspPackage)
                 {
-                    AssertSz(!fSlipstreamed, "An MSP should only show up as a slipstreamed patch in an MSI once.");
-                    fSlipstreamed = TRUE;
+                    AssertSz(BURN_PACKAGE_INVALID_PATCH_INDEX == pSlipstreamMsp->dwMsiChainedPatchIndex, "An MSP should only show up as a slipstreamed patch in an MSI once.");
+                    pTargetProduct->fSlipstream = TRUE;
+                    pSlipstreamMsp->dwMsiChainedPatchIndex = dwChainedPatchIndex;
                     break;
                 }
             }
@@ -987,10 +1053,8 @@ static void DeterminePatchChainedTarget(
         }
     }
 
-    *ppChainedTargetPackage = pTargetMsiPackage;
-    *pfSlipstreamed = fSlipstreamed;
-
-    return;
+LExit:
+    return hr;
 }
 
 static HRESULT PlanTargetProduct(

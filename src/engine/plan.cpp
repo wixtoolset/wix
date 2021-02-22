@@ -2168,7 +2168,7 @@ static HRESULT AddCacheSlipstreamMsps(
 
     for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
     {
-        BURN_PACKAGE* pMspPackage = pPackage->Msi.rgpSlipstreamMspPackages[i];
+        BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[i].pMspPackage;
         AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
 
         hr = AddCachePackageHelper(pPlan, pMspPackage, &hIgnored);
@@ -2791,7 +2791,7 @@ static HRESULT FinalizeSlipstreamPatchActions(
             {
                 for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
                 {
-                    BURN_PACKAGE* pMspPackage = pPackage->Msi.rgpSlipstreamMspPackages[j];
+                    BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[j].pMspPackage;
                     AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
 
                     pAction->msiPackage.rgSlipstreamPatches[j] = fExecute ? pMspPackage->execute : pMspPackage->rollback;

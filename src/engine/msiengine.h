@@ -27,6 +27,9 @@ HRESULT MsiEngineParsePropertiesFromXml(
 void MsiEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     );
+HRESULT MsiEngineDetectInitialize(
+    __in BURN_PACKAGES* pPackages
+    );
 HRESULT MsiEngineDetectPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_USER_EXPERIENCE* pUserExperience

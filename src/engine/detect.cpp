@@ -82,6 +82,16 @@ extern "C" void DetectReset(
 
                 pFeature->currentState = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
             }
+
+            for (DWORD iSlipstreamMsp = 0; iSlipstreamMsp < pPackage->Msi.cSlipstreamMspPackages; ++iSlipstreamMsp)
+            {
+                BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + iSlipstreamMsp;
+
+                pSlipstreamMsp->dwMsiChainedPatchIndex = BURN_PACKAGE_INVALID_PATCH_INDEX;
+            }
+
+            ReleaseNullMem(pPackage->Msi.rgChainedPatches);
+            pPackage->Msi.cChainedPatches = 0;
         }
         else if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
         {

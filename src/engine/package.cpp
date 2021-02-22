@@ -282,7 +282,9 @@ extern "C" HRESULT PackagesParseFromXml(
                         {
                             if (pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k] && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k], -1))
                             {
-                                pMsiPackage->Msi.rgpSlipstreamMspPackages[k] = pPackage;
+                                BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pMsiPackage->Msi.rgSlipstreamMsps + k;
+                                pSlipstreamMsp->pMspPackage = pPackage;
+                                pSlipstreamMsp->dwMsiChainedPatchIndex = BURN_PACKAGE_INVALID_PATCH_INDEX;
 
                                 ReleaseNullStr(pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k]); // we don't need the slipstream package id any longer so free it.
                             }
@@ -294,6 +296,25 @@ extern "C" HRESULT PackagesParseFromXml(
     }
 
     AssertSz(pPackages->cPatchInfo == cMspPackages, "Count of packages patch info should be equal to the number of MSP packages.");
+
+#if DEBUG
+    // Loop through all MSI packages seeing if any of them are missing their slipstream MSP.
+    for (DWORD i = 0; i < pPackages->cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = &pPackages->rgPackages[i];
+
+        if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
+        {
+            for (DWORD k = 0; k < pPackage->Msi.cSlipstreamMspPackages; ++k)
+            {
+                if (pPackage->Msi.rgsczSlipstreamMspPackageIds[k])
+                {
+                    AssertSz(FALSE, "MSI slipstream MSP package doesn't exist.");
+                }
+            }
+        }
+    }
+#endif
 
     hr = ParsePatchTargetCode(pPackages, pixnBundle);
     ExitOnFailure(hr, "Failed to parse target product codes.");

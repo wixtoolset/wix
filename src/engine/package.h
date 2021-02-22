@@ -14,6 +14,8 @@ typedef _BURN_PACKAGE BURN_PACKAGE;
 
 // constants
 
+const DWORD BURN_PACKAGE_INVALID_PATCH_INDEX = 0x80000000;
+
 enum BURN_EXE_EXIT_CODE_TYPE
 {
     BURN_EXE_EXIT_CODE_TYPE_NONE,
@@ -116,7 +118,9 @@ typedef struct _BURN_MSPTARGETPRODUCT
     DWORD dwOrder;
     WCHAR wzTargetProductCode[39];
     BURN_PACKAGE* pChainedTargetPackage;
+    BOOL fInstalled;
     BOOL fSlipstream;
+    BOOL fSlipstreamRequired; // this means the target product is not present on the machine, but is available in the chain as a slipstream target.
 
     BOOTSTRAPPER_PACKAGE_STATE patchPackageState; // only valid after Detect.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;  // only valid during Plan.
@@ -171,6 +175,18 @@ typedef struct _BURN_RELATED_MSI
     DWORD* rgdwLanguages;
     DWORD cLanguages;
 } BURN_RELATED_MSI;
+
+typedef struct _BURN_CHAINED_PATCH
+{
+    BURN_PACKAGE* pMspPackage;
+    DWORD dwMspTargetProductIndex; // index into the Msp.rgTargetProducts
+} BURN_CHAINED_PATCH;
+
+typedef struct _BURN_SLIPSTREAM_MSP
+{
+    BURN_PACKAGE* pMspPackage;
+    DWORD dwMsiChainedPatchIndex; // index into the Msi.rgChainedPatches
+} BURN_SLIPSTREAM_MSP;
 
 typedef struct _BURN_PACKAGE_PAYLOAD
 {
@@ -295,9 +311,12 @@ typedef struct _BURN_PACKAGE
             BURN_RELATED_MSI* rgRelatedMsis;
             DWORD cRelatedMsis;
 
-            _BURN_PACKAGE** rgpSlipstreamMspPackages;
+            BURN_SLIPSTREAM_MSP* rgSlipstreamMsps;
             LPWSTR* rgsczSlipstreamMspPackageIds;
             DWORD cSlipstreamMspPackages;
+
+            BURN_CHAINED_PATCH* rgChainedPatches;
+            DWORD cChainedPatches;
         } Msi;
         struct
         {

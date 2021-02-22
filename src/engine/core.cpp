@@ -351,6 +351,9 @@ extern "C" HRESULT CoreDetect(
     {
         hr = MspEngineDetectInitialize(&pEngineState->packages);
         ExitOnFailure(hr, "Failed to initialize MSP engine detection.");
+
+        hr = MsiEngineDetectInitialize(&pEngineState->packages);
+        ExitOnFailure(hr, "Failed to initialize MSI engine detection.");
     }
 
     for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
