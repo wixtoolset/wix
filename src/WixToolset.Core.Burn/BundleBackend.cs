@@ -17,7 +17,7 @@ namespace WixToolset.Core.Burn
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendExtensions = extensionManager.GetServices<IBurnBackendExtension>();
+            var backendExtensions = extensionManager.GetServices<IBurnBackendBinderExtension>();
 
             foreach (var extension in backendExtensions)
             {

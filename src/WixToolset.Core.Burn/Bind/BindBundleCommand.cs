@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal class BindBundleCommand
     {
-        public BindBundleCommand(IBindContext context, IEnumerable<IBurnBackendExtension> backedExtensions)
+        public BindBundleCommand(IBindContext context, IEnumerable<IBurnBackendBinderExtension> backedExtensions)
         {
             this.ServiceProvider = context.ServiceProvider;
 
@@ -58,7 +58,7 @@ namespace WixToolset.Core.Burn
 
         public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; }
 
-        private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private Intermediate Output {  get; }
 
@@ -380,16 +380,21 @@ namespace WixToolset.Core.Burn
             // Update the bundle per-machine/per-user scope based on the chained packages.
             this.ResolveBundleInstallScope(section, bundleSymbol, orderedFacades);
 
+            // Give the extension one last hook before generating the output files.
+            foreach (var extension in this.BackendExtensions)
+            {
+                extension.SymbolsFinalized(section);
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
             // Generate data for all manifests.
             {
                 var command = new GenerateManifestDataFromIRCommand(this.Messaging, section, this.BackendExtensions, this.InternalBurnBackendHelper, extensionSearchSymbolsById);
                 command.Execute();
-            }
-
-            // Give the extension one last hook before generating the output files.
-            foreach (var extension in this.BackendExtensions)
-            {
-                extension.BundleFinalize();
             }
 
             if (this.Messaging.EncounteredError)

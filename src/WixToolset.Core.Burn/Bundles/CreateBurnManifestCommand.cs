@@ -18,7 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
+        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendExtensions = backendExtensions;
@@ -39,7 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IMessaging Messaging { get; }
 
-        private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private string ExecutableName { get; }
 

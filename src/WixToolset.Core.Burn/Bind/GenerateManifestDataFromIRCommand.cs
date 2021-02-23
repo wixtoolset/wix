@@ -16,7 +16,7 @@ namespace WixToolset.Core.Burn.Bind
 
     internal class GenerateManifestDataFromIRCommand
     {
-        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IList<IntermediateSymbol>> extensionSearchSymbolsById)
+        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IList<IntermediateSymbol>> extensionSearchSymbolsById)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -25,7 +25,7 @@ namespace WixToolset.Core.Burn.Bind
             this.ExtensionSearchSymbolsById = extensionSearchSymbolsById;
         }
 
-        private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private IBurnBackendHelper BackendHelper { get; }
 
@@ -220,7 +220,7 @@ namespace WixToolset.Core.Burn.Bind
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryAddSymbolToDataManifest(this.Section, symbol))
+                if (extension.TryProcessSymbol(this.Section, symbol))
                 {
                     return true;
                 }

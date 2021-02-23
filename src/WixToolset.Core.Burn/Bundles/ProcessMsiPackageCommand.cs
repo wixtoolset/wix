@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private const string PropertySqlFormat = "SELECT `Value` FROM `Property` WHERE `Property` = '{0}'";
 
-        public ProcessMsiPackageCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<IBurnBackendExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
+        public ProcessMsiPackageCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
@@ -42,7 +42,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IPathResolver PathResolver { get; }
 
-        private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { get; }
 
@@ -395,7 +395,7 @@ namespace WixToolset.Core.Burn.Bundles
                         if (!payloadNames.Contains(cabinetName))
                         {
                             var generatedId = Common.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
-                            var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers, BindStage.Normal);
+                            var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers);
 
                             this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                             {
@@ -472,7 +472,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 if (!payloadNames.Contains(name))
                                 {
                                     var generatedId = Common.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
-                                    var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers, BindStage.Normal);
+                                    var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers);
 
                                     this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                                     {
@@ -542,13 +542,13 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private string ResolveRelatedFile(string resolvedSource, string unresolvedSource, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage stage)
+        private string ResolveRelatedFile(string resolvedSource, string unresolvedSource, string relatedSource, string type, SourceLineNumber sourceLineNumbers)
         {
             var checkedPaths = new List<string>();
 
             foreach (var extension in this.BackendExtensions)
             {
-                var resolved = extension.ResolveRelatedFile(unresolvedSource, relatedSource, type, sourceLineNumbers, stage);
+                var resolved = extension.ResolveRelatedFile(unresolvedSource, relatedSource, type, sourceLineNumbers);
 
                 if (resolved?.CheckedPaths != null)
                 {

@@ -1153,7 +1153,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryAddSymbolToOutput(this.Section, symbol, this.Output, this.TableDefinitions))
+                if (extension.TryProcessSymbol(this.Section, symbol, this.Output, this.TableDefinitions))
                 {
                     return true;
                 }

@@ -11,7 +11,7 @@ namespace Example.Extension
     {
         public override IEnumerable<TableDefinition> TableDefinitions => ExampleTableDefinitions.All;
 
-        public override bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public override bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
             if (ExampleSymbolDefinitions.TryGetSymbolType(symbol.Definition.Name, out var symbolType))
             {
@@ -27,7 +27,7 @@ namespace Example.Extension
                 }
             }
 
-            return base.TryAddSymbolToOutput(section, symbol, output, tableDefinitions);
+            return base.TryProcessSymbol(section, symbol, output, tableDefinitions);
         }
     }
 }
