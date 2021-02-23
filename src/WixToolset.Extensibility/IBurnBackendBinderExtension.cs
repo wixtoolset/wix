@@ -8,7 +8,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Interface all Burn backend extensions implement.
     /// </summary>
-    public interface IBurnBackendExtension
+    public interface IBurnBackendBinderExtension
     {
         /// <summary>
         /// Called before binding occurs.

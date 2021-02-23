@@ -13,7 +13,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Base class for creating a Burn backend extension.
     /// </summary>
-    public abstract class BaseBurnBackendExtension : IBurnBackendExtension
+    public abstract class BaseBurnBackendBinderExtension : IBurnBackendBinderExtension
     {
         /// <summary>
         /// Context for use by the extension.
@@ -36,7 +36,7 @@ namespace WixToolset.Extensibility
         protected virtual IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => Enumerable.Empty<IntermediateSymbolDefinition>();
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.PreBackendBind(IBindContext)"/>
+        /// See <see cref="IBurnBackendBinderExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
         public virtual void PreBackendBind(IBindContext context)
         {
@@ -46,7 +46,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.ResolveRelatedFile(String, String, String, SourceLineNumber)"/>
+        /// See <see cref="IBurnBackendBinderExtension.ResolveRelatedFile(String, String, String, SourceLineNumber)"/>
         /// </summary>
         public virtual IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers)
         {
@@ -54,14 +54,14 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.SymbolsFinalized(IntermediateSection)"/>
+        /// See <see cref="IBurnBackendBinderExtension.SymbolsFinalized(IntermediateSection)"/>
         /// </summary>
         public virtual void SymbolsFinalized(IntermediateSection section)
         {
         }
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.ResolveUrl(String, String, String, String, String)"/>
+        /// See <see cref="IBurnBackendBinderExtension.ResolveUrl(String, String, String, String, String)"/>
         /// </summary>
         public virtual string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName)
         {
@@ -69,7 +69,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.TryProcessSymbol(IntermediateSection, IntermediateSymbol)"/>
+        /// See <see cref="IBurnBackendBinderExtension.TryProcessSymbol(IntermediateSection, IntermediateSymbol)"/>
         /// </summary>
         public virtual bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol)
         {
@@ -84,7 +84,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="IBurnBackendExtension.PostBackendBind(IBindResult)"/>
+        /// See <see cref="IBurnBackendBinderExtension.PostBackendBind(IBindResult)"/>
         /// </summary>
         /// <param name="result"></param>
         public virtual void PostBackendBind(IBindResult result)
