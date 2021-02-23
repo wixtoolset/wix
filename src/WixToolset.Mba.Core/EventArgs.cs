@@ -547,18 +547,18 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when a target MSI package has been detected.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectPatchTarget"/>
     /// </summary>
-    public class DetectTargetMsiPackageEventArgs : CancellableHResultEventArgs
+    public class DetectPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="DetectMsiFeatureEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="packageId">Detected package identifier.</param>
-        /// <param name="productCode">Detected product code.</param>
-        /// <param name="state">Package state detected.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectTargetMsiPackageEventArgs(string packageId, string productCode, PackageState state, bool cancelRecommendation)
+        /// <param name="packageId"></param>
+        /// <param name="productCode"></param>
+        /// <param name="state"></param>
+        /// <param name="cancelRecommendation"></param>
+        public DetectPatchTargetEventArgs(string packageId, string productCode, PackageState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
@@ -567,17 +567,17 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Gets the identity of the target's package detected.
+        /// Gets the identity of the patch's package.
         /// </summary>
         public string PackageId { get; private set; }
 
         /// <summary>
-        /// Gets the product code of the target MSI detected.
+        /// Gets the product code of the target.
         /// </summary>
         public string ProductCode { get; private set; }
 
         /// <summary>
-        /// Gets the detected patch package state.
+        /// Gets the detected patch state for the target.
         /// </summary>
         public PackageState State { get; private set; }
     }
@@ -732,22 +732,26 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun planning the installation of a specific package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanPackageBegin"/>
     /// </summary>
     [Serializable]
     public class PlanPackageBeginEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="PlanPackageBeginEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="packageId">The identity of the package to plan for.</param>
-        /// <param name="recommendedState">The recommended requested state for the package.</param>
-        /// <param name="state">The requested state for the package.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public PlanPackageBeginEventArgs(string packageId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        /// <param name="packageId"></param>
+        /// <param name="currentState"></param>
+        /// <param name="installCondition"></param>
+        /// <param name="recommendedState"></param>
+        /// <param name="state"></param>
+        /// <param name="cancelRecommendation"></param>
+        public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool installCondition, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
+            this.CurrentState = currentState;
+            this.InstallCondition = installCondition;
             this.RecommendedState = recommendedState;
             this.State = state;
         }
@@ -756,6 +760,16 @@ namespace WixToolset.Mba.Core
         /// Gets the identity of the package to plan for.
         /// </summary>
         public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the current state of the package.
+        /// </summary>
+        public PackageState CurrentState { get; private set; }
+
+        /// <summary>
+        /// Gets the evaluated result of the package's install condition.
+        /// </summary>
+        public bool InstallCondition { get; private set; }
 
         /// <summary>
         /// Gets the recommended requested state for the package.
@@ -769,20 +783,20 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when engine is about to plan a MSP applied to a target MSI package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanPatchTarget"/>
     /// </summary>
     [Serializable]
-    public class PlanTargetMsiPackageEventArgs : CancellableHResultEventArgs
+    public class PlanPatchTargetEventArgs : CancellableHResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="PlanMsiFeatureEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="packageId">Package identifier of the patch being planned.</param>
-        /// <param name="productCode">Product code identifier being planned.</param>
-        /// <param name="recommendedState">Recommended package state of the patch being planned.</param>
-        /// <param name="state">Package state of the patch being planned.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public PlanTargetMsiPackageEventArgs(string packageId, string productCode, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        /// <param name="packageId"></param>
+        /// <param name="productCode"></param>
+        /// <param name="recommendedState"></param>
+        /// <param name="state"></param>
+        /// <param name="cancelRecommendation"></param>
+        public PlanPatchTargetEventArgs(string packageId, string productCode, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
@@ -792,22 +806,22 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Gets the identity of the patch package to plan.
+        /// Gets the identity of the patch's package.
         /// </summary>
         public string PackageId { get; private set; }
 
         /// <summary>
-        /// Gets the identity of the patch's target MSI to plan.
+        /// Gets the product code of the target.
         /// </summary>
         public string ProductCode { get; private set; }
 
         /// <summary>
-        /// Gets the recommended state of the patch to use by planning.
+        /// Gets the recommended state of the patch to use by planning for the target.
         /// </summary>
         public RequestState RecommendedState { get; private set; }
 
         /// <summary>
-        /// Gets or sets the state of the patch to use by planning.
+        /// Gets or sets the state of the patch to use by planning for the target.
         /// </summary>
         public RequestState State { get; set; }
     }
@@ -915,26 +929,50 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when then engine has completed planning the installation of a specific package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanPackageComplete"/>
     /// </summary>
     [Serializable]
     public class PlanPackageCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="PlanPackageCompleteEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="packageId">The identity of the package planned for.</param>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="state">The current state of the package.</param>
-        /// <param name="requested">The requested state for the package</param>
-        /// <param name="execute">The execution action to take.</param>
-        /// <param name="rollback">The rollback action to take.</param>
-        public PlanPackageCompleteEventArgs(string packageId, int hrStatus, PackageState state, RequestState requested, ActionState execute, ActionState rollback)
+        /// <param name="packageId"></param>
+        /// <param name="hrStatus"></param>
+        /// <param name="requested"></param>
+        public PlanPackageCompleteEventArgs(string packageId, int hrStatus, RequestState requested)
             : base(hrStatus)
         {
             this.PackageId = packageId;
-            this.State = state;
             this.Requested = requested;
+        }
+
+        /// <summary>
+        /// Gets the identity of the package planned for.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets the requested state for the package.
+        /// </summary>
+        public RequestState Requested { get; private set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlannedPackage"/>
+    /// </summary>
+    [Serializable]
+    public class PlannedPackageEventArgs : HResultEventArgs
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="execute"></param>
+        /// <param name="rollback"></param>
+        public PlannedPackageEventArgs(string packageId, ActionState execute, ActionState rollback)
+        {
+            this.PackageId = packageId;
             this.Execute = execute;
             this.Rollback = rollback;
         }
@@ -945,22 +983,12 @@ namespace WixToolset.Mba.Core
         public string PackageId { get; private set; }
 
         /// <summary>
-        /// Gets the current state of the package.
-        /// </summary>
-        public PackageState State { get; private set; }
-
-        /// <summary>
-        /// Gets the requested state for the package.
-        /// </summary>
-        public RequestState Requested { get; private set; }
-
-        /// <summary>
-        /// Gets the execution action to take.
+        /// Gets the planned execution action.
         /// </summary>
         public ActionState Execute { get; private set; }
 
         /// <summary>
-        /// Gets the rollback action to take.
+        /// Gets the planned rollback action.
         /// </summary>
         public ActionState Rollback { get; private set; }
     }

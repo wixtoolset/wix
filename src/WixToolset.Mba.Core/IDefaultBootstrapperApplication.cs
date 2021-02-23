@@ -115,6 +115,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<DetectPackageCompleteEventArgs> DetectPackageComplete;
 
         /// <summary>
+        /// Fired when the engine detects a target product for an MSP package.
+        /// </summary>
+        event EventHandler<DetectPatchTargetEventArgs> DetectPatchTarget;
+
+        /// <summary>
         /// Fired when a related bundle has been detected for a bundle.
         /// </summary>
         event EventHandler<DetectRelatedBundleEventArgs> DetectRelatedBundle;
@@ -123,11 +128,6 @@ namespace WixToolset.Mba.Core
         /// Fired when a related MSI package has been detected for a package.
         /// </summary>
         event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
-
-        /// <summary>
-        /// Fired when an MSP package detects a target MSI has been detected.
-        /// </summary>
-        event EventHandler<DetectTargetMsiPackageEventArgs> DetectTargetMsiPackage;
 
         /// <summary>
         /// Fired when the update detection has found a potential update candidate.
@@ -230,6 +230,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanCompleteEventArgs> PlanComplete;
 
         /// <summary>
+        /// Fired when the engine has completed planning a package.
+        /// </summary>
+        event EventHandler<PlannedPackageEventArgs> PlannedPackage;
+
+        /// <summary>
         /// Fired when the engine is about to plan a feature in an MSI package.
         /// </summary>
         event EventHandler<PlanMsiFeatureEventArgs> PlanMsiFeature;
@@ -240,24 +245,24 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanMsiPackageEventArgs> PlanMsiPackage;
 
         /// <summary>
-        /// Fired when the engine has begun planning the installation of a specific package.
+        /// Fired when the engine has begun getting the BA's input for planning a package.
         /// </summary>
         event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
 
         /// <summary>
-        /// Fired when the engine has completed planning the installation of a specific package.
+        /// Fired when the engine has completed getting the BA's input for planning a package.
         /// </summary>
         event EventHandler<PlanPackageCompleteEventArgs> PlanPackageComplete;
+
+        /// <summary>
+        /// Fired when the engine is about to plan a target of an MSP package.
+        /// </summary>
+        event EventHandler<PlanPatchTargetEventArgs> PlanPatchTarget;
 
         /// <summary>
         /// Fired when the engine has begun planning for a related bundle.
         /// </summary>
         event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
-
-        /// <summary>
-        /// Fired when the engine is about to plan the target MSI of a MSP package.
-        /// </summary>
-        event EventHandler<PlanTargetMsiPackageEventArgs> PlanTargetMsiPackage;
 
         /// <summary>
         /// Fired when the engine has changed progress for the bundle installation.

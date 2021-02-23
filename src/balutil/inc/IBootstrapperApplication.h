@@ -91,9 +91,9 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnDetectTargetMsiPackage - called when the engine detects a target MSI package for
-    //                            an MSP package.
-    STDMETHOD(OnDetectTargetMsiPackage)(
+    // OnDetectPatchTarget - called when the engine detects a target product
+    //                       for an MSP package.
+    STDMETHOD(OnDetectPatchTarget)(
         __in_z LPCWSTR wzPackageId,
         __in_z LPCWSTR wzProductCode,
         __in BOOTSTRAPPER_PACKAGE_STATE patchState,
@@ -137,17 +137,20 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnPlanPackageBegin - called when the engine begins planning a package.
+    // OnPlanPackageBegin - called when the engine has begun getting the BA's input
+    //                      for planning a package.
     STDMETHOD(OnPlanPackageBegin)(
         __in_z LPCWSTR wzPackageId,
+        __in BOOTSTRAPPER_PACKAGE_STATE state,
+        __in BOOL fInstallCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnPlanTargetMsiPackage - called when the engine plans an MSP package
-    //                          to apply to an MSI package.
-    STDMETHOD(OnPlanTargetMsiPackage)(
+    // OnPlanPatchTarget - called when the engine is about to plan a target
+    //                     of an MSP package.
+    STDMETHOD(OnPlanPatchTarget)(
         __in_z LPCWSTR wzPackageId,
         __in_z LPCWSTR wzProductCode,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
@@ -177,13 +180,17 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfDisableExternalUiHandler
         ) = 0;
 
-    // OnPlanPackageComplete - called after the engine plans a package.
-    //
+    // OnPlanPackageComplete - called after the engine has completed getting the BA's input
+    //                         for planning a package.
     STDMETHOD(OnPlanPackageComplete)(
         __in_z LPCWSTR wzPackageId,
         __in HRESULT hrStatus,
-        __in BOOTSTRAPPER_PACKAGE_STATE state,
-        __in BOOTSTRAPPER_REQUEST_STATE requested,
+        __in BOOTSTRAPPER_REQUEST_STATE requested
+        ) = 0;
+
+    // OnPlannedPackage - called after the engine has completed planning a package.
+    STDMETHOD(OnPlannedPackage)(
+        __in_z LPCWSTR wzPackageId,
         __in BOOTSTRAPPER_ACTION_STATE execute,
         __in BOOTSTRAPPER_ACTION_STATE rollback
         ) = 0;

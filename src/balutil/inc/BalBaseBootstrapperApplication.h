@@ -181,7 +181,7 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnDetectTargetMsiPackage(
+    virtual STDMETHODIMP OnDetectPatchTarget(
         __in_z LPCWSTR /*wzPackageId*/,
         __in_z LPCWSTR /*wzProductCode*/,
         __in BOOTSTRAPPER_PACKAGE_STATE /*patchState*/,
@@ -242,6 +242,8 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnPlanPackageBegin(
         __in_z LPCWSTR /*wzPackageId*/,
+        __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,
+        __in BOOL /*fInstallCondition*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
         __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestState*/,
         __inout BOOL* pfCancel
@@ -251,7 +253,7 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnPlanTargetMsiPackage(
+    virtual STDMETHODIMP OnPlanPatchTarget(
         __in_z LPCWSTR /*wzPackageId*/,
         __in_z LPCWSTR /*wzProductCode*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
@@ -292,8 +294,14 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnPlanPackageComplete(
         __in_z LPCWSTR /*wzPackageId*/,
         __in HRESULT /*hrStatus*/,
-        __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,
-        __in BOOTSTRAPPER_REQUEST_STATE /*requested*/,
+        __in BOOTSTRAPPER_REQUEST_STATE /*requested*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnPlannedPackage(
+        __in_z LPCWSTR /*wzPackageId*/,
         __in BOOTSTRAPPER_ACTION_STATE /*execute*/,
         __in BOOTSTRAPPER_ACTION_STATE /*rollback*/
         )

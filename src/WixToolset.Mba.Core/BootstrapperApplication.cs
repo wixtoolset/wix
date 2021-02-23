@@ -68,7 +68,7 @@ namespace WixToolset.Mba.Core
         public event EventHandler<DetectRelatedMsiPackageEventArgs> DetectRelatedMsiPackage;
 
         /// <inheritdoc/>
-        public event EventHandler<DetectTargetMsiPackageEventArgs> DetectTargetMsiPackage;
+        public event EventHandler<DetectPatchTargetEventArgs> DetectPatchTarget;
 
         /// <inheritdoc/>
         public event EventHandler<DetectMsiFeatureEventArgs> DetectMsiFeature;
@@ -89,7 +89,7 @@ namespace WixToolset.Mba.Core
         public event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
 
         /// <inheritdoc/>
-        public event EventHandler<PlanTargetMsiPackageEventArgs> PlanTargetMsiPackage;
+        public event EventHandler<PlanPatchTargetEventArgs> PlanPatchTarget;
 
         /// <inheritdoc/>
         public event EventHandler<PlanMsiFeatureEventArgs> PlanMsiFeature;
@@ -99,6 +99,9 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<PlanPackageCompleteEventArgs> PlanPackageComplete;
+
+        /// <inheritdoc/>
+        public event EventHandler<PlannedPackageEventArgs> PlannedPackage;
 
         /// <inheritdoc/>
         public event EventHandler<PlanCompleteEventArgs> PlanComplete;
@@ -392,12 +395,12 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine, raises the <see cref="DetectTargetMsiPackage"/> event.
+        /// Called by the engine, raises the <see cref="DetectPatchTarget"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnDetectTargetMsiPackage(DetectTargetMsiPackageEventArgs args)
+        protected virtual void OnDetectPatchTarget(DetectPatchTargetEventArgs args)
         {
-            EventHandler<DetectTargetMsiPackageEventArgs> handler = this.DetectTargetMsiPackage;
+            EventHandler<DetectPatchTargetEventArgs> handler = this.DetectPatchTarget;
             if (null != handler)
             {
                 handler(this, args);
@@ -483,12 +486,12 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine, raises the <see cref="PlanTargetMsiPackage"/> event.
+        /// Called by the engine, raises the <see cref="PlanPatchTarget"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnPlanTargetMsiPackage(PlanTargetMsiPackageEventArgs args)
+        protected virtual void OnPlanPatchTarget(PlanPatchTargetEventArgs args)
         {
-            EventHandler<PlanTargetMsiPackageEventArgs> handler = this.PlanTargetMsiPackage;
+            EventHandler<PlanPatchTargetEventArgs> handler = this.PlanPatchTarget;
             if (null != handler)
             {
                 handler(this, args);
@@ -528,6 +531,19 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanPackageComplete(PlanPackageCompleteEventArgs args)
         {
             EventHandler<PlanPackageCompleteEventArgs> handler = this.PlanPackageComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlannedPackage"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlannedPackage(PlannedPackageEventArgs args)
+        {
+            EventHandler<PlannedPackageEventArgs> handler = this.PlannedPackage;
             if (null != handler)
             {
                 handler(this, args);
@@ -1170,10 +1186,10 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectTargetMsiPackage(string wzPackageId, string wzProductCode, PackageState patchState, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectPatchTarget(string wzPackageId, string wzProductCode, PackageState patchState, ref bool fCancel)
         {
-            DetectTargetMsiPackageEventArgs args = new DetectTargetMsiPackageEventArgs(wzPackageId, wzProductCode, patchState, fCancel);
-            this.OnDetectTargetMsiPackage(args);
+            DetectPatchTargetEventArgs args = new DetectPatchTargetEventArgs(wzPackageId, wzProductCode, patchState, fCancel);
+            this.OnDetectPatchTarget(args);
 
             fCancel = args.Cancel;
             return args.HResult;
@@ -1223,9 +1239,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, PackageState state, bool fInstallCondition, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
-            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, recommendedState, pRequestedState, fCancel);
+            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, state, fInstallCondition, recommendedState, pRequestedState, fCancel);
             this.OnPlanPackageBegin(args);
 
             pRequestedState = args.State;
@@ -1233,10 +1249,10 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanTargetMsiPackage(string wzPackageId, string wzProductCode, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanPatchTarget(string wzPackageId, string wzProductCode, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
-            PlanTargetMsiPackageEventArgs args = new PlanTargetMsiPackageEventArgs(wzPackageId, wzProductCode, recommendedState, pRequestedState, fCancel);
-            this.OnPlanTargetMsiPackage(args);
+            PlanPatchTargetEventArgs args = new PlanPatchTargetEventArgs(wzPackageId, wzProductCode, recommendedState, pRequestedState, fCancel);
+            this.OnPlanPatchTarget(args);
 
             pRequestedState = args.State;
             fCancel = args.Cancel;
@@ -1265,10 +1281,18 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanPackageComplete(string wzPackageId, int hrStatus, PackageState state, RequestState requested, ActionState execute, ActionState rollback)
+        int IBootstrapperApplication.OnPlanPackageComplete(string wzPackageId, int hrStatus, RequestState requested)
         {
-            var args = new PlanPackageCompleteEventArgs(wzPackageId, hrStatus, state, requested, execute, rollback);
+            var args = new PlanPackageCompleteEventArgs(wzPackageId, hrStatus, requested);
             this.OnPlanPackageComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlannedPackage(string wzPackageId, ActionState execute, ActionState rollback)
+        {
+            var args = new PlannedPackageEventArgs(wzPackageId, execute, rollback);
+            this.OnPlannedPackage(args);
 
             return args.HResult;
         }

@@ -19,7 +19,7 @@ dotnet test -c %_C% --no-build src\test\WixToolsetTest.Mba.Core\WixToolsetTest.M
 
 msbuild -t:Pack -p:Configuration=%_C% src\balutil\balutil.vcxproj || exit /b
 msbuild -t:Pack -p:Configuration=%_C% src\bextutil\bextutil.vcxproj || exit /b
-msbuild -t:Pack -p:Configuration=%_C% src\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -p:NoBuild=true src\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj || exit /b
 
 @popd
 @endlocal

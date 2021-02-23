@@ -194,7 +194,7 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.DetectTargetMsiPackage"/>.
+        /// See <see cref="IDefaultBootstrapperApplication.DetectPatchTarget"/>.
         /// </summary>
         /// <param name="wzPackageId"></param>
         /// <param name="wzProductCode"></param>
@@ -203,7 +203,7 @@ namespace WixToolset.Mba.Core
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
-        int OnDetectTargetMsiPackage(
+        int OnDetectPatchTarget(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzProductCode,
             [MarshalAs(UnmanagedType.U4)] PackageState patchState,
@@ -289,6 +289,8 @@ namespace WixToolset.Mba.Core
         /// See <see cref="IDefaultBootstrapperApplication.PlanPackageBegin"/>.
         /// </summary>
         /// <param name="wzPackageId"></param>
+        /// <param name="state"></param>
+        /// <param name="fInstallCondition"></param>
         /// <param name="recommendedState"></param>
         /// <param name="pRequestedState"></param>
         /// <param name="fCancel"></param>
@@ -297,13 +299,15 @@ namespace WixToolset.Mba.Core
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPackageBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.U4)] PackageState state,
+            [MarshalAs(UnmanagedType.Bool)] bool fInstallCondition,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.PlanTargetMsiPackage"/>.
+        /// See <see cref="IDefaultBootstrapperApplication.PlanPatchTarget"/>.
         /// </summary>
         /// <param name="wzPackageId"></param>
         /// <param name="wzProductCode"></param>
@@ -313,7 +317,7 @@ namespace WixToolset.Mba.Core
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
-        int OnPlanTargetMsiPackage(
+        int OnPlanPatchTarget(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzProductCode,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
@@ -368,18 +372,27 @@ namespace WixToolset.Mba.Core
         /// </summary>
         /// <param name="wzPackageId"></param>
         /// <param name="hrStatus"></param>
-        /// <param name="state"></param>
         /// <param name="requested"></param>
-        /// <param name="execute"></param>
-        /// <param name="rollback"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPackageComplete(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             int hrStatus,
-            [MarshalAs(UnmanagedType.U4)] PackageState state,
-            [MarshalAs(UnmanagedType.U4)] RequestState requested,
+            [MarshalAs(UnmanagedType.U4)] RequestState requested
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlannedPackage"/>.
+        /// </summary>
+        /// <param name="wzPackageId"></param>
+        /// <param name="execute"></param>
+        /// <param name="rollback"></param>
+        /// <returns></returns>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlannedPackage(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.U4)] ActionState execute,
             [MarshalAs(UnmanagedType.U4)] ActionState rollback
             );
