@@ -178,8 +178,8 @@ namespace WixToolset.Http
                     ComponentRef = componentId,
                 });
 
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedHttpUrlReservationsInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedHttpUrlReservationsUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedHttpUrlReservationsInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedHttpUrlReservationsUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
             }
         }
 
