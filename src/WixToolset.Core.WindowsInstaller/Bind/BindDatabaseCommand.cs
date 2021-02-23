@@ -301,50 +301,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-#if TODO_FINISH_UPDATE // use symbols instead of rows
-            // Extended binder extensions can be called now that fields are resolved.
+            // Update symbols that reference text files on disk.
             {
-                Table updatedFiles = this.Output.EnsureTable(this.TableDefinitions["WixBindUpdatedFiles"]);
-
-                foreach (IBinderExtension extension in this.Extensions)
-                {
-                    extension.AfterResolvedFields(this.Output);
-                }
-
-                List<FileFacade> updatedFileFacades = new List<FileFacade>();
-
-                foreach (Row updatedFile in updatedFiles.Rows)
-                {
-                    string updatedId = updatedFile.FieldAsString(0);
-
-                    FileFacade updatedFacade = fileFacades.First(f => f.File.File.Equals(updatedId));
-
-                    updatedFileFacades.Add(updatedFacade);
-                }
-
-                if (updatedFileFacades.Any())
-                {
-                    UpdateFileFacadesCommand command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, updateFileFacades, variableCache, overwriteHash: false);
-                    //command.FileFacades = fileFacades;
-                    //command.UpdateFileFacades = updatedFileFacades;
-                    //command.ModularizationGuid = modularizationGuid;
-                    //command.Output = this.Output;
-                    //command.OverwriteHash = true;
-                    //command.TableDefinitions = this.TableDefinitions;
-                    //command.VariableCache = variableCache;
-                    command.Execute();
-                }
-            }
-#endif
-
-            // Set generated component guids.
-            {
-                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section, platform);
-                command.Execute();
-            }
-
-            {
-                var command = new ValidateComponentGuidsCommand(this.Messaging, section);
+                var command = new UpdateFromTextFilesCommand(this.Messaging, section);
                 command.Execute();
             }
 
@@ -354,9 +313,46 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Update symbols that reference text files on disk.
+            // If there are any backend extensions, give them the opportunity to process
+            // the section now that the fields have all be resolved.
+            //
+            if (this.BackendExtensions.Any())
             {
-                var command = new UpdateFromTextFilesCommand(this.Messaging, section);
+                using (new IntermediateFieldContext("wix.bind.finalize"))
+                {
+                    foreach (var extension in this.BackendExtensions)
+                    {
+                        extension.SymbolsFinalized(section);
+                    }
+
+                    var reresolvedFiles = section.Symbols
+                                                 .OfType<FileSymbol>()
+                                                 .Where(s => s.Fields.Any(f => f?.Context == "wix.bind.finalize"))
+                                                 .ToList();
+
+                    if (reresolvedFiles.Any())
+                    {
+                        var updatedFacades = reresolvedFiles.Select(f => fileFacades.First(ff => ff.Id == f.Id?.Id));
+
+                        var command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, updatedFacades, variableCache, overwriteHash: false);
+                        command.Execute();
+                    }
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+            }
+
+            // Set generated component guids.
+            {
+                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section, platform);
+                command.Execute();
+            }
+
+            {
+                var command = new ValidateComponentGuidsCommand(this.Messaging, section);
                 command.Execute();
             }
 
