@@ -257,7 +257,7 @@ namespace WixToolset.Test.BA
             }
         }
 
-        protected override void OnPlanTargetMsiPackage(PlanTargetMsiPackageEventArgs args)
+        protected override void OnPlanPatchTarget(PlanPatchTargetEventArgs args)
         {
             RequestState state;
             string action = this.ReadPackageAction(args.PackageId, "Requested");

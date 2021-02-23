@@ -17,7 +17,7 @@ namespace WixToolsetTest.BurnE2E
         private const string V100 = "1.0.0.0";
         private const string V101 = "1.0.1.0";
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6297")]
+        [Fact]
         public void CanInstallBundleWithSlipstreamedPatchThenRemoveIt()
         {
             var testRegistryValue = "PackageA";
@@ -45,7 +45,7 @@ namespace WixToolsetTest.BurnE2E
         /// BundleOnlyPatchA in uninstalled which should do nothing since BundleA has a dependency on it.
         /// Bundle is installed which should remove everything.
         /// </summary>
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6297")]
+        [Fact]
         public void ReferenceCountsSlipstreamedPatch()
         {
             var testRegistryValue = "PackageA";
@@ -266,7 +266,7 @@ namespace WixToolsetTest.BurnE2E
             packageBv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "The bundle is slipstreaming the patches correctly, need to research why testRegistryValueB is getting patched because patch AB2 is not supposed to change it")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6359")]
         public void CanAutomaticallyPredetermineSlipstreamPatchesAtBuildTime()
         {
             var testRegistryValueA = "PackageA";
@@ -300,7 +300,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6297")]
+        [Fact]
         public void CanInstallSlipstreamedPatchWithPackageDuringMajorUpgrade()
         {
             var testRegistryValue = "PackageA";
@@ -327,7 +327,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv1.VerifyTestRegistryRootDeleted();
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/3897")]
+        [Fact]
         public void RespectsSlipstreamedPatchInstallCondition()
         {
             var testRegistryValue = "PackageA";

@@ -13,7 +13,7 @@
     <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.83" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.84" />
     <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.61" />
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.48" />
     <PackageReference Include="WixToolset.Data" Version="4.0.185" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.48" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.49" />
   </ItemGroup>
 
   <ItemGroup>
