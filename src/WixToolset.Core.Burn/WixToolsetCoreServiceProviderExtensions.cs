@@ -30,7 +30,7 @@ namespace WixToolset.Core.Burn
         private static void AddServices(IWixToolsetCoreServiceProvider coreProvider)
         {
             // Singletons.
-            coreProvider.AddService((provider, singletons) => AddSingleton<IInternalBurnBackendHelper>(singletons, new BurnBackendHelper()));
+            coreProvider.AddService((provider, singletons) => AddSingleton<IInternalBurnBackendHelper>(singletons, new BurnBackendHelper(provider)));
             coreProvider.AddService((provider, singletons) => AddSingleton<IBurnBackendHelper>(singletons, provider.GetService<IInternalBurnBackendHelper>()));
         }
 

@@ -9,15 +9,40 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
     using System.Xml;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class BurnBackendHelper : IInternalBurnBackendHelper
     {
         public static readonly XmlReaderSettings ReaderSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
         public static readonly XmlWriterSettings WriterSettings = new XmlWriterSettings { ConformanceLevel = ConformanceLevel.Fragment };
 
+        private readonly IBackendHelper backendHelper;
+
         private ManifestData BootstrapperApplicationManifestData { get; } = new ManifestData();
 
         private Dictionary<string, ManifestData> BundleExtensionDataById { get; } = new Dictionary<string, ManifestData>();
+
+        public BurnBackendHelper(IWixToolsetServiceProvider serviceProvider)
+        {
+            this.backendHelper = serviceProvider.GetService<IBackendHelper>();
+        }
+
+        #region IBackendHelper interfaces
+
+        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);
+
+        public string CreateGuid(Guid namespaceGuid, string value) => this.backendHelper.CreateGuid(namespaceGuid, value);
+
+        public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name) => this.backendHelper.CreateResolvedDirectory(directoryParent, name);
+
+        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath) => this.backendHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+
+        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.TrackFile(path, type, sourceLineNumbers);
+
+        #endregion
+
+        #region IBurnBackendHelper interfaces
 
         public void AddBootstrapperApplicationData(string xml)
         {
@@ -41,6 +66,10 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnCommon.BundleExtensionDataNamespace);
         }
 
+        #endregion
+
+        #region IInternalBurnBackendHelper interfaces
+
         public void WriteBootstrapperApplicationData(XmlWriter writer)
         {
             this.BootstrapperApplicationManifestData.Write(writer);
@@ -53,6 +82,8 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
                 this.WriteExtension(writer, kvp.Key, kvp.Value);
             }
         }
+
+        #endregion
 
         private ManifestData GetBundleExtensionManifestData(string extensionId)
         {

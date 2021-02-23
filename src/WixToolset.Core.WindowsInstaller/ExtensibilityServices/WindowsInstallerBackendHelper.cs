@@ -2,13 +2,38 @@
 
 namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 {
+    using System;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class WindowsInstallerBackendHelper : IWindowsInstallerBackendHelper
     {
+        private readonly IBackendHelper backendHelper;
+
+        public WindowsInstallerBackendHelper(IWixToolsetServiceProvider serviceProvider)
+        {
+            this.backendHelper = serviceProvider.GetService<IBackendHelper>();
+        }
+
+        #region IBackendHelper interfaces
+
+        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);
+
+        public string CreateGuid(Guid namespaceGuid, string value) => this.backendHelper.CreateGuid(namespaceGuid, value);
+
+        public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name) => this.backendHelper.CreateResolvedDirectory(directoryParent, name);
+
+        public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath) => this.backendHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+
+        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.TrackFile(path, type, sourceLineNumbers);
+
+        #endregion
+
+        #region IWindowsInstallerBackendHelper interfaces
+
         public Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinition tableDefinition)
         {
             var table = output.EnsureTable(tableDefinition);
@@ -57,5 +82,7 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 
             return true;
         }
+
+        #endregion
     }
 }

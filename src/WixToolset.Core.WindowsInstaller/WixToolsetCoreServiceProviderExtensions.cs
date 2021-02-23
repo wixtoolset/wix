@@ -30,7 +30,7 @@ namespace WixToolset.Core.WindowsInstaller
         private static void AddServices(IWixToolsetCoreServiceProvider coreProvider)
         {
             // Singletons.
-            coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper()));
+            coreProvider.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper(provider)));
             coreProvider.AddService<IUnbinder>((provider, singletons) => new Unbinder(provider));
         }
 
