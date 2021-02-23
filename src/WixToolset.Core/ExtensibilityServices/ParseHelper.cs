@@ -875,7 +875,6 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (!this.Messaging.EncounteredError)
             {
-                var name = String.Concat("Wix4", customAction);
                 var suffix = "_X86";
 
                 switch (currentPlatform)
@@ -894,7 +893,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         break;
                 }
 
-                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, name + suffix);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.CustomAction, customAction + suffix);
             }
         }
 

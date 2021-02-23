@@ -26,11 +26,11 @@ namespace WixToolsetTest.CoreIntegration
             parseHelper.CreateCustomActionReference(null, section, "CustomAction", Platform.X64, CustomActionPlatforms.X86 | CustomActionPlatforms.X64);
 
             var simpleReferences = section.Symbols.OfType<WixSimpleReferenceSymbol>();
-            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:Wix4CustomAction32_X86").FirstOrDefault());
-            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:Wix4CustomArmAction_X86").FirstOrDefault());
-            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:Wix4CustomArmAction_A64").FirstOrDefault());
-            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:Wix4CustomAction_X86").FirstOrDefault());
-            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:Wix4CustomAction_X64").FirstOrDefault());
+            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:CustomAction32_X86").FirstOrDefault());
+            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:CustomArmAction_X86").FirstOrDefault());
+            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:CustomArmAction_A64").FirstOrDefault());
+            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:CustomAction_X86").FirstOrDefault());
+            Assert.NotNull(simpleReferences.Where(t => t.SymbolicName == "CustomAction:CustomAction_X64").FirstOrDefault());
         }
     }
 }
