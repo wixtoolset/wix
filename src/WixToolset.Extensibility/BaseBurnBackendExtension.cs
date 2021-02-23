@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
@@ -35,24 +36,8 @@ namespace WixToolset.Extensibility
         protected virtual IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => Enumerable.Empty<IntermediateSymbolDefinition>();
 
         /// <summary>
-        /// Called after all output changes occur and right before the output is bound into its final format.
+        /// See <see cref="IBurnBackendExtension.PreBackendBind(IBindContext)"/>
         /// </summary>
-        public virtual void BundleFinalize()
-        {
-        }
-
-        /// <summary>
-        /// Called after output is bound into its final format.
-        /// </summary>
-        /// <param name="result"></param>
-        public virtual void PostBackendBind(IBindResult result)
-        {
-        }
-
-        /// <summary>
-        /// Called before binding occurs.
-        /// </summary>
-        /// <param name="context"></param>
         public virtual void PreBackendBind(IBindContext context)
         {
             this.Context = context;
@@ -61,44 +46,32 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// 
+        /// See <see cref="IBurnBackendExtension.ResolveRelatedFile(String, String, String, SourceLineNumber)"/>
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="relatedSource"></param>
-        /// <param name="type"></param>
-        /// <param name="sourceLineNumbers"></param>
-        /// <param name="bindStage"></param>
-        /// <returns></returns>
-        public virtual IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        public virtual IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers)
         {
             return null;
         }
 
         /// <summary>
-        /// 
+        /// See <see cref="IBurnBackendExtension.SymbolsFinalized(IntermediateSection)"/>
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="fallbackUrl"></param>
-        /// <param name="packageId"></param>
-        /// <param name="payloadId"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
+        public virtual void SymbolsFinalized(IntermediateSection section)
+        {
+        }
+
+        /// <summary>
+        /// See <see cref="IBurnBackendExtension.ResolveUrl(String, String, String, String, String)"/>
+        /// </summary>
         public virtual string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName)
         {
             return null;
         }
 
         /// <summary>
-        /// Called for each extension symbol that hasn't been handled yet.
-        /// Use IBurnBackendHelper to add data to the appropriate data manifest.
+        /// See <see cref="IBurnBackendExtension.TryProcessSymbol(IntermediateSection, IntermediateSymbol)"/>
         /// </summary>
-        /// <param name="section">The linked section.</param>
-        /// <param name="symbol">The current symbol.</param>
-        /// <returns>
-        /// True if the extension handled the symbol, false otherwise.
-        /// The Burn backend will warn on all unhandled symbols.
-        /// </returns>
-        public virtual bool TryAddSymbolToDataManifest(IntermediateSection section, IntermediateSymbol symbol)
+        public virtual bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol)
         {
             if (this.SymbolDefinitions.Any(t => t == symbol.Definition) &&
                 symbol.Definition.HasTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag))
@@ -108,6 +81,14 @@ namespace WixToolset.Extensibility
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// See <see cref="IBurnBackendExtension.PostBackendBind(IBindResult)"/>
+        /// </summary>
+        /// <param name="result"></param>
+        public virtual void PostBackendBind(IBindResult result)
+        {
         }
     }
 }

@@ -53,9 +53,9 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="IWindowsInstallerBackendBinderExtension.FullyResolved(IntermediateSection)"/>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.SymbolsFinalized(IntermediateSection)"/>
         /// </summary>
-        public virtual void FullyResolved(IntermediateSection section)
+        public virtual void SymbolsFinalized(IntermediateSection section)
         {
         }
 
@@ -70,13 +70,13 @@ namespace WixToolset.Extensibility
         public virtual string ResolveMedia(MediaSymbol mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
 
         /// <summary>
-        /// See <see cref="IWindowsInstallerBackendBinderExtension.PreBackendBind(IBindContext)"/>
+        /// See <see cref="IWindowsInstallerBackendBinderExtension.TryProcessSymbol(IntermediateSection, IntermediateSymbol, WindowsInstallerData, TableDefinitionCollection)"/>
         /// </summary>
-        public virtual bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public virtual bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions)
         {
             if (this.TableDefinitions.Any(t => t.SymbolDefinition == symbol.Definition))
             {
-                return this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(section, symbol, output, tableDefinitions);
+                return this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(section, symbol, data, tableDefinitions);
             }
 
             return false;

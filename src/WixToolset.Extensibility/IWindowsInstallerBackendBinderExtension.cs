@@ -24,10 +24,10 @@ namespace WixToolset.Extensibility
         void PreBackendBind(IBindContext context);
 
         /// <summary>
-        /// 
+        /// Extension can process the intermediate before the Windows Installer data is created.
         /// </summary>
-        /// <param name="section">The resolved intermedate section.</param>
-        void FullyResolved(IntermediateSection section);
+        /// <param name="section">The finalized intermediate section.</param>
+        void SymbolsFinalized(IntermediateSection section);
 
         /// <summary>
         /// Finds an existing cabinet that contains the provided files.
@@ -41,20 +41,20 @@ namespace WixToolset.Extensibility
         /// Override layout location for a media.
         /// </summary>
         /// <param name="mediaSymbol">Media symbol.</param>
-        /// <param name="mediaLayoutDirectory">Default media layout directory.</param>
-        /// <param name="layoutDirectory">Default layout directory.</param>
+        /// <param name="mediaLayoutDirectory">Default media specific layout directory.</param>
+        /// <param name="layoutDirectory">Default overall layout directory.</param>
         /// <returns>Layout location or null to use the default processing.</returns>
         string ResolveMedia(MediaSymbol mediaSymbol, string mediaLayoutDirectory, string layoutDirectory);
 
         /// <summary>
-        /// 
+        /// Called for each extension symbol that hasn't been handled yet.
         /// </summary>
-        /// <param name="section"></param>
-        /// <param name="symbol"></param>
-        /// <param name="output">Windows Installer data </param>
+        /// <param name="section">The linked section.</param>
+        /// <param name="symbol">The current symbol.</param>
+        /// <param name="data">Windows Installer data </param>
         /// <param name="tableDefinitions">Collection of table definitions available for the output.</param>
-        /// <returns>True if the symbol was added to the output, or false if not.</returns>
-        bool TryAddSymbolToOutput(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
+        /// <returns>True if the symbol was handled, or false if not.</returns>
+        bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
