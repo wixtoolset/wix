@@ -760,7 +760,7 @@ namespace Bootstrapper
             Assert::Equal(3ul, pEngineState->packages.cPackages);
             ValidatePermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"NetFx48Web");
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
-            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PatchA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
+            ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PatchA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
         [Fact]

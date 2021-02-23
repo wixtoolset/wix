@@ -855,6 +855,9 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     DWORD dwResult = 0;
 
     // serialize message data
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRollback);
+    ExitOnFailure(hr, "Failed to write rollback flag to message buffer.");
+
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->msiPackage.pPackage->sczId);
     ExitOnFailure(hr, "Failed to write package id to message buffer.");
 
@@ -886,15 +889,14 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     // Slipstream patches actions.
     for (DWORD i = 0; i < pExecuteAction->msiPackage.pPackage->Msi.cSlipstreamMspPackages; ++i)
     {
-        hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.rgSlipstreamPatches[i]);
+        BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pExecuteAction->msiPackage.pPackage->Msi.rgSlipstreamMsps + i;
+        BOOTSTRAPPER_ACTION_STATE* pAction = fRollback ? &pSlipstreamMsp->rollback : &pSlipstreamMsp->execute;
+        hr = BuffWriteNumber(&pbData, &cbData, (DWORD)*pAction);
         ExitOnFailure(hr, "Failed to write slipstream patch action to message buffer.");
     }
 
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
-
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fRollback);
-    ExitOnFailure(hr, "Failed to write rollback flag to message buffer.");
 
 
     // send message
@@ -2263,6 +2265,9 @@ static HRESULT OnExecuteMsiPackage(
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
 
     // Deserialize message data.
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
+    ExitOnFailure(hr, "Failed to read rollback flag.");
+
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
     ExitOnFailure(hr, "Failed to read MSI package id.");
 
@@ -2303,21 +2308,17 @@ static HRESULT OnExecuteMsiPackage(
     // Read slipstream patches actions.
     if (executeAction.msiPackage.pPackage->Msi.cSlipstreamMspPackages)
     {
-        executeAction.msiPackage.rgSlipstreamPatches = (BOOTSTRAPPER_ACTION_STATE*)MemAlloc(executeAction.msiPackage.pPackage->Msi.cSlipstreamMspPackages * sizeof(BOOTSTRAPPER_ACTION_STATE), TRUE);
-        ExitOnNull(executeAction.msiPackage.rgSlipstreamPatches, hr, E_OUTOFMEMORY, "Failed to allocate memory for slipstream patch actions.");
-        
         for (DWORD i = 0; i < executeAction.msiPackage.pPackage->Msi.cSlipstreamMspPackages; ++i)
         {
-            hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.rgSlipstreamPatches[i]);
+            BURN_SLIPSTREAM_MSP* pSlipstreamMsp = executeAction.msiPackage.pPackage->Msi.rgSlipstreamMsps + i;
+            BOOTSTRAPPER_ACTION_STATE* pAction = fRollback ? &pSlipstreamMsp->rollback : &pSlipstreamMsp->execute;
+            hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)pAction);
             ExitOnFailure(hr, "Failed to read slipstream action.");
         }
     }
 
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
-
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
-    ExitOnFailure(hr, "Failed to read rollback flag.");
 
     // Execute MSI package.
     hr = MsiEngineExecutePackage(hwndParent, &executeAction, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);

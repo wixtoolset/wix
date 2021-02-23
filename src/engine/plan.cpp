@@ -154,10 +154,14 @@ static void RemoveUnnecessaryActions(
     __in BURN_EXECUTE_ACTION* rgActions,
     __in DWORD cActions
     );
-static HRESULT FinalizeSlipstreamPatchActions(
+static void FinalizePatchActions(
     __in BOOL fExecute,
     __in BURN_EXECUTE_ACTION* rgActions,
     __in DWORD cActions
+    );
+static void CalculateExpectedRegistrationStates(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages
     );
 static HRESULT PlanDependencyActions(
     __in BOOL fBundlePerMachine,
@@ -301,7 +305,6 @@ extern "C" void PlanUninitializeExecuteAction(
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
         ReleaseStr(pExecuteAction->msiPackage.sczLogPath);
         ReleaseMem(pExecuteAction->msiPackage.rgFeatures);
-        ReleaseMem(pExecuteAction->msiPackage.rgSlipstreamPatches);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
@@ -823,6 +826,8 @@ static HRESULT PlanPackagesHelper(
     hr = PlanFinalizeActions(pPlan);
     ExitOnFailure(hr, "Failed to remove unnecessary actions from plan.");
 
+    CalculateExpectedRegistrationStates(rgPackages, cPackages);
+
     // Let the BA know the actions that were planned.
     for (DWORD i = 0; i < cPackages; ++i)
     {
@@ -847,6 +852,12 @@ static HRESULT InitializePackage(
     HRESULT hr = S_OK;
     BOOL fInstallCondition = FALSE;
     BOOL fBeginCalled = FALSE;
+
+    if (pPackage->fCanAffectRegistration)
+    {
+        pPackage->expectedCacheRegistrationState = pPackage->cacheRegistrationState;
+        pPackage->expectedInstallRegistrationState = pPackage->installRegistrationState;
+    }
 
     if (pPackage->sczInstallCondition && *pPackage->sczInstallCondition)
     {
@@ -903,68 +914,24 @@ static HRESULT ProcessPackage(
     hr = ProcessPackageRollbackBoundary(pPlan, pEffectiveRollbackBoundary, ppRollbackBoundary);
     ExitOnFailure(hr, "Failed to process package rollback boundary.");
 
-    if (pPackage->fCanAffectRegistration)
+    if (BOOTSTRAPPER_ACTION_LAYOUT == pPlan->action)
     {
-        pPackage->expectedCacheRegistrationState = pPackage->cacheRegistrationState;
-        pPackage->expectedInstallRegistrationState = pPackage->installRegistrationState;
+        hr = PlanLayoutPackage(pPlan, pPackage, wzLayoutDirectory);
+        ExitOnFailure(hr, "Failed to plan layout package.");
     }
-
-    // If the package is in a requested state, plan it.
-    if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
+    else
     {
-        if (BOOTSTRAPPER_ACTION_LAYOUT == pPlan->action)
+        if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
         {
-            hr = PlanLayoutPackage(pPlan, pPackage, wzLayoutDirectory);
-            ExitOnFailure(hr, "Failed to plan layout package.");
+            // If the package is in a requested state, plan it.
+            hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
+            ExitOnFailure(hr, "Failed to plan execute package.");
         }
         else
         {
-            hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
-            ExitOnFailure(hr, "Failed to plan execute package.");
-
-            if (pPackage->fCanAffectRegistration)
-            {
-                if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pPackage->execute)
-                {
-                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
-                }
-                else if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
-                {
-                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
-                }
-            }
-        }
-    }
-    else if (BOOTSTRAPPER_ACTION_LAYOUT != pPlan->action)
-    {
-        // Make sure the package is properly ref-counted even if no plan is requested.
-        hr = PlanDependencyActions(fBundlePerMachine, pPlan, pPackage);
-        ExitOnFailure(hr, "Failed to plan dependency actions for package: %ls", pPackage->sczId);
-    }
-
-    if (pPackage->fCanAffectRegistration)
-    {
-        if (BURN_DEPENDENCY_ACTION_REGISTER == pPackage->dependencyExecute)
-        {
-            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedCacheRegistrationState)
-            {
-                pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
-            }
-            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedInstallRegistrationState)
-            {
-                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
-            }
-        }
-        else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pPackage->dependencyExecute)
-        {
-            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedCacheRegistrationState)
-            {
-                pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
-            }
-            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedInstallRegistrationState)
-            {
-                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
-            }
+            // Make sure the package is properly ref-counted even if no plan is requested.
+            hr = PlanDependencyActions(fBundlePerMachine, pPlan, pPackage);
+            ExitOnFailure(hr, "Failed to plan dependency actions for package: %ls", pPackage->sczId);
         }
     }
 
@@ -1498,17 +1465,14 @@ extern "C" HRESULT PlanFinalizeActions(
 {
     HRESULT hr = S_OK;
 
+    FinalizePatchActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
+
+    FinalizePatchActions(FALSE, pPlan->rgRollbackActions, pPlan->cRollbackActions);
+
     RemoveUnnecessaryActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
 
     RemoveUnnecessaryActions(FALSE, pPlan->rgRollbackActions, pPlan->cRollbackActions);
 
-    hr = FinalizeSlipstreamPatchActions(TRUE, pPlan->rgExecuteActions, pPlan->cExecuteActions);
-    ExitOnFailure(hr, "Failed to finalize slipstream execute actions.");
-
-    hr = FinalizeSlipstreamPatchActions(FALSE, pPlan->rgRollbackActions, pPlan->cRollbackActions);
-    ExitOnFailure(hr, "Failed to finalize slipstream rollback actions.");
-
-LExit:
     return hr;
 }
 
@@ -1868,7 +1832,7 @@ static void ResetPlannedPackageState(
     pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
     pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
-    if (BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.rgFeatures)
+    if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
     {
         for (DWORD i = 0; i < pPackage->Msi.cFeatures; ++i)
         {
@@ -1879,6 +1843,14 @@ static void ResetPlannedPackageState(
             pFeature->requested = BOOTSTRAPPER_FEATURE_STATE_UNKNOWN;
             pFeature->execute = BOOTSTRAPPER_FEATURE_ACTION_NONE;
             pFeature->rollback = BOOTSTRAPPER_FEATURE_ACTION_NONE;
+        }
+
+        for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
+        {
+            BURN_SLIPSTREAM_MSP* pSlipstreamMsp = &pPackage->Msi.rgSlipstreamMsps[i];
+
+            pSlipstreamMsp->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
+            pSlipstreamMsp->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
         }
     }
     else if (BURN_PACKAGE_TYPE_MSP == pPackage->type && pPackage->Msp.rgTargetProducts)
@@ -2716,47 +2688,91 @@ static void RemoveUnnecessaryActions(
     {
         BURN_EXECUTE_ACTION* pAction = rgActions + i;
 
-        // If this MSP targets a package in the chain, check the target's execute state
-        // to see if this patch should be skipped.
         if (BURN_EXECUTE_ACTION_TYPE_MSP_TARGET == pAction->type && pAction->mspTarget.pChainedTargetPackage)
         {
+            BURN_MSPTARGETPRODUCT* pFirstTargetProduct = pAction->mspTarget.rgOrderedPatches->pTargetProduct;
+            BURN_PATCH_SKIP_STATE skipState = fExecute ? pFirstTargetProduct->executeSkip : pFirstTargetProduct->rollbackSkip;
             BOOTSTRAPPER_ACTION_STATE chainedTargetPackageAction = fExecute ? pAction->mspTarget.pChainedTargetPackage->execute : pAction->mspTarget.pChainedTargetPackage->rollback;
-            BURN_PATCH_SKIP_STATE skipState = BURN_PATCH_SKIP_STATE_NONE;
-            if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == chainedTargetPackageAction)
+
+            switch (skipState)
             {
-                skipState = BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL;
+            case BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL:
+                pAction->fDeleted = TRUE;
                 LogId(REPORT_STANDARD, MSG_PLAN_SKIP_PATCH_ACTION, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.pChainedTargetPackage->sczId, LoggingActionStateToString(chainedTargetPackageAction), szExecuteOrRollback);
+                break;
+            case BURN_PATCH_SKIP_STATE_SLIPSTREAM:
+                pAction->fDeleted = TRUE;
+                LogId(REPORT_STANDARD, MSG_PLAN_SKIP_SLIPSTREAM_ACTION, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.pChainedTargetPackage->sczId, LoggingActionStateToString(chainedTargetPackageAction), szExecuteOrRollback);
+                break;
             }
-            else if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < chainedTargetPackageAction && pAction->mspTarget.fSlipstream && BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pAction->mspTarget.action)
+        }
+    }
+}
+
+static void FinalizePatchActions(
+    __in BOOL fExecute,
+    __in BURN_EXECUTE_ACTION* rgActions,
+    __in DWORD cActions
+    )
+{
+    for (DWORD i = 0; i < cActions; ++i)
+    {
+        BURN_EXECUTE_ACTION* pAction = rgActions + i;
+
+        if (BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE == pAction->type)
+        {
+            BURN_PACKAGE* pPackage = pAction->msiPackage.pPackage;
+            AssertSz(BOOTSTRAPPER_ACTION_STATE_NONE < pAction->msiPackage.action, "Planned execute MSI action to do nothing");
+
+            if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pAction->msiPackage.action)
+            {
+                // If we are uninstalling the MSI, we must skip all the patches.
+                for (DWORD j = 0; j < pPackage->Msi.cChainedPatches; ++j)
+                {
+                    BURN_CHAINED_PATCH* pChainedPatch = pPackage->Msi.rgChainedPatches + j;
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pChainedPatch->pMspPackage->Msp.rgTargetProducts + pChainedPatch->dwMspTargetProductIndex;
+
+                    if (fExecute)
+                    {
+                        pTargetProduct->execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+                        pTargetProduct->executeSkip = BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL;
+                    }
+                    else
+                    {
+                        pTargetProduct->rollback = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+                        pTargetProduct->rollbackSkip = BURN_PATCH_SKIP_STATE_TARGET_UNINSTALL;
+                    }
+                }
+            }
+            else
             {
                 // If the slipstream target is being installed or upgraded (not uninstalled or repaired) then we will slipstream so skip
-                // this action to install the patch standalone. Also, if the slipstream target is being repaired and the patch is being
+                // the patch's standalone action. Also, if the slipstream target is being repaired and the patch is being
                 // repaired, skip this operation since it will be redundant.
                 //
                 // The primary goal here is to ensure that a slipstream patch that is yet not installed is installed even if the MSI
                 // is already on the machine. The slipstream must be installed standalone if the MSI is being repaired.
-                if (BOOTSTRAPPER_ACTION_STATE_REPAIR != chainedTargetPackageAction || BOOTSTRAPPER_ACTION_STATE_REPAIR == pAction->mspTarget.action)
+                for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
                 {
-                    skipState = BURN_PATCH_SKIP_STATE_SLIPSTREAM;
-                    LogId(REPORT_STANDARD, MSG_PLAN_SKIP_SLIPSTREAM_ACTION, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.pChainedTargetPackage->sczId, LoggingActionStateToString(chainedTargetPackageAction), szExecuteOrRollback);
-                }
-            }
+                    BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + j;
+                    BURN_CHAINED_PATCH* pChainedPatch = pPackage->Msi.rgChainedPatches + pSlipstreamMsp->dwMsiChainedPatchIndex;
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pSlipstreamMsp->pMspPackage->Msp.rgTargetProducts + pChainedPatch->dwMspTargetProductIndex;
+                    BOOTSTRAPPER_ACTION_STATE action = fExecute ? pTargetProduct->execute : pTargetProduct->rollback;
+                    BOOL fSlipstream = BOOTSTRAPPER_ACTION_STATE_UNINSTALL < action &&
+                                       (BOOTSTRAPPER_ACTION_STATE_REPAIR != pAction->msiPackage.action || BOOTSTRAPPER_ACTION_STATE_REPAIR == action);
 
-            if (BURN_PATCH_SKIP_STATE_NONE != skipState)
-            {
-                pAction->fDeleted = TRUE;
-
-                for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
-                {
-                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->mspTarget.rgOrderedPatches[j].pTargetProduct;
-
-                    if (fExecute)
+                    if (fSlipstream)
                     {
-                        pTargetProduct->executeSkip = skipState;
-                    }
-                    else
-                    {
-                        pTargetProduct->rollbackSkip = skipState;
+                        if (fExecute)
+                        {
+                            pSlipstreamMsp->execute = action;
+                            pTargetProduct->executeSkip = BURN_PATCH_SKIP_STATE_SLIPSTREAM;
+                        }
+                        else
+                        {
+                            pSlipstreamMsp->rollback = action;
+                            pTargetProduct->rollbackSkip = BURN_PATCH_SKIP_STATE_SLIPSTREAM;
+                        }
                     }
                 }
             }
@@ -2764,53 +2780,73 @@ static void RemoveUnnecessaryActions(
     }
 }
 
-static HRESULT FinalizeSlipstreamPatchActions(
-    __in BOOL fExecute,
-    __in BURN_EXECUTE_ACTION* rgActions,
-    __in DWORD cActions
+static void CalculateExpectedRegistrationStates(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages
     )
 {
-    HRESULT hr = S_OK;
-
-    for (DWORD i = 0; i < cActions; ++i)
+    for (DWORD i = 0; i < cPackages; ++i)
     {
-        BURN_EXECUTE_ACTION* pAction = rgActions + i;
+        BURN_PACKAGE* pPackage = rgPackages + i;
 
-        // If this MSI package contains slipstream patches store the slipstream actions.
-        if (BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE == pAction->type && pAction->msiPackage.pPackage->Msi.cSlipstreamMspPackages)
+        // MspPackages can have actions throughout the plan, so the plan needed to be finalized before anything could be calculated.
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type && !pPackage->fDependencyManagerWasHere)
         {
-            BURN_PACKAGE* pPackage = pAction->msiPackage.pPackage;
+            pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
+            pPackage->rollback = BOOTSTRAPPER_ACTION_STATE_NONE;
 
-            // By default all slipstream actions will be initialized to "no action" (aka: 0).
-            pAction->msiPackage.rgSlipstreamPatches = (BOOTSTRAPPER_ACTION_STATE*)MemAlloc(sizeof(BOOTSTRAPPER_ACTION_STATE) * pPackage->Msi.cSlipstreamMspPackages, TRUE);
-            ExitOnNull(pAction->msiPackage.rgSlipstreamPatches, hr, E_OUTOFMEMORY, "Failed to allocate memory for patch actions.");
-
-            // If we are uninstalling or repairing the MSI, we must ignore all the slipstream patches because they cannot
-            // be applied right now.
-            if (BOOTSTRAPPER_ACTION_STATE_REPAIR != pAction->msiPackage.action && BOOTSTRAPPER_ACTION_STATE_UNINSTALL != pAction->msiPackage.action)
+            for (DWORD j = 0; j < pPackage->Msp.cTargetProductCodes; ++j)
             {
-                for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
-                {
-                    BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[j].pMspPackage;
-                    AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
+                BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + j;
 
-                    pAction->msiPackage.rgSlipstreamPatches[j] = fExecute ? pMspPackage->execute : pMspPackage->rollback;
-                    for (DWORD k = 0; k < pMspPackage->Msp.cTargetProductCodes; ++k)
-                    {
-                        BURN_MSPTARGETPRODUCT* pTargetProduct = pMspPackage->Msp.rgTargetProducts + k;
-                        if (pPackage == pTargetProduct->pChainedTargetPackage)
-                        {
-                            pAction->msiPackage.rgSlipstreamPatches[j] = fExecute ? pTargetProduct->execute : pTargetProduct->rollback;
-                            break;
-                        }
-                    }
+                // The highest aggregate action state found will be used.
+                if (pPackage->execute < pTargetProduct->execute)
+                {
+                    pPackage->execute = pTargetProduct->execute;
+                }
+
+                if (pPackage->rollback < pTargetProduct->rollback)
+                {
+                    pPackage->rollback = pTargetProduct->rollback;
+                }
+            }
+        }
+
+        if (pPackage->fCanAffectRegistration)
+        {
+            if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < pPackage->execute)
+            {
+                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+            }
+            else if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+            {
+                pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+            }
+
+            if (BURN_DEPENDENCY_ACTION_REGISTER == pPackage->dependencyExecute)
+            {
+                if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedCacheRegistrationState)
+                {
+                    pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                }
+                if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pPackage->expectedInstallRegistrationState)
+                {
+                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                }
+            }
+            else if (BURN_DEPENDENCY_ACTION_UNREGISTER == pPackage->dependencyExecute)
+            {
+                if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedCacheRegistrationState)
+                {
+                    pPackage->expectedCacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                }
+                if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->expectedInstallRegistrationState)
+                {
+                    pPackage->expectedInstallRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
                 }
             }
         }
     }
-
-LExit:
-    return hr;
 }
 
 static HRESULT PlanDependencyActions(
@@ -3064,6 +3100,11 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        for (DWORD j = 0; j < pAction->msiPackage.pPackage->Msi.cSlipstreamMspPackages; ++j)
+        {
+            const BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pAction->msiPackage.pPackage->Msi.rgSlipstreamMsps + j;
+            LogStringLine(PlanDumpLevel, "      Patch[%u]: msp package id: %ls, action: %hs", j, pSlipstreamMsp->pMspPackage->sczId, LoggingActionStateToString(fRollback ? pSlipstreamMsp->rollback : pSlipstreamMsp->execute));
+        }
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:

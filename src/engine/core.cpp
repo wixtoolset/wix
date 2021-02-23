@@ -1814,15 +1814,30 @@ static void LogPackages(
 
             LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingBoolToString(pPackage->fAcquire), LoggingBoolToString(pPackage->fUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
             
-            if (BURN_PACKAGE_TYPE_MSI == pPackage->type && pPackage->Msi.cFeatures)
+            if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
             {
-                LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURES, pPackage->Msi.cFeatures, pPackage->sczId);
-
-                for (DWORD j = 0; j < pPackage->Msi.cFeatures; ++j)
+                if (pPackage->Msi.cFeatures)
                 {
-                    const BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[j];
+                    LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURES, pPackage->Msi.cFeatures, pPackage->sczId);
 
-                    LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURE, pFeature->sczId, LoggingMsiFeatureStateToString(pFeature->currentState), LoggingMsiFeatureStateToString(pFeature->defaultRequested), LoggingMsiFeatureStateToString(pFeature->requested), LoggingMsiFeatureActionToString(pFeature->execute), LoggingMsiFeatureActionToString(pFeature->rollback));
+                    for (DWORD j = 0; j < pPackage->Msi.cFeatures; ++j)
+                    {
+                        const BURN_MSIFEATURE* pFeature = &pPackage->Msi.rgFeatures[j];
+
+                        LogId(REPORT_STANDARD, MSG_PLANNED_MSI_FEATURE, pFeature->sczId, LoggingMsiFeatureStateToString(pFeature->currentState), LoggingMsiFeatureStateToString(pFeature->defaultRequested), LoggingMsiFeatureStateToString(pFeature->requested), LoggingMsiFeatureActionToString(pFeature->execute), LoggingMsiFeatureActionToString(pFeature->rollback));
+                    }
+                }
+
+                if (pPackage->Msi.cSlipstreamMspPackages)
+                {
+                    LogId(REPORT_STANDARD, MSG_PLANNED_SLIPSTREAMED_MSP_TARGETS, pPackage->Msi.cSlipstreamMspPackages, pPackage->sczId);
+
+                    for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
+                    {
+                        const BURN_SLIPSTREAM_MSP* pSlipstreamMsp = &pPackage->Msi.rgSlipstreamMsps[j];
+
+                        LogId(REPORT_STANDARD, MSG_PLANNED_SLIPSTREAMED_MSP_TARGET, pSlipstreamMsp->pMspPackage->sczId, LoggingActionStateToString(pSlipstreamMsp->execute), LoggingActionStateToString(pSlipstreamMsp->rollback));
+                    }
                 }
             }
             else if (BURN_PACKAGE_TYPE_MSP == pPackage->type && pPackage->Msp.cTargetProductCodes)

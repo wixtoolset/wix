@@ -774,6 +774,18 @@ static HRESULT DetectPackageDependents(
         {
             pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
         }
+        if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
+        {
+            for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
+            {
+                BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+
+                if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pTargetProduct->registrationState)
+                {
+                    pTargetProduct->registrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                }
+            }
+        }
     }
 
 LExit:

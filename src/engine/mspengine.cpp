@@ -372,6 +372,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fWillUninstallAll = TRUE;
 
     for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
     {
@@ -388,6 +389,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             {
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 execute = BOOTSTRAPPER_ACTION_STATE_REPAIR;
+                fWillUninstallAll = FALSE;
                 break;
 
             case BOOTSTRAPPER_REQUEST_STATE_ABSENT: __fallthrough;
@@ -401,6 +403,7 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
 
             default:
                 execute = BOOTSTRAPPER_ACTION_STATE_NONE;
+                fWillUninstallAll = FALSE;
                 break;
             }
             break;
@@ -411,11 +414,19 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
+                fWillUninstallAll = FALSE;
                 break;
 
             default:
                 execute = BOOTSTRAPPER_ACTION_STATE_NONE;
                 break;
+            }
+            break;
+
+        default:
+            if (pTargetProduct->fInstalled)
+            {
+                fWillUninstallAll = FALSE;
             }
             break;
         }
@@ -473,6 +484,13 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
         {
             pPackage->rollback = rollback;
         }
+    }
+
+    // The dependency manager will do the wrong thing if the package level action is UNINSTALL
+    // when the patch will still be applied to at least one product.
+    if (!fWillUninstallAll && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute)
+    {
+        pPackage->execute = BOOTSTRAPPER_ACTION_STATE_NONE;
     }
 
     return hr;
@@ -776,16 +794,22 @@ extern "C" void MspEngineFinalizeInstallRegistrationState(
         ExitFunction();
     }
 
-    pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
-
-    for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
+    if (!pPackage->Msp.cTargetProductCodes)
     {
-        BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+    }
+    else
+    {
+        pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
-        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pTargetProduct->registrationState)
+        for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)
         {
-            pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
-            break;
+            BURN_MSPTARGETPRODUCT* pTargetProduct = pPackage->Msp.rgTargetProducts + i;
+
+            if (pPackage->installRegistrationState < pTargetProduct->registrationState)
+            {
+                pPackage->installRegistrationState = pTargetProduct->registrationState;
+            }
         }
     }
 

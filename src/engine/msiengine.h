@@ -95,6 +95,7 @@ HRESULT MsiEngineCalculateInstallUiLevel(
     );
 void MsiEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,
+    __in BOOL fRollback,
     __in HRESULT hrExecute,
     __in BOOL fInsideMsiTransaction
     );

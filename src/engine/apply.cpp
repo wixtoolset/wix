@@ -2032,7 +2032,7 @@ static HRESULT ExecuteMsiPackage(
 LExit:
     if (fExecuted)
     {
-        MsiEngineUpdateInstallRegistrationState(pExecuteAction, hrExecute, fInsideMsiTransaction);
+        MsiEngineUpdateInstallRegistrationState(pExecuteAction, fRollback, hrExecute, fInsideMsiTransaction);
     }
 
     if (fBeginCalled)
@@ -2248,7 +2248,20 @@ static HRESULT ExecuteDependencyAction(
             {
                 pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
             }
-            if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->installRegistrationState)
+
+            if (BURN_PACKAGE_TYPE_MSP == pAction->packageDependency.pPackage->type)
+            {
+                for (DWORD i = 0; i < pAction->packageDependency.pPackage->Msp.cTargetProductCodes; ++i)
+                {
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->packageDependency.pPackage->Msp.rgTargetProducts + i;
+
+                    if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pTargetProduct->registrationState)
+                    {
+                        pTargetProduct->registrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
+                    }
+                }
+            }
+            else if (BURN_PACKAGE_REGISTRATION_STATE_IGNORED == pAction->packageDependency.pPackage->installRegistrationState)
             {
                 pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
             }
@@ -2259,7 +2272,20 @@ static HRESULT ExecuteDependencyAction(
             {
                 pAction->packageDependency.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
             }
-            if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->installRegistrationState)
+
+            if (BURN_PACKAGE_TYPE_MSP == pAction->packageDependency.pPackage->type)
+            {
+                for (DWORD i = 0; i < pAction->packageDependency.pPackage->Msp.cTargetProductCodes; ++i)
+                {
+                    BURN_MSPTARGETPRODUCT* pTargetProduct = pAction->packageDependency.pPackage->Msp.rgTargetProducts + i;
+
+                    if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pTargetProduct->registrationState)
+                    {
+                        pTargetProduct->registrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                    }
+                }
+            }
+            else if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pAction->packageDependency.pPackage->installRegistrationState)
             {
                 pAction->packageDependency.pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
             }

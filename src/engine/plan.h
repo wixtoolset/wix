@@ -253,7 +253,6 @@ typedef struct _BURN_EXECUTE_ACTION
             BOOTSTRAPPER_ACTION_STATE action;
 
             BOOTSTRAPPER_FEATURE_ACTION* rgFeatures;
-            BOOTSTRAPPER_ACTION_STATE* rgSlipstreamPatches;
         } msiPackage;
         struct
         {

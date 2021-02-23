@@ -42,7 +42,7 @@ static HRESULT ConcatFeatureActionProperties(
     );
 static HRESULT ConcatPatchProperty(
     __in BURN_PACKAGE* pPackage,
-    __in_opt BOOTSTRAPPER_ACTION_STATE* rgSlipstreamPatchActions,
+    __in BOOL fRollback,
     __inout_z LPWSTR* psczArguments
     );
 static void RegisterSourceDirectory(
@@ -1180,10 +1180,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     ExitOnFailure(hr, "Failed to add feature action properties to obfuscated argument string.");
 
     // add slipstream patch properties
-    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, pExecuteAction->msiPackage.rgSlipstreamPatches, &sczProperties);
+    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, fRollback, &sczProperties);
     ExitOnFailure(hr, "Failed to add patch properties to argument string.");
 
-    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, pExecuteAction->msiPackage.rgSlipstreamPatches, &sczObfuscatedProperties);
+    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
     hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczProperties);
@@ -1432,6 +1432,7 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
 
 extern "C" void MsiEngineUpdateInstallRegistrationState(
     __in BURN_EXECUTE_ACTION* pAction,
+    __in BOOL fRollback,
     __in HRESULT hrExecute,
     __in BOOL fInsideMsiTransaction
     )
@@ -1460,6 +1461,49 @@ extern "C" void MsiEngineUpdateInstallRegistrationState(
     else
     {
         pPackage->installRegistrationState = newState;
+    }
+
+    if (BURN_PACKAGE_REGISTRATION_STATE_ABSENT == newState)
+    {
+        for (DWORD i = 0; i < pPackage->Msi.cChainedPatches; ++i)
+        {
+            BURN_CHAINED_PATCH* pChainedPatch = pPackage->Msi.rgChainedPatches + i;
+            BURN_MSPTARGETPRODUCT* pTargetProduct = pChainedPatch->pMspPackage->Msp.rgTargetProducts + pChainedPatch->dwMspTargetProductIndex;
+
+            if (fInsideMsiTransaction)
+            {
+                pTargetProduct->transactionRegistrationState = newState;
+            }
+            else
+            {
+                pTargetProduct->registrationState = newState;
+            }
+        }
+    }
+    else
+    {
+        for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
+        {
+            BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + i;
+            BOOTSTRAPPER_ACTION_STATE patchExecuteAction = fRollback ? pSlipstreamMsp->rollback : pSlipstreamMsp->execute;
+
+            if (BOOTSTRAPPER_ACTION_STATE_INSTALL > patchExecuteAction)
+            {
+                continue;
+            }
+
+            BURN_CHAINED_PATCH* pChainedPatch = pPackage->Msi.rgChainedPatches + pSlipstreamMsp->dwMsiChainedPatchIndex;
+            BURN_MSPTARGETPRODUCT* pTargetProduct = pChainedPatch->pMspPackage->Msp.rgTargetProducts + pChainedPatch->dwMspTargetProductIndex;
+
+            if (fInsideMsiTransaction)
+            {
+                pTargetProduct->transactionRegistrationState = newState;
+            }
+            else
+            {
+                pTargetProduct->registrationState = newState;
+            }
+        }
     }
 
 LExit:
@@ -1911,7 +1955,7 @@ LExit:
 
 static HRESULT ConcatPatchProperty(
     __in BURN_PACKAGE* pPackage,
-    __in_opt BOOTSTRAPPER_ACTION_STATE* rgSlipstreamPatchActions,
+    __in BOOL fRollback,
     __inout_z LPWSTR* psczArguments
     )
 {
@@ -1921,14 +1965,14 @@ static HRESULT ConcatPatchProperty(
     LPWSTR sczPatches = NULL;
 
     // If there are slipstream patch actions, build up their patch action.
-    if (rgSlipstreamPatchActions)
+    if (pPackage->Msi.cSlipstreamMspPackages)
     {
         for (DWORD i = 0; i < pPackage->Msi.cSlipstreamMspPackages; ++i)
         {
-            BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[i].pMspPackage;
-            AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Only MSP packages can be slipstream patches.");
+            BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + i;
+            BURN_PACKAGE* pMspPackage = pSlipstreamMsp->pMspPackage;
+            BOOTSTRAPPER_ACTION_STATE patchExecuteAction = fRollback ? pSlipstreamMsp->rollback : pSlipstreamMsp->execute;
 
-            BOOTSTRAPPER_ACTION_STATE patchExecuteAction = rgSlipstreamPatchActions[i];
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < patchExecuteAction)
             {
                 hr = CacheGetCompletedPath(pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
