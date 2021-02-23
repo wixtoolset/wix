@@ -383,6 +383,8 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnPlanPackageBegin(
         __in_z LPCWSTR wzPackageId,
+        __in BOOTSTRAPPER_PACKAGE_STATE state,
+        __in BOOL fInstallCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __inout BOOTSTRAPPER_REQUEST_STATE *pRequestState,
         __inout BOOL* pfCancel
@@ -392,7 +394,7 @@ public: // IBootstrapperApplication
         WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
         BAL_INFO_PACKAGE* pPackage = NULL;
 
-        // If we're planning to install a prerequisite, install it. The prerequisite needs to be installed
+        // If we're planning to install prerequisites, install them. The prerequisites need to be installed
         // in all cases (even uninstall!) so the BA can load next.
         if (m_fPrereq)
         {
@@ -401,21 +403,7 @@ public: // IBootstrapperApplication
             hr = GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage);
             if (SUCCEEDED(hr) && pPackage->fPrereqPackage && pPackageInfo)
             {
-                if (pPackage->sczInstallCondition && *pPackage->sczInstallCondition)
-                {
-                    hr = BalEvaluateCondition(pPackage->sczInstallCondition, &fInstall);
-                    if (FAILED(hr))
-                    {
-                        fInstall = FALSE;
-                    }
-                }
-                else
-                {
-                    // If the InstallCondition is missing, then it should always be installed.
-                    fInstall = TRUE;
-                }
-
-                pPackageInfo->fPlannedToBeInstalled = fInstall;
+                pPackageInfo->fPlannedToBeInstalled = fInstall = fInstallCondition;
             }
 
             if (fInstall)
@@ -449,7 +437,7 @@ public: // IBootstrapperApplication
             }
         }
 
-        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, recommendedState, pRequestState, pfCancel);
+        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fInstallCondition, recommendedState, pRequestState, pfCancel);
     }
 
 
@@ -1146,8 +1134,8 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDMSIPACKAGE:
             OnDetectRelatedMsiPackageFallback(reinterpret_cast<BA_ONDETECTRELATEDMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTRELATEDMSIPACKAGE_RESULTS*>(pvResults));
             break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTTARGETMSIPACKAGE:
-            OnDetectTargetMsiPackageFallback(reinterpret_cast<BA_ONDETECTTARGETMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTTARGETMSIPACKAGE_RESULTS*>(pvResults));
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTPATCHTARGET:
+            OnDetectPatchTargetFallback(reinterpret_cast<BA_ONDETECTPATCHTARGET_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTPATCHTARGET_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTMSIFEATURE:
             OnDetectMsiFeatureFallback(reinterpret_cast<BA_ONDETECTMSIFEATURE_ARGS*>(pvArgs), reinterpret_cast<BA_ONDETECTMSIFEATURE_RESULTS*>(pvResults));
@@ -1161,8 +1149,8 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN:
             OnPlanPackageBeginFallback(reinterpret_cast<BA_ONPLANPACKAGEBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANPACKAGEBEGIN_RESULTS*>(pvResults));
             break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANTARGETMSIPACKAGE:
-            OnPlanTargetMsiPackageFallback(reinterpret_cast<BA_ONPLANTARGETMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANTARGETMSIPACKAGE_RESULTS*>(pvResults));
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPATCHTARGET:
+            OnPlanPatchTargetFallback(reinterpret_cast<BA_ONPLANPATCHTARGET_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANPATCHTARGET_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIFEATURE:
             OnPlanMsiFeatureFallback(reinterpret_cast<BA_ONPLANMSIFEATURE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANMSIFEATURE_RESULTS*>(pvResults));
@@ -1293,6 +1281,9 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE:
             OnSystemRestorePointCompleteFallback(reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONSYSTEMRESTOREPOINTCOMPLETE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDPACKAGE:
+            OnPlannedPackageFallback(reinterpret_cast<BA_ONPLANNEDPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDPACKAGE_RESULTS*>(pvResults));
+            break;
         default:
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
             m_pfnBAFunctionsProc((BA_FUNCTIONS_MESSAGE)message, pvArgs, pvResults, m_pvBAFunctionsProcContext);
@@ -1408,12 +1399,12 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTRELATEDMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
-    void OnDetectTargetMsiPackageFallback(
-        __in BA_ONDETECTTARGETMSIPACKAGE_ARGS* pArgs,
-        __inout BA_ONDETECTTARGETMSIPACKAGE_RESULTS* pResults
+    void OnDetectPatchTargetFallback(
+        __in BA_ONDETECTPATCHTARGET_ARGS* pArgs,
+        __inout BA_ONDETECTPATCHTARGET_RESULTS* pResults
         )
     {
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTTARGETMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTPATCHTARGET, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     void OnDetectMsiFeatureFallback(
@@ -1452,13 +1443,13 @@ private: // privates
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_PACKAGE, m_hModule, pArgs->wzPackageId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
     }
 
-    void OnPlanTargetMsiPackageFallback(
-        __in BA_ONPLANTARGETMSIPACKAGE_ARGS* pArgs,
-        __inout BA_ONPLANTARGETMSIPACKAGE_RESULTS* pResults
+    void OnPlanPatchTargetFallback(
+        __in BA_ONPLANPATCHTARGET_ARGS* pArgs,
+        __inout BA_ONPLANPATCHTARGET_RESULTS* pResults
         )
     {
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANTARGETMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANPATCHTARGET, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_TARGET_MSI_PACKAGE, m_hModule, pArgs->wzPackageId, pArgs->wzProductCode, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
     }
 
@@ -1478,6 +1469,14 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANPACKAGECOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnPlannedPackageFallback(
+        __in BA_ONPLANNEDPACKAGE_ARGS* pArgs,
+        __inout BA_ONPLANNEDPACKAGE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANNEDPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     void OnApplyBeginFallback(
