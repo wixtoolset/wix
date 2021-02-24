@@ -111,7 +111,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 2, 18, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 2, 24, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -2011,7 +2011,8 @@ LExit:
 }
 
 EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout BOOL* pfKeepRegistration
     )
 {
     HRESULT hr = S_OK;
@@ -2019,15 +2020,16 @@ EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
     BA_ONUNREGISTERBEGIN_RESULTS results = { };
 
     args.cbSize = sizeof(args);
+    args.fKeepRegistration = *pfKeepRegistration;
 
     results.cbSize = sizeof(results);
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnUnregisterBegin failed.");
 
-    if (results.fCancel)
+    if (!args.fKeepRegistration && results.fForceKeepRegistration)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+        *pfKeepRegistration = TRUE;
     }
 
 LExit:

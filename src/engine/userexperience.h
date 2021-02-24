@@ -452,7 +452,8 @@ BAAPI UserExperienceOnSystemShutdown(
     __inout BOOL* pfCancel
     );
 BAAPI UserExperienceOnUnregisterBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout BOOL* pfKeepRegistration
     );
 BAAPI UserExperienceOnUnregisterComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,

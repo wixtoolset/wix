@@ -1089,12 +1089,13 @@ struct BA_ONSYSTEMSHUTDOWN_RESULTS
 struct BA_ONUNREGISTERBEGIN_ARGS
 {
     DWORD cbSize;
+    BOOL fKeepRegistration;
 };
 
 struct BA_ONUNREGISTERBEGIN_RESULTS
 {
     DWORD cbSize;
-    BOOL fCancel;
+    BOOL fForceKeepRegistration;
 };
 
 struct BA_ONUNREGISTERCOMPLETE_ARGS
