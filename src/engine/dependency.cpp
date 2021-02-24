@@ -680,10 +680,12 @@ LExit:
 }
 
 extern "C" void DependencyUnregisterBundle(
-    __in const BURN_REGISTRATION* pRegistration
+    __in const BURN_REGISTRATION* pRegistration,
+    __in const BURN_PACKAGES* pPackages
     )
 {
     HRESULT hr = S_OK;
+    LPCWSTR wzDependentProviderKey = pRegistration->sczId;
 
     // Remove the bundle provider key.
     hr = DepUnregisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey);
@@ -694,6 +696,19 @@ extern "C" void DependencyUnregisterBundle(
     else if (FAILED(hr) && E_FILENOTFOUND != hr)
     {
         LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_UNREGISTERED_FAILED, pRegistration->sczProviderKey, hr);
+    }
+
+    // Best effort to make sure this bundle is not registered as a dependent for anything.
+    for (DWORD i = 0; i < pPackages->cPackages; ++i)
+    {
+        const BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
+        UnregisterPackageDependency(pPackage->fPerMachine, pPackage, wzDependentProviderKey);
+    }
+
+    for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
+    {
+        const BURN_PACKAGE* pPackage = &pRegistration->relatedBundles.rgRelatedBundles[i].package;
+        UnregisterPackageDependency(pPackage->fPerMachine, pPackage, wzDependentProviderKey);
     }
 }
 

@@ -169,7 +169,8 @@ HRESULT DependencyProcessDependentRegistration(
  Note: Does not check for existing dependents before removing the key.
 *********************************************************************/
 void DependencyUnregisterBundle(
-    __in const BURN_REGISTRATION* pRegistration
+    __in const BURN_REGISTRATION* pRegistration,
+    __in const BURN_PACKAGES* pPackages
     );
 
 #if defined(__cplusplus)

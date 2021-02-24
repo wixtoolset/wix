@@ -435,7 +435,7 @@ extern "C" HRESULT ApplyUnregister(
     }
     else
     {
-        hr = RegistrationSessionEnd(&pEngineState->registration, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction);
+        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction);
         ExitOnFailure(hr, "Failed to end session in per-user process.");
     }
 

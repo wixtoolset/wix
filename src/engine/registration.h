@@ -196,6 +196,7 @@ HRESULT RegistrationSessionResume(
     );
 HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction

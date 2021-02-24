@@ -869,6 +869,7 @@ LExit:
  *******************************************************************/
 extern "C" HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction
@@ -912,7 +913,7 @@ extern "C" HRESULT RegistrationSessionEnd(
             BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER == dependencyRegistrationAction)
         {
             // Remove the bundle dependency key.
-            DependencyUnregisterBundle(pRegistration);
+            DependencyUnregisterBundle(pRegistration, pPackages);
         }
 
         // Delete update registration key.
