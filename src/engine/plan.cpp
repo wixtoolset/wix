@@ -519,7 +519,7 @@ extern "C" HRESULT PlanRegistration(
     STRINGDICT_HANDLE sdBundleDependents = NULL;
     STRINGDICT_HANDLE sdIgnoreDependents = NULL;
 
-    pPlan->fRegister = TRUE; // register the bundle since we're modifying machine state.
+    pPlan->fCanAffectMachineState = TRUE; // register the bundle since we're modifying machine state.
 
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
 

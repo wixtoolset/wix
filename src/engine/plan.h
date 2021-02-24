@@ -309,10 +309,11 @@ typedef struct _BURN_PLAN
     LPWSTR wzBundleId;          // points directly into parent the ENGINE_STATE.
     LPWSTR wzBundleProviderKey; // points directly into parent the ENGINE_STATE.
     BOOL fPerMachine;
-    BOOL fRegister;
+    BOOL fCanAffectMachineState;
     DWORD dwRegistrationOperations;
     BOOL fDisallowRemoval;
     BOOL fDisableRollback;
+    BOOL fAffectedMachineState;
 
     DWORD64 qwCacheSizeTotal;
 

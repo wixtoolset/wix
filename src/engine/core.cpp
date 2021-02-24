@@ -282,7 +282,6 @@ extern "C" HRESULT CoreDetect(
     // Always reset the detect state which means the plan should be reset too.
     pEngineState->fDetected = FALSE;
     pEngineState->fPlanned = FALSE;
-    pEngineState->fApplied = FALSE;
     DetectReset(&pEngineState->registration, &pEngineState->packages);
     PlanReset(&pEngineState->plan, &pEngineState->packages);
 
@@ -458,7 +457,7 @@ extern "C" HRESULT CorePlan(
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Plan cannot be done without a successful Detect.");
     }
-    else if (pEngineState->fApplied)
+    else if (pEngineState->plan.fAffectedMachineState)
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Plan requires a new successful Detect after calling Apply.");
     }
@@ -624,7 +623,7 @@ extern "C" HRESULT CoreApply(
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Apply cannot be done without a successful Plan.");
     }
-    else if (pEngineState->fApplied)
+    else if (pEngineState->plan.fAffectedMachineState)
     {
         ExitOnFailure(hr = E_INVALIDSTATE, "Plans cannot be applied multiple times.");
     }
@@ -644,7 +643,7 @@ extern "C" HRESULT CoreApply(
     hr = UserExperienceOnApplyBegin(&pEngineState->userExperience, dwPhaseCount);
     ExitOnRootFailure(hr, "BA aborted apply begin.");
 
-    pEngineState->fApplied = TRUE;
+    pEngineState->plan.fAffectedMachineState = pEngineState->plan.fCanAffectMachineState;
 
     // Abort if this bundle already requires a restart.
     if (BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
@@ -695,7 +694,7 @@ extern "C" HRESULT CoreApply(
     }
 
     // Register.
-    if (pEngineState->plan.fRegister)
+    if (pEngineState->plan.fCanAffectMachineState)
     {
         fRegistered = TRUE;
         hr = ApplyRegister(pEngineState);
@@ -1107,7 +1106,7 @@ extern "C" void CoreCleanup(
 
     LogId(REPORT_STANDARD, MSG_CLEANUP_BEGIN);
 
-    if (pEngineState->fApplied && BOOTSTRAPPER_ACTION_LAYOUT < pEngineState->plan.action && BOOTSTRAPPER_ACTION_UPDATE_REPLACE > pEngineState->plan.action)
+    if (pEngineState->plan.fAffectedMachineState)
     {
         LogId(REPORT_STANDARD, MSG_CLEANUP_SKIPPED_APPLY);
         ExitFunction();
