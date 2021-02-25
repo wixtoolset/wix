@@ -316,6 +316,9 @@ namespace WixToolset.Core
                             string parentName = null;
                             this.ParseSFPCatalogElement(child, ref parentName);
                             break;
+                        case "SoftwareTag":
+                            this.ParsePackageTagElement(child);
+                            break;
                         case "SummaryInformation":
                             this.ParseSummaryInformationElement(child, ref isCodepageSet, ref isPackageNameSet, ref isKeywordsSet, ref isPackageAuthorSet);
                             break;

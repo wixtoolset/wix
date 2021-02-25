@@ -346,6 +346,9 @@ namespace WixToolset.Core
                     case "SetVariableRef":
                         this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
                         break;
+                    case "SoftwareTag":
+                        this.ParseBundleTagElement(child);
+                        break;
                     case "Update":
                         this.ParseUpdateElement(child);
                         break;

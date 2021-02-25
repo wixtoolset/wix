@@ -295,17 +295,15 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteEndElement(); // </Update>
                 }
 
-#if TODO // Handle SWID Tags
-                var bundleTags = this.Output.Tables["WixBundleTag"].RowsAs<Row>();
-                foreach (var row in bundleTags)
+                foreach (var bundleTagSymbol in this.Section.Symbols.OfType<WixBundleTagSymbol>())
                 {
                     writer.WriteStartElement("SoftwareTag");
-                    writer.WriteAttributeString("Filename", (string)row[0]);
-                    writer.WriteAttributeString("Regid", (string)row[1]);
-                    writer.WriteCData((string)row[4]);
+                    writer.WriteAttributeString("Filename", bundleTagSymbol.Filename);
+                    writer.WriteAttributeString("Regid", bundleTagSymbol.Regid);
+                    writer.WriteAttributeString("Path", bundleTagSymbol.InstallPath);
+                    writer.WriteCData(bundleTagSymbol.Xml);
                     writer.WriteEndElement();
                 }
-#endif
 
                 writer.WriteEndElement(); // </Register>
 

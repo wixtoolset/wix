@@ -410,6 +410,9 @@ namespace WixToolset.Core
                     case "PropertyRef":
                         this.ParsePatchChildRefElement(child, "Property");
                         break;
+                    case "SoftwareTagRef":
+                        this.ParseTagRefElement(child);
+                        break;
                     case "UIRef":
                         this.ParsePatchChildRefElement(child, "WixUI");
                         break;

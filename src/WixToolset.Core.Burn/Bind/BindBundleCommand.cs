@@ -380,6 +380,13 @@ namespace WixToolset.Core.Burn
             // Update the bundle per-machine/per-user scope based on the chained packages.
             this.ResolveBundleInstallScope(section, bundleSymbol, orderedFacades);
 
+            var softwareTags = section.Symbols.OfType<WixBundleTagSymbol>().ToList();
+            if (softwareTags.Any())
+            {
+                var command = new ProcessBundleSoftwareTagsCommand(section, softwareTags);
+                command.Execute();
+            }
+
             // Give the extension one last hook before generating the output files.
             foreach (var extension in this.BackendExtensions)
             {

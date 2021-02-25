@@ -231,6 +231,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolDefinitionType.WixPatchRef:
                     case SymbolDefinitionType.WixPatchTarget:
                     case SymbolDefinitionType.WixProperty:
+                    case SymbolDefinitionType.WixProductTag:
                     case SymbolDefinitionType.WixSimpleReference:
                     case SymbolDefinitionType.WixSuppressAction:
                     case SymbolDefinitionType.WixSuppressModularization:
@@ -456,7 +457,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddDirectorySymbol(DirectorySymbol symbol)
         {
-            if (String.IsNullOrEmpty(symbol.ShortName) && !symbol.Name.Equals(".") && !symbol.Name.Equals("SourceDir") && !Common.IsValidShortFilename(symbol.Name, false))
+            if (String.IsNullOrEmpty(symbol.ShortName) && symbol.Name != null && !symbol.Name.Equals(".") && !symbol.Name.Equals("SourceDir") && !Common.IsValidShortFilename(symbol.Name, false))
             {
                 symbol.ShortName = CreateShortName(symbol.Name, false, false, "Directory", symbol.ParentDirectoryRef);
             }

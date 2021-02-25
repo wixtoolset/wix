@@ -282,6 +282,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
+            // Process SoftwareTags in MSI packages.
+            if (SectionType.Product == section.Type)
+            {
+                var softwareTags = section.Symbols.OfType<WixProductTagSymbol>().ToList();
+
+                if (softwareTags.Any())
+                {
+                    var command = new ProcessPackageSoftwareTagsCommand(section, softwareTags, this.IntermediateFolder);
+                    command.Execute();
+                }
+            }
+
             // Gather information about files that do not come from merge modules.
             {
                 var command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, fileFacades.Where(f => !f.FromModule), variableCache, overwriteHash: true);

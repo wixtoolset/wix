@@ -45,7 +45,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var assemblyNameSymbols = this.Section.Symbols.OfType<MsiAssemblyNameSymbol>().ToDictionary(t => t.Id.Id);
 
-            foreach (var file in this.UpdateFileFacades)
+            foreach (var file in this.UpdateFileFacades.Where(f => f.SourcePath != null))
             {
                 this.UpdateFileFacade(file, assemblyNameSymbols);
             }

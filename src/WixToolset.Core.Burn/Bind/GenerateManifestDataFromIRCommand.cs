@@ -82,6 +82,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundleRelatedPackage:
                     case SymbolDefinitionType.WixBundleRollbackBoundary:
                     case SymbolDefinitionType.WixBundleSlipstreamMsp:
+                    case SymbolDefinitionType.WixBundleTag:
                     case SymbolDefinitionType.WixBundleUpdate:
                     case SymbolDefinitionType.WixBundleVariable:
                     case SymbolDefinitionType.WixBuildInfo:

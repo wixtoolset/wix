@@ -125,7 +125,7 @@ namespace WixToolset.Core.Bind
 
         public SourceLineNumber SourceLineNumber => this.FileRow == null ? this.FileSymbol.SourceLineNumbers : this.FileRow.SourceLineNumbers;
 
-        public string SourcePath => this.FileRow == null ? this.FileSymbol.Source.Path : this.FileRow.Source;
+        public string SourcePath => this.FileRow == null ? this.FileSymbol.Source?.Path : this.FileRow.Source;
 
         public bool Compressed => this.FileRow == null ? (this.FileSymbol.Attributes & FileSymbolAttributes.Compressed) == FileSymbolAttributes.Compressed : (this.FileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed;
 
