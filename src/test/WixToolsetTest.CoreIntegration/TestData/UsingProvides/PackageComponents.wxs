@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <Provides Key="UsingProvides" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

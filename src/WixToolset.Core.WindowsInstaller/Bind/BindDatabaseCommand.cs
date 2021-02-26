@@ -325,6 +325,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            // Process dependency references.
+            if (SectionType.Product == section.Type || SectionType.Module == section.Type)
+            {
+                var dependencyRefs = section.Symbols.OfType<WixDependencyRefSymbol>().ToList();
+
+                if (dependencyRefs.Any())
+                {
+                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, section, dependencyRefs);
+                    command.Execute();
+                }
+            }
+
             // If there are any backend extensions, give them the opportunity to process
             // the section now that the fields have all be resolved.
             //

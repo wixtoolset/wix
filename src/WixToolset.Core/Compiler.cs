@@ -2366,6 +2366,16 @@ namespace WixToolset.Core
                         var foundExtension = false;
                         this.ParseProgIdElement(child, id.Id, YesNoType.NotSet, null, null, null, ref foundExtension, YesNoType.NotSet);
                         break;
+                    case "Provides":
+                        if (win64)
+                        {
+                            this.Messaging.Write(CompilerWarnings.Win64Component(sourceLineNumbers, id.Id));
+                        }
+
+                        keyPathSet = this.ParseProvidesElement(child, null, id.Id, out keyPossible);
+                        keyBit = ComponentKeyPathType.Registry;
+                        break;
+
                     case "RegistryKey":
                         keyPathSet = this.ParseRegistryKeyElement(child, id.Id, null, null, win64, out keyPossible);
                         keyBit = ComponentKeyPathType.Registry;
@@ -6289,6 +6299,9 @@ namespace WixToolset.Core
                         break;
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
+                        break;
+                    case "Requires":
+                        this.ParseRequiresElement(child, null, false);
                         break;
                     case "SetDirectory":
                         this.ParseSetDirectoryElement(child);

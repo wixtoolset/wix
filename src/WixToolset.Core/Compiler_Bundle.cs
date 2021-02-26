@@ -196,6 +196,9 @@ namespace WixToolset.Core
                     case "ParentName":
                         parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
+                    case "ProviderKey":
+                        this.ParseBundleProviderKeyAttribute(sourceLineNumbers, node, attrib);
+                        break;
                     case "SplashScreenSourceFile":
                         splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
@@ -339,6 +342,9 @@ namespace WixToolset.Core
                         break;
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
+                        break;
+                    case "Requires":
+                        this.ParseRequiresElement(child, null, false);
                         break;
                     case "SetVariable":
                         this.ParseSetVariableElement(child);
@@ -2385,6 +2391,9 @@ namespace WixToolset.Core
                         break;
                     case "PayloadGroupRef":
                         this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id, ComplexReferenceChildType.Unknown, null);
+                        break;
+                    case "Provides":
+                        this.ParseProvidesElement(child, packageType, id.Id, out _);
                         break;
                     case "ExitCode":
                         allowed = (packageType == WixBundlePackageType.Exe);
