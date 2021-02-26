@@ -80,6 +80,8 @@ namespace WixToolset.Converters
         private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
         private static readonly XName SetPropertyElementName = WixNamespace + "SetProperty";
         private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
+        private static readonly XName SoftwareTagElementName = WixNamespace + "SoftwareTag";
+        private static readonly XName TagElementName = XNamespace.None + "Tag";
         private static readonly XName TextElementName = WixNamespace + "Text";
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
@@ -117,7 +119,7 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/NetFxExtension", "http://wixtoolset.org/schemas/v4/wxs/netfx" },
             { "http://schemas.microsoft.com/wix/PSExtension", "http://wixtoolset.org/schemas/v4/wxs/powershell" },
             { "http://schemas.microsoft.com/wix/SqlExtension", "http://wixtoolset.org/schemas/v4/wxs/sql" },
-            { "http://schemas.microsoft.com/wix/TagExtension", "http://wixtoolset.org/schemas/v4/wxs/tag" },
+            { "http://schemas.microsoft.com/wix/TagExtension", XNamespace.None },
             { "http://schemas.microsoft.com/wix/UtilExtension", WixUtilNamespace },
             { "http://schemas.microsoft.com/wix/VSExtension", "http://wixtoolset.org/schemas/v4/wxs/vs" },
             { "http://wixtoolset.org/schemas/thmutil/2010", "http://wixtoolset.org/schemas/v4/thmutil" },
@@ -186,6 +188,7 @@ namespace WixToolset.Converters
                 { WixConverter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
                 { WixConverter.SetPropertyElementName, this.ConvertSetPropertyElement },
                 { WixConverter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
+                { WixConverter.TagElementName, this.ConvertTagElement },
                 { WixConverter.TextElementName, this.ConvertTextElement },
                 { WixConverter.UITextElementName, this.ConvertUITextElement },
                 { WixConverter.VariableElementName, this.ConvertVariableElement },
@@ -1144,6 +1147,14 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertTagElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the element 'SoftwareTag' name."))
+            {
+                element.Name = SoftwareTagElementName;
+            }
+        }
+
         private void ConvertTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
         private void ConvertUITextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
@@ -1378,7 +1389,6 @@ namespace WixToolset.Converters
         {
             foreach (var element in elements)
             {
-
                 if (deprecatedToUpdatedNamespaces.TryGetValue(element.Name.Namespace, out var ns))
                 {
                     element.Name = ns.GetName(element.Name.LocalName);
@@ -1396,6 +1406,11 @@ namespace WixToolset.Converters
                     {
                         if (deprecatedToUpdatedNamespaces.TryGetValue(attribute.Value, out ns))
                         {
+                            if (ns == XNamespace.None)
+                            {
+                                continue;
+                            }
+
                             convertedAttribute = ("xmlns" == attribute.Name.LocalName) ? new XAttribute(attribute.Name.LocalName, ns.NamespaceName) : new XAttribute(XNamespace.Xmlns + attribute.Name.LocalName, ns.NamespaceName);
                         }
                     }
@@ -1815,6 +1830,11 @@ namespace WixToolset.Converters
             /// Breaking change: The Win64 attribute's value '{0}' cannot be converted automatically to the new Bitness attribute.
             /// </summary>
             Win64AttributeRenameCannotBeAutomatic,
+
+            /// <summary>
+            /// The Tag element has been renamed. Use the element 'SoftwareTag' name.
+            /// </summary>
+            TagElementRenamed,
         }
     }
 }

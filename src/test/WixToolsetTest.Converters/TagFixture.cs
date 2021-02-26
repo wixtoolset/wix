@@ -9,26 +9,24 @@ namespace WixToolsetTest.Converters
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
 
-    public class FirewallExtensionFixture : BaseConverterFixture
+    public class TagFixture : BaseConverterFixture
     {
         [Fact]
-        public void FixRemoteAddressValue()
+        public void FixTagExtension()
         {
             var parse = String.Join(Environment.NewLine,
-                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:fw='http://schemas.microsoft.com/wix/FirewallExtension'>",
-                "  <Fragment>",
-                "    <fw:RemoteAddress>",
-                "      127.0.0.1",
-                "    </fw:RemoteAddress>",
-                "  </Fragment>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:tag='http://schemas.microsoft.com/wix/TagExtension'>",
+                "  <Product>",
+                "    <tag:Tag Regid='wixtoolset.org' InstallDirectory='InstallFolder' />",
+                "  </Product>",
                 "</Wix>");
 
             var expected = new[]
             {
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:fw=\"http://wixtoolset.org/schemas/v4/wxs/firewall\">",
-                "  <Fragment>",
-                "    <fw:RemoteAddress Value=\"127.0.0.1\" />",
-                "  </Fragment>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Package>",
+                "    <SoftwareTag Regid=\"wixtoolset.org\" InstallDirectory=\"InstallFolder\" />",
+                "  </Package>",
                 "</Wix>"
             };
 
@@ -38,7 +36,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
