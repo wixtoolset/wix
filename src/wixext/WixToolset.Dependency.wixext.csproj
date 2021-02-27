@@ -4,16 +4,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>embedded</DebugType>
     <RootNamespace>WixToolset.Dependency</RootNamespace>
     <Description>WiX Toolset Dependency Extension</Description>
     <Title>WiX Toolset Dependency Extension</Title>
     <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\dependency.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileName).targets" PackagePath="build" />
+    <Content Include="$(OutputPath)..\**\*.pdb" PackagePath="pdbs\%(RelativeFolder)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\wixlib\dependency.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\dependency.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
   </ItemGroup>
 </Project>

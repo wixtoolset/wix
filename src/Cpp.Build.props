@@ -6,6 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' OR '$(Platform)' == 'AnyCPU' ">Win32</Platform>
     <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(Platform)\</IntDir>
     <OutDir>$(OutputPath)$(Platform)\</OutDir>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <NuGetTargetMoniker>native,Version=v0.0</NuGetTargetMoniker>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' AND '$(VisualStudioVersion)'>='15.0'">

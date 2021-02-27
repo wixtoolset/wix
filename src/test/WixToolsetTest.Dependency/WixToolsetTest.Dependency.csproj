@@ -4,6 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
