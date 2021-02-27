@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage SourceFile="C:\Windows\system32\credwiz.exe" Permanent="yes">
+                <PayloadGroupRef Id="SharedPayloads" />
+            </ExePackage>
+            <ExePackage SourceFile="C:\Windows\system32\cscript.exe" Permanent="yes">
+                <PayloadGroupRef Id="SharedPayloads" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+    <Fragment>
+        <PayloadGroup Id="SharedPayloads">
+            <Payload SourceFile="$(sys.SOURCEFILEPATH)" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

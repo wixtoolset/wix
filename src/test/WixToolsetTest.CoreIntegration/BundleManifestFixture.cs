@@ -51,6 +51,93 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesBAManifestWithPackageInformation()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "CustomPackageDescription", "CustomPackageDescription.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var packageElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties");
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPackageProperties", new List<string> { "DownloadSize", "PackageSize", "InstalledSize", "Version" } },
+                };
+                Assert.Equal(3, packageElements.Count);
+                Assert.Equal("<WixPackageProperties Package='burn.exe' Vital='yes' DisplayName='Windows Installer XML Toolset' Description='WiX Toolset Bootstrapper' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' Compressed='yes' Version='*' Cache='yes' />", packageElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPackageProperties Package='RemotePayloadExe' Vital='yes' DisplayName='Override RemotePayload display name' Description='Override RemotePayload description' DownloadSize='1' PackageSize='1' InstalledSize='1' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_RemotePayloadExe' RollbackLogPathVariable='WixBundleRollbackLog_RemotePayloadExe' Compressed='no' Version='1.0.0.0' Cache='yes' />", packageElements[1].GetTestXml());
+                Assert.Equal("<WixPackageProperties Package='calc.exe' Vital='yes' DisplayName='Override harvested display name' Description='Override harvested description' DownloadSize='*' PackageSize='*' InstalledSize='*' PackageType='Exe' Permanent='yes' LogPathVariable='WixBundleLog_calc.exe' RollbackLogPathVariable='WixBundleRollbackLog_calc.exe' Compressed='yes' Version='*' Cache='yes' />", packageElements[2].GetTestXml(ignoreAttributesByElementName));
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesBAManifestWithPayloadInformation()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SharedPayloadsBetweenPackages", "SharedPayloadsBetweenPackages.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var payloadElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPayloadProperties");
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPayloadProperties", new List<string> { "Size" } },
+                };
+                Assert.Equal(4, payloadElements.Count);
+                Assert.Equal("<WixPayloadProperties Payload='credwiz.exe' Package='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' LayoutOnly='no' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Payload='payue_e5DuhsDGlzJxWYPhqr6S7rkc' Package='credwiz.exe' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Payload='cscript.exe' Package='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' LayoutOnly='no' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Payload='payue_e5DuhsDGlzJxWYPhqr6S7rkc' Package='cscript.exe' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
+            }
+        }
+
         [Fact]
         public void PopulatesBEManifestWithBundleExtensionBundleCustomData()
         {
@@ -188,6 +275,48 @@ namespace WixToolsetTest.CoreIntegration
 
                 var exampleSearches = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']/be:ExampleSearch");
                 Assert.Equal(2, exampleSearches.Count);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesManifestWithExePackages()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SharedPayloadsBetweenPackages", "SharedPayloadsBetweenPackages.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var exePackageElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage");
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
+                };
+                Assert.Equal(2, exePackageElements.Count);
+                Assert.Equal("<ExePackage Id='credwiz.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='payue_e5DuhsDGlzJxWYPhqr6S7rkc' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<ExePackage Id='cscript.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='cscript.exe' /><PayloadRef Id='payue_e5DuhsDGlzJxWYPhqr6S7rkc' /></ExePackage>", exePackageElements[1].GetTestXml(ignoreAttributesByElementName));
             }
         }
 

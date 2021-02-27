@@ -211,7 +211,9 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void WritePayloadInfo(XmlTextWriter writer)
         {
-            var payloadSymbols = this.Section.Symbols.OfType<WixBundlePayloadSymbol>();
+            // TODO: check v3 - should this be only include package payloads or include all non-UX container payloads?
+            var payloadSymbols = this.Section.Symbols.OfType<WixBundlePayloadSymbol>()
+                                                     .Where(p => !String.IsNullOrEmpty(p.PackageRef));
 
             foreach (var payloadSymbol in payloadSymbols)
             {
@@ -219,10 +221,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
 
-                if (!String.IsNullOrEmpty(payloadSymbol.PackageRef))
-                {
-                    writer.WriteAttributeString("Package", payloadSymbol.PackageRef);
-                }
+                writer.WriteAttributeString("Package", payloadSymbol.PackageRef);
 
                 if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
                 {

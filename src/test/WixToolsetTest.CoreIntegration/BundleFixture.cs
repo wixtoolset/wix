@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -115,6 +116,11 @@ namespace WixToolsetTest.CoreIntegration
                     Assert.Equal($"<Registration Id='{bundleSymbol.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleId}'>" +
                         "<Arp Register='yes' DisplayName='~TestBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' />" +
                         "</Registration>", registrationElement.GetTestXml());
+
+                    var msiPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='test.msi']");
+                    var msiPayload = (XmlNode)Assert.Single(msiPayloads);
+                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
+                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } }));
                 }
 
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);

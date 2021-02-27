@@ -569,6 +569,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <param name="actionSymbol">The action symbol to be sequenced.</param>
         /// <param name="requiredActionSymbols">Collection of actions which must be included.</param>
+        /// <param name="firstReference">A dictionary used for detecting cyclic references among action symbols.</param>
         private void SequenceActionSymbol(WixActionSymbol actionSymbol, Dictionary<string, WixActionSymbol> requiredActionSymbols, Dictionary<WixActionSymbol, WixActionSymbol> firstReference)
         {
             var after = false;
