@@ -16,12 +16,11 @@ namespace WixToolset.Dependency
         /// <value>The default culture.</value>
         public override string DefaultCulture => "en-US";
 
-        public override bool TryGetSymbolDefinitionByName(string name, out IntermediateSymbolDefinition symbolDefinition)
-        {
-            symbolDefinition = DependencySymbolDefinitions.ByName(name);
-            return symbolDefinition != null;
-        }
-
+        /// <summary>
+        /// Gets the contained .wixlib content.
+        /// </summary>
+        /// <param name="symbolDefinitions">Strong typed symbold definitions.</param>
+        /// <returns>The .wixlib.</returns>
         public override Intermediate GetLibrary(ISymbolDefinitionCreator symbolDefinitions)
         {
             return Intermediate.Load(typeof(DependencyExtensionData).Assembly, "WixToolset.Dependency.dependency.wixlib", symbolDefinitions);

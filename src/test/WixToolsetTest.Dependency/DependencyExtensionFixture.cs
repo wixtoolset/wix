@@ -15,9 +15,10 @@ namespace WixToolsetTest.Dependency
             var folder = TestData.Get(@"TestData\UsingProvides");
             var build = new Builder(folder, typeof(DependencyExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "WixDependencyProvider");
+            var results = build.BuildAndQuery(Build, "CustomAction", "WixDependencyProvider");
             Assert.Equal(new[]
             {
+                "CustomAction:Wix4DependencyCheck_X86\t1\tDependencyCA_X86\tWixDependencyCheck\t",
                 "WixDependencyProvider:dep74OfIcniaqxA7EprRGBw4Oyy3r8\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
             }, results);
         }

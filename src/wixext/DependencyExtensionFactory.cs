@@ -12,7 +12,6 @@ namespace WixToolset.Dependency
         {
             typeof(DependencyCompiler),
             typeof(DependencyExtensionData),
-            typeof(DependencyWindowsInstallerBackendBinderExtension),
         };
     }
 }
