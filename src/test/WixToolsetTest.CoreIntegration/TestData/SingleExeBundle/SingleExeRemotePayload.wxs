@@ -21,7 +21,7 @@
                   Description="Microsoft .NET Framework 4.6.2 Setup"
                   Hash="C42E6ED280290648BBD59F664008852F4CFE4548"
                   ProductName="Microsoft .NET Framework 4.6.2"
-                  Size="1429344"
+                  Size="9223372036854775807"
                   Version="4.6.1590.0" />
             </ExePackage>
         </PackageGroup>

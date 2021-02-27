@@ -252,6 +252,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -266,6 +267,16 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(exePath));
+                Assert.True(File.Exists(pdbPath));
+
+                using (var wixOutput = WixOutput.Read(pdbPath))
+                {
+                    var intermediate = Intermediate.Load(wixOutput);
+                    var section = intermediate.Sections.Single();
+
+                    var payloadSymbol = section.Symbols.OfType<WixBundlePayloadSymbol>().Where(x => x.Id.Id == "NetFx462Web").Single();
+                    Assert.Equal(Int64.MaxValue, payloadSymbol.FileSize);
+                }
             }
         }
 
@@ -371,58 +382,6 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
             }
-        }
-
-        [Fact]
-        public void CanBuildBundleWithLargePayload()
-        {
-            var folder = TestData.Get(@"TestData\LargePayload");
-
-            // Overwrite the payload with a 2.5 GiB file. We do this dynamically to avoid committing such
-            // a large file to source control.
-            var largeFile = Path.Combine(folder, "data", "large_file.dat");
-            const long TwoAndAHalfGigabytes = 2_684_354_560;
-            using (var stream = File.Create(largeFile))
-            {
-                stream.Seek(TwoAndAHalfGigabytes - 1, SeekOrigin.Begin);
-                stream.WriteByte(1);
-            }
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
-                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Bundle.wxs"),
-                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", exePath,
-                });
-
-                result.AssertSuccess();
-                Assert.Empty(result.Messages.Where(m => m.Level == MessageLevel.Warning));
-
-                Assert.True(File.Exists(exePath));
-                Assert.True(File.Exists(pdbPath));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\large_file.dat")));
-
-                using (var wixOutput = WixOutput.Read(pdbPath))
-                {
-                    var intermediate = Intermediate.Load(wixOutput);
-                    var section = intermediate.Sections.Single();
-
-                    var payloadSymbol = section.Symbols.OfType<WixBundlePayloadSymbol>().Where(x => x.Name == "large_file.dat").Single();
-                    Assert.Equal(TwoAndAHalfGigabytes, payloadSymbol.FileSize);
-                }
-            }
-
-            File.Delete(largeFile);
         }
     }
 }

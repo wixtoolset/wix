@@ -1447,7 +1447,7 @@ namespace WixToolset.Core
                         remotePayload.ProductName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Size":
-                        remotePayload.Size = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                        remotePayload.Size = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
                         break;
                     case "Version":
                         remotePayload.Version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3260,7 +3260,7 @@ namespace WixToolset.Core
 
             public string ProductName { get; set; }
 
-            public int Size { get; set; }
+            public long Size { get; set; }
 
             public string Version { get; set; }
         }

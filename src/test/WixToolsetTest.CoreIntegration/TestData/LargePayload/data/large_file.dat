@@ -1,2 +1,0 @@
-When running the tests, this file will be overwritten with 2.5GB of data to test how Wix handles large files. We've avoided
-committing such a large file to Git as it would bloat the repo.
