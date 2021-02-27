@@ -278,6 +278,16 @@ static HRESULT EnsureAbsentDependents(
     UINT cDependents = 0;
     PMSIHANDLE hDependencyRec = NULL;
 
+    // Skip the dependent check if the WixDependencyProvider table is missing (no dependency providers).
+    hr = WcaTableExists(L"WixDependencyProvider");
+    if (S_FALSE == hr)
+    {
+        WcaLog(LOGMSG_STANDARD, "Skipping the dependents check since no dependency providers are authored.");
+        ExitFunction1(hr = S_OK);
+    }
+
+    ExitOnFailure(hr, "Failed to check if the WixDependencyProvider table exists.");
+
     // Split the IGNOREDEPENDENCIES property for use below if set. If it is "ALL", then quit now.
     hr = SplitIgnoredDependents(&sdIgnoredDependents);
     ExitOnFailure(hr, "Failed to get the ignored dependents.");
@@ -296,16 +306,6 @@ static HRESULT EnsureAbsentDependents(
         // Key was not found, so proceed.
         hr = S_OK;
     }
-
-    // Skip the dependent check if the WixDependencyProvider table is missing (no dependency providers).
-    hr = WcaTableExists(L"WixDependencyProvider");
-    if (S_FALSE == hr)
-    {
-        WcaLog(LOGMSG_STANDARD, "Skipping the dependents check since no dependency providers are authored.");
-        ExitFunction();
-    }
-
-    ExitOnFailure(hr, "Failed to check if the WixDependencyProvider table exists.");
 
     // Set the registry hive to use depending on install context.
     hkHive = fMachineContext ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
