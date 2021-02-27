@@ -166,7 +166,7 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment />",
                 "</Wix>");
 
@@ -179,7 +179,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
             Assert.Equal(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
         }

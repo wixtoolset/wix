@@ -32,6 +32,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
         private static readonly XNamespace Wix3Namespace = "http://schemas.microsoft.com/wix/2006/wi";
         private static readonly XNamespace WixBalNamespace = "http://wixtoolset.org/schemas/v4/wxs/bal";
+        private static readonly XNamespace WixDependencyNamespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
         private static readonly XNamespace WixFirewallNamespace = "http://wixtoolset.org/schemas/v4/wxs/firewall";
 
@@ -53,6 +54,9 @@ namespace WixToolset.Converters
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DataElementName = WixNamespace + "Data";
+        private static readonly XName OldProvidesElementName = WixDependencyNamespace + "Provides";
+        private static readonly XName OldRequiresElementName = WixDependencyNamespace + "Requires";
+        private static readonly XName OldRequiresRefElementName = WixDependencyNamespace + "RequiresRef";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
         private static readonly XName ErrorElementName = WixNamespace + "Error";
         private static readonly XName FeatureElementName = WixNamespace + "Feature";
@@ -72,6 +76,9 @@ namespace WixToolset.Converters
         private static readonly XName ProductElementName = WixNamespace + "Product";
         private static readonly XName ProgressTextElementName = WixNamespace + "ProgressText";
         private static readonly XName PublishElementName = WixNamespace + "Publish";
+        private static readonly XName ProvidesElementName = WixNamespace + "Provides";
+        private static readonly XName RequiresElementName = WixNamespace + "Requires";
+        private static readonly XName RequiresRefElementName = WixNamespace + "RequiresRef";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
         private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
         private static readonly XName RegistrySearchElementName = WixNamespace + "RegistrySearch";
@@ -106,11 +113,14 @@ namespace WixToolset.Converters
         private static readonly XName SummaryInformationElementName = WixNamespace + "SummaryInformation";
         private static readonly XName MediaTemplateElementName = WixNamespace + "MediaTemplate";
 
+        private static readonly XName DependencyCheckAttributeName = WixDependencyNamespace + "Check";
+        private static readonly XName DependencyEnforceAttributeName = WixDependencyNamespace + "Enforce";
+
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
             { "http://schemas.microsoft.com/wix/BalExtension", "http://wixtoolset.org/schemas/v4/wxs/bal" },
             { "http://schemas.microsoft.com/wix/ComPlusExtension", "http://wixtoolset.org/schemas/v4/wxs/complus" },
-            { "http://schemas.microsoft.com/wix/DependencyExtension", "http://wixtoolset.org/schemas/v4/wxs/dependency" },
+            { "http://schemas.microsoft.com/wix/DependencyExtension", WixDependencyNamespace },
             { "http://schemas.microsoft.com/wix/DifxAppExtension", "http://wixtoolset.org/schemas/v4/wxs/difxapp" },
             { "http://schemas.microsoft.com/wix/FirewallExtension", "http://wixtoolset.org/schemas/v4/wxs/firewall" },
             { "http://schemas.microsoft.com/wix/HttpExtension", "http://wixtoolset.org/schemas/v4/wxs/http" },
@@ -174,6 +184,9 @@ namespace WixToolset.Converters
                 { WixConverter.MsiPackageElementName, this.ConvertWindowsInstallerPackageElement },
                 { WixConverter.MspPackageElementName, this.ConvertWindowsInstallerPackageElement },
                 { WixConverter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.OldProvidesElementName, this.ConvertProvidesElement },
+                { WixConverter.OldRequiresElementName, this.ConvertRequiresElement },
+                { WixConverter.OldRequiresRefElementName, this.ConvertRequiresRefElement },
                 { WixConverter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { WixConverter.PermissionExElementName, this.ConvertPermissionExElement },
                 { WixConverter.ProductElementName, this.ConvertProductElement },
@@ -275,6 +288,7 @@ namespace WixToolset.Converters
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
+            this.RemoveUnusedNamspaces(document.Root);
 
             return this.Errors;
         }
@@ -327,6 +341,7 @@ namespace WixToolset.Converters
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
+            this.RemoveUnusedNamspaces(document.Root);
 
             return this.Errors;
         }
@@ -1136,6 +1151,50 @@ namespace WixToolset.Converters
 
         private void ConvertShortcutPropertyElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
+        private void ConvertProvidesElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            {
+                element.Name = ProvidesElementName;
+            }
+
+            if (element.Parent.Name == ComponentElementName &&
+                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Provides element has been integrated into the WiX v4 namespace. Add the 'Check' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+            {
+                element.Add(new XAttribute(DependencyCheckAttributeName, "yes"));
+            }
+        }
+
+        private void ConvertRequiresElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            {
+                element.Name = RequiresElementName;
+            }
+
+            if (element.Parent.Name == ProvidesElementName &&
+                element.Parent.Parent?.Name == ComponentElementName &&
+                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The Requires element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+            {
+                element.Add(new XAttribute(DependencyEnforceAttributeName, "yes"));
+            }
+        }
+
+        private void ConvertRequiresRefElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Remove the namespace."))
+            {
+                element.Name = RequiresRefElementName;
+            }
+
+            if (element.Parent.Name == ProvidesElementName &&
+                element.Parent.Parent?.Name == ComponentElementName &&
+                this.OnError(ConverterTestType.IntegratedDependencyNamespace, element, "The RequiresRef element has been integrated into the WiX v4 namespace. Add the 'Enforce' attribute from the WixDependency.wixext to match v3 runtime behavior."))
+            {
+                element.Add(new XAttribute(DependencyEnforceAttributeName, "yes"));
+            }
+        }
+
         private void ConvertSuppressSignatureValidation(XElement element)
         {
             var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
@@ -1149,7 +1208,7 @@ namespace WixToolset.Converters
 
         private void ConvertTagElement(XElement element)
         {
-            if (this.OnError(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the element 'SoftwareTag' name."))
+            if (this.OnError(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the 'SoftwareTag' element instead."))
             {
                 element.Name = SoftwareTagElementName;
             }
@@ -1311,6 +1370,10 @@ namespace WixToolset.Converters
                     element.Add(new XAttribute("Bitness", value));
                     win64.Remove();
                 }
+                //else if (this.OnError(ConverterTestType.BitnessAttributeRequired, element, "Use the Bitness attribute instead."))
+                //{
+                //    element.Add(new XAttribute("Bitness", "always32"));
+                //}
 
                 var result = element.Attribute("Result")?.Value;
                 if (result == null || result == "value")
@@ -1461,6 +1524,50 @@ namespace WixToolset.Converters
         }
 
         /// <summary>
+        /// Removes unused namespaces from the element and its children.
+        /// </summary>
+        /// <param name="root">Root element to start at.</param>
+        private void RemoveUnusedNamspaces(XElement root)
+        {
+            var declarations = new List<XAttribute>();
+            var namespaces = new HashSet<string>();
+
+            VisitElement(root, x =>
+            {
+                if (x is XAttribute a && a.IsNamespaceDeclaration)
+                {
+                    declarations.Add(a);
+                    namespaces.Add(a.Value);
+                }
+                return true;
+            });
+
+            foreach (var ns in namespaces.ToList())
+            {
+                VisitElement(root, x =>
+                {
+                    if ((x is XElement e && e.Name.Namespace == ns) ||
+                        (x is XAttribute a && !a.IsNamespaceDeclaration && a.Name.Namespace == ns))
+                    {
+                        namespaces.Remove(ns);
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            foreach (var declaration in declarations)
+            {
+                if (namespaces.Contains(declaration.Value) &&
+                    this.OnError(ConverterTestType.RemoveUnusedNamespaces, declaration, "The namespace '{0}' is not used. Remove unused namespaces.", declaration.Value))
+                {
+                    declaration.Remove();
+                }
+            }
+        }
+
+        /// <summary>
         /// Output an error message to the console.
         /// </summary>
         /// <param name="converterTestType">The type of converter test.</param>
@@ -1599,6 +1706,21 @@ namespace WixToolset.Converters
             {
                 node.Remove();
             }
+        }
+
+        private static bool VisitElement(XElement element, Func<XObject, bool> visitor)
+        {
+            if (!visitor(element))
+            {
+                return false;
+            }
+
+            if (!element.Attributes().All(a => visitor(a)))
+            {
+                return false;
+            }
+
+            return element.Elements().All(e => VisitElement(e, visitor));
         }
 
         private static bool WasImplicitlyStringTyped(string value)
@@ -1835,6 +1957,16 @@ namespace WixToolset.Converters
             /// The Tag element has been renamed. Use the element 'SoftwareTag' name.
             /// </summary>
             TagElementRenamed,
+
+            /// <summary>
+            /// The Dependency namespace has been incorporated into WiX v4 namespace.
+            /// </summary>
+            IntegratedDependencyNamespace,
+
+            /// <summary>
+            /// Remove unused namespaces.
+            /// </summary>
+            RemoveUnusedNamespaces,
         }
     }
 }

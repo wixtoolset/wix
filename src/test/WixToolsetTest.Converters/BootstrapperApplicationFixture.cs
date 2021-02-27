@@ -396,7 +396,7 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:bal=\"http://wixtoolset.org/schemas/v4/wxs/bal\">",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <BootstrapperApplication Id=\"ba\" />",
                 "  </Fragment>",
@@ -409,7 +409,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(4, errors);
+            Assert.Equal(5, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
