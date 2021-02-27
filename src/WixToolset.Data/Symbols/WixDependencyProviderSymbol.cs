@@ -7,7 +7,7 @@ namespace WixToolset.Data
     public static partial class SymbolDefinitions
     {
         public static readonly IntermediateSymbolDefinition WixDependencyProvider = new IntermediateSymbolDefinition(
-            SymbolDefinitionType.WixDependencyProvider.ToString(),
+            SymbolDefinitionType.WixDependencyProvider,
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ComponentRef), IntermediateFieldType.String),

@@ -154,6 +154,8 @@ namespace WixToolset.Data
         WixCustomTableColumn,
         WixDeltaPatchFile,
         WixDeltaPatchSymbolPaths,
+        WixDependency,
+        WixDependencyRef,
         WixDependencyProvider,
         WixEnsureTable,
         WixFeatureGroup,
@@ -649,6 +651,12 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixDeltaPatchSymbolPaths:
                     return SymbolDefinitions.WixDeltaPatchSymbolPaths;
+
+                case SymbolDefinitionType.WixDependency:
+                    return SymbolDefinitions.WixDependency;
+
+                case SymbolDefinitionType.WixDependencyRef:
+                    return SymbolDefinitions.WixDependencyRef;
 
                 case SymbolDefinitionType.WixEnsureTable:
                     return SymbolDefinitions.WixEnsureTable;
