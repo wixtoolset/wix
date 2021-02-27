@@ -102,6 +102,7 @@ namespace WixToolset.Data
         SFPCatalog,
         Shortcut,
         Signature,
+        SoftwareIdentificationTag,
         TargetFilesOptionalData,
         TargetImages,
         TextStyle,
@@ -140,6 +141,7 @@ namespace WixToolset.Data
         WixBundleRelatedPackage,
         WixBundleRollbackBoundary,
         WixBundleSlipstreamMsp,
+        WixBundleTag,
         WixBundleUpdate,
         WixBundleVariable,
         WixChain,
@@ -170,6 +172,7 @@ namespace WixToolset.Data
         WixPatchRef,
         WixPatchTarget,
         WixProductSearch,
+        WixProductTag,
         WixProperty,
         WixRegistrySearch,
         WixRelatedBundle,
@@ -491,6 +494,9 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.Signature:
                     return SymbolDefinitions.Signature;
 
+                case SymbolDefinitionType.SoftwareIdentificationTag:
+                    return SymbolDefinitions.SoftwareIdentificationTag;
+
                 case SymbolDefinitionType.TargetFilesOptionalData:
                     return SymbolDefinitions.TargetFilesOptionalData;
 
@@ -605,6 +611,9 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixBundleSlipstreamMsp:
                     return SymbolDefinitions.WixBundleSlipstreamMsp;
 
+                case SymbolDefinitionType.WixBundleTag:
+                    return SymbolDefinitions.WixBundleTag;
+
                 case SymbolDefinitionType.WixBundleUpdate:
                     return SymbolDefinitions.WixBundleUpdate;
 
@@ -691,6 +700,9 @@ namespace WixToolset.Data
 
                 case SymbolDefinitionType.WixProductSearch:
                     return SymbolDefinitions.WixProductSearch;
+
+                case SymbolDefinitionType.WixProductTag:
+                    return SymbolDefinitions.WixProductTag;
 
                 case SymbolDefinitionType.WixProperty:
                     return SymbolDefinitions.WixProperty;

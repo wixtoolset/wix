@@ -1283,6 +1283,20 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: true
         );
 
+        public static readonly TableDefinition SoftwareIdentificationTag = new TableDefinition(
+            "SoftwareIdentificationTag",
+            SymbolDefinitions.SoftwareIdentificationTag,
+            new[]
+            {
+                new ColumnDefinition("File_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "The file that installs the software id tag.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Regid", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The regid for the software id tag."),
+                new ColumnDefinition("TagId", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The unique id for the software id tag."),
+                new ColumnDefinition("PersistentId", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "The type of the software id tag."),
+                new ColumnDefinition("Alias", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Alias for the software id tag."),
+            },
+            symbolIdIsPrimaryKey: false
+        );
+
         public static readonly TableDefinition TextStyle = new TableDefinition(
             "TextStyle",
             SymbolDefinitions.TextStyle,
@@ -1813,6 +1827,7 @@ namespace WixToolset.Data.WindowsInstaller
             Shortcut,
             MsiShortcutProperty,
             Signature,
+            SoftwareIdentificationTag,
             TextStyle,
             TypeLib,
             UIText,
