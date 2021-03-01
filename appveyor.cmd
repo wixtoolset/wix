@@ -1,8 +1,19 @@
 @setlocal
 @pushd %~dp0
+@set _C=Release
+@if /i "%1"=="debug" set _C=Debug
 
-dotnet test -c Release src\test\WixToolsetTest.Data\WixToolsetTest.Data.csproj || exit /b
-dotnet pack -c Release || exit /b
+:: Restore
+msbuild -p:Configuration=%_C% -t:Restore || exit /b
+
+:: Build
+msbuild -p:Configuration=%_C% || exit /b
+
+:: Test
+dotnet test -c %_C% --no-build || exit /b
+
+:: Pack
+msbuild -p:Configuration=%_C% -p:NoBuild=true -t:Pack || exit /b
 
 @popd
 @endlocal
