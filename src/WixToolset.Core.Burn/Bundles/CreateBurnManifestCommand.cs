@@ -564,15 +564,16 @@ namespace WixToolset.Core.Burn.Bundles
                     }
 
                     // Write any contained Payloads with the PackagePayload being first
+                    var packagePayloadId = package.PackageSymbol.PayloadRef;
                     writer.WriteStartElement("PayloadRef");
-                    writer.WriteAttributeString("Id", package.PackageSymbol.PayloadRef);
+                    writer.WriteAttributeString("Id", packagePayloadId);
                     writer.WriteEndElement();
 
                     var packagePayloads = payloadsByPackage[package.PackageId];
 
                     foreach (var payload in packagePayloads)
                     {
-                        if (payload.Id.Id != package.PackageSymbol.PayloadRef)
+                        if (payload.Id.Id != packagePayloadId)
                         {
                             writer.WriteStartElement("PayloadRef");
                             writer.WriteAttributeString("Id", payload.Id.Id);

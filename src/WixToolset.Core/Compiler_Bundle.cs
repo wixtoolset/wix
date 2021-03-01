@@ -1451,71 +1451,6 @@ namespace WixToolset.Core
             return compilerPayload.Id;
         }
 
-        private CompilerPayload ParseRemotePayloadElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var remotePayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Description":
-                        remotePayload.ParseDescription(attrib);
-                        break;
-                    case "Hash":
-                        remotePayload.ParseHash(attrib);
-                        break;
-                    case "ProductName":
-                        remotePayload.ParseProductName(attrib);
-                        break;
-                    case "Size":
-                        remotePayload.ParseSize(attrib);
-                        break;
-                    case "Version":
-                        remotePayload.ParseVersion(attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.ProductName))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductName"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Description))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Hash))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Hash"));
-            }
-
-            if (0 == remotePayload.Size)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Size"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Version))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-
-            return remotePayload;
-        }
-
         /// <summary>
         /// Parse PayloadGroup element.
         /// </summary>
@@ -1561,8 +1496,21 @@ namespace WixToolset.Core
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
                 {
+                    WixBundlePackageType? packageType = null;
                     switch (child.Name.LocalName)
                     {
+                    case "ExePackagePayload":
+                        packageType = WixBundlePackageType.Exe;
+                        break;
+                    case "MsiPackagePayload":
+                        packageType = WixBundlePackageType.Msi;
+                        break;
+                    case "MspPackagePayload":
+                        packageType = WixBundlePackageType.Msp;
+                        break;
+                    case "MsuPackagePayload":
+                        packageType = WixBundlePackageType.Msu;
+                        break;
                     case "Payload":
                         previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id, previousType, previousId);
                         previousType = ComplexReferenceChildType.Payload;
@@ -1574,6 +1522,19 @@ namespace WixToolset.Core
                     default:
                         this.Core.UnexpectedElement(node, child);
                         break;
+                    }
+
+                    if (packageType.HasValue)
+                    {
+                        var compilerPayload = this.ParsePackagePayloadElement(null, child, packageType.Value, null);
+                        var payloadSymbol = compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.PayloadGroup, id?.Id, previousType, previousId?.Id);
+                        if (payloadSymbol != null)
+                        {
+                            previousId = payloadSymbol.Id;
+                            previousType = ComplexReferenceChildType.Payload;
+
+                            this.CreatePackagePayloadSymbol(payloadSymbol.SourceLineNumbers, packageType.Value, payloadSymbol.Id, ComplexReferenceParentType.PayloadGroup, id);
+                        }
                     }
                 }
                 else
@@ -1984,7 +1945,7 @@ namespace WixToolset.Core
             Debug.Assert(ComplexReferenceParentType.PackageGroup == parentType);
             Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
 
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);;
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
             {
                 IsRequired = false,
@@ -2008,8 +1969,9 @@ namespace WixToolset.Core
             string msuKB = null;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
-            CompilerPayload remotePayload = null;
+            CompilerPayload childPackageCompilerPayload = null;
             var slipstream = YesNoType.NotSet;
+            var hasPayloadInfo = false;
 
             var expectedNetFx4Args = new string[] { "/q", "/norestart", "/chainingpackage" };
 
@@ -2029,12 +1991,15 @@ namespace WixToolset.Core
                         break;
                     case "Name":
                         compilerPayload.ParseName(attrib);
+                        hasPayloadInfo = true;
                         break;
                     case "SourceFile":
                         compilerPayload.ParseSourceFile(attrib);
+                        hasPayloadInfo = true;
                         break;
                     case "DownloadUrl":
                         compilerPayload.ParseDownloadUrl(attrib);
+                        hasPayloadInfo = true;
                         break;
                     case "After":
                         after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2128,6 +2093,7 @@ namespace WixToolset.Core
                         break;
                     case "Compressed":
                         compilerPayload.ParseCompressed(attrib);
+                        hasPayloadInfo = true;
                         break;
                     case "Slipstream":
                         slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2150,26 +2116,30 @@ namespace WixToolset.Core
                 }
             }
 
-            // We need to handle RemotePayload up front because it effects value of sourceFile which is used in Id generation.  Id is needed by other child elements.
-            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
+            // We need to handle the package payload up front because it affects Id generation.  Id is needed by other child elements.
+            var packagePayloadElementName = packageType + "PackagePayload";
+            foreach (var child in node.Elements(CompilerCore.WixNamespace + packagePayloadElementName))
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
 
-                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage" && node.Name.LocalName != "MsuPackage")
-                {
-                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
-                    continue;
-                }
-
-                if (null != remotePayload)
+                if (childPackageCompilerPayload != null)
                 {
                     this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                 }
+                else if (hasPayloadInfo)
+                {
+                    this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "SourceFile", "Name", "DownloadUrl", "Compressed"));
+                }
 
-                remotePayload = this.ParseRemotePayloadElement(child);
+                childPackageCompilerPayload = this.ParsePackagePayloadElement(childSourceLineNumbers, child, packageType, compilerPayload.Id);
             }
 
-            compilerPayload.FinishCompilingPackage(remotePayload);
+            if (compilerPayload.Id == null && childPackageCompilerPayload != null)
+            {
+                compilerPayload.Id = childPackageCompilerPayload.Id;
+            }
+
+            compilerPayload.FinishCompilingPackage();
             var id = compilerPayload.Id;
 
             if (null == logPathVariable)
@@ -2279,7 +2249,11 @@ namespace WixToolset.Core
                             this.ParseCommandLineElement(child, id.Id);
                         }
                         break;
-                    case "RemotePayload":
+                    case "ExePackagePayload":
+                    case "MsiPackagePayload":
+                    case "MspPackagePayload":
+                    case "MsuPackagePayload":
+                        allowed = packagePayloadElementName == child.Name.LocalName;
                         // Handled previously
                         break;
                     default:
@@ -2301,8 +2275,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                // We create the package contents as a payload with this package as the parent
-                compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Package, id.Id);
+                var packageCompilerPayload = childPackageCompilerPayload ?? (hasPayloadInfo ? compilerPayload : null);
+                if (packageCompilerPayload != null)
+                {
+                    var payload = packageCompilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Package, id.Id);
+
+                    this.CreatePackagePayloadSymbol(sourceLineNumbers, packageType, payload.Id, ComplexReferenceParentType.Package, id);
+                }
 
                 this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
@@ -2313,7 +2292,6 @@ namespace WixToolset.Core
                 var chainPackageSymbol = this.Core.AddSymbol(new WixBundlePackageSymbol(sourceLineNumbers, id)
                 {
                     Type = packageType,
-                    PayloadRef = id.Id,
                     Attributes = attributes,
                     InstallCondition = installCondition,
                     CacheId = cacheId,
@@ -2389,6 +2367,134 @@ namespace WixToolset.Core
             }
 
             return id.Id;
+        }
+
+        private void CreatePackagePayloadSymbol(SourceLineNumber sourceLineNumbers, WixBundlePackageType packageType, Identifier payloadId, ComplexReferenceParentType parentType, Identifier parentId)
+        {
+            switch (packageType)
+            {
+                case WixBundlePackageType.Exe:
+                    this.Core.AddSymbol(new WixBundleExePackagePayloadSymbol(sourceLineNumbers, payloadId));
+                    break;
+
+                case WixBundlePackageType.Msi:
+                    this.Core.AddSymbol(new WixBundleMsiPackagePayloadSymbol(sourceLineNumbers, payloadId));
+                    break;
+
+                case WixBundlePackageType.Msp:
+                    this.Core.AddSymbol(new WixBundleMspPackagePayloadSymbol(sourceLineNumbers, payloadId));
+                    break;
+
+                case WixBundlePackageType.Msu:
+                    this.Core.AddSymbol(new WixBundleMsuPackagePayloadSymbol(sourceLineNumbers, payloadId));
+                    break;
+            }
+
+            this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PackagePayload, payloadId?.Id, ComplexReferenceChildType.Unknown, null);
+        }
+
+        private CompilerPayload ParsePackagePayloadElement(SourceLineNumber sourceLineNumbers, XElement node, WixBundlePackageType packageType, Identifier defaultId)
+        {
+            sourceLineNumbers = sourceLineNumbers ?? Preprocessor.GetSourceLineNumbers(node);
+            var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
+            {
+                Id = defaultId,
+                IsRemoteAllowed = packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu,
+            };
+
+            // This list lets us evaluate extension attributes *after* all core attributes
+            // have been parsed and dealt with, regardless of authoring order.
+            var extensionAttributes = new List<XAttribute>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    var allowed = true;
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            compilerPayload.ParseId(attrib);
+                            break;
+                        case "Compressed":
+                            compilerPayload.ParseCompressed(attrib);
+                            break;
+                        case "Name":
+                            compilerPayload.ParseName(attrib);
+                            break;
+                        case "SourceFile":
+                            compilerPayload.ParseSourceFile(attrib);
+                            break;
+                        case "DownloadUrl":
+                            compilerPayload.ParseDownloadUrl(attrib);
+                            break;
+                        case "Description":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseDescription(attrib);
+                            }
+                            break;
+                        case "Hash":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseHash(attrib);
+                            }
+                            break;
+                        case "ProductName":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseProductName(attrib);
+                            }
+                            break;
+                        case "Size":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseSize(attrib);
+                            }
+                            break;
+                        case "Version":
+                            allowed = compilerPayload.IsRemoteAllowed;
+                            if (allowed)
+                            {
+                                compilerPayload.ParseVersion(attrib);
+                            }
+                            break;
+                        default:
+                            allowed = false;
+                            break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedAttribute(node, attrib);
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            compilerPayload.FinishCompilingPackagePayload();
+
+            // Now that the PayloadId is known, we can parse the extension attributes.
+            var context = new Dictionary<string, string>
+            {
+                ["Id"] = compilerPayload.Id.Id,
+            };
+
+            foreach (var extensionAttribute in extensionAttributes)
+            {
+                this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            return compilerPayload;
         }
 
         /// <summary>

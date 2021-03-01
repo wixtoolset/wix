@@ -66,12 +66,16 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundleContainer:
                     case SymbolDefinitionType.WixBundleCustomDataAttribute:
                     case SymbolDefinitionType.WixBundleExePackage:
+                    case SymbolDefinitionType.WixBundleExePackagePayload:
                     case SymbolDefinitionType.WixBundleExtension:
                     case SymbolDefinitionType.WixBundleMsiFeature:
                     case SymbolDefinitionType.WixBundleMsiPackage:
+                    case SymbolDefinitionType.WixBundleMsiPackagePayload:
                     case SymbolDefinitionType.WixBundleMsiProperty:
                     case SymbolDefinitionType.WixBundleMspPackage:
+                    case SymbolDefinitionType.WixBundleMspPackagePayload:
                     case SymbolDefinitionType.WixBundleMsuPackage:
+                    case SymbolDefinitionType.WixBundleMsuPackagePayload:
                     case SymbolDefinitionType.WixBundlePackage:
                     case SymbolDefinitionType.WixBundlePackageCommandLine:
                     case SymbolDefinitionType.WixBundlePackageExitCode:

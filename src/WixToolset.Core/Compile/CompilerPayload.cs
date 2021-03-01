@@ -23,6 +23,8 @@ namespace WixToolset.Core
 
         public Identifier Id { get; set; }
 
+        public bool IsRemoteAllowed { get; set; }
+
         public bool IsRequired { get; set; } = true;
 
         public string Name { get; set; }
@@ -48,25 +50,16 @@ namespace WixToolset.Core
 
         private SourceLineNumber SourceLineNumbers { get; }
 
-        private void CalculateAndVerifyFields(CompilerPayload remotePayload = null)
+        private void CalculateAndVerifyFields()
         {
+            var isRemote = this.IsRemoteAllowed && !String.IsNullOrEmpty(this.Hash);
+
             if (String.IsNullOrEmpty(this.SourceFile))
             {
-                if (String.IsNullOrEmpty(this.Name))
-                {
-                    if (this.IsRequired)
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
-                    }
-                }
-                else if (remotePayload == null)
+                if (!String.IsNullOrEmpty(this.Name) && !isRemote)
                 {
                     this.SourceFile = Path.Combine("SourceDir", this.Name);
                 }
-            }
-            else if (remotePayload != null)
-            {
-                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "RemotePayload", "SourceFile"));
             }
             else if (this.SourceFile.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             {
@@ -80,24 +73,67 @@ namespace WixToolset.Core
                 }
             }
 
-            if (remotePayload != null)
+            if (String.IsNullOrEmpty(this.SourceFile) && !isRemote)
             {
-                if (this.DownloadUrl == null)
+                if (this.IsRequired)
                 {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(this.SourceLineNumbers, this.Element.Name.LocalName, "DownloadUrl", "RemotePayload"));
+                    if (!this.IsRemoteAllowed)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
+                    }
+                    else
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "SourceFile", "Hash"));
+                    }
                 }
+            }
+            else if (this.IsRemoteAllowed)
+            {
+                var isLocal = !String.IsNullOrEmpty(this.SourceFile);
 
-                if (YesNoDefaultType.No != this.Compressed)
+                if (isLocal)
                 {
+                    if (isRemote)
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
+                    }
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(this.DownloadUrl))
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "DownloadUrl", "Hash"));
+                    }
+
+                    if (String.IsNullOrEmpty(this.Name))
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "Hash"));
+                    }
+
+                    if (YesNoDefaultType.Yes == this.Compressed)
+                    {
+                        this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(this.SourceLineNumbers, this.Element.Name.LocalName));
+                    }
+
                     this.Compressed = YesNoDefaultType.No;
-                    this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(this.SourceLineNumbers, this.Element.Name.LocalName));
                 }
 
-                this.Description = remotePayload.Description;
-                this.DisplayName = remotePayload.DisplayName;
-                this.Hash = remotePayload.Hash;
-                this.Size = remotePayload.Size;
-                this.Version = remotePayload.Version;
+                VerifyValidValue("Description", !String.IsNullOrEmpty(this.Description));
+                VerifyValidValue("ProductName", !String.IsNullOrEmpty(this.ProductName));
+                VerifyValidValue("Size", this.Size.HasValue);
+                VerifyValidValue("Version", !String.IsNullOrEmpty(this.Version));
+
+                void VerifyValidValue(string attributeName, bool isSpecified)
+                {
+                    if (isLocal && isSpecified)
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, attributeName, "SourceFile"));
+                    }
+                    else if (!isLocal && !isSpecified)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, attributeName, "Hash"));
+                    }
+                }
             }
         }
 
@@ -143,9 +179,9 @@ namespace WixToolset.Core
             return symbol;
         }
 
-        public void FinishCompilingPackage(CompilerPayload remotePayload)
+        public void FinishCompilingPackage()
         {
-            this.CalculateAndVerifyFields(remotePayload);
+            this.CalculateAndVerifyFields();
             this.GenerateIdFromFilename();
 
             if (this.Id == null)
@@ -153,6 +189,13 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Id"));
                 this.Id = Identifier.Invalid;
             }
+        }
+
+        public void FinishCompilingPackagePayload()
+        {
+            this.CalculateAndVerifyFields();
+            this.GenerateIdFromFilename();
+            this.GenerateIdFromPrefix("ppy");
         }
 
         public void FinishCompilingPayload()

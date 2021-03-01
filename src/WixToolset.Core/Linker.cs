@@ -1242,7 +1242,7 @@ namespace WixToolset.Core
             var groups = new WixGroupingOrdering(entrySection, this.Messaging);
 
             // Create UX payloads and Package payloads
-            groups.UseTypes(new[] { ComplexReferenceParentType.Container, ComplexReferenceParentType.Layout, ComplexReferenceParentType.PackageGroup, ComplexReferenceParentType.PayloadGroup, ComplexReferenceParentType.Package }, new[] { ComplexReferenceChildType.PackageGroup, ComplexReferenceChildType.Package, ComplexReferenceChildType.PayloadGroup, ComplexReferenceChildType.Payload });
+            groups.UseTypes(new[] { ComplexReferenceParentType.Container, ComplexReferenceParentType.Layout, ComplexReferenceParentType.PackageGroup, ComplexReferenceParentType.PayloadGroup, ComplexReferenceParentType.Package }, new[] { ComplexReferenceChildType.PackageGroup, ComplexReferenceChildType.Package, ComplexReferenceChildType.PackagePayload, ComplexReferenceChildType.PayloadGroup, ComplexReferenceChildType.Payload });
             groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Package, false);
             groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Container, false);
             groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Layout, false);

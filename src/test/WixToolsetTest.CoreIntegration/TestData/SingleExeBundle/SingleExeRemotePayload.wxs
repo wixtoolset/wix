@@ -13,11 +13,10 @@
                 Vital="yes"
                 Permanent="yes"
                 Protocol="netfx4"
-                DownloadUrl="C"
-                LogPathVariable="NetFx462FullLog"
-                Compressed="no"
-                Name="NDP462-KB3151802-Web.exe">
-                <RemotePayload
+                LogPathVariable="NetFx462FullLog">
+                <ExePackagePayload
+                  DownloadUrl="C"
+                  Name="NDP462-KB3151802-Web.exe"
                   Description="Microsoft .NET Framework 4.6.2 Setup"
                   Hash="C42E6ED280290648BBD59F664008852F4CFE4548"
                   ProductName="Microsoft .NET Framework 4.6.2"

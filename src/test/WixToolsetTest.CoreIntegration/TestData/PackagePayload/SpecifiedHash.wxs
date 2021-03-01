@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <MspPackage Id="SpecifiedHash">
+                <MspPackagePayload SourceFile="example.msp" DownloadUrl="example.com" Hash="abcd" />
+            </MspPackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

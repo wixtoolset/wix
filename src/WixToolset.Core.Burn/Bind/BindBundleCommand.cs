@@ -180,10 +180,15 @@ namespace WixToolset.Core.Burn
 
             IDictionary<string, PackageFacade> facades;
             {
-                var command = new GetPackageFacadesCommand(chainPackageSymbols, section);
+                var command = new GetPackageFacadesCommand(this.Messaging, chainPackageSymbols, section);
                 command.Execute();
 
                 facades = command.PackageFacades;
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
             }
 
             // Process each package facade. Note this is likely to add payloads and other symbols so
