@@ -112,9 +112,14 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DeprecatedAttribute, "The {0}/@{1} attribute has been deprecated.  Please use the {2} or {3} attribute instead.", elementName, attributeName, newAttributeName1, newAttributeName2);
         }
 
+        public static Message DeprecatedAttributeValue(SourceLineNumber sourceLineNumbers, string attributeValue, string elementName, string attributeName)
+        {
+            return Message(sourceLineNumbers, Ids.DeprecatedAttributeValue, "The value \"{0}\" for the {1}/@{2} attribute has been deprecated. Remove the attribute.", attributeValue, elementName, attributeName);
+        }
+
         public static Message DeprecatedAttributeValue(SourceLineNumber sourceLineNumbers, string attributeValue, string elementName, string attributeName, string newAttributeValue)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedAttributeValue, "The value \"{0}\" for the {1}/@{2} attribute has been deprecated.  Please use \"{3}\" instead.", attributeValue, elementName, attributeName, newAttributeValue);
+            return Message(sourceLineNumbers, Ids.DeprecatedAttributeValue, "The value \"{0}\" for the {1}/@{2} attribute has been deprecated. Please use \"{3}\" instead.", attributeValue, elementName, attributeName, newAttributeValue);
         }
 
         public static Message DeprecatedCommandLineSwitch(string oldSwitch)
@@ -139,12 +144,12 @@ namespace WixToolset.Data
 
         public static Message DeprecatedElement(SourceLineNumber sourceLineNumbers, string elementName, string newElementName)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedElement, "The {0} element has been deprecated.  Please use the {1} element instead.", elementName, newElementName);
+            return Message(sourceLineNumbers, Ids.DeprecatedElement, "The {0} element has been deprecated. Please use the {1} element instead.", elementName, newElementName);
         }
 
         public static Message DeprecatedElement(SourceLineNumber sourceLineNumbers, string elementName, string newElementName1, string newElementName2)
         {
-            return Message(sourceLineNumbers, Ids.DeprecatedElement, "The {0} element has been deprecated.  Please use the {1} or {2} element instead.", elementName, newElementName1, newElementName2);
+            return Message(sourceLineNumbers, Ids.DeprecatedElement, "The {0} element has been deprecated. Please use the {1} or {2} element instead.", elementName, newElementName1, newElementName2);
         }
 
         public static Message DeprecatedIgnoreModularizationElement(SourceLineNumber sourceLineNumbers)
@@ -582,6 +587,11 @@ namespace WixToolset.Data
             return Message(null, Ids.TargetDirCorrectedDefaultDir, "The Directory with Id 'TARGETDIR' must have the value 'SourceDir' in its 'DefaultDir' column. This has been automatically corrected for you in the decompiled output.");
         }
 
+        public static Message DefiningWellKnownDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
+        {
+            return Message(null, Ids.DefiningWellKnownDirectoryDeprecated, "It is no longer necessary to define Directory with Id '{0}'. One will be provided automatically. Remove the Directory element.", directoryId);
+        }
+
         public static Message TooManyProgIds(SourceLineNumber sourceLineNumbers, string clsId, string progId, string otherClsId)
         {
             return Message(sourceLineNumbers, Ids.TooManyProgIds, "Class '{0}' tried to use ProgId '{1}' which has already been associated with class '{2}'. This information will be left out of the decompiled output.", clsId, progId, otherClsId);
@@ -804,6 +814,7 @@ namespace WixToolset.Data
             PathCanonicalized = 1152,
             DetectConditionRecommended = 1153,
             ExperimentalBundlePlatform = 1154,
+            DefiningWellKnownDirectoryDeprecated = 1155,
         }
     }
 }

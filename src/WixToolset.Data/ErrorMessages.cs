@@ -263,11 +263,6 @@ namespace WixToolset.Data
             return Message(null, Ids.DirectoryPathRequired, "The parameter '{0}' must be followed by a directory path.", parameter);
         }
 
-        public static Message DirectoryRootWithoutName(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
-        {
-            return Message(sourceLineNumbers, Ids.DirectoryRootWithoutName, "The {0} element requires the {1} attribute because there is no parent {0} element.", elementName, attributeName);
-        }
-
         public static Message DisallowedMsiProperty(SourceLineNumber sourceLineNumbers, string property, string illegalValueList)
         {
             return Message(sourceLineNumbers, Ids.DisallowedMsiProperty, "The '{0}' MsiProperty is controlled by the bootstrapper and cannot be authored. (Illegal properties are: {1}.) Remove the MsiProperty element.", property, illegalValueList);
@@ -2320,7 +2315,6 @@ namespace WixToolset.Data
             CustomActionMultipleSources = 22,
             CustomActionMultipleTargets = 23,
             CustomActionIllegalInnerText = 24,
-            DirectoryRootWithoutName = 25,
             IllegalShortFilename = 26,
             IllegalLongFilename = 27,
             TableNameTooLong = 28,
