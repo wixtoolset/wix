@@ -1,16 +1,20 @@
 @setlocal
 @pushd %~dp0
 @set _P=%~dp0build\Release\publish
+@set _C=Release
+@if /i "%1"=="debug" set _C=Debug
 
-dotnet test -c Release src\test\WixToolsetTest.CoreIntegration || exit /b
-dotnet test -c Release src\test\WixToolsetTest.Core.Burn || exit /b
+:: Restore
+msbuild -p:Configuration=%_C% -t:Restore || exit /b
 
-dotnet pack -c Release src\WixToolset.Core || exit /b
-dotnet pack -c Release src\WixToolset.Core.Burn || exit /b
-dotnet pack -c Release src\WixToolset.Core.ExtensionCache || exit /b
-dotnet pack -c Release src\WixToolset.Core.WindowsInstaller || exit /b
+:: Build
+msbuild -p:Configuration=%_C% || exit /b
 
-dotnet pack -c Release src\WixToolset.Core.TestPackage || exit /b
+:: Test
+dotnet test -c %_C% --no-build || exit /b
+
+:: Pack
+msbuild -p:Configuration=%_C% -p:NoBuild=true -t:Pack || exit /b
 
 @popd
 @endlocal
