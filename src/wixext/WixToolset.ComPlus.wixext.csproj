@@ -4,16 +4,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>embedded</DebugType>
     <RootNamespace>WixToolset.ComPlus</RootNamespace>
     <Description>WiX Toolset ComPlus Extension</Description>
     <Title>WiX Toolset ComPlus Extension</Title>
     <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\complus.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\wixlib\complus.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\complus.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
   </ItemGroup>
 </Project>

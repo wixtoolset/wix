@@ -40,9 +40,12 @@
         <ProjectReference  Include="@(PackageInSolution->'$(SmartSolutionDir)\%(SmartPath)' )"/>
 
         <!-- Remove the package references that are now referenced as projects -->
-        <PackageReference Remove="@(PackageInSolution->'%(PackageName)' )"/>
+        <PackageReference Remove="@(PackageInSolution->'%(PackageName)')"/>
       </ItemGroup>
 
     </When>
   </Choose>
+
+  <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
+  <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
 </Project>

@@ -33,6 +33,8 @@ skip_tags: true
 artifacts:
 - path: build\Release\**\*.nupkg
   name: nuget
+- path: build\Release\**\*.snupkg
+  name: snupkg
 
 notifications:
 - provider: Slack
