@@ -97,6 +97,26 @@ namespace WixToolset.Core
                     {
                         this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Hash", "SourceFile"));
                     }
+
+                    if (!String.IsNullOrEmpty(this.Description))
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Description", "SourceFile"));
+                    }
+
+                    if (!String.IsNullOrEmpty(this.ProductName))
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "ProductName", "SourceFile"));
+                    }
+
+                    if (this.Size.HasValue)
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "SourceFile"));
+                    }
+
+                    if (!String.IsNullOrEmpty(this.Version))
+                    {
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Version", "SourceFile"));
+                    }
                 }
                 else
                 {
@@ -110,29 +130,17 @@ namespace WixToolset.Core
                         this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "Hash"));
                     }
 
+                    if (!this.Size.HasValue)
+                    {
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "Size", "Hash"));
+                    }
+
                     if (YesNoDefaultType.Yes == this.Compressed)
                     {
                         this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(this.SourceLineNumbers, this.Element.Name.LocalName));
                     }
 
                     this.Compressed = YesNoDefaultType.No;
-                }
-
-                VerifyValidValue("Description", !String.IsNullOrEmpty(this.Description));
-                VerifyValidValue("ProductName", !String.IsNullOrEmpty(this.ProductName));
-                VerifyValidValue("Size", this.Size.HasValue);
-                VerifyValidValue("Version", !String.IsNullOrEmpty(this.Version));
-
-                void VerifyValidValue(string attributeName, bool isSpecified)
-                {
-                    if (isLocal && isSpecified)
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, attributeName, "SourceFile"));
-                    }
-                    else if (!isLocal && !isSpecified)
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, attributeName, "Hash"));
-                    }
                 }
             }
         }
