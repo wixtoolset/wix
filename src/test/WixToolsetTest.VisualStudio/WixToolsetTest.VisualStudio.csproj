@@ -12,10 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\UsingVsixPackage\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingVsixPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingVsixPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingVsixPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
