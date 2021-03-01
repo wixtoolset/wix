@@ -3,14 +3,13 @@
   <metadata minClientVersion="4.0">
     <id>$id$</id>
     <version>$version$</version>
-    <authors>$authors$</authors>
-    <owners>$authors$</owners>
-    <license type="expression">MS-RL</license>
-    <projectUrl>https://github.com/wixtoolset/Util.wixext</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>$title$</title>
     <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
   </metadata>
 
@@ -20,6 +19,7 @@
     <file src="netstandard2.0\$id$.dll" target="tools" />
 
     <file src="ARM64\*.pdb" target="pdbs\ARM64" />
+    <file src="Win32\*.pdb" target="pdbs\Win32" />
     <file src="x86\*.pdb" target="pdbs\x86" />
     <file src="x64\*.pdb" target="pdbs\x64" />
   </files>
