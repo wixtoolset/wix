@@ -12,7 +12,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             byte[] hashBytes;
 
-            using (var managed = new SHA1Managed())
+            using (var managed = new SHA512CryptoServiceProvider())
             using (var stream = fileInfo.OpenRead())
             {
                 hashBytes = managed.ComputeHash(stream);

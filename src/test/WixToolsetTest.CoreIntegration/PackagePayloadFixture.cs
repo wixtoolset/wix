@@ -49,6 +49,10 @@ namespace WixToolsetTest.CoreIntegration
                 };
                 Assert.Equal(1, exePackageElements.Count);
                 Assert.Equal("<ExePackage Id='PackagePayloadInPayloadGroup' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_PackagePayloadInPayloadGroup' RollbackLogPathVariable='WixBundleRollbackLog_PackagePayloadInPayloadGroup' DetectCondition='none' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='burn.exe' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
+
+                var payloadElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='burn.exe']");
+                Assert.Equal(1, payloadElements.Count);
+                Assert.Equal("<Payload Id='burn.exe' FilePath='burn.exe' FileSize='463360' Hash='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964E246A1E8AE72E2CF23E0138AFC281BAFDE45969204405E114EB20C8195DA7E5E' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />", payloadElements[0].GetTestXml());
             }
         }
 
