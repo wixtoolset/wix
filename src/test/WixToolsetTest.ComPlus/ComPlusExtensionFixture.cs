@@ -10,16 +10,16 @@ namespace WixToolsetTest.ComPlus
 
     public class ComPlusExtensionFixture
     {
-        [Fact(Skip = "Currently fails due to duplicate symbols")]
+        [Fact]
         public void CanBuildUsingComPlusPartition()
         {
             var folder = TestData.Get(@"TestData\UsingComPlusPartition");
             var build = new Builder(folder, typeof(ComPlusExtensionFactory), new[] { folder });
 
             var results = build.BuildAndQuery(Build, "ComPlusPartition");
-            Assert.Equal(new[]
+            WixAssert.CompareLineByLine(new[]
             {
-                "ComPlusPartition:",
+                "ComPlusPartition:MyPartition\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tMyPartitionId\tMyPartition",
             }, results);
         }
 
