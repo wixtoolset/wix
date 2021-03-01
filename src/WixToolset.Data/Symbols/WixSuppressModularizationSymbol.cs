@@ -10,6 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixSuppressModularization,
             new IntermediateFieldDefinition[]
             {
+                new IntermediateFieldDefinition(nameof(WixSuppressModularizationSymbolFields.SuppressIdentifier), IntermediateFieldType.String),
             },
             typeof(WixSuppressModularizationSymbol));
     }
@@ -19,6 +20,7 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixSuppressModularizationSymbolFields
     {
+        SuppressIdentifier,
     }
 
     public class WixSuppressModularizationSymbol : IntermediateSymbol
@@ -29,6 +31,12 @@ namespace WixToolset.Data.Symbols
 
         public WixSuppressModularizationSymbol(SourceLineNumber sourceLineNumber, Identifier id = null) : base(SymbolDefinitions.WixSuppressModularization, sourceLineNumber, id)
         {
+        }
+
+        public string SuppressIdentifier
+        {
+            get => (string)this.Fields[(int)WixSuppressModularizationSymbolFields.SuppressIdentifier];
+            set => this.Set((int)WixSuppressModularizationSymbolFields.SuppressIdentifier, value);
         }
 
         public IntermediateField this[WixSuppressModularizationSymbolFields index] => this.Fields[(int)index];
