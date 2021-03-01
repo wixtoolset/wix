@@ -619,7 +619,12 @@ namespace WixToolset.Converters.Symbolizer
                 };
             }
             case "WixSuppressModularization":
-                return DefaultSymbolFromRow(typeof(WixSuppressModularizationSymbol), row, columnZeroIsId: true);
+            {
+                return new WixSuppressModularizationSymbol(SourceLineNumber4(row.SourceLineNumbers))
+                {
+                    SuppressIdentifier = FieldAsString(row, 0)
+                };
+            }
             case "WixUI":
                 return DefaultSymbolFromRow(typeof(WixUISymbol), row, columnZeroIsId: true);
             case "WixVariable":
