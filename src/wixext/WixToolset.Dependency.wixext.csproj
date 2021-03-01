@@ -9,17 +9,11 @@
     <Description>WiX Toolset Dependency Extension</Description>
     <Title>WiX Toolset Dependency Extension</Title>
     <IsTool>true</IsTool>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="$(OutputPath)..\dependency.wixlib" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" PackagePath="build" />
-    <Content Include="$(OutputPath)..\**\*.pdb" PackagePath="pdbs\%(RelativeFolder)" />
   </ItemGroup>
 
   <ItemGroup>
