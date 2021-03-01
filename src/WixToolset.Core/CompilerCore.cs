@@ -341,6 +341,46 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Creates group and ordering information.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="type">Type of this item.</param>
+        /// <param name="id">Identifier for this item.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        public void CreateGroupAndOrderingRows(SourceLineNumber sourceLineNumbers,
+            ComplexReferenceParentType parentType, string parentId,
+            ComplexReferenceChildType type, string id,
+            ComplexReferenceChildType previousType, string previousId)
+        {
+            if (this.EncounteredError)
+            {
+                return;
+            }
+
+            if (parentType != ComplexReferenceParentType.Unknown && parentId != null)
+            {
+                this.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, type, id);
+            }
+
+            if (previousType != ComplexReferenceChildType.Unknown && previousId != null)
+            {
+                // TODO: Should we define our own enum for this, just to ensure there's no "cross-contamination"?
+                // TODO: Also, we could potentially include an 'Attributes' field to track things like
+                // 'before' vs. 'after', and explicit vs. inferred dependencies.
+                this.AddSymbol(new WixOrderingSymbol(sourceLineNumbers)
+                {
+                    ItemType = type,
+                    ItemIdRef = id,
+                    DependsOnType = previousType,
+                    DependsOnIdRef = previousId,
+                });
+            }
+        }
+
+        /// <summary>
         /// Creates a version 3 name-based UUID.
         /// </summary>
         /// <param name="namespaceGuid">The namespace UUID.</param>

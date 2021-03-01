@@ -11,6 +11,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Core.Bind;
     using WixToolset.Core.Burn.Bind;
     using WixToolset.Core.Burn.Bundles;
+    using WixToolset.Core.Burn.Interfaces;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
@@ -31,6 +32,7 @@ namespace WixToolset.Core.Burn
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
             this.InternalBurnBackendHelper = context.ServiceProvider.GetService<IInternalBurnBackendHelper>();
+            this.PayloadHarvester = context.ServiceProvider.GetService<IPayloadHarvester>();
 
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
@@ -51,6 +53,8 @@ namespace WixToolset.Core.Burn
         private IBackendHelper BackendHelper { get; }
 
         private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
+
+        private IPayloadHarvester PayloadHarvester { get; }
 
         private CompressionLevel? DefaultCompressionLevel { get; }
 
@@ -165,7 +169,7 @@ namespace WixToolset.Core.Burn
             // Process the explicitly authored payloads.
             ISet<string> processedPayloads;
             {
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, this.PayloadHarvester, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -247,7 +251,7 @@ namespace WixToolset.Core.Burn
             {
                 var toProcess = payloadSymbols.Values.Where(r => !processedPayloads.Contains(r.Id.Id)).ToList();
 
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, this.PayloadHarvester, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);

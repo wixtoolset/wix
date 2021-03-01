@@ -5,6 +5,7 @@ namespace WixToolset.Core.Burn
     using System;
     using System.Collections.Generic;
     using WixToolset.Core.Burn.ExtensibilityServices;
+    using WixToolset.Core.Burn.Interfaces;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -31,6 +32,7 @@ namespace WixToolset.Core.Burn
         {
             // Singletons.
             coreProvider.AddService((provider, singletons) => AddSingleton<IInternalBurnBackendHelper>(singletons, new BurnBackendHelper(provider)));
+            coreProvider.AddService((provider, singletons) => AddSingleton<IPayloadHarvester>(singletons, new PayloadHarvester()));
             coreProvider.AddService((provider, singletons) => AddSingleton<IBurnBackendHelper>(singletons, provider.GetService<IInternalBurnBackendHelper>()));
         }
 

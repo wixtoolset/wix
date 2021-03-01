@@ -6,6 +6,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using WixToolset.Core.Burn.Interfaces;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
@@ -14,13 +15,12 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class ProcessPayloadsCommand
     {
-        private static readonly Version EmptyVersion = new Version(0, 0, 0, 0);
-
-        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
 
             this.BackendHelper = backendHelper;
+            this.PayloadHarvester = payloadHarvester;
             this.Payloads = payloads;
             this.DefaultPackaging = defaultPackaging;
             this.LayoutDirectory = layoutDirectory;
@@ -33,6 +33,8 @@ namespace WixToolset.Core.Burn.Bundles
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IPayloadHarvester PayloadHarvester { get; }
 
         private IEnumerable<WixBundlePayloadSymbol> Payloads { get; }
 
@@ -56,17 +58,13 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.UpdatePayloadPackagingType(payload);
 
-                if (String.IsNullOrEmpty(sourceFile?.Path))
+                if (!this.PayloadHarvester.HarvestStandardInformation(payload))
                 {
                     // Remote payloads obviously cannot be embedded.
                     Debug.Assert(PackagingType.Embedded != payload.Packaging);
                 }
                 else // not a remote payload so we have a lot more to update.
                 {
-                    this.UpdatePayloadFileInformation(payload, sourceFile);
-
-                    this.UpdatePayloadVersionInformation(payload, sourceFile);
-
                     // External payloads need to be transfered.
                     if (PackagingType.External == payload.Packaging)
                     {
@@ -108,41 +106,6 @@ namespace WixToolset.Core.Burn.Bundles
             if (PackagingType.Embedded == payload.Packaging && String.IsNullOrEmpty(payload.ContainerRef))
             {
                 payload.ContainerRef = BurnConstants.BurnDefaultAttachedContainerName;
-            }
-        }
-
-        private void UpdatePayloadFileInformation(WixBundlePayloadSymbol payload, IntermediateFieldPathValue sourceFile)
-        {
-            var fileInfo = new FileInfo(sourceFile.Path);
-
-            if (null != fileInfo)
-            {
-                payload.FileSize = fileInfo.Length;
-
-                payload.Hash = BundleHashAlgorithm.Hash(fileInfo);
-            }
-            else
-            {
-                payload.FileSize = 0;
-            }
-        }
-
-        private void UpdatePayloadVersionInformation(WixBundlePayloadSymbol payload, IntermediateFieldPathValue sourceFile)
-        {
-            var versionInfo = FileVersionInfo.GetVersionInfo(sourceFile.Path);
-
-            if (null != versionInfo)
-            {
-                // Use the fixed version info block for the file since the resource text may not be a dotted quad.
-                var version = new Version(versionInfo.ProductMajorPart, versionInfo.ProductMinorPart, versionInfo.ProductBuildPart, versionInfo.ProductPrivatePart);
-
-                if (ProcessPayloadsCommand.EmptyVersion != version)
-                {
-                    payload.Version = version.ToString();
-                }
-
-                payload.Description = versionInfo.FileDescription;
-                payload.DisplayName = versionInfo.ProductName;
             }
         }
     }
