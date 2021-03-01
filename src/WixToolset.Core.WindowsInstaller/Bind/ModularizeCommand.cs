@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ModularizationSuffix = modularizationSuffix;
 
             // Gather all the unique suppress modularization identifiers.
-            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressSymbols.Select(s => s.Id.Id));
+            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressSymbols.Select(s => s.SuppressIdentifier));
         }
 
         private WindowsInstallerData Output { get; }

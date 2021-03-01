@@ -327,56 +327,6 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildSimpleModule()
-        {
-            var folder = TestData.Get(@"TestData\SimpleModule");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var intermediateFolder = fs.GetFolder();
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Module.wxs"),
-                    "-loc", Path.Combine(folder, "Module.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"bin\test.msm")
-                });
-
-                result.AssertSuccess();
-
-                var msmPath = Path.Combine(intermediateFolder, @"bin\test.msm");
-                Assert.True(File.Exists(msmPath));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
-
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
-                var section = intermediate.Sections.Single();
-
-                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal("filyIq8rqcxxf903Hsn5K9L0SWV73g", fileSymbol.Id.Id);
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
-
-                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
-                var fileRows = data.Tables["File"].Rows;
-                Assert.Equal(new[]
-                {
-                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
-                }, fileRows.Select(r => r.FieldAsString(0)).ToArray());
-
-                var cabPath = Path.Combine(intermediateFolder, "msm-test.cab");
-                Query.ExtractStream(msmPath, "MergeModule.CABinet", cabPath);
-                var files = Query.GetCabinetFiles(cabPath);
-                Assert.Equal(new[]
-                {
-                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
-                }, files.Select(f => Path.Combine(f.Path, f.Name)).ToArray());
-            }
-        }
-
-        [Fact]
         public void CanBuildManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");

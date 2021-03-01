@@ -728,14 +728,17 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var symbol = this.Core.AddSymbol(new BinarySymbol(sourceLineNumbers, id)
+                this.Core.AddSymbol(new BinarySymbol(sourceLineNumbers, id)
                 {
                     Data = new IntermediateFieldPathValue { Path = sourceFile }
                 });
 
                 if (YesNoType.Yes == suppressModularization)
                 {
-                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers)
+                    {
+                        SuppressIdentifier = id.Id
+                    });
                 }
             }
 
@@ -3502,7 +3505,10 @@ namespace WixToolset.Core
 
                 if (YesNoType.Yes == suppressModularization)
                 {
-                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, id));
+                    this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers)
+                    {
+                        SuppressIdentifier = id.Id
+                    });
                 }
             }
         }

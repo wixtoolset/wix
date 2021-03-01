@@ -1515,7 +1515,10 @@ namespace WixToolset.Core
             {
                 this.Core.Write(WarningMessages.PropertyModularizationSuppressed(sourceLineNumbers));
 
-                this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers, id));
+                this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers)
+                {
+                    SuppressIdentifier = id.Id
+                });
             }
         }
 
