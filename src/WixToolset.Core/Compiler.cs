@@ -4226,11 +4226,6 @@ namespace WixToolset.Core
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
                 }
-
-                if (null == parentId)
-                {
-                    this.Core.Write(ErrorMessages.DirectoryRootWithoutName(sourceLineNumbers, node.Name.LocalName, "Name"));
-                }
             }
             else if (!String.IsNullOrEmpty(name))
             {
