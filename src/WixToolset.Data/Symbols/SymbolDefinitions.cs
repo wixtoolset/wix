@@ -125,12 +125,16 @@ namespace WixToolset.Data
         WixBundleCustomDataAttribute,
         WixBundleCustomDataCell,
         WixBundleExePackage,
+        WixBundleExePackagePayload,
         WixBundleExtension,
         WixBundleMsiFeature,
         WixBundleMsiPackage,
+        WixBundleMsiPackagePayload,
         WixBundleMsiProperty,
         WixBundleMspPackage,
+        WixBundleMspPackagePayload,
         WixBundleMsuPackage,
+        WixBundleMsuPackagePayload,
         WixBundlePackage,
         WixBundlePackageCommandLine,
         WixBundlePackageExitCode,
@@ -568,11 +572,17 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixBundleExePackage:
                     return SymbolDefinitions.WixBundleExePackage;
 
+                case SymbolDefinitionType.WixBundleExePackagePayload:
+                    return SymbolDefinitions.WixBundleExePackagePayload;
+
                 case SymbolDefinitionType.WixBundleMsiFeature:
                     return SymbolDefinitions.WixBundleMsiFeature;
 
                 case SymbolDefinitionType.WixBundleMsiPackage:
                     return SymbolDefinitions.WixBundleMsiPackage;
+
+                case SymbolDefinitionType.WixBundleMsiPackagePayload:
+                    return SymbolDefinitions.WixBundleMsiPackagePayload;
 
                 case SymbolDefinitionType.WixBundleMsiProperty:
                     return SymbolDefinitions.WixBundleMsiProperty;
@@ -580,8 +590,14 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixBundleMspPackage:
                     return SymbolDefinitions.WixBundleMspPackage;
 
+                case SymbolDefinitionType.WixBundleMspPackagePayload:
+                    return SymbolDefinitions.WixBundleMspPackagePayload;
+
                 case SymbolDefinitionType.WixBundleMsuPackage:
                     return SymbolDefinitions.WixBundleMsuPackage;
+
+                case SymbolDefinitionType.WixBundleMsuPackagePayload:
+                    return SymbolDefinitions.WixBundleMsuPackagePayload;
 
                 case SymbolDefinitionType.WixBundlePackage:
                     return SymbolDefinitions.WixBundlePackage;

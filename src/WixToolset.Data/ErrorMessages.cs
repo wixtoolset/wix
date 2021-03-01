@@ -493,6 +493,16 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ExpectedAttributeWithElement, "The {0} element must have attribute '{1}' when child element '{2}' is present.", elementName, attribute, childElementName);
         }
 
+        public static Message ExpectedAttributeWithoutOtherAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeWithoutOtherAttributes, "The {0} element's {1} attribute was not found; it is required without attribute {2} present.", elementName, attributeName, otherAttributeName);
+        }
+
+        public static Message ExpectedAttributeWithoutOtherAttributes(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string otherAttributeName1, string otherAttributeName2)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedAttributeWithoutOtherAttributes, "The {0} element's {1} attribute was not found; it is required without attribute {2} or {3} present.", elementName, attributeName, otherAttributeName1, otherAttributeName2);
+        }
+
         public static Message ExpectedBinaryCategory(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.ExpectedBinaryCategory, "The Column element specifies a binary column but does not have the correct Category specified.  Windows Installer requires binary columns to specify their category as binary.  Please set the Category attribute's value to 'Binary'.");
@@ -1499,6 +1509,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.MissingOrInvalidModuleInstallerVersion, "The merge module '{0}' from file '{1}' is either missing or has an invalid installer version. The value read from the installer version in module's summary information was '{2}'. This should be a numeric value representing a valid installer version such as 200 or 301.", moduleId, mergeModuleFile, productInstallerVersion);
         }
 
+        public static Message MissingPackagePayload(SourceLineNumber sourceLineNumbers, string packageId, string packageType)
+        {
+            return Message(sourceLineNumbers, Ids.MissingPackagePayload, "There is no payload defined for package '{0}'. This is specified on the {1}Package element or a child {1}PackagePayload element.", packageId, packageType);
+        }
+
         public static Message MissingTableDefinition(string tableName)
         {
             return Message(null, Ids.MissingTableDefinition, "Cannot find the table definitions for the '{0}' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.", tableName);
@@ -1537,6 +1552,21 @@ namespace WixToolset.Data
         public static Message MultipleIdentifiersFound(SourceLineNumber sourceLineNumbers, string elementName, string identifier, string mismatchIdentifier)
         {
             return Message(sourceLineNumbers, Ids.MultipleIdentifiersFound, "Under a '{0}' element, multiple identifiers were found: '{1}' and '{2}'.  All search elements under this element must have the same id.", elementName, identifier, mismatchIdentifier);
+        }
+
+        public static Message MultiplePackagePayloads(SourceLineNumber sourceLineNumbers, string packageId, string packagePayloadId1, string packagePayloadId2)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads, "The package '{0}' has multiple PackagePayloads: '{1}' and '{2}'. This normally happens when the payload is defined on the package element and a child PackagePayload element.", packageId, packagePayloadId1, packagePayloadId2);
+        }
+
+        public static Message MultiplePackagePayloads2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads2, "The location of the package payload related to previous error.");
+        }
+
+        public static Message MultiplePackagePayloads3(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads3, "The location of the package related to previous error.");
         }
 
         public static Message MultiplePrimaryReferences(SourceLineNumber sourceLineNumbers, string crefChildType, string crefChildId, string crefParentType, string crefParentId, string conflictParentType, string conflictParentId)
@@ -1632,6 +1662,16 @@ namespace WixToolset.Data
         public static Message OverridableActionCollision2(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.OverridableActionCollision2, "The location of the action related to previous error.");
+        }
+
+        public static Message PackagePayloadUnsupported(SourceLineNumber sourceLineNumbers, string packageType)
+        {
+            return Message(sourceLineNumbers, Ids.PackagePayloadUnsupported, "The {0}PackagePayload element can only be used for {0}Packages.", packageType);
+        }
+
+        public static Message PackagePayloadUnsupported2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.PackagePayloadUnsupported2, "The location of the package related to previous error.");
         }
 
         public static Message ParentElementAttributeRequired(SourceLineNumber sourceLineNumbers, string parentElement, string parentAttribute, string childElement)
@@ -1772,11 +1812,6 @@ namespace WixToolset.Data
         public static Message RelativePathForRegistryElement(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.RelativePathForRegistryElement, "Cannot convert RelativePath into Registry elements.");
-        }
-
-        public static Message RemotePayloadUnsupported(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.RemotePayloadUnsupported, "The RemotePayload element can only be used for ExePackage and MsuPackage payloads.");
         }
 
         public static Message ReservedNamespaceViolation(SourceLineNumber sourceLineNumbers, string element, string attribute, string prefix)
@@ -2022,6 +2057,11 @@ namespace WixToolset.Data
         public static Message UnexpectedElementWithAttribute(SourceLineNumber sourceLineNumbers, string elementName, string childElementName, string attribute)
         {
             return Message(sourceLineNumbers, Ids.UnexpectedElementWithAttribute, "The {0} element cannot have a child element '{1}' when attribute '{2}' is set.", elementName, childElementName, attribute);
+        }
+
+        public static Message UnexpectedElementWithAttribute(SourceLineNumber sourceLineNumbers, string elementName, string childElementName, string attribute1, string attribute2, string attribute3, string attribute4)
+        {
+            return Message(sourceLineNumbers, Ids.UnexpectedElementWithAttribute, "The {0} element cannot have a child element '{1}' when any of attributes '{2}', '{3}', '{4}', or '{5}' are set.", elementName, childElementName, attribute1, attribute2, attribute3, attribute4);
         }
 
         public static Message UnexpectedElementWithAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string childElementName, string attribute, string attributeValue)
@@ -2661,7 +2701,6 @@ namespace WixToolset.Data
             InvalidModuleOrBundleVersion = 380,
             UnsupportedPlatformForElement = 381,
             MissingMedia = 382,
-            RemotePayloadUnsupported = 383,
             IllegalYesNoAlwaysValue = 384,
             TooDeeplyIncluded = 385,
             TooManyColumnsInRealTable = 386,
@@ -2680,6 +2719,13 @@ namespace WixToolset.Data
             UnknownSymbolType = 399,
             IllegalInnerText = 400,
             ExpectedAttributeWithValueWithOtherAttribute = 401,
+            PackagePayloadUnsupported = 402,
+            PackagePayloadUnsupported2 = 403,
+            MultiplePackagePayloads = 404,
+            MultiplePackagePayloads2 = 405,
+            MultiplePackagePayloads3 = 406,
+            MissingPackagePayload = 407,
+            ExpectedAttributeWithoutOtherAttributes = 408,
         }
     }
 }

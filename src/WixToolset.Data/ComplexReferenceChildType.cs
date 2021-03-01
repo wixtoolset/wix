@@ -37,6 +37,9 @@ namespace WixToolset.Data
         /// <summary>PackageGroup child of complex reference.</summary>
         PackageGroup,
 
+        /// <summary>PackagePayload child of complex reference.</summary>
+        PackagePayload,
+
         /// <summary>PatchFamily child of complex reference.</summary>
         PatchFamily,
 
