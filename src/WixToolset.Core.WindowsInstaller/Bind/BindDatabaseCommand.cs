@@ -32,7 +32,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
-            this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
             this.WindowsInstallerBackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
 
             this.PathResolver = this.ServiceProvider.GetService<IPathResolver>();
@@ -60,8 +59,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
-
-        private IBackendHelper BackendHelper { get; }
 
         private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
@@ -237,7 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var command = new ExtractEmbeddedFilesCommand(this.BackendHelper, this.ExpectedEmbeddedFiles);
+                var command = new ExtractEmbeddedFilesCommand(this.WindowsInstallerBackendHelper, this.ExpectedEmbeddedFiles);
                 command.Execute();
 
                 trackedFiles.AddRange(command.TrackedFiles);
@@ -371,7 +368,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Set generated component guids.
             {
-                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section, platform);
+                var command = new CalculateComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
                 command.Execute();
             }
 
@@ -384,7 +381,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             Dictionary<MediaSymbol, IEnumerable<FileFacade>> filesByCabinetMedia;
             IEnumerable<FileFacade> uncompressedFiles;
             {
-                var order = new OptimizeFileFacadesOrderCommand(this.BackendHelper, this.PathResolver, section, platform, fileFacades);
+                var order = new OptimizeFileFacadesOrderCommand(this.WindowsInstallerBackendHelper, this.PathResolver, section, platform, fileFacades);
                 order.Execute();
 
                 fileFacades = order.FileFacades;
@@ -457,7 +454,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 var mediaTemplate = section.Symbols.OfType<WixMediaTemplateSymbol>().FirstOrDefault();
 
-                var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper, mediaTemplate);
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.WindowsInstallerBackendHelper, mediaTemplate);
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
@@ -486,7 +483,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // We can create instance transforms since Component Guids and Outputs are created.
             if (output.Type == OutputType.Product)
             {
-                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.BackendHelper);
+                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.WindowsInstallerBackendHelper);
                 command.Execute();
             }
             else if (output.Type == OutputType.Patch)
@@ -500,10 +497,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Messaging.Write(VerboseMessages.GeneratingDatabase());
 
             {
-                var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
+                var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
                 trackedFiles.Add(trackMsi);
 
-                var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
+                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, output, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
                 command.Execute();
 
                 trackedFiles.AddRange(command.GeneratedTemporaryFiles);
@@ -556,7 +553,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Process uncompressed files.
             if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
             {
-                var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper, this.PathResolver);
+                var command = new ProcessUncompressedFilesCommand(section, this.WindowsInstallerBackendHelper, this.PathResolver);
                 command.Compressed = compressed;
                 command.FileFacades = uncompressedFiles;
                 command.LayoutDirectory = layoutDirectory;
@@ -570,7 +567,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
-            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
+            trackedFiles.AddRange(fileFacades.Select(f => this.WindowsInstallerBackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
 
             var result = this.ServiceProvider.GetService<IBindResult>();
             result.FileTransfers = fileTransfers;
@@ -590,7 +587,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
+                var trackPdb = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
                 trackedFiles.Add(trackPdb);
 
                 wixout = WixOutput.Create(trackPdb.Path);
