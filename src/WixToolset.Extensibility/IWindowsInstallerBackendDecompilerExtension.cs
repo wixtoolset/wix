@@ -16,24 +16,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreBackendDecompile(IDecompileContext context);
 
-        /// <summary>
-        /// Gets the table definitions this extension decompiles.
-        /// </summary>
-        /// <value>Table definitions this extension decompiles.</value>
-        TableDefinitionCollection TableDefinitions { get; }
-
-        /// <summary>
-        /// Gets the library that this decompiler wants removed from the decomipiled output.
-        /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The library for this extension or null if there is no library to be removed.</returns>
-        Library GetLibraryToRemove(TableDefinitionCollection tableDefinitions);
-
-        /// <summary>
-        /// Decompiles an extension table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        void DecompileTable(Table table);
+        // TODO: Redesign this interface to be useful.
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
