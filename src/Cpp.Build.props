@@ -25,7 +25,7 @@
       <DisableSpecificWarnings>$(DisableSpecificCompilerWarnings)</DisableSpecificWarnings>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>$(ProjectDir)inc;$(MSBuildProjectDirectory);$(IntDir);$(SqlCESdkIncludePath);$(ProjectAdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_MSI=500;_WIN32_WINNT=0x0501;$(ArmPreprocessorDefinitions);$(UnicodePreprocessorDefinitions);_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_MSI=500;_WIN32_WINNT=0x0600;$(ArmPreprocessorDefinitions);$(UnicodePreprocessorDefinitions);_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
       <CallingConvention Condition="'$(Platform)'=='Win32'">StdCall</CallingConvention>

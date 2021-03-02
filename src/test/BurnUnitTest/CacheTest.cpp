@@ -24,7 +24,7 @@ namespace Bootstrapper
         {
         }
 
-        [Fact(Skip = "Currently fails")]
+        [Fact]
         void CacheSignatureTest()
         {
             HRESULT hr = S_OK;
@@ -36,12 +36,12 @@ namespace Bootstrapper
 
             try
             {
-                pin_ptr<const wchar_t> dataDirectory = PtrToStringChars(this->TestContext->DataDirectory);
-                hr = PathConcat(dataDirectory, L"BurnTestPayloads\\Products\\TestExe\\TestExe.exe", &sczPayloadPath);
+                pin_ptr<const wchar_t> dataDirectory = PtrToStringChars(this->TestContext->TestDirectory);
+                hr = PathConcat(dataDirectory, L"TestData\\CacheTest\\CacheSignatureTest.File", &sczPayloadPath);
                 Assert::True(S_OK == hr, "Failed to get path to test file.");
                 Assert::True(FileExistsEx(sczPayloadPath, NULL), "Test file does not exist.");
 
-                hr = StrAllocHexDecode(L"232BD16B78C1926F95D637731E1EE5379A3C4222", &pb, &cb);
+                hr = StrAllocHexDecode(L"25e61cd83485062b70713aebddd3fe4992826cb121466fddc8de3eacb1e42f39d4bdd8455d95eec8c9529ced4c0296ab861931fe2c86df2f2b4e8d259a6d9223", &pb, &cb);
                 Assert::Equal(S_OK, hr);
 
                 package.fPerMachine = FALSE;
