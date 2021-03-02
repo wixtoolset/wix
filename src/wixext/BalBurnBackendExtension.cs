@@ -11,7 +11,7 @@ namespace WixToolset.Bal
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
 
-    public class BalBurnBackendExtension : BaseBurnBackendExtension
+    public class BalBurnBackendExtension : BaseBurnBackendBinderExtension
     {
         private static readonly IntermediateSymbolDefinition[] BurnSymbolDefinitions =
         {
@@ -27,12 +27,9 @@ namespace WixToolset.Bal
 
         protected override IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;
 
-        public override void BundleFinalize()
+        public override void SymbolsFinalized(IntermediateSection section)
         {
-            base.BundleFinalize();
-
-            var intermediate = this.Context.IntermediateRepresentation;
-            var section = intermediate.Sections.Single();
+            base.SymbolsFinalized(section);
 
             var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
             var baId = baSymbol?.Id?.Id;
