@@ -2,9 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-       <Component>
-         <File Source="test.txt" />
-       </Component>
+        <?include DontDoThis.wxi ?>
     </ComponentGroup>
   </Fragment>
 </Wix>

@@ -1,4 +1,4 @@
-﻿<?include Package.wxi ?>
+<?include Package.wxi ?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="MsiPackage" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
     

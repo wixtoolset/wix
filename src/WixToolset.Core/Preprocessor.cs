@@ -1351,7 +1351,7 @@ namespace WixToolset.Core
 
                 if (state.Context.CurrentSourceLineNumber.LineNumber != newLine)
                 {
-                    state.Context.CurrentSourceLineNumber = new SourceLineNumber(state.Context.CurrentSourceLineNumber.FileName, newLine);
+                    state.Context.CurrentSourceLineNumber = new SourceLineNumber(state.Context.CurrentSourceLineNumber.FileName, state.Context.CurrentSourceLineNumber.Parent, newLine);
                 }
             }
         }
@@ -1372,7 +1372,7 @@ namespace WixToolset.Core
 
             state.CurrentFileStack.Push(path);
             state.SourceStack.Push(state.Context.CurrentSourceLineNumber);
-            state.Context.CurrentSourceLineNumber = new SourceLineNumber(path);
+            state.Context.CurrentSourceLineNumber = new SourceLineNumber(path, state.Context.CurrentSourceLineNumber);
             state.IncludeNextStack.Push(true);
         }
 

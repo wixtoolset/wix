@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
     using Xunit;
 
@@ -37,6 +38,45 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal(1, includedFile.SourceLineNumbers.LineNumber.Value);
             Assert.Equal($"{sourcePath}*1", includedFile.SourceLineNumbers.QualifiedFileName);
             Assert.Null(includedFile.SourceLineNumbers.Parent);
+        }
+
+        [Fact]
+        public void IncludeSourceLineNumbersPreserved()
+        {
+            var folder = TestData.Get(@"TestData\IncludePath");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-includepath", Path.Combine(folder, "data"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                using (var output = WixOutput.Read(Path.Combine(baseFolder, @"bin\test.wixpdb")))
+                {
+                    var intermediate = Intermediate.Load(output);
+                    var component = intermediate.Sections.Single().Symbols.OfType<ComponentSymbol>().Single();
+                    Assert.Equal(3, component.SourceLineNumbers.LineNumber);
+                    Assert.Equal(5, component.SourceLineNumbers.Parent.LineNumber);
+
+                    var encoded = component.SourceLineNumbers.GetEncoded();
+                    var decoded = SourceLineNumber.CreateFromEncoded(encoded);
+                    Assert.Equal(3, decoded.LineNumber);
+                    Assert.Equal(5, decoded.Parent.LineNumber);
+                }
+            }
         }
 
         [Fact]
