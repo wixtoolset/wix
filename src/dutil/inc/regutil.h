@@ -50,7 +50,7 @@ typedef LSTATUS (APIENTRY *PFN_REGENUMKEYEXW)(
     __out        LPWSTR lpName,
     __inout      LPDWORD lpcName,
     __reserved   LPDWORD lpReserved,
-    __inout      LPWSTR lpClass,
+    __inout_opt  LPWSTR lpClass,
     __inout_opt  LPDWORD lpcClass,
     __out_opt    PFILETIME lpftLastWriteTime
     );
@@ -66,7 +66,7 @@ typedef LSTATUS (APIENTRY *PFN_REGENUMVALUEW)(
     );
 typedef LSTATUS (APIENTRY *PFN_REGQUERYINFOKEYW)(
     __in         HKEY hKey,
-    __out        LPWSTR lpClass,
+    __out_opt    LPWSTR lpClass,
     __inout_opt  LPDWORD lpcClass,
     __reserved   LPDWORD lpReserved,
     __out_opt    LPDWORD lpcSubKeys,
@@ -170,7 +170,7 @@ HRESULT DAPI RegReadString(
 HRESULT DAPI RegReadStringArray(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
-    __deref_out_ecount_opt(pcStrings) LPWSTR** prgsczStrings,
+    __deref_out_ecount_opt(*pcStrings) LPWSTR** prgsczStrings,
     __out DWORD *pcStrings
     );
 HRESULT DAPI RegReadVersion(
@@ -202,7 +202,7 @@ HRESULT DAPI RegWriteString(
 HRESULT DAPI RegWriteStringArray(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
-    __in_ecount(cValues) LPWSTR *rgwzStrings,
+    __in_ecount(cStrings) LPWSTR *rgwzStrings,
     __in DWORD cStrings
     );
 HRESULT DAPI RegWriteStringFormatted(

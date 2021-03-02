@@ -3,6 +3,21 @@
 #include "precomp.h"
 #include "iis7util.h"
 
+
+// Exit macros
+#define IisExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_IIS7UTIL, x, s, __VA_ARGS__)
+#define IisExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_IIS7UTIL, p, x, e, s, __VA_ARGS__)
+#define IisExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_IIS7UTIL, p, x, s, __VA_ARGS__)
+#define IisExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_IIS7UTIL, p, x, e, s, __VA_ARGS__)
+#define IisExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_IIS7UTIL, p, x, s, __VA_ARGS__)
+#define IisExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_IIS7UTIL, e, x, s, __VA_ARGS__)
+#define IisExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_IIS7UTIL, g, x, s, __VA_ARGS__)
+
 #define ISSTRINGVARIANT(vt) (VT_BSTR == vt || VT_LPWSTR == vt)
 
 extern "C" HRESULT DAPI Iis7PutPropertyVariant(
@@ -16,13 +31,13 @@ extern "C" HRESULT DAPI Iis7PutPropertyVariant(
     BSTR bstrPropName = NULL;
 
     bstrPropName = ::SysAllocString(wzPropName);
-    ExitOnNull(bstrPropName, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    IisExitOnNull(bstrPropName, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     hr = pElement->GetPropertyByName(bstrPropName, &pProperty);
-    ExitOnFailure(hr, "Failed to get property object for %ls", wzPropName);
+    IisExitOnFailure(hr, "Failed to get property object for %ls", wzPropName);
 
     hr = pProperty->put_Value(vtPut);
-    ExitOnFailure(hr, "Failed to set property value for %ls", wzPropName);
+    IisExitOnFailure(hr, "Failed to set property value for %ls", wzPropName);
 
 LExit:
     ReleaseBSTR(bstrPropName);
@@ -44,7 +59,7 @@ extern "C" HRESULT DAPI Iis7PutPropertyString(
     ::VariantInit(&vtPut);
     vtPut.vt = VT_BSTR;
     vtPut.bstrVal = ::SysAllocString(wzString);
-    ExitOnNull(vtPut.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    IisExitOnNull(vtPut.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     hr = Iis7PutPropertyVariant(pElement, wzPropName, vtPut);
 
@@ -92,13 +107,13 @@ extern "C" HRESULT DAPI Iis7GetPropertyVariant(
     BSTR bstrPropName = NULL;
 
     bstrPropName = ::SysAllocString(wzPropName);
-    ExitOnNull(bstrPropName, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    IisExitOnNull(bstrPropName, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     hr = pElement->GetPropertyByName(bstrPropName, &pProperty);
-    ExitOnFailure(hr, "Failed to get property object for %ls", wzPropName);
+    IisExitOnFailure(hr, "Failed to get property object for %ls", wzPropName);
 
     hr = pProperty->get_Value(vtGet);
-    ExitOnFailure(hr, "Failed to get property value for %ls", wzPropName);
+    IisExitOnFailure(hr, "Failed to get property value for %ls", wzPropName);
 
 LExit:
     ReleaseBSTR(bstrPropName);
@@ -119,12 +134,12 @@ extern "C" HRESULT DAPI Iis7GetPropertyString(
 
     ::VariantInit(&vtGet);
     hr = Iis7GetPropertyVariant(pElement, wzPropName, &vtGet);
-    ExitOnFailure(hr, "Failed to get iis7 property variant with name: %ls", wzPropName);
+    IisExitOnFailure(hr, "Failed to get iis7 property variant with name: %ls", wzPropName);
 
     if (!ISSTRINGVARIANT(vtGet.vt))
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Tried to get property as a string, but type was %d instead.", vtGet.vt);
+        IisExitOnFailure(hr, "Tried to get property as a string, but type was %d instead.", vtGet.vt);
     }
 
     hr = StrAllocString(psczGet, vtGet.bstrVal, 0);
@@ -198,13 +213,13 @@ BOOL DAPI CompareVariantPath(
     if (ISSTRINGVARIANT(pVariant1->vt))
     {
         hr = PathExpand(&wzValue1, pVariant1->bstrVal, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-        ExitOnFailure(hr, "Failed to expand path %ls", pVariant1->bstrVal);
+        IisExitOnFailure(hr, "Failed to expand path %ls", pVariant1->bstrVal);
     }
 
     if (ISSTRINGVARIANT(pVariant2->vt))
     {
         hr = PathExpand(&wzValue2, pVariant2->bstrVal, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-        ExitOnFailure(hr, "Failed to expand path %ls", pVariant2->bstrVal);
+        IisExitOnFailure(hr, "Failed to expand path %ls", pVariant2->bstrVal);
     }
 
     fEqual = CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzValue1, -1, wzValue2, -1);
@@ -242,14 +257,14 @@ extern "C" BOOL DAPI Iis7IsMatchingAppHostElement(
     VARIANTCOMPARATORPROC pComparator = pComparison->pComparator ? pComparison->pComparator : CompareVariantDefault;
 
     hr = pElement->get_Name(&bstrElementName);
-    ExitOnFailure(hr, "Failed to get name of element");
+    IisExitOnFailure(hr, "Failed to get name of element");
     if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pComparison->sczElementName, -1, bstrElementName, -1))
     {
         ExitFunction();
     }
 
     hr = Iis7GetPropertyVariant(pElement, pComparison->sczAttributeName, &vPropValue);
-    ExitOnFailure(hr, "Failed to get value of %ls attribute of %ls element", pComparison->sczAttributeName, pComparison->sczElementName);
+    IisExitOnFailure(hr, "Failed to get value of %ls attribute of %ls element", pComparison->sczAttributeName, pComparison->sczElementName);
 
     if (TRUE == pComparator(pComparison->pvAttributeValue, &vPropValue))
     {
@@ -274,7 +289,9 @@ BOOL DAPI IsMatchingAppHostMethod(
     BSTR bstrName = NULL;
 
     hr = pMethod->get_Name(&bstrName);
-    ExitOnFailure(hr, "Failed to get name of element");
+    IisExitOnFailure(hr, "Failed to get name of element");
+
+    Assert(bstrName);
 
     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzMethodName, -1, bstrName, -1))
     {
@@ -303,7 +320,7 @@ extern "C" HRESULT DAPI Iis7FindAppHostElementPath(
 
     vtValue.vt = VT_BSTR;
     vtValue.bstrVal = ::SysAllocString(wzAttributeValue);
-    ExitOnNull(vtValue.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    IisExitOnNull(vtValue.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     comparison.sczElementName = wzElementName;
     comparison.sczAttributeName = wzAttributeName;
@@ -337,7 +354,7 @@ extern "C" HRESULT DAPI Iis7FindAppHostElementString(
 
     vtValue.vt = VT_BSTR;
     vtValue.bstrVal = ::SysAllocString(wzAttributeValue);
-    ExitOnNull(vtValue.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    IisExitOnNull(vtValue.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     hr = Iis7FindAppHostElementVariant(pCollection,
                                        wzElementName,
@@ -427,14 +444,14 @@ extern "C" HRESULT DAPI Iis7EnumAppHostElements(
     }
 
     hr = pCollection->get_Count(&dwElements);
-    ExitOnFailure(hr, "Failed get application IAppHostElementCollection count");
+    IisExitOnFailure(hr, "Failed get application IAppHostElementCollection count");
 
     vtIndex.vt = VT_UI4;
     for (DWORD i = 0; i < dwElements; ++i)
     {
         vtIndex.ulVal = i;
         hr = pCollection->get_Item(vtIndex , &pElement);
-        ExitOnFailure(hr, "Failed get IAppHostElement element");
+        IisExitOnFailure(hr, "Failed get IAppHostElement element");
 
         if (pCallback(pElement, pContext))
         {
@@ -484,14 +501,14 @@ extern "C" HRESULT DAPI Iis7FindAppHostMethod(
     }
 
     hr = pCollection->get_Count(&dwMethods);
-    ExitOnFailure(hr, "Failed get application IAppHostMethodCollection count");
+    IisExitOnFailure(hr, "Failed get application IAppHostMethodCollection count");
 
     vtIndex.vt = VT_UI4;
     for (DWORD i = 0; i < dwMethods; ++i)
     {
         vtIndex.ulVal = i;
         hr = pCollection->get_Item(vtIndex , &pMethod);
-        ExitOnFailure(hr, "Failed get IAppHostMethod element");
+        IisExitOnFailure(hr, "Failed get IAppHostMethod element");
 
         if (IsMatchingAppHostMethod(pMethod, wzMethodName))
         {

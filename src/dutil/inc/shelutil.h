@@ -19,9 +19,9 @@ void DAPI ShelFunctionOverride(
     );
 HRESULT DAPI ShelExec(
     __in_z LPCWSTR wzTargetPath,
-    __in_opt LPCWSTR wzParameters,
-    __in_opt LPCWSTR wzVerb,
-    __in_opt LPCWSTR wzWorkingDirectory,
+    __in_z_opt LPCWSTR wzParameters,
+    __in_z_opt LPCWSTR wzVerb,
+    __in_z_opt LPCWSTR wzWorkingDirectory,
     __in int nShowCmd,
     __in_opt HWND hwndParent,
     __out_opt HANDLE* phProcess

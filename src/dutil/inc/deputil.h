@@ -55,7 +55,7 @@ DAPI_(HRESULT) DepCheckDependency(
 DAPI_(HRESULT) DepCheckDependents(
     __in HKEY hkHive,
     __in_z LPCWSTR wzProviderKey,
-    __in int iAttributes,
+    __reserved int iAttributes,
     __in C_STRINGDICT_HANDLE sdIgnoredDependents,
     __deref_inout_ecount_opt(*pcDependents) DEPENDENCY** prgDependents,
     __inout LPUINT pcDependents

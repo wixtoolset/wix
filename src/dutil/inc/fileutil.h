@@ -121,7 +121,7 @@ HRESULT DAPI FileReadPartial(
     __in BOOL fPartialOK
     );
 HRESULT DAPI FileReadPartialEx(
-    __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
+    __deref_inout_bcount_full(*pcbDest) LPBYTE* ppbDest,
     __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,

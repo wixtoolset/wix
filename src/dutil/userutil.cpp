@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// UserExit macros
+#define UserExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_USERUTIL, x, s, __VA_ARGS__)
+#define UserExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_USERUTIL, p, x, e, s, __VA_ARGS__)
+#define UserExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_USERUTIL, p, x, s, __VA_ARGS__)
+#define UserExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_USERUTIL, p, x, e, s, __VA_ARGS__)
+#define UserExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_USERUTIL, p, x, s, __VA_ARGS__)
+#define UserExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_USERUTIL, e, x, s, __VA_ARGS__)
+#define UserExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_USERUTIL, g, x, s, __VA_ARGS__)
+
 static BOOL CheckIsMemberHelper(
     __in_z LPCWSTR pwzGroupUserDomain,
     __in_ecount(cguiGroupData) const GROUP_USERS_INFO_0 *pguiGroupData,
@@ -29,14 +44,14 @@ extern "C" HRESULT DAPI UserBuildDomainUserName(
     if (cch >= cchLeft)
     {
         hr = ERROR_MORE_DATA;
-        ExitOnFailure(hr, "Buffer size is not big enough to hold domain name: %ls", pwzDomain);
+        UserExitOnFailure(hr, "Buffer size is not big enough to hold domain name: %ls", pwzDomain);
     }
     else if (cch > 0)
     {
         // handle the domain case
 
         hr = ::StringCchCopyNW(pwz, cchWz, pwzDomain, cchLeft - 1); // last parameter does not include '\0'
-        ExitOnFailure(hr, "Failed to copy Domain onto string.");
+        UserExitOnFailure(hr, "Failed to copy Domain onto string.");
 
         cchLeft -= cch;
         pwz += cch;
@@ -45,11 +60,11 @@ extern "C" HRESULT DAPI UserBuildDomainUserName(
         if (1 >= cchLeft)
         {
             hr = ERROR_MORE_DATA;
-            ExitOnFailure(hr, "Insufficient buffer size while building domain user name");
+            UserExitOnFailure(hr, "Insufficient buffer size while building domain user name");
         }
 
         hr = ::StringCchCopyNW(pwz, cchWz, L"\\", cchLeft - 1); // last parameter does not include '\0'
-        ExitOnFailure(hr, "Failed to copy backslash onto string.");
+        UserExitOnFailure(hr, "Failed to copy backslash onto string.");
 
         --cchLeft;
         ++pwz;
@@ -60,11 +75,11 @@ extern "C" HRESULT DAPI UserBuildDomainUserName(
     if (cch >= cchLeft)
     {
         hr = ERROR_MORE_DATA;
-        ExitOnFailure(hr, "Buffer size is not big enough to hold user name: %ls", pwzName);
+        UserExitOnFailure(hr, "Buffer size is not big enough to hold user name: %ls", pwzName);
     }
 
     hr = ::StringCchCopyNW(pwz, cchWz, pwzName, cchLeft - 1); // last parameter does not include '\0'
-    ExitOnFailure(hr, "Failed to copy User name onto string.");
+    UserExitOnFailure(hr, "Failed to copy User name onto string.");
 
 LExit:
     return hr;
@@ -98,10 +113,10 @@ extern "C" HRESULT DAPI UserCheckIsMember(
     VARIANT_BOOL vtBoolResult = VARIANT_FALSE;
 
     hr = UserBuildDomainUserName(wzGroupUserDomain, countof(wzGroupUserDomain), pwzGroupName, pwzGroupDomain);
-    ExitOnFailure(hr, "Failed to build group name from group domain %ls, group name %ls", pwzGroupDomain, pwzGroupName);
+    UserExitOnFailure(hr, "Failed to build group name from group domain %ls, group name %ls", pwzGroupDomain, pwzGroupName);
 
     hr = UserBuildDomainUserName(wzUserDomain, countof(wzUserDomain), pwzName, pwzDomain);
-    ExitOnFailure(hr, "Failed to build group name from group domain %ls, group name %ls", pwzGroupDomain, pwzGroupName);
+    UserExitOnFailure(hr, "Failed to build group name from group domain %ls, group name %ls", pwzGroupDomain, pwzGroupName);
 
     if (pwzDomain && *pwzDomain)
     {
@@ -115,12 +130,12 @@ extern "C" HRESULT DAPI UserCheckIsMember(
         Trace(REPORT_VERBOSE, "failed to get groups for user %ls from domain %ls with error code 0x%x - continuing", pwzName, (wz != NULL) ? wz : L"", HRESULT_FROM_WIN32(er));
         er = ERROR_SUCCESS;
     }
-    ExitOnWin32Error(er, hr, "Failed to get list of global groups for user while checking group membership information for user: %ls", pwzName);
+    UserExitOnWin32Error(er, hr, "Failed to get list of global groups for user while checking group membership information for user: %ls", pwzName);
 
     if (dwRead != dwTotal)
     {
         hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA);
-        ExitOnRootFailure(hr, "Failed to get entire list of groups (global) for user while checking group membership information for user: %ls", pwzName);
+        UserExitOnRootFailure(hr, "Failed to get entire list of groups (global) for user while checking group membership information for user: %ls", pwzName);
     }
 
     if (CheckIsMemberHelper(wzGroupUserDomain, pguiGroupData, dwRead))
@@ -143,12 +158,12 @@ extern "C" HRESULT DAPI UserCheckIsMember(
         Trace(REPORT_VERBOSE, "failed to get local groups for user %ls from domain %ls with error code 0x%x - continuing", pwzName, (wz != NULL) ? wz : L"", HRESULT_FROM_WIN32(er));
         er = ERROR_SUCCESS;
     }
-    ExitOnWin32Error(er, hr, "Failed to get list of groups for user while checking group membership information for user: %ls", pwzName);
+    UserExitOnWin32Error(er, hr, "Failed to get list of groups for user while checking group membership information for user: %ls", pwzName);
 
     if (dwRead != dwTotal)
     {
         hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA);
-        ExitOnRootFailure(hr, "Failed to get entire list of groups (local) for user while checking group membership information for user: %ls", pwzName);
+        UserExitOnRootFailure(hr, "Failed to get entire list of groups (local) for user while checking group membership information for user: %ls", pwzName);
     }
 
     if (CheckIsMemberHelper(wzGroupUserDomain, pguiGroupData, dwRead))
@@ -159,18 +174,18 @@ extern "C" HRESULT DAPI UserCheckIsMember(
 
     // If the above methods failed, let's try active directory
     hr = UserCreateADsPath(pwzDomain, pwzName, &bstrUser);
-    ExitOnFailure(hr, "failed to create user ADsPath in order to check group membership for group: %ls domain: %ls", pwzName, pwzDomain);
+    UserExitOnFailure(hr, "failed to create user ADsPath in order to check group membership for group: %ls domain: %ls", pwzName, pwzDomain);
 
     hr = UserCreateADsPath(pwzGroupDomain, pwzGroupName, &bstrGroup);
-    ExitOnFailure(hr, "failed to create group ADsPath in order to check group membership for group: %ls domain: %ls", pwzGroupName, pwzGroupDomain);
+    UserExitOnFailure(hr, "failed to create group ADsPath in order to check group membership for group: %ls domain: %ls", pwzGroupName, pwzGroupDomain);
 
     if (lstrlenW(pwzGroupDomain) > 0)
     {
         hr = ::ADsGetObject(bstrGroup, IID_IADsGroup, reinterpret_cast<void**>(&pGroup));
-        ExitOnFailure(hr, "Failed to get group '%ls' from active directory.", reinterpret_cast<WCHAR*>(bstrGroup) );
+        UserExitOnFailure(hr, "Failed to get group '%ls' from active directory.", reinterpret_cast<WCHAR*>(bstrGroup) );
 
         hr = pGroup->IsMember(bstrUser, &vtBoolResult);
-        ExitOnFailure(hr, "Failed to check if user %ls is a member of group '%ls' using active directory.", reinterpret_cast<WCHAR*>(bstrUser), reinterpret_cast<WCHAR*>(bstrGroup) );
+        UserExitOnFailure(hr, "Failed to check if user %ls is a member of group '%ls' using active directory.", reinterpret_cast<WCHAR*>(bstrUser), reinterpret_cast<WCHAR*>(bstrGroup) );
     }
 
     if (vtBoolResult)
@@ -180,10 +195,10 @@ extern "C" HRESULT DAPI UserCheckIsMember(
     }
 
     hr = ::ADsGetObject(bstrGroup, IID_IADsGroup, reinterpret_cast<void**>(&pGroup));
-    ExitOnFailure(hr, "Failed to get group '%ls' from active directory.", reinterpret_cast<WCHAR*>(bstrGroup) );
+    UserExitOnFailure(hr, "Failed to get group '%ls' from active directory.", reinterpret_cast<WCHAR*>(bstrGroup) );
 
     hr = pGroup->IsMember(bstrUser, &vtBoolResult);
-    ExitOnFailure(hr, "Failed to check if user %ls is a member of group '%ls' using active directory.", reinterpret_cast<WCHAR*>(bstrUser), reinterpret_cast<WCHAR*>(bstrGroup) );
+    UserExitOnFailure(hr, "Failed to check if user %ls is a member of group '%ls' using active directory.", reinterpret_cast<WCHAR*>(bstrUser), reinterpret_cast<WCHAR*>(bstrGroup) );
 
     if (vtBoolResult)
     {
@@ -222,25 +237,25 @@ extern "C" HRESULT DAPI UserCreateADsPath(
     LPWSTR pwzAdsPath = NULL;
 
     hr = StrAllocString(&pwzAdsPath, L"WinNT://", 0);
-    ExitOnFailure(hr, "failed to allocate AdsPath string");
+    UserExitOnFailure(hr, "failed to allocate AdsPath string");
 
     if (*wzObjectDomain)
     {
         hr = StrAllocFormatted(&pwzAdsPath, L"%s/%s", wzObjectDomain, wzObjectName);
-        ExitOnFailure(hr, "failed to allocate AdsPath string");
+        UserExitOnFailure(hr, "failed to allocate AdsPath string");
     }
     else if (NULL != wcsstr(wzObjectName, L"\\") || NULL != wcsstr(wzObjectName, L"/"))
     {
         hr = StrAllocConcat(&pwzAdsPath, wzObjectName, 0);
-        ExitOnFailure(hr, "failed to concat objectname: %ls", wzObjectName);
+        UserExitOnFailure(hr, "failed to concat objectname: %ls", wzObjectName);
     }
     else
     {
         hr = StrAllocConcat(&pwzAdsPath, L"Localhost/", 0);
-        ExitOnFailure(hr, "failed to concat LocalHost/");
+        UserExitOnFailure(hr, "failed to concat LocalHost/");
 
         hr = StrAllocConcat(&pwzAdsPath, wzObjectName, 0);
-        ExitOnFailure(hr, "failed to concat object name: %ls", wzObjectName);
+        UserExitOnFailure(hr, "failed to concat object name: %ls", wzObjectName);
     }
 
     *pbstrAdsPath = ::SysAllocString(pwzAdsPath);

@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define RssExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_RSSUTIL, x, s, __VA_ARGS__)
+#define RssExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_RSSUTIL, p, x, e, s, __VA_ARGS__)
+#define RssExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_RSSUTIL, p, x, s, __VA_ARGS__)
+#define RssExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_RSSUTIL, p, x, e, s, __VA_ARGS__)
+#define RssExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_RSSUTIL, p, x, s, __VA_ARGS__)
+#define RssExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_RSSUTIL, e, x, s, __VA_ARGS__)
+#define RssExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_RSSUTIL, g, x, s, __VA_ARGS__)
+
 static HRESULT ParseRssDocument(
     __in IXMLDOMDocument *pixd,
     __out RSS_CHANNEL **ppChannel
@@ -68,10 +83,10 @@ extern "C" HRESULT DAPI RssParseFromString(
     IXMLDOMDocument *pixdRss = NULL;
 
     hr = XmlLoadDocument(wzRssString, &pixdRss);
-    ExitOnFailure(hr, "Failed to load RSS string as XML document.");
+    RssExitOnFailure(hr, "Failed to load RSS string as XML document.");
 
     hr = ParseRssDocument(pixdRss, &pNewChannel);
-    ExitOnFailure(hr, "Failed to parse RSS document.");
+    RssExitOnFailure(hr, "Failed to parse RSS document.");
 
     *ppChannel = pNewChannel;
     pNewChannel = NULL;
@@ -102,10 +117,10 @@ extern "C" HRESULT DAPI RssParseFromFile(
     IXMLDOMDocument *pixdRss = NULL;
 
     hr = XmlLoadDocumentFromFile(wzRssFile, &pixdRss);
-    ExitOnFailure(hr, "Failed to load RSS string as XML document.");
+    RssExitOnFailure(hr, "Failed to load RSS string as XML document.");
 
     hr = ParseRssDocument(pixdRss, &pNewChannel);
-    ExitOnFailure(hr, "Failed to parse RSS document.");
+    RssExitOnFailure(hr, "Failed to parse RSS document.");
 
     *ppChannel = pNewChannel;
     pNewChannel = NULL;
@@ -175,17 +190,17 @@ static HRESULT ParseRssDocument(
     // Get the document element and start processing channels.
     //
     hr = pixd ->get_documentElement(&pRssElement);
-    ExitOnFailure(hr, "failed get_documentElement in ParseRssDocument");
+    RssExitOnFailure(hr, "failed get_documentElement in ParseRssDocument");
 
     hr = pRssElement->get_childNodes(&pChannelNodes);
-    ExitOnFailure(hr, "Failed to get child nodes of Rss Document element.");
+    RssExitOnFailure(hr, "Failed to get child nodes of Rss Document element.");
 
     while (S_OK == (hr = XmlNextElement(pChannelNodes, &pNode, &bstrNodeName)))
     {
         if (0 == lstrcmpW(bstrNodeName, L"channel"))
         {
             hr = ParseRssChannel(pNode, &pNewChannel);
-            ExitOnFailure(hr, "Failed to parse RSS channel.");
+            RssExitOnFailure(hr, "Failed to parse RSS channel.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"link"))
         {
@@ -242,13 +257,13 @@ static HRESULT ParseRssChannel(
     // the RSS_CHANNEL structure
     //
     hr = XmlSelectNodes(pixnChannel, L"item", &pNodeList);
-    ExitOnFailure(hr, "Failed to select all RSS items in an RSS channel.");
+    RssExitOnFailure(hr, "Failed to select all RSS items in an RSS channel.");
 
     hr = pNodeList->get_length(&cItems);
-    ExitOnFailure(hr, "Failed to count the number of RSS items in RSS channel.");
+    RssExitOnFailure(hr, "Failed to count the number of RSS items in RSS channel.");
 
     pNewChannel = static_cast<RSS_CHANNEL*>(MemAlloc(sizeof(RSS_CHANNEL) + sizeof(RSS_ITEM) * cItems, TRUE));
-    ExitOnNull(pNewChannel, hr, E_OUTOFMEMORY, "Failed to allocate RSS channel structure.");
+    RssExitOnNull(pNewChannel, hr, E_OUTOFMEMORY, "Failed to allocate RSS channel structure.");
 
     pNewChannel->cItems = cItems;
 
@@ -256,7 +271,7 @@ static HRESULT ParseRssChannel(
     // Process the elements under a channel now.
     //
     hr = pixnChannel->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of RSS channel element.");
+    RssExitOnFailure(hr, "Failed to get child nodes of RSS channel element.");
 
     cItems = 0; // reset the counter and use this to walk through the channel items
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
@@ -264,45 +279,45 @@ static HRESULT ParseRssChannel(
         if (0 == lstrcmpW(bstrNodeName, L"title"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel title.");
+            RssExitOnFailure(hr, "Failed to get RSS channel title.");
 
             hr = StrAllocString(&pNewChannel->wzTitle, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS channel title.");
+            RssExitOnFailure(hr, "Failed to allocate RSS channel title.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"link"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel link.");
+            RssExitOnFailure(hr, "Failed to get RSS channel link.");
 
             hr = StrAllocString(&pNewChannel->wzLink, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS channel link.");
+            RssExitOnFailure(hr, "Failed to allocate RSS channel link.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"description"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel description.");
+            RssExitOnFailure(hr, "Failed to get RSS channel description.");
 
             hr = StrAllocString(&pNewChannel->wzDescription, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS channel description.");
+            RssExitOnFailure(hr, "Failed to allocate RSS channel description.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"ttl"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel description.");
+            RssExitOnFailure(hr, "Failed to get RSS channel description.");
 
             pNewChannel->dwTimeToLive = (DWORD)wcstoul(bstrNodeValue, NULL, 10);
         }
         else if (0 == lstrcmpW(bstrNodeName, L"item"))
         {
             hr = ParseRssItem(pNode, cItems, pNewChannel);
-            ExitOnFailure(hr, "Failed to parse RSS item.");
+            RssExitOnFailure(hr, "Failed to parse RSS item.");
 
             ++cItems;
         }
         else
         {
             hr = ParseRssUnknownElement(pNode, &pNewChannel->pUnknownElements);
-            ExitOnFailure(hr, "Failed to parse unknown RSS channel element: %ls", bstrNodeName);
+            RssExitOnFailure(hr, "Failed to parse unknown RSS channel element: %ls", bstrNodeName);
         }
 
         ReleaseNullBSTR(bstrNodeValue);
@@ -349,7 +364,7 @@ static HRESULT ParseRssItem(
     if (pChannel->cItems <= cItem)
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Unexpected number of items parsed.");
+        RssExitOnFailure(hr, "Unexpected number of items parsed.");
     }
 
     pItem = pChannel->rgItems + cItem;
@@ -358,71 +373,71 @@ static HRESULT ParseRssItem(
     // Process the elements under an item now.
     //
     hr = pixnItem->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of RSS item element.");
+    RssExitOnFailure(hr, "Failed to get child nodes of RSS item element.");
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         if (0 == lstrcmpW(bstrNodeName, L"title"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel title.");
+            RssExitOnFailure(hr, "Failed to get RSS channel title.");
 
             hr = StrAllocString(&pItem->wzTitle, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item title.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item title.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"link"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS channel link.");
+            RssExitOnFailure(hr, "Failed to get RSS channel link.");
 
             hr = StrAllocString(&pItem->wzLink, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item link.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item link.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"description"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS item description.");
+            RssExitOnFailure(hr, "Failed to get RSS item description.");
 
             hr = StrAllocString(&pItem->wzDescription, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item description.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item description.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"guid"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS item guid.");
+            RssExitOnFailure(hr, "Failed to get RSS item guid.");
 
             hr = StrAllocString(&pItem->wzGuid, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item guid.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item guid.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"pubDate"))
         {
             hr = XmlGetText(pNode, &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS item guid.");
+            RssExitOnFailure(hr, "Failed to get RSS item guid.");
 
             hr = TimeFromString(bstrNodeValue, &pItem->ftPublished);
-            ExitOnFailure(hr, "Failed to convert RSS item time.");
+            RssExitOnFailure(hr, "Failed to convert RSS item time.");
         }
         else if (0 == lstrcmpW(bstrNodeName, L"enclosure"))
         {
             hr = XmlGetAttribute(pNode, L"url", &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS item enclosure url.");
+            RssExitOnFailure(hr, "Failed to get RSS item enclosure url.");
 
             hr = StrAllocString(&pItem->wzEnclosureUrl, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item enclosure url.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item enclosure url.");
             ReleaseNullBSTR(bstrNodeValue);
 
             hr = XmlGetAttributeNumber(pNode, L"length", &pItem->dwEnclosureSize);
-            ExitOnFailure(hr, "Failed to get RSS item enclosure length.");
+            RssExitOnFailure(hr, "Failed to get RSS item enclosure length.");
 
             hr = XmlGetAttribute(pNode, L"type", &bstrNodeValue);
-            ExitOnFailure(hr, "Failed to get RSS item enclosure type.");
+            RssExitOnFailure(hr, "Failed to get RSS item enclosure type.");
 
             hr = StrAllocString(&pItem->wzEnclosureType, bstrNodeValue, 0);
-            ExitOnFailure(hr, "Failed to allocate RSS item enclosure type.");
+            RssExitOnFailure(hr, "Failed to allocate RSS item enclosure type.");
         }
         else
         {
             hr = ParseRssUnknownElement(pNode, &pItem->pUnknownElements);
-            ExitOnFailure(hr, "Failed to parse unknown RSS item element: %ls", bstrNodeName);
+            RssExitOnFailure(hr, "Failed to parse unknown RSS item element: %ls", bstrNodeName);
         }
 
         ReleaseNullBSTR(bstrNodeValue);
@@ -460,39 +475,39 @@ static HRESULT ParseRssUnknownElement(
     RSS_UNKNOWN_ELEMENT* pNewUnknownElement;
 
     pNewUnknownElement = static_cast<RSS_UNKNOWN_ELEMENT*>(MemAlloc(sizeof(RSS_UNKNOWN_ELEMENT), TRUE));
-    ExitOnNull(pNewUnknownElement, hr, E_OUTOFMEMORY, "Failed to allocate unknown element.");
+    RssExitOnNull(pNewUnknownElement, hr, E_OUTOFMEMORY, "Failed to allocate unknown element.");
 
     hr = pNode->get_namespaceURI(&bstrNodeNamespace);
     if (S_OK == hr)
     {
         hr = StrAllocString(&pNewUnknownElement->wzNamespace, bstrNodeNamespace, 0);
-        ExitOnFailure(hr, "Failed to allocate RSS unknown element namespace.");
+        RssExitOnFailure(hr, "Failed to allocate RSS unknown element namespace.");
     }
     else if (S_FALSE == hr)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to get unknown element namespace.");
+    RssExitOnFailure(hr, "Failed to get unknown element namespace.");
 
     hr = pNode->get_baseName(&bstrNodeName);
-    ExitOnFailure(hr, "Failed to get unknown element name.");
+    RssExitOnFailure(hr, "Failed to get unknown element name.");
 
     hr = StrAllocString(&pNewUnknownElement->wzElement, bstrNodeName, 0);
-    ExitOnFailure(hr, "Failed to allocate RSS unknown element name.");
+    RssExitOnFailure(hr, "Failed to allocate RSS unknown element name.");
 
     hr = XmlGetText(pNode, &bstrNodeValue);
-    ExitOnFailure(hr, "Failed to get unknown element value.");
+    RssExitOnFailure(hr, "Failed to get unknown element value.");
 
     hr = StrAllocString(&pNewUnknownElement->wzValue, bstrNodeValue, 0);
-    ExitOnFailure(hr, "Failed to allocate RSS unknown element value.");
+    RssExitOnFailure(hr, "Failed to allocate RSS unknown element value.");
 
     hr = pNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get attributes on RSS unknown element.");
+    RssExitOnFailure(hr, "Failed get attributes on RSS unknown element.");
 
     while (S_OK == (hr = pixnnmAttributes->nextNode(&pixnAttribute)))
     {
         hr = ParseRssUnknownAttribute(pixnAttribute, &pNewUnknownElement->pAttributes);
-        ExitOnFailure(hr, "Failed to parse attribute on RSS unknown element.");
+        RssExitOnFailure(hr, "Failed to parse attribute on RSS unknown element.");
 
         ReleaseNullObject(pixnAttribute);
     }
@@ -501,7 +516,7 @@ static HRESULT ParseRssUnknownElement(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to enumerate all attributes on RSS unknown element.");
+    RssExitOnFailure(hr, "Failed to enumerate all attributes on RSS unknown element.");
 
     RSS_UNKNOWN_ELEMENT** ppTail = ppUnknownElement;
     while (*ppTail)
@@ -543,31 +558,31 @@ static HRESULT ParseRssUnknownAttribute(
     RSS_UNKNOWN_ATTRIBUTE* pNewUnknownAttribute;
 
     pNewUnknownAttribute = static_cast<RSS_UNKNOWN_ATTRIBUTE*>(MemAlloc(sizeof(RSS_UNKNOWN_ATTRIBUTE), TRUE));
-    ExitOnNull(pNewUnknownAttribute, hr, E_OUTOFMEMORY, "Failed to allocate unknown attribute.");
+    RssExitOnNull(pNewUnknownAttribute, hr, E_OUTOFMEMORY, "Failed to allocate unknown attribute.");
 
     hr = pNode->get_namespaceURI(&bstrNodeNamespace);
     if (S_OK == hr)
     {
         hr = StrAllocString(&pNewUnknownAttribute->wzNamespace, bstrNodeNamespace, 0);
-        ExitOnFailure(hr, "Failed to allocate RSS unknown attribute namespace.");
+        RssExitOnFailure(hr, "Failed to allocate RSS unknown attribute namespace.");
     }
     else if (S_FALSE == hr)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to get unknown attribute namespace.");
+    RssExitOnFailure(hr, "Failed to get unknown attribute namespace.");
 
     hr = pNode->get_baseName(&bstrNodeName);
-    ExitOnFailure(hr, "Failed to get unknown attribute name.");
+    RssExitOnFailure(hr, "Failed to get unknown attribute name.");
 
     hr = StrAllocString(&pNewUnknownAttribute->wzAttribute, bstrNodeName, 0);
-    ExitOnFailure(hr, "Failed to allocate RSS unknown attribute name.");
+    RssExitOnFailure(hr, "Failed to allocate RSS unknown attribute name.");
 
     hr = XmlGetText(pNode, &bstrNodeValue);
-    ExitOnFailure(hr, "Failed to get unknown attribute value.");
+    RssExitOnFailure(hr, "Failed to get unknown attribute value.");
 
     hr = StrAllocString(&pNewUnknownAttribute->wzValue, bstrNodeValue, 0);
-    ExitOnFailure(hr, "Failed to allocate RSS unknown attribute value.");
+    RssExitOnFailure(hr, "Failed to allocate RSS unknown attribute value.");
 
     RSS_UNKNOWN_ATTRIBUTE** ppTail = ppUnknownAttribute;
     while (*ppTail)

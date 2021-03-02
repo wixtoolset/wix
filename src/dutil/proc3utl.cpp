@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define ProcExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PROCUTIL, p, x, e, s, __VA_ARGS__)
+#define ProcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
+#define ProcExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_PROCUTIL, p, x, e, s, __VA_ARGS__)
+#define ProcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
+#define ProcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PROCUTIL, e, x, s, __VA_ARGS__)
+#define ProcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PROCUTIL, g, x, s, __VA_ARGS__)
+
 static HRESULT GetActiveSessionUserToken(
     __out HANDLE *phToken
     );
@@ -25,20 +40,20 @@ extern "C" HRESULT DAPI ProcExecuteAsInteractiveUser(
     PROCESS_INFORMATION pi = { };
 
     hr = GetActiveSessionUserToken(&hToken);
-    ExitOnFailure(hr, "Failed to get active session user token.");
+    ProcExitOnFailure(hr, "Failed to get active session user token.");
 
     if (!::CreateEnvironmentBlock(&pEnvironment, hToken, FALSE))
     {
-        ExitWithLastError(hr, "Failed to create environment block for UI process.");
+        ProcExitWithLastError(hr, "Failed to create environment block for UI process.");
     }
 
     hr = StrAllocFormatted(&sczFullCommandLine, L"\"%ls\" %ls", wzExecutablePath, wzCommandLine);
-    ExitOnFailure(hr, "Failed to allocate full command-line.");
+    ProcExitOnFailure(hr, "Failed to allocate full command-line.");
 
     si.cb = sizeof(si);
     if (!::CreateProcessAsUserW(hToken, wzExecutablePath, sczFullCommandLine, NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT, pEnvironment, NULL, &si, &pi))
     {
-        ExitWithLastError(hr, "Failed to create UI process: %ls", sczFullCommandLine);
+        ProcExitWithLastError(hr, "Failed to create UI process: %ls", sczFullCommandLine);
     }
 
     *phProcess = pi.hProcess;
@@ -74,7 +89,7 @@ static HRESULT GetActiveSessionUserToken(
     // Loop through the sessions looking for the active one.
     if (!::WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessionInfo, &cSessions))
     {
-        ExitWithLastError(hr, "Failed to enumerate sessions.");
+        ProcExitWithLastError(hr, "Failed to enumerate sessions.");
     }
 
     for (DWORD i = 0; i < cSessions; ++i)
@@ -96,7 +111,7 @@ static HRESULT GetActiveSessionUserToken(
     // Get the user token from the active session.
     if (!::WTSQueryUserToken(dwSessionId, &hToken))
     {
-        ExitWithLastError(hr, "Failed to get active session user token.");
+        ProcExitWithLastError(hr, "Failed to get active session user token.");
     }
 
     *phToken = hToken;

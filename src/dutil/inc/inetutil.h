@@ -30,7 +30,7 @@ HRESULT DAPI InternetQueryInfoString(
 HRESULT DAPI InternetQueryInfoNumber(
     __in HINTERNET h,
     __in DWORD dwInfo,
-    __out LONG* plInfo
+    __inout LONG* plInfo
     );
 
 #ifdef __cplusplus

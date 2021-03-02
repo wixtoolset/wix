@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define FileExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_FILEUTIL, x, s, __VA_ARGS__)
+#define FileExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_FILEUTIL, p, x, e, s, __VA_ARGS__)
+#define FileExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_FILEUTIL, p, x, s, __VA_ARGS__)
+#define FileExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_FILEUTIL, p, x, e, s, __VA_ARGS__)
+#define FileExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_FILEUTIL, p, x, s, __VA_ARGS__)
+#define FileExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_FILEUTIL, e, x, s, __VA_ARGS__)
+#define FileExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_FILEUTIL, g, x, s, __VA_ARGS__)
+
 // constants
 
 const BYTE UTF8BOM[] = {0xEF, 0xBB, 0xBF};
@@ -15,7 +30,7 @@ const LPCWSTR REGISTRY_PENDING_FILE_RENAME_VALUE = L"PendingFileRenameOperations
 
 ********************************************************************/
 extern "C" LPWSTR DAPI FileFromPath(
-    __in LPCWSTR wzPath
+    __in_z LPCWSTR wzPath
     )
 {
     if (!wzPath)
@@ -42,7 +57,7 @@ extern "C" LPWSTR DAPI FileFromPath(
 
 ********************************************************************/
 extern "C" HRESULT DAPI FileResolvePath(
-    __in LPCWSTR wzRelativePath,
+    __in_z LPCWSTR wzRelativePath,
     __out LPWSTR *ppwzFullPath
     )
 {
@@ -63,28 +78,28 @@ extern "C" HRESULT DAPI FileResolvePath(
     //
     cchExpandedPath = MAX_PATH;
     hr = StrAlloc(&pwzExpandedPath, cchExpandedPath);
-    ExitOnFailure(hr, "Failed to allocate space for expanded path.");
+    FileExitOnFailure(hr, "Failed to allocate space for expanded path.");
 
     cch = ::ExpandEnvironmentStringsW(wzRelativePath, pwzExpandedPath, cchExpandedPath);
     if (0 == cch)
     {
-        ExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
+        FileExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
     }
     else if (cchExpandedPath < cch)
     {
         cchExpandedPath = cch;
         hr = StrAlloc(&pwzExpandedPath, cchExpandedPath);
-        ExitOnFailure(hr, "Failed to re-allocate more space for expanded path.");
+        FileExitOnFailure(hr, "Failed to re-allocate more space for expanded path.");
 
         cch = ::ExpandEnvironmentStringsW(wzRelativePath, pwzExpandedPath, cchExpandedPath);
         if (0 == cch)
         {
-            ExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
+            FileExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
         }
         else if (cchExpandedPath < cch)
         {
             hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-            ExitOnRootFailure(hr, "Failed to allocate buffer for expanded path.");
+            FileExitOnRootFailure(hr, "Failed to allocate buffer for expanded path.");
         }
     }
 
@@ -93,28 +108,28 @@ extern "C" HRESULT DAPI FileResolvePath(
     //
     cchFullPath = MAX_PATH;
     hr = StrAlloc(&pwzFullPath, cchFullPath);
-    ExitOnFailure(hr, "Failed to allocate space for full path.");
+    FileExitOnFailure(hr, "Failed to allocate space for full path.");
 
     cch = ::GetFullPathNameW(pwzExpandedPath, cchFullPath, pwzFullPath, &wzFileName);
     if (0 == cch)
     {
-        ExitWithLastError(hr, "Failed to get full path for string: %ls", pwzExpandedPath);
+        FileExitWithLastError(hr, "Failed to get full path for string: %ls", pwzExpandedPath);
     }
     else if (cchFullPath < cch)
     {
         cchFullPath = cch;
         hr = StrAlloc(&pwzFullPath, cchFullPath);
-        ExitOnFailure(hr, "Failed to re-allocate more space for full path.");
+        FileExitOnFailure(hr, "Failed to re-allocate more space for full path.");
 
         cch = ::GetFullPathNameW(pwzExpandedPath, cchFullPath, pwzFullPath, &wzFileName);
         if (0 == cch)
         {
-            ExitWithLastError(hr, "Failed to get full path for string: %ls", pwzExpandedPath);
+            FileExitWithLastError(hr, "Failed to get full path for string: %ls", pwzExpandedPath);
         }
         else if (cchFullPath < cch)
         {
             hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-            ExitOnRootFailure(hr, "Failed to allocate buffer for full path.");
+            FileExitOnRootFailure(hr, "Failed to allocate buffer for full path.");
         }
     }
 
@@ -133,7 +148,7 @@ LExit:
 FileStripExtension - Strip extension from filename
 ********************************************************************/
 extern "C" HRESULT DAPI FileStripExtension(
-__in LPCWSTR wzFileName,
+__in_z LPCWSTR wzFileName,
 __out LPWSTR *ppwzFileNameNoExtension
 )
 {
@@ -158,14 +173,14 @@ __out LPWSTR *ppwzFileNameNoExtension
     }
    
     hr = StrAlloc(&pwzFileNameNoExtension, cchFileNameNoExtension);
-    ExitOnFailure(hr, "failed to allocate space for File Name without extension");
+    FileExitOnFailure(hr, "failed to allocate space for File Name without extension");
    
     // _wsplitpath_s can handle drive/path/filename/extension
     errno_t err = _wsplitpath_s(wzFileName, NULL, NULL, NULL, NULL, pwzFileNameNoExtension, cchFileNameNoExtension, NULL, NULL);
     if (0 != err)
     {
         hr = E_INVALIDARG;
-        ExitOnFailure(hr, "failed to parse filename: %ls", wzFileName);
+        FileExitOnFailure(hr, "failed to parse filename: %ls", wzFileName);
     }
    
     *ppwzFileNameNoExtension = pwzFileNameNoExtension;
@@ -182,8 +197,8 @@ LExit:
 FileChangeExtension - Changes the extension of a filename
 ********************************************************************/
 extern "C" HRESULT DAPI FileChangeExtension(
-    __in LPCWSTR wzFileName,
-    __in LPCWSTR wzNewExtension,
+    __in_z LPCWSTR wzFileName,
+    __in_z LPCWSTR wzNewExtension,
     __out LPWSTR *ppwzFileNameNewExtension
     )
 {
@@ -193,10 +208,10 @@ extern "C" HRESULT DAPI FileChangeExtension(
     LPWSTR sczFileName = NULL;
 
     hr = FileStripExtension(wzFileName, &sczFileName);
-    ExitOnFailure(hr, "Failed to strip extension from file name: %ls", wzFileName);
+    FileExitOnFailure(hr, "Failed to strip extension from file name: %ls", wzFileName);
 
     hr = StrAllocConcat(&sczFileName, wzNewExtension, 0);
-    ExitOnFailure(hr, "Failed to add new extension.");
+    FileExitOnFailure(hr, "Failed to add new extension.");
 
     *ppwzFileNameNewExtension = sczFileName;
     sczFileName = NULL;
@@ -238,11 +253,11 @@ extern "C" HRESULT DAPI FileAddSuffixToBaseName(
     {
         // no extension, so add the suffix at the end of the whole name
         hr = StrAllocString(&sczNewFileName, wzFileName, 0);
-        ExitOnFailure(hr, "Failed to allocate new file name.");
+        FileExitOnFailure(hr, "Failed to allocate new file name.");
 
         hr = StrAllocConcat(&sczNewFileName, wzSuffix, 0);
     }
-    ExitOnFailure(hr, "Failed to allocate new file name with suffix.");
+    FileExitOnFailure(hr, "Failed to allocate new file name with suffix.");
 
     *psczNewFileName = sczNewFileName;
     sczNewFileName = NULL;
@@ -259,7 +274,7 @@ LExit:
 
 ********************************************************************/
 extern "C" HRESULT DAPI FileVersion(
-    __in LPCWSTR wzFilename,
+    __in_z LPCWSTR wzFilename,
     __out DWORD *pdwVerMajor,
     __out DWORD* pdwVerMinor
     )
@@ -274,20 +289,20 @@ extern "C" HRESULT DAPI FileVersion(
 
     if (0 == (cbVerBuffer = ::GetFileVersionInfoSizeW(wzFilename, &dwHandle)))
     {
-        ExitOnLastErrorDebugTrace(hr, "failed to get version info for file: %ls", wzFilename);
+        FileExitOnLastErrorDebugTrace(hr, "failed to get version info for file: %ls", wzFilename);
     }
 
     pVerBuffer = ::GlobalAlloc(GMEM_FIXED, cbVerBuffer);
-    ExitOnNullDebugTrace(pVerBuffer, hr, E_OUTOFMEMORY, "failed to allocate version info for file: %ls", wzFilename);
+    FileExitOnNullDebugTrace(pVerBuffer, hr, E_OUTOFMEMORY, "failed to allocate version info for file: %ls", wzFilename);
 
     if (!::GetFileVersionInfoW(wzFilename, dwHandle, cbVerBuffer, pVerBuffer))
     {
-        ExitOnLastErrorDebugTrace(hr, "failed to get version info for file: %ls", wzFilename);
+        FileExitOnLastErrorDebugTrace(hr, "failed to get version info for file: %ls", wzFilename);
     }
 
     if (!::VerQueryValueW(pVerBuffer, L"\\", (void**)&pvsFileInfo, &cbFileInfo))
     {
-        ExitOnLastErrorDebugTrace(hr, "failed to get version value for file: %ls", wzFilename);
+        FileExitOnLastErrorDebugTrace(hr, "failed to get version value for file: %ls", wzFilename);
     }
 
     *pdwVerMajor = pvsFileInfo->dwFileVersionMS;
@@ -307,7 +322,7 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileVersionFromString(
-    __in LPCWSTR wzVersion,
+    __in_z LPCWSTR wzVersion,
     __out DWORD* pdwVerMajor,
     __out DWORD* pdwVerMinor
     )
@@ -394,7 +409,7 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileVersionFromStringEx(
-    __in LPCWSTR wzVersion,
+    __in_z LPCWSTR wzVersion,
     __in DWORD cchVersion,
     __out DWORD64* pqwVersion
     )
@@ -453,11 +468,11 @@ extern "C" HRESULT DAPI FileVersionFromStringEx(
 
         DWORD cchPart;
         hr = ::PtrdiffTToDWord(wzPartEnd - wzPartBegin, &cchPart);
-        ExitOnFailure(hr, "Version number part was too long.");
+        FileExitOnFailure(hr, "Version number part was too long.");
 
         // parse version part
         hr = StrStringToUInt16(wzPartBegin, cchPart, &us);
-        ExitOnFailure(hr, "Failed to parse version number part.");
+        FileExitOnFailure(hr, "Failed to parse version number part.");
 
         // add part to qword version
         qwVersion |= (DWORD64)us << ((3 - iPart) * 16);
@@ -501,7 +516,7 @@ extern "C" HRESULT DAPI FileVersionToStringEx(
 
     // Format and return the version string.
     hr = StrAllocFormatted(psczVersion, L"%u.%u.%u.%u", wMajor, wMinor, wBuild, wRevision);
-    ExitOnFailure(hr, "Failed to allocate and format the version number.");
+    FileExitOnFailure(hr, "Failed to allocate and format the version number.");
 
 LExit:
     return hr;
@@ -527,7 +542,7 @@ extern "C" HRESULT DAPI FileSetPointer(
     liMove.QuadPart = dw64Move;
     if (!::SetFilePointerEx(hFile, liMove, &liNewPosition, dwMoveMethod))
     {
-        ExitWithLastError(hr, "Failed to set file pointer.");
+        FileExitWithLastError(hr, "Failed to set file pointer.");
     }
 
     if (pdw64NewPosition)
@@ -545,23 +560,23 @@ LExit:
 
 ********************************************************************/
 extern "C" HRESULT DAPI FileSize(
-    __in LPCWSTR pwzFileName,
+    __in_z LPCWSTR pwzFileName,
     __out LONGLONG* pllSize
     )
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
 
-    ExitOnNull(pwzFileName, hr, E_INVALIDARG, "Attempted to check filename, but no filename was provided");
+    FileExitOnNull(pwzFileName, hr, E_INVALIDARG, "Attempted to check filename, but no filename was provided");
 
     hFile = ::CreateFileW(pwzFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (INVALID_HANDLE_VALUE == hFile)
     {
-        ExitWithLastError(hr, "Failed to open file %ls while checking file size", pwzFileName);
+        FileExitWithLastError(hr, "Failed to open file %ls while checking file size", pwzFileName);
     }
 
     hr = FileSizeByHandle(hFile, pllSize);
-    ExitOnFailure(hr, "Failed to check size of file %ls by handle", pwzFileName);
+    FileExitOnFailure(hr, "Failed to check size of file %ls by handle", pwzFileName);
 
 LExit:
     ReleaseFileHandle(hFile);
@@ -587,7 +602,7 @@ extern "C" HRESULT DAPI FileSizeByHandle(
 
     if (!::GetFileSizeEx(hFile, &li))
     {
-        ExitWithLastError(hr, "Failed to get size of file.");
+        FileExitWithLastError(hr, "Failed to get size of file.");
     }
 
     *pllSize = li.QuadPart;
@@ -602,7 +617,7 @@ LExit:
 
 ********************************************************************/
 extern "C" BOOL DAPI FileExistsEx(
-    __in LPCWSTR wzPath,
+    __in_z LPCWSTR wzPath,
     __out_opt DWORD *pdwAttributes
     )
 {
@@ -655,14 +670,14 @@ extern "C" BOOL DAPI FileExistsAfterRestart(
         {
             ExitFunction1(hr = S_OK);
         }
-        ExitOnFailure(hr, "Failed to open pending file rename registry key.");
+        FileExitOnFailure(hr, "Failed to open pending file rename registry key.");
 
         hr = RegReadStringArray(hkPendingFileRename, REGISTRY_PENDING_FILE_RENAME_VALUE, &rgsczRenames, &cRenames);
         if (E_FILENOTFOUND == hr)
         {
             ExitFunction1(hr = S_OK);
         }
-        ExitOnFailure(hr, "Failed to read pending file renames.");
+        FileExitOnFailure(hr, "Failed to read pending file renames.");
 
         // The pending file renames array is pairs of source and target paths. We only care
         // about checking the source paths so skip the target paths (i += 2).
@@ -678,7 +693,7 @@ extern "C" BOOL DAPI FileExistsAfterRestart(
                 }
 
                 hr = PathCompare(wzPath, wzRename, &nCompare);
-                ExitOnFailure(hr, "Failed to compare path from pending file rename to check path.");
+                FileExitOnFailure(hr, "Failed to compare path from pending file rename to check path.");
 
                 if (CSTR_EQUAL == nCompare)
                 {
@@ -719,14 +734,14 @@ extern "C" HRESULT DAPI FileRemoveFromPendingRename(
     {
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to open pending file rename registry key.");
+    FileExitOnFailure(hr, "Failed to open pending file rename registry key.");
 
     hr = RegReadStringArray(hkPendingFileRename, REGISTRY_PENDING_FILE_RENAME_VALUE, &rgsczRenames, &cRenames);
     if (E_FILENOTFOUND == hr)
     {
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to read pending file renames.");
+    FileExitOnFailure(hr, "Failed to read pending file renames.");
 
     // The pending file renames array is pairs of source and target paths. We only care
     // about checking the source paths so skip the target paths (i += 2).
@@ -742,7 +757,7 @@ extern "C" HRESULT DAPI FileRemoveFromPendingRename(
             }
 
             hr = PathCompare(wzPath, wzRename, &nCompare);
-            ExitOnFailure(hr, "Failed to compare path from pending file rename to check path.");
+            FileExitOnFailure(hr, "Failed to compare path from pending file rename to check path.");
 
             // If we find our path in the list, null out the source and target slot and
             // we'll compact the array next.
@@ -772,7 +787,7 @@ extern "C" HRESULT DAPI FileRemoveFromPendingRename(
 
         // Write the new array back to the pending file rename key.
         hr = RegWriteStringArray(hkPendingFileRename, REGISTRY_PENDING_FILE_RENAME_VALUE, rgsczRenames, cRenames);
-        ExitOnFailure(hr, "Failed to update pending file renames.");
+        FileExitOnFailure(hr, "Failed to update pending file renames.");
     }
 
 LExit:
@@ -790,7 +805,7 @@ LExit:
 extern "C" HRESULT DAPI FileRead(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
     __out SIZE_T* pcbDest,
-    __in LPCWSTR wzSrcPath
+    __in_z LPCWSTR wzSrcPath
     )
 {
     HRESULT hr = FileReadPartial(ppbDest, pcbDest, wzSrcPath, FALSE, 0, 0xFFFFFFFF, FALSE);
@@ -819,7 +834,7 @@ extern "C" HRESULT DAPI FileReadEx(
 extern "C" HRESULT DAPI FileReadUntil(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
     __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
-    __in LPCWSTR wzSrcPath,
+    __in_z LPCWSTR wzSrcPath,
     __in DWORD cbMaxRead
     )
 {
@@ -835,7 +850,7 @@ extern "C" HRESULT DAPI FileReadUntil(
 extern "C" HRESULT DAPI FileReadPartial(
     __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
     __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
-    __in LPCWSTR wzSrcPath,
+    __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,
     __in DWORD cbStartPosition,
     __in DWORD cbMaxRead,
@@ -850,7 +865,7 @@ extern "C" HRESULT DAPI FileReadPartial(
                    (with specified share mode)
 ********************************************************************/
 extern "C" HRESULT DAPI FileReadPartialEx(
-    __deref_out_bcount_full(*pcbDest) LPBYTE* ppbDest,
+    __deref_inout_bcount_full(*pcbDest) LPBYTE* ppbDest,
     __out_range(<=, cbMaxRead) SIZE_T* pcbDest,
     __in_z LPCWSTR wzSrcPath,
     __in BOOL fSeek,
@@ -868,10 +883,10 @@ extern "C" HRESULT DAPI FileReadPartialEx(
     DWORD cbData = 0;
     BYTE* pbData = NULL;
 
-    ExitOnNull(pcbDest, hr, E_INVALIDARG, "Invalid argument pcbDest");
-    ExitOnNull(ppbDest, hr, E_INVALIDARG, "Invalid argument ppbDest");
-    ExitOnNull(wzSrcPath, hr, E_INVALIDARG, "Invalid argument wzSrcPath");
-    ExitOnNull(*wzSrcPath, hr, E_INVALIDARG, "*wzSrcPath is null");
+    FileExitOnNull(pcbDest, hr, E_INVALIDARG, "Invalid argument pcbDest");
+    FileExitOnNull(ppbDest, hr, E_INVALIDARG, "Invalid argument ppbDest");
+    FileExitOnNull(wzSrcPath, hr, E_INVALIDARG, "Invalid argument wzSrcPath");
+    FileExitOnNull(*wzSrcPath, hr, E_INVALIDARG, "*wzSrcPath is null");
 
     hFile = ::CreateFileW(wzSrcPath, GENERIC_READ, dwShareMode, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (INVALID_HANDLE_VALUE == hFile)
@@ -881,12 +896,12 @@ extern "C" HRESULT DAPI FileReadPartialEx(
         {
             ExitFunction1(hr = E_FILENOTFOUND);
         }
-        ExitOnWin32Error(er, hr, "Failed to open file: %ls", wzSrcPath);
+        FileExitOnWin32Error(er, hr, "Failed to open file: %ls", wzSrcPath);
     }
 
     if (!::GetFileSizeEx(hFile, &liFileSize))
     {
-        ExitWithLastError(hr, "Failed to get size of file: %ls", wzSrcPath);
+        FileExitWithLastError(hr, "Failed to get size of file: %ls", wzSrcPath);
     }
 
     if (fSeek)
@@ -894,13 +909,13 @@ extern "C" HRESULT DAPI FileReadPartialEx(
         if (cbStartPosition > liFileSize.QuadPart)
         {
             hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Start position %d bigger than file '%ls' size %d", cbStartPosition, wzSrcPath, liFileSize.QuadPart);
+            FileExitOnFailure(hr, "Start position %d bigger than file '%ls' size %llu", cbStartPosition, wzSrcPath, liFileSize.QuadPart);
         }
 
         DWORD dwErr = ::SetFilePointer(hFile, cbStartPosition, NULL, FILE_CURRENT);
         if (INVALID_SET_FILE_POINTER == dwErr)
         {
-            ExitOnLastError(hr, "Failed to seek position %d", cbStartPosition);
+            FileExitOnLastError(hr, "Failed to seek position %d", cbStartPosition);
         }
     }
     else
@@ -918,7 +933,7 @@ extern "C" HRESULT DAPI FileReadPartialEx(
         if (cbMaxRead < liFileSize.QuadPart - cbStartPosition)
         {
             hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-            ExitOnRootFailure(hr, "Failed to load file: %ls, too large.", wzSrcPath);
+            FileExitOnRootFailure(hr, "Failed to load file: %ls, too large.", wzSrcPath);
         }
     }
 
@@ -932,7 +947,7 @@ extern "C" HRESULT DAPI FileReadPartialEx(
         }
 
         LPVOID pv = MemReAlloc(*ppbDest, cbData, TRUE);
-        ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to re-allocate memory to read in file: %ls", wzSrcPath);
+        FileExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to re-allocate memory to read in file: %ls", wzSrcPath);
 
         pbData = static_cast<BYTE*>(pv);
     }
@@ -945,7 +960,7 @@ extern "C" HRESULT DAPI FileReadPartialEx(
         }
 
         pbData = static_cast<BYTE*>(MemAlloc(cbData, TRUE));
-        ExitOnNull(pbData, hr, E_OUTOFMEMORY, "Failed to allocate memory to read in file: %ls", wzSrcPath);
+        FileExitOnNull(pbData, hr, E_OUTOFMEMORY, "Failed to allocate memory to read in file: %ls", wzSrcPath);
     }
 
     DWORD cbTotalRead = 0;
@@ -954,11 +969,11 @@ extern "C" HRESULT DAPI FileReadPartialEx(
     {
         DWORD cbRemaining = 0;
         hr = ::ULongSub(cbData, cbTotalRead, &cbRemaining);
-        ExitOnFailure(hr, "Underflow calculating remaining buffer size.");
+        FileExitOnFailure(hr, "Underflow calculating remaining buffer size.");
 
         if (!::ReadFile(hFile, pbData + cbTotalRead, cbRemaining, &cbRead, NULL))
         {
-            ExitWithLastError(hr, "Failed to read from file: %ls", wzSrcPath);
+            FileExitWithLastError(hr, "Failed to read from file: %ls", wzSrcPath);
         }
 
         cbTotalRead += cbRead;
@@ -967,7 +982,7 @@ extern "C" HRESULT DAPI FileReadPartialEx(
     if (cbTotalRead != cbData)
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Failed to completely read file: %ls", wzSrcPath);
+        FileExitOnFailure(hr, "Failed to completely read file: %ls", wzSrcPath);
     }
 
     *ppbDest = pbData;
@@ -999,10 +1014,10 @@ extern "C" HRESULT DAPI FileWrite(
 
     // Open the file
     hFile = ::CreateFileW(pwzFileName, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, dwFlagsAndAttributes, NULL);
-    ExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file: %ls", pwzFileName);
+    FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file: %ls", pwzFileName);
 
     hr = FileWriteHandle(hFile, pbData, cbData);
-    ExitOnFailure(hr, "Failed to write to file: %ls", pwzFileName);
+    FileExitOnFailure(hr, "Failed to write to file: %ls", pwzFileName);
 
     if (pHandle)
     {
@@ -1036,7 +1051,7 @@ extern "C" HRESULT DAPI FileWriteHandle(
     {
         if (!::WriteFile(hFile, pbData + cbTotal, (DWORD)(cbData - cbTotal), &cbDataWritten, NULL))
         {
-            ExitOnLastError(hr, "Failed to write data to file handle.");
+            FileExitOnLastError(hr, "Failed to write data to file handle.");
         }
 
         cbTotal += cbDataWritten;
@@ -1068,13 +1083,13 @@ extern "C" HRESULT DAPI FileCopyUsingHandles(
         cbRead = static_cast<DWORD>((0 == cbCopy) ? countof(rgbData) : min(countof(rgbData), cbCopy - cbTotalCopied));
         if (!::ReadFile(hSource, rgbData, cbRead, &cbRead, NULL))
         {
-            ExitWithLastError(hr, "Failed to read from source.");
+            FileExitWithLastError(hr, "Failed to read from source.");
         }
 
         if (cbRead)
         {
             hr = FileWriteHandle(hTarget, rgbData, cbRead);
-            ExitOnFailure(hr, "Failed to write to target.");
+            FileExitOnFailure(hr, "Failed to write to target.");
         }
 
         cbTotalCopied += cbRead;
@@ -1095,8 +1110,8 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileEnsureCopy(
-    __in LPCWSTR wzSource,
-    __in LPCWSTR wzTarget,
+    __in_z LPCWSTR wzSource,
+    __in_z LPCWSTR wzTarget,
     __in BOOL fOverwrite
     )
 {
@@ -1132,12 +1147,12 @@ extern "C" HRESULT DAPI FileEnsureCopy(
             *pwzLastSlash = L'\0'; // null terminate
             hr = DirEnsureExists(wzTarget, NULL);
             *pwzLastSlash = L'\\'; // now put the slash back
-            ExitOnFailureDebugTrace(hr, "failed to create directory while copying file: '%ls' to: '%ls'", wzSource, wzTarget);
+            FileExitOnFailureDebugTrace(hr, "failed to create directory while copying file: '%ls' to: '%ls'", wzSource, wzTarget);
 
             // try to copy again
             if (!::CopyFileW(wzSource, wzTarget, fOverwrite))
             {
-                ExitOnLastErrorDebugTrace(hr, "failed to copy file: '%ls' to: '%ls'", wzSource, wzTarget);
+                FileExitOnLastErrorDebugTrace(hr, "failed to copy file: '%ls' to: '%ls'", wzSource, wzTarget);
             }
         }
         else // no path was specified so just return the error
@@ -1186,7 +1201,7 @@ extern "C" HRESULT DAPI FileEnsureCopyWithRetry(
             break; // no reason to retry these errors.
         }
     }
-    ExitOnFailure(hr, "Failed to copy file: '%ls' to: '%ls' after %u retries.", wzSource, wzTarget, i);
+    FileExitOnFailure(hr, "Failed to copy file: '%ls' to: '%ls' after %u retries.", wzSource, wzTarget, i);
 
 LExit:
     return hr;
@@ -1198,8 +1213,8 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileEnsureMove(
-    __in LPCWSTR wzSource,
-    __in LPCWSTR wzTarget,
+    __in_z LPCWSTR wzSource,
+    __in_z LPCWSTR wzTarget,
     __in BOOL fOverwrite,
     __in BOOL fAllowCopy
     )
@@ -1260,12 +1275,12 @@ extern "C" HRESULT DAPI FileEnsureMove(
             *pwzLastSlash = L'\0'; // null terminate
             hr = DirEnsureExists(wzTarget, NULL);
             *pwzLastSlash = L'\\'; // now put the slash back
-            ExitOnFailureDebugTrace(hr, "failed to create directory while moving file: '%ls' to: '%ls'", wzSource, wzTarget);
+            FileExitOnFailureDebugTrace(hr, "failed to create directory while moving file: '%ls' to: '%ls'", wzSource, wzTarget);
 
             // try to move again
             if (!::MoveFileExW(wzSource, wzTarget, dwFlags))
             {
-                ExitOnLastErrorDebugTrace(hr, "failed to move file: '%ls' to: '%ls'", wzSource, wzTarget);
+                FileExitOnLastErrorDebugTrace(hr, "failed to move file: '%ls' to: '%ls'", wzSource, wzTarget);
             }
         }
         else // no path was specified so just return the error
@@ -1310,7 +1325,7 @@ extern "C" HRESULT DAPI FileEnsureMoveWithRetry(
 
         hr = FileEnsureMove(wzSource, wzTarget, fOverwrite, fAllowCopy);
     }
-    ExitOnFailure(hr, "Failed to move file: '%ls' to: '%ls' after %u retries.", wzSource, wzTarget, i);
+    FileExitOnFailure(hr, "Failed to move file: '%ls' to: '%ls' after %u retries.", wzSource, wzTarget, i);
 
 LExit:
     return hr;
@@ -1323,8 +1338,8 @@ LExit:
  NOTE: uses ANSI functions internally so it is Win9x safe
 ********************************************************************/
 extern "C" HRESULT DAPI FileCreateTemp(
-    __in LPCWSTR wzPrefix,
-    __in LPCWSTR wzExtension,
+    __in_z LPCWSTR wzPrefix,
+    __in_z LPCWSTR wzExtension,
     __deref_opt_out_z LPWSTR* ppwzTempFile,
     __out_opt HANDLE* phTempFile
     )
@@ -1340,13 +1355,13 @@ extern "C" HRESULT DAPI FileCreateTemp(
     int i = 0;
 
     hr = StrAnsiAlloc(&pszTempPath, cchTempPath);
-    ExitOnFailure(hr, "failed to allocate memory for the temp path");
+    FileExitOnFailure(hr, "failed to allocate memory for the temp path");
     ::GetTempPathA(cchTempPath, pszTempPath);
 
     for (i = 0; i < 1000 && INVALID_HANDLE_VALUE == hTempFile; ++i)
     {
         hr = StrAnsiAllocFormatted(&pszTempFile, "%s%ls%05d.%ls", pszTempPath, wzPrefix, i, wzExtension);
-        ExitOnFailure(hr, "failed to allocate memory for log file");
+        FileExitOnFailure(hr, "failed to allocate memory for log file");
 
         hTempFile = ::CreateFileA(pszTempFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == hTempFile)
@@ -1358,7 +1373,7 @@ extern "C" HRESULT DAPI FileCreateTemp(
                 hr = S_OK;
                 continue;
             }
-            ExitOnFailureDebugTrace(hr, "failed to create file: %ls", pszTempFile);
+            FileExitOnFailureDebugTrace(hr, "failed to create file: %hs", pszTempFile);
         }
     }
 
@@ -1387,8 +1402,8 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileCreateTempW(
-    __in LPCWSTR wzPrefix,
-    __in LPCWSTR wzExtension,
+    __in_z LPCWSTR wzPrefix,
+    __in_z LPCWSTR wzExtension,
     __deref_opt_out_z LPWSTR* ppwzTempFile,
     __out_opt HANDLE* phTempFile
     )
@@ -1405,13 +1420,13 @@ extern "C" HRESULT DAPI FileCreateTempW(
 
     if (!::GetTempPathW(cchTempPath, wzTempPath))
     {
-        ExitOnLastError(hr, "failed to get temp path");
+        FileExitOnLastError(hr, "failed to get temp path");
     }
 
     for (i = 0; i < 1000 && INVALID_HANDLE_VALUE == hTempFile; ++i)
     {
         hr = StrAllocFormatted(&pwzTempFile, L"%s%s%05d.%s", wzTempPath, wzPrefix, i, wzExtension);
-        ExitOnFailure(hr, "failed to allocate memory for temp filename");
+        FileExitOnFailure(hr, "failed to allocate memory for temp filename");
 
         hTempFile = ::CreateFileW(pwzTempFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == hTempFile)
@@ -1423,7 +1438,7 @@ extern "C" HRESULT DAPI FileCreateTempW(
                 hr = S_OK;
                 continue;
             }
-            ExitOnFailureDebugTrace(hr, "failed to create file: %ls", pwzTempFile);
+            FileExitOnFailureDebugTrace(hr, "failed to create file: %ls", pwzTempFile);
         }
     }
 
@@ -1452,8 +1467,8 @@ LExit:
 
 ********************************************************************/
 extern "C" HRESULT DAPI FileIsSame(
-    __in LPCWSTR wzFile1,
-    __in LPCWSTR wzFile2,
+    __in_z LPCWSTR wzFile1,
+    __in_z LPCWSTR wzFile2,
     __out LPBOOL lpfSameFile
     )
 {
@@ -1464,19 +1479,19 @@ extern "C" HRESULT DAPI FileIsSame(
     BY_HANDLE_FILE_INFORMATION fileInfo2 = { };
 
     hFile1 = ::CreateFileW(wzFile1, FILE_READ_ATTRIBUTES, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    ExitOnInvalidHandleWithLastError(hFile1, hr, "Failed to open file 1. File = '%ls'", wzFile1);
+    FileExitOnInvalidHandleWithLastError(hFile1, hr, "Failed to open file 1. File = '%ls'", wzFile1);
 
     hFile2 = ::CreateFileW(wzFile2, FILE_READ_ATTRIBUTES, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    ExitOnInvalidHandleWithLastError(hFile2, hr, "Failed to open file 2. File = '%ls'", wzFile2);
+    FileExitOnInvalidHandleWithLastError(hFile2, hr, "Failed to open file 2. File = '%ls'", wzFile2);
 
     if (!::GetFileInformationByHandle(hFile1, &fileInfo1))
     {
-        ExitWithLastError(hr, "Failed to get information for file 1. File = '%ls'", wzFile1);
+        FileExitWithLastError(hr, "Failed to get information for file 1. File = '%ls'", wzFile1);
     }
 
     if (!::GetFileInformationByHandle(hFile2, &fileInfo2))
     {
-        ExitWithLastError(hr, "Failed to get information for file 2. File = '%ls'", wzFile2);
+        FileExitWithLastError(hr, "Failed to get information for file 2. File = '%ls'", wzFile2);
     }
 
     *lpfSameFile = fileInfo1.dwVolumeSerialNumber == fileInfo2.dwVolumeSerialNumber &&
@@ -1495,7 +1510,7 @@ LExit:
     hidden, or system attributes if necessary.
 ********************************************************************/
 extern "C" HRESULT DAPI FileEnsureDelete(
-    __in LPCWSTR wzFile
+    __in_z LPCWSTR wzFile
     )
 {
     HRESULT hr = S_OK;
@@ -1507,13 +1522,13 @@ extern "C" HRESULT DAPI FileEnsureDelete(
         {
             if (!::SetFileAttributesW(wzFile, FILE_ATTRIBUTE_NORMAL))
             {
-                ExitOnLastError(hr, "Failed to remove attributes from file: %ls", wzFile);
+                FileExitOnLastError(hr, "Failed to remove attributes from file: %ls", wzFile);
             }
         }
 
         if (!::DeleteFileW(wzFile))
         {
-            ExitOnLastError(hr, "Failed to delete file: %ls", wzFile);
+            FileExitOnLastError(hr, "Failed to delete file: %ls", wzFile);
         }
     }
 
@@ -1525,7 +1540,7 @@ LExit:
  FileGetTime - Gets the file time of a specified file
 ********************************************************************/
 extern "C" HRESULT DAPI FileGetTime(
-    __in LPCWSTR wzFile,
+    __in_z LPCWSTR wzFile,
     __out_opt  LPFILETIME lpCreationTime,
     __out_opt  LPFILETIME lpLastAccessTime,
     __out_opt  LPFILETIME lpLastWriteTime
@@ -1535,11 +1550,11 @@ extern "C" HRESULT DAPI FileGetTime(
     HANDLE hFile = NULL;
 
     hFile = ::CreateFileW(wzFile, FILE_READ_ATTRIBUTES, FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
-    ExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
+    FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
 
     if (!::GetFileTime(hFile, lpCreationTime, lpLastAccessTime, lpLastWriteTime))
     {
-        ExitWithLastError(hr, "Failed to get file time for file. File = '%ls'", wzFile);
+        FileExitWithLastError(hr, "Failed to get file time for file. File = '%ls'", wzFile);
     }
 
 LExit:
@@ -1551,7 +1566,7 @@ LExit:
  FileSetTime - Sets the file time of a specified file
 ********************************************************************/
 extern "C" HRESULT DAPI FileSetTime(
-    __in LPCWSTR wzFile,
+    __in_z LPCWSTR wzFile,
     __in_opt  const FILETIME *lpCreationTime,
     __in_opt  const FILETIME *lpLastAccessTime,
     __in_opt  const FILETIME *lpLastWriteTime
@@ -1561,11 +1576,11 @@ extern "C" HRESULT DAPI FileSetTime(
     HANDLE hFile = NULL;
 
     hFile = ::CreateFileW(wzFile, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
-    ExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
+    FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
 
     if (!::SetFileTime(hFile, lpCreationTime, lpLastAccessTime, lpLastWriteTime))
     {
-        ExitWithLastError(hr, "Failed to set file time for file. File = '%ls'", wzFile);
+        FileExitWithLastError(hr, "Failed to set file time for file. File = '%ls'", wzFile);
     }
 
 LExit:
@@ -1578,7 +1593,7 @@ LExit:
  creation time of the file
 ********************************************************************/
 extern "C" HRESULT DAPI FileResetTime(
-    __in LPCWSTR wzFile
+    __in_z LPCWSTR wzFile
     )
 {
     HRESULT hr = S_OK;
@@ -1586,16 +1601,16 @@ extern "C" HRESULT DAPI FileResetTime(
     FILETIME ftCreateTime;
 
     hFile = ::CreateFileW(wzFile, FILE_WRITE_ATTRIBUTES | FILE_READ_ATTRIBUTES, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    ExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
+    FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
     
     if (!::GetFileTime(hFile, &ftCreateTime, NULL, NULL))
     {
-        ExitWithLastError(hr, "Failed to get file time for file. File = '%ls'", wzFile);
+        FileExitWithLastError(hr, "Failed to get file time for file. File = '%ls'", wzFile);
     }
 
     if (!::SetFileTime(hFile, NULL, NULL, &ftCreateTime))
     {
-        ExitWithLastError(hr, "Failed to reset file time for file. File = '%ls'", wzFile);
+        FileExitWithLastError(hr, "Failed to reset file time for file. File = '%ls'", wzFile);
     }
 
 LExit:
@@ -1609,7 +1624,7 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT DAPI FileExecutableArchitecture(
-    __in LPCWSTR wzFile,
+    __in_z LPCWSTR wzFile,
     __out FILE_ARCHITECTURE *pArchitecture
     )
 {
@@ -1623,34 +1638,34 @@ extern "C" HRESULT DAPI FileExecutableArchitecture(
     hFile = ::CreateFileW(wzFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        ExitWithLastError(hr, "Failed to open file: %ls", wzFile);
+        FileExitWithLastError(hr, "Failed to open file: %ls", wzFile);
     }
 
     if (!::ReadFile(hFile, &DosImageHeader, sizeof(DosImageHeader), &cbRead, NULL))
     {
-        ExitWithLastError(hr, "Failed to read DOS header from file: %ls", wzFile);
+        FileExitWithLastError(hr, "Failed to read DOS header from file: %ls", wzFile);
     }
 
     if (DosImageHeader.e_magic != IMAGE_DOS_SIGNATURE)
     {
         hr = HRESULT_FROM_WIN32(ERROR_BAD_FORMAT);
-        ExitOnRootFailure(hr, "Read invalid DOS header from file: %ls", wzFile);
+        FileExitOnRootFailure(hr, "Read invalid DOS header from file: %ls", wzFile);
     }
 
     if (INVALID_SET_FILE_POINTER == ::SetFilePointer(hFile, DosImageHeader.e_lfanew, NULL, FILE_BEGIN))
     {
-        ExitWithLastError(hr, "Failed to seek the NT header in file: %ls", wzFile);
+        FileExitWithLastError(hr, "Failed to seek the NT header in file: %ls", wzFile);
     }
 
     if (!::ReadFile(hFile, &NtImageHeader, sizeof(NtImageHeader), &cbRead, NULL))
     {
-        ExitWithLastError(hr, "Failed to read NT header from file: %ls", wzFile);
+        FileExitWithLastError(hr, "Failed to read NT header from file: %ls", wzFile);
     }
 
     if (NtImageHeader.Signature != IMAGE_NT_SIGNATURE)
     {
         hr = HRESULT_FROM_WIN32(ERROR_BAD_FORMAT);
-        ExitOnRootFailure(hr, "Read invalid NT header from file: %ls", wzFile);
+        FileExitOnRootFailure(hr, "Read invalid NT header from file: %ls", wzFile);
     }
 
     if (IMAGE_SUBSYSTEM_NATIVE == NtImageHeader.OptionalHeader.Subsystem ||
@@ -1677,7 +1692,7 @@ extern "C" HRESULT DAPI FileExecutableArchitecture(
     {
         hr = HRESULT_FROM_WIN32(ERROR_BAD_FORMAT);
     }
-    ExitOnFailure(hr, "Unexpected subsystem: %d machine type: %d specified in NT header from file: %ls", NtImageHeader.OptionalHeader.Subsystem, NtImageHeader.FileHeader.Machine, wzFile);
+    FileExitOnFailure(hr, "Unexpected subsystem: %d machine type: %d specified in NT header from file: %ls", NtImageHeader.OptionalHeader.Subsystem, NtImageHeader.FileHeader.Machine, wzFile);
 
 LExit:
     if (hFile != INVALID_HANDLE_VALUE)
@@ -1706,7 +1721,7 @@ extern "C" HRESULT DAPI FileToString(
 
     // Check if the file is ANSI
     hr = FileRead(&pbFullFileBuffer, &cbFullFileBuffer, wzFile);
-    ExitOnFailure(hr, "Failed to read file: %ls", wzFile);
+    FileExitOnFailure(hr, "Failed to read file: %ls", wzFile);
 
     if (0 == cbFullFileBuffer)
     {
@@ -1723,7 +1738,7 @@ extern "C" HRESULT DAPI FileToString(
         }
 
         hr = StrAllocStringAnsi(&sczFileText, reinterpret_cast<LPCSTR>(pbFullFileBuffer + 3), cbFullFileBuffer - 3, CP_UTF8);
-        ExitOnFailure(hr, "Failed to convert file %ls from UTF-8 as its BOM indicated", wzFile);
+        FileExitOnFailure(hr, "Failed to convert file %ls from UTF-8 as its BOM indicated", wzFile);
 
         *psczString = sczFileText;
         sczFileText = NULL;
@@ -1737,7 +1752,7 @@ extern "C" HRESULT DAPI FileToString(
         }
 
         hr = StrAllocString(psczString, reinterpret_cast<LPWSTR>(pbFullFileBuffer + 2), (cbFullFileBuffer - 2) / sizeof(WCHAR));
-        ExitOnFailure(hr, "Failed to allocate copy of string");
+        FileExitOnFailure(hr, "Failed to allocate copy of string");
     }
     // No BOM, let's try to detect
     else
@@ -1763,7 +1778,7 @@ extern "C" HRESULT DAPI FileToString(
             {
                 if (E_OUTOFMEMORY == hr)
                 {
-                    ExitOnFailure(hr, "Failed to convert file %ls from UTF-8", wzFile);
+                    FileExitOnFailure(hr, "Failed to convert file %ls from UTF-8", wzFile);
                 }
             }
             else
@@ -1780,7 +1795,7 @@ extern "C" HRESULT DAPI FileToString(
             }
 
             hr = StrAllocString(psczString, reinterpret_cast<LPWSTR>(pbFullFileBuffer), cbFullFileBuffer / sizeof(WCHAR));
-            ExitOnFailure(hr, "Failed to allocate copy of string");
+            FileExitOnFailure(hr, "Failed to allocate copy of string");
         }
     }
 
@@ -1813,20 +1828,20 @@ extern "C" HRESULT DAPI FileFromString(
     {
     case FILE_ENCODING_UTF8:
         hr = StrAnsiAllocString(&sczUtf8String, sczString, 0, CP_UTF8);
-        ExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
+        FileExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
         
         cbFullFileBuffer = lstrlenA(sczUtf8String);
         pcbFullFileBuffer = reinterpret_cast<BYTE *>(sczUtf8String);
         break;
     case FILE_ENCODING_UTF8_WITH_BOM:
         hr = StrAnsiAllocString(&sczUtf8String, sczString, 0, CP_UTF8);
-        ExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
+        FileExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
         
         cbStrLen = lstrlenA(sczUtf8String);
         cbFullFileBuffer = sizeof(UTF8BOM) + cbStrLen;
 
         pbFullFileBuffer = reinterpret_cast<BYTE *>(MemAlloc(cbFullFileBuffer, TRUE));
-        ExitOnNull(pbFullFileBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for output file buffer");
+        FileExitOnNull(pbFullFileBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for output file buffer");
 
         memcpy_s(pbFullFileBuffer, sizeof(UTF8BOM), UTF8BOM, sizeof(UTF8BOM));
         memcpy_s(pbFullFileBuffer + sizeof(UTF8BOM), cbStrLen, sczUtf8String, cbStrLen);
@@ -1841,7 +1856,7 @@ extern "C" HRESULT DAPI FileFromString(
         cbFullFileBuffer = sizeof(UTF16BOM) + cbStrLen;
 
         pbFullFileBuffer = reinterpret_cast<BYTE *>(MemAlloc(cbFullFileBuffer, TRUE));
-        ExitOnNull(pbFullFileBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for output file buffer");
+        FileExitOnNull(pbFullFileBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for output file buffer");
 
         memcpy_s(pbFullFileBuffer, sizeof(UTF16BOM), UTF16BOM, sizeof(UTF16BOM));
         memcpy_s(pbFullFileBuffer + sizeof(UTF16BOM), cbStrLen, sczString, cbStrLen);
@@ -1850,7 +1865,7 @@ extern "C" HRESULT DAPI FileFromString(
     }
 
     hr = FileWrite(wzFile, dwFlagsAndAttributes, pcbFullFileBuffer, cbFullFileBuffer, NULL);
-    ExitOnFailure(hr, "Failed to write file from string to: %ls", wzFile);
+    FileExitOnFailure(hr, "Failed to write file from string to: %ls", wzFile);
 
 LExit:
     ReleaseStr(sczUtf8String);

@@ -2,6 +2,20 @@
 
 #include "precomp.h"
 
+// Exit macros
+#define AclExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_ACLUTIL, x, s, __VA_ARGS__)
+#define AclExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_ACLUTIL, p, x, e, s, __VA_ARGS__)
+#define AclExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_ACLUTIL, p, x, s, __VA_ARGS__)
+#define AclExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_ACLUTIL, p, x, e, s, __VA_ARGS__)
+#define AclExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_ACLUTIL, p, x, s, __VA_ARGS__)
+#define AclExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_ACLUTIL, e, x, s, __VA_ARGS__)
+#define AclExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_ACLUTIL, g, x, s, __VA_ARGS__)
+
 /********************************************************************
 AclCalculateServiceSidString - gets the SID string for the given service name
 
@@ -26,17 +40,17 @@ extern "C" HRESULT DAPI AclCalculateServiceSidString(
     if (0 == cchServiceName)
     {
         hr = ::StringCchLengthW(wzServiceName, INT_MAX, reinterpret_cast<size_t*>(&cchServiceName));
-        ExitOnFailure(hr, "Failed to get the length of the service name.");
+        AclExitOnFailure(hr, "Failed to get the length of the service name.");
     }
 
     hr = StrAllocStringToUpperInvariant(&sczUpperServiceName, wzServiceName, cchServiceName);
-    ExitOnFailure(hr, "Failed to upper case the service name.");
+    AclExitOnFailure(hr, "Failed to upper case the service name.");
 
     pbHash = reinterpret_cast<BYTE*>(MemAlloc(cbHash, TRUE));
-    ExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to allocate hash byte array.");
+    AclExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to allocate hash byte array.");
 
     hr = CrypHashBuffer(reinterpret_cast<BYTE*>(sczUpperServiceName), cchServiceName * 2, PROV_RSA_FULL, CALG_SHA1, pbHash, cbHash);
-    ExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to hash the service name.");
+    AclExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to hash the service name.");
 
     hr = StrAllocFormatted(psczSid, L"S-1-5-80-%u-%u-%u-%u-%u",
                            MAKEDWORD(MAKEWORD(pbHash[0], pbHash[1]), MAKEWORD(pbHash[2], pbHash[3])),
@@ -80,7 +94,7 @@ extern "C" HRESULT DAPI AclGetAccountSidStringEx(
 
         if (!::ConvertSidToStringSidW(psid, &pwz))
         {
-            ExitWithLastError(hr, "Failed to convert SID to string for Account: %ls", wzAccount);
+            AclExitWithLastError(hr, "Failed to convert SID to string for Account: %ls", wzAccount);
         }
 
         hr = StrAllocString(psczSid, pwz, 0);
@@ -90,20 +104,20 @@ extern "C" HRESULT DAPI AclGetAccountSidStringEx(
         if (HRESULT_FROM_WIN32(ERROR_NONE_MAPPED) == hr)
         {
             HRESULT hrLength = ::StringCchLengthW(wzAccount, INT_MAX, reinterpret_cast<size_t*>(&cchAccount));
-            ExitOnFailure(hrLength, "Failed to get the length of the account name.");
+            AclExitOnFailure(hrLength, "Failed to get the length of the account name.");
 
             if (11 < cchAccount && CSTR_EQUAL == CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, L"NT SERVICE\\", 11, wzAccount, 11))
             {
                 // If the service is not installed then LookupAccountName doesn't resolve the SID, but we can calculate it.
                 LPCWSTR wzServiceName = &wzAccount[11];
                 hr = AclCalculateServiceSidString(wzServiceName, cchAccount - 11, &sczSid);
-                ExitOnFailure(hr, "Failed to calculate the service SID for %ls", wzServiceName);
+                AclExitOnFailure(hr, "Failed to calculate the service SID for %ls", wzServiceName);
 
                 *psczSid = sczSid;
                 sczSid = NULL;
             }
         }
-        ExitOnFailure(hr, "Failed to get SID for account: %ls", wzAccount);
+        AclExitOnFailure(hr, "Failed to get SID for account: %ls", wzAccount);
     }
 
 LExit:

@@ -9,6 +9,21 @@
 #include "metautil.h"
 
 
+// Exit macros
+#define MetaExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_METAUTIL, x, s, __VA_ARGS__)
+#define MetaExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_METAUTIL, p, x, e, s, __VA_ARGS__)
+#define MetaExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_METAUTIL, p, x, s, __VA_ARGS__)
+#define MetaExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_METAUTIL, p, x, e, s, __VA_ARGS__)
+#define MetaExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_METAUTIL, p, x, s, __VA_ARGS__)
+#define MetaExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_METAUTIL, e, x, s, __VA_ARGS__)
+#define MetaExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_METAUTIL, g, x, s, __VA_ARGS__)
+
+
 // prototypes
 static void Sort(
     __in_ecount(cArray) DWORD dwArray[], 
@@ -75,7 +90,7 @@ extern "C" HRESULT DAPI MetaFindWebBase(
             hr = S_FALSE;  // didn't find anything, try next one
             continue;
         }
-        ExitOnFailure(hr, "failed to get key from metabase while searching for web servers");
+        MetaExitOnFailure(hr, "failed to get key from metabase while searching for web servers");
 
         // if we have an IIsWebServer store the key
         if (0 == lstrcmpW(L"IIsWebServer", (LPCWSTR)mr.pbMDData))
@@ -83,7 +98,7 @@ extern "C" HRESULT DAPI MetaFindWebBase(
             hr = MetaGetValue(piMetabase, METADATA_MASTER_ROOT_HANDLE, wzKey, &mrAddress);
             if (MD_ERROR_DATA_NOT_FOUND == hr)
                 hr = S_FALSE;
-            ExitOnFailure(hr, "failed to get address from metabase while searching for web servers");
+            MetaExitOnFailure(hr, "failed to get address from metabase while searching for web servers");
 
             // break down the first address into parts
             pwzIPExists = reinterpret_cast<LPWSTR>(mrAddress.pbMDData);
@@ -111,7 +126,7 @@ extern "C" HRESULT DAPI MetaFindWebBase(
             {
                 // if the passed in buffer wasn't big enough
                 hr = ::StringCchCopyW(wzWebBase, cchWebBase, wzKey);
-                ExitOnFailure(hr, "failed to copy in web base: %ls", wzKey);
+                MetaExitOnFailure(hr, "failed to copy in web base: %ls", wzKey);
 
                 fFound = TRUE;
                 break;
@@ -182,7 +197,7 @@ extern "C" HRESULT DAPI MetaFindFreeWebBase(
             hr = S_FALSE;  // didn't find anything, try next one
             continue;
         }
-        ExitOnFailure(hr, "failed to get key from metabase while searching for free web root");
+        MetaExitOnFailure(hr, "failed to get key from metabase while searching for free web root");
 
         // if we have a IIsWebServer get the address information
         if (0 == lstrcmpW(L"IIsWebServer", reinterpret_cast<LPCWSTR>(mr.pbMDData)))
@@ -190,7 +205,7 @@ extern "C" HRESULT DAPI MetaFindFreeWebBase(
             if (cSubKeys >= countof(dwSubKeys))
             {
                 hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-                ExitOnFailure(hr, "Insufficient buffer to track all sub-WebSites");
+                MetaExitOnFailure(hr, "Insufficient buffer to track all sub-WebSites");
             }
 
             dwSubKeys[cSubKeys] = wcstol(wzSubkey, NULL, 10);
@@ -201,7 +216,7 @@ extern "C" HRESULT DAPI MetaFindFreeWebBase(
 
     if (E_NOMOREITEMS == hr)
         hr = S_OK;
-    ExitOnFailure(hr, "failed to find free web root");
+    MetaExitOnFailure(hr, "failed to find free web root");
 
     // find the lowest free web root
     dwKey  = 1;
@@ -270,18 +285,18 @@ extern "C" HRESULT DAPI MetaGetValue(
     if (!piMetabase)
     {
         hr = ::CoInitialize(NULL);
-        ExitOnFailure(hr, "failed to initialize COM");
+        MetaExitOnFailure(hr, "failed to initialize COM");
         fInitialized = TRUE;
 
         hr = ::CoCreateInstance(CLSID_MSAdminBase, NULL, CLSCTX_ALL, IID_IMSAdminBase, reinterpret_cast<LPVOID*>(&piMetabase)); 
-        ExitOnFailure(hr, "failed to get IID_IMSAdminBaseW object");
+        MetaExitOnFailure(hr, "failed to get IID_IMSAdminBaseW object");
     }
 
     if (!pmr->pbMDData)
     {
         pmr->dwMDDataLen = 256;
         pmr->pbMDData = static_cast<BYTE*>(MemAlloc(pmr->dwMDDataLen, TRUE));
-        ExitOnNull(pmr->pbMDData, hr, E_OUTOFMEMORY, "failed to allocate memory for metabase value");
+        MetaExitOnNull(pmr->pbMDData, hr, E_OUTOFMEMORY, "failed to allocate memory for metabase value");
     }
     else  // set the size of the data to the actual size of the memory
         pmr->dwMDDataLen = (DWORD)MemSize(pmr->pbMDData);
@@ -291,12 +306,12 @@ extern "C" HRESULT DAPI MetaGetValue(
     {
         pmr->dwMDDataLen = cbRequired;
         BYTE* pb = static_cast<BYTE*>(MemReAlloc(pmr->pbMDData, pmr->dwMDDataLen, TRUE));
-        ExitOnNull(pb, hr, E_OUTOFMEMORY, "failed to reallocate memory for metabase value");
+        MetaExitOnNull(pb, hr, E_OUTOFMEMORY, "failed to reallocate memory for metabase value");
 
         pmr->pbMDData = pb;
         hr = piMetabase->GetData(mhKey, wzKey, pmr, &cbRequired);
     }
-    ExitOnFailure(hr, "failed to get metabase data");
+    MetaExitOnFailure(hr, "failed to get metabase data");
 
 LExit:
     if (fInitialized)

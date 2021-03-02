@@ -55,7 +55,7 @@ HRESULT DAPI IniParse(
 // (their value will be NULL)
 HRESULT DAPI IniGetValueList(
     __in_bcount(INI_HANDLE_BYTES) INI_HANDLE piHandle,
-    __deref_out_ecount_opt(pcValues) INI_VALUE** prgivValues,
+    __deref_out_ecount_opt(*pcValues) INI_VALUE** prgivValues,
     __out DWORD *pcValues
     );
 HRESULT DAPI IniGetValue(

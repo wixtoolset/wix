@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define CertExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_CERTUTIL, x, s, __VA_ARGS__)
+#define CertExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_CERTUTIL, p, x, e, s, __VA_ARGS__)
+#define CertExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_CERTUTIL, p, x, s, __VA_ARGS__)
+#define CertExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_CERTUTIL, p, x, e, s, __VA_ARGS__)
+#define CertExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_CERTUTIL, p, x, s, __VA_ARGS__)
+#define CertExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_CERTUTIL, e, x, s, __VA_ARGS__)
+#define CertExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_CERTUTIL, g, x, s, __VA_ARGS__)
+
 /********************************************************************
 CertReadProperty - reads a property from the certificate.
 
@@ -20,15 +35,15 @@ extern "C" HRESULT DAPI CertReadProperty(
 
     if (!::CertGetCertificateContextProperty(pCertContext, dwProperty, NULL, &cb))
     {
-        ExitWithLastError(hr, "Failed to get size of certificate property.");
+        CertExitWithLastError(hr, "Failed to get size of certificate property.");
     }
 
     pv = MemAlloc(cb, TRUE);
-    ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for certificate property.");
+    CertExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for certificate property.");
 
     if (!::CertGetCertificateContextProperty(pCertContext, dwProperty, pv, &cb))
     {
-        ExitWithLastError(hr, "Failed to get certificate property.");
+        CertExitWithLastError(hr, "Failed to get certificate property.");
     }
 
     *ppvValue = pv;
@@ -70,11 +85,11 @@ extern "C" HRESULT DAPI CertGetAuthenticodeSigningTimestamp(
     if (!pBlob)
     {
         hr = TRUST_E_FAIL;
-        ExitOnFailure(hr, "Failed to find countersigner in signer information.");
+        CertExitOnFailure(hr, "Failed to find countersigner in signer information.");
     }
 
     hr = CrypDecodeObject(PKCS7_SIGNER_INFO, pBlob->pbData, pBlob->cbData, 0, reinterpret_cast<LPVOID*>(&pCounterSignerInfo), NULL);
-    ExitOnFailure(hr, "Failed to decode countersigner information.");
+    CertExitOnFailure(hr, "Failed to decode countersigner information.");
 
     pBlob = NULL; // reset the blob before searching for the signing time.
 
@@ -91,12 +106,12 @@ extern "C" HRESULT DAPI CertGetAuthenticodeSigningTimestamp(
     if (!pBlob)
     {
         hr = TRUST_E_FAIL;
-        ExitOnFailure(hr, "Failed to find signing time in countersigner information.");
+        CertExitOnFailure(hr, "Failed to find signing time in countersigner information.");
     }
 
     if (!::CryptDecodeObject(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, szOID_RSA_signingTime, pBlob->pbData, pBlob->cbData, 0, pftSigningTimestamp, &cbSigningTimestamp))
     {
-        ExitWithLastError(hr, "Failed to decode countersigner signing timestamp.");
+        CertExitWithLastError(hr, "Failed to decode countersigner signing timestamp.");
     }
 
 LExit:
@@ -124,10 +139,10 @@ extern "C" HRESULT DAPI GetCryptProvFromCert(
     GETCRYPTPROVFROMCERTPTR pGetCryptProvFromCert = NULL;
 
     hr = LoadSystemLibrary(L"MsSign32.dll", &hMsSign32);
-    ExitOnFailure(hr, "Failed to get handle to MsSign32.dll");
+    CertExitOnFailure(hr, "Failed to get handle to MsSign32.dll");
 
     pGetCryptProvFromCert = (GETCRYPTPROVFROMCERTPTR)::GetProcAddress(hMsSign32, "GetCryptProvFromCert");
-    ExitOnNullWithLastError(hMsSign32, hr, "Failed to get handle to MsSign32.dll");
+    CertExitOnNullWithLastError(hMsSign32, hr, "Failed to get handle to MsSign32.dll");
 
     if (!pGetCryptProvFromCert(hwnd,
                                pCert,
@@ -138,7 +153,7 @@ extern "C" HRESULT DAPI GetCryptProvFromCert(
                                ppwszProviderName,
                                pdwProviderType))
     {
-        ExitWithLastError(hr, "Failed to get CSP from cert.");
+        CertExitWithLastError(hr, "Failed to get CSP from cert.");
     }
 LExit:
     return hr;
@@ -159,10 +174,10 @@ extern "C" HRESULT DAPI FreeCryptProvFromCert(
     FREECRYPTPROVFROMCERT pFreeCryptProvFromCert = NULL;
 
     hr = LoadSystemLibrary(L"MsSign32.dll", &hMsSign32);
-    ExitOnFailure(hr, "Failed to get handle to MsSign32.dll");
+    CertExitOnFailure(hr, "Failed to get handle to MsSign32.dll");
 
     pFreeCryptProvFromCert = (FREECRYPTPROVFROMCERT)::GetProcAddress(hMsSign32, "FreeCryptProvFromCert");
-    ExitOnNullWithLastError(hMsSign32, hr, "Failed to get handle to MsSign32.dll");
+    CertExitOnNullWithLastError(hMsSign32, hr, "Failed to get handle to MsSign32.dll");
 
     pFreeCryptProvFromCert(fAcquired, hProv, pwszCapiProvider, dwProviderType, pwszTmpContainer);
 LExit:
@@ -185,12 +200,12 @@ extern "C" HRESULT DAPI GetProvSecurityDesc(
                              &ulSize,
                              DACL_SECURITY_INFORMATION))
     {
-        ExitWithLastError(hr, "Error getting security descriptor size for CSP.");
+        CertExitWithLastError(hr, "Error getting security descriptor size for CSP.");
     }
 
     // Allocate the memory for the security descriptor.
     pSecurity = static_cast<SECURITY_DESCRIPTOR *>(MemAlloc(ulSize, TRUE));
-    ExitOnNullWithLastError(pSecurity, hr, "Error allocating memory for CSP DACL");
+    CertExitOnNullWithLastError(pSecurity, hr, "Error allocating memory for CSP DACL");
 
     // Get the security descriptor.
     if (!::CryptGetProvParam(
@@ -201,7 +216,7 @@ extern "C" HRESULT DAPI GetProvSecurityDesc(
                              DACL_SECURITY_INFORMATION))
     {
         MemFree(pSecurity);
-        ExitWithLastError(hr, "Error getting security descriptor for CSP.");
+        CertExitWithLastError(hr, "Error getting security descriptor for CSP.");
     }
     *ppSecurity = pSecurity;
 
@@ -223,7 +238,7 @@ extern "C" HRESULT DAPI SetProvSecurityDesc(
                             (BYTE*)pSecurity,
                             DACL_SECURITY_INFORMATION))
     {
-        ExitWithLastError(hr, "Error setting security descriptor for CSP.");
+        CertExitWithLastError(hr, "Error setting security descriptor for CSP.");
     }
 LExit:
     return hr;
@@ -278,12 +293,12 @@ extern "C" HRESULT DAPI CertInstallSingleCertificate(
 
     if (!::CertSetCertificateContextProperty(pCertContext, CERT_FRIENDLY_NAME_PROP_ID, 0, &blob))
     {
-        ExitWithLastError(hr, "Failed to set the friendly name of the certificate: %ls", wzName);
+        CertExitWithLastError(hr, "Failed to set the friendly name of the certificate: %ls", wzName);
     }
 
     if (!::CertAddCertificateContextToStore(hStore, pCertContext, CERT_STORE_ADD_REPLACE_EXISTING, NULL))
     {
-        ExitWithLastError(hr, "Failed to add certificate to the store.");
+        CertExitWithLastError(hr, "Failed to add certificate to the store.");
     }
 
     // if the certificate has a private key, grant Administrators access
@@ -293,16 +308,16 @@ extern "C" HRESULT DAPI CertInstallSingleCertificate(
         {
             // We added a CSP key
             hr = GetCryptProvFromCert(NULL, pCertContext, &hCsp, &dwKeySpec, &fAcquired, &pwszTmpContainer, &pwszProviderName, &dwProviderType);
-            ExitOnFailure(hr, "Failed to get handle to CSP");
+            CertExitOnFailure(hr, "Failed to get handle to CSP");
 
             hr = GetProvSecurityDesc(hCsp, &pSecurity);
-            ExitOnFailure(hr, "Failed to get security descriptor of CSP");
+            CertExitOnFailure(hr, "Failed to get security descriptor of CSP");
 
             hr = AclAddAdminToSecurityDescriptor(pSecurity, &pSecurityNew);
-            ExitOnFailure(hr, "Failed to create new security descriptor");
+            CertExitOnFailure(hr, "Failed to create new security descriptor");
 
             hr = SetProvSecurityDesc(hCsp, pSecurityNew);
-            ExitOnFailure(hr, "Failed to set Admin ACL on CSP");
+            CertExitOnFailure(hr, "Failed to set Admin ACL on CSP");
         }
 
         if (CERT_NCRYPT_KEY_SPEC == dwKeySpec)

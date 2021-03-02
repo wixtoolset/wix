@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define TimeExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_TIMEUTIL, x, s, __VA_ARGS__)
+#define TimeExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_TIMEUTIL, p, x, e, s, __VA_ARGS__)
+#define TimeExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_TIMEUTIL, p, x, s, __VA_ARGS__)
+#define TimeExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_TIMEUTIL, p, x, e, s, __VA_ARGS__)
+#define TimeExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_TIMEUTIL, p, x, s, __VA_ARGS__)
+#define TimeExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_TIMEUTIL, e, x, s, __VA_ARGS__)
+#define TimeExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_TIMEUTIL, g, x, s, __VA_ARGS__)
+
 const LPCWSTR DAY_OF_WEEK[] = { L"Sun", L"Mon", L"Tue", L"Wed", L"Thu", L"Fri", L"Sat" };
 const LPCWSTR MONTH_OF_YEAR[] = { L"None", L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec" };
 enum TIME_PARSER { DayOfWeek, DayOfMonth, MonthOfYear, Year, Hours, Minutes, Seconds, TimeZone };
@@ -39,7 +54,7 @@ extern "C" HRESULT DAPI TimeFromString(
     LPWSTR pwzEnd = NULL;
 
     hr = StrAllocString(&pwzTime, wzTime, 0);
-    ExitOnFailure(hr, "Failed to copy time.");
+    TimeExitOnFailure(hr, "Failed to copy time.");
 
     pwzStart = pwzEnd = pwzTime;
     while (pwzEnd && *pwzEnd)
@@ -58,7 +73,7 @@ extern "C" HRESULT DAPI TimeFromString(
             {
                 case DayOfWeek:
                     hr = DayFromString(pwzStart, &sysTime.wDayOfWeek);
-                    ExitOnFailure(hr, "Failed to convert string to day: %ls", pwzStart);
+                    TimeExitOnFailure(hr, "Failed to convert string to day: %ls", pwzStart);
                     break;
 
                 case DayOfMonth:
@@ -67,7 +82,7 @@ extern "C" HRESULT DAPI TimeFromString(
 
                 case MonthOfYear:
                     hr = MonthFromString(pwzStart, &sysTime.wMonth);
-                    ExitOnFailure(hr, "Failed to convert to month: %ls", pwzStart);
+                    TimeExitOnFailure(hr, "Failed to convert to month: %ls", pwzStart);
                     break;
 
                 case Year:
@@ -104,7 +119,7 @@ extern "C" HRESULT DAPI TimeFromString(
 
     if (!::SystemTimeToFileTime(&sysTime, pFileTime))
     {
-        ExitWithLastError(hr, "Failed to convert system time to file time.");
+        TimeExitWithLastError(hr, "Failed to convert system time to file time.");
     }
 
 LExit:
@@ -134,7 +149,7 @@ extern "C" HRESULT DAPI TimeFromString3339(
     LPWSTR pwzEnd = NULL;
 
     hr = StrAllocString(&pwzTime, wzTime, 0);
-    ExitOnFailure(hr, "Failed to copy time.");
+    TimeExitOnFailure(hr, "Failed to copy time.");
 
     pwzStart = pwzEnd = pwzTime;
     while (pwzEnd && *pwzEnd)
@@ -188,7 +203,7 @@ extern "C" HRESULT DAPI TimeFromString3339(
 
     if (!::SystemTimeToFileTime(&sysTime, pFileTime))
     {
-        ExitWithLastError(hr, "Failed to convert system time to file time.");
+        TimeExitWithLastError(hr, "Failed to convert system time to file time.");
     }
 
 LExit:
@@ -291,29 +306,29 @@ HRESULT DAPI TimeSystemToDateTimeString(
     iLenDate = ::GetDateFormatW(locale, 0, pst, DATE_FORMAT, NULL, 0);
     if (0 >= iLenDate)
     {
-        ExitWithLastError(hr, "Failed to get date format with NULL");
+        TimeExitWithLastError(hr, "Failed to get date format with NULL");
     }
 
     iLenTime = ::GetTimeFormatW(locale, 0, pst, TIME_FORMAT, NULL, 0);
     if (0 >= iLenTime)
     {
-        ExitWithLastError(hr, "Failed to get time format with NULL");
+        TimeExitWithLastError(hr, "Failed to get time format with NULL");
     }
 
     // Between both lengths we account for 2 null terminators, and only need one, so we subtract one
     hr = StrAlloc(ppwz, iLenDate + iLenTime - 1);
-    ExitOnFailure(hr, "Failed to allocate string");
+    TimeExitOnFailure(hr, "Failed to allocate string");
 
     if (!::GetDateFormatW(locale, 0, pst, DATE_FORMAT, *ppwz, iLenDate))
     {
-        ExitWithLastError(hr, "Failed to get date format with buffer");
+        TimeExitWithLastError(hr, "Failed to get date format with buffer");
     }
     // Space to separate them
     (*ppwz)[iLenDate - 1] = ' ';
 
     if (!::GetTimeFormatW(locale, 0, pst, TIME_FORMAT, (*ppwz) + iLenDate - 1, iLenTime))
     {
-        ExitWithLastError(hr, "Failed to get time format with buffer");
+        TimeExitWithLastError(hr, "Failed to get time format with buffer");
     }
 
 LExit:

@@ -91,7 +91,7 @@ HRESULT DAPI UriResolve(
     __in_z LPCWSTR wzUri,
     __in_opt LPCWSTR wzBaseUri,
     __out LPWSTR* ppwzResolvedUri,
-    __out_opt const URI_PROTOCOL* pResolvedProtocol
+    __out_opt URI_PROTOCOL* pResolvedProtocol
     );
 
 #ifdef __cplusplus

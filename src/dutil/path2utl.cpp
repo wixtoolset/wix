@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define PathExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PATHUTIL, p, x, e, s, __VA_ARGS__)
+#define PathExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
+#define PathExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_PATHUTIL, p, x, e, s, __VA_ARGS__)
+#define PathExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
+#define PathExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PATHUTIL, e, x, s, __VA_ARGS__)
+#define PathExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PATHUTIL, g, x, s, __VA_ARGS__)
+
+
 DAPI_(HRESULT) PathCanonicalizePath(
     __in_z LPCWSTR wzPath,
     __deref_out_z LPWSTR* psczCanonicalized
@@ -12,7 +27,7 @@ DAPI_(HRESULT) PathCanonicalizePath(
     int cch = MAX_PATH + 1;
 
     hr = StrAlloc(psczCanonicalized, cch);
-    ExitOnFailure(hr, "Failed to allocate string for the canonicalized path.");
+    PathExitOnFailure(hr, "Failed to allocate string for the canonicalized path.");
 
     if (::PathCanonicalizeW(*psczCanonicalized, wzPath))
     {
@@ -39,10 +54,10 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
     LPWSTR sczOriginalDirectory = NULL;
 
     hr = PathCanonicalizePath(wzPath, &sczOriginalPath);
-    ExitOnFailure(hr, "Failed to canonicalize the path.");
+    PathExitOnFailure(hr, "Failed to canonicalize the path.");
 
     hr = PathCanonicalizePath(wzDirectory, &sczOriginalDirectory);
-    ExitOnFailure(hr, "Failed to canonicalize the directory.");
+    PathExitOnFailure(hr, "Failed to canonicalize the directory.");
 
     if (!sczOriginalPath || !*sczOriginalPath)
     {

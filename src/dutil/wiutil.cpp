@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define WiuExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
+#define WiuExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_WIUTIL, p, x, e, s, __VA_ARGS__)
+#define WiuExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_WIUTIL, p, x, s, __VA_ARGS__)
+#define WiuExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_WIUTIL, p, x, e, s, __VA_ARGS__)
+#define WiuExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_WIUTIL, p, x, s, __VA_ARGS__)
+#define WiuExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_WIUTIL, e, x, s, __VA_ARGS__)
+#define WiuExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_WIUTIL, g, x, s, __VA_ARGS__)
+
+
 // constants
 
 const DWORD WIU_MSI_PROGRESS_INVALID = 0xFFFFFFFF;
@@ -112,8 +127,8 @@ static DWORD CalculatePhaseProgress(
     __in DWORD dwWeightPercentage
     );
 void InitializeMessageData(
-    __in MSIHANDLE hRecord,
-    __out LPWSTR** prgsczData,
+    __in_opt MSIHANDLE hRecord,
+    __deref_out_ecount(*pcData) LPWSTR** prgsczData,
     __out DWORD* pcData
     );
 void UninitializeMessageData(
@@ -133,7 +148,7 @@ extern "C" HRESULT DAPI WiuInitialize(
     LPWSTR sczMsiDllPath = NULL;
 
     hr = LoadSystemLibraryWithPath(L"Msi.dll", &vhMsiDll, &sczMsiDllPath);
-    ExitOnFailure(hr, "Failed to load Msi.DLL");
+    WiuExitOnFailure(hr, "Failed to load Msi.DLL");
 
     // Ignore failures
     FileVersion(sczMsiDllPath, &vdwMsiDllMajorMinor, &vdwMsiDllBuildRevision);
@@ -275,7 +290,7 @@ extern "C" HRESULT DAPI WiuGetComponentPath(
     DWORD cchCompare;
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for component path.");
+    WiuExitOnFailure(hr, "Failed to allocate string for component path.");
 
     cchCompare = cch;
     *pInstallState = vpfnMsiGetComponentPathW(wzProductCode, wzComponentId, *psczValue, &cch);
@@ -283,7 +298,7 @@ extern "C" HRESULT DAPI WiuGetComponentPath(
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for component path.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for component path.");
 
         cchCompare = cch;
         *pInstallState = vpfnMsiGetComponentPathW(wzProductCode, wzComponentId, *psczValue, &cch);
@@ -292,7 +307,7 @@ extern "C" HRESULT DAPI WiuGetComponentPath(
     if (INSTALLSTATE_INVALIDARG == *pInstallState)
     {
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Invalid argument when getting component path.");
+        WiuExitOnRootFailure(hr, "Invalid argument when getting component path.");
     }
     else if (INSTALLSTATE_UNKNOWN == *pInstallState)
     {
@@ -306,7 +321,7 @@ extern "C" HRESULT DAPI WiuGetComponentPath(
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for component path.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for component path.");
 
         *pInstallState = vpfnMsiGetComponentPathW(wzProductCode, wzComponentId, *psczValue, &cch);
     }
@@ -327,7 +342,7 @@ extern "C" HRESULT DAPI WiuLocateComponent(
     DWORD cchCompare;
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for component path.");
+    WiuExitOnFailure(hr, "Failed to allocate string for component path.");
 
     cchCompare = cch;
     *pInstallState = vpfnMsiLocateComponentW(wzComponentId, *psczValue, &cch);
@@ -335,7 +350,7 @@ extern "C" HRESULT DAPI WiuLocateComponent(
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for component path.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for component path.");
 
         cchCompare = cch;
         *pInstallState = vpfnMsiLocateComponentW(wzComponentId, *psczValue, &cch);
@@ -344,7 +359,7 @@ extern "C" HRESULT DAPI WiuLocateComponent(
     if (INSTALLSTATE_INVALIDARG == *pInstallState)
     {
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Invalid argument when locating component.");
+        WiuExitOnRootFailure(hr, "Invalid argument when locating component.");
     }
     else if (INSTALLSTATE_UNKNOWN == *pInstallState)
     {
@@ -358,7 +373,7 @@ extern "C" HRESULT DAPI WiuLocateComponent(
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for component path.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for component path.");
 
         *pInstallState = vpfnMsiLocateComponentW(wzComponentId, *psczValue, &cch);
     }
@@ -380,7 +395,7 @@ extern "C" HRESULT DAPI WiuQueryFeatureState(
     if (INSTALLSTATE_INVALIDARG == *pInstallState)
     {
         hr = E_INVALIDARG;
-        ExitOnRootFailure(hr, "Failed to query state of feature: %ls in product: %ls", wzFeature, wzProduct);
+        WiuExitOnRootFailure(hr, "Failed to query state of feature: %ls in product: %ls", wzFeature, wzProduct);
     }
 
 LExit:
@@ -399,18 +414,18 @@ extern "C" HRESULT DAPI WiuGetProductInfo(
     DWORD cch = WIU_GOOD_ENOUGH_PROPERTY_LENGTH;
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for product info.");
+    WiuExitOnFailure(hr, "Failed to allocate string for product info.");
 
     er = vpfnMsiGetProductInfoW(wzProductCode, wzProperty, *psczValue, &cch);
     if (ERROR_MORE_DATA == er)
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for product info.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for product info.");
 
         er = vpfnMsiGetProductInfoW(wzProductCode, wzProperty, *psczValue, &cch);
     }
-    ExitOnWin32Error(er, hr, "Failed to get product info.");
+    WiuExitOnWin32Error(er, hr, "Failed to get product info.");
 
 LExit:
     return hr;
@@ -432,24 +447,24 @@ extern "C" HRESULT DAPI WiuGetProductInfoEx(
     if (!vpfnMsiGetProductInfoExW)
     {
         hr = WiuGetProductInfo(wzProductCode, wzProperty, psczValue);
-        ExitOnFailure(hr, "Failed to get product info when extended info was not available.");
+        WiuExitOnFailure(hr, "Failed to get product info when extended info was not available.");
 
         ExitFunction();
     }
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for extended product info.");
+    WiuExitOnFailure(hr, "Failed to allocate string for extended product info.");
 
     er = vpfnMsiGetProductInfoExW(wzProductCode, wzUserSid, dwContext, wzProperty, *psczValue, &cch);
     if (ERROR_MORE_DATA == er)
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for extended product info.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for extended product info.");
 
         er = vpfnMsiGetProductInfoExW(wzProductCode, wzUserSid, dwContext, wzProperty, *psczValue, &cch);
     }
-    ExitOnWin32Error(er, hr, "Failed to get extended product info.");
+    WiuExitOnWin32Error(er, hr, "Failed to get extended product info.");
 
 LExit:
     return hr;
@@ -467,18 +482,18 @@ extern "C" HRESULT DAPI WiuGetProductProperty(
     DWORD cch = WIU_GOOD_ENOUGH_PROPERTY_LENGTH;
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for product property.");
+    WiuExitOnFailure(hr, "Failed to allocate string for product property.");
 
     er = ::MsiGetProductPropertyW(hProduct, wzProperty, *psczValue, &cch);
     if (ERROR_MORE_DATA == er)
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for product property.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for product property.");
 
         er = ::MsiGetProductPropertyW(hProduct, wzProperty, *psczValue, &cch);
     }
-    ExitOnWin32Error(er, hr, "Failed to get product property.");
+    WiuExitOnWin32Error(er, hr, "Failed to get product property.");
 
 LExit:
     return hr;
@@ -504,18 +519,18 @@ extern "C" HRESULT DAPI WiuGetPatchInfoEx(
     }
 
     hr = StrAlloc(psczValue, cch);
-    ExitOnFailure(hr, "Failed to allocate string for extended patch info.");
+    WiuExitOnFailure(hr, "Failed to allocate string for extended patch info.");
 
     er = vpfnMsiGetPatchInfoExW(wzPatchCode, wzProductCode, wzUserSid, dwContext, wzProperty, *psczValue, &cch);
     if (ERROR_MORE_DATA == er)
     {
         ++cch;
         hr = StrAlloc(psczValue, cch);
-        ExitOnFailure(hr, "Failed to reallocate string for extended patch info.");
+        WiuExitOnFailure(hr, "Failed to reallocate string for extended patch info.");
 
         er = vpfnMsiGetPatchInfoExW(wzPatchCode, wzProductCode, wzUserSid, dwContext, wzProperty, *psczValue, &cch);
     }
-    ExitOnWin32Error(er, hr, "Failed to get extended patch info.");
+    WiuExitOnWin32Error(er, hr, "Failed to get extended patch info.");
 
 LExit:
     return hr;
@@ -539,7 +554,7 @@ extern "C" HRESULT DAPI WiuDeterminePatchSequence(
     }
 
     er = vpfnMsiDeterminePatchSequenceW(wzProductCode, wzUserSid, context, cPatchInfo, pPatchInfo);
-    ExitOnWin32Error(er, hr, "Failed to determine patch sequence for product code.");
+    WiuExitOnWin32Error(er, hr, "Failed to determine patch sequence for product code.");
 
 LExit:
     return hr;
@@ -561,7 +576,7 @@ extern "C" HRESULT DAPI WiuDetermineApplicablePatches(
     }
 
     er = vpfnMsiDetermineApplicablePatchesW(wzProductPackagePath, cPatchInfo, pPatchInfo);
-    ExitOnWin32Error(er, hr, "Failed to determine applicable patches for product package.");
+    WiuExitOnWin32Error(er, hr, "Failed to determine applicable patches for product package.");
 
 LExit:
     return hr;
@@ -581,7 +596,7 @@ extern "C" HRESULT DAPI WiuEnumProducts(
     {
         ExitFunction1(hr = HRESULT_FROM_WIN32(er));
     }
-    ExitOnWin32Error(er, hr, "Failed to enumerate products.");
+    WiuExitOnWin32Error(er, hr, "Failed to enumerate products.");
 
 LExit:
     return hr;
@@ -612,7 +627,7 @@ extern "C" HRESULT DAPI WiuEnumProductsEx(
     {
         ExitFunction1(hr = HRESULT_FROM_WIN32(er));
     }
-    ExitOnWin32Error(er, hr, "Failed to enumerate products.");
+    WiuExitOnWin32Error(er, hr, "Failed to enumerate products.");
 
 LExit:
     return hr;
@@ -633,7 +648,7 @@ extern "C" HRESULT DAPI WiuEnumRelatedProducts(
     {
         ExitFunction1(hr = HRESULT_FROM_WIN32(er));
     }
-    ExitOnWin32Error(er, hr, "Failed to enumerate related products for updgrade code: %ls", wzUpgradeCode);
+    WiuExitOnWin32Error(er, hr, "Failed to enumerate related products for updgrade code: %ls", wzUpgradeCode);
 
 LExit:
     return hr;
@@ -650,7 +665,7 @@ LExit:
 ********************************************************************/
 extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
     __in_z LPCWSTR wzUpgradeCode,
-    __deref_out_ecount_opt(pcRelatedProducts) LPWSTR** prgsczProductCodes,
+    __deref_out_ecount_opt(*pcRelatedProducts) LPWSTR** prgsczProductCodes,
     __out DWORD* pcRelatedProducts,
     __in BOOL fReturnHighestVersionOnly
     )
@@ -673,16 +688,16 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
             hr = S_OK;
             break;
         }
-        ExitOnFailure(hr, "Failed to enumerate related products for upgrade code: %ls", wzUpgradeCode);
+        WiuExitOnFailure(hr, "Failed to enumerate related products for upgrade code: %ls", wzUpgradeCode);
 
         if (fReturnHighestVersionOnly)
         {
             // get the version
             hr = WiuGetProductInfo(wzCurrentProductCode, L"VersionString", &sczInstalledVersion);
-            ExitOnFailure(hr, "Failed to get version for product code: %ls", wzCurrentProductCode);
+            WiuExitOnFailure(hr, "Failed to get version for product code: %ls", wzCurrentProductCode);
 
             hr = FileVersionFromStringEx(sczInstalledVersion, 0, &qwCurrentVersion);
-            ExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for product code: %ls", sczInstalledVersion, wzCurrentProductCode);
+            WiuExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for product code: %ls", sczInstalledVersion, wzCurrentProductCode);
 
             // if this is the first product found then it is the highest version (for now)
             if (0 == *pcRelatedProducts)
@@ -698,7 +713,7 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
                     qwHighestVersion = qwCurrentVersion;
 
                     hr = StrAllocString(prgsczProductCodes[0], wzCurrentProductCode, 0);
-                    ExitOnFailure(hr, "Failed to update array with higher versioned product code.");
+                    WiuExitOnFailure(hr, "Failed to update array with higher versioned product code.");
                 }
 
                 // continue here as we don't want anything else added to the list
@@ -707,7 +722,7 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
         }
 
         hr = StrArrayAllocString(prgsczProductCodes, (LPUINT)(pcRelatedProducts), wzCurrentProductCode, 0);
-        ExitOnFailure(hr, "Failed to add product code to array.");
+        WiuExitOnFailure(hr, "Failed to add product code to array.");
     }
 
 LExit:
@@ -726,7 +741,7 @@ extern "C" HRESULT DAPI WiuEnableLog(
     DWORD er = ERROR_SUCCESS;
 
     er = vpfnMsiEnableLogW(dwLogMode, wzLogFile, dwLogAttributes);
-    ExitOnWin32Error(er, hr, "Failed to enable MSI internal logging.");
+    WiuExitOnWin32Error(er, hr, "Failed to enable MSI internal logging.");
 
 LExit:
     return hr;
@@ -780,7 +795,7 @@ extern "C" HRESULT DAPI WiuInitializeExternalUI(
 
     // Wire the internal and external UI handler.
     hr = WiuInitializeInternalUI(internalUILevel, hwndParent, pExecuteContext);
-    ExitOnFailure(hr, "Failed to set internal UI level and window.");
+    WiuExitOnFailure(hr, "Failed to set internal UI level and window.");
 
     pExecuteContext->fRollback = fRollback;
     pExecuteContext->pfnMessageHandler = pfnMessageHandler;
@@ -791,7 +806,7 @@ extern "C" HRESULT DAPI WiuInitializeExternalUI(
     if (vpfnMsiSetExternalUIRecord)
     {
         er = vpfnMsiSetExternalUIRecord(InstallEngineRecordCallback, dwMessageFilter, pExecuteContext, &pExecuteContext->pfnPreviousExternalUIRecord);
-        ExitOnWin32Error(er, hr, "Failed to wire up external UI record handler.");
+        WiuExitOnWin32Error(er, hr, "Failed to wire up external UI record handler.");
         pExecuteContext->fSetPreviousExternalUIRecord = TRUE;
     }
     else
@@ -841,7 +856,7 @@ extern "C" HRESULT DAPI WiuConfigureProductEx(
 
     er = vpfnMsiConfigureProductExW(wzProduct, iInstallLevel, eInstallState, wzCommandLine);
     er = CheckForRestartErrorCode(er, pRestart);
-    ExitOnWin32Error(er, hr, "Failed to configure product: %ls", wzProduct);
+    WiuExitOnWin32Error(er, hr, "Failed to configure product: %ls", wzProduct);
 
 LExit:
     return hr;
@@ -859,7 +874,7 @@ extern "C" HRESULT DAPI WiuInstallProduct(
 
     er = vpfnMsiInstallProductW(wzPackagePath, wzCommandLine);
     er = CheckForRestartErrorCode(er, pRestart);
-    ExitOnWin32Error(er, hr, "Failed to install product: %ls", wzPackagePath);
+    WiuExitOnWin32Error(er, hr, "Failed to install product: %ls", wzPackagePath);
 
 LExit:
     return hr;
@@ -878,7 +893,7 @@ extern "C" HRESULT DAPI WiuRemovePatches(
 
     er = vpfnMsiRemovePatchesW(wzPatchList, wzProductCode, INSTALLTYPE_SINGLE_INSTANCE, wzPropertyList);
     er = CheckForRestartErrorCode(er, pRestart);
-    ExitOnWin32Error(er, hr, "Failed to remove patches.");
+    WiuExitOnWin32Error(er, hr, "Failed to remove patches.");
 
 LExit:
     return hr;
@@ -898,7 +913,7 @@ extern "C" HRESULT DAPI WiuSourceListAddSourceEx(
     DWORD er = ERROR_SUCCESS;
 
     er = vpfnMsiSourceListAddSourceExW(wzProductCodeOrPatchCode, wzUserSid, dwContext, MSISOURCETYPE_NETWORK | dwCode, wzSource, dwIndex);
-    ExitOnWin32Error(er, hr, "Failed to add source.");
+    WiuExitOnWin32Error(er, hr, "Failed to add source.");
 
 LExit:
     return hr;
@@ -924,14 +939,14 @@ extern "C" HRESULT DAPI WiuBeginTransaction(
 
     if (!WiuIsMsiTransactionSupported())
     {
-        ExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
+        WiuExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
     }
 
     hr = WiuEnableLog(dwLogMode, szLogPath, INSTALLLOGATTRIBUTES_APPEND);
-    ExitOnFailure(hr, "Failed to enable logging for MSI transaction");
+    WiuExitOnFailure(hr, "Failed to enable logging for MSI transaction");
 
     er = vpfnMsiBeginTransaction(szName, dwTransactionAttributes, phTransactionHandle, phChangeOfOwnerEvent);
-    ExitOnWin32Error(er, hr, "Failed to begin transaction.");
+    WiuExitOnWin32Error(er, hr, "Failed to begin transaction.");
 
 LExit:
     return hr;
@@ -948,14 +963,14 @@ extern "C" HRESULT DAPI WiuEndTransaction(
 
     if (!WiuIsMsiTransactionSupported())
     {
-        ExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
+        WiuExitOnFailure(hr = E_NOTIMPL, "Msi transactions are not supported");
     }
 
     hr = WiuEnableLog(dwLogMode, szLogPath, INSTALLLOGATTRIBUTES_APPEND);
-    ExitOnFailure(hr, "Failed to enable logging for MSI transaction");
+    WiuExitOnFailure(hr, "Failed to enable logging for MSI transaction");
 
     er = vpfnMsiEndTransaction(dwTransactionState);
-    ExitOnWin32Error(er, hr, "Failed to end transaction.");
+    WiuExitOnWin32Error(er, hr, "Failed to end transaction.");
 
 LExit:
     return hr;
@@ -1048,10 +1063,10 @@ static INT CALLBACK InstallEngineRecordCallback(
             {
                 hr = HRESULT_FROM_WIN32(er);
             }
-            ExitOnFailure(hr, "Failed to allocate string for formated message.");
+            WiuExitOnFailure(hr, "Failed to allocate string for formated message.");
 
             er = ::MsiFormatRecordW(NULL, hRecord, sczMessage, &cchMessage);
-            ExitOnWin32Error(er, hr, "Failed to format message record.");
+            WiuExitOnWin32Error(er, hr, "Failed to format message record.");
 
             // Pass to handler including both the formated message and the original record.
             nResult = HandleInstallMessage(pContext, mt, uiFlags, sczMessage, hRecord);
@@ -1213,7 +1228,7 @@ static INT HandleInstallProgress(
 
             // parse number
             hr = StrStringToInt32(pwz, cch, &iFields[cFields]);
-            ExitOnFailure(hr, "Failed to parse MSI message part.");
+            WiuExitOnFailure(hr, "Failed to parse MSI message part.");
 
             // increment field count
             ++cFields;
@@ -1255,7 +1270,7 @@ static INT HandleInstallProgress(
         else
         {
             hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-            ExitOnRootFailure(hr, "Insufficient space to hold progress information.");
+            WiuExitOnRootFailure(hr, "Insufficient space to hold progress information.");
         }
 
         // we only care about the first stage after script execution has started

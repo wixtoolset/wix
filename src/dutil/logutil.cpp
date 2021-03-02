@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define LoguExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_LOGUTIL, x, s, __VA_ARGS__)
+#define LoguExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_LOGUTIL, p, x, e, s, __VA_ARGS__)
+#define LoguExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_LOGUTIL, p, x, s, __VA_ARGS__)
+#define LoguExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_LOGUTIL, p, x, e, s, __VA_ARGS__)
+#define LoguExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_LOGUTIL, p, x, s, __VA_ARGS__)
+#define LoguExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_LOGUTIL, e, x, s, __VA_ARGS__)
+#define LoguExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_LOGUTIL, g, x, s, __VA_ARGS__)
+
 // globals
 static HMODULE LogUtil_hModule = NULL;
 static BOOL LogUtil_fDisabled = FALSE;
@@ -110,23 +125,23 @@ extern "C" HRESULT DAPI LogOpen(
     if (wzExt && *wzExt)
     {
         hr = PathCreateTimeBasedTempFile(wzDirectory, wzLog, wzPostfix, wzExt, &LogUtil_sczLogPath, &LogUtil_hLog);
-        ExitOnFailure(hr, "Failed to create log based on current system time.");
+        LoguExitOnFailure(hr, "Failed to create log based on current system time.");
     }
     else
     {
         hr = PathConcat(wzDirectory, wzLog, &LogUtil_sczLogPath);
-        ExitOnFailure(hr, "Failed to combine the log path.");
+        LoguExitOnFailure(hr, "Failed to combine the log path.");
 
         hr = PathGetDirectory(LogUtil_sczLogPath, &sczLogDirectory);
-        ExitOnFailure(hr, "Failed to get log directory.");
+        LoguExitOnFailure(hr, "Failed to get log directory.");
 
         hr = DirEnsureExists(sczLogDirectory, NULL);
-        ExitOnFailure(hr, "Failed to ensure log file directory exists: %ls", sczLogDirectory);
+        LoguExitOnFailure(hr, "Failed to ensure log file directory exists: %ls", sczLogDirectory);
 
         LogUtil_hLog = ::CreateFileW(LogUtil_sczLogPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, (fAppend) ? OPEN_ALWAYS : CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == LogUtil_hLog)
         {
-            ExitOnLastError(hr, "failed to create log file: %ls", LogUtil_sczLogPath);
+            LoguExitOnLastError(hr, "failed to create log file: %ls", LogUtil_sczLogPath);
         }
 
         if (fAppend)
@@ -152,7 +167,7 @@ extern "C" HRESULT DAPI LogOpen(
     if (psczLogPath)
     {
         hr = StrAllocString(psczLogPath, LogUtil_sczLogPath, 0);
-        ExitOnFailure(hr, "Failed to copy log path.");
+        LoguExitOnFailure(hr, "Failed to copy log path.");
     }
 
 LExit:
@@ -217,15 +232,15 @@ HRESULT DAPI LogRename(
     ReleaseFileHandle(LogUtil_hLog);
 
     hr = FileEnsureMove(LogUtil_sczLogPath, wzNewPath, TRUE, TRUE);
-    ExitOnFailure(hr, "Failed to move logfile to new location: %ls", wzNewPath);
+    LoguExitOnFailure(hr, "Failed to move logfile to new location: %ls", wzNewPath);
 
     hr = StrAllocString(&LogUtil_sczLogPath, wzNewPath, 0);
-    ExitOnFailure(hr, "Failed to store new logfile path: %ls", wzNewPath);
+    LoguExitOnFailure(hr, "Failed to store new logfile path: %ls", wzNewPath);
 
     LogUtil_hLog = ::CreateFileW(LogUtil_sczLogPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == LogUtil_hLog)
     {
-        ExitOnLastError(hr, "failed to create log file: %ls", LogUtil_sczLogPath);
+        LoguExitOnLastError(hr, "failed to create log file: %ls", LogUtil_sczLogPath);
     }
 
     // Enable "append" mode by moving file pointer to the end
@@ -307,7 +322,7 @@ HRESULT DAPI LogSetSpecialParams(
     else
     {
         hr = StrAllocConcat(&LogUtil_sczSpecialBeginLine, wzSpecialBeginLine, 0);
-        ExitOnFailure(hr, "Failed to allocate copy of special beginline string");
+        LoguExitOnFailure(hr, "Failed to allocate copy of special beginline string");
     }
 
     // Handle special string to be appended to every time stamp
@@ -318,7 +333,7 @@ HRESULT DAPI LogSetSpecialParams(
     else
     {
         hr = StrAllocConcat(&LogUtil_sczSpecialAfterTimeStamp, wzSpecialAfterTimeStamp, 0);
-        ExitOnFailure(hr, "Failed to allocate copy of special post-timestamp string");
+        LoguExitOnFailure(hr, "Failed to allocate copy of special post-timestamp string");
     }
 
     // Handle special string to be appended before every full line
@@ -329,7 +344,7 @@ HRESULT DAPI LogSetSpecialParams(
     else
     {
         hr = StrAllocConcat(&LogUtil_sczSpecialEndLine, wzSpecialEndLine, 0);
-        ExitOnFailure(hr, "Failed to allocate copy of special endline string");
+        LoguExitOnFailure(hr, "Failed to allocate copy of special endline string");
     }
 
 LExit:
@@ -597,14 +612,14 @@ extern "C" HRESULT DAPI LogErrorStringArgs(
     LPWSTR sczMessage = NULL;
 
     hr = StrAllocStringAnsi(&sczFormat, szFormat, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed to convert format string to wide character string");
+    LoguExitOnFailure(hr, "Failed to convert format string to wide character string");
 
     // format the string as a unicode string - this is necessary to be able to include
     // international characters in our output string. This does have the counterintuitive effect
     // that the caller's "%s" is interpreted differently
     // (so callers should use %hs for LPSTR and %ls for LPWSTR)
     hr = StrAllocFormattedArgs(&sczMessage, sczFormat, args);
-    ExitOnFailure(hr, "Failed to format error message: \"%ls\"", sczFormat);
+    LoguExitOnFailure(hr, "Failed to format error message: \"%ls\"", sczFormat);
 
     hr = LogStringLine(REPORT_ERROR, "Error 0x%x: %ls", hrError, sczMessage);
 
@@ -636,14 +651,14 @@ extern "C" HRESULT DAPI LogErrorIdModule(
     WORD cStrings = 1; // guaranteed wzError is in the list
 
     hr = ::StringCchPrintfW(wzError, countof(wzError), L"0x%08x", hrError);
-    ExitOnFailure(hr, "failed to format error code: \"0%08x\"", hrError);
+    LoguExitOnFailure(hr, "failed to format error code: \"0%08x\"", hrError);
 
     cStrings += wzString1 ? 1 : 0;
     cStrings += wzString2 ? 1 : 0;
     cStrings += wzString3 ? 1 : 0;
 
     hr = LogIdModule(REPORT_ERROR, dwLogId, hModule, wzError, wzString1, wzString2, wzString3);
-    ExitOnFailure(hr, "Failed to log id module.");
+    LoguExitOnFailure(hr, "Failed to log id module.");
 
 LExit:
     return hr;
@@ -771,7 +786,7 @@ extern "C" HRESULT LogStringWorkRaw(
     if (INVALID_HANDLE_VALUE == LogUtil_hLog)
     {
         hr = StrAnsiAllocConcat(&LogUtil_sczPreInitBuffer, szLogData, 0);
-        ExitOnFailure(hr, "Failed to concatenate string to pre-init buffer");
+        LoguExitOnFailure(hr, "Failed to concatenate string to pre-init buffer");
 
         ExitFunction1(hr = S_OK);
     }
@@ -781,7 +796,7 @@ extern "C" HRESULT LogStringWorkRaw(
     {
         if (!::WriteFile(LogUtil_hLog, reinterpret_cast<const BYTE*>(szLogData) + cbTotal, cbLogData - cbTotal, &cbWrote, NULL))
         {
-            ExitOnLastError(hr, "Failed to write output to log: %ls - %ls", LogUtil_sczLogPath, szLogData);
+            LoguExitOnLastError(hr, "Failed to write output to log: %ls - %hs", LogUtil_sczLogPath, szLogData);
         }
 
         cbTotal += cbWrote;
@@ -816,7 +831,7 @@ static HRESULT LogIdWork(
 
     if (0 == cch)
     {
-        ExitOnLastError(hr, "failed to log id: %d", dwLogId);
+        LoguExitOnLastError(hr, "failed to log id: %d", dwLogId);
     }
 
     if (2 <= cch && L'\r' == pwz[cch-2] && L'\n' == pwz[cch-1])
@@ -850,14 +865,14 @@ static HRESULT LogStringWorkArgs(
     LPWSTR sczMessage = NULL;
 
     hr = StrAllocStringAnsi(&sczFormat, szFormat, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed to convert format string to wide character string");
+    LoguExitOnFailure(hr, "Failed to convert format string to wide character string");
 
     // format the string as a unicode string
     hr = StrAllocFormattedArgs(&sczMessage, sczFormat, args);
-    ExitOnFailure(hr, "Failed to format message: \"%ls\"", sczFormat);
+    LoguExitOnFailure(hr, "Failed to format message: \"%ls\"", sczFormat);
 
     hr = LogStringWork(rl, 0, sczMessage, fLOGUTIL_NEWLINE);
-    ExitOnFailure(hr, "Failed to write formatted string to log:%ls", sczMessage);
+    LoguExitOnFailure(hr, "Failed to write formatted string to log:%ls", sczMessage);
 
 LExit:
     ReleaseStr(sczFormat);
@@ -909,24 +924,24 @@ static HRESULT LogStringWork(
         hr = StrAllocFormatted(&scz, L"%ls[%04X:%04X][%04hu-%02hu-%02huT%02hu:%02hu:%02hu]%hs%03d:%ls %ls%ls", LogUtil_sczSpecialBeginLine ? LogUtil_sczSpecialBeginLine : L"",
             dwProcessId, dwThreadId, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, szType, dwId,
             LogUtil_sczSpecialAfterTimeStamp ? LogUtil_sczSpecialAfterTimeStamp : L"", sczString, LogUtil_sczSpecialEndLine ? LogUtil_sczSpecialEndLine : L"\r\n");
-        ExitOnFailure(hr, "Failed to format line prefix.");
+        LoguExitOnFailure(hr, "Failed to format line prefix.");
     }
 
     wzLogData = scz ? scz : sczString;
 
     // Convert to UTF-8 before writing out to the log file
     hr = StrAnsiAllocString(&sczMultiByte, wzLogData, 0, CP_UTF8);
-    ExitOnFailure(hr, "Failed to convert log string to UTF-8");
+    LoguExitOnFailure(hr, "Failed to convert log string to UTF-8");
 
     if (s_vpfLogStringWorkRaw)
     {
         hr = s_vpfLogStringWorkRaw(sczMultiByte, s_vpvLogStringWorkRawContext);
-        ExitOnFailure(hr, "Failed to write string to log using redirected function: %ls", sczString);
+        LoguExitOnFailure(hr, "Failed to write string to log using redirected function: %ls", sczString);
     }
     else
     {
         hr = LogStringWorkRaw(sczMultiByte);
-        ExitOnFailure(hr, "Failed to write string to log using default function: %ls", sczString);
+        LoguExitOnFailure(hr, "Failed to write string to log using default function: %ls", sczString);
     }
 
 LExit:

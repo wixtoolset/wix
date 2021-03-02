@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define ReswExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_RESWUTIL, x, s, __VA_ARGS__)
+#define ReswExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_RESWUTIL, p, x, e, s, __VA_ARGS__)
+#define ReswExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_RESWUTIL, p, x, s, __VA_ARGS__)
+#define ReswExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_RESWUTIL, p, x, e, s, __VA_ARGS__)
+#define ReswExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_RESWUTIL, p, x, s, __VA_ARGS__)
+#define ReswExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_RESWUTIL, e, x, s, __VA_ARGS__)
+#define ReswExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_RESWUTIL, g, x, s, __VA_ARGS__)
+
 #define RES_STRINGS_PER_BLOCK 16
 
 // Internal data structure format for a string block in a resource table.
@@ -66,31 +81,31 @@ extern "C" HRESULT DAPI ResWriteString(
     DWORD dwStringId = (dwDataId % RES_STRINGS_PER_BLOCK);
 
     hModule = LoadLibraryExW(wzResourceFile, NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_DATAFILE);
-    ExitOnNullWithLastError(hModule, hr, "Failed to load library: %ls", wzResourceFile);
+    ReswExitOnNullWithLastError(hModule, hr, "Failed to load library: %ls", wzResourceFile);
 
     hr = StringBlockInitialize(hModule, dwBlockId, wLangId, &StrBlock);
-    ExitOnFailure(hr, "Failed to get string block to update.");
+    ReswExitOnFailure(hr, "Failed to get string block to update.");
 
     hr = StringBlockChangeString(&StrBlock, dwStringId, wzData);
-    ExitOnFailure(hr, "Failed to update string block string.");
+    ReswExitOnFailure(hr, "Failed to update string block string.");
 
     hr = StringBlockConvertToResourceData(&StrBlock, &pvData, &cbData);
-    ExitOnFailure(hr, "Failed to convert string block to resource data.");
+    ReswExitOnFailure(hr, "Failed to convert string block to resource data.");
 
     ::FreeLibrary(hModule);
     hModule = NULL;
 
     hUpdate = ::BeginUpdateResourceW(wzResourceFile, FALSE);
-    ExitOnNullWithLastError(hUpdate, hr, "Failed to ::BeginUpdateResourcesW.");
+    ReswExitOnNullWithLastError(hUpdate, hr, "Failed to ::BeginUpdateResourcesW.");
 
     if (!::UpdateResourceA(hUpdate, RT_STRING, MAKEINTRESOURCE(dwBlockId), wLangId, pvData, cbData))
     {
-        ExitWithLastError(hr, "Failed to ::UpdateResourceA.");
+        ReswExitWithLastError(hr, "Failed to ::UpdateResourceA.");
     }
 
     if (!::EndUpdateResource(hUpdate, FALSE))
     {
-        ExitWithLastError(hr, "Failed to ::EndUpdateResourceW.");
+        ReswExitWithLastError(hr, "Failed to ::EndUpdateResourceW.");
     }
 
     hUpdate = NULL;
@@ -134,16 +149,16 @@ extern "C" HRESULT DAPI ResWriteData(
     HANDLE hUpdate = NULL;
 
     hUpdate = ::BeginUpdateResourceW(wzResourceFile, FALSE);
-    ExitOnNullWithLastError(hUpdate, hr, "Failed to ::BeginUpdateResourcesW.");
+    ReswExitOnNullWithLastError(hUpdate, hr, "Failed to ::BeginUpdateResourcesW.");
 
     if (!::UpdateResourceA(hUpdate, RT_RCDATA, szDataName, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), pData, cbData))
     {
-        ExitWithLastError(hr, "Failed to ::UpdateResourceA.");
+        ReswExitWithLastError(hr, "Failed to ::UpdateResourceA.");
     }
 
     if (!::EndUpdateResource(hUpdate, FALSE))
     {
-        ExitWithLastError(hr, "Failed to ::EndUpdateResourceW.");
+        ReswExitWithLastError(hr, "Failed to ::EndUpdateResourceW.");
     }
 
     hUpdate = NULL;
@@ -177,23 +192,23 @@ extern "C" HRESULT DAPI ResImportDataFromFile(
     hFile = ::CreateFileW(wzSourceFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hFile)
     {
-        ExitWithLastError(hr, "Failed to CreateFileW for %ls.", wzSourceFile);
+        ReswExitWithLastError(hr, "Failed to CreateFileW for %ls.", wzSourceFile);
     }
 
     cbFile = ::GetFileSize(hFile, NULL);
     if (!cbFile)
     {
-        ExitWithLastError(hr, "Failed to GetFileSize for %ls.", wzSourceFile);
+        ReswExitWithLastError(hr, "Failed to GetFileSize for %ls.", wzSourceFile);
     }
 
     hMap = ::CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-    ExitOnNullWithLastError(hMap, hr, "Failed to CreateFileMapping for %ls.", wzSourceFile);
+    ReswExitOnNullWithLastError(hMap, hr, "Failed to CreateFileMapping for %ls.", wzSourceFile);
 
     pv = ::MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, cbFile);
-    ExitOnNullWithLastError(pv, hr, "Failed to MapViewOfFile for %ls.", wzSourceFile);
+    ReswExitOnNullWithLastError(pv, hr, "Failed to MapViewOfFile for %ls.", wzSourceFile);
 
     hr = ResWriteData(wzTargetFile, szDataName, pv, cbFile);
-    ExitOnFailure(hr, "Failed to ResSetData %s on file %ls.", szDataName, wzTargetFile);
+    ReswExitOnFailure(hr, "Failed to ResSetData %s on file %ls.", szDataName, wzTargetFile);
 
 LExit:
     if (pv)
@@ -226,25 +241,25 @@ static HRESULT StringBlockInitialize(
     DWORD cbData = 0;
 
     hRsrc = ::FindResourceExA(hModule, RT_STRING, MAKEINTRESOURCE(dwBlockId), wLangId);
-    ExitOnNullWithLastError(hRsrc, hr, "Failed to ::FindResourceExW.");
+    ReswExitOnNullWithLastError(hRsrc, hr, "Failed to ::FindResourceExW.");
 
     hData = ::LoadResource(hModule, hRsrc);
-    ExitOnNullWithLastError(hData, hr, "Failed to ::LoadResource.");
+    ReswExitOnNullWithLastError(hData, hr, "Failed to ::LoadResource.");
 
     cbData = ::SizeofResource(hModule, hRsrc);
     if (!cbData)
     {
-        ExitWithLastError(hr, "Failed to ::SizeofResource.");
+        ReswExitWithLastError(hr, "Failed to ::SizeofResource.");
     }
 
     pvData = ::LockResource(hData);
-    ExitOnNullWithLastError(pvData, hr, "Failed to lock data resource.");
+    ReswExitOnNullWithLastError(pvData, hr, "Failed to lock data resource.");
 
     pStrBlock->dwBlockId = dwBlockId;
     pStrBlock->wLangId = wLangId;
 
     hr = StringBlockConvertFromResourceData(pStrBlock, pvData, cbData);
-    ExitOnFailure(hr, "Failed to convert string block from resource data.");
+    ReswExitOnFailure(hr, "Failed to convert string block from resource data.");
 
 LExit:
     return hr;
@@ -276,10 +291,10 @@ static HRESULT StringBlockChangeString(
     DWORD cchData = lstrlenW(szData);
 
     pwzData = static_cast<LPWSTR>(MemAlloc((cchData + 1) * sizeof(WCHAR), TRUE));
-    ExitOnNull(pwzData, hr, E_OUTOFMEMORY, "Failed to allocate new block string.");
+    ReswExitOnNull(pwzData, hr, E_OUTOFMEMORY, "Failed to allocate new block string.");
 
     hr = ::StringCchCopyW(pwzData, cchData + 1, szData);
-    ExitOnFailure(hr, "Failed to copy new block string.");
+    ReswExitOnFailure(hr, "Failed to copy new block string.");
 
     ReleaseNullMem(pStrBlock->rgwz[dwStringId]);
 
@@ -311,7 +326,7 @@ static HRESULT StringBlockConvertToResourceData(
     cbData *= sizeof(WCHAR);
 
     pvData = MemAlloc(cbData, TRUE);
-    ExitOnNull(pvData, hr, E_OUTOFMEMORY, "Failed to allocate buffer to convert string block.");
+    ReswExitOnNull(pvData, hr, E_OUTOFMEMORY, "Failed to allocate buffer to convert string block.");
 
     pwz = static_cast<LPWSTR>(pvData);
     for (DWORD i = 0; i < RES_STRINGS_PER_BLOCK; ++i)
@@ -355,10 +370,10 @@ static HRESULT StringBlockConvertFromResourceData(
         ++pwzParse;
 
         pStrBlock->rgwz[i] = static_cast<LPWSTR>(MemAlloc((cchParse + 1) * sizeof(WCHAR), TRUE));
-        ExitOnNull(pStrBlock->rgwz[i], hr, E_OUTOFMEMORY, "Failed to populate pStrBlock.");
+        ReswExitOnNull(pStrBlock->rgwz[i], hr, E_OUTOFMEMORY, "Failed to populate pStrBlock.");
 
         hr = ::StringCchCopyNExW(pStrBlock->rgwz[i], cchParse + 1, pwzParse, cchParse, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-        ExitOnFailure(hr, "Failed to copy parsed resource data into string block.");
+        ReswExitOnFailure(hr, "Failed to copy parsed resource data into string block.");
 
         pwzParse += cchParse;
     }

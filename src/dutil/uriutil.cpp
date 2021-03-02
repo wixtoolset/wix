@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define UriExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_URIUTIL, x, s, __VA_ARGS__)
+#define UriExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_URIUTIL, p, x, e, s, __VA_ARGS__)
+#define UriExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_URIUTIL, p, x, s, __VA_ARGS__)
+#define UriExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_URIUTIL, p, x, e, s, __VA_ARGS__)
+#define UriExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_URIUTIL, p, x, s, __VA_ARGS__)
+#define UriExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_URIUTIL, e, x, s, __VA_ARGS__)
+#define UriExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_URIUTIL, g, x, s, __VA_ARGS__)
+
+
 //
 // UriCanonicalize - canonicalizes a URI.
 //
@@ -16,11 +31,11 @@ extern "C" HRESULT DAPI UriCanonicalize(
 
     if (!::InternetCanonicalizeUrlW(*psczUri, wz, &cch, ICU_DECODE))
     {
-        ExitWithLastError(hr, "Failed to canonicalize URI.");
+        UriExitWithLastError(hr, "Failed to canonicalize URI.");
     }
 
     hr = StrAllocString(psczUri, wz, cch);
-    ExitOnFailure(hr, "Failed copy canonicalized URI.");
+    UriExitOnFailure(hr, "Failed copy canonicalized URI.");
 
 LExit:
     return hr;
@@ -83,7 +98,7 @@ extern "C" HRESULT DAPI UriCrack(
 
     if (!::InternetCrackUrlW(wzUri, 0, ICU_DECODE | ICU_ESCAPE, &components))
     {
-        ExitWithLastError(hr, "Failed to crack URI.");
+        UriExitWithLastError(hr, "Failed to crack URI.");
     }
 
     if (pScheme)
@@ -94,7 +109,7 @@ extern "C" HRESULT DAPI UriCrack(
     if (psczHostName)
     {
         hr = StrAllocString(psczHostName, components.lpszHostName, components.dwHostNameLength);
-        ExitOnFailure(hr, "Failed to copy host name.");
+        UriExitOnFailure(hr, "Failed to copy host name.");
     }
 
     if (pPort)
@@ -105,25 +120,25 @@ extern "C" HRESULT DAPI UriCrack(
     if (psczUser)
     {
         hr = StrAllocString(psczUser, components.lpszUserName, components.dwUserNameLength);
-        ExitOnFailure(hr, "Failed to copy user name.");
+        UriExitOnFailure(hr, "Failed to copy user name.");
     }
 
     if (psczPassword)
     {
         hr = StrAllocString(psczPassword, components.lpszPassword, components.dwPasswordLength);
-        ExitOnFailure(hr, "Failed to copy password.");
+        UriExitOnFailure(hr, "Failed to copy password.");
     }
 
     if (psczPath)
     {
         hr = StrAllocString(psczPath, components.lpszUrlPath, components.dwUrlPathLength);
-        ExitOnFailure(hr, "Failed to copy path.");
+        UriExitOnFailure(hr, "Failed to copy path.");
     }
 
     if (psczQueryString)
     {
         hr = StrAllocString(psczQueryString, components.lpszExtraInfo, components.dwExtraInfoLength);
-        ExitOnFailure(hr, "Failed to copy query string.");
+        UriExitOnFailure(hr, "Failed to copy query string.");
     }
 
 LExit:
@@ -142,7 +157,7 @@ extern "C" HRESULT DAPI UriCrackEx(
     HRESULT hr = S_OK;
 
     hr = UriCrack(wzUri, &pUriInfo->scheme, &pUriInfo->sczHostName, &pUriInfo->port, &pUriInfo->sczUser, &pUriInfo->sczPassword, &pUriInfo->sczPath, &pUriInfo->sczQueryString);
-    ExitOnFailure(hr, "Failed to crack URI.");
+    UriExitOnFailure(hr, "Failed to crack URI.");
 
 LExit:
     return hr;
@@ -195,11 +210,11 @@ extern "C" HRESULT DAPI UriCreate(
 
     if (!::InternetCreateUrlW(&components, ICU_ESCAPE, wz, &cch))
     {
-        ExitWithLastError(hr, "Failed to create URI.");
+        UriExitWithLastError(hr, "Failed to create URI.");
     }
 
     hr = StrAllocString(psczUri, wz, cch);
-    ExitOnFailure(hr, "Failed copy created URI.");
+    UriExitOnFailure(hr, "Failed copy created URI.");
 
 LExit:
     return hr;
@@ -227,13 +242,13 @@ extern "C" HRESULT DAPI UriGetServerAndResource(
     LPWSTR sczQueryString = NULL;
 
     hr = UriCrack(wzUri, &scheme, &sczHostName, &port, &sczUser, &sczPassword, &sczPath, &sczQueryString);
-    ExitOnFailure(hr, "Failed to crack URI.");
+    UriExitOnFailure(hr, "Failed to crack URI.");
 
     hr = UriCreate(psczServer, scheme, sczHostName, port, sczUser, sczPassword, NULL, NULL);
-    ExitOnFailure(hr, "Failed to allocate server URI.");
+    UriExitOnFailure(hr, "Failed to allocate server URI.");
 
     hr = UriCreate(psczResource, INTERNET_SCHEME_UNKNOWN, NULL, INTERNET_INVALID_PORT_NUMBER, NULL, NULL, sczPath, sczQueryString);
-    ExitOnFailure(hr, "Failed to allocate resource URI.");
+    UriExitOnFailure(hr, "Failed to allocate resource URI.");
 
 LExit:
     ReleaseStr(sczQueryString);
@@ -265,13 +280,13 @@ extern "C" HRESULT DAPI UriFile(
 
     if (!::InternetCrackUrlW(wzUri, 0, ICU_DECODE | ICU_ESCAPE, &uc))
     {
-        ExitWithLastError(hr, "Failed to crack URI.");
+        UriExitWithLastError(hr, "Failed to crack URI.");
     }
 
     // Copy only the file name. Fortunately, PathFile() understands that
     // forward slashes can be directory separators like backslashes.
     hr = StrAllocString(psczFile, PathFile(wz), 0);
-    ExitOnFailure(hr, "Failed to copy file name");
+    UriExitOnFailure(hr, "Failed to copy file name");
 
 LExit:
     return hr;
@@ -367,7 +382,7 @@ extern "C" HRESULT DAPI UriRoot(
     LPCWSTR pwcSlash = NULL;
 
     hr = UriProtocol(wzUri, &protocol);
-    ExitOnFailure(hr, "Invalid URI.");
+    UriExitOnFailure(hr, "Invalid URI.");
 
     switch (protocol)
     {
@@ -377,7 +392,7 @@ extern "C" HRESULT DAPI UriRoot(
             if (((L'a' <= wzUri[8] && L'z' >= wzUri[8]) || (L'A' <= wzUri[8] && L'Z' >= wzUri[8])) && L':' == wzUri[9])
             {
                 hr = StrAlloc(ppwzRoot, 4);
-                ExitOnFailure(hr, "Failed to allocate string for root of URI.");
+                UriExitOnFailure(hr, "Failed to allocate string for root of URI.");
                 *ppwzRoot[0] = wzUri[8];
                 *ppwzRoot[1] = L':';
                 *ppwzRoot[2] = L'\\';
@@ -386,7 +401,7 @@ extern "C" HRESULT DAPI UriRoot(
             else
             {
                 hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid file path in URI.");
+                UriExitOnFailure(hr, "Invalid file path in URI.");
             }
         }
         else // UNC share
@@ -395,23 +410,23 @@ extern "C" HRESULT DAPI UriRoot(
             if (!pwcSlash)
             {
                 hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Invalid server name in URI.");
+                UriExitOnFailure(hr, "Invalid server name in URI.");
             }
             else
             {
                 hr = StrAllocString(ppwzRoot, L"\\\\", 64);
-                ExitOnFailure(hr, "Failed to allocate string for root of URI.");
+                UriExitOnFailure(hr, "Failed to allocate string for root of URI.");
 
                 pwcSlash = wcschr(pwcSlash + 1, L'/');
                 if (pwcSlash)
                 {
                     hr = StrAllocConcat(ppwzRoot, wzUri + 8, pwcSlash - wzUri - 8);
-                    ExitOnFailure(hr, "Failed to add server/share to root of URI.");
+                    UriExitOnFailure(hr, "Failed to add server/share to root of URI.");
                 }
                 else
                 {
                     hr = StrAllocConcat(ppwzRoot, wzUri + 8, 0);
-                    ExitOnFailure(hr, "Failed to add server/share to root of URI.");
+                    UriExitOnFailure(hr, "Failed to add server/share to root of URI.");
                 }
 
                 // replace all slashes with backslashes to be truly UNC.
@@ -431,12 +446,12 @@ extern "C" HRESULT DAPI UriRoot(
         if (pwcSlash)
         {
             hr = StrAllocString(ppwzRoot, wzUri, pwcSlash - wzUri);
-            ExitOnFailure(hr, "Failed allocate root from URI.");
+            UriExitOnFailure(hr, "Failed allocate root from URI.");
         }
         else
         {
             hr = StrAllocString(ppwzRoot, wzUri, 0);
-            ExitOnFailure(hr, "Failed allocate root from URI.");
+            UriExitOnFailure(hr, "Failed allocate root from URI.");
         }
         break;
 
@@ -445,18 +460,18 @@ extern "C" HRESULT DAPI UriRoot(
         if (pwcSlash)
         {
             hr = StrAllocString(ppwzRoot, wzUri, pwcSlash - wzUri);
-            ExitOnFailure(hr, "Failed allocate root from URI.");
+            UriExitOnFailure(hr, "Failed allocate root from URI.");
         }
         else
         {
             hr = StrAllocString(ppwzRoot, wzUri, 0);
-            ExitOnFailure(hr, "Failed allocate root from URI.");
+            UriExitOnFailure(hr, "Failed allocate root from URI.");
         }
         break;
 
     default:
         hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Unknown URI protocol.");
+        UriExitOnFailure(hr, "Unknown URI protocol.");
     }
 
     if (pProtocol)
@@ -473,7 +488,7 @@ extern "C" HRESULT DAPI UriResolve(
     __in_z LPCWSTR wzUri,
     __in_opt LPCWSTR wzBaseUri,
     __out LPWSTR* ppwzResolvedUri,
-    __out_opt const URI_PROTOCOL* pResolvedProtocol
+    __out_opt URI_PROTOCOL* pResolvedProtocol
     )
 {
     UNREFERENCED_PARAMETER(wzUri);
@@ -486,45 +501,45 @@ extern "C" HRESULT DAPI UriResolve(
     URI_PROTOCOL protocol = URI_PROTOCOL_UNKNOWN;
 
     hr = UriProtocol(wzUri, &protocol);
-    ExitOnFailure(hr, "Failed to determine protocol for URL: %ls", wzUri);
+    UriExitOnFailure(hr, "Failed to determine protocol for URL: %ls", wzUri);
 
-    ExitOnNull(ppwzResolvedUri, hr, E_INVALIDARG, "Failed to resolve URI, because no method of output was provided");
+    UriExitOnNull(ppwzResolvedUri, hr, E_INVALIDARG, "Failed to resolve URI, because no method of output was provided");
 
     if (URI_PROTOCOL_UNKNOWN == protocol)
     {
-        ExitOnNull(wzBaseUri, hr, E_INVALIDARG, "Failed to resolve URI - base URI provided was NULL");
+        UriExitOnNull(wzBaseUri, hr, E_INVALIDARG, "Failed to resolve URI - base URI provided was NULL");
 
         if (L'/' == *wzUri || L'\\' == *wzUri)
         {
             hr = UriRoot(wzBaseUri, ppwzResolvedUri, &protocol);
-            ExitOnFailure(hr, "Failed to get root from URI: %ls", wzBaseUri);
+            UriExitOnFailure(hr, "Failed to get root from URI: %ls", wzBaseUri);
 
             hr = StrAllocConcat(ppwzResolvedUri, wzUri, 0);
-            ExitOnFailure(hr, "Failed to concat file to base URI.");
+            UriExitOnFailure(hr, "Failed to concat file to base URI.");
         }
         else
         {
             hr = UriProtocol(wzBaseUri, &protocol);
-            ExitOnFailure(hr, "Failed to get protocol of base URI: %ls", wzBaseUri);
+            UriExitOnFailure(hr, "Failed to get protocol of base URI: %ls", wzBaseUri);
 
             LPCWSTR pwcFile = const_cast<LPCWSTR> (UriFile(wzBaseUri));
             if (!pwcFile)
             {
                 hr = E_INVALIDARG;
-                ExitOnFailure(hr, "Failed to get file from base URI: %ls", wzBaseUri);
+                UriExitOnFailure(hr, "Failed to get file from base URI: %ls", wzBaseUri);
             }
 
             hr = StrAllocString(ppwzResolvedUri, wzBaseUri, pwcFile - wzBaseUri);
-            ExitOnFailure(hr, "Failed to allocate string for resolved URI.");
+            UriExitOnFailure(hr, "Failed to allocate string for resolved URI.");
 
             hr = StrAllocConcat(ppwzResolvedUri, wzUri, 0);
-            ExitOnFailure(hr, "Failed to concat file to resolved URI.");
+            UriExitOnFailure(hr, "Failed to concat file to resolved URI.");
         }
     }
     else
     {
         hr = StrAllocString(ppwzResolvedUri, wzUri, 0);
-        ExitOnFailure(hr, "Failed to copy resolved URI.");
+        UriExitOnFailure(hr, "Failed to copy resolved URI.");
     }
 
     if (pResolvedProtocol)

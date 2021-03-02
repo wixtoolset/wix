@@ -2,6 +2,19 @@
 
 #include "precomp.h"
 
+// Exit macros
+#define AtomExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_ATOMUTIL, x, s, __VA_ARGS__)
+#define AtomExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_ATOMUTIL, p, x, e, s, __VA_ARGS__)
+#define AtomExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_ATOMUTIL, p, x, s, __VA_ARGS__)
+#define AtomExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_ATOMUTIL, p, x, e, s, __VA_ARGS__)
+#define AtomExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_ATOMUTIL, p, x, s, __VA_ARGS__)
+#define AtomExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_ATOMUTIL, e, x, s, __VA_ARGS__)
+#define AtomExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_ATOMUTIL, g, x, s, __VA_ARGS__)
 
 static HRESULT ParseAtomDocument(
     __in IXMLDOMDocument *pixd,
@@ -98,7 +111,7 @@ extern "C" void DAPI AtomUninitialize()
 
 *********************************************************************/
 extern "C" HRESULT DAPI AtomParseFromString(
-    __in LPCWSTR wzAtomString,
+    __in_z LPCWSTR wzAtomString,
     __out ATOM_FEED **ppFeed
     )
 {
@@ -110,10 +123,10 @@ extern "C" HRESULT DAPI AtomParseFromString(
     IXMLDOMDocument *pixdAtom = NULL;
 
     hr = XmlLoadDocument(wzAtomString, &pixdAtom);
-    ExitOnFailure(hr, "Failed to load ATOM string as XML document.");
+    AtomExitOnFailure(hr, "Failed to load ATOM string as XML document.");
 
     hr = ParseAtomDocument(pixdAtom, &pNewFeed);
-    ExitOnFailure(hr, "Failed to parse ATOM document.");
+    AtomExitOnFailure(hr, "Failed to parse ATOM document.");
 
     *ppFeed = pNewFeed;
     pNewFeed = NULL;
@@ -131,7 +144,7 @@ LExit:
 
 *********************************************************************/
 extern "C" HRESULT DAPI AtomParseFromFile(
-    __in LPCWSTR wzAtomFile,
+    __in_z LPCWSTR wzAtomFile,
     __out ATOM_FEED **ppFeed
     )
 {
@@ -143,10 +156,10 @@ extern "C" HRESULT DAPI AtomParseFromFile(
     IXMLDOMDocument *pixdAtom = NULL;
 
     hr = XmlLoadDocumentFromFile(wzAtomFile, &pixdAtom);
-    ExitOnFailure(hr, "Failed to load ATOM string as XML document.");
+    AtomExitOnFailure(hr, "Failed to load ATOM string as XML document.");
 
     hr = ParseAtomDocument(pixdAtom, &pNewFeed);
-    ExitOnFailure(hr, "Failed to parse ATOM document.");
+    AtomExitOnFailure(hr, "Failed to parse ATOM document.");
 
     *ppFeed = pNewFeed;
     pNewFeed = NULL;
@@ -175,7 +188,7 @@ extern "C" HRESULT DAPI AtomParseFromDocument(
     ATOM_FEED *pNewFeed = NULL;
 
     hr = ParseAtomDocument(pixdDocument, &pNewFeed);
-    ExitOnFailure(hr, "Failed to parse ATOM document.");
+    AtomExitOnFailure(hr, "Failed to parse ATOM document.");
 
     *ppFeed = pNewFeed;
     pNewFeed = NULL;
@@ -192,7 +205,7 @@ LExit:
 
 *********************************************************************/
 extern "C" void DAPI AtomFreeFeed(
-    __in_xcount(pFeed->cItems) ATOM_FEED *pFeed
+    __in_xcount(pFeed->cItems) ATOM_FEED* pFeed
     )
 {
     if (pFeed)
@@ -257,10 +270,10 @@ static HRESULT ParseAtomDocument(
     // Get the document element and start processing feeds.
     //
     hr = pixd->get_documentElement(&pFeedElement);
-    ExitOnFailure(hr, "failed get_documentElement in ParseAtomDocument");
+    AtomExitOnFailure(hr, "failed get_documentElement in ParseAtomDocument");
 
     hr = ParseAtomFeed(pFeedElement, &pNewFeed);
-    ExitOnFailure(hr, "Failed to parse ATOM feed.");
+    AtomExitOnFailure(hr, "Failed to parse ATOM feed.");
 
     if (S_FALSE == hr)
     {
@@ -305,96 +318,96 @@ static HRESULT ParseAtomFeed(
 
     // First, allocate the new feed and all the possible sub elements.
     pNewFeed = (ATOM_FEED*)MemAlloc(sizeof(ATOM_FEED), TRUE);
-    ExitOnNull(pNewFeed, hr, E_OUTOFMEMORY, "Failed to allocate ATOM feed structure.");
+    AtomExitOnNull(pNewFeed, hr, E_OUTOFMEMORY, "Failed to allocate ATOM feed structure.");
 
     pNewFeed->pixn = pixnFeed;
     pNewFeed->pixn->AddRef();
 
     hr = AllocateAtomType<ATOM_AUTHOR>(pixnFeed, L"author", &pNewFeed->rgAuthors, &pNewFeed->cAuthors);
-    ExitOnFailure(hr, "Failed to allocate ATOM feed authors.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM feed authors.");
 
     hr = AllocateAtomType<ATOM_CATEGORY>(pixnFeed, L"category", &pNewFeed->rgCategories, &pNewFeed->cCategories);
-    ExitOnFailure(hr, "Failed to allocate ATOM feed categories.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM feed categories.");
 
     hr = AllocateAtomType<ATOM_ENTRY>(pixnFeed, L"entry", &pNewFeed->rgEntries, &pNewFeed->cEntries);
-    ExitOnFailure(hr, "Failed to allocate ATOM feed entries.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM feed entries.");
 
     hr = AllocateAtomType<ATOM_LINK>(pixnFeed, L"link", &pNewFeed->rgLinks, &pNewFeed->cLinks);
-    ExitOnFailure(hr, "Failed to allocate ATOM feed links.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM feed links.");
 
     // Second, process the elements under a feed.
     hr = pixnFeed->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM feed element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM feed element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"generator", -1))
         {
             hr = AssignString(&pNewFeed->wzGenerator, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed generator.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed generator.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"icon", -1))
         {
             hr = AssignString(&pNewFeed->wzIcon, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed icon.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed icon.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"id", -1))
         {
             hr = AssignString(&pNewFeed->wzId, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed id.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed id.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"logo", -1))
         {
             hr = AssignString(&pNewFeed->wzLogo, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed logo.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed logo.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"subtitle", -1))
         {
             hr = AssignString(&pNewFeed->wzSubtitle, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed subtitle.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed subtitle.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
         {
             hr = AssignString(&pNewFeed->wzTitle, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed title.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed title.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"updated", -1))
         {
             hr = AssignDateTime(&pNewFeed->ftUpdated, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM feed updated.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM feed updated.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"author", -1))
         {
             hr = ParseAtomAuthor(pNode, &pNewFeed->rgAuthors[cAuthors]);
-            ExitOnFailure(hr, "Failed to parse ATOM author.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM author.");
 
             ++cAuthors;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"category", -1))
         {
             hr = ParseAtomCategory(pNode, &pNewFeed->rgCategories[cCategories]);
-            ExitOnFailure(hr, "Failed to parse ATOM category.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM category.");
 
             ++cCategories;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"entry", -1))
         {
             hr = ParseAtomEntry(pNode, &pNewFeed->rgEntries[cEntries]);
-            ExitOnFailure(hr, "Failed to parse ATOM entry.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM entry.");
 
             ++cEntries;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"link", -1))
         {
             hr = ParseAtomLink(pNode, &pNewFeed->rgLinks[cLinks]);
-            ExitOnFailure(hr, "Failed to parse ATOM link.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM link.");
 
             ++cLinks;
         }
         else
         {
             hr = ParseAtomUnknownElement(pNode, &pNewFeed->pUnknownElements);
-            ExitOnFailure(hr, "Failed to parse unknown ATOM feed element: %ls", bstrNodeName);
+            AtomExitOnFailure(hr, "Failed to parse unknown ATOM feed element: %ls", bstrNodeName);
         }
 
         ReleaseNullBSTR(bstrNodeName);
@@ -404,17 +417,17 @@ static HRESULT ParseAtomFeed(
     if (!pNewFeed->wzId || !*pNewFeed->wzId)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/id element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/id element.");
     }
     else if (!pNewFeed->wzTitle || !*pNewFeed->wzTitle)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/title element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/title element.");
     }
     else if (0 == pNewFeed->ftUpdated.dwHighDateTime && 0 == pNewFeed->ftUpdated.dwLowDateTime)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/updated element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/updated element.");
     }
 
     *ppFeed = pNewFeed;
@@ -450,12 +463,12 @@ template<class T> static HRESULT AllocateAtomType(
     T* prgT = NULL;
 
     hr = XmlSelectNodes(pixnParent, wzT, &pNodeList);
-    ExitOnFailure(hr, "Failed to select all ATOM %ls.", wzT);
+    AtomExitOnFailure(hr, "Failed to select all ATOM %ls.", wzT);
 
     if (S_OK == hr)
     {
         hr = pNodeList->get_length(&cT);
-        ExitOnFailure(hr, "Failed to count the number of ATOM %ls.", wzT);
+        AtomExitOnFailure(hr, "Failed to count the number of ATOM %ls.", wzT);
 
         if (cT == 0)
         {
@@ -463,7 +476,7 @@ template<class T> static HRESULT AllocateAtomType(
         }
 
         prgT = static_cast<T*>(MemAlloc(sizeof(T) * cT, TRUE));
-        ExitOnNull(prgT, hr, E_OUTOFMEMORY, "Failed to allocate ATOM.");
+        AtomExitOnNull(prgT, hr, E_OUTOFMEMORY, "Failed to allocate ATOM.");
 
         *pcT = cT;
         *pprgT = prgT;
@@ -499,30 +512,30 @@ static HRESULT ParseAtomAuthor(
     BSTR bstrNodeName = NULL;
 
     hr = pixnAuthor->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM author element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM author element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"name", -1))
         {
             hr = AssignString(&pAuthor->wzName, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM author name.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM author name.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"email", -1))
         {
             hr = AssignString(&pAuthor->wzEmail, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM author email.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM author email.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"uri", -1))
         {
             hr = AssignString(&pAuthor->wzUrl, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM author uri.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM author uri.");
         }
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM author elements.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM author elements.");
 
     hr = S_OK;
 
@@ -553,44 +566,44 @@ static HRESULT ParseAtomCategory(
 
     // Process attributes first.
     hr = pixnCategory->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
+    AtomExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"label", -1))
         {
             hr = AssignString(&pCategory->wzLabel, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM category label.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM category label.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"scheme", -1))
         {
             hr = AssignString(&pCategory->wzScheme, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM category scheme.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM category scheme.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"term", -1))
         {
             hr = AssignString(&pCategory->wzTerm, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM category term.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM category term.");
         }
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM category attributes.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM category attributes.");
 
     // Process elements second.
     hr = pixnCategory->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM category element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM category element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         hr = ParseAtomUnknownElement(pNode, &pCategory->pUnknownElements);
-        ExitOnFailure(hr, "Failed to parse unknown ATOM category element: %ls", bstrNodeName);
+        AtomExitOnFailure(hr, "Failed to parse unknown ATOM category element: %ls", bstrNodeName);
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM category elements.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM category elements.");
 
     hr = S_OK;
 
@@ -622,42 +635,42 @@ static HRESULT ParseAtomContent(
 
     // Process attributes first.
     hr = pixnContent->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
+    AtomExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"type", -1))
         {
             hr = AssignString(&pContent->wzType, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM content type.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM content type.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"url", -1))
         {
             hr = AssignString(&pContent->wzUrl, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM content scheme.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM content scheme.");
         }
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM content attributes.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM content attributes.");
 
     // Process elements second.
     hr = pixnContent->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM content element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM content element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         hr = ParseAtomUnknownElement(pNode, &pContent->pUnknownElements);
-        ExitOnFailure(hr, "Failed to parse unknown ATOM content element: %ls", bstrNodeName);
+        AtomExitOnFailure(hr, "Failed to parse unknown ATOM content element: %ls", bstrNodeName);
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM content elements.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM content elements.");
 
     hr = AssignString(&pContent->wzValue, pixnContent);
-    ExitOnFailure(hr, "Failed to allocate ATOM content value.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM content value.");
 
 LExit:
     ReleaseBSTR(bstrNodeName);
@@ -694,56 +707,56 @@ static HRESULT ParseAtomEntry(
 
     // First, allocate all the possible sub elements.
     hr = AllocateAtomType<ATOM_AUTHOR>(pixnEntry, L"author", &pEntry->rgAuthors, &pEntry->cAuthors);
-    ExitOnFailure(hr, "Failed to allocate ATOM entry authors.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM entry authors.");
 
     hr = AllocateAtomType<ATOM_CATEGORY>(pixnEntry, L"category", &pEntry->rgCategories, &pEntry->cCategories);
-    ExitOnFailure(hr, "Failed to allocate ATOM entry categories.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM entry categories.");
 
     hr = AllocateAtomType<ATOM_LINK>(pixnEntry, L"link", &pEntry->rgLinks, &pEntry->cLinks);
-    ExitOnFailure(hr, "Failed to allocate ATOM entry links.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM entry links.");
 
     // Second, process elements.
     hr = pixnEntry->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM entry element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM entry element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"id", -1))
         {
             hr = AssignString(&pEntry->wzId, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM entry id.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM entry id.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"summary", -1))
         {
             hr = AssignString(&pEntry->wzSummary, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM entry summary.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM entry summary.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
         {
             hr = AssignString(&pEntry->wzTitle, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM entry title.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM entry title.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"published", -1))
         {
             hr = AssignDateTime(&pEntry->ftPublished, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM entry published.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM entry published.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"updated", -1))
         {
             hr = AssignDateTime(&pEntry->ftUpdated, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM entry updated.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM entry updated.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"author", -1))
         {
             hr = ParseAtomAuthor(pNode, &pEntry->rgAuthors[cAuthors]);
-            ExitOnFailure(hr, "Failed to parse ATOM entry author.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM entry author.");
 
             ++cAuthors;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"category", -1))
         {
             hr = ParseAtomCategory(pNode, &pEntry->rgCategories[cCategories]);
-            ExitOnFailure(hr, "Failed to parse ATOM entry category.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM entry category.");
 
             ++cCategories;
         }
@@ -752,47 +765,47 @@ static HRESULT ParseAtomEntry(
             if (NULL != pEntry->pContent)
             {
                 hr = E_UNEXPECTED;
-                ExitOnFailure(hr, "Cannot have two content elements in ATOM entry.");
+                AtomExitOnFailure(hr, "Cannot have two content elements in ATOM entry.");
             }
 
             pEntry->pContent = static_cast<ATOM_CONTENT*>(MemAlloc(sizeof(ATOM_CONTENT), TRUE));
-            ExitOnNull(pEntry->pContent, hr, E_OUTOFMEMORY, "Failed to allocate ATOM entry content.");
+            AtomExitOnNull(pEntry->pContent, hr, E_OUTOFMEMORY, "Failed to allocate ATOM entry content.");
 
             hr = ParseAtomContent(pNode, pEntry->pContent);
-            ExitOnFailure(hr, "Failed to parse ATOM entry content.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM entry content.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"link", -1))
         {
             hr = ParseAtomLink(pNode, &pEntry->rgLinks[cLinks]);
-            ExitOnFailure(hr, "Failed to parse ATOM entry link.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM entry link.");
 
             ++cLinks;
         }
         else
         {
             hr = ParseAtomUnknownElement(pNode, &pEntry->pUnknownElements);
-            ExitOnFailure(hr, "Failed to parse unknown ATOM entry element: %ls", bstrNodeName);
+            AtomExitOnFailure(hr, "Failed to parse unknown ATOM entry element: %ls", bstrNodeName);
         }
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM entry elements.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM entry elements.");
 
     if (!pEntry->wzId || !*pEntry->wzId)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/entry/id element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/entry/id element.");
     }
     else if (!pEntry->wzTitle || !*pEntry->wzTitle)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/entry/title element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/entry/title element.");
     }
     else if (0 == pEntry->ftUpdated.dwHighDateTime && 0 == pEntry->ftUpdated.dwLowDateTime)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to find required feed/entry/updated element.");
+        AtomExitOnRootFailure(hr, "Failed to find required feed/entry/updated element.");
     }
 
     hr = S_OK;
@@ -825,19 +838,19 @@ static HRESULT ParseAtomLink(
 
     // Process attributes first.
     hr = pixnLink->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get attributes for ATOM link.");
+    AtomExitOnFailure(hr, "Failed get attributes for ATOM link.");
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"rel", -1))
         {
             hr = AssignString(&pLink->wzRel, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM link rel.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM link rel.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"href", -1))
         {
             hr = AssignString(&pLink->wzUrl, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM link href.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM link href.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"length", -1))
         {
@@ -846,45 +859,45 @@ static HRESULT ParseAtomLink(
             {
                 hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
             }
-            ExitOnFailure(hr, "Failed to parse ATOM link length.");
+            AtomExitOnFailure(hr, "Failed to parse ATOM link length.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
         {
             hr = AssignString(&pLink->wzTitle, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM link title.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM link title.");
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"type", -1))
         {
             hr = AssignString(&pLink->wzType, pNode);
-            ExitOnFailure(hr, "Failed to allocate ATOM link type.");
+            AtomExitOnFailure(hr, "Failed to allocate ATOM link type.");
         }
         else
         {
             hr = ParseAtomUnknownAttribute(pNode, &pLink->pUnknownAttributes);
-            ExitOnFailure(hr, "Failed to parse unknown ATOM link attribute: %ls", bstrNodeName);
+            AtomExitOnFailure(hr, "Failed to parse unknown ATOM link attribute: %ls", bstrNodeName);
         }
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM link attributes.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM link attributes.");
 
     // Process elements second.
     hr = pixnLink->get_childNodes(&pNodeList);
-    ExitOnFailure(hr, "Failed to get child nodes of ATOM link element.");
+    AtomExitOnFailure(hr, "Failed to get child nodes of ATOM link element.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
         hr = ParseAtomUnknownElement(pNode, &pLink->pUnknownElements);
-        ExitOnFailure(hr, "Failed to parse unknown ATOM link element: %ls", bstrNodeName);
+        AtomExitOnFailure(hr, "Failed to parse unknown ATOM link element: %ls", bstrNodeName);
 
         ReleaseNullBSTR(bstrNodeName);
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to process all ATOM link elements.");
+    AtomExitOnFailure(hr, "Failed to process all ATOM link elements.");
 
     hr = AssignString(&pLink->wzValue, pixnLink);
-    ExitOnFailure(hr, "Failed to allocate ATOM link value.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM link value.");
 
 LExit:
     ReleaseBSTR(bstrNodeName);
@@ -916,39 +929,39 @@ static HRESULT ParseAtomUnknownElement(
     ATOM_UNKNOWN_ELEMENT* pNewUnknownElement;
 
     pNewUnknownElement = (ATOM_UNKNOWN_ELEMENT*)MemAlloc(sizeof(ATOM_UNKNOWN_ELEMENT), TRUE);
-    ExitOnNull(pNewUnknownElement, hr, E_OUTOFMEMORY, "Failed to allocate unknown element.");
+    AtomExitOnNull(pNewUnknownElement, hr, E_OUTOFMEMORY, "Failed to allocate unknown element.");
 
     hr = pNode->get_namespaceURI(&bstrNodeNamespace);
     if (S_OK == hr)
     {
         hr = StrAllocString(&pNewUnknownElement->wzNamespace, bstrNodeNamespace, 0);
-        ExitOnFailure(hr, "Failed to allocate ATOM unknown element namespace.");
+        AtomExitOnFailure(hr, "Failed to allocate ATOM unknown element namespace.");
     }
     else if (S_FALSE == hr)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to get unknown element namespace.");
+    AtomExitOnFailure(hr, "Failed to get unknown element namespace.");
 
     hr = pNode->get_baseName(&bstrNodeName);
-    ExitOnFailure(hr, "Failed to get unknown element name.");
+    AtomExitOnFailure(hr, "Failed to get unknown element name.");
 
     hr = StrAllocString(&pNewUnknownElement->wzElement, bstrNodeName, 0);
-    ExitOnFailure(hr, "Failed to allocate ATOM unknown element name.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM unknown element name.");
 
     hr = XmlGetText(pNode, &bstrNodeValue);
-    ExitOnFailure(hr, "Failed to get unknown element value.");
+    AtomExitOnFailure(hr, "Failed to get unknown element value.");
 
     hr = StrAllocString(&pNewUnknownElement->wzValue, bstrNodeValue, 0);
-    ExitOnFailure(hr, "Failed to allocate ATOM unknown element value.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM unknown element value.");
 
     hr = pNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
+    AtomExitOnFailure(hr, "Failed get attributes on ATOM unknown element.");
 
     while (S_OK == (hr = pixnnmAttributes->nextNode(&pixnAttribute)))
     {
         hr = ParseAtomUnknownAttribute(pixnAttribute, &pNewUnknownElement->pAttributes);
-        ExitOnFailure(hr, "Failed to parse attribute on ATOM unknown element.");
+        AtomExitOnFailure(hr, "Failed to parse attribute on ATOM unknown element.");
 
         ReleaseNullObject(pixnAttribute);
     }
@@ -957,7 +970,7 @@ static HRESULT ParseAtomUnknownElement(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to enumerate all attributes on ATOM unknown element.");
+    AtomExitOnFailure(hr, "Failed to enumerate all attributes on ATOM unknown element.");
 
     ATOM_UNKNOWN_ELEMENT** ppTail = ppUnknownElement;
     while (*ppTail)
@@ -999,31 +1012,31 @@ static HRESULT ParseAtomUnknownAttribute(
     ATOM_UNKNOWN_ATTRIBUTE* pNewUnknownAttribute;
 
     pNewUnknownAttribute = (ATOM_UNKNOWN_ATTRIBUTE*)MemAlloc(sizeof(ATOM_UNKNOWN_ATTRIBUTE), TRUE);
-    ExitOnNull(pNewUnknownAttribute, hr, E_OUTOFMEMORY, "Failed to allocate unknown attribute.");
+    AtomExitOnNull(pNewUnknownAttribute, hr, E_OUTOFMEMORY, "Failed to allocate unknown attribute.");
 
     hr = pNode->get_namespaceURI(&bstrNodeNamespace);
     if (S_OK == hr)
     {
         hr = StrAllocString(&pNewUnknownAttribute->wzNamespace, bstrNodeNamespace, 0);
-        ExitOnFailure(hr, "Failed to allocate ATOM unknown attribute namespace.");
+        AtomExitOnFailure(hr, "Failed to allocate ATOM unknown attribute namespace.");
     }
     else if (S_FALSE == hr)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to get unknown attribute namespace.");
+    AtomExitOnFailure(hr, "Failed to get unknown attribute namespace.");
 
     hr = pNode->get_baseName(&bstrNodeName);
-    ExitOnFailure(hr, "Failed to get unknown attribute name.");
+    AtomExitOnFailure(hr, "Failed to get unknown attribute name.");
 
     hr = StrAllocString(&pNewUnknownAttribute->wzAttribute, bstrNodeName, 0);
-    ExitOnFailure(hr, "Failed to allocate ATOM unknown attribute name.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM unknown attribute name.");
 
     hr = XmlGetText(pNode, &bstrNodeValue);
-    ExitOnFailure(hr, "Failed to get unknown attribute value.");
+    AtomExitOnFailure(hr, "Failed to get unknown attribute value.");
 
     hr = StrAllocString(&pNewUnknownAttribute->wzValue, bstrNodeValue, 0);
-    ExitOnFailure(hr, "Failed to allocate ATOM unknown attribute value.");
+    AtomExitOnFailure(hr, "Failed to allocate ATOM unknown attribute value.");
 
     ATOM_UNKNOWN_ATTRIBUTE** ppTail = ppUnknownAttribute;
     while (*ppTail)
@@ -1060,16 +1073,16 @@ static HRESULT AssignDateTime(
     if (0 != pft->dwHighDateTime || 0 != pft->dwLowDateTime)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Already process this datetime value.");
+        AtomExitOnRootFailure(hr, "Already process this datetime value.");
     }
 
     hr = XmlGetText(pNode, &bstrValue);
-    ExitOnFailure(hr, "Failed to get value.");
+    AtomExitOnFailure(hr, "Failed to get value.");
 
     if (S_OK == hr)
     {
         hr = TimeFromString3339(bstrValue, pft);
-        ExitOnFailure(hr, "Failed to convert value to time.");
+        AtomExitOnFailure(hr, "Failed to convert value to time.");
     }
     else
     {
@@ -1099,16 +1112,16 @@ static HRESULT AssignString(
     if (pwzValue && *pwzValue)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Already processed this value.");
+        AtomExitOnRootFailure(hr, "Already processed this value.");
     }
 
     hr = XmlGetText(pNode, &bstrValue);
-    ExitOnFailure(hr, "Failed to get value.");
+    AtomExitOnFailure(hr, "Failed to get value.");
 
     if (S_OK == hr)
     {
         hr = StrAllocString(pwzValue, bstrValue, 0);
-        ExitOnFailure(hr, "Failed to allocate value.");
+        AtomExitOnFailure(hr, "Failed to allocate value.");
     }
     else
     {

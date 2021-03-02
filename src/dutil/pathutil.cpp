@@ -2,11 +2,26 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define PathExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PATHUTIL, p, x, e, s, __VA_ARGS__)
+#define PathExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
+#define PathExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_PATHUTIL, p, x, e, s, __VA_ARGS__)
+#define PathExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
+#define PathExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PATHUTIL, e, x, s, __VA_ARGS__)
+#define PathExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PATHUTIL, g, x, s, __VA_ARGS__)
+
 #define PATH_GOOD_ENOUGH 64
 
 
 DAPI_(HRESULT) PathCommandLineAppend(
-    __deref_out_z LPWSTR* psczCommandLine,
+    __deref_inout_z LPWSTR* psczCommandLine,
     __in_z LPCWSTR wzArgument
     )
 {
@@ -41,7 +56,7 @@ DAPI_(HRESULT) PathCommandLineAppend(
     if (fRequiresQuoting)
     {
         hr = StrAlloc(&sczQuotedArg, dwMaxEscapedSize + 3); // plus three for the start and end quote plus null terminator.
-        ExitOnFailure(hr, "Failed to allocate argument to be quoted.");
+        PathExitOnFailure(hr, "Failed to allocate argument to be quoted.");
 
         LPCWSTR pwz = wzArgument; 
         LPWSTR pwzQuoted = sczQuotedArg;
@@ -94,11 +109,11 @@ DAPI_(HRESULT) PathCommandLineAppend(
     if (*psczCommandLine && **psczCommandLine)
     {
         hr = StrAllocConcat(psczCommandLine, L" ", 0);
-        ExitOnFailure(hr, "Failed to append space to command line with existing data.");
+        PathExitOnFailure(hr, "Failed to append space to command line with existing data.");
     }
 
     hr = StrAllocConcat(psczCommandLine, sczQuotedArg ? sczQuotedArg : wzArgument, 0);
-    ExitOnFailure(hr, "Failed to copy command line argument.");
+    PathExitOnFailure(hr, "Failed to copy command line argument.");
 
 LExit:
     ReleaseStr(sczQuotedArg);
@@ -162,7 +177,7 @@ DAPI_(LPCWSTR) PathExtension(
 
 DAPI_(HRESULT) PathGetDirectory(
     __in_z LPCWSTR wzPath,
-    __out LPWSTR *psczDirectory
+    __out_z LPWSTR *psczDirectory
     )
 {
     HRESULT hr = S_OK;
@@ -193,7 +208,7 @@ DAPI_(HRESULT) PathGetDirectory(
     }
 
     hr = StrAllocString(psczDirectory, wzPath, cchDirectory);
-    ExitOnFailure(hr, "Failed to copy directory.");
+    PathExitOnFailure(hr, "Failed to copy directory.");
 
 LExit:
     return hr;
@@ -223,28 +238,28 @@ DAPI_(HRESULT) PathExpand(
         cchExpandedPath = PATH_GOOD_ENOUGH;
 
         hr = StrAlloc(&sczExpandedPath, cchExpandedPath);
-        ExitOnFailure(hr, "Failed to allocate space for expanded path.");
+        PathExitOnFailure(hr, "Failed to allocate space for expanded path.");
 
         cch = ::ExpandEnvironmentStringsW(wzRelativePath, sczExpandedPath, cchExpandedPath);
         if (0 == cch)
         {
-            ExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
+            PathExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
         }
         else if (cchExpandedPath < cch)
         {
             cchExpandedPath = cch;
             hr = StrAlloc(&sczExpandedPath, cchExpandedPath);
-            ExitOnFailure(hr, "Failed to re-allocate more space for expanded path.");
+            PathExitOnFailure(hr, "Failed to re-allocate more space for expanded path.");
 
             cch = ::ExpandEnvironmentStringsW(wzRelativePath, sczExpandedPath, cchExpandedPath);
             if (0 == cch)
             {
-                ExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
+                PathExitWithLastError(hr, "Failed to expand environment variables in string: %ls", wzRelativePath);
             }
             else if (cchExpandedPath < cch)
             {
                 hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-                ExitOnRootFailure(hr, "Failed to allocate buffer for expanded path.");
+                PathExitOnRootFailure(hr, "Failed to allocate buffer for expanded path.");
             }
         }
 
@@ -255,10 +270,10 @@ DAPI_(HRESULT) PathExpand(
             {
                 hr = S_OK;
             }
-            ExitOnFailure(hr, "Failed to prefix long path after expanding environment variables.");
+            PathExitOnFailure(hr, "Failed to prefix long path after expanding environment variables.");
 
             hr = StrMaxLength(sczExpandedPath, reinterpret_cast<DWORD_PTR *>(&cchExpandedPath));
-            ExitOnFailure(hr, "Failed to get max length of expanded path.");
+            PathExitOnFailure(hr, "Failed to get max length of expanded path.");
         }
     }
 
@@ -272,35 +287,35 @@ DAPI_(HRESULT) PathExpand(
         DWORD cchFullPath = PATH_GOOD_ENOUGH < cchExpandedPath ? cchExpandedPath : PATH_GOOD_ENOUGH;
 
         hr = StrAlloc(&sczFullPath, cchFullPath);
-        ExitOnFailure(hr, "Failed to allocate space for full path.");
+        PathExitOnFailure(hr, "Failed to allocate space for full path.");
 
         cch = ::GetFullPathNameW(wzPath, cchFullPath, sczFullPath, &wzFileName);
         if (0 == cch)
         {
-            ExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
+            PathExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
         }
         else if (cchFullPath < cch)
         {
             cchFullPath = cch < MAX_PATH ? cch : cch + 7; // ensure space for "\\?\UNC" prefix if needed
             hr = StrAlloc(&sczFullPath, cchFullPath);
-            ExitOnFailure(hr, "Failed to re-allocate more space for full path.");
+            PathExitOnFailure(hr, "Failed to re-allocate more space for full path.");
 
             cch = ::GetFullPathNameW(wzPath, cchFullPath, sczFullPath, &wzFileName);
             if (0 == cch)
             {
-                ExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
+                PathExitWithLastError(hr, "Failed to get full path for string: %ls", wzPath);
             }
             else if (cchFullPath < cch)
             {
                 hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-                ExitOnRootFailure(hr, "Failed to allocate buffer for full path.");
+                PathExitOnRootFailure(hr, "Failed to allocate buffer for full path.");
             }
         }
 
         if (MAX_PATH < cch)
         {
             hr = PathPrefix(&sczFullPath);
-            ExitOnFailure(hr, "Failed to prefix long path after expanding.");
+            PathExitOnFailure(hr, "Failed to prefix long path after expanding.");
         }
     }
     else
@@ -310,7 +325,7 @@ DAPI_(HRESULT) PathExpand(
     }
 
     hr = StrAllocString(psczFullPath, sczFullPath? sczFullPath : wzRelativePath, 0);
-    ExitOnFailure(hr, "Failed to copy relative path into full path.");
+    PathExitOnFailure(hr, "Failed to copy relative path into full path.");
 
 LExit:
     ReleaseStr(sczFullPath);
@@ -336,7 +351,7 @@ DAPI_(HRESULT) PathPrefix(
         L'\\' == wzFullPath[2]) // normal path
     {
         hr = StrAllocPrefix(psczFullPath, L"\\\\?\\", 4);
-        ExitOnFailure(hr, "Failed to add prefix to file path.");
+        PathExitOnFailure(hr, "Failed to add prefix to file path.");
     }
     else if (L'\\' == wzFullPath[0] && L'\\' == wzFullPath[1]) // UNC
     {
@@ -344,18 +359,18 @@ DAPI_(HRESULT) PathPrefix(
         if (!(L'?' == wzFullPath[2] && L'\\' == wzFullPath[3]))
         {
             hr = StrSize(*psczFullPath, &cbFullPath);
-            ExitOnFailure(hr, "Failed to get size of full path.");
+            PathExitOnFailure(hr, "Failed to get size of full path.");
 
             memmove_s(wzFullPath, cbFullPath, wzFullPath + 1, cbFullPath - sizeof(WCHAR));
 
             hr = StrAllocPrefix(psczFullPath, L"\\\\?\\UNC", 7);
-            ExitOnFailure(hr, "Failed to add prefix to UNC path.");
+            PathExitOnFailure(hr, "Failed to add prefix to UNC path.");
         }
     }
     else
     {
         hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Invalid path provided to prefix: %ls.", wzFullPath);
+        PathExitOnFailure(hr, "Invalid path provided to prefix: %ls.", wzFullPath);
     }
 
 LExit:
@@ -372,7 +387,7 @@ DAPI_(HRESULT) PathFixedBackslashTerminate(
     size_t cchLength = 0;
 
     hr = ::StringCchLengthW(wzPath, cchPath, &cchLength);
-    ExitOnFailure(hr, "Failed to get length of path.");
+    PathExitOnFailure(hr, "Failed to get length of path.");
 
     if (cchLength >= cchPath)
     {
@@ -400,15 +415,15 @@ DAPI_(HRESULT) PathBackslashTerminate(
     size_t cchLength = 0;
 
     hr = StrMaxLength(*psczPath, &cchPath);
-    ExitOnFailure(hr, "Failed to get size of path string.");
+    PathExitOnFailure(hr, "Failed to get size of path string.");
 
     hr = ::StringCchLengthW(*psczPath, cchPath, &cchLength);
-    ExitOnFailure(hr, "Failed to get length of path.");
+    PathExitOnFailure(hr, "Failed to get length of path.");
 
     if (L'\\' != (*psczPath)[cchLength - 1])
     {
         hr = StrAllocConcat(psczPath, L"\\", 1);
-        ExitOnFailure(hr, "Failed to concat backslash onto string.");
+        PathExitOnFailure(hr, "Failed to concat backslash onto string.");
     }
 
 LExit:
@@ -427,12 +442,12 @@ DAPI_(HRESULT) PathForCurrentProcess(
     do
     {
         hr = StrAlloc(psczFullPath, cch);
-        ExitOnFailure(hr, "Failed to allocate string for module path.");
+        PathExitOnFailure(hr, "Failed to allocate string for module path.");
 
         DWORD cchRequired = ::GetModuleFileNameW(hModule, *psczFullPath, cch);
         if (0 == cchRequired)
         {
-            ExitWithLastError(hr, "Failed to get path for executing process.");
+            PathExitWithLastError(hr, "Failed to get path for executing process.");
         }
         else if (cchRequired == cch)
         {
@@ -457,15 +472,15 @@ DAPI_(HRESULT) PathRelativeToModule(
     )
 {
     HRESULT hr = PathForCurrentProcess(psczFullPath, hModule);
-    ExitOnFailure(hr, "Failed to get current module path.");
+    PathExitOnFailure(hr, "Failed to get current module path.");
 
     hr = PathGetDirectory(*psczFullPath, psczFullPath);
-    ExitOnFailure(hr, "Failed to get current module directory.");
+    PathExitOnFailure(hr, "Failed to get current module directory.");
 
     if (wzFileName)
     {
         hr = PathConcat(*psczFullPath, wzFileName, psczFullPath);
-        ExitOnFailure(hr, "Failed to append filename.");
+        PathExitOnFailure(hr, "Failed to append filename.");
     }
 
 LExit:
@@ -496,16 +511,16 @@ DAPI_(HRESULT) PathCreateTempFile(
     if (wzDirectory && *wzDirectory)
     {
         hr = StrAllocString(&sczTempPath, wzDirectory, 0);
-        ExitOnFailure(hr, "Failed to copy temp path.");
+        PathExitOnFailure(hr, "Failed to copy temp path.");
     }
     else
     {
         hr = StrAlloc(&sczTempPath, cchTempPath);
-        ExitOnFailure(hr, "Failed to allocate memory for the temp path.");
+        PathExitOnFailure(hr, "Failed to allocate memory for the temp path.");
 
         if (!::GetTempPathW(cchTempPath, sczTempPath))
         {
-            ExitWithLastError(hr, "Failed to get temp path.");
+            PathExitWithLastError(hr, "Failed to get temp path.");
         }
     }
 
@@ -514,10 +529,10 @@ DAPI_(HRESULT) PathCreateTempFile(
         for (DWORD i = 1; i <= dwUniqueCount && INVALID_HANDLE_VALUE == hTempFile; ++i)
         {
             hr = StrAllocFormatted(&scz, wzFileNameTemplate, i);
-            ExitOnFailure(hr, "Failed to allocate memory for file template.");
+            PathExitOnFailure(hr, "Failed to allocate memory for file template.");
 
             hr = StrAllocFormatted(&sczTempFile, L"%s%s", sczTempPath, scz);
-            ExitOnFailure(hr, "Failed to allocate temp file name.");
+            PathExitOnFailure(hr, "Failed to allocate temp file name.");
 
             hTempFile = ::CreateFileW(sczTempFile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_NEW, dwFileAttributes, NULL);
             if (INVALID_HANDLE_VALUE == hTempFile)
@@ -528,7 +543,7 @@ DAPI_(HRESULT) PathCreateTempFile(
                 {
                     hr = S_OK;
                 }
-                ExitOnFailure(hr, "Failed to create file: %ls", sczTempFile);
+                PathExitOnFailure(hr, "Failed to create file: %ls", sczTempFile);
             }
         }
     }
@@ -538,17 +553,17 @@ DAPI_(HRESULT) PathCreateTempFile(
     if (INVALID_HANDLE_VALUE == hTempFile)
     {
         hr = StrAlloc(&sczTempFile, MAX_PATH);
-        ExitOnFailure(hr, "Failed to allocate memory for the temp path");
+        PathExitOnFailure(hr, "Failed to allocate memory for the temp path");
 
         if (!::GetTempFileNameW(sczTempPath, L"TMP", 0, sczTempFile))
         {
-            ExitWithLastError(hr, "Failed to create new temp file name.");
+            PathExitWithLastError(hr, "Failed to create new temp file name.");
         }
 
         hTempFile = ::CreateFileW(sczTempFile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, dwFileAttributes, NULL);
         if (INVALID_HANDLE_VALUE == hTempFile)
         {
-            ExitWithLastError(hr, "Failed to open new temp file: %ls", sczTempFile);
+            PathExitWithLastError(hr, "Failed to open new temp file: %ls", sczTempFile);
         }
     }
 
@@ -556,7 +571,7 @@ DAPI_(HRESULT) PathCreateTempFile(
     if (psczTempFile)
     {
         hr = StrAllocString(psczTempFile, sczTempFile, 0);
-        ExitOnFailure(hr, "Failed to copy temp file string.");
+        PathExitOnFailure(hr, "Failed to copy temp file string.");
     }
 
     if (phTempFile)
@@ -602,24 +617,24 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
     if (wzDirectory && *wzDirectory)
     {
         hr = PathConcat(wzDirectory, wzPrefix, &sczPrefix);
-        ExitOnFailure(hr, "Failed to combine directory and log prefix.");
+        PathExitOnFailure(hr, "Failed to combine directory and log prefix.");
     }
     else
     {
         if (!::GetTempPathW(countof(wzTempPath), wzTempPath))
         {
-            ExitWithLastError(hr, "Failed to get temp folder.");
+            PathExitWithLastError(hr, "Failed to get temp folder.");
         }
 
         hr = PathConcat(wzTempPath, wzPrefix, &sczPrefix);
-        ExitOnFailure(hr, "Failed to concatenate the temp folder and log prefix.");
+        PathExitOnFailure(hr, "Failed to concatenate the temp folder and log prefix.");
     }
 
     hr = PathGetDirectory(sczPrefix, &sczPrefixFolder);
     if (S_OK == hr)
     {
         hr = DirEnsureExists(sczPrefixFolder, NULL);
-        ExitOnFailure(hr, "Failed to ensure temp file path exists: %ls", sczPrefixFolder);
+        PathExitOnFailure(hr, "Failed to ensure temp file path exists: %ls", sczPrefixFolder);
     }
 
     if (!wzPostfix)
@@ -636,7 +651,7 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
 
         // Log format:                         pre YYYY MM  dd  hh  mm  ss post ext
         hr = StrAllocFormatted(&sczTempPath, L"%ls_%04u%02u%02u%02u%02u%02u%ls%ls%ls", sczPrefix, time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, wzPostfix, L'.' == *wzExtension ? L"" : L".", wzExtension);
-        ExitOnFailure(hr, "failed to allocate memory for the temp path");
+        PathExitOnFailure(hr, "failed to allocate memory for the temp path");
 
         hTempFile = ::CreateFileW(sczTempPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == hTempFile)
@@ -655,14 +670,14 @@ DAPI_(HRESULT) PathCreateTimeBasedTempFile(
             }
 
             hr = HRESULT_FROM_WIN32(er);
-            ExitOnFailureDebugTrace(hr, "Failed to create temp file: %ls", sczTempPath);
+            PathExitOnFailureDebugTrace(hr, "Failed to create temp file: %ls", sczTempPath);
         }
     } while (fRetry);
 
     if (psczTempFile)
     {
         hr = StrAllocString(psczTempFile, sczTempPath, 0);
-        ExitOnFailure(hr, "Failed to copy temp path to return.");
+        PathExitOnFailure(hr, "Failed to copy temp path to return.");
     }
 
     if (phTempFile)
@@ -701,29 +716,29 @@ DAPI_(HRESULT) PathCreateTempDirectory(
     if (wzDirectory && *wzDirectory)
     {
         hr = StrAllocString(&sczTempPath, wzDirectory, 0);
-        ExitOnFailure(hr, "Failed to copy temp path.");
+        PathExitOnFailure(hr, "Failed to copy temp path.");
 
         hr = PathBackslashTerminate(&sczTempPath);
-        ExitOnFailure(hr, "Failed to ensure path ends in backslash: %ls", wzDirectory);
+        PathExitOnFailure(hr, "Failed to ensure path ends in backslash: %ls", wzDirectory);
     }
     else
     {
         hr = StrAlloc(&sczTempPath, cchTempPath);
-        ExitOnFailure(hr, "Failed to allocate memory for the temp path.");
+        PathExitOnFailure(hr, "Failed to allocate memory for the temp path.");
 
         if (!::GetTempPathW(cchTempPath, sczTempPath))
         {
-            ExitWithLastError(hr, "Failed to get temp path.");
+            PathExitWithLastError(hr, "Failed to get temp path.");
         }
     }
 
     for (DWORD i = 1; i <= dwUniqueCount; ++i)
     {
         hr = StrAllocFormatted(&scz, wzDirectoryNameTemplate, i);
-        ExitOnFailure(hr, "Failed to allocate memory for directory name template.");
+        PathExitOnFailure(hr, "Failed to allocate memory for directory name template.");
 
         hr = StrAllocFormatted(psczTempDirectory, L"%s%s", sczTempPath, scz);
-        ExitOnFailure(hr, "Failed to allocate temp directory name.");
+        PathExitOnFailure(hr, "Failed to allocate temp directory name.");
 
         if (!::CreateDirectoryW(*psczTempDirectory, NULL))
         {
@@ -750,10 +765,10 @@ DAPI_(HRESULT) PathCreateTempDirectory(
             break;
         }
     }
-    ExitOnFailure(hr, "Failed to create temp directory.");
+    PathExitOnFailure(hr, "Failed to create temp directory.");
 
     hr = PathBackslashTerminate(psczTempDirectory);
-    ExitOnFailure(hr, "Failed to ensure temp directory is backslash terminated.");
+    PathExitOnFailure(hr, "Failed to ensure temp directory is backslash terminated.");
 
 LExit:
     ReleaseStr(scz);
@@ -771,13 +786,13 @@ DAPI_(HRESULT) PathGetKnownFolder(
     HRESULT hr = S_OK;
 
     hr = StrAlloc(psczKnownFolder, MAX_PATH);
-    ExitOnFailure(hr, "Failed to allocate memory for known folder.");
+    PathExitOnFailure(hr, "Failed to allocate memory for known folder.");
 
     hr = ::SHGetFolderPathW(NULL, csidl, NULL, SHGFP_TYPE_CURRENT, *psczKnownFolder);
-    ExitOnFailure(hr, "Failed to get known folder path.");
+    PathExitOnFailure(hr, "Failed to get known folder path.");
 
     hr = PathBackslashTerminate(psczKnownFolder);
-    ExitOnFailure(hr, "Failed to ensure known folder path is backslash terminated.");
+    PathExitOnFailure(hr, "Failed to ensure known folder path is backslash terminated.");
 
 LExit:
     return hr;
@@ -804,23 +819,23 @@ DAPI_(HRESULT) PathConcat(
     if (!wzPath2 || !*wzPath2)
     {
         hr = StrAllocString(psczCombined, wzPath1, 0);
-        ExitOnFailure(hr, "Failed to copy just path1 to output.");
+        PathExitOnFailure(hr, "Failed to copy just path1 to output.");
     }
     else if (!wzPath1 || !*wzPath1 || PathIsAbsolute(wzPath2))
     {
         hr = StrAllocString(psczCombined, wzPath2, 0);
-        ExitOnFailure(hr, "Failed to copy just path2 to output.");
+        PathExitOnFailure(hr, "Failed to copy just path2 to output.");
     }
     else
     {
         hr = StrAllocString(psczCombined, wzPath1, 0);
-        ExitOnFailure(hr, "Failed to copy path1 to output.");
+        PathExitOnFailure(hr, "Failed to copy path1 to output.");
 
         hr = PathBackslashTerminate(psczCombined);
-        ExitOnFailure(hr, "Failed to backslashify.");
+        PathExitOnFailure(hr, "Failed to backslashify.");
 
         hr = StrAllocConcat(psczCombined, wzPath2, 0);
-        ExitOnFailure(hr, "Failed to append path2 to output.");
+        PathExitOnFailure(hr, "Failed to append path2 to output.");
     }
 
 LExit:
@@ -839,13 +854,13 @@ DAPI_(HRESULT) PathEnsureQuoted(
     size_t cchPath = 0;
 
     hr = ::StringCchLengthW(*ppszPath, STRSAFE_MAX_CCH, &cchPath);
-    ExitOnFailure(hr, "Failed to get the length of the path.");
+    PathExitOnFailure(hr, "Failed to get the length of the path.");
 
     // Handle simple special cases.
     if (0 == cchPath || (1 == cchPath && L'"' == (*ppszPath)[0]))
     {
         hr = StrAllocString(ppszPath, L"\"\"", 2);
-        ExitOnFailure(hr, "Failed to allocate a quoted empty string.");
+        PathExitOnFailure(hr, "Failed to allocate a quoted empty string.");
 
         ExitFunction();
     }
@@ -853,7 +868,7 @@ DAPI_(HRESULT) PathEnsureQuoted(
     if (L'"' != (*ppszPath)[0])
     {
         hr = StrAllocPrefix(ppszPath, L"\"", 1);
-        ExitOnFailure(hr, "Failed to allocate an opening quote.");
+        PathExitOnFailure(hr, "Failed to allocate an opening quote.");
 
         // Add a char for the opening quote.
         ++cchPath;
@@ -862,7 +877,7 @@ DAPI_(HRESULT) PathEnsureQuoted(
     if (L'"' != (*ppszPath)[cchPath - 1])
     {
         hr = StrAllocConcat(ppszPath, L"\"", 1);
-        ExitOnFailure(hr, "Failed to allocate a closing quote.");
+        PathExitOnFailure(hr, "Failed to allocate a closing quote.");
 
         // Add a char for the closing quote.
         ++cchPath;
@@ -876,7 +891,7 @@ DAPI_(HRESULT) PathEnsureQuoted(
             (*ppszPath)[cchPath - 1] = L'\\';
 
             hr = StrAllocConcat(ppszPath, L"\"", 1);
-            ExitOnFailure(hr, "Failed to allocate another closing quote after the backslash.");
+            PathExitOnFailure(hr, "Failed to allocate another closing quote after the backslash.");
         }
     }
 
@@ -897,10 +912,10 @@ DAPI_(HRESULT) PathCompare(
     LPWSTR sczPath2 = NULL;
 
     hr = PathExpand(&sczPath1, wzPath1, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-    ExitOnFailure(hr, "Failed to expand path1.");
+    PathExitOnFailure(hr, "Failed to expand path1.");
 
     hr = PathExpand(&sczPath2, wzPath2, PATH_EXPAND_ENVIRONMENT | PATH_EXPAND_FULLPATH);
-    ExitOnFailure(hr, "Failed to expand path2.");
+    PathExitOnFailure(hr, "Failed to expand path2.");
 
     *pnResult = ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczPath1, -1, sczPath2, -1);
 
@@ -922,7 +937,7 @@ DAPI_(HRESULT) PathCompress(
     hPath = ::CreateFileW(wzPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
     if (INVALID_HANDLE_VALUE == hPath)
     {
-        ExitWithLastError(hr, "Failed to open path %ls for compression.", wzPath);
+        PathExitWithLastError(hr, "Failed to open path %ls for compression.", wzPath);
     }
 
     DWORD dwBytesReturned = 0;
@@ -933,7 +948,7 @@ DAPI_(HRESULT) PathCompress(
         DWORD er = ::GetLastError();
         if (ERROR_INVALID_FUNCTION != er)
         {
-            ExitOnWin32Error(er, hr, "Failed to set compression state for path %ls.", wzPath);
+            PathExitOnWin32Error(er, hr, "Failed to set compression state for path %ls.", wzPath);
         }
     }
 
@@ -945,7 +960,7 @@ LExit:
 
 DAPI_(HRESULT) PathGetHierarchyArray(
     __in_z LPCWSTR wzPath,
-    __deref_inout_ecount_opt(*pcStrArray) LPWSTR **prgsczPathArray,
+    __deref_inout_ecount_opt(*pcPathArray) LPWSTR **prgsczPathArray,
     __inout LPUINT pcPathArray
     )
 {
@@ -975,16 +990,16 @@ DAPI_(HRESULT) PathGetHierarchyArray(
     Assert(cArraySpacesNeeded >= 1);
 
     hr = MemEnsureArraySize(reinterpret_cast<void **>(prgsczPathArray), cArraySpacesNeeded, sizeof(LPWSTR), 0);
-    ExitOnFailure(hr, "Failed to allocate array of size %u for parent directories", cArraySpacesNeeded);
+    PathExitOnFailure(hr, "Failed to allocate array of size %u for parent directories", cArraySpacesNeeded);
     *pcPathArray = cArraySpacesNeeded;
 
     hr = StrAllocString(&sczPathCopy, wzPath, 0);
-    ExitOnFailure(hr, "Failed to allocate copy of original path");
+    PathExitOnFailure(hr, "Failed to allocate copy of original path");
 
     for (DWORD i = 0; i < cArraySpacesNeeded; ++i)
     {
         hr = StrAllocString((*prgsczPathArray) + cArraySpacesNeeded - 1 - i, sczPathCopy, 0);
-        ExitOnFailure(hr, "Failed to copy path");
+        PathExitOnFailure(hr, "Failed to copy path");
 
         // If it ends in a backslash, it's a directory path, so cut off everything the last backslash before we get the directory portion of the path
         if (wzPath[lstrlenW(sczPathCopy) - 1] == L'\\')
@@ -993,7 +1008,7 @@ DAPI_(HRESULT) PathGetHierarchyArray(
         }
         
         hr = PathGetDirectory(sczPathCopy, &sczNewPathCopy);
-        ExitOnFailure(hr, "Failed to get directory portion of path");
+        PathExitOnFailure(hr, "Failed to get directory portion of path");
 
         ReleaseStr(sczPathCopy);
         sczPathCopy = sczNewPathCopy;

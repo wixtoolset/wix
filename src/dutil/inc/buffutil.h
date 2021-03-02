@@ -50,37 +50,37 @@ HRESULT BuffReadStream(
     __in_bcount(cbBuffer) const BYTE* pbBuffer,
     __in SIZE_T cbBuffer,
     __inout SIZE_T* piBuffer,
-    __deref_out_bcount(*pcbStream) BYTE** ppbStream,
+    __deref_inout_bcount(*pcbStream) BYTE** ppbStream,
     __out SIZE_T* pcbStream
     );
 
 HRESULT BuffWriteNumber(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in DWORD_PTR dw
     );
 HRESULT BuffWriteNumber64(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in DWORD64 dw64
     );
 HRESULT BuffWritePointer(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in DWORD_PTR dw
 );
 HRESULT BuffWriteString(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in_z_opt LPCWSTR scz
     );
 HRESULT BuffWriteStringAnsi(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in_z_opt LPCSTR scz
     );
 HRESULT BuffWriteStream(
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in_bcount(cbStream) const BYTE* pbStream,
     __in SIZE_T cbStream

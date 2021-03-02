@@ -138,7 +138,7 @@ HRESULT DAPI AtomParseFromDocument(
     );
 
 void DAPI AtomFreeFeed(
-    __in_xcount(pFeed->cItems) ATOM_FEED *pFEED
+    __in_xcount(pFeed->cItems) ATOM_FEED* pFeed
     );
 
 #ifdef __cplusplus

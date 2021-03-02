@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define EseExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__)
+#define EseExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_ESEUTIL, p, x, e, s, __VA_ARGS__)
+#define EseExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_ESEUTIL, p, x, s, __VA_ARGS__)
+#define EseExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_ESEUTIL, p, x, e, s, __VA_ARGS__)
+#define EseExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_ESEUTIL, p, x, s, __VA_ARGS__)
+#define EseExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_ESEUTIL, e, x, s, __VA_ARGS__)
+#define EseExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_ESEUTIL, g, x, s, __VA_ARGS__)
+
 struct ESE_QUERY
 {
     ESE_QUERY_TYPE qtQueryType;
@@ -85,13 +100,13 @@ HRESULT HresultFromJetError(JET_ERR jEr)
     }
 
     // Log the actual Jet error code so we have record of it before it's morphed into an HRESULT to be compatible with the rest of our code
-    ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Encountered Jet Error: 0x%08x", jEr);
+    ExitTraceSource(DUTIL_SOURCE_ESEUTIL, hr, "Encountered Jet Error: 0x%08x", jEr);
 
     return hr;
 }
 
-#define ExitOnJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { ExitTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__); goto LExit; }}
-#define ExitOnRootJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__); goto LExit; }}
+#define ExitOnJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { ExitTraceSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__); goto LExit; }}
+#define ExitOnRootJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(DUTIL_SOURCE_ESEUTIL, x, s, __VA_ARGS__); goto LExit; }}
 
 HRESULT DAPI EseBeginSession(
     __out JET_INSTANCE *pjiInstance,
@@ -106,15 +121,15 @@ HRESULT DAPI EseBeginSession(
     LPSTR pszAnsiPath = NULL;
 
     hr = DirEnsureExists(pszPath, NULL);
-    ExitOnFailure(hr, "Failed to ensure database directory exists");
+    EseExitOnFailure(hr, "Failed to ensure database directory exists");
 
     // Sigh. JETblue requires Vista and up for the wide character version of this function, so we'll convert to ANSI before calling,
     // likely breaking everyone with unicode characters in their path.
     hr = StrAnsiAllocString(&pszAnsiInstance, pszInstance, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting instance name to ansi");
+    EseExitOnFailure(hr, "Failed converting instance name to ansi");
 
     hr = StrAnsiAllocString(&pszAnsiPath, pszPath, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting session path name to ansi");
+    EseExitOnFailure(hr, "Failed converting session path name to ansi");
 
     jEr = JetCreateInstanceA(pjiInstance, pszAnsiInstance);
     ExitOnJetFailure(jEr, hr, "Failed to create instance");
@@ -173,17 +188,17 @@ HRESULT AllocColumnCreateStruct(
     size_t cbAllocSize = 0;
 
     hr = ::SizeTMult(ptsSchema->dwColumns, sizeof(JET_COLUMNCREATE), &(cbAllocSize));
-    ExitOnFailure(hr, "Maximum allocation exceeded.");
+    EseExitOnFailure(hr, "Maximum allocation exceeded.");
 
     *ppjccColumnCreate = static_cast<JET_COLUMNCREATE*>(MemAlloc(cbAllocSize, TRUE));
-    ExitOnNull(*ppjccColumnCreate, hr, E_OUTOFMEMORY, "Failed to allocate column create structure for database");
+    EseExitOnNull(*ppjccColumnCreate, hr, E_OUTOFMEMORY, "Failed to allocate column create structure for database");
 
     for (i = 0; i < ptsSchema->dwColumns; ++i)
     {
         (*ppjccColumnCreate)[i].cbStruct = sizeof(JET_COLUMNCREATE);
 
         hr = StrAnsiAllocString(&(*ppjccColumnCreate)[i].szColumnName, ptsSchema->pcsColumns[i].pszName, 0, CP_ACP);
-        ExitOnFailure(hr, "Failed to allocate ansi column name: %ls", ptsSchema->pcsColumns[i].pszName);
+        EseExitOnFailure(hr, "Failed to allocate ansi column name: %ls", ptsSchema->pcsColumns[i].pszName);
 
         (*ppjccColumnCreate)[i].coltyp = ptsSchema->pcsColumns[i].jcColumnType;
 
@@ -237,7 +252,7 @@ HRESULT FreeColumnCreateStruct(
     }
 
     hr = MemFree(pjccColumnCreate);
-    ExitOnFailure(hr, "Failed to release core column create struct");
+    EseExitOnFailure(hr, "Failed to release core column create struct");
 
 LExit:
     return hr;
@@ -261,20 +276,20 @@ HRESULT AllocIndexCreateStruct(
         if (ptsSchema->pcsColumns[i].fKey)
         {
             hr = StrAnsiAllocString(&pszTempString, ptsSchema->pcsColumns[i].pszName, 0, CP_ACP);
-            ExitOnFailure(hr, "Failed to convert string to ansi: %ls", ptsSchema->pcsColumns[i].pszName);
+            EseExitOnFailure(hr, "Failed to convert string to ansi: %ls", ptsSchema->pcsColumns[i].pszName);
 
             hr = StrAnsiAllocConcat(&pszMultiSzKeys, "+", 0);
-            ExitOnFailure(hr, "Failed to append plus sign to multisz string: %s", pszTempString);
+            EseExitOnFailure(hr, "Failed to append plus sign to multisz string: %s", pszTempString);
 
             hr = StrAnsiAllocConcat(&pszMultiSzKeys, pszTempString, 0);
-            ExitOnFailure(hr, "Failed to append column name to multisz string: %s", pszTempString);
+            EseExitOnFailure(hr, "Failed to append column name to multisz string: %s", pszTempString);
 
             ReleaseNullStr(pszTempString);
 
             // All question marks will be converted to null characters later; this is just to trick dutil
             // into letting us create an ansi, double-null-terminated list of single-null-terminated strings
             hr = StrAnsiAllocConcat(&pszMultiSzKeys, "?", 0);
-            ExitOnFailure(hr, "Failed to append placeholder character to multisz string: %ls", pszMultiSzKeys);
+            EseExitOnFailure(hr, "Failed to append placeholder character to multisz string: %hs", pszMultiSzKeys);
 
             // Record that at least one key column was found
             fKeyColumns = TRUE;
@@ -288,18 +303,18 @@ HRESULT AllocIndexCreateStruct(
     }
 
     hr = StrAnsiAllocString(&pszIndexName, ptsSchema->pszName, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed to allocate ansi string version of %ls", ptsSchema->pszName);
+    EseExitOnFailure(hr, "Failed to allocate ansi string version of %ls", ptsSchema->pszName);
 
     hr = StrAnsiAllocConcat(&pszIndexName, "_Index", 0);
-    ExitOnFailure(hr, "Failed to append table name string version of %ls", ptsSchema->pszName);
+    EseExitOnFailure(hr, "Failed to append table name string version of %ls", ptsSchema->pszName);
 
     *ppjicIndexCreate = static_cast<JET_INDEXCREATE*>(MemAlloc(sizeof(JET_INDEXCREATE), TRUE));
-    ExitOnNull(*ppjicIndexCreate, hr, E_OUTOFMEMORY, "Failed to allocate index create structure for database");
+    EseExitOnNull(*ppjicIndexCreate, hr, E_OUTOFMEMORY, "Failed to allocate index create structure for database");
 
     // Record the size including both null terminators - the struct requires this
     DWORD dwSize = 0;
     dwSize = lstrlen(pszMultiSzKeys) + 1; // add 1 to include null character at the end
-    ExitOnFailure(hr, "Failed to get size of keys string");
+    EseExitOnFailure(hr, "Failed to get size of keys string");
 
     // At this point convert all question marks to null characters
     for (i = 0; i < dwSize; ++i)
@@ -349,7 +364,7 @@ HRESULT EnsureSchema(
     jtTableCreate.cIndexes = 1;
 
     hr = EseBeginTransaction(jsSession);
-    ExitOnFailure(hr, "Failed to begin transaction to create tables");
+    EseExitOnFailure(hr, "Failed to begin transaction to create tables");
     fTransaction = TRUE;
    
     for (dwTable = 0;dwTable < pdsSchema->dwTables; ++dwTable)
@@ -363,13 +378,13 @@ HRESULT EnsureSchema(
         {
             // Fill out the JET_TABLECREATE struct
             hr = StrAnsiAllocString(&jtTableCreate.szTableName, pdsSchema->ptsTables[dwTable].pszName, 0, CP_ACP);
-            ExitOnFailure(hr, "Failed converting table name to ansi");
+            EseExitOnFailure(hr, "Failed converting table name to ansi");
 
             hr = AllocColumnCreateStruct(&(pdsSchema->ptsTables[dwTable]), &jtTableCreate.rgcolumncreate);
-            ExitOnFailure(hr, "Failed to allocate column create struct");
+            EseExitOnFailure(hr, "Failed to allocate column create struct");
 
             hr = AllocIndexCreateStruct(&(pdsSchema->ptsTables[dwTable]), &jtTableCreate.rgindexcreate);
-            ExitOnFailure(hr, "Failed to allocate index create struct");
+            EseExitOnFailure(hr, "Failed to allocate index create struct");
 
             jtTableCreate.cColumns = pdsSchema->ptsTables[dwTable].dwColumns;
             jtTableCreate.tableid = NULL;
@@ -392,7 +407,7 @@ HRESULT EnsureSchema(
             ReleaseNullStr(jtTableCreate.szTableName);
 
             hr = FreeColumnCreateStruct(jtTableCreate.rgcolumncreate, jtTableCreate.cColumns);
-            ExitOnFailure(hr, "Failed to free column create struct");
+            EseExitOnFailure(hr, "Failed to free column create struct");
             jtTableCreate.rgcolumncreate = NULL;
         }
         else
@@ -422,7 +437,7 @@ HRESULT EnsureSchema(
                 }
 
                 hr = EseEnsureColumn(jsSession, pdsSchema->ptsTables[dwTable].jtTable, pcsColumn->pszName, pcsColumn->jcColumnType, ulColumnSize, pcsColumn->fFixed, fNullable, &pcsColumn->jcColumn);
-                ExitOnFailure(hr, "Failed to create column %u of %ls table", dwColumn, pwzTableName);
+                EseExitOnFailure(hr, "Failed to create column %u of %ls table", dwColumn, pwzTableName);
             }
         }
     }
@@ -464,13 +479,13 @@ HRESULT DAPI EseEnsureDatabase(
     // Sigh. JETblue requires Vista and up for the wide character version of this function, so we'll convert to ANSI before calling,
     // likely breaking all those with unicode characters in their path.
     hr = StrAnsiAllocString(&pszAnsiFile, pszFile, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting database name to ansi");
+    EseExitOnFailure(hr, "Failed converting database name to ansi");
 
     hr = PathGetDirectory(pszFile, &pszDir);
-    ExitOnFailure(hr, "Failed to get directory that will contain database file");
+    EseExitOnFailure(hr, "Failed to get directory that will contain database file");
 
     hr = DirEnsureExists(pszDir, NULL);
-    ExitOnFailure(hr, "Failed to ensure directory exists for database: %ls", pszDir);
+    EseExitOnFailure(hr, "Failed to ensure directory exists for database: %ls", pszDir);
 
     if (FileExistsEx(pszFile, NULL))
     {
@@ -498,7 +513,7 @@ HRESULT DAPI EseEnsureDatabase(
     }
 
     hr = EnsureSchema(*pjdbDb, jsSession, pdsSchema);
-    ExitOnFailure(hr, "Failed to ensure database schema matches expectations");
+    EseExitOnFailure(hr, "Failed to ensure database schema matches expectations");
         
 LExit:
     ReleaseStr(pszDir);
@@ -535,7 +550,7 @@ HRESULT DAPI EseCreateTable(
     LPSTR pszAnsiTable = NULL;
 
     hr = StrAnsiAllocString(&pszAnsiTable, pszTable, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting table name to ansi");
+    EseExitOnFailure(hr, "Failed converting table name to ansi");
 
     jEr = JetCreateTableA(jsSession, jdbDb, pszAnsiTable, 100, 0, pjtTable);
     ExitOnJetFailure(jEr, hr, "Failed to create table %s", pszAnsiTable);
@@ -558,7 +573,7 @@ HRESULT DAPI EseOpenTable(
     LPSTR pszAnsiTable = NULL;
 
     hr = StrAnsiAllocString(&pszAnsiTable, pszTable, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting table name to ansi");
+    EseExitOnFailure(hr, "Failed converting table name to ansi");
 
     jEr = JetOpenTableA(jsSession, jdbDb, pszAnsiTable, NULL, 0, 0, pjtTable);
     ExitOnJetFailure(jEr, hr, "Failed to open table %s", pszAnsiTable);
@@ -602,7 +617,7 @@ HRESULT DAPI EseEnsureColumn(
     JET_COLUMNBASE jcdTempBase = { sizeof(JET_COLUMNBASE) };
 
     hr = StrAnsiAllocString(&pszAnsiColumnName, pszColumnName, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting column name to ansi");
+    EseExitOnFailure(hr, "Failed converting column name to ansi");
 
     jEr = JetGetTableColumnInfoA(jsSession, jtTable, pszAnsiColumnName, &jcdTempBase, sizeof(JET_COLUMNBASE), JET_ColInfoBase);
     if (JET_errSuccess == jEr)
@@ -661,7 +676,7 @@ HRESULT DAPI EseGetColumn(
     JET_COLUMNBASE jcdTempBase = { sizeof(JET_COLUMNBASE) };
 
     hr = StrAnsiAllocString(&pszAnsiColumnName, pszColumnName, 0, CP_ACP);
-    ExitOnFailure(hr, "Failed converting column name to ansi");
+    EseExitOnFailure(hr, "Failed converting column name to ansi");
 
     jEr = JetGetTableColumnInfoA(jsSession, jtTable, pszAnsiColumnName, &jcdTempBase, sizeof(JET_COLUMNBASE), JET_ColInfoBase);
     if (JET_errSuccess == jEr)
@@ -898,7 +913,7 @@ HRESULT DAPI EseGetColumnBinary(
     __in JET_SESID jsSession,
     __in ESE_TABLE_SCHEMA tsTable,
     __in DWORD dwColumn,
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer
     )
 {
@@ -916,12 +931,12 @@ HRESULT DAPI EseGetColumnBinary(
     if (NULL == *ppbBuffer)
     {
         *ppbBuffer = reinterpret_cast<BYTE *>(MemAlloc(ulActualSize, FALSE));
-        ExitOnNull(*ppbBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for reading binary value column");
+        EseExitOnNull(*ppbBuffer, hr, E_OUTOFMEMORY, "Failed to allocate memory for reading binary value column");
     }
     else
     {
         *ppbBuffer = reinterpret_cast<BYTE *>(MemReAlloc(*ppbBuffer, ulActualSize, FALSE));
-        ExitOnNull(*ppbBuffer, hr, E_OUTOFMEMORY, "Failed to reallocate memory for reading binary value column");
+        EseExitOnNull(*ppbBuffer, hr, E_OUTOFMEMORY, "Failed to reallocate memory for reading binary value column");
     }
 
     jEr = JetRetrieveColumn(jsSession, tsTable.jtTable, tsTable.pcsColumns[dwColumn].jcColumn, *ppbBuffer, ulActualSize, NULL, 0, NULL);
@@ -1001,7 +1016,7 @@ HRESULT DAPI EseGetColumnString(
     ExitOnJetFailure(jEr, hr, "Failed to check size of string value from record");
 
     hr = StrAlloc(ppszValue, ulActualSize);
-    ExitOnFailure(hr, "Failed to allocate string while retrieving column value");
+    EseExitOnFailure(hr, "Failed to allocate string while retrieving column value");
 
     jEr = JetRetrieveColumn(jsSession, tsTable.jtTable, tsTable.pcsColumns[dwColumn].jcColumn, *ppszValue, ulActualSize, NULL, 0, NULL);
     ExitOnJetFailure(jEr, hr, "Failed to retrieve string value from record");
@@ -1023,7 +1038,7 @@ HRESULT DAPI EseBeginQuery(
     HRESULT hr = S_OK;
 
     *peqhHandle = static_cast<ESE_QUERY*>(MemAlloc(sizeof(ESE_QUERY), TRUE));
-    ExitOnNull(*peqhHandle, hr, E_OUTOFMEMORY, "Failed to allocate new query");
+    EseExitOnNull(*peqhHandle, hr, E_OUTOFMEMORY, "Failed to allocate new query");
 
     ESE_QUERY *peqHandle = static_cast<ESE_QUERY *>(*peqhHandle);
     peqHandle->qtQueryType = qtQueryType;
@@ -1050,7 +1065,7 @@ HRESULT DAPI SetQueryColumn(
     if (peqHandle->dwColumns == countof(peqHandle->pvData))
     {
         hr = E_NOTIMPL;
-        ExitOnFailure(hr, "Dutil hasn't implemented support for queries of more than %d columns", countof(peqHandle->pvData));
+        EseExitOnFailure(hr, "Dutil hasn't implemented support for queries of more than %d columns", countof(peqHandle->pvData));
     }
 
     if (0 == peqHandle->dwColumns) // If it's the first column, start a new key
@@ -1065,7 +1080,7 @@ HRESULT DAPI SetQueryColumn(
     if (ESE_QUERY_EXACT != peqHandle->qtQueryType)
     {
         peqHandle->pvData[peqHandle->dwColumns] = MemAlloc(cbData, FALSE);
-        ExitOnNull(peqHandle->pvData[peqHandle->dwColumns], hr, E_OUTOFMEMORY, "Failed to allocate memory");
+        EseExitOnNull(peqHandle->pvData[peqHandle->dwColumns], hr, E_OUTOFMEMORY, "Failed to allocate memory");
 
         memcpy(peqHandle->pvData[peqHandle->dwColumns], pvData, cbData);
 
@@ -1108,7 +1123,7 @@ HRESULT DAPI EseSetQueryColumnBinary(
     }
 
     hr = SetQueryColumn(eqhHandle, reinterpret_cast<const void *>(pbBuffer), static_cast<DWORD>(cbBuffer), jGrb);
-    ExitOnFailure(hr, "Failed to set value of query colum (as binary) to:");
+    EseExitOnFailure(hr, "Failed to set value of query colum (as binary) to:");
 
 LExit:
     return hr;
@@ -1137,7 +1152,7 @@ HRESULT DAPI EseSetQueryColumnDword(
     }
 
     hr = SetQueryColumn(eqhHandle, (const void *)&dwData, sizeof(DWORD), jGrb);
-    ExitOnFailure(hr, "Failed to set value of query colum (as dword) to: %u", dwData);
+    EseExitOnFailure(hr, "Failed to set value of query colum (as dword) to: %u", dwData);
 
 LExit:
     return hr;
@@ -1167,7 +1182,7 @@ HRESULT DAPI EseSetQueryColumnBool(
     }
 
     hr = SetQueryColumn(eqhHandle, (const void *)&bByte, 1, jGrb);
-    ExitOnFailure(hr, "Failed to set value of query colum (as bool) to: %s", fValue ? "TRUE" : "FALSE");
+    EseExitOnFailure(hr, "Failed to set value of query colum (as bool) to: %s", fValue ? "TRUE" : "FALSE");
 
 LExit:
     return hr;
@@ -1200,7 +1215,7 @@ HRESULT DAPI EseSetQueryColumnString(
     }
 
     hr = SetQueryColumn(eqhHandle, (const void *)pszString, dwStringSize, jGrb);
-    ExitOnFailure(hr, "Failed to set value of query colum (as string) to: %ls", pszString);
+    EseExitOnFailure(hr, "Failed to set value of query colum (as string) to: %ls", pszString);
 
 LExit:
     return hr;

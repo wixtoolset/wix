@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define OsExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_OSUTIL, x, s, __VA_ARGS__)
+#define OsExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_OSUTIL, p, x, e, s, __VA_ARGS__)
+#define OsExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_OSUTIL, p, x, s, __VA_ARGS__)
+#define OsExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_OSUTIL, p, x, e, s, __VA_ARGS__)
+#define OsExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_OSUTIL, p, x, s, __VA_ARGS__)
+#define OsExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_OSUTIL, e, x, s, __VA_ARGS__)
+#define OsExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_OSUTIL, g, x, s, __VA_ARGS__)
+
 typedef NTSTATUS(NTAPI* PFN_RTL_GET_VERSION)(_Out_ PRTL_OSVERSIONINFOEXW lpVersionInformation);
 
 OS_VERSION vOsVersion = OS_VERSION_UNKNOWN;
@@ -127,7 +142,7 @@ extern "C" HRESULT DAPI OsIsRunningPrivileged(
 
     if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
     {
-        ExitOnLastError(hr, "Failed to open process token.");
+        OsExitOnLastError(hr, "Failed to open process token.");
     }
 
     if (::GetTokenInformation(hToken, TokenElevationType, &elevationType, sizeof(TOKEN_ELEVATION_TYPE), &dwSize))
@@ -142,7 +157,7 @@ extern "C" HRESULT DAPI OsIsRunningPrivileged(
     {
         er = ERROR_SUCCESS;
     }
-    ExitOnWin32Error(er, hr, "Failed to get process token information.");
+    OsExitOnWin32Error(er, hr, "Failed to get process token information.");
 
     // Fallback to this check for some OS's (like XP)
     *pfPrivileged = ::AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &AdministratorsGroup);
@@ -180,14 +195,14 @@ extern "C" HRESULT DAPI OsIsUacEnabled(
     {
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to open system policy key to detect UAC.");
+    OsExitOnFailure(hr, "Failed to open system policy key to detect UAC.");
 
     hr = RegReadNumber(hk, L"EnableLUA", &dwUacEnabled);
     if (E_FILENOTFOUND == hr)
     {
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to read registry value to detect UAC.");
+    OsExitOnFailure(hr, "Failed to read registry value to detect UAC.");
 
     *pfUacEnabled = (0 != dwUacEnabled);
 
@@ -215,12 +230,12 @@ HRESULT DAPI OsRtlGetVersion(
     hr = LoadSystemLibrary(L"ntdll.dll", &hNtdll);
     if (E_MODNOTFOUND == hr)
     {
-        ExitOnRootFailure(hr = E_NOTIMPL, "Failed to load ntdll.dll");
+        OsExitOnRootFailure(hr = E_NOTIMPL, "Failed to load ntdll.dll");
     }
-    ExitOnFailure(hr, "Failed to load ntdll.dll.");
+    OsExitOnFailure(hr, "Failed to load ntdll.dll.");
 
     pfnRtlGetVersion = reinterpret_cast<PFN_RTL_GET_VERSION>(::GetProcAddress(hNtdll, "RtlGetVersion"));
-    ExitOnNullWithLastError(pfnRtlGetVersion, hr, "Failed to locate RtlGetVersion.");
+    OsExitOnNullWithLastError(pfnRtlGetVersion, hr, "Failed to locate RtlGetVersion.");
 
     hr = static_cast<HRESULT>(pfnRtlGetVersion(&vovix));
 

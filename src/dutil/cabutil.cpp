@@ -2,6 +2,22 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define CabExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_CABUTIL, x, s, __VA_ARGS__)
+#define CabExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_CABUTIL, p, x, e, s, __VA_ARGS__)
+#define CabExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_CABUTIL, p, x, s, __VA_ARGS__)
+#define CabExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_CABUTIL, p, x, e, s, __VA_ARGS__)
+#define CabExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_CABUTIL, p, x, s, __VA_ARGS__)
+#define CabExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_CABUTIL, e, x, s, __VA_ARGS__)
+#define CabExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_CABUTIL, g, x, s, __VA_ARGS__)
+
+
 // external prototypes
 typedef BOOL (FAR DIAMONDAPI *PFNFDIDESTROY)(VOID*);
 typedef HFDI (FAR DIAMONDAPI *PFNFDICREATE)(PFNALLOC, PFNFREE, PFNOPEN, PFNREAD, PFNWRITE, PFNCLOSE, PFNSEEK, int, PERF);
@@ -59,20 +75,20 @@ inline HRESULT LoadCabinetDll()
     if (!vhCabinetDll)
     {
         hr = LoadSystemLibrary(L"cabinet.dll", &vhCabinetDll);
-        ExitOnFailure(hr, "failed to load cabinet.dll");
+        CabExitOnFailure(hr, "failed to load cabinet.dll");
 
         // retrieve all address functions
         vpfnFDICreate = reinterpret_cast<PFNFDICREATE>(::GetProcAddress(vhCabinetDll, "FDICreate"));
-        ExitOnNullWithLastError(vpfnFDICreate, hr, "failed to import FDICreate from CABINET.DLL");
+        CabExitOnNullWithLastError(vpfnFDICreate, hr, "failed to import FDICreate from CABINET.DLL");
         vpfnFDICopy = reinterpret_cast<PFNFDICOPY>(::GetProcAddress(vhCabinetDll, "FDICopy"));
-        ExitOnNullWithLastError(vpfnFDICopy, hr, "failed to import FDICopy from CABINET.DLL");
+        CabExitOnNullWithLastError(vpfnFDICopy, hr, "failed to import FDICopy from CABINET.DLL");
         vpfnFDIIsCabinet = reinterpret_cast<PFNFDIISCABINET>(::GetProcAddress(vhCabinetDll, "FDIIsCabinet"));
-        ExitOnNullWithLastError(vpfnFDIIsCabinet, hr, "failed to import FDIIsCabinetfrom CABINET.DLL");
+        CabExitOnNullWithLastError(vpfnFDIIsCabinet, hr, "failed to import FDIIsCabinetfrom CABINET.DLL");
         vpfnFDIDestroy = reinterpret_cast<PFNFDIDESTROY>(::GetProcAddress(vhCabinetDll, "FDIDestroy"));
-        ExitOnNullWithLastError(vpfnFDIDestroy, hr, "failed to import FDIDestroyfrom CABINET.DLL");
+        CabExitOnNullWithLastError(vpfnFDIDestroy, hr, "failed to import FDIDestroyfrom CABINET.DLL");
 
         vhfdi = vpfnFDICreate(CabExtractAlloc, CabExtractFree, CabExtractOpen, CabExtractRead, CabExtractWrite, CabExtractClose, CabExtractSeek, cpuUNKNOWN, &verf);
-        ExitOnNull(vhfdi, hr, E_FAIL, "failed to initialize cabinet.dll");
+        CabExitOnNull(vhfdi, hr, E_FAIL, "failed to initialize cabinet.dll");
     }
 
 LExit:
@@ -99,7 +115,7 @@ extern "C" HRESULT DAPI CabInitialize(
     if (!fDelayLoad)
     {
         hr = LoadCabinetDll();
-        ExitOnFailure(hr, "failed to load CABINET.DLL");
+        CabExitOnFailure(hr, "failed to load CABINET.DLL");
     }
 
 LExit:
@@ -143,8 +159,8 @@ extern "C" void DAPI CabUninitialize(
        in the cabinet
 ********************************************************************/
 extern "C" HRESULT DAPI CabEnumerate(
-    __in LPCWSTR wzCabinet,
-    __in LPCWSTR wzEnumerateFile,
+    __in_z LPCWSTR wzCabinet,
+    __in_z LPCWSTR wzEnumerateFile,
     __in STDCALL_PFNFDINOTIFY pfnNotify,
     __in DWORD64 dw64EmbeddedOffset
     )
@@ -161,9 +177,9 @@ extern "C" HRESULT DAPI CabEnumerate(
        if pfnBeginFile is NULL pfnEndFile must be NULL and vice versa
 ********************************************************************/
 extern "C" HRESULT DAPI CabExtract(
-    __in LPCWSTR wzCabinet,
-    __in LPCWSTR wzExtractFile,
-    __in LPCWSTR wzExtractDir,
+    __in_z LPCWSTR wzCabinet,
+    __in_z LPCWSTR wzExtractFile,
+    __in_z LPCWSTR wzExtractDir,
     __in_opt CAB_CALLBACK_PROGRESS pfnProgress,
     __in_opt LPVOID pvContext,
     __in DWORD64 dw64EmbeddedOffset
@@ -238,21 +254,21 @@ static HRESULT DAPI CabOperation(
     if (!vhfdi)
     {
         hr = LoadCabinetDll();
-        ExitOnFailure(hr, "failed to load CABINET.DLL");
+        CabExitOnFailure(hr, "failed to load CABINET.DLL");
     }
 
     hr = StrAllocString(&sczCabinet, wzCabinet, 0);
-    ExitOnFailure(hr, "Failed to make copy of cabinet name:%ls", wzCabinet);
+    CabExitOnFailure(hr, "Failed to make copy of cabinet name:%ls", wzCabinet);
 
     //
     // split the cabinet full path into directory and filename and convert to multi-byte (ick!)
     //
     pwz = FileFromPath(sczCabinet);
-    ExitOnNull(pwz, hr, E_INVALIDARG, "failed to process cabinet path: %ls", wzCabinet);
+    CabExitOnNull(pwz, hr, E_INVALIDARG, "failed to process cabinet path: %ls", wzCabinet);
 
     if (!::WideCharToMultiByte(CP_UTF8, 0, pwz, -1, szCabFile, countof(szCabFile), NULL, NULL))
     {
-        ExitWithLastError(hr, "failed to convert cabinet filename to ASCII: %ls", pwz);
+        CabExitWithLastError(hr, "failed to convert cabinet filename to ASCII: %ls", pwz);
     }
 
     *pwz = '\0';
@@ -261,13 +277,13 @@ static HRESULT DAPI CabOperation(
     if (wzCabinet == pwz)
     {
         hr = ::StringCchCopyA(szCabDirectory, countof(szCabDirectory), ".\\");
-        ExitOnFailure(hr, "Failed to copy relative current directory as cabinet directory.");
+        CabExitOnFailure(hr, "Failed to copy relative current directory as cabinet directory.");
     }
     else
     {
         if (!::WideCharToMultiByte(CP_UTF8, 0, sczCabinet, -1, szCabDirectory, countof(szCabDirectory), NULL, NULL))
         {
-            ExitWithLastError(hr, "failed to convert cabinet directory to ASCII: %ls", sczCabinet);
+            CabExitWithLastError(hr, "failed to convert cabinet directory to ASCII: %ls", sczCabinet);
         }
     }
 
@@ -295,7 +311,7 @@ static HRESULT DAPI CabOperation(
     fResult = vpfnFDICopy(vhfdi, szCabFile, szCabDirectory, 0, pfnFdiNotify, NULL, static_cast<void*>(&ccs));
     if (!fResult && !ccs.fStopExtracting)   // if something went wrong and it wasn't us just stopping the extraction, then return a failure
     {
-        ExitWithLastError(hr, "failed to extract cabinet file: %ls", sczCabinet);
+        CabExitWithLastError(hr, "failed to extract cabinet file: %ls", sczCabinet);
     }
 
 LExit:
@@ -331,22 +347,22 @@ static __callback INT_PTR FAR DIAMONDAPI CabExtractOpen(__in_z PSTR pszFile, __i
     if ((oflag != (/*_O_BINARY*/ 0x8000 | /*_O_RDONLY*/ 0x0000)) || (pmode != (_S_IREAD | _S_IWRITE)))
     {
         hr = E_OUTOFMEMORY;
-        ExitOnFailure(hr, "FDI asked for a scratch file to be created, which is unsupported");
+        CabExitOnFailure(hr, "FDI asked for a scratch file to be created, which is unsupported");
     }
 
     hr = StrAllocStringAnsi(&sczCabFile, pszFile, 0, CP_UTF8);
-    ExitOnFailure(hr, "Failed to convert UTF8 cab file name to wide character string");
+    CabExitOnFailure(hr, "Failed to convert UTF8 cab file name to wide character string");
 
     pFile = reinterpret_cast<INT_PTR>(::CreateFileW(sczCabFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
     if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(pFile))
     {
-        ExitWithLastError(hr, "failed to open file: %ls", sczCabFile);
+        CabExitWithLastError(hr, "failed to open file: %ls", sczCabFile);
     }
 
     if (vdw64EmbeddedOffset)
     {
         hr = CabExtractSeek(pFile, 0, 0);
-        ExitOnFailure(hr, "Failed to seek to embedded offset %I64d", vdw64EmbeddedOffset);
+        CabExitOnFailure(hr, "Failed to seek to embedded offset %I64d", vdw64EmbeddedOffset);
     }
 
 LExit:
@@ -361,10 +377,10 @@ static __callback UINT FAR DIAMONDAPI CabExtractRead(__in INT_PTR hf, __out void
     HRESULT hr = S_OK;
     DWORD cbRead = 0;
 
-    ExitOnNull(hf, hr, E_INVALIDARG, "Failed to read file during cabinet extraction - no file given to read");
+    CabExitOnNull(hf, hr, E_INVALIDARG, "Failed to read file during cabinet extraction - no file given to read");
     if (!::ReadFile(reinterpret_cast<HANDLE>(hf), pv, cb, &cbRead, NULL))
     {
-        ExitWithLastError(hr, "failed to read during cabinet extraction");
+        CabExitWithLastError(hr, "failed to read during cabinet extraction");
     }
 
 LExit:
@@ -377,10 +393,10 @@ static __callback UINT FAR DIAMONDAPI CabExtractWrite(__in INT_PTR hf, __in void
     HRESULT hr = S_OK;
     DWORD cbWrite = 0;
 
-    ExitOnNull(hf, hr, E_INVALIDARG, "Failed to write file during cabinet extraction - no file given to write");
+    CabExitOnNull(hf, hr, E_INVALIDARG, "Failed to write file during cabinet extraction - no file given to write");
     if (!::WriteFile(reinterpret_cast<HANDLE>(hf), pv, cb, &cbWrite, NULL))
     {
-        ExitWithLastError(hr, "failed to write during cabinet extraction");
+        CabExitWithLastError(hr, "failed to write during cabinet extraction");
     }
 
 LExit:
@@ -409,7 +425,7 @@ static __callback long FAR DIAMONDAPI CabExtractSeek(__in INT_PTR hf, __in long 
     default :
         dwMoveMethod = 0;
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "unexpected seektype in FDISeek(): %d", seektype);
+        CabExitOnFailure(hr, "unexpected seektype in FDISeek(): %d", seektype);
     }
 
     // SetFilePointer returns -1 if it fails (this will cause FDI to quit with an FDIERROR_USER_ABORT error. 
@@ -417,7 +433,7 @@ static __callback long FAR DIAMONDAPI CabExtractSeek(__in INT_PTR hf, __in long 
     lMove = ::SetFilePointer(reinterpret_cast<HANDLE>(hf), dist, NULL, dwMoveMethod);
     if (0xFFFFFFFF == lMove)
     {
-        ExitWithLastError(hr, "failed to move file pointer %d bytes", dist);
+        CabExitWithLastError(hr, "failed to move file pointer %d bytes", dist);
     }
 
 LExit:
@@ -431,7 +447,7 @@ static __callback int FAR DIAMONDAPI CabExtractClose(__in INT_PTR hf)
 
     if (!::CloseHandle(reinterpret_cast<HANDLE>(hf)))
     {
-        ExitWithLastError(hr, "failed to close file during cabinet extraction");
+        CabExitWithLastError(hr, "failed to close file during cabinet extraction");
     }
 
 LExit:
@@ -454,8 +470,8 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
     switch (iNotification)
     {
     case fdintCOPY_FILE:  // begin extracting a resource from cabinet
-        ExitOnNull(pFDINotify->psz1, hr, E_INVALIDARG, "No cabinet file ID given to convert");
-        ExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
+        CabExitOnNull(pFDINotify->psz1, hr, E_INVALIDARG, "No cabinet file ID given to convert");
+        CabExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
 
         if (pccs->fStopExtracting)
         {
@@ -466,7 +482,7 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
         if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
         {
-            ExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
+            CabExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
         }
 
         if (pccs->pfnProgress)
@@ -484,21 +500,21 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
             FILETIME ftLocal;
             if (!::DosDateTimeToFileTime(pFDINotify->date, pFDINotify->time, &ftLocal))
             {
-                ExitWithLastError(hr, "failed to get time for resource: %ls", wz);
+                CabExitWithLastError(hr, "failed to get time for resource: %ls", wz);
             }
             ::LocalFileTimeToFileTime(&ftLocal, &ft);
             
 
             WCHAR wzPath[MAX_PATH];
             hr = ::StringCchCopyW(wzPath, countof(wzPath), pccs->pwzExtractDir);
-            ExitOnFailure(hr, "failed to copy in extract directory: %ls for file: %ls", pccs->pwzExtractDir, wz);
+            CabExitOnFailure(hr, "failed to copy in extract directory: %ls for file: %ls", pccs->pwzExtractDir, wz);
             hr = ::StringCchCatW(wzPath, countof(wzPath), wz);
-            ExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, wz);
+            CabExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, wz);
 
             ipResult = reinterpret_cast<INT_PTR>(::CreateFileW(wzPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL));
             if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(ipResult))
             {
-                ExitWithLastError(hr, "failed to create file: %s", wzPath);
+                CabExitWithLastError(hr, "failed to create file: %ls", wzPath);
             }
 
             ::SetFileTime(reinterpret_cast<HANDLE>(ipResult), &ft, &ft, &ft);   // try to set the file time (who cares if it fails)
@@ -520,15 +536,15 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
         break;
     case fdintCLOSE_FILE_INFO:  // resource extraction complete
         Assert(pFDINotify->hf && pFDINotify->psz1);
-        ExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
+        CabExitOnNull(pccs, hr, E_INVALIDARG, "Failed to call cabextract callback, because no callback struct was provided");
 
         // convert params to useful variables
         sz = static_cast<LPCSTR>(pFDINotify->psz1);
-        ExitOnNull(sz, hr, E_INVALIDARG, "Failed to convert cabinet file id, because no cabinet file id was provided");
+        CabExitOnNull(sz, hr, E_INVALIDARG, "Failed to convert cabinet file id, because no cabinet file id was provided");
 
         if (!::MultiByteToWideChar(CP_ACP, 0, sz, -1, wz, countof(wz)))
         {
-            ExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
+            CabExitWithLastError(hr, "failed to convert cabinet file id to unicode: %s", sz);
         }
 
         if (NULL != pFDINotify->hf)  // just close the file

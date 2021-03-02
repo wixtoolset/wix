@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define XmlExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_XMLUTIL, x, s, __VA_ARGS__)
+#define XmlExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_XMLUTIL, p, x, e, s, __VA_ARGS__)
+#define XmlExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_XMLUTIL, p, x, s, __VA_ARGS__)
+#define XmlExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_XMLUTIL, p, x, e, s, __VA_ARGS__)
+#define XmlExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_XMLUTIL, p, x, s, __VA_ARGS__)
+#define XmlExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_XMLUTIL, e, x, s, __VA_ARGS__)
+#define XmlExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_XMLUTIL, g, x, s, __VA_ARGS__)
+
 // intialization globals
 CLSID vclsidXMLDOM = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0} };
 static volatile LONG vcXmlInitialized = 0;
@@ -23,7 +38,7 @@ extern "C" HRESULT DAPI XmlInitialize(
         hr = ::CoInitialize(0);
         if (RPC_E_CHANGED_MODE != hr)
         {
-            ExitOnFailure(hr, "failed to initialize COM");
+            XmlExitOnFailure(hr, "failed to initialize COM");
             fComInitialized = TRUE;
         }
     }
@@ -47,7 +62,7 @@ extern "C" HRESULT DAPI XmlInitialize(
             // try to fall back to old MSXML
             hr = ::CLSIDFromProgID(L"MSXML.DOMDocument", &vclsidXMLDOM);
         }
-        ExitOnFailure(hr, "failed to get CLSID for XML DOM");
+        XmlExitOnFailure(hr, "failed to get CLSID for XML DOM");
 
         Assert(IsEqualCLSID(vclsidXMLDOM, XmlUtil_CLSID_DOMDocument) ||
                IsEqualCLSID(vclsidXMLDOM, XmlUtil_CLSID_DOMDocument20) ||
@@ -99,7 +114,7 @@ extern "C" HRESULT DAPI XmlCreateElement(
 
     HRESULT hr = S_OK;
     BSTR bstrElementName = ::SysAllocString(wzElementName);
-    ExitOnNull(bstrElementName, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    XmlExitOnNull(bstrElementName, hr, E_OUTOFMEMORY, "failed SysAllocString");
     hr = pixdDocument->createElement(bstrElementName, ppixnElement);
 LExit:
     ReleaseBSTR(bstrElementName);
@@ -130,7 +145,7 @@ extern "C" HRESULT DAPI XmlCreateDocument(
 
     // Test if we have access to the Wow64 API, and store the result in fWow64Available
     HMODULE hKernel32 = ::GetModuleHandleA("kernel32.dll");
-    ExitOnNullWithLastError(hKernel32, hr, "failed to get handle to kernel32.dll");
+    XmlExitOnNullWithLastError(hKernel32, hr, "failed to get handle to kernel32.dll");
 
     // This will test if we have access to the Wow64 API
     if (NULL != GetProcAddress(hKernel32, "IsWow64Process"))
@@ -155,7 +170,7 @@ extern "C" HRESULT DAPI XmlCreateDocument(
     }
 
     hr = ::CoCreateInstance(vclsidXMLDOM, NULL, CLSCTX_INPROC_SERVER, XmlUtil_IID_IXMLDOMDocument, (void**)&pixdDocument);
-    ExitOnFailure(hr, "failed to create XML DOM Document");
+    XmlExitOnFailure(hr, "failed to create XML DOM Document");
     Assert(pixdDocument);
 
     if (IsEqualCLSID(vclsidXMLDOM, XmlUtil_CLSID_DOMDocument30) || IsEqualCLSID(vclsidXMLDOM, XmlUtil_CLSID_DOMDocument20))
@@ -166,9 +181,9 @@ extern "C" HRESULT DAPI XmlCreateDocument(
     if (pwzElementName)
     {
         hr = XmlCreateElement(pixdDocument, pwzElementName, &pixeRootElement);
-        ExitOnFailure(hr, "failed XmlCreateElement");
+        XmlExitOnFailure(hr, "failed XmlCreateElement");
         hr = pixdDocument->appendChild(pixeRootElement, NULL);
-        ExitOnFailure(hr, "failed appendChild");
+        XmlExitOnFailure(hr, "failed appendChild");
     }
 
     *ppixdDocument = pixdDocument;
@@ -222,28 +237,28 @@ static void XmlReportParseError(
     Trace(REPORT_STANDARD, "Failed to parse XML. IXMLDOMParseError reports:");
 
     hr = pixpe->get_errorCode(&lNumber);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.errorCode.");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.errorCode.");
     Trace(REPORT_STANDARD, "errorCode = 0x%x", lNumber);
 
     hr = pixpe->get_filepos(&lNumber);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.filepos.");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.filepos.");
     Trace(REPORT_STANDARD, "filepos = %d", lNumber);
 
     hr = pixpe->get_line(&lNumber);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.line.");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.line.");
     Trace(REPORT_STANDARD, "line = %d", lNumber);
 
     hr = pixpe->get_linepos(&lNumber);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.linepos.");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.linepos.");
     Trace(REPORT_STANDARD, "linepos = %d", lNumber);
 
     hr = pixpe->get_reason(&bstr);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.reason.");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.reason.");
     Trace(REPORT_STANDARD, "reason = %ls", bstr);
     ReleaseNullBSTR(bstr);
 
     hr = pixpe->get_srcText (&bstr);
-    ExitOnFailure(hr, "Failed to query IXMLDOMParseError.srcText .");
+    XmlExitOnFailure(hr, "Failed to query IXMLDOMParseError.srcText .");
     Trace(REPORT_STANDARD, "srcText = %ls", bstr);
     ReleaseNullBSTR(bstr);
 
@@ -272,7 +287,7 @@ extern "C" HRESULT DAPI XmlLoadDocumentEx(
     if (!wzDocument || !*wzDocument)
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "string must be non-null");
+        XmlExitOnFailure(hr, "string must be non-null");
     }
 
     hr = XmlCreateDocument(NULL, &pixd);
@@ -280,22 +295,22 @@ extern "C" HRESULT DAPI XmlLoadDocumentEx(
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed XmlCreateDocument");
+    XmlExitOnFailure(hr, "failed XmlCreateDocument");
 
     if (dwAttributes & XML_LOAD_PRESERVE_WHITESPACE)
     {
         hr = pixd->put_preserveWhiteSpace(VARIANT_TRUE);
-        ExitOnFailure(hr, "failed put_preserveWhiteSpace");
+        XmlExitOnFailure(hr, "failed put_preserveWhiteSpace");
     }
 
     // Security issue.  Avoid triggering anything external.
     hr = pixd->put_validateOnParse(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_validateOnParse");
+    XmlExitOnFailure(hr, "failed put_validateOnParse");
     hr = pixd->put_resolveExternals(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_resolveExternals");
+    XmlExitOnFailure(hr, "failed put_resolveExternals");
 
     bstrLoad = ::SysAllocString(wzDocument);
-    ExitOnNull(bstrLoad, hr, E_OUTOFMEMORY, "failed to allocate bstr for Load in XmlLoadDocumentEx");
+    XmlExitOnNull(bstrLoad, hr, E_OUTOFMEMORY, "failed to allocate bstr for Load in XmlLoadDocumentEx");
 
     hr = pixd->loadXML(bstrLoad, &vbSuccess);
     if (S_FALSE == hr)
@@ -308,7 +323,7 @@ extern "C" HRESULT DAPI XmlLoadDocumentEx(
         XmlReportParseError(pixpe);
     }
 
-    ExitOnFailure(hr, "failed loadXML");
+    XmlExitOnFailure(hr, "failed loadXML");
 
 
     hr = S_OK;
@@ -359,26 +374,26 @@ extern "C" HRESULT DAPI XmlLoadDocumentFromFileEx(
     ::VariantInit(&varPath);
     varPath.vt = VT_BSTR;
     varPath.bstrVal = ::SysAllocString(wzPath);
-    ExitOnNull(varPath.bstrVal, hr, E_OUTOFMEMORY, "failed to allocate bstr for Path in XmlLoadDocumentFromFileEx");
+    XmlExitOnNull(varPath.bstrVal, hr, E_OUTOFMEMORY, "failed to allocate bstr for Path in XmlLoadDocumentFromFileEx");
 
     hr = XmlCreateDocument(NULL, &pixd);
     if (hr == S_FALSE)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed XmlCreateDocument");
+    XmlExitOnFailure(hr, "failed XmlCreateDocument");
 
     if (dwAttributes & XML_LOAD_PRESERVE_WHITESPACE)
     {
         hr = pixd->put_preserveWhiteSpace(VARIANT_TRUE);
-        ExitOnFailure(hr, "failed put_preserveWhiteSpace");
+        XmlExitOnFailure(hr, "failed put_preserveWhiteSpace");
     }
 
     // Avoid triggering anything external.
     hr = pixd->put_validateOnParse(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_validateOnParse");
+    XmlExitOnFailure(hr, "failed put_validateOnParse");
     hr = pixd->put_resolveExternals(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_resolveExternals");
+    XmlExitOnFailure(hr, "failed put_resolveExternals");
 
     pixd->put_async(VARIANT_FALSE);
     hr = pixd->load(varPath, &vbSuccess);
@@ -392,7 +407,7 @@ extern "C" HRESULT DAPI XmlLoadDocumentFromFileEx(
         XmlReportParseError(pixpe);
     }
 
-    ExitOnFailure(hr, "failed to load XML from: %ls", wzPath);
+    XmlExitOnFailure(hr, "failed to load XML from: %ls", wzPath);
 
     if (ppixdDocument)
     {
@@ -434,13 +449,13 @@ extern "C" HRESULT DAPI XmlLoadDocumentFromBuffer(
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed XmlCreateDocument");
+    XmlExitOnFailure(hr, "failed XmlCreateDocument");
 
     // Security issue.  Avoid triggering anything external.
     hr = pixdDocument->put_validateOnParse(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_validateOnParse");
+    XmlExitOnFailure(hr, "failed put_validateOnParse");
     hr = pixdDocument->put_resolveExternals(VARIANT_FALSE);
-    ExitOnFailure(hr, "failed put_resolveExternals");
+    XmlExitOnFailure(hr, "failed put_resolveExternals");
 
     // load document
     sa.cDims = 1;
@@ -456,7 +471,7 @@ extern "C" HRESULT DAPI XmlLoadDocumentFromBuffer(
     {
         hr = HRESULT_FROM_WIN32(ERROR_OPEN_FAILED);
     }
-    ExitOnFailure(hr, "failed loadXML");
+    XmlExitOnFailure(hr, "failed loadXML");
 
     // return value
     *ppixdDocument = pixdDocument;
@@ -488,20 +503,20 @@ extern "C" HRESULT DAPI XmlSetAttribute(
     IXMLDOMAttribute* pixaAttribute = NULL;
     IXMLDOMNode* pixaNode = NULL;
     BSTR bstrAttributeName = ::SysAllocString(pwzAttribute);
-    ExitOnNull(bstrAttributeName, hr, E_OUTOFMEMORY, "failed to allocate bstr for AttributeName in XmlSetAttribute");
+    XmlExitOnNull(bstrAttributeName, hr, E_OUTOFMEMORY, "failed to allocate bstr for AttributeName in XmlSetAttribute");
 
     hr = pixnNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "failed get_attributes in XmlSetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed get_attributes in XmlSetAttribute(%ls)", pwzAttribute);
 
     hr = pixnNode->get_ownerDocument(&pixdDocument);
     if (hr == S_FALSE)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed get_ownerDocument in XmlSetAttribute");
+    XmlExitOnFailure(hr, "failed get_ownerDocument in XmlSetAttribute");
 
     hr = pixdDocument->createAttribute(bstrAttributeName, &pixaAttribute);
-    ExitOnFailure(hr, "failed createAttribute in XmlSetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed createAttribute in XmlSetAttribute(%ls)", pwzAttribute);
 
     varAttributeValue.vt = VT_BSTR;
     varAttributeValue.bstrVal = ::SysAllocString(pwzAttributeValue);
@@ -509,13 +524,13 @@ extern "C" HRESULT DAPI XmlSetAttribute(
     {
         hr = HRESULT_FROM_WIN32(ERROR_OUTOFMEMORY);
     }
-    ExitOnFailure(hr, "failed SysAllocString in XmlSetAttribute");
+    XmlExitOnFailure(hr, "failed SysAllocString in XmlSetAttribute");
 
     hr = pixaAttribute->put_nodeValue(varAttributeValue);
-    ExitOnFailure(hr, "failed put_nodeValue in XmlSetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed put_nodeValue in XmlSetAttribute(%ls)", pwzAttribute);
 
     hr = pixnnmAttributes->setNamedItem(pixaAttribute, &pixaNode);
-    ExitOnFailure(hr, "failed setNamedItem in XmlSetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed setNamedItem in XmlSetAttribute(%ls)", pwzAttribute);
 
 LExit:
     ReleaseObject(pixdDocument);
@@ -543,11 +558,11 @@ extern "C" HRESULT DAPI XmlSelectSingleNode(
 
     BSTR bstrXPath = NULL;
 
-    ExitOnNull(pixnParent, hr, E_UNEXPECTED, "pixnParent parameter was null in XmlSelectSingleNode");
-    ExitOnNull(ppixnChild, hr, E_UNEXPECTED, "ppixnChild parameter was null in XmlSelectSingleNode");
+    XmlExitOnNull(pixnParent, hr, E_UNEXPECTED, "pixnParent parameter was null in XmlSelectSingleNode");
+    XmlExitOnNull(ppixnChild, hr, E_UNEXPECTED, "ppixnChild parameter was null in XmlSelectSingleNode");
 
     bstrXPath = ::SysAllocString(wzXPath ? wzXPath : L"");
-    ExitOnNull(bstrXPath, hr, E_OUTOFMEMORY, "failed to allocate bstr for XPath expression in XmlSelectSingleNode");
+    XmlExitOnNull(bstrXPath, hr, E_OUTOFMEMORY, "failed to allocate bstr for XPath expression in XmlSelectSingleNode");
 
     hr = pixnParent->selectSingleNode(bstrXPath, ppixnChild);
 
@@ -575,7 +590,7 @@ extern "C" HRESULT DAPI XmlCreateTextNode(
 
     HRESULT hr = S_OK;
     BSTR bstrText = ::SysAllocString(wzText);
-    ExitOnNull(bstrText, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    XmlExitOnNull(bstrText, hr, E_OUTOFMEMORY, "failed SysAllocString");
     hr = pixdDocument->createTextNode(bstrText, ppixnTextNode);
 LExit:
     ReleaseBSTR(bstrText);
@@ -621,7 +636,7 @@ extern "C" HRESULT DAPI XmlGetAttribute(
 
     // get attribute value from source
     hr = pixnNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "failed get_attributes");
+    XmlExitOnFailure(hr, "failed get_attributes");
 
     hr = XmlGetNamedItem(pixnnmAttributes, bstrAttribute, &pixnAttribute);
     if (S_FALSE == hr)
@@ -629,10 +644,10 @@ extern "C" HRESULT DAPI XmlGetAttribute(
         // hr = E_FAIL;
         ExitFunction();
     }
-    ExitOnFailure(hr, "failed getNamedItem in XmlGetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed getNamedItem in XmlGetAttribute(%ls)", pwzAttribute);
 
     hr = pixnAttribute->get_nodeValue(&varAttributeValue);
-    ExitOnFailure(hr, "failed get_nodeValue in XmlGetAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed get_nodeValue in XmlGetAttribute(%ls)", pwzAttribute);
 
     // steal the BSTR from the VARIANT
     if (S_OK == hr && pbstrAttributeValue)
@@ -672,28 +687,28 @@ HRESULT DAPI XmlGetAttributeEx(
 
     // get attribute value from source
     hr = pixnNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "Failed get_attributes.");
+    XmlExitOnFailure(hr, "Failed get_attributes.");
 
     bstrAttribute = ::SysAllocString(wzAttribute);
-    ExitOnNull(bstrAttribute, hr, E_OUTOFMEMORY, "Failed to allocate attribute name BSTR.");
+    XmlExitOnNull(bstrAttribute, hr, E_OUTOFMEMORY, "Failed to allocate attribute name BSTR.");
 
     hr = XmlGetNamedItem(pixnnmAttributes, bstrAttribute, &pixnAttribute);
     if (S_FALSE == hr)
     {
         ExitFunction1(hr = E_NOTFOUND);
     }
-    ExitOnFailure(hr, "Failed getNamedItem in XmlGetAttribute(%ls)", wzAttribute);
+    XmlExitOnFailure(hr, "Failed getNamedItem in XmlGetAttribute(%ls)", wzAttribute);
 
     hr = pixnAttribute->get_nodeValue(&varAttributeValue);
     if (S_FALSE == hr)
     {
         ExitFunction1(hr = E_NOTFOUND);
     }
-    ExitOnFailure(hr, "Failed get_nodeValue in XmlGetAttribute(%ls)", wzAttribute);
+    XmlExitOnFailure(hr, "Failed get_nodeValue in XmlGetAttribute(%ls)", wzAttribute);
 
     // copy value
     hr = StrAllocString(psczAttributeValue, varAttributeValue.bstrVal, 0);
-    ExitOnFailure(hr, "Failed to copy attribute value.");
+    XmlExitOnFailure(hr, "Failed to copy attribute value.");
 
 LExit:
     ReleaseObject(pixnnmAttributes);
@@ -721,7 +736,7 @@ HRESULT DAPI XmlGetYesNoAttribute(
     hr = XmlGetAttributeEx(pixnNode, wzAttribute, &sczValue);
     if (E_NOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to get attribute.");
+        XmlExitOnFailure(hr, "Failed to get attribute.");
 
         *pfYes = CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczValue, -1, L"yes", -1);
     }
@@ -764,7 +779,7 @@ extern "C" HRESULT DAPI XmlGetAttributeNumberBase(
     BSTR bstrPointer = NULL;
 
     hr = XmlGetAttribute(pixnNode, pwzAttribute, &bstrPointer);
-    ExitOnFailure(hr, "Failed to get value from attribute.");
+    XmlExitOnFailure(hr, "Failed to get value from attribute.");
 
     if (S_OK == hr)
     {
@@ -791,13 +806,13 @@ extern "C" HRESULT DAPI XmlGetAttributeLargeNumber(
     BSTR bstrValue = NULL;
 
     hr = XmlGetAttribute(pixnNode, pwzAttribute, &bstrValue);
-    ExitOnFailure(hr, "failed XmlGetAttribute");
+    XmlExitOnFailure(hr, "failed XmlGetAttribute");
 
     if (S_OK == hr)
     {
         LONGLONG ll = 0;
         hr = StrStringToInt64(bstrValue, 0, &ll);
-        ExitOnFailure(hr, "Failed to treat attribute value as number.");
+        XmlExitOnFailure(hr, "Failed to treat attribute value as number.");
 
         *pdw64Value = ll;
     }
@@ -829,7 +844,7 @@ extern "C" HRESULT DAPI XmlGetNamedItem(
 
     HRESULT hr = S_OK;
     BSTR bstrName = ::SysAllocString(wzName);
-    ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString");
+    XmlExitOnNull(bstrName, hr, E_OUTOFMEMORY, "failed SysAllocString");
 
     hr = pixnmAttributes->getNamedItem(bstrName, ppixnNamedItem);
 
@@ -863,12 +878,12 @@ extern "C" HRESULT DAPI XmlSetText(
 
     // find the text node
     hr = pixnNode->get_childNodes(&pixnlNodeList);
-    ExitOnFailure(hr, "failed to get child nodes");
+    XmlExitOnFailure(hr, "failed to get child nodes");
 
     while (S_OK == (hr = pixnlNodeList->nextNode(&pixnChildNode)))
     {
         hr = pixnChildNode->get_nodeType(&dnType);
-        ExitOnFailure(hr, "failed to get node type");
+        XmlExitOnFailure(hr, "failed to get node type");
 
         if (NODE_TEXT == dnType)
             break;
@@ -887,10 +902,10 @@ extern "C" HRESULT DAPI XmlSetText(
         {
             hr = HRESULT_FROM_WIN32(ERROR_OUTOFMEMORY);
         }
-        ExitOnFailure(hr, "failed SysAllocString in XmlSetText");
+        XmlExitOnFailure(hr, "failed SysAllocString in XmlSetText");
 
         hr = pixnChildNode->put_nodeValue(varText);
-        ExitOnFailure(hr, "failed IXMLDOMNode::put_nodeValue");
+        XmlExitOnFailure(hr, "failed IXMLDOMNode::put_nodeValue");
     }
     else
     {
@@ -899,13 +914,13 @@ extern "C" HRESULT DAPI XmlSetText(
         {
             hr = E_FAIL;
         }
-        ExitOnFailure(hr, "failed get_ownerDocument in XmlSetAttribute");
+        XmlExitOnFailure(hr, "failed get_ownerDocument in XmlSetAttribute");
 
         hr = XmlCreateTextNode(pixdDocument, pwzText, &pixtTextNode);
-        ExitOnFailure(hr, "failed createTextNode in XmlSetText(%ls)", pwzText);
+        XmlExitOnFailure(hr, "failed createTextNode in XmlSetText(%ls)", pwzText);
 
         hr = pixnNode->appendChild(pixtTextNode, NULL);
-        ExitOnFailure(hr, "failed appendChild in XmlSetText(%ls)", pwzText);
+        XmlExitOnFailure(hr, "failed appendChild in XmlSetText(%ls)", pwzText);
     }
 
     hr = *pwzText ? S_OK : S_FALSE;
@@ -933,7 +948,7 @@ extern "C" HRESULT DAPI XmlSetTextNumber(
     WCHAR wzValue[12];
 
     hr = ::StringCchPrintfW(wzValue, countof(wzValue), L"%u", dwValue);
-    ExitOnFailure(hr, "Failed to format numeric value as string.");
+    XmlExitOnFailure(hr, "Failed to format numeric value as string.");
 
     hr = XmlSetText(pixnNode, wzValue);
 
@@ -963,21 +978,21 @@ extern "C" HRESULT DAPI XmlCreateChild(
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed get_ownerDocument");
+    XmlExitOnFailure(hr, "failed get_ownerDocument");
 
     hr = XmlCreateElement(pixdDocument, pwzElementType, (IXMLDOMElement**) &pixnChild);
     if (hr == S_FALSE)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed createElement");
+    XmlExitOnFailure(hr, "failed createElement");
 
     pixnParent->appendChild(pixnChild,NULL);
     if (hr == S_FALSE)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed appendChild");
+    XmlExitOnFailure(hr, "failed appendChild");
 
     if (ppixnChild)
     {
@@ -1005,13 +1020,13 @@ extern "C" HRESULT DAPI XmlRemoveAttribute(
     // RELEASEME
     IXMLDOMNamedNodeMap* pixnnmAttributes = NULL;
     BSTR bstrAttribute = ::SysAllocString(pwzAttribute);
-    ExitOnNull(bstrAttribute, hr, E_OUTOFMEMORY, "failed to allocate bstr for attribute in XmlRemoveAttribute");
+    XmlExitOnNull(bstrAttribute, hr, E_OUTOFMEMORY, "failed to allocate bstr for attribute in XmlRemoveAttribute");
 
     hr = pixnNode->get_attributes(&pixnnmAttributes);
-    ExitOnFailure(hr, "failed get_attributes in RemoveXmlAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed get_attributes in RemoveXmlAttribute(%ls)", pwzAttribute);
 
     hr = pixnnmAttributes->removeNamedItem(bstrAttribute, NULL);
-    ExitOnFailure(hr, "failed removeNamedItem in RemoveXmlAttribute(%ls)", pwzAttribute);
+    XmlExitOnFailure(hr, "failed removeNamedItem in RemoveXmlAttribute(%ls)", pwzAttribute);
 
 LExit:
     ReleaseObject(pixnnmAttributes);
@@ -1035,11 +1050,11 @@ extern "C" HRESULT DAPI XmlSelectNodes(
 
     BSTR bstrXPath = NULL;
 
-    ExitOnNull(pixnParent, hr, E_UNEXPECTED, "pixnParent parameter was null in XmlSelectNodes");
-    ExitOnNull(ppixnlChildren, hr, E_UNEXPECTED, "ppixnChild parameter was null in XmlSelectNodes");
+    XmlExitOnNull(pixnParent, hr, E_UNEXPECTED, "pixnParent parameter was null in XmlSelectNodes");
+    XmlExitOnNull(ppixnlChildren, hr, E_UNEXPECTED, "ppixnChild parameter was null in XmlSelectNodes");
 
     bstrXPath = ::SysAllocString(wzXPath ? wzXPath : L"");
-    ExitOnNull(bstrXPath, hr, E_OUTOFMEMORY, "failed to allocate bstr for XPath expression in XmlSelectNodes");
+    XmlExitOnNull(bstrXPath, hr, E_OUTOFMEMORY, "failed to allocate bstr for XPath expression in XmlSelectNodes");
 
     hr = pixnParent->selectNodes(bstrXPath, ppixnlChildren);
 
@@ -1077,24 +1092,24 @@ extern "C" HRESULT DAPI XmlNextAttribute(
     }
 
     hr = pixnnm->nextNode(&pixn);
-    ExitOnFailure(hr, "Failed to get next attribute.");
+    XmlExitOnFailure(hr, "Failed to get next attribute.");
 
     if (S_OK == hr)
     {
         hr = pixn->get_nodeType(&nt);
-        ExitOnFailure(hr, "failed to get node type");
+        XmlExitOnFailure(hr, "failed to get node type");
 
         if (NODE_ATTRIBUTE != nt)
         {
             hr = E_UNEXPECTED;
-            ExitOnFailure(hr, "Failed to get expected node type back: attribute");
+            XmlExitOnFailure(hr, "Failed to get expected node type back: attribute");
         }
 
         // if the caller asked for the attribute name
         if (pbstrAttribute)
         {
             hr = pixn->get_baseName(pbstrAttribute);
-            ExitOnFailure(hr, "failed to get attribute name");
+            XmlExitOnFailure(hr, "failed to get attribute name");
         }
 
         *pixnAttribute = pixn;
@@ -1140,20 +1155,20 @@ extern "C" HRESULT DAPI XmlNextElement(
     while (S_OK == (hr = pixnl->nextNode(&pixn)))
     {
         hr = pixn->get_nodeType(&nt);
-        ExitOnFailure(hr, "failed to get node type");
+        XmlExitOnFailure(hr, "failed to get node type");
 
         if (NODE_ELEMENT == nt)
             break;
 
         ReleaseNullObject(pixn);
     }
-    ExitOnFailure(hr, "failed to get next element");
+    XmlExitOnFailure(hr, "failed to get next element");
 
     // if we have a node and the caller asked for the element name
     if (pixn && pbstrElement)
     {
         hr = pixn->get_baseName(pbstrElement);
-        ExitOnFailure(hr, "failed to get element name");
+        XmlExitOnFailure(hr, "failed to get element name");
     }
 
     *pixnElement = pixn;
@@ -1185,12 +1200,12 @@ extern "C" HRESULT DAPI XmlRemoveChildren(
     if (pwzXPath)
     {
         hr = XmlSelectNodes(pixnSource, pwzXPath, &pixnlNodeList);
-        ExitOnFailure(hr, "failed XmlSelectNodes");
+        XmlExitOnFailure(hr, "failed XmlSelectNodes");
     }
     else
     {
         hr = pixnSource->get_childNodes(&pixnlNodeList);
-        ExitOnFailure(hr, "failed childNodes");
+        XmlExitOnFailure(hr, "failed childNodes");
     }
     if (S_FALSE == hr)
     {
@@ -1200,7 +1215,7 @@ extern "C" HRESULT DAPI XmlRemoveChildren(
     while (S_OK == (hr = pixnlNodeList->nextNode(&pixnNode)))
     {
         hr = pixnSource->removeChild(pixnNode, &pixnRemoveChild);
-        ExitOnFailure(hr, "failed removeChild");
+        XmlExitOnFailure(hr, "failed removeChild");
 
         ReleaseNullObject(pixnRemoveChild);
         ReleaseNullObject(pixnNode);
@@ -1240,14 +1255,14 @@ extern "C" HRESULT DAPI XmlSaveDocument(
     {
         hr = HRESULT_FROM_WIN32(ERROR_OUTOFMEMORY);
     }
-    ExitOnFailure(hr, "failed to create BSTR");
+    XmlExitOnFailure(hr, "failed to create BSTR");
 
     hr = pixdDocument->save(varsDestPath);
     if (hr == S_FALSE)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "failed save in WriteDocument");
+    XmlExitOnFailure(hr, "failed save in WriteDocument");
 
 LExit:
     ReleaseVariant(varsDestPath);
@@ -1277,33 +1292,33 @@ extern "C" HRESULT DAPI XmlSaveDocumentToBuffer(
 
     // create stream
     hr = ::CreateStreamOnHGlobal(NULL, TRUE, &pStream);
-    ExitOnFailure(hr, "Failed to create stream.");
+    XmlExitOnFailure(hr, "Failed to create stream.");
 
     // write document to stream
     vtDestination.vt = VT_UNKNOWN;
     vtDestination.punkVal = (IUnknown*)pStream;
     hr = pixdDocument->save(vtDestination);
-    ExitOnFailure(hr, "Failed to save document.");
+    XmlExitOnFailure(hr, "Failed to save document.");
 
     // get stream size
     hr = pStream->Stat(&statstg, STATFLAG_NONAME);
-    ExitOnFailure(hr, "Failed to get stream size.");
+    XmlExitOnFailure(hr, "Failed to get stream size.");
 
     // allocate buffer
     pbDest = static_cast<BYTE*>(MemAlloc((SIZE_T)statstg.cbSize.LowPart, TRUE));
-    ExitOnNull(pbDest, hr, E_OUTOFMEMORY, "Failed to allocate destination buffer.");
+    XmlExitOnNull(pbDest, hr, E_OUTOFMEMORY, "Failed to allocate destination buffer.");
 
     // read data from stream
     li.QuadPart = 0;
     hr = pStream->Seek(li, STREAM_SEEK_SET, NULL);
-    ExitOnFailure(hr, "Failed to seek stream.");
+    XmlExitOnFailure(hr, "Failed to seek stream.");
 
     hr = pStream->Read(pbDest, statstg.cbSize.LowPart, &cbRead);
     if (cbRead < statstg.cbSize.LowPart)
     {
         hr = E_FAIL;
     }
-    ExitOnFailure(hr, "Failed to read stream content to buffer.");
+    XmlExitOnFailure(hr, "Failed to read stream content to buffer.");
 
     // return value
     *ppbDest = pbDest;

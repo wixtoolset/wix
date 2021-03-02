@@ -2,6 +2,20 @@
 
 #include "precomp.h"
 
+// Exit macros
+#define ApupExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_APUPUTIL, x, s, __VA_ARGS__)
+#define ApupExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_APUPUTIL, p, x, e, s, __VA_ARGS__)
+#define ApupExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_APUPUTIL, p, x, s, __VA_ARGS__)
+#define ApupExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_APUPUTIL, p, x, e, s, __VA_ARGS__)
+#define ApupExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_APUPUTIL, p, x, s, __VA_ARGS__)
+#define ApupExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_APUPUTIL, e, x, s, __VA_ARGS__)
+#define ApupExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_APUPUTIL, g, x, s, __VA_ARGS__)
+
 // prototypes
 static HRESULT ProcessEntry(
     __in ATOM_ENTRY* pAtomEntry,
@@ -61,14 +75,14 @@ extern "C" HRESULT DAPI ApupAllocChainFromAtom(
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"application", -1))
             {
                 hr = StrAllocString(&pChain->wzDefaultApplicationId, pElement->wzValue, 0);
-                ExitOnFailure(hr, "Failed to allocate default application id.");
+                ApupExitOnFailure(hr, "Failed to allocate default application id.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"type", -1))
                     {
                         hr = StrAllocString(&pChain->wzDefaultApplicationType, pAttribute->wzValue, 0);
-                        ExitOnFailure(hr, "Failed to allocate default application type.");
+                        ApupExitOnFailure(hr, "Failed to allocate default application type.");
                     }
                 }
             }
@@ -79,13 +93,13 @@ extern "C" HRESULT DAPI ApupAllocChainFromAtom(
     if (pFeed->cEntries)
     {
         pChain->rgEntries = static_cast<APPLICATION_UPDATE_ENTRY*>(MemAlloc(sizeof(APPLICATION_UPDATE_ENTRY) * pFeed->cEntries, TRUE));
-        ExitOnNull(pChain->rgEntries, hr, E_OUTOFMEMORY, "Failed to allocate memory for update entries.");
+        ApupExitOnNull(pChain->rgEntries, hr, E_OUTOFMEMORY, "Failed to allocate memory for update entries.");
 
         // Process each entry, building up the chain.
         for (DWORD i = 0; i < pFeed->cEntries; ++i)
         {
             hr = ProcessEntry(pFeed->rgEntries + i, pChain->wzDefaultApplicationId, pChain->rgEntries + pChain->cEntries);
-            ExitOnFailure(hr, "Failed to process ATOM entry.");
+            ApupExitOnFailure(hr, "Failed to process ATOM entry.");
 
             if (S_FALSE != hr)
             {
@@ -103,7 +117,7 @@ extern "C" HRESULT DAPI ApupAllocChainFromAtom(
         if (pChain->cEntries > 0)
         {
             pChain->rgEntries = static_cast<APPLICATION_UPDATE_ENTRY*>(MemReAlloc(pChain->rgEntries, sizeof(APPLICATION_UPDATE_ENTRY) * pChain->cEntries, FALSE));
-            ExitOnNull(pChain->rgEntries, hr, E_OUTOFMEMORY, "Failed to reallocate memory for update entries.");
+            ApupExitOnNull(pChain->rgEntries, hr, E_OUTOFMEMORY, "Failed to reallocate memory for update entries.");
         }
         else
         {
@@ -136,21 +150,21 @@ HRESULT DAPI ApupFilterChain(
     DWORD cEntries = NULL;
 
     pNewChain = static_cast<APPLICATION_UPDATE_CHAIN*>(MemAlloc(sizeof(APPLICATION_UPDATE_CHAIN), TRUE));
-    ExitOnNull(pNewChain, hr, E_OUTOFMEMORY, "Failed to allocate filtered chain.");
+    ApupExitOnNull(pNewChain, hr, E_OUTOFMEMORY, "Failed to allocate filtered chain.");
 
     hr = FilterEntries(pChain->rgEntries, pChain->cEntries, pVersion, &prgEntries, &cEntries);
-    ExitOnFailure(hr, "Failed to filter entries by version.");
+    ApupExitOnFailure(hr, "Failed to filter entries by version.");
 
     if (pChain->wzDefaultApplicationId)
     {
         hr = StrAllocString(&pNewChain->wzDefaultApplicationId, pChain->wzDefaultApplicationId, 0);
-        ExitOnFailure(hr, "Failed to copy default application id.");
+        ApupExitOnFailure(hr, "Failed to copy default application id.");
     }
 
     if (pChain->wzDefaultApplicationType)
     {
         hr = StrAllocString(&pNewChain->wzDefaultApplicationType, pChain->wzDefaultApplicationType, 0);
-        ExitOnFailure(hr, "Failed to copy default application type.");
+        ApupExitOnFailure(hr, "Failed to copy default application type.");
     }
 
     pNewChain->rgEntries = prgEntries;
@@ -205,28 +219,28 @@ static HRESULT ProcessEntry(
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"application", -1))
             {
                 hr = StrAllocString(&pApupEntry->wzApplicationId, pElement->wzValue, 0);
-                ExitOnFailure(hr, "Failed to allocate application identity.");
+                ApupExitOnFailure(hr, "Failed to allocate application identity.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"type", -1))
                     {
                         hr = StrAllocString(&pApupEntry->wzApplicationType, pAttribute->wzValue, 0);
-                        ExitOnFailure(hr, "Failed to allocate application type.");
+                        ApupExitOnFailure(hr, "Failed to allocate application type.");
                     }
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"upgrade", -1))
             {
                 hr = StrAllocString(&pApupEntry->wzUpgradeId, pElement->wzValue, 0);
-                ExitOnFailure(hr, "Failed to allocate upgrade id.");
+                ApupExitOnFailure(hr, "Failed to allocate upgrade id.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"version", -1))
                     {
                         hr = VerParseVersion(pAttribute->wzValue, 0, FALSE, &pApupEntry->pUpgradeVersion);
-                        ExitOnFailure(hr, "Failed to parse upgrade version string '%ls' from ATOM entry.", pAttribute->wzValue);
+                        ApupExitOnFailure(hr, "Failed to parse upgrade version string '%ls' from ATOM entry.", pAttribute->wzValue);
                     }
                     else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"exclusive", -1))
                     {
@@ -240,7 +254,7 @@ static HRESULT ProcessEntry(
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"version", -1))
             {
                 hr = VerParseVersion(pElement->wzValue, 0, FALSE, &pApupEntry->pVersion);
-                ExitOnFailure(hr, "Failed to parse version string '%ls' from ATOM entry.", pElement->wzValue);
+                ApupExitOnFailure(hr, "Failed to parse version string '%ls' from ATOM entry.", pElement->wzValue);
 
                 fVersionFound = TRUE;
             }
@@ -254,24 +268,24 @@ static HRESULT ProcessEntry(
     }
 
     hr = VerCompareParsedVersions(pApupEntry->pUpgradeVersion, pApupEntry->pVersion, &nCompareResult);
-    ExitOnFailure(hr, "Failed to compare version to upgrade version.");
+    ApupExitOnFailure(hr, "Failed to compare version to upgrade version.");
 
     if (nCompareResult >= 0)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Upgrade version is greater than or equal to application version.");
+        ApupExitOnRootFailure(hr, "Upgrade version is greater than or equal to application version.");
     }
 
     if (pAtomEntry->wzTitle)
     {
         hr = StrAllocString(&pApupEntry->wzTitle, pAtomEntry->wzTitle, 0);
-        ExitOnFailure(hr, "Failed to allocate application title.");
+        ApupExitOnFailure(hr, "Failed to allocate application title.");
     }
 
     if (pAtomEntry->wzSummary)
     {
         hr = StrAllocString(&pApupEntry->wzSummary, pAtomEntry->wzSummary, 0);
-        ExitOnFailure(hr, "Failed to allocate application summary.");
+        ApupExitOnFailure(hr, "Failed to allocate application summary.");
     }
 
     if (pAtomEntry->pContent)
@@ -279,18 +293,18 @@ static HRESULT ProcessEntry(
         if (pAtomEntry->pContent->wzType)
         {
             hr = StrAllocString(&pApupEntry->wzContentType, pAtomEntry->pContent->wzType, 0);
-            ExitOnFailure(hr, "Failed to allocate content type.");
+            ApupExitOnFailure(hr, "Failed to allocate content type.");
         }
 
         if (pAtomEntry->pContent->wzValue)
         {
             hr = StrAllocString(&pApupEntry->wzContent, pAtomEntry->pContent->wzValue, 0);
-            ExitOnFailure(hr, "Failed to allocate content.");
+            ApupExitOnFailure(hr, "Failed to allocate content.");
         }
     }
     // Now process the enclosures.  Assume every link in the ATOM entry is an enclosure.
     pApupEntry->rgEnclosures = static_cast<APPLICATION_UPDATE_ENCLOSURE*>(MemAlloc(sizeof(APPLICATION_UPDATE_ENCLOSURE) * pAtomEntry->cLinks, TRUE));
-    ExitOnNull(pApupEntry->rgEnclosures, hr, E_OUTOFMEMORY, "Failed to allocate enclosures for application update entry.");
+    ApupExitOnNull(pApupEntry->rgEnclosures, hr, E_OUTOFMEMORY, "Failed to allocate enclosures for application update entry.");
 
     for (DWORD i = 0; i < pAtomEntry->cLinks; ++i)
     {
@@ -298,7 +312,7 @@ static HRESULT ProcessEntry(
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pLink->wzRel, -1, L"enclosure", -1))
         {
             hr = ParseEnclosure(pLink, pApupEntry->rgEnclosures + pApupEntry->cEnclosures);
-            ExitOnFailure(hr, "Failed to parse enclosure.");
+            ApupExitOnFailure(hr, "Failed to parse enclosure.");
 
             pApupEntry->dw64TotalSize += pApupEntry->rgEnclosures[pApupEntry->cEnclosures].dw64Size; // total up the size of the enclosures
 
@@ -369,25 +383,25 @@ static HRESULT ParseEnclosure(
                     dwDigestStringLength = 2 * dwDigestLength;
 
                     hr = ::StringCchLengthW(pElement->wzValue, STRSAFE_MAX_CCH, &cchDigestString);
-                    ExitOnFailure(hr, "Failed to get string length of digest value.");
+                    ApupExitOnFailure(hr, "Failed to get string length of digest value.");
 
                     if (dwDigestStringLength != cchDigestString)
                     {
                         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                        ExitOnRootFailure(hr, "Invalid digest length (%zu) for digest algorithm (%u).", cchDigestString, dwDigestStringLength);
+                        ApupExitOnRootFailure(hr, "Invalid digest length (%zu) for digest algorithm (%u).", cchDigestString, dwDigestStringLength);
                     }
 
                     pEnclosure->cbDigest = sizeof(BYTE) * dwDigestLength;
                     pEnclosure->rgbDigest = static_cast<BYTE*>(MemAlloc(pEnclosure->cbDigest, TRUE));
-                    ExitOnNull(pEnclosure->rgbDigest, hr, E_OUTOFMEMORY, "Failed to allocate memory for digest.");
+                    ApupExitOnNull(pEnclosure->rgbDigest, hr, E_OUTOFMEMORY, "Failed to allocate memory for digest.");
 
                     hr = StrHexDecode(pElement->wzValue, pEnclosure->rgbDigest, pEnclosure->cbDigest);
-                    ExitOnFailure(hr, "Failed to decode digest value.");
+                    ApupExitOnFailure(hr, "Failed to decode digest value.");
                 }
                 else
                 {
                     hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                    ExitOnRootFailure(hr, "Unknown algorithm type for digest.");
+                    ApupExitOnRootFailure(hr, "Unknown algorithm type for digest.");
                 }
 
                 break;
@@ -395,7 +409,7 @@ static HRESULT ParseEnclosure(
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"name", -1, pElement->wzElement, -1))
             {
                 hr = StrAllocString(&pEnclosure->wzLocalName, pElement->wzValue, 0);
-                ExitOnFailure(hr, "Failed to copy local name.");
+                ApupExitOnFailure(hr, "Failed to copy local name.");
             }
         }
     }
@@ -403,7 +417,7 @@ static HRESULT ParseEnclosure(
     pEnclosure->dw64Size = pLink->dw64Length;
 
     hr = StrAllocString(&pEnclosure->wzUrl, pLink->wzUrl, 0);
-    ExitOnFailure(hr, "Failed to allocate enclosure URL.");
+    ApupExitOnFailure(hr, "Failed to allocate enclosure URL.");
 
     pEnclosure->fInstaller = FALSE;
     pEnclosure->wzLocalName = NULL;
@@ -459,7 +473,7 @@ static HRESULT FilterEntries(
             const APPLICATION_UPDATE_ENTRY* pEntry = rgEntries + i;
 
             hr = VerCompareParsedVersions(pCurrentVersion, pEntry->pVersion, &nCompareResult);
-            ExitOnFailure(hr, "Failed to compare versions.");
+            ApupExitOnFailure(hr, "Failed to compare versions.");
 
             if (nCompareResult >= 0)
             {
@@ -467,7 +481,7 @@ static HRESULT FilterEntries(
             }
 
             hr = VerCompareParsedVersions(pCurrentVersion, pEntry->pUpgradeVersion, &nCompareResult);
-            ExitOnFailure(hr, "Failed to compare upgrade versions.");
+            ApupExitOnFailure(hr, "Failed to compare upgrade versions.");
 
             if (nCompareResult > 0 || (!pEntry->fUpgradeExclusive && nCompareResult == 0))
             {
@@ -481,17 +495,17 @@ static HRESULT FilterEntries(
             DWORD cNewFilteredEntries = *pcFilteredEntries + 1;
 
             hr = ::SizeTMult(sizeof(APPLICATION_UPDATE_ENTRY), cNewFilteredEntries, &cbAllocSize);
-            ExitOnFailure(hr, "Overflow while calculating alloc size for more entries - number of entries: %u", cNewFilteredEntries);
+            ApupExitOnFailure(hr, "Overflow while calculating alloc size for more entries - number of entries: %u", cNewFilteredEntries);
 
             if (*prgFilteredEntries)
             {
                 pv = MemReAlloc(*prgFilteredEntries, cbAllocSize, FALSE);
-                ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for more entries.");
+                ApupExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for more entries.");
             }
             else
             {
                 pv = MemAlloc(cbAllocSize, TRUE);
-                ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for entries.");
+                ApupExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for entries.");
             }
 
             *pcFilteredEntries = cNewFilteredEntries;
@@ -499,10 +513,10 @@ static HRESULT FilterEntries(
             pv = NULL;
 
             hr = CopyEntry(pRequired, *prgFilteredEntries + *pcFilteredEntries - 1);
-            ExitOnFailure(hr, "Failed to deep copy entry.");
+            ApupExitOnFailure(hr, "Failed to deep copy entry.");
 
             hr = VerCompareParsedVersions(pRequired->pVersion, rgEntries[0].pVersion, &nCompareResult);
-            ExitOnFailure(hr, "Failed to compare required version.");
+            ApupExitOnFailure(hr, "Failed to compare required version.");
 
             if (nCompareResult < 0)
             {
@@ -530,67 +544,67 @@ static HRESULT CopyEntry(
     if (pSrc->wzApplicationId)
     {
         hr = StrAllocString(&pDest->wzApplicationId, pSrc->wzApplicationId, 0);
-        ExitOnFailure(hr, "Failed to copy application id.");
+        ApupExitOnFailure(hr, "Failed to copy application id.");
     }
 
     if (pSrc->wzApplicationType)
     {
         hr = StrAllocString(&pDest->wzApplicationType, pSrc->wzApplicationType, 0);
-        ExitOnFailure(hr, "Failed to copy application type.");
+        ApupExitOnFailure(hr, "Failed to copy application type.");
     }
 
     if (pSrc->wzUpgradeId)
     {
         hr = StrAllocString(&pDest->wzUpgradeId, pSrc->wzUpgradeId, 0);
-        ExitOnFailure(hr, "Failed to copy upgrade id.");
+        ApupExitOnFailure(hr, "Failed to copy upgrade id.");
     }
 
     if (pSrc->wzTitle)
     {
         hr = StrAllocString(&pDest->wzTitle, pSrc->wzTitle, 0);
-        ExitOnFailure(hr, "Failed to copy title.");
+        ApupExitOnFailure(hr, "Failed to copy title.");
     }
 
     if (pSrc->wzSummary)
     {
         hr = StrAllocString(&pDest->wzSummary, pSrc->wzSummary, 0);
-        ExitOnFailure(hr, "Failed to copy summary.");
+        ApupExitOnFailure(hr, "Failed to copy summary.");
     }
 
     if (pSrc->wzContentType)
     {
         hr = StrAllocString(&pDest->wzContentType, pSrc->wzContentType, 0);
-        ExitOnFailure(hr, "Failed to copy content type.");
+        ApupExitOnFailure(hr, "Failed to copy content type.");
     }
 
     if (pSrc->wzContent)
     {
         hr = StrAllocString(&pDest->wzContent, pSrc->wzContent, 0);
-        ExitOnFailure(hr, "Failed to copy content.");
+        ApupExitOnFailure(hr, "Failed to copy content.");
     }
 
     pDest->dw64TotalSize = pSrc->dw64TotalSize;
 
     hr = VerCopyVersion(pSrc->pUpgradeVersion, &pDest->pUpgradeVersion);
-    ExitOnFailure(hr, "Failed to copy upgrade version.");
+    ApupExitOnFailure(hr, "Failed to copy upgrade version.");
 
     hr = VerCopyVersion(pSrc->pVersion, &pDest->pVersion);
-    ExitOnFailure(hr, "Failed to copy version.");
+    ApupExitOnFailure(hr, "Failed to copy version.");
 
     pDest->fUpgradeExclusive = pSrc->fUpgradeExclusive;
 
     hr = ::SizeTMult(sizeof(APPLICATION_UPDATE_ENCLOSURE), pSrc->cEnclosures, &cbAllocSize);
-    ExitOnRootFailure(hr, "Overflow while calculating memory allocation size");
+    ApupExitOnRootFailure(hr, "Overflow while calculating memory allocation size");
 
     pDest->rgEnclosures = static_cast<APPLICATION_UPDATE_ENCLOSURE*>(MemAlloc(cbAllocSize, TRUE));
-    ExitOnNull(pDest->rgEnclosures, hr, E_OUTOFMEMORY, "Failed to allocate copy of enclosures.");
+    ApupExitOnNull(pDest->rgEnclosures, hr, E_OUTOFMEMORY, "Failed to allocate copy of enclosures.");
 
     pDest->cEnclosures = pSrc->cEnclosures;
 
     for (DWORD i = 0; i < pDest->cEnclosures; ++i)
     {
         hr = CopyEnclosure(pSrc->rgEnclosures + i, pDest->rgEnclosures + i);
-        ExitOnFailure(hr, "Failed to copy enclosure.");
+        ApupExitOnFailure(hr, "Failed to copy enclosure.");
     }
 
 LExit:
@@ -615,17 +629,17 @@ static HRESULT CopyEnclosure(
     if (pSrc->wzUrl)
     {
         hr = StrAllocString(&pDest->wzUrl, pSrc->wzUrl, 0);
-        ExitOnFailure(hr, "Failed copy url.");
+        ApupExitOnFailure(hr, "Failed copy url.");
     }
 
     if (pSrc->wzLocalName)
     {
         hr = StrAllocString(&pDest->wzLocalName, pSrc->wzLocalName, 0);
-        ExitOnFailure(hr, "Failed copy url.");
+        ApupExitOnFailure(hr, "Failed copy url.");
     }
 
     pDest->rgbDigest = static_cast<BYTE*>(MemAlloc(sizeof(BYTE) * pSrc->cbDigest, FALSE));
-    ExitOnNull(pDest->rgbDigest, hr, E_OUTOFMEMORY, "Failed to allocate memory for copy of digest.");
+    ApupExitOnNull(pDest->rgbDigest, hr, E_OUTOFMEMORY, "Failed to allocate memory for copy of digest.");
 
     pDest->cbDigest = pSrc->cbDigest;
 

@@ -1,8 +1,21 @@
-#pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-
 #include "precomp.h"
+
+
+// Exit macros
+#define MemExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_MEMUTIL, x, s, __VA_ARGS__)
+#define MemExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_MEMUTIL, p, x, e, s, __VA_ARGS__)
+#define MemExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_MEMUTIL, p, x, s, __VA_ARGS__)
+#define MemExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_MEMUTIL, p, x, e, s, __VA_ARGS__)
+#define MemExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_MEMUTIL, p, x, s, __VA_ARGS__)
+#define MemExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_MEMUTIL, e, x, s, __VA_ARGS__)
+#define MemExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_MEMUTIL, g, x, s, __VA_ARGS__)
 
 
 #if DEBUG
@@ -51,7 +64,7 @@ extern "C" HRESULT DAPI MemReAllocSecure(
     __in LPVOID pv,
     __in SIZE_T cbSize,
     __in BOOL fZero,
-    __out LPVOID* ppvNew
+    __deref_out LPVOID* ppvNew
     )
 {
 //    AssertSz(vfMemInitialized, "MemInitialize() not called, this would normally crash");
@@ -72,14 +85,14 @@ extern "C" HRESULT DAPI MemReAllocSecure(
             const SIZE_T cbCurrent = MemSize(pv);
             if (-1 == cbCurrent)
             {
-                ExitOnFailure(hr = E_INVALIDARG, "Failed to get memory size");
+                MemExitOnRootFailure(hr = E_INVALIDARG, "Failed to get memory size");
             }
 
             // HeapReAlloc may allocate more memory than requested.
             const SIZE_T cbNew = MemSize(pvNew);
             if (-1 == cbNew)
             {
-                ExitOnFailure(hr = E_INVALIDARG, "Failed to get memory size");
+                MemExitOnRootFailure(hr = E_INVALIDARG, "Failed to get memory size");
             }
 
             cbSize = cbNew;
@@ -94,7 +107,7 @@ extern "C" HRESULT DAPI MemReAllocSecure(
             MemFree(pv);
         }
     }
-    ExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to reallocate memory");
+    MemExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to reallocate memory");
 
     *ppvNew = pvNew;
     pvNew = NULL;
@@ -129,10 +142,10 @@ extern "C" HRESULT DAPI MemReAllocArray(
     SIZE_T cbNew = 0;
 
     hr = ::DWordAdd(cArray, dwNewItemCount, &cNew);
-    ExitOnFailure(hr, "Integer overflow when calculating new element count.");
+    MemExitOnFailure(hr, "Integer overflow when calculating new element count.");
 
     hr = ::SIZETMult(cNew, cbArrayType, &cbNew);
-    ExitOnFailure(hr, "Integer overflow when calculating new block size.");
+    MemExitOnFailure(hr, "Integer overflow when calculating new block size.");
 
     if (*ppvArray)
     {
@@ -140,7 +153,7 @@ extern "C" HRESULT DAPI MemReAllocArray(
         if (cbCurrent < cbNew)
         {
             pvNew = MemReAlloc(*ppvArray, cbNew, TRUE);
-            ExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate larger array.");
+            MemExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate larger array.");
 
             *ppvArray = pvNew;
         }
@@ -148,7 +161,7 @@ extern "C" HRESULT DAPI MemReAllocArray(
     else
     {
         pvNew = MemAlloc(cbNew, TRUE);
-        ExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate new array.");
+        MemExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate new array.");
 
         *ppvArray = pvNew;
     }
@@ -159,7 +172,7 @@ LExit:
 
 
 extern "C" HRESULT DAPI MemEnsureArraySize(
-    __deref_out_bcount(cArray * cbArrayType) LPVOID* ppvArray,
+    __deref_inout_bcount(cArray * cbArrayType) LPVOID* ppvArray,
     __in DWORD cArray,
     __in SIZE_T cbArrayType,
     __in DWORD dwGrowthCount
@@ -171,10 +184,10 @@ extern "C" HRESULT DAPI MemEnsureArraySize(
     SIZE_T cbNew = 0;
 
     hr = ::DWordAdd(cArray, dwGrowthCount, &cNew);
-    ExitOnFailure(hr, "Integer overflow when calculating new element count.");
+    MemExitOnFailure(hr, "Integer overflow when calculating new element count.");
 
     hr = ::SIZETMult(cNew, cbArrayType, &cbNew);
-    ExitOnFailure(hr, "Integer overflow when calculating new block size.");
+    MemExitOnFailure(hr, "Integer overflow when calculating new block size.");
 
     if (*ppvArray)
     {
@@ -183,7 +196,7 @@ extern "C" HRESULT DAPI MemEnsureArraySize(
         if (cbCurrent < cbUsed)
         {
             pvNew = MemReAlloc(*ppvArray, cbNew, TRUE);
-            ExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate array larger.");
+            MemExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate array larger.");
 
             *ppvArray = pvNew;
         }
@@ -191,7 +204,7 @@ extern "C" HRESULT DAPI MemEnsureArraySize(
     else
     {
         pvNew = MemAlloc(cbNew, TRUE);
-        ExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate new array.");
+        MemExitOnNull(pvNew, hr, E_OUTOFMEMORY, "Failed to allocate new array.");
 
         *ppvArray = pvNew;
     }
@@ -202,7 +215,7 @@ LExit:
 
 
 extern "C" HRESULT DAPI MemInsertIntoArray(
-    __deref_out_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
+    __deref_inout_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
     __in DWORD dwInsertIndex,
     __in DWORD cInsertItems,
     __in DWORD cExistingArray,
@@ -220,7 +233,7 @@ extern "C" HRESULT DAPI MemInsertIntoArray(
     }
 
     hr = MemEnsureArraySize(ppvArray, cExistingArray + cInsertItems, cbArrayType, dwGrowthCount);
-    ExitOnFailure(hr, "Failed to resize array while inserting items");
+    MemExitOnFailure(hr, "Failed to resize array while inserting items");
 
     pbArray = reinterpret_cast<BYTE *>(*ppvArray);
     for (i = cExistingArray + cInsertItems - 1; i > dwInsertIndex; --i)
@@ -236,7 +249,7 @@ LExit:
 }
 
 extern "C" void DAPI MemRemoveFromArray(
-    __inout_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID pvArray,
+    __inout_bcount((cExistingArray) * cbArrayType) LPVOID pvArray,
     __in DWORD dwRemoveIndex,
     __in DWORD cRemoveItems,
     __in DWORD cExistingArray,
@@ -261,7 +274,7 @@ extern "C" void DAPI MemRemoveFromArray(
 }
 
 extern "C" void DAPI MemArraySwapItems(
-    __inout_bcount((cExistingArray) * cbArrayType) LPVOID pvArray,
+    __inout_bcount(cbArrayType) LPVOID pvArray,
     __in DWORD dwIndex1,
     __in DWORD dwIndex2,
     __in SIZE_T cbArrayType

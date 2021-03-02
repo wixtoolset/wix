@@ -160,7 +160,7 @@ HRESULT DAPI EseGetColumnBinary(
     __in JET_SESID jsSession,
     __in ESE_TABLE_SCHEMA tsTable,
     __in DWORD dwColumn,
-    __deref_out_bcount(*piBuffer) BYTE** ppbBuffer,
+    __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer
     );
 HRESULT DAPI EseGetColumnDword(

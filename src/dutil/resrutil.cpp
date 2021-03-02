@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define ResrExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_RESRUTIL, x, s, __VA_ARGS__)
+#define ResrExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_RESRUTIL, p, x, e, s, __VA_ARGS__)
+#define ResrExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_RESRUTIL, p, x, s, __VA_ARGS__)
+#define ResrExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_RESRUTIL, p, x, e, s, __VA_ARGS__)
+#define ResrExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_RESRUTIL, p, x, s, __VA_ARGS__)
+#define ResrExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_RESRUTIL, e, x, s, __VA_ARGS__)
+#define ResrExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_RESRUTIL, g, x, s, __VA_ARGS__)
+
 #define RES_STRINGS_PER_BLOCK 16
 
 
@@ -33,7 +48,7 @@ extern "C" HRESULT DAPI ResGetStringLangId(
     if (wzPath && *wzPath)
     {
         hModule = LoadLibraryExW(wzPath, NULL, DONT_RESOLVE_DLL_REFERENCES | LOAD_LIBRARY_AS_DATAFILE);
-        ExitOnNullWithLastError(hModule, hr, "Failed to open resource file: %ls", wzPath);
+        ResrExitOnNullWithLastError(hModule, hr, "Failed to open resource file: %ls", wzPath);
     }
 
 #pragma prefast(push)
@@ -41,7 +56,7 @@ extern "C" HRESULT DAPI ResGetStringLangId(
     if (!::EnumResourceLanguagesA(hModule, RT_STRING, MAKEINTRESOURCE(dwBlockId), static_cast<ENUMRESLANGPROC>(EnumLangIdProc), reinterpret_cast<LONG_PTR>(&wFoundLangId)))
 #pragma prefast(pop)
     {
-        ExitWithLastError(hr, "Failed to find string language identifier.");
+        ResrExitWithLastError(hr, "Failed to find string language identifier.");
     }
 
     *pwLangId = wFoundLangId;
@@ -76,12 +91,12 @@ extern "C" HRESULT DAPI ResReadString(
     do
     {
         hr = StrAlloc(ppwzString, cch);
-        ExitOnFailureDebugTrace(hr, "Failed to allocate string for resource id: %d", uID);
+        ResrExitOnFailureDebugTrace(hr, "Failed to allocate string for resource id: %d", uID);
 
         cchReturned = ::LoadStringW(hinst, uID, *ppwzString, cch);
         if (0 == cchReturned)
         {
-            ExitWithLastError(hr, "Failed to load string resource id: %d", uID);
+            ResrExitWithLastError(hr, "Failed to load string resource id: %d", uID);
         }
 
         // if the returned string count is one character too small, it's likely we have
@@ -92,7 +107,7 @@ extern "C" HRESULT DAPI ResReadString(
             hr = S_FALSE;
         }
     } while (S_FALSE == hr);
-    ExitOnFailure(hr, "Failed to load string resource id: %d", uID);
+    ResrExitOnFailure(hr, "Failed to load string resource id: %d", uID);
 
 LExit:
     return hr;
@@ -119,7 +134,7 @@ extern "C" HRESULT DAPI ResReadStringAnsi(
     do
     {
         hr = StrAnsiAlloc(ppszString, cch);
-        ExitOnFailureDebugTrace(hr, "Failed to allocate string for resource id: %d", uID);
+        ResrExitOnFailureDebugTrace(hr, "Failed to allocate string for resource id: %d", uID);
 
 #pragma prefast(push)
 #pragma prefast(disable:25068)
@@ -127,7 +142,7 @@ extern "C" HRESULT DAPI ResReadStringAnsi(
 #pragma prefast(pop)
         if (0 == cchReturned)
         {
-            ExitWithLastError(hr, "Failed to load string resource id: %d", uID);
+            ResrExitWithLastError(hr, "Failed to load string resource id: %d", uID);
         }
 
         // if the returned string count is one character too small, it's likely we have
@@ -138,7 +153,7 @@ extern "C" HRESULT DAPI ResReadStringAnsi(
             hr = S_FALSE;
         }
     } while (S_FALSE == hr);
-    ExitOnFailure(hr, "failed to load string resource id: %d", uID);
+    ResrExitOnFailure(hr, "failed to load string resource id: %d", uID);
 
 LExit:
     return hr;
@@ -169,19 +184,19 @@ extern "C" HRESULT DAPI ResReadData(
 #pragma prefast(disable:25068)
     hRsrc = ::FindResourceExA(hinst, RT_RCDATA, szDataName, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
 #pragma prefast(pop)
-    ExitOnNullWithLastError(hRsrc, hr, "Failed to find resource.");
+    ResrExitOnNullWithLastError(hRsrc, hr, "Failed to find resource.");
 
     hData = ::LoadResource(hinst, hRsrc);
-    ExitOnNullWithLastError(hData, hr, "Failed to load resource.");
+    ResrExitOnNullWithLastError(hData, hr, "Failed to load resource.");
 
     cbData = ::SizeofResource(hinst, hRsrc);
     if (!cbData)
     {
-        ExitWithLastError(hr, "Failed to get size of resource.");
+        ResrExitWithLastError(hr, "Failed to get size of resource.");
     }
 
     *ppv = ::LockResource(hData);
-    ExitOnNullWithLastError(*ppv, hr, "Failed to lock data resource.");
+    ResrExitOnNullWithLastError(*ppv, hr, "Failed to lock data resource.");
     *pcb = cbData;
 
 LExit:
@@ -207,18 +222,18 @@ extern "C" HRESULT DAPI ResExportDataToFile(
     BOOL bCreatedFile = FALSE;
 
     hr = ResReadData(NULL, szDataName, &pData, &cbData);
-    ExitOnFailure(hr, "Failed to GetData from %s.", szDataName);
+    ResrExitOnFailure(hr, "Failed to GetData from %s.", szDataName);
 
     hFile = ::CreateFileW(wzTargetFile, GENERIC_WRITE, 0, NULL, dwCreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hFile)
     {
-        ExitWithLastError(hr, "Failed to CreateFileW for %ls.", wzTargetFile);
+        ResrExitWithLastError(hr, "Failed to CreateFileW for %ls.", wzTargetFile);
     }
     bCreatedFile = TRUE;
 
     if (!::WriteFile(hFile, pData, cbData, &cbWritten, NULL))
     {
-        ExitWithLastError(hr, "Failed to ::WriteFile for %ls.", wzTargetFile);
+        ResrExitWithLastError(hr, "Failed to ::WriteFile for %ls.", wzTargetFile);
     }
 
 LExit:

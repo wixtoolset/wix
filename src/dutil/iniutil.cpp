@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define IniExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_INIUTIL, x, s, __VA_ARGS__)
+#define IniExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_INIUTIL, p, x, e, s, __VA_ARGS__)
+#define IniExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_INIUTIL, p, x, s, __VA_ARGS__)
+#define IniExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_INIUTIL, p, x, e, s, __VA_ARGS__)
+#define IniExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_INIUTIL, p, x, s, __VA_ARGS__)
+#define IniExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_INIUTIL, e, x, s, __VA_ARGS__)
+#define IniExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_INIUTIL, g, x, s, __VA_ARGS__)
+
 const LPCWSTR wzSectionSeparator = L"\\";
 
 struct INI_STRUCT
@@ -33,7 +48,7 @@ const int INI_HANDLE_BYTES = sizeof(INI_STRUCT);
 
 static HRESULT GetSectionPrefixFromName(
     __in_z LPCWSTR wzName,
-    __deref_out_z LPWSTR* psczOutput
+    __deref_inout_z LPWSTR* psczOutput
     );
 static void UninitializeIniValue(
     INI_VALUE *pivValue
@@ -47,7 +62,7 @@ extern "C" HRESULT DAPI IniInitialize(
 
     // Allocate the handle
     *piHandle = static_cast<INI_HANDLE>(MemAlloc(sizeof(INI_STRUCT), TRUE));
-    ExitOnNull(*piHandle, hr, E_OUTOFMEMORY, "Failed to allocate ini object");
+    IniExitOnNull(*piHandle, hr, E_OUTOFMEMORY, "Failed to allocate ini object");
 
 LExit:
     return hr;
@@ -96,7 +111,7 @@ extern "C" HRESULT DAPI IniSetOpenTag(
     if (wzOpenTagPrefix)
     {
         hr = StrAllocString(&pi->sczOpenTagPrefix, wzOpenTagPrefix, 0);
-        ExitOnFailure(hr, "Failed to copy open tag prefix to ini struct: %ls", wzOpenTagPrefix);
+        IniExitOnFailure(hr, "Failed to copy open tag prefix to ini struct: %ls", wzOpenTagPrefix);
     }
     else
     {
@@ -106,7 +121,7 @@ extern "C" HRESULT DAPI IniSetOpenTag(
     if (wzOpenTagPostfix)
     {
         hr = StrAllocString(&pi->sczOpenTagPostfix, wzOpenTagPostfix, 0);
-        ExitOnFailure(hr, "Failed to copy open tag postfix to ini struct: %ls", wzOpenTagPostfix);
+        IniExitOnFailure(hr, "Failed to copy open tag postfix to ini struct: %ls", wzOpenTagPostfix);
     }
     else
     {
@@ -130,7 +145,7 @@ extern "C" HRESULT DAPI IniSetValueStyle(
     if (wzValuePrefix)
     {
         hr = StrAllocString(&pi->sczValuePrefix, wzValuePrefix, 0);
-        ExitOnFailure(hr, "Failed to copy value prefix to ini struct: %ls", wzValuePrefix);
+        IniExitOnFailure(hr, "Failed to copy value prefix to ini struct: %ls", wzValuePrefix);
     }
     else
     {
@@ -140,7 +155,7 @@ extern "C" HRESULT DAPI IniSetValueStyle(
     if (wzValueSeparator)
     {
         hr = StrAllocString(&pi->sczValueSeparator, wzValueSeparator, 0);
-        ExitOnFailure(hr, "Failed to copy value separator to ini struct: %ls", wzValueSeparator);
+        IniExitOnFailure(hr, "Failed to copy value separator to ini struct: %ls", wzValueSeparator);
     }
     else
     {
@@ -162,12 +177,12 @@ extern "C" HRESULT DAPI IniSetValueSeparatorException(
     INI_STRUCT *pi = static_cast<INI_STRUCT *>(piHandle);
 
     hr = MemEnsureArraySize(reinterpret_cast<void **>(&pi->rgsczValueSeparatorExceptions), pi->cValueSeparatorExceptions + 1, sizeof(LPWSTR), 5);
-    ExitOnFailure(hr, "Failed to increase array size for value separator exceptions");
+    IniExitOnFailure(hr, "Failed to increase array size for value separator exceptions");
     dwInsertedIndex = pi->cValueSeparatorExceptions;
     ++pi->cValueSeparatorExceptions;
 
     hr = StrAllocString(&pi->rgsczValueSeparatorExceptions[dwInsertedIndex], wzValueNamePrefix, 0);
-    ExitOnFailure(hr, "Failed to copy value separator exception");
+    IniExitOnFailure(hr, "Failed to copy value separator exception");
 
 LExit:
     return hr;
@@ -185,7 +200,7 @@ extern "C" HRESULT DAPI IniSetCommentStyle(
     if (wzLinePrefix)
     {
         hr = StrAllocString(&pi->sczCommentLinePrefix, wzLinePrefix, 0);
-        ExitOnFailure(hr, "Failed to copy comment line prefix to ini struct: %ls", wzLinePrefix);
+        IniExitOnFailure(hr, "Failed to copy comment line prefix to ini struct: %ls", wzLinePrefix);
     }
     else
     {
@@ -226,10 +241,10 @@ extern "C" HRESULT DAPI IniParse(
     BOOL fValuePrefix = (NULL != pi->sczValuePrefix);
 
     hr = StrAllocString(&pi->sczPath, wzPath, 0);
-    ExitOnFailure(hr, "Failed to copy path to ini struct: %ls", wzPath);
+    IniExitOnFailure(hr, "Failed to copy path to ini struct: %ls", wzPath);
 
     hr = FileToString(pi->sczPath, &sczContents, &pi->feEncoding);
-    ExitOnFailure(hr, "Failed to convert file to string: %ls", pi->sczPath);
+    IniExitOnFailure(hr, "Failed to convert file to string: %ls", pi->sczPath);
 
     if (pfeEncodingFound)
     {
@@ -244,7 +259,7 @@ extern "C" HRESULT DAPI IniParse(
 
     dwValuePrefixLength = lstrlenW(pi->sczValuePrefix);
     hr = StrSplitAllocArray(&pi->rgsczLines, reinterpret_cast<UINT *>(&pi->cLines), sczContents, L"\n");
-    ExitOnFailure(hr, "Failed to split INI file into lines");
+    IniExitOnFailure(hr, "Failed to split INI file into lines");
 
     for (DWORD i = 0; i < pi->cLines; ++i)
     {
@@ -324,7 +339,7 @@ extern "C" HRESULT DAPI IniParse(
         {
             // There is an section starting here, let's keep track of it and move on
             hr = StrAllocString(&sczCurrentSection, wzOpenTagPrefix + lstrlenW(pi->sczOpenTagPrefix), wzOpenTagPostfix - (wzOpenTagPrefix + lstrlenW(pi->sczOpenTagPrefix)));
-            ExitOnFailure(hr, "Failed to record section name for line: %ls of INI file: %ls", pi->rgsczLines[i], pi->sczPath);
+            IniExitOnFailure(hr, "Failed to record section name for line: %ls of INI file: %ls", pi->rgsczLines[i], pi->sczPath);
 
             // Sections will be calculated dynamically after any set operations, so don't include this in the list of lines to remember for output
             ReleaseNullStr(pi->rgsczLines[i]);
@@ -342,28 +357,28 @@ extern "C" HRESULT DAPI IniParse(
             }
 
             hr = MemEnsureArraySize(reinterpret_cast<void **>(&pi->rgivValues), pi->cValues + 1, sizeof(INI_VALUE), 100);
-            ExitOnFailure(hr, "Failed to increase array size for value array");
+            IniExitOnFailure(hr, "Failed to increase array size for value array");
 
             if (sczCurrentSection)
             {
                 hr = StrAllocString(&sczName, sczCurrentSection, 0);
-                ExitOnFailure(hr, "Failed to copy current section name");
+                IniExitOnFailure(hr, "Failed to copy current section name");
 
                 hr = StrAllocConcat(&sczName, wzSectionSeparator, 0);
-                ExitOnFailure(hr, "Failed to copy current section name");
+                IniExitOnFailure(hr, "Failed to copy current section name");
             }
 
             hr = StrAllocConcat(&sczName, wzValueBegin, wzValueSeparator - wzValueBegin);
-            ExitOnFailure(hr, "Failed to copy name");
+            IniExitOnFailure(hr, "Failed to copy name");
 
             hr = StrAllocString(&sczValue, wzValueSeparator + lstrlenW(pi->sczValueSeparator), 0);
-            ExitOnFailure(hr, "Failed to copy value");
+            IniExitOnFailure(hr, "Failed to copy value");
 
             hr = StrTrimWhitespace(&sczNameTrimmed, sczName);
-            ExitOnFailure(hr, "Failed to trim whitespace from name");
+            IniExitOnFailure(hr, "Failed to trim whitespace from name");
 
             hr = StrTrimWhitespace(&sczValueTrimmed, sczValue);
-            ExitOnFailure(hr, "Failed to trim whitespace from value");
+            IniExitOnFailure(hr, "Failed to trim whitespace from value");
 
             pi->rgivValues[pi->cValues].wzName = const_cast<LPCWSTR>(sczNameTrimmed);
             sczNameTrimmed = NULL;
@@ -397,7 +412,7 @@ LExit:
 
 extern "C" HRESULT DAPI IniGetValueList(
     __in_bcount(INI_HANDLE_BYTES) INI_HANDLE piHandle,
-    __deref_out_ecount_opt(pcValues) INI_VALUE** prgivValues,
+    __deref_out_ecount_opt(*pcValues) INI_VALUE** prgivValues,
     __out DWORD *pcValues
     )
 {
@@ -434,7 +449,7 @@ extern "C" HRESULT DAPI IniGetValue(
     if (NULL == pValue)
     {
         hr = E_NOTFOUND;
-        ExitOnFailure(hr, "Failed to check for INI value: %ls", wzValueName);
+        IniExitOnFailure(hr, "Failed to check for INI value: %ls", wzValueName);
     }
 
     if (NULL == pValue->wzValue)
@@ -443,7 +458,7 @@ extern "C" HRESULT DAPI IniGetValue(
     }
 
     hr = StrAllocString(psczValue, pValue->wzValue, 0);
-    ExitOnFailure(hr, "Failed to make copy of value while looking up INI value named: %ls", wzValueName);
+    IniExitOnFailure(hr, "Failed to make copy of value while looking up INI value named: %ls", wzValueName);
 
 LExit:
     return hr;
@@ -494,7 +509,7 @@ extern "C" HRESULT DAPI IniSetValue(
             {
                 pi->fModified = TRUE;
                 hr = StrAllocString(const_cast<LPWSTR *>(&pValue->wzValue), wzValue, 0);
-                ExitOnFailure(hr, "Failed to update value INI value named: %ls", wzValueName);
+                IniExitOnFailure(hr, "Failed to update value INI value named: %ls", wzValueName);
             }
 
             ExitFunction1(hr = S_OK);
@@ -504,7 +519,7 @@ extern "C" HRESULT DAPI IniSetValue(
             if (wzValueName)
             {
                 hr = GetSectionPrefixFromName(wzValueName, &sczSectionPrefix);
-                ExitOnFailure(hr, "Failed to get section prefix from value name: %ls", wzValueName);
+                IniExitOnFailure(hr, "Failed to get section prefix from value name: %ls", wzValueName);
             }
 
             // If we have a section prefix, figure out the index to insert it (at the end of the section it belongs in)
@@ -545,13 +560,13 @@ extern "C" HRESULT DAPI IniSetValue(
 
             pi->fModified = TRUE;
             hr = MemInsertIntoArray(reinterpret_cast<void **>(&pi->rgivValues), dwInsertIndex, 1, pi->cValues + 1, sizeof(INI_VALUE), 100);
-            ExitOnFailure(hr, "Failed to insert value into array");
+            IniExitOnFailure(hr, "Failed to insert value into array");
 
             hr = StrAllocString(&sczName, wzValueName, 0);
-            ExitOnFailure(hr, "Failed to copy name");
+            IniExitOnFailure(hr, "Failed to copy name");
 
             hr = StrAllocString(&sczValue, wzValue, 0);
-            ExitOnFailure(hr, "Failed to copy value");
+            IniExitOnFailure(hr, "Failed to copy value");
 
             pi->rgivValues[dwInsertIndex].wzName = const_cast<LPCWSTR>(sczName);
             sczName = NULL;
@@ -611,7 +626,7 @@ extern "C" HRESULT DAPI IniWriteFile(
     BOOL fSections = (pi->sczOpenTagPrefix) && (pi->sczOpenTagPostfix);
 
     hr = StrAllocString(&sczContents, L"", 0);
-    ExitOnFailure(hr, "Failed to begin contents string as empty string");
+    IniExitOnFailure(hr, "Failed to begin contents string as empty string");
 
     // Insert any beginning lines we didn't understand like comments
     if (0 < pi->cLines)
@@ -619,10 +634,10 @@ extern "C" HRESULT DAPI IniWriteFile(
         while (pi->rgsczLines[dwLineArrayIndex])
         {
             hr = StrAllocConcat(&sczContents, pi->rgsczLines[dwLineArrayIndex], 0);
-            ExitOnFailure(hr, "Failed to add previous line to ini output buffer in-memory");
+            IniExitOnFailure(hr, "Failed to add previous line to ini output buffer in-memory");
 
             hr = StrAllocConcat(&sczContents, L"\r\n", 2);
-            ExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
+            IniExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
 
             ++dwLineArrayIndex;
         }
@@ -640,23 +655,23 @@ extern "C" HRESULT DAPI IniWriteFile(
 
         // First see if we need to write a section line
         hr = GetSectionPrefixFromName(pi->rgivValues[i].wzName, &sczNewSectionPrefix);
-        ExitOnFailure(hr, "Failed to get section prefix from name: %ls", pi->rgivValues[i].wzName);
+        IniExitOnFailure(hr, "Failed to get section prefix from name: %ls", pi->rgivValues[i].wzName);
 
         // If the new section prefix is different, write a section out for it
         if (fSections && sczNewSectionPrefix && (NULL == sczCurrentSectionPrefix || CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, sczNewSectionPrefix, -1, sczCurrentSectionPrefix, -1)))
         {
             hr = StrAllocConcat(&sczContents, pi->sczOpenTagPrefix, 0);
-            ExitOnFailure(hr, "Failed to concat open tag prefix to string");
+            IniExitOnFailure(hr, "Failed to concat open tag prefix to string");
 
             // Exclude section separator (i.e. backslash) from new section prefix
             hr = StrAllocConcat(&sczContents, sczNewSectionPrefix, lstrlenW(sczNewSectionPrefix)-lstrlenW(wzSectionSeparator));
-            ExitOnFailure(hr, "Failed to concat section name to string");
+            IniExitOnFailure(hr, "Failed to concat section name to string");
 
             hr = StrAllocConcat(&sczContents, pi->sczOpenTagPostfix, 0);
-            ExitOnFailure(hr, "Failed to concat open tag postfix to string");
+            IniExitOnFailure(hr, "Failed to concat open tag postfix to string");
 
             hr = StrAllocConcat(&sczContents, L"\r\n", 2);
-            ExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
+            IniExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
             
             ReleaseNullStr(sczCurrentSectionPrefix);
             sczCurrentSectionPrefix = sczNewSectionPrefix;
@@ -674,10 +689,10 @@ extern "C" HRESULT DAPI IniWriteFile(
             }
 
             hr = StrAllocConcat(&sczContents, pi->rgsczLines[dwLineArrayIndex++], 0);
-            ExitOnFailure(hr, "Failed to add previous line to ini output buffer in-memory");
+            IniExitOnFailure(hr, "Failed to add previous line to ini output buffer in-memory");
 
             hr = StrAllocConcat(&sczContents, L"\r\n", 2);
-            ExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
+            IniExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
         }
 
         wzName = pi->rgivValues[i].wzName;
@@ -690,20 +705,20 @@ extern "C" HRESULT DAPI IniWriteFile(
         if (pi->sczValuePrefix)
         {
             hr = StrAllocConcat(&sczContents, pi->sczValuePrefix, 0);
-            ExitOnFailure(hr, "Failed to concat value prefix to ini output buffer");
+            IniExitOnFailure(hr, "Failed to concat value prefix to ini output buffer");
         }
 
         hr = StrAllocConcat(&sczContents, wzName, 0);
-        ExitOnFailure(hr, "Failed to concat value name to ini output buffer");
+        IniExitOnFailure(hr, "Failed to concat value name to ini output buffer");
 
         hr = StrAllocConcat(&sczContents, pi->sczValueSeparator, 0);
-        ExitOnFailure(hr, "Failed to concat value separator to ini output buffer");
+        IniExitOnFailure(hr, "Failed to concat value separator to ini output buffer");
 
         hr = StrAllocConcat(&sczContents, pi->rgivValues[i].wzValue, 0);
-        ExitOnFailure(hr, "Failed to concat value to ini output buffer");
+        IniExitOnFailure(hr, "Failed to concat value to ini output buffer");
 
         hr = StrAllocConcat(&sczContents, L"\r\n", 2);
-        ExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
+        IniExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
     }
 
     // If no path was specified, use the path to the file we parsed
@@ -713,7 +728,7 @@ extern "C" HRESULT DAPI IniWriteFile(
     }
 
     hr = FileFromString(wzPath, 0, sczContents, feEncoding);
-    ExitOnFailure(hr, "Failed to write INI contents out to file: %ls", wzPath);
+    IniExitOnFailure(hr, "Failed to write INI contents out to file: %ls", wzPath);
 
 LExit:
     ReleaseStr(sczContents);
@@ -733,7 +748,7 @@ static void UninitializeIniValue(
 
 static HRESULT GetSectionPrefixFromName(
     __in_z LPCWSTR wzName,
-    __deref_out_z LPWSTR* psczOutput
+    __deref_inout_z LPWSTR* psczOutput
     )
 {
     HRESULT hr = S_OK;
@@ -745,7 +760,7 @@ static HRESULT GetSectionPrefixFromName(
     if (wzSectionDelimiter && wzSectionDelimiter != wzName)
     {
         hr = StrAllocString(psczOutput, wzName, wzSectionDelimiter - wzName + 1);
-        ExitOnFailure(hr, "Failed to copy section prefix");
+        IniExitOnFailure(hr, "Failed to copy section prefix");
     }
 
 LExit:

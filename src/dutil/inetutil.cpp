@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define InetExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_INETUTIL, x, s, __VA_ARGS__)
+#define InetExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_INETUTIL, p, x, e, s, __VA_ARGS__)
+#define InetExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_INETUTIL, p, x, s, __VA_ARGS__)
+#define InetExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_INETUTIL, p, x, e, s, __VA_ARGS__)
+#define InetExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_INETUTIL, p, x, s, __VA_ARGS__)
+#define InetExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_INETUTIL, e, x, s, __VA_ARGS__)
+#define InetExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_INETUTIL, g, x, s, __VA_ARGS__)
+
+
 /*******************************************************************
  InternetGetSizeByHandle - returns size of file by url handle
 
@@ -15,13 +30,13 @@ extern "C" HRESULT DAPI InternetGetSizeByHandle(
     Assert(pllSize);
 
     HRESULT hr = S_OK;
-    DWORD dwSize;
-    DWORD cb;
+    DWORD dwSize = 0;
+    DWORD cb = 0;
 
     cb = sizeof(dwSize);
     if (!::HttpQueryInfoW(hiFile, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, reinterpret_cast<LPVOID>(&dwSize), &cb, NULL))
     {
-        ExitOnLastError(hr, "Failed to get size for internet file handle");
+        InetExitOnLastError(hr, "Failed to get size for internet file handle");
     }
 
     *pllSize = dwSize;
@@ -47,12 +62,12 @@ extern "C" HRESULT DAPI InternetGetCreateTimeByHandle(
 
     if (!::HttpQueryInfoW(hiFile, HTTP_QUERY_LAST_MODIFIED | HTTP_QUERY_FLAG_SYSTEMTIME, reinterpret_cast<LPVOID>(&st), &cb, NULL))
     {
-        ExitWithLastError(hr, "failed to get create time for internet file handle");
+        InetExitWithLastError(hr, "failed to get create time for internet file handle");
     }
 
     if (!::SystemTimeToFileTime(&st, pft))
     {
-        ExitWithLastError(hr, "failed to convert system time to file time");
+        InetExitWithLastError(hr, "failed to convert system time to file time");
     }
 
 LExit:
@@ -78,11 +93,11 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
     if (!*psczValue)
     {
         hr = StrAlloc(psczValue, 64);
-        ExitOnFailure(hr, "Failed to allocate memory for value.");
+        InetExitOnFailure(hr, "Failed to allocate memory for value.");
     }
 
     hr = StrSize(*psczValue, &cbValue);
-    ExitOnFailure(hr, "Failed to get size of value.");
+    InetExitOnFailure(hr, "Failed to get size of value.");
 
     if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), reinterpret_cast<DWORD*>(&cbValue), &dwIndex))
     {
@@ -92,7 +107,7 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
             cbValue += sizeof(WCHAR); // add one character for the null terminator.
 
             hr = StrAlloc(psczValue, cbValue / sizeof(WCHAR));
-            ExitOnFailure(hr, "Failed to allocate value.");
+            InetExitOnFailure(hr, "Failed to allocate value.");
 
             if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), reinterpret_cast<DWORD*>(&cbValue), &dwIndex))
             {
@@ -105,7 +120,7 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
         }
 
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnRootFailure(hr, "Failed to get query information.");
+        InetExitOnRootFailure(hr, "Failed to get query information.");
     }
 
 LExit:
@@ -120,7 +135,7 @@ LExit:
 extern "C" HRESULT DAPI InternetQueryInfoNumber(
     __in HINTERNET hRequest,
     __in DWORD dwInfo,
-    __out LONG* plInfo
+    __inout LONG* plInfo
     )
 {
     HRESULT hr = S_OK;
@@ -129,7 +144,7 @@ extern "C" HRESULT DAPI InternetQueryInfoNumber(
 
     if (!::HttpQueryInfoW(hRequest, dwInfo | HTTP_QUERY_FLAG_NUMBER, static_cast<void*>(plInfo), &cbCode, &dwIndex))
     {
-        ExitWithLastError(hr, "Failed to get query information.");
+        InetExitWithLastError(hr, "Failed to get query information.");
     }
 
 LExit:

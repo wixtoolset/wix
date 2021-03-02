@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define DirExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_DIRUTIL, x, s, __VA_ARGS__)
+#define DirExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_DIRUTIL, p, x, e, s, __VA_ARGS__)
+#define DirExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, p, x, s, __VA_ARGS__)
+#define DirExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_DIRUTIL, p, x, e, s, __VA_ARGS__)
+#define DirExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DIRUTIL, p, x, s, __VA_ARGS__)
+#define DirExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DIRUTIL, e, x, s, __VA_ARGS__)
+#define DirExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DIRUTIL, g, x, s, __VA_ARGS__)
+
+
 /*******************************************************************
  DirExists
 
@@ -59,12 +74,12 @@ extern "C" HRESULT DAPI DirCreateTempPath(
     cch = ::GetTempPathW(countof(wzDir), wzDir);
     if (!cch || cch >= countof(wzDir))
     {
-        ExitWithLastError(hr, "Failed to GetTempPath.");
+        DirExitWithLastError(hr, "Failed to GetTempPath.");
     }
 
     if (!::GetTempFileNameW(wzDir, wzPrefix, 0, wzFile))
     {
-        ExitWithLastError(hr, "Failed to GetTempFileName.");
+        DirExitWithLastError(hr, "Failed to GetTempFileName.");
     }
 
     hr = ::StringCchCopyW(wzPath, cchPath, wzFile);
@@ -111,12 +126,12 @@ extern "C" HRESULT DAPI DirEnsureExists(
         }
 
         // if there is no parent directory fail
-        ExitOnNullDebugTrace(pwzLastSlash, hr, HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND), "cannot find parent path");
+        DirExitOnNullDebugTrace(pwzLastSlash, hr, HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND), "cannot find parent path");
 
         *pwzLastSlash = L'\0'; // null terminate the parent path
         hr = DirEnsureExists(wzPath, psa);   // recurse!
         *pwzLastSlash = L'\\';  // put the slash back
-        ExitOnFailureDebugTrace(hr, "failed to create path: %ls", wzPath);
+        DirExitOnFailureDebugTrace(hr, "failed to create path: %ls", wzPath);
 
         // try to create the directory now that all parents are created
         if (!::CreateDirectoryW(wzPath, psa))
@@ -197,7 +212,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
             er = ERROR_PATH_NOT_FOUND;
         }
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnRootFailure(hr, "Failed to get attributes for path: %ls", wzPath);
+        DirExitOnRootFailure(hr, "Failed to get attributes for path: %ls", wzPath);
     }
 
     if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
@@ -206,7 +221,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
         {
             if (!::SetFileAttributesW(wzPath, FILE_ATTRIBUTE_NORMAL))
             {
-                ExitWithLastError(hr, "Failed to remove read-only attribute from path: %ls", wzPath);
+                DirExitWithLastError(hr, "Failed to remove read-only attribute from path: %ls", wzPath);
             }
         }
 
@@ -217,18 +232,18 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
             {
                 if (!::GetTempPathW(countof(wzTempDirectory), wzTempDirectory))
                 {
-                    ExitWithLastError(hr, "Failed to get temp directory.");
+                    DirExitWithLastError(hr, "Failed to get temp directory.");
                 }
             }
 
             // Delete everything in this directory.
             hr = PathConcat(wzPath, L"*.*", &sczDelete);
-            ExitOnFailure(hr, "Failed to concat wild cards to string: %ls", wzPath);
+            DirExitOnFailure(hr, "Failed to concat wild cards to string: %ls", wzPath);
 
             hFind = ::FindFirstFileW(sczDelete, &wfd);
             if (INVALID_HANDLE_VALUE == hFind)
             {
-                ExitWithLastError(hr, "failed to get first file in directory: %ls", wzPath);
+                DirExitWithLastError(hr, "failed to get first file in directory: %ls", wzPath);
             }
 
             do
@@ -243,18 +258,18 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                 wfd.cFileName[MAX_PATH - 1] = L'\0';
 
                 hr = PathConcat(wzPath, wfd.cFileName, &sczDelete);
-                ExitOnFailure(hr, "Failed to concat filename '%ls' to directory: %ls", wfd.cFileName, wzPath);
+                DirExitOnFailure(hr, "Failed to concat filename '%ls' to directory: %ls", wfd.cFileName, wzPath);
 
                 if (fRecurse && wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
                     hr = PathBackslashTerminate(&sczDelete);
-                    ExitOnFailure(hr, "Failed to ensure path is backslash terminated: %ls", sczDelete);
+                    DirExitOnFailure(hr, "Failed to ensure path is backslash terminated: %ls", sczDelete);
 
                     hr = DirEnsureDeleteEx(sczDelete, dwFlags); // recursive call
                     if (FAILED(hr))
                     {
                       // if we failed to delete a subdirectory, keep trying to finish any remaining files
-                      ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
+                      ExitTraceSource(DUTIL_SOURCE_DIRUTIL, hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
                       hr = S_OK;
                     }
                 }
@@ -264,7 +279,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                     {
                         if (!::SetFileAttributesW(sczDelete, FILE_ATTRIBUTE_NORMAL))
                         {
-                            ExitWithLastError(hr, "Failed to remove attributes from file: %ls", sczDelete);
+                            DirExitWithLastError(hr, "Failed to remove attributes from file: %ls", sczDelete);
                         }
                     }
 
@@ -274,7 +289,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                         {
                             if (!::GetTempFileNameW(wzTempDirectory, L"DEL", 0, wzTempPath))
                             {
-                                ExitWithLastError(hr, "Failed to get temp file to move to.");
+                                DirExitWithLastError(hr, "Failed to get temp file to move to.");
                             }
 
                             // Try to move the file to the temp directory then schedule for delete,
@@ -290,7 +305,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                         }
                         else
                         {
-                            ExitWithLastError(hr, "Failed to delete file: %ls", sczDelete);
+                            DirExitWithLastError(hr, "Failed to delete file: %ls", sczDelete);
                         }
                     }
                 }
@@ -303,7 +318,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
             }
             else
             {
-                ExitWithLastError(hr, "Failed while looping through files in directory: %ls", wzPath);
+                DirExitWithLastError(hr, "Failed while looping through files in directory: %ls", wzPath);
             }
         }
 
@@ -318,13 +333,13 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                 }
             }
 
-            ExitOnRootFailure(hr, "Failed to remove directory: %ls", wzPath);
+            DirExitOnRootFailure(hr, "Failed to remove directory: %ls", wzPath);
         }
     }
     else
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Directory delete cannot delete file: %ls", wzPath);
+        DirExitOnFailure(hr, "Directory delete cannot delete file: %ls", wzPath);
     }
 
     Assert(S_OK == hr);
@@ -351,22 +366,22 @@ extern "C" HRESULT DAPI DirGetCurrent(
     if (psczCurrentDirectory && *psczCurrentDirectory)
     {
         hr = StrMaxLength(*psczCurrentDirectory, &cch);
-        ExitOnFailure(hr, "Failed to determine size of current directory.");
+        DirExitOnFailure(hr, "Failed to determine size of current directory.");
     }
 
     DWORD cchRequired = ::GetCurrentDirectoryW(static_cast<DWORD>(cch), 0 == cch ? NULL : *psczCurrentDirectory);
     if (0 == cchRequired)
     {
-        ExitWithLastError(hr, "Failed to get current directory.");
+        DirExitWithLastError(hr, "Failed to get current directory.");
     }
     else if (cch < cchRequired)
     {
         hr = StrAlloc(psczCurrentDirectory, cchRequired);
-        ExitOnFailure(hr, "Failed to allocate string for current directory.");
+        DirExitOnFailure(hr, "Failed to allocate string for current directory.");
 
         if (!::GetCurrentDirectoryW(cchRequired, *psczCurrentDirectory))
         {
-            ExitWithLastError(hr, "Failed to get current directory using allocated string.");
+            DirExitWithLastError(hr, "Failed to get current directory using allocated string.");
         }
     }
 
@@ -387,7 +402,7 @@ extern "C" HRESULT DAPI DirSetCurrent(
 
     if (!::SetCurrentDirectoryW(wzDirectory))
     {
-        ExitWithLastError(hr, "Failed to set current directory to: %ls", wzDirectory);
+        DirExitWithLastError(hr, "Failed to set current directory to: %ls", wzDirectory);
     }
 
 LExit:

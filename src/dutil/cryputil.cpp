@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define CrypExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_CRYPUTIL, x, s, __VA_ARGS__)
+#define CrypExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_CRYPUTIL, p, x, e, s, __VA_ARGS__)
+#define CrypExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_CRYPUTIL, p, x, s, __VA_ARGS__)
+#define CrypExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_CRYPUTIL, p, x, e, s, __VA_ARGS__)
+#define CrypExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_CRYPUTIL, p, x, s, __VA_ARGS__)
+#define CrypExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_CRYPUTIL, e, x, s, __VA_ARGS__)
+#define CrypExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_CRYPUTIL, g, x, s, __VA_ARGS__)
+
 static PFN_RTLENCRYPTMEMORY vpfnRtlEncryptMemory = NULL;
 static PFN_RTLDECRYPTMEMORY vpfnRtlDecryptMemory = NULL;
 static PFN_CRYPTPROTECTMEMORY vpfnCryptProtectMemory = NULL;
@@ -32,17 +47,17 @@ extern "C" HRESULT DAPI CrypInitialize(
     if (!vpfnRtlEncryptMemory || !vpfnRtlDecryptMemory)
     {
         hr = LoadSystemLibrary(L"Crypt32.dll", &vhCrypt32Dll);
-        ExitOnFailure(hr, "Failed to load Crypt32.dll");
+        CrypExitOnFailure(hr, "Failed to load Crypt32.dll");
         
         vpfnCryptProtectMemory = reinterpret_cast<PFN_CRYPTPROTECTMEMORY>(::GetProcAddress(vhCrypt32Dll, "CryptProtectMemory"));
         if (!vpfnRtlEncryptMemory && !vpfnCryptProtectMemory)
         {
-            ExitWithLastError(hr, "Failed to load an encryption method");
+            CrypExitWithLastError(hr, "Failed to load an encryption method");
         }
         vpfnCryptUnprotectMemory = reinterpret_cast<PFN_CRYPTUNPROTECTMEMORY>(::GetProcAddress(vhCrypt32Dll, "CryptUnprotectMemory"));
         if (!vpfnRtlDecryptMemory && !vpfnCryptUnprotectMemory)
         {
-            ExitWithLastError(hr, "Failed to load a decryption method");
+            CrypExitWithLastError(hr, "Failed to load a decryption method");
         }
     }
 
@@ -94,15 +109,15 @@ extern "C" HRESULT DAPI CrypDecodeObject(
 
     if (!::CryptDecodeObject(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, szStructType, pbData, cbData, dwFlags, NULL, &cbObject))
     {
-        ExitWithLastError(hr, "Failed to decode object to determine size.");
+        CrypExitWithLastError(hr, "Failed to decode object to determine size.");
     }
 
     pvObject = MemAlloc(cbObject, TRUE);
-    ExitOnNull(pvObject, hr, E_OUTOFMEMORY, "Failed to allocate memory for decoded object.");
+    CrypExitOnNull(pvObject, hr, E_OUTOFMEMORY, "Failed to allocate memory for decoded object.");
 
     if (!::CryptDecodeObject(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, szStructType, pbData, cbData, dwFlags, pvObject, &cbObject))
     {
-        ExitWithLastError(hr, "Failed to decode object.");
+        CrypExitWithLastError(hr, "Failed to decode object.");
     }
 
     *ppvObject = pvObject;
@@ -134,15 +149,15 @@ extern "C" HRESULT DAPI CrypMsgGetParam(
 
     if (!::CryptMsgGetParam(hCryptMsg, dwType, dwIndex, NULL, &cb))
     {
-        ExitWithLastError(hr, "Failed to get crypt message parameter data size.");
+        CrypExitWithLastError(hr, "Failed to get crypt message parameter data size.");
     }
 
     pv = MemAlloc(cb, TRUE);
-    ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for crypt message parameter.");
+    CrypExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for crypt message parameter.");
 
     if (!::CryptMsgGetParam(hCryptMsg, dwType, dwIndex, pv, &cb))
     {
-        ExitWithLastError(hr, "Failed to get crypt message parameter.");
+        CrypExitWithLastError(hr, "Failed to get crypt message parameter.");
     }
 
     *ppvData = pv;
@@ -161,7 +176,7 @@ LExit:
 
 
 extern "C" HRESULT DAPI CrypHashFile(
-    __in LPCWSTR wzFilePath,
+    __in_z LPCWSTR wzFilePath,
     __in DWORD dwProvType,
     __in ALG_ID algid,
     __out_bcount(cbHash) BYTE* pbHash,
@@ -176,11 +191,11 @@ extern "C" HRESULT DAPI CrypHashFile(
     hFile = ::CreateFileW(wzFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     if (INVALID_HANDLE_VALUE == hFile)
     {
-        ExitWithLastError(hr, "Failed to open input file.");
+        CrypExitWithLastError(hr, "Failed to open input file.");
     }
 
     hr = CrypHashFileHandle(hFile, dwProvType, algid, pbHash, cbHash, pqwBytesHashed);
-    ExitOnFailure(hr, "Failed to hash file: %ls", wzFilePath);
+    CrypExitOnFailure(hr, "Failed to hash file: %ls", wzFilePath);
 
 LExit:
     ReleaseFileHandle(hFile);
@@ -208,13 +223,13 @@ extern "C" HRESULT DAPI CrypHashFileHandle(
     // get handle to the crypto provider
     if (!::CryptAcquireContextW(&hProv, NULL, NULL, dwProvType, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
     {
-        ExitWithLastError(hr, "Failed to acquire crypto context.");
+        CrypExitWithLastError(hr, "Failed to acquire crypto context.");
     }
 
     // initiate hash
     if (!::CryptCreateHash(hProv, algid, 0, 0, &hHash))
     {
-        ExitWithLastError(hr, "Failed to initiate hash.");
+        CrypExitWithLastError(hr, "Failed to initiate hash.");
     }
 
     for (;;)
@@ -222,7 +237,7 @@ extern "C" HRESULT DAPI CrypHashFileHandle(
         // read data block
         if (!::ReadFile(hFile, rgbBuffer, sizeof(rgbBuffer), &cbRead, NULL))
         {
-            ExitWithLastError(hr, "Failed to read data block.");
+            CrypExitWithLastError(hr, "Failed to read data block.");
         }
 
         if (!cbRead)
@@ -233,21 +248,21 @@ extern "C" HRESULT DAPI CrypHashFileHandle(
         // hash data block
         if (!::CryptHashData(hHash, rgbBuffer, cbRead, 0))
         {
-            ExitWithLastError(hr, "Failed to hash data block.");
+            CrypExitWithLastError(hr, "Failed to hash data block.");
         }
     }
 
     // get hash value
     if (!::CryptGetHashParam(hHash, HP_HASHVAL, pbHash, &cbHash, 0))
     {
-        ExitWithLastError(hr, "Failed to get hash value.");
+        CrypExitWithLastError(hr, "Failed to get hash value.");
     }
 
     if (pqwBytesHashed)
     {
         if (!::SetFilePointerEx(hFile, liZero, (LARGE_INTEGER*)pqwBytesHashed, FILE_CURRENT))
         {
-            ExitWithLastError(hr, "Failed to get file pointer.");
+            CrypExitWithLastError(hr, "Failed to get file pointer.");
         }
     }
 
@@ -280,24 +295,24 @@ HRESULT DAPI CrypHashBuffer(
     // get handle to the crypto provider
     if (!::CryptAcquireContextW(&hProv, NULL, NULL, dwProvType, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
     {
-        ExitWithLastError(hr, "Failed to acquire crypto context.");
+        CrypExitWithLastError(hr, "Failed to acquire crypto context.");
     }
 
     // initiate hash
     if (!::CryptCreateHash(hProv, algid, 0, 0, &hHash))
     {
-        ExitWithLastError(hr, "Failed to initiate hash.");
+        CrypExitWithLastError(hr, "Failed to initiate hash.");
     }
 
     if (!::CryptHashData(hHash, pbBuffer, static_cast<DWORD>(cbBuffer), 0))
     {
-        ExitWithLastError(hr, "Failed to hash data.");
+        CrypExitWithLastError(hr, "Failed to hash data.");
     }
 
     // get hash value
     if (!::CryptGetHashParam(hHash, HP_HASHVAL, pbHash, &cbHash, 0))
     {
-        ExitWithLastError(hr, "Failed to get hash value.");
+        CrypExitWithLastError(hr, "Failed to get hash value.");
     }
 
 LExit:
@@ -340,7 +355,7 @@ HRESULT DAPI CrypEncryptMemory(
             hr = HRESULT_FROM_WIN32(::GetLastError());
         }
     }
-    ExitOnFailure(hr, "Failed to encrypt memory");
+    CrypExitOnFailure(hr, "Failed to encrypt memory");
 LExit:
     return hr;
 }
@@ -372,7 +387,7 @@ HRESULT DAPI CrypDecryptMemory(
             hr = HRESULT_FROM_WIN32(::GetLastError());
         }
     }
-    ExitOnFailure(hr, "Failed to decrypt memory");
+    CrypExitOnFailure(hr, "Failed to decrypt memory");
 LExit:
     return hr;
 }

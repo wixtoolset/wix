@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define GuidExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_GUIDUTIL, x, s, __VA_ARGS__)
+#define GuidExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_GUIDUTIL, p, x, e, s, __VA_ARGS__)
+#define GuidExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_GUIDUTIL, p, x, s, __VA_ARGS__)
+#define GuidExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_GUIDUTIL, p, x, e, s, __VA_ARGS__)
+#define GuidExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_GUIDUTIL, p, x, s, __VA_ARGS__)
+#define GuidExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_GUIDUTIL, e, x, s, __VA_ARGS__)
+#define GuidExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_GUIDUTIL, g, x, s, __VA_ARGS__)
+
 extern "C" HRESULT DAPI GuidFixedCreate(
     _Out_z_cap_c_(GUID_STRING_LENGTH) WCHAR* wzGuid
     )
@@ -10,12 +25,12 @@ extern "C" HRESULT DAPI GuidFixedCreate(
     UUID guid = { };
 
     hr = HRESULT_FROM_RPC(::UuidCreate(&guid));
-    ExitOnFailure(hr, "UuidCreate failed.");
+    GuidExitOnFailure(hr, "UuidCreate failed.");
 
     if (!::StringFromGUID2(guid, wzGuid, GUID_STRING_LENGTH))
     {
         hr = E_OUTOFMEMORY;
-        ExitOnRootFailure(hr, "Failed to convert guid into string.");
+        GuidExitOnRootFailure(hr, "Failed to convert guid into string.");
     }
 
 LExit:
@@ -29,10 +44,10 @@ extern "C" HRESULT DAPI GuidCreate(
     HRESULT hr = S_OK;
 
     hr = StrAlloc(psczGuid, GUID_STRING_LENGTH);
-    ExitOnFailure(hr, "Failed to allocate space for guid");
+    GuidExitOnFailure(hr, "Failed to allocate space for guid");
 
     hr = GuidFixedCreate(*psczGuid);
-    ExitOnFailure(hr, "Failed to create new guid.");
+    GuidExitOnFailure(hr, "Failed to create new guid.");
 
 LExit:
     return hr;

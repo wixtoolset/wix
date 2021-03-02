@@ -9,6 +9,21 @@
 #define DBINITCONSTANTS
 #include "sqlutil.h"
 
+
+// Exit macros
+#define SqlExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_SQLUTIL, x, s, __VA_ARGS__)
+#define SqlExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_SQLUTIL, p, x, e, s, __VA_ARGS__)
+#define SqlExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_SQLUTIL, p, x, s, __VA_ARGS__)
+#define SqlExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_SQLUTIL, p, x, e, s, __VA_ARGS__)
+#define SqlExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_SQLUTIL, p, x, s, __VA_ARGS__)
+#define SqlExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_SQLUTIL, e, x, s, __VA_ARGS__)
+#define SqlExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_SQLUTIL, g, x, s, __VA_ARGS__)
+
 // private prototypes
 static HRESULT FileSpecToString(
     __in const SQL_FILESPEC* psf,
@@ -54,7 +69,7 @@ extern "C" HRESULT DAPI SqlConnectDatabase(
     //obtain access to the SQLOLEDB provider
     hr = ::CoCreateInstance(CLSID_SQLOLEDB, NULL, CLSCTX_INPROC_SERVER,
                             IID_IDBInitialize, (LPVOID*)&pidbInitialize);
-    ExitOnFailure(hr, "failed to create IID_IDBInitialize object");
+    SqlExitOnFailure(hr, "failed to create IID_IDBInitialize object");
 
     // if there is an instance
     if (wzInstance && *wzInstance)
@@ -65,7 +80,7 @@ extern "C" HRESULT DAPI SqlConnectDatabase(
     {
         hr = StrAllocString(&pwzServerInstance, wzServer, 0);
     }
-    ExitOnFailure(hr, "failed to allocate memory for the server instance");
+    SqlExitOnFailure(hr, "failed to allocate memory for the server instance");
 
     // server[\instance]
     rgdbpInit[cProperties].dwPropertyID = DBPROP_INIT_DATASOURCE;
@@ -124,13 +139,13 @@ extern "C" HRESULT DAPI SqlConnectDatabase(
 
     // create and set the property set
     hr = pidbInitialize->QueryInterface(IID_IDBProperties, (LPVOID*)&pidbProperties);
-    ExitOnFailure(hr, "failed to get IID_IDBProperties object");
+    SqlExitOnFailure(hr, "failed to get IID_IDBProperties object");
     hr = pidbProperties->SetProperties(1, rgdbpsetInit); 
-    ExitOnFailure(hr, "failed to set properties");
+    SqlExitOnFailure(hr, "failed to set properties");
 
     //initialize connection to datasource
     hr = pidbInitialize->Initialize();
-    ExitOnFailure(hr, "failed to initialize connection to database: %ls", wzDatabase);
+    SqlExitOnFailure(hr, "failed to initialize connection to database: %ls", wzDatabase);
 
     hr = pidbInitialize->QueryInterface(IID_IDBCreateSession, (LPVOID*)ppidbSession);
 
@@ -163,10 +178,10 @@ extern "C" HRESULT DAPI SqlStartTransaction(
     HRESULT hr = S_OK;
 
     hr = pidbSession->CreateSession(NULL, IID_IDBCreateCommand, (IUnknown**)ppidbCommand);
-    ExitOnFailure(hr, "unable to create command from session");
+    SqlExitOnFailure(hr, "unable to create command from session");
 
     hr = (*ppidbCommand)->QueryInterface(IID_ITransactionLocal, (LPVOID*)ppit);
-    ExitOnFailure(hr, "Unable to QueryInterface session to get ITransactionLocal");
+    SqlExitOnFailure(hr, "Unable to QueryInterface session to get ITransactionLocal");
 
     hr = ((ITransactionLocal*)*ppit)->StartTransaction(ISOLATIONLEVEL_SERIALIZABLE, 0, NULL, NULL);
 
@@ -192,12 +207,12 @@ extern "C" HRESULT DAPI SqlEndTransaction(
     if (fCommit)
     {
         hr = pit->Commit(FALSE, XACTTC_SYNC, 0);
-        ExitOnFailure(hr, "commit of transaction failed");
+        SqlExitOnFailure(hr, "commit of transaction failed");
     }
     else
     {
         hr = pit->Abort(NULL, FALSE, FALSE);
-        ExitOnFailure(hr, "abort of transaction failed");
+        SqlExitOnFailure(hr, "abort of transaction failed");
     }
 
 LExit:
@@ -231,7 +246,7 @@ extern "C" HRESULT DAPI SqlDatabaseExists(
     IDBCreateSession* pidbSession = NULL;
 
     hr = SqlConnectDatabase(wzServer, wzInstance, L"master", fIntegratedAuth, wzUser, wzPassword, &pidbSession);
-    ExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
+    SqlExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
 
     hr = SqlSessionDatabaseExists(pidbSession, wzDatabase, pbstrErrorDescription);
 
@@ -271,17 +286,17 @@ extern "C" HRESULT DAPI SqlSessionDatabaseExists(
     // query to see if the database exists
     //
     hr = StrAllocFormatted(&pwzQuery, L"SELECT name FROM sysdatabases WHERE name='%s'", wzDatabase);
-    ExitOnFailure(hr, "failed to allocate query string to ensure database exists");
+    SqlExitOnFailure(hr, "failed to allocate query string to ensure database exists");
 
     hr = SqlSessionExecuteQuery(pidbSession, pwzQuery, &pirs, NULL, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to get database list from 'master' database");
+    SqlExitOnFailure(hr, "failed to get database list from 'master' database");
     Assert(pirs);
 
     //
     // check to see if the database was returned
     //
     hr = pirs->GetNextRows(DB_NULL_HCHAPTER, 0, 1, &cRows, &prow);
-    ExitOnFailure(hr, "failed to get row with database name");
+    SqlExitOnFailure(hr, "failed to get row with database name");
 
     // succeeded but no database
     if ((DB_S_ENDOFROWSET == hr) || (0 == cRows))
@@ -324,10 +339,10 @@ extern "C" HRESULT DAPI SqlDatabaseEnsureExists(
     // connect to the master database to create the new database
     //
     hr = SqlConnectDatabase(wzServer, wzInstance, L"master", fIntegratedAuth, wzUser, wzPassword, &pidbSession);
-    ExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
+    SqlExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
 
     hr = SqlSessionDatabaseEnsureExists(pidbSession, wzDatabase, psfDatabase, psfLog, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to create database: %ls", wzDatabase);
+    SqlExitOnFailure(hr, "failed to create database: %ls", wzDatabase);
 
     Assert(S_OK == hr);
 LExit:
@@ -355,12 +370,12 @@ extern "C" HRESULT DAPI SqlSessionDatabaseEnsureExists(
     HRESULT hr = S_OK;
 
     hr = SqlSessionDatabaseExists(pidbSession, wzDatabase, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to determine if exists, database: %ls", wzDatabase);
+    SqlExitOnFailure(hr, "failed to determine if exists, database: %ls", wzDatabase);
 
     if (S_FALSE == hr)
     {
         hr = SqlSessionCreateDatabase(pidbSession, wzDatabase, psfDatabase, psfLog, pbstrErrorDescription);
-        ExitOnFailure(hr, "failed to create database: %1", wzDatabase);
+        SqlExitOnFailure(hr, "failed to create database: %ls", wzDatabase);
     }
     // else database already exists, return S_FALSE
 
@@ -398,10 +413,10 @@ extern "C" HRESULT DAPI SqlCreateDatabase(
     // connect to the master database to create the new database
     //
     hr = SqlConnectDatabase(wzServer, wzInstance, L"master", fIntegratedAuth, wzUser, wzPassword, &pidbSession);
-    ExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
+    SqlExitOnFailure(hr, "failed to connect to 'master' database on server %ls", wzServer);
 
     hr = SqlSessionCreateDatabase(pidbSession, wzDatabase, psfDatabase, psfLog, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to create database: %ls", wzDatabase);
+    SqlExitOnFailure(hr, "failed to create database: %ls", wzDatabase);
 
     Assert(S_OK == hr);
 LExit:
@@ -433,23 +448,23 @@ extern "C" HRESULT DAPI SqlSessionCreateDatabase(
     if (psfDatabase)
     {
         hr = FileSpecToString(psfDatabase, &pwzDbFile);
-        ExitOnFailure(hr, "failed to convert db filespec to string");
+        SqlExitOnFailure(hr, "failed to convert db filespec to string");
     }
 
     if (psfLog)
     {
         hr = FileSpecToString(psfLog, &pwzLogFile);
-        ExitOnFailure(hr, "failed to convert log filespec to string");
+        SqlExitOnFailure(hr, "failed to convert log filespec to string");
     }
 
     hr = EscapeSqlIdentifier(wzDatabase, &pwzDatabaseEscaped);
-    ExitOnFailure(hr, "failed to escape database string");
+    SqlExitOnFailure(hr, "failed to escape database string");
 
     hr = StrAllocFormatted(&pwzQuery, L"CREATE DATABASE %s %s%s %s%s", pwzDatabaseEscaped, pwzDbFile ? L"ON " : L"", pwzDbFile ? pwzDbFile : L"", pwzLogFile ? L"LOG ON " : L"", pwzLogFile ? pwzLogFile : L"");
-    ExitOnFailure(hr, "failed to allocate query to create database: %ls", pwzDatabaseEscaped);    
+    SqlExitOnFailure(hr, "failed to allocate query to create database: %ls", pwzDatabaseEscaped);    
 
     hr = SqlSessionExecuteQuery(pidbSession, pwzQuery, NULL, NULL, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to create database: %ls, Query: %ls", pwzDatabaseEscaped, pwzQuery);
+    SqlExitOnFailure(hr, "failed to create database: %ls, Query: %ls", pwzDatabaseEscaped, pwzQuery);
 
 LExit:
     ReleaseStr(pwzQuery);
@@ -486,7 +501,7 @@ extern "C" HRESULT DAPI SqlDropDatabase(
     // connect to the master database to search for wzDatabase
     //
     hr = SqlConnectDatabase(wzServer, wzInstance, L"master", fIntegratedAuth, wzUser, wzPassword, &pidbSession);
-    ExitOnFailure(hr, "Failed to connect to 'master' database");
+    SqlExitOnFailure(hr, "Failed to connect to 'master' database");
 
     hr = SqlSessionDropDatabase(pidbSession, wzDatabase, pbstrErrorDescription);
 
@@ -515,18 +530,18 @@ extern "C" HRESULT DAPI SqlSessionDropDatabase(
     LPWSTR pwzDatabaseEscaped = NULL;
 
     hr = SqlSessionDatabaseExists(pidbSession, wzDatabase, pbstrErrorDescription);
-    ExitOnFailure(hr, "failed to determine if exists, database: %ls", wzDatabase);
+    SqlExitOnFailure(hr, "failed to determine if exists, database: %ls", wzDatabase);
     
     hr = EscapeSqlIdentifier(wzDatabase, &pwzDatabaseEscaped);
-    ExitOnFailure(hr, "failed to escape database string");
+    SqlExitOnFailure(hr, "failed to escape database string");
 
     if (S_OK == hr)
     {
         hr = StrAllocFormatted(&pwzQuery, L"DROP DATABASE %s", pwzDatabaseEscaped);
-        ExitOnFailure(hr, "failed to allocate query to drop database: %ls", pwzDatabaseEscaped);
+        SqlExitOnFailure(hr, "failed to allocate query to drop database: %ls", pwzDatabaseEscaped);
 
         hr = SqlSessionExecuteQuery(pidbSession, pwzQuery, NULL, NULL, pbstrErrorDescription);
-        ExitOnFailure(hr, "Failed to drop database");
+        SqlExitOnFailure(hr, "Failed to drop database");
     }
 
 LExit:
@@ -567,23 +582,23 @@ extern "C" HRESULT DAPI SqlSessionExecuteQuery(
     // create the command
     //
     hr = pidbSession->CreateSession(NULL, IID_IDBCreateCommand, (IUnknown**)&pidbCommand);
-    ExitOnFailure(hr, "failed to create database session");
+    SqlExitOnFailure(hr, "failed to create database session");
     hr = pidbCommand->CreateCommand(NULL, IID_ICommand, (IUnknown**)&picmd);
-    ExitOnFailure(hr, "failed to create command to execute session");
+    SqlExitOnFailure(hr, "failed to create command to execute session");
 
     //
     // set the sql text into the command
     //
     hr = picmd->QueryInterface(IID_ICommandText, (LPVOID*)&picmdText);
-    ExitOnFailure(hr, "failed to get command text object for command");
+    SqlExitOnFailure(hr, "failed to get command text object for command");
     hr = picmdText->SetCommandText(DBGUID_DEFAULT , wzSql);
-    ExitOnFailure(hr, "failed to set SQL string: %ls", wzSql);
+    SqlExitOnFailure(hr, "failed to set SQL string: %ls", wzSql);
 
     //
     // execute the command
     //
     hr = picmd->Execute(NULL, (ppirs) ? IID_IRowset : IID_NULL, NULL, &cRows, reinterpret_cast<IUnknown**>(ppirs));
-    ExitOnFailure(hr, "failed to execute SQL string: %ls", wzSql);
+    SqlExitOnFailure(hr, "failed to execute SQL string: %ls", wzSql);
 
     if (DB_S_ERRORSOCCURRED == hr)
     {
@@ -642,21 +657,21 @@ extern "C" HRESULT DAPI SqlCommandExecuteQuery(
     // create the command
     //
     hr = pidbCommand->CreateCommand(NULL, IID_ICommand, (IUnknown**)&picmd);
-    ExitOnFailure(hr, "failed to create command to execute session");
+    SqlExitOnFailure(hr, "failed to create command to execute session");
 
     //
     // set the sql text into the command
     //
     hr = picmd->QueryInterface(IID_ICommandText, (LPVOID*)&picmdText);
-    ExitOnFailure(hr, "failed to get command text object for command");
+    SqlExitOnFailure(hr, "failed to get command text object for command");
     hr = picmdText->SetCommandText(DBGUID_DEFAULT , wzSql);
-    ExitOnFailure(hr, "failed to set SQL string: %ls", wzSql);
+    SqlExitOnFailure(hr, "failed to set SQL string: %ls", wzSql);
 
     //
     // execute the command
     //
     hr = picmd->Execute(NULL, (ppirs) ? IID_IRowset : IID_NULL, NULL, &cRows, reinterpret_cast<IUnknown**>(ppirs));
-    ExitOnFailure(hr, "failed to execute SQL string: %ls", wzSql);
+    SqlExitOnFailure(hr, "failed to execute SQL string: %ls", wzSql);
 
     if (DB_S_ERRORSOCCURRED == hr)
     {
@@ -700,14 +715,14 @@ extern "C" HRESULT DAPI SqlGetErrorInfo(
 
     // only ask for error information if the interface supports it.
     hr = pObjectWithError->QueryInterface(IID_ISupportErrorInfo,(void**)&pISupportErrorInfo);
-    ExitOnFailure(hr, "No error information was found for object.");
+    SqlExitOnFailure(hr, "No error information was found for object.");
 
     hr = pISupportErrorInfo->InterfaceSupportsErrorInfo(IID_InterfaceWithError);
-    ExitOnFailure(hr, "InterfaceWithError is not supported for object with error");
+    SqlExitOnFailure(hr, "InterfaceWithError is not supported for object with error");
 
     // ignore the return of GetErrorInfo it can succeed and return a NULL pointer in pIErrorInfoAll anyway
     hr = ::GetErrorInfo(0, &pIErrorInfoAll);
-    ExitOnFailure(hr, "failed to get error info");
+    SqlExitOnFailure(hr, "failed to get error info");
 
     if (S_OK == hr && pIErrorInfoAll)
     {
@@ -787,37 +802,37 @@ static HRESULT FileSpecToString(
     LPWSTR pwz = NULL;
 
     hr = StrAllocString(&pwz, L"(", 1024);
-    ExitOnFailure(hr, "failed to allocate string for database file info");
+    SqlExitOnFailure(hr, "failed to allocate string for database file info");
 
-    ExitOnNull(*psf->wzName, hr, E_INVALIDARG, "logical name not specified in database file info");
-    ExitOnNull(*psf->wzFilename, hr, E_INVALIDARG, "filename not specified in database file info");
+    SqlExitOnNull(*psf->wzName, hr, E_INVALIDARG, "logical name not specified in database file info");
+    SqlExitOnNull(*psf->wzFilename, hr, E_INVALIDARG, "filename not specified in database file info");
 
     hr = StrAllocFormatted(&pwz, L"%sNAME=%s", pwz, psf->wzName);
-    ExitOnFailure(hr, "failed to format database file info name: %ls", psf->wzName);
+    SqlExitOnFailure(hr, "failed to format database file info name: %ls", psf->wzName);
 
     hr = StrAllocFormatted(&pwz, L"%s, FILENAME='%s'", pwz, psf->wzFilename);
-    ExitOnFailure(hr, "failed to format database file info filename: %ls", psf->wzFilename);
+    SqlExitOnFailure(hr, "failed to format database file info filename: %ls", psf->wzFilename);
 
     if (0 != psf->wzSize[0])
     {
         hr = StrAllocFormatted(&pwz, L"%s, SIZE=%s", pwz, psf->wzSize);
-        ExitOnFailure(hr, "failed to format database file info size: %s", psf->wzSize);
+        SqlExitOnFailure(hr, "failed to format database file info size: %ls", psf->wzSize);
     }
 
     if (0 != psf->wzMaxSize[0])
     {
         hr = StrAllocFormatted(&pwz, L"%s, MAXSIZE=%s", pwz, psf->wzMaxSize);
-        ExitOnFailure(hr, "failed to format database file info maxsize: %s", psf->wzMaxSize);
+        SqlExitOnFailure(hr, "failed to format database file info maxsize: %ls", psf->wzMaxSize);
     }
 
     if (0 != psf->wzGrow[0])
     {
         hr = StrAllocFormatted(&pwz, L"%s, FILEGROWTH=%s", pwz, psf->wzGrow);
-        ExitOnFailure(hr, "failed to format database file info growth: %s", psf->wzGrow);
+        SqlExitOnFailure(hr, "failed to format database file info growth: %ls", psf->wzGrow);
     }
 
     hr = StrAllocFormatted(&pwz, L"%s)", pwz);
-    ExitOnFailure(hr, "failed to allocate string for file spec");
+    SqlExitOnFailure(hr, "failed to allocate string for file spec");
 
     *ppwz = pwz;
     pwz = NULL;  // null here so it doesn't get freed below
@@ -850,13 +865,13 @@ static HRESULT EscapeSqlIdentifier(
     if (cchIdentifier == 0 || (wzIdentifier[0] == '[' && wzIdentifier[cchIdentifier-1] == ']'))
     {
         hr = StrAllocString(&pwz, wzIdentifier, 0);
-        ExitOnFailure(hr, "failed to format database name: %ls", wzIdentifier);
+        SqlExitOnFailure(hr, "failed to format database name: %ls", wzIdentifier);
     }
     else
     {
         //escape it
         hr = StrAllocFormatted(&pwz, L"[%s]", wzIdentifier);
-        ExitOnFailure(hr, "failed to format escaped database name: %ls", wzIdentifier);
+        SqlExitOnFailure(hr, "failed to format escaped database name: %ls", wzIdentifier);
     }
 
     *ppwz = pwz;

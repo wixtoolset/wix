@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define LocExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_LOCUTIL, x, s, __VA_ARGS__)
+#define LocExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_LOCUTIL, p, x, e, s, __VA_ARGS__)
+#define LocExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_LOCUTIL, p, x, s, __VA_ARGS__)
+#define LocExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_LOCUTIL, p, x, e, s, __VA_ARGS__)
+#define LocExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_LOCUTIL, p, x, s, __VA_ARGS__)
+#define LocExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_LOCUTIL, e, x, s, __VA_ARGS__)
+#define LocExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_LOCUTIL, g, x, s, __VA_ARGS__)
+
 // prototypes
 static HRESULT ParseWxl(
     __in IXMLDOMDocument* pixd,
@@ -63,10 +78,10 @@ extern "C" HRESULT DAPI LocProbeForFile(
     if (wzLanguage && *wzLanguage)
     {
         hr = PathConcat(wzBasePath, wzLanguage, &sczProbePath);
-        ExitOnFailure(hr, "Failed to concat base path to language.");
+        LocExitOnFailure(hr, "Failed to concat base path to language.");
 
         hr = PathConcat(sczProbePath, wzLocFileName, &sczProbePath);
-        ExitOnFailure(hr, "Failed to concat loc file name to probe path.");
+        LocExitOnFailure(hr, "Failed to concat loc file name to probe path.");
 
         if (FileExistsEx(sczProbePath, NULL))
         {
@@ -81,16 +96,16 @@ extern "C" HRESULT DAPI LocProbeForFile(
         DWORD dwFlags = MUI_LANGUAGE_ID | MUI_MERGE_USER_FALLBACK | MUI_MERGE_SYSTEM_FALLBACK;
         if (!(*pvfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, NULL, &cchLangs))
         {
-            ExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return buffer size.");
+            LocExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return buffer size.");
         }
 
         hr = StrAlloc(&sczLangsBuff, cchLangs);
-        ExitOnFailure(hr, "Failed to allocate buffer for languages");
+        LocExitOnFailure(hr, "Failed to allocate buffer for languages");
 
         nLangs = 0;
         if (!(*pvfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, sczLangsBuff, &cchLangs))
         {
-            ExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return language list.");
+            LocExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return language list.");
         }
 
         LPWSTR szLangs = sczLangsBuff;
@@ -98,14 +113,14 @@ extern "C" HRESULT DAPI LocProbeForFile(
         {
             // StrHexDecode assumes low byte is first. We'll need to swap the bytes once we parse out the value.
             hr = StrHexDecode(szLangs, reinterpret_cast<BYTE*>(&langid), sizeof(langid));
-            ExitOnFailure(hr, "Failed to parse langId.");
+            LocExitOnFailure(hr, "Failed to parse langId.");
 
             langid = MAKEWORD(HIBYTE(langid), LOBYTE(langid));
             hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
-            ExitOnFailure(hr, "Failed to format user preferred langid.");
+            LocExitOnFailure(hr, "Failed to format user preferred langid.");
 
             hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
-            ExitOnFailure(hr, "Failed to concat user preferred langid file name to base path.");
+            LocExitOnFailure(hr, "Failed to concat user preferred langid file name to base path.");
 
             if (FileExistsEx(sczProbePath, NULL)) 
             { 
@@ -117,10 +132,10 @@ extern "C" HRESULT DAPI LocProbeForFile(
     langid = ::GetUserDefaultUILanguage();
 
     hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
-    ExitOnFailure(hr, "Failed to format user langid.");
+    LocExitOnFailure(hr, "Failed to format user langid.");
 
     hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath);
-    ExitOnFailure(hr, "Failed to concat user langid file name to base path.");
+    LocExitOnFailure(hr, "Failed to concat user langid file name to base path.");
 
     if (FileExistsEx(sczProbePath, NULL))
     {
@@ -132,10 +147,10 @@ extern "C" HRESULT DAPI LocProbeForFile(
         langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT); 
         
         hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
-        ExitOnFailure(hr, "Failed to format user langid (default sublang).");
+        LocExitOnFailure(hr, "Failed to format user langid (default sublang).");
 
         hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
-        ExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
+        LocExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
 
         if (FileExistsEx(sczProbePath, NULL)) 
         { 
@@ -146,10 +161,10 @@ extern "C" HRESULT DAPI LocProbeForFile(
     langid = ::GetSystemDefaultUILanguage();
 
     hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
-    ExitOnFailure(hr, "Failed to format system langid.");
+    LocExitOnFailure(hr, "Failed to format system langid.");
 
     hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath);
-    ExitOnFailure(hr, "Failed to concat system langid file name to base path.");
+    LocExitOnFailure(hr, "Failed to concat system langid file name to base path.");
 
     if (FileExistsEx(sczProbePath, NULL))
     {
@@ -161,10 +176,10 @@ extern "C" HRESULT DAPI LocProbeForFile(
         langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT); 
         
         hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
-        ExitOnFailure(hr, "Failed to format user langid (default sublang).");
+        LocExitOnFailure(hr, "Failed to format user langid (default sublang).");
 
         hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
-        ExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
+        LocExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
 
         if (FileExistsEx(sczProbePath, NULL)) 
         { 
@@ -174,7 +189,7 @@ extern "C" HRESULT DAPI LocProbeForFile(
 
     // Finally, look for the loc file in the base path.
     hr = PathConcat(wzBasePath, wzLocFileName, &sczProbePath);
-    ExitOnFailure(hr, "Failed to concat loc file name to base path.");
+    LocExitOnFailure(hr, "Failed to concat loc file name to base path.");
 
     if (!FileExistsEx(sczProbePath, NULL))
     {
@@ -203,10 +218,10 @@ extern "C" HRESULT DAPI LocLoadFromFile(
     IXMLDOMDocument* pixd = NULL;
 
     hr = XmlLoadDocumentFromFile(wzWxlFile, &pixd);
-    ExitOnFailure(hr, "Failed to load WXL file as XML document.");
+    LocExitOnFailure(hr, "Failed to load WXL file as XML document.");
 
     hr = ParseWxl(pixd, ppWixLoc);
-    ExitOnFailure(hr, "Failed to parse WXL.");
+    LocExitOnFailure(hr, "Failed to parse WXL.");
 
 LExit:
     ReleaseObject(pixd);
@@ -227,16 +242,16 @@ extern "C" HRESULT DAPI LocLoadFromResource(
     IXMLDOMDocument* pixd = NULL;
 
     hr = ResReadData(hModule, szResource, &pvResource, &cbResource);
-    ExitOnFailure(hr, "Failed to read theme from resource.");
+    LocExitOnFailure(hr, "Failed to read theme from resource.");
 
     hr = StrAllocStringAnsi(&sczXml, reinterpret_cast<LPCSTR>(pvResource), cbResource, CP_UTF8);
-    ExitOnFailure(hr, "Failed to convert XML document data from UTF-8 to unicode string.");
+    LocExitOnFailure(hr, "Failed to convert XML document data from UTF-8 to unicode string.");
 
     hr = XmlLoadDocument(sczXml, &pixd);
-    ExitOnFailure(hr, "Failed to load theme resource as XML document.");
+    LocExitOnFailure(hr, "Failed to load theme resource as XML document.");
 
     hr = ParseWxl(pixd, ppWixLoc);
-    ExitOnFailure(hr, "Failed to parse WXL.");
+    LocExitOnFailure(hr, "Failed to parse WXL.");
 
 LExit:
     ReleaseObject(pixd);
@@ -280,7 +295,7 @@ extern "C" HRESULT DAPI LocLocalizeString(
     for (DWORD i = 0; i < pWixLoc->cLocStrings; ++i)
     {
         hr = StrReplaceStringAll(ppsczInput, pWixLoc->rgLocStrings[i].wzId, pWixLoc->rgLocStrings[i].wzText);
-        ExitOnFailure(hr, "Localizing string failed.");
+        LocExitOnFailure(hr, "Localizing string failed.");
     }
 
 LExit:
@@ -348,15 +363,15 @@ extern "C" HRESULT DAPI LocAddString(
 
     ++pWixLoc->cLocStrings;
     pWixLoc->rgLocStrings = static_cast<LOC_STRING*>(MemReAlloc(pWixLoc->rgLocStrings, sizeof(LOC_STRING) * pWixLoc->cLocStrings, TRUE));
-    ExitOnNull(pWixLoc->rgLocStrings, hr, E_OUTOFMEMORY, "Failed to reallocate memory for localization strings.");
+    LocExitOnNull(pWixLoc->rgLocStrings, hr, E_OUTOFMEMORY, "Failed to reallocate memory for localization strings.");
 
     LOC_STRING* pLocString = pWixLoc->rgLocStrings + (pWixLoc->cLocStrings - 1);
 
     hr = StrAllocFormatted(&pLocString->wzId, L"#(loc.%s)", wzId);
-    ExitOnFailure(hr, "Failed to set localization string Id.");
+    LocExitOnFailure(hr, "Failed to set localization string Id.");
 
     hr = StrAllocString(&pLocString->wzText, wzLocString, 0);
-    ExitOnFailure(hr, "Failed to set localization string Text.");
+    LocExitOnFailure(hr, "Failed to set localization string Text.");
 
     pLocString->bOverridable = bOverridable;
 
@@ -376,11 +391,11 @@ static HRESULT ParseWxl(
     WIX_LOCALIZATION* pWixLoc = NULL;
 
     pWixLoc = static_cast<WIX_LOCALIZATION*>(MemAlloc(sizeof(WIX_LOCALIZATION), TRUE));
-    ExitOnNull(pWixLoc, hr, E_OUTOFMEMORY, "Failed to allocate memory for Wxl file.");
+    LocExitOnNull(pWixLoc, hr, E_OUTOFMEMORY, "Failed to allocate memory for Wxl file.");
 
     // read the WixLocalization tag
     hr = pixd->get_documentElement(&pWxlElement);
-    ExitOnFailure(hr, "Failed to get localization element.");
+    LocExitOnFailure(hr, "Failed to get localization element.");
 
     // get the Language attribute if present
     pWixLoc->dwLangId = WIX_LOCALIZATION_LANGUAGE_NOT_SET;
@@ -389,14 +404,14 @@ static HRESULT ParseWxl(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed to get Language value.");
+    LocExitOnFailure(hr, "Failed to get Language value.");
 
     // store the strings and controls in a node list
     hr = ParseWxlStrings(pWxlElement, pWixLoc);
-    ExitOnFailure(hr, "Parsing localization strings failed.");
+    LocExitOnFailure(hr, "Parsing localization strings failed.");
 
     hr = ParseWxlControls(pWxlElement, pWixLoc);
-    ExitOnFailure(hr, "Parsing localization controls failed.");
+    LocExitOnFailure(hr, "Parsing localization controls failed.");
 
     *ppWixLoc = pWixLoc;
     pWixLoc = NULL;
@@ -420,27 +435,27 @@ static HRESULT ParseWxlStrings(
     DWORD dwIdx = 0;
 
     hr = XmlSelectNodes(pElement, L"String", &pixnl);
-    ExitOnLastError(hr, "Failed to get String child nodes of Wxl File.");
+    LocExitOnLastError(hr, "Failed to get String child nodes of Wxl File.");
 
     hr = pixnl->get_length(reinterpret_cast<long*>(&pWixLoc->cLocStrings));
-    ExitOnLastError(hr, "Failed to get number of String child nodes in Wxl File.");
+    LocExitOnLastError(hr, "Failed to get number of String child nodes in Wxl File.");
 
     if (0 < pWixLoc->cLocStrings)
     {
         pWixLoc->rgLocStrings = static_cast<LOC_STRING*>(MemAlloc(sizeof(LOC_STRING) * pWixLoc->cLocStrings, TRUE));
-        ExitOnNull(pWixLoc->rgLocStrings, hr, E_OUTOFMEMORY, "Failed to allocate memory for localization strings.");
+        LocExitOnNull(pWixLoc->rgLocStrings, hr, E_OUTOFMEMORY, "Failed to allocate memory for localization strings.");
 
         while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
         {
             hr = ParseWxlString(pixn, dwIdx, pWixLoc);
-            ExitOnFailure(hr, "Failed to parse localization string.");
+            LocExitOnFailure(hr, "Failed to parse localization string.");
 
             ++dwIdx;
             ReleaseNullObject(pixn);
         }
 
         hr = S_OK;
-        ExitOnFailure(hr, "Failed to enumerate all localization strings.");
+        LocExitOnFailure(hr, "Failed to enumerate all localization strings.");
     }
 
 LExit:
@@ -472,27 +487,27 @@ static HRESULT ParseWxlControls(
     DWORD dwIdx = 0;
 
     hr = XmlSelectNodes(pElement, L"UI|Control", &pixnl);
-    ExitOnLastError(hr, "Failed to get UI child nodes of Wxl File.");
+    LocExitOnLastError(hr, "Failed to get UI child nodes of Wxl File.");
 
     hr = pixnl->get_length(reinterpret_cast<long*>(&pWixLoc->cLocControls));
-    ExitOnLastError(hr, "Failed to get number of UI child nodes in Wxl File.");
+    LocExitOnLastError(hr, "Failed to get number of UI child nodes in Wxl File.");
 
     if (0 < pWixLoc->cLocControls)
     {
         pWixLoc->rgLocControls = static_cast<LOC_CONTROL*>(MemAlloc(sizeof(LOC_CONTROL) * pWixLoc->cLocControls, TRUE));
-        ExitOnNull(pWixLoc->rgLocControls, hr, E_OUTOFMEMORY, "Failed to allocate memory for localized controls.");
+        LocExitOnNull(pWixLoc->rgLocControls, hr, E_OUTOFMEMORY, "Failed to allocate memory for localized controls.");
 
         while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
         {
             hr = ParseWxlControl(pixn, dwIdx, pWixLoc);
-            ExitOnFailure(hr, "Failed to parse localized control.");
+            LocExitOnFailure(hr, "Failed to parse localized control.");
 
             ++dwIdx;
             ReleaseNullObject(pixn);
         }
 
         hr = S_OK;
-        ExitOnFailure(hr, "Failed to enumerate all localized controls.");
+        LocExitOnFailure(hr, "Failed to enumerate all localized controls.");
     }
 
 LExit:
@@ -527,16 +542,16 @@ static HRESULT ParseWxlString(
 
     // Id
     hr = XmlGetAttribute(pixn, L"Id", &bstrText);
-    ExitOnFailure(hr, "Failed to get Xml attribute Id in Wxl file.");
+    LocExitOnFailure(hr, "Failed to get Xml attribute Id in Wxl file.");
 
     hr = StrAllocFormatted(&pLocString->wzId, L"#(loc.%s)", bstrText);
-    ExitOnFailure(hr, "Failed to duplicate Xml attribute Id in Wxl file.");
+    LocExitOnFailure(hr, "Failed to duplicate Xml attribute Id in Wxl file.");
 
     ReleaseNullBSTR(bstrText);
 
     // Overrideable
     hr = XmlGetAttribute(pixn, L"Overridable", &bstrText);
-    ExitOnFailure(hr, "Failed to get Xml attribute Overridable.");
+    LocExitOnFailure(hr, "Failed to get Xml attribute Overridable.");
 
     if (S_OK == hr)
     {
@@ -547,10 +562,10 @@ static HRESULT ParseWxlString(
 
     // Text
     hr = XmlGetText(pixn, &bstrText);
-    ExitOnFailure(hr, "Failed to get Xml text in Wxl file.");
+    LocExitOnFailure(hr, "Failed to get Xml text in Wxl file.");
 
     hr = StrAllocString(&pLocString->wzText, bstrText, 0);
-    ExitOnFailure(hr, "Failed to duplicate Xml text in Wxl file.");
+    LocExitOnFailure(hr, "Failed to duplicate Xml text in Wxl file.");
 
 LExit:
     ReleaseBSTR(bstrText);
@@ -572,39 +587,39 @@ static HRESULT ParseWxlControl(
 
     // Id
     hr = XmlGetAttribute(pixn, L"Control", &bstrText);
-    ExitOnFailure(hr, "Failed to get Xml attribute Control in Wxl file.");
+    LocExitOnFailure(hr, "Failed to get Xml attribute Control in Wxl file.");
 
     hr = StrAllocString(&pLocControl->wzControl, bstrText, 0);
-    ExitOnFailure(hr, "Failed to duplicate Xml attribute Control in Wxl file.");
+    LocExitOnFailure(hr, "Failed to duplicate Xml attribute Control in Wxl file.");
 
     ReleaseNullBSTR(bstrText);
 
     // X
     pLocControl->nX = LOC_CONTROL_NOT_SET;
     hr = XmlGetAttributeNumber(pixn, L"X", reinterpret_cast<DWORD*>(&pLocControl->nX));
-    ExitOnFailure(hr, "Failed to get control X attribute.");
+    LocExitOnFailure(hr, "Failed to get control X attribute.");
 
     // Y
     pLocControl->nY = LOC_CONTROL_NOT_SET;
     hr = XmlGetAttributeNumber(pixn, L"Y", reinterpret_cast<DWORD*>(&pLocControl->nY));
-    ExitOnFailure(hr, "Failed to get control Y attribute.");
+    LocExitOnFailure(hr, "Failed to get control Y attribute.");
 
     // Width
     pLocControl->nWidth = LOC_CONTROL_NOT_SET;
     hr = XmlGetAttributeNumber(pixn, L"Width", reinterpret_cast<DWORD*>(&pLocControl->nWidth));
-    ExitOnFailure(hr, "Failed to get control width attribute.");
+    LocExitOnFailure(hr, "Failed to get control width attribute.");
 
     // Height
     pLocControl->nHeight = LOC_CONTROL_NOT_SET;
     hr = XmlGetAttributeNumber(pixn, L"Height", reinterpret_cast<DWORD*>(&pLocControl->nHeight));
-    ExitOnFailure(hr, "Failed to get control height attribute.");
+    LocExitOnFailure(hr, "Failed to get control height attribute.");
 
     // Text
     hr = XmlGetText(pixn, &bstrText);
-    ExitOnFailure(hr, "Failed to get control text in Wxl file.");
+    LocExitOnFailure(hr, "Failed to get control text in Wxl file.");
 
     hr = StrAllocString(&pLocControl->wzText, bstrText, 0);
-    ExitOnFailure(hr, "Failed to duplicate control text in Wxl file.");
+    LocExitOnFailure(hr, "Failed to duplicate control text in Wxl file.");
 
 LExit:
     ReleaseBSTR(bstrText);

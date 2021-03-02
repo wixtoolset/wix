@@ -4,6 +4,21 @@
 
 using namespace Gdiplus;
 
+
+// Exit macros
+#define GdipExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_GDIPUTIL, p, x, e, s, __VA_ARGS__)
+#define GdipExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, p, x, s, __VA_ARGS__)
+#define GdipExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, p, x, e, s, __VA_ARGS__)
+#define GdipExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, p, x, s, __VA_ARGS__)
+#define GdipExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_GDIPUTIL, e, x, s, __VA_ARGS__)
+#define GdipExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_GDIPUTIL, g, x, s, __VA_ARGS__)
+
 /********************************************************************
  GdipInitialize - initializes GDI+.
 
@@ -22,7 +37,7 @@ extern "C" HRESULT DAPI GdipInitialize(
     Status status = Ok;
 
     status = GdiplusStartup(pToken, pInput, pOutput);
-    ExitOnGdipFailure(status, hr, "Failed to initialize GDI+.");
+    GdipExitOnGdipFailure(status, hr, "Failed to initialize GDI+.");
 
 LExit:
     return hr;
@@ -59,15 +74,15 @@ extern "C" HRESULT DAPI GdipBitmapFromResource(
     Status gs = Ok;
 
     hr = ResReadData(hinst, szId, &pvData, &cbData);
-    ExitOnFailure(hr, "Failed to load GDI+ bitmap from resource.");
+    GdipExitOnFailure(hr, "Failed to load GDI+ bitmap from resource.");
 
     // Have to copy the fixed resource data into moveable (heap) memory
     // since that's what GDI+ expects.
     hGlobal = ::GlobalAlloc(GMEM_MOVEABLE, cbData);
-    ExitOnNullWithLastError(hGlobal, hr, "Failed to allocate global memory.");
+    GdipExitOnNullWithLastError(hGlobal, hr, "Failed to allocate global memory.");
 
     pv = ::GlobalLock(hGlobal);
-    ExitOnNullWithLastError(pv, hr, "Failed to lock global memory.");
+    GdipExitOnNullWithLastError(pv, hr, "Failed to lock global memory.");
 
     memcpy(pv, pvData, cbData);
 
@@ -75,15 +90,15 @@ extern "C" HRESULT DAPI GdipBitmapFromResource(
     pv = NULL;
 
     hr = ::CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
-    ExitOnFailure(hr, "Failed to allocate stream from global memory.");
+    GdipExitOnFailure(hr, "Failed to allocate stream from global memory.");
 
     hGlobal = NULL; // we gave the global memory to the stream object so it will close it
 
     pBitmap = Bitmap::FromStream(pStream);
-    ExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from stream.");
+    GdipExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from stream.");
 
     gs = pBitmap->GetLastStatus();
-    ExitOnGdipFailure(gs, hr, "Failed to load bitmap from stream.");
+    GdipExitOnGdipFailure(gs, hr, "Failed to load bitmap from stream.");
 
     *ppBitmap = pBitmap;
     pBitmap = NULL;
@@ -123,13 +138,13 @@ extern "C" HRESULT DAPI GdipBitmapFromFile(
     Bitmap *pBitmap = NULL;
     Status gs = Ok;
 
-    ExitOnNull(ppBitmap, hr, E_INVALIDARG, "Invalid null wzFileName");
+    GdipExitOnNull(ppBitmap, hr, E_INVALIDARG, "Invalid null wzFileName");
 
     pBitmap = Bitmap::FromFile(wzFileName);
-    ExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from file.");
+    GdipExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from file.");
 
     gs = pBitmap->GetLastStatus();
-    ExitOnGdipFailure(gs, hr, "Failed to load bitmap from file: %ls", wzFileName);
+    GdipExitOnGdipFailure(gs, hr, "Failed to load bitmap from file: %ls", wzFileName);
 
     *ppBitmap = pBitmap;
     pBitmap = NULL;

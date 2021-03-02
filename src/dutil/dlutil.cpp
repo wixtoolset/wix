@@ -5,6 +5,21 @@
 #include <inetutil.h>
 #include <uriutil.h>
 
+
+// Exit macros
+#define DlExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_DLUTIL, x, s, __VA_ARGS__)
+#define DlExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_DLUTIL, p, x, e, s, __VA_ARGS__)
+#define DlExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_DLUTIL, p, x, s, __VA_ARGS__)
+#define DlExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_DLUTIL, p, x, e, s, __VA_ARGS__)
+#define DlExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DLUTIL, p, x, s, __VA_ARGS__)
+#define DlExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DLUTIL, e, x, s, __VA_ARGS__)
+#define DlExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DLUTIL, g, x, s, __VA_ARGS__)
+
 static const DWORD64 DOWNLOAD_ENGINE_TWO_GIGABYTES = DWORD64(2) * 1024 * 1024 * 1024;
 static LPCWSTR DOWNLOAD_ENGINE_ACCEPT_TYPES[] = { L"*/*", NULL };
 
@@ -41,7 +56,7 @@ static HRESULT DownloadResource(
 static HRESULT AllocateRangeRequestHeader(
     __in DWORD64 dw64ResumeOffset,
     __in DWORD64 dw64ResourceLength,
-    __deref_out_z LPWSTR* psczHeader
+    __deref_inout_z LPWSTR* psczHeader
     );
 static HRESULT WriteToFile(
     __in HINTERNET hUrl,
@@ -126,10 +141,10 @@ extern "C" HRESULT DAPI DownloadUrl(
     // Copy the download source into a working variable to handle redirects then
     // open the internet session.
     hr = StrAllocString(&sczUrl, pDownloadSource->sczUrl, 0);
-    ExitOnFailure(hr, "Failed to copy download source URL.");
+    DlExitOnFailure(hr, "Failed to copy download source URL.");
 
     hSession = ::InternetOpenW(L"Burn", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-    ExitOnNullWithLastError(hSession, hr, "Failed to open internet session");
+    DlExitOnNullWithLastError(hSession, hr, "Failed to open internet session");
 
     // Make a best effort to set the download timeouts to 2 minutes or whatever policy says.
     PolcReadNumber(POLICY_BURN_REGISTRY_PATH, L"DownloadTimeout", 2 * 60, &dwTimeout);
@@ -143,14 +158,14 @@ extern "C" HRESULT DAPI DownloadUrl(
 
     // Get the resource size and creation time from the internet.
     hr = GetResourceMetadata(hSession, &sczUrl, pDownloadSource->sczUser, pDownloadSource->sczPassword, pAuthenticate, &dw64Size, &ftCreated);
-    ExitOnFailure(hr, "Failed to get size and time for URL: %ls", sczUrl);
+    DlExitOnFailure(hr, "Failed to get size and time for URL: %ls", sczUrl);
 
     // Ignore failure to initialize resume because we will fall back to full download then
     // download.
     InitializeResume(wzDestinationPath, &sczResumePath, &hResumeFile, &dw64ResumeOffset);
 
     hr = DownloadResource(hSession, &sczUrl, pDownloadSource->sczUser, pDownloadSource->sczPassword, wzDestinationPath, dw64AuthoredDownloadSize, dw64Size, dw64ResumeOffset, hResumeFile, pCache, pAuthenticate);
-    ExitOnFailure(hr, "Failed to download URL: %ls", sczUrl);
+    DlExitOnFailure(hr, "Failed to download URL: %ls", sczUrl);
 
     // Cleanup the resume file because we successfully downloaded the whole file.
     if (sczResumePath && *sczResumePath)
@@ -185,19 +200,19 @@ static HRESULT InitializeResume(
     *pdw64ResumeOffset = 0;
 
     hr = DownloadGetResumePath(wzDestinationPath, psczResumePath);
-    ExitOnFailure(hr, "Failed to calculate resume path from working path: %ls", wzDestinationPath);
+    DlExitOnFailure(hr, "Failed to calculate resume path from working path: %ls", wzDestinationPath);
 
     hResumeFile = ::CreateFileW(*psczResumePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hResumeFile)
     {
-        ExitWithLastError(hr, "Failed to create resume file: %ls", *psczResumePath);
+        DlExitWithLastError(hr, "Failed to create resume file: %ls", *psczResumePath);
     }
 
     do
     {
         if (!::ReadFile(hResumeFile, reinterpret_cast<BYTE*>(pdw64ResumeOffset) + cbTotalReadResumeData, sizeof(DWORD64) - cbTotalReadResumeData, &cbReadData, NULL))
         {
-            ExitWithLastError(hr, "Failed to read resume file: %ls", *psczResumePath);
+            DlExitWithLastError(hr, "Failed to read resume file: %ls", *psczResumePath);
         }
         cbTotalReadResumeData += cbReadData;
     } while (cbReadData && sizeof(DWORD64) > cbTotalReadResumeData);
@@ -233,7 +248,7 @@ static HRESULT GetResourceMetadata(
     LONGLONG llLength = 0;
 
     hr = MakeRequest(hSession, psczUrl, L"HEAD", NULL, wzUser, wzPassword, pAuthenticate, &hConnect, &hUrl, &fRangeRequestsAccepted);
-    ExitOnFailure(hr, "Failed to connect to URL: %ls", *psczUrl);
+    DlExitOnFailure(hr, "Failed to connect to URL: %ls", *psczUrl);
 
     hr = InternetGetSizeByHandle(hUrl, &llLength);
     if (FAILED(hr))
@@ -286,12 +301,12 @@ static HRESULT DownloadResource(
     hPayloadFile = ::CreateFileW(wzDestinationPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hPayloadFile)
     {
-        ExitWithLastError(hr, "Failed to create download destination file: %ls", wzDestinationPath);
+        DlExitWithLastError(hr, "Failed to create download destination file: %ls", wzDestinationPath);
     }
 
     // Allocate a memory block on a page boundary in case we want to do optimal writing.
     pbData = static_cast<BYTE*>(::VirtualAlloc(NULL, cbMaxData, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE));
-    ExitOnNullWithLastError(pbData, hr, "Failed to allocate buffer to download files into.");
+    DlExitOnNullWithLastError(pbData, hr, "Failed to allocate buffer to download files into.");
 
     // Let's try downloading the file assuming that range requests are accepted. If range requests
     // are not supported we'll have to start over and accept the fact that we only get one shot
@@ -300,13 +315,13 @@ static HRESULT DownloadResource(
     while (fRangeRequestsAccepted && (0 == dw64ResourceLength || dw64ResumeOffset < dw64ResourceLength))
     {
         hr = AllocateRangeRequestHeader(dw64ResumeOffset, 0 == dw64ResourceLength ? dw64AuthoredResourceLength : dw64ResourceLength, &sczRangeRequestHeader);
-        ExitOnFailure(hr, "Failed to allocate range request header.");
+        DlExitOnFailure(hr, "Failed to allocate range request header.");
 
         ReleaseNullInternet(hConnect);
         ReleaseNullInternet(hUrl);
 
         hr = MakeRequest(hSession, psczUrl, L"GET", sczRangeRequestHeader, wzUser, wzPassword, pAuthenticate, &hConnect, &hUrl, &fRangeRequestsAccepted);
-        ExitOnFailure(hr, "Failed to request URL for download: %ls", *psczUrl);
+        DlExitOnFailure(hr, "Failed to request URL for download: %ls", *psczUrl);
 
         // If we didn't get the size of the resource from the initial "HEAD" request
         // then let's try to get the size from this "GET" request.
@@ -335,7 +350,7 @@ static HRESULT DownloadResource(
         }
 
         hr = WriteToFile(hUrl, hPayloadFile, &dw64ResumeOffset, hResumeFile, dw64ResourceLength, pbData, cbMaxData, pCache);
-        ExitOnFailure(hr, "Failed while reading from internet and writing to: %ls", wzDestinationPath);
+        DlExitOnFailure(hr, "Failed while reading from internet and writing to: %ls", wzDestinationPath);
     }
 
 LExit:
@@ -354,7 +369,7 @@ LExit:
 static HRESULT AllocateRangeRequestHeader(
     __in DWORD64 dw64ResumeOffset,
     __in DWORD64 dw64ResourceLength,
-    __deref_out_z LPWSTR* psczHeader
+    __deref_inout_z LPWSTR* psczHeader
     )
 {
     HRESULT hr = S_OK;
@@ -368,7 +383,7 @@ static HRESULT AllocateRangeRequestHeader(
         if (0 < dw64ResumeOffset)
         {
             hr = StrAllocFormatted(psczHeader, L"Range: bytes=%I64u-", dw64ResumeOffset);
-            ExitOnFailure(hr, "Failed to add range read header.");
+            DlExitOnFailure(hr, "Failed to add range read header.");
         }
         else
         {
@@ -378,7 +393,7 @@ static HRESULT AllocateRangeRequestHeader(
     else // we'll have to download in chunks.
     {
         hr = StrAllocFormatted(psczHeader, L"Range: bytes=%I64u-%I64u", dw64ResumeOffset, dw64ResumeOffset + dw64RemainingLength - 1);
-        ExitOnFailure(hr, "Failed to add range read header.");
+        DlExitOnFailure(hr, "Failed to add range read header.");
     }
 
 LExit:
@@ -400,14 +415,14 @@ static HRESULT WriteToFile(
     DWORD cbReadData = 0;
 
     hr = FileSetPointer(hPayloadFile, *pdw64ResumeOffset, NULL, FILE_BEGIN);
-    ExitOnFailure(hr, "Failed to seek to start point in file.");
+    DlExitOnFailure(hr, "Failed to seek to start point in file.");
 
     do
     {
         // Read bits from the internet.
         if (!::InternetReadFile(hUrl, static_cast<void*>(pbData), cbData, &cbReadData))
         {
-            ExitWithLastError(hr, "Failed while reading from internet.");
+            DlExitWithLastError(hr, "Failed while reading from internet.");
         }
 
         // Write bits to disk (if there are any).
@@ -419,7 +434,7 @@ static HRESULT WriteToFile(
             {
                 if (!::WriteFile(hPayloadFile, pbData + cbTotalWritten, cbReadData - cbTotalWritten, &cbWritten, NULL))
                 {
-                    ExitWithLastError(hr, "Failed to write data from internet.");
+                    DlExitWithLastError(hr, "Failed to write data from internet.");
                 }
 
                 cbTotalWritten += cbWritten;
@@ -431,7 +446,7 @@ static HRESULT WriteToFile(
             if (pCallback && pCallback->pfnProgress)
             {
                 hr = DownloadSendProgressCallback(pCallback, *pdw64ResumeOffset, dw64ResourceLength, hPayloadFile);
-                ExitOnFailure(hr, "UX aborted on cache progress.");
+                DlExitOnFailure(hr, "UX aborted on cache progress.");
             }
         }
     } while (cbReadData);
@@ -456,14 +471,14 @@ static HRESULT UpdateResumeOffset(
         DWORD cbWrittenResumeData = 0;
 
         hr = FileSetPointer(hResumeFile, 0, NULL, FILE_BEGIN);
-        ExitOnFailure(hr, "Failed to seek to start point in file.");
+        DlExitOnFailure(hr, "Failed to seek to start point in file.");
 
         do
         {
             // Ignore failure to write to the resume file as that should not prevent the download from happening.
             if (!::WriteFile(hResumeFile, pdw64ResumeOffset + cbTotalWrittenResumeData, sizeof(DWORD64) - cbTotalWrittenResumeData, &cbWrittenResumeData, NULL))
             {
-                ExitOnFailure(hr, "Failed to seek to write to file.");
+                DlExitOnFailure(hr, "Failed to seek to write to file.");
             }
 
             cbTotalWrittenResumeData += cbWrittenResumeData;
@@ -504,10 +519,10 @@ static HRESULT MakeRequest(
 
         // Open the url.
         hr = UriCrackEx(*psczSourceUrl, &uri);
-        ExitOnFailure(hr, "Failed to break URL into server and resource parts.");
+        DlExitOnFailure(hr, "Failed to break URL into server and resource parts.");
 
         hConnect = ::InternetConnectW(hSession, uri.sczHostName, uri.port, (wzUser && *wzUser) ? wzUser : uri.sczUser, (wzPassword && *wzPassword) ? wzPassword : uri.sczPassword, INTERNET_SCHEME_FTP == uri.scheme ? INTERNET_SERVICE_FTP : INTERNET_SERVICE_HTTP, 0, 0);
-        ExitOnNullWithLastError(hConnect, hr, "Failed to connect to URL: %ls", *psczSourceUrl);
+        DlExitOnNullWithLastError(hConnect, hr, "Failed to connect to URL: %ls", *psczSourceUrl);
 
         // Best effort set the proxy username and password, if they were provided.
         if ((wzUser && *wzUser) && (wzPassword && *wzPassword))
@@ -519,10 +534,10 @@ static HRESULT MakeRequest(
         }
 
         hr = OpenRequest(hConnect, wzMethod, uri.scheme, uri.sczPath, uri.sczQueryString, wzHeaders, &hUrl);
-        ExitOnFailure(hr, "Failed to open internet URL: %ls", *psczSourceUrl);
+        DlExitOnFailure(hr, "Failed to open internet URL: %ls", *psczSourceUrl);
 
         hr = SendRequest(hUrl, psczSourceUrl, pAuthenticate, &fRetry, pfRangeRequestsAccepted);
-        ExitOnFailure(hr, "Failed to send request to URL: %ls", *psczSourceUrl);
+        DlExitOnFailure(hr, "Failed to send request to URL: %ls", *psczSourceUrl);
     } while (fRetry);
 
     // Okay, we're all ready to start downloading. Update the connection information.
@@ -565,23 +580,23 @@ static HRESULT OpenRequest(
     
     // Allocate the resource name.
     hr = StrAllocString(&sczResource, wzResource, 0);
-    ExitOnFailure(hr, "Failed to allocate string for resource URI.");
+    DlExitOnFailure(hr, "Failed to allocate string for resource URI.");
 
     if (wzQueryString && *wzQueryString)
     {
         hr = StrAllocConcat(&sczResource, wzQueryString, 0);
-        ExitOnFailure(hr, "Failed to append query strong to resource from URI.");
+        DlExitOnFailure(hr, "Failed to append query strong to resource from URI.");
     }
 
     // Open the request and add the header if provided.
     hUrl = ::HttpOpenRequestW(hConnect, wzMethod, sczResource, NULL, NULL, DOWNLOAD_ENGINE_ACCEPT_TYPES, dwRequestFlags, NULL);
-    ExitOnNullWithLastError(hUrl, hr, "Failed to open internet request.");
+    DlExitOnNullWithLastError(hUrl, hr, "Failed to open internet request.");
 
     if (wzHeader && *wzHeader)
     {
         if (!::HttpAddRequestHeadersW(hUrl, wzHeader, static_cast<DWORD>(-1), HTTP_ADDREQ_FLAG_COALESCE))
         {
-            ExitWithLastError(hr, "Failed to add header to HTTP request.");
+            DlExitWithLastError(hr, "Failed to add header to HTTP request.");
         }
     }
 
@@ -618,12 +633,12 @@ static HRESULT SendRequest(
             // Try to get the HTTP status code and, if good, handle via the switch statement below but if it
             // fails return the error code from the send request above as the result of the function.
             HRESULT hrQueryStatusCode = InternetQueryInfoNumber(hUrl, HTTP_QUERY_STATUS_CODE, &lCode);
-            ExitOnFailure(hrQueryStatusCode, "Failed to get HTTP status code for failed request to URL: %ls", *psczUrl);
+            DlExitOnFailure(hrQueryStatusCode, "Failed to get HTTP status code for failed request to URL: %ls", *psczUrl);
         }
         else // get the http status code.
         {
             hr = InternetQueryInfoNumber(hUrl, HTTP_QUERY_STATUS_CODE, &lCode);
-            ExitOnFailure(hr, "Failed to get HTTP status code for request to URL: %ls", *psczUrl);
+            DlExitOnFailure(hr, "Failed to get HTTP status code for request to URL: %ls", *psczUrl);
         }
 
         switch (lCode)
@@ -643,7 +658,7 @@ static HRESULT SendRequest(
         case 302: __fallthrough; // temporary
         case 303: // redirect method
             hr = InternetQueryInfoString(hUrl, HTTP_QUERY_CONTENT_LOCATION, psczUrl);
-            ExitOnFailure(hr, "Failed to get redirect url: %ls", *psczUrl);
+            DlExitOnFailure(hr, "Failed to get redirect url: %ls", *psczUrl);
 
             *pfRetry = TRUE;
             break;
@@ -734,7 +749,7 @@ static HRESULT DownloadGetResumePath(
     HRESULT hr = S_OK;
 
     hr = StrAllocFormatted(psczResumePath, L"%ls.R", wzPayloadWorkingPath);
-    ExitOnFailure(hr, "Failed to create resume path.");
+    DlExitOnFailure(hr, "Failed to create resume path.");
 
 LExit:
     return hr;
@@ -769,7 +784,7 @@ static HRESULT DownloadSendProgressCallback(
         case PROGRESS_CANCEL: __fallthrough; // TODO: should cancel and stop be treated differently?
         case PROGRESS_STOP:
             hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
-            ExitOnRootFailure(hr, "UX aborted on download progress.");
+            DlExitOnRootFailure(hr, "UX aborted on download progress.");
 
         case PROGRESS_QUIET: // Not actually an error, just an indication to the caller to stop requesting progress.
             pCallback->pfnProgress = NULL;
@@ -778,7 +793,7 @@ static HRESULT DownloadSendProgressCallback(
 
         default:
             hr = E_UNEXPECTED;
-            ExitOnRootFailure(hr, "Invalid return code from progress routine.");
+            DlExitOnRootFailure(hr, "Invalid return code from progress routine.");
         }
     }
 

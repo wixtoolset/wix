@@ -55,12 +55,12 @@ HRESULT DAPI ConsoleReadW(
     );
 
 HRESULT DAPI ConsoleReadStringA(
-    __deref_out_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* szCharBuffer,
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* szCharBuffer,
     CONST DWORD cchCharBuffer,
     __out DWORD* pcchNumCharReturn
     );
 HRESULT DAPI ConsoleReadStringW(
-    __deref_out_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* szCharBuffer,
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* szCharBuffer,
     CONST DWORD cchCharBuffer,
     __out DWORD* pcchNumCharReturn
     );

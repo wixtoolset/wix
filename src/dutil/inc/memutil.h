@@ -39,13 +39,13 @@ HRESULT DAPI MemReAllocArray(
     __in DWORD dwNewItemCount
     );
 HRESULT DAPI MemEnsureArraySize(
-    __deref_out_bcount(cArray * cbArrayType) LPVOID* ppvArray,
+    __deref_inout_bcount(cArray * cbArrayType) LPVOID* ppvArray,
     __in DWORD cArray,
     __in SIZE_T cbArrayType,
     __in DWORD dwGrowthCount
     );
 HRESULT DAPI MemInsertIntoArray(
-    __deref_out_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
+    __deref_inout_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
     __in DWORD dwInsertIndex,
     __in DWORD cInsertItems,
     __in DWORD cExistingArray,
@@ -61,7 +61,7 @@ void DAPI MemRemoveFromArray(
     __in BOOL fPreserveOrder
     );
 void DAPI MemArraySwapItems(
-    __inout_bcount((cExistingArray) * cbArrayType) LPVOID pvArray,
+    __inout_bcount(cbArrayType) LPVOID pvArray,
     __in DWORD dwIndex1,
     __in DWORD dwIndex2,
     __in SIZE_T cbArrayType

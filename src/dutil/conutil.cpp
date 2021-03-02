@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define ConExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_CONUTIL, x, s, __VA_ARGS__)
+#define ConExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_CONUTIL, p, x, e, s, __VA_ARGS__)
+#define ConExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_CONUTIL, p, x, s, __VA_ARGS__)
+#define ConExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_CONUTIL, p, x, e, s, __VA_ARGS__)
+#define ConExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_CONUTIL, p, x, s, __VA_ARGS__)
+#define ConExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_CONUTIL, e, x, s, __VA_ARGS__)
+#define ConExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_CONUTIL, g, x, s, __VA_ARGS__)
+
+
 static HANDLE vhStdIn = INVALID_HANDLE_VALUE;
 static HANDLE vhStdOut = INVALID_HANDLE_VALUE;
 static BOOL vfConsoleIn = FALSE;
@@ -19,13 +34,13 @@ extern "C" HRESULT DAPI ConsoleInitialize()
     vhStdIn = ::GetStdHandle(STD_INPUT_HANDLE);
     if (INVALID_HANDLE_VALUE == vhStdIn)
     {
-        ExitOnLastError(hr, "failed to open stdin");
+        ConExitOnLastError(hr, "failed to open stdin");
     }
 
     vhStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
     if (INVALID_HANDLE_VALUE == vhStdOut)
     {
-        ExitOnLastError(hr, "failed to open stdout");
+        ConExitOnLastError(hr, "failed to open stdout");
     }
 
     // check if we have a std in on the console
@@ -43,7 +58,7 @@ extern "C" HRESULT DAPI ConsoleInitialize()
         }
         else
         {
-            ExitOnWin32Error(er, hr, "failed to get input console screen buffer info");
+            ConExitOnWin32Error(er, hr, "failed to get input console screen buffer info");
         }
     }
 
@@ -62,7 +77,7 @@ extern "C" HRESULT DAPI ConsoleInitialize()
         }
         else
         {
-            ExitOnWin32Error(er, hr, "failed to get output console screen buffer info");
+            ConExitOnWin32Error(er, hr, "failed to get output console screen buffer info");
         }
     }
 
@@ -89,6 +104,8 @@ LExit:
 
 extern "C" void DAPI ConsoleUninitialize()
 {
+    BOOL fOutEqualsIn = vhStdOut == vhStdIn;
+
     memset(&vcsbiInfo, 0, sizeof(vcsbiInfo));
 
     if (INVALID_HANDLE_VALUE != vhStdOut)
@@ -96,7 +113,7 @@ extern "C" void DAPI ConsoleUninitialize()
         ::CloseHandle(vhStdOut);
     }
 
-    if (INVALID_HANDLE_VALUE != vhStdIn && vhStdOut != vhStdIn)
+    if (INVALID_HANDLE_VALUE != vhStdIn && !fOutEqualsIn)
     {
         ::CloseHandle(vhStdIn);
     }
@@ -178,14 +195,14 @@ extern "C" HRESULT DAPI ConsoleWrite(
     va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&pszOutput, szFormat, args);
     va_end(args);
-    ExitOnFailure(hr, "failed to format message: \"%s\"", szFormat);
+    ConExitOnFailure(hr, "failed to format message: \"%s\"", szFormat);
 
     cchOutput = lstrlenA(pszOutput);
     while (cbTotal < (sizeof(*pszOutput) * cchOutput))
     {
         if (!::WriteFile(vhStdOut, reinterpret_cast<BYTE*>(pszOutput) + cbTotal, cchOutput * sizeof(*pszOutput) - cbTotal, &cbWrote, NULL))
         {
-            ExitOnLastError(hr, "failed to write output to console: %s", pszOutput);
+            ConExitOnLastError(hr, "failed to write output to console: %s", pszOutput);
         }
 
         cbTotal += cbWrote;
@@ -236,7 +253,7 @@ extern "C" HRESULT DAPI ConsoleWriteLine(
     va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&pszOutput, szFormat, args);
     va_end(args);
-    ExitOnFailure(hr, "failed to format message: \"%s\"", szFormat);
+    ConExitOnFailure(hr, "failed to format message: \"%s\"", szFormat);
 
     //
     // write the string
@@ -245,7 +262,7 @@ extern "C" HRESULT DAPI ConsoleWriteLine(
     while (cbTotal < (sizeof(*pszOutput) * cchOutput))
     {
         if (!::WriteFile(vhStdOut, reinterpret_cast<BYTE*>(pszOutput) + cbTotal, cchOutput * sizeof(*pszOutput) - cbTotal, &cbWrote, NULL))
-            ExitOnLastError(hr, "failed to write output to console: %s", pszOutput);
+            ConExitOnLastError(hr, "failed to write output to console: %s", pszOutput);
 
         cbTotal += cbWrote;
     }
@@ -255,7 +272,7 @@ extern "C" HRESULT DAPI ConsoleWriteLine(
     //
     if (!::WriteFile(vhStdOut, reinterpret_cast<const BYTE*>(szNewLine), 2, &cbWrote, NULL))
     {
-        ExitOnLastError(hr, "failed to write newline to console");
+        ConExitOnLastError(hr, "failed to write newline to console");
     }
 
     // reset the color to normal
@@ -289,7 +306,7 @@ HRESULT ConsoleWriteError(
     va_start(args, szFormat);
     hr = StrAnsiAllocFormattedArgs(&pszMessage, szFormat, args);
     va_end(args);
-    ExitOnFailure(hr, "failed to format error message: \"%s\"", szFormat);
+    ConExitOnFailure(hr, "failed to format error message: \"%s\"", szFormat);
 
     if (FAILED(hrError))
     {
@@ -326,14 +343,14 @@ extern "C" HRESULT DAPI ConsoleReadW(
 
     cch  = 64;
     hr = StrAnsiAlloc(&psz, cch);
-    ExitOnFailure(hr, "failed to allocate memory to read from console");
+    ConExitOnFailure(hr, "failed to allocate memory to read from console");
 
     // loop until we read the \r\n from the console
     for (;;)
     {
         // read one character at a time, since that seems to be the only way to make this work
         if (!::ReadFile(vhStdIn, psz + cchTotalRead, 1, &cchRead, NULL))
-            ExitOnLastError(hr, "failed to read string from console");
+            ConExitOnLastError(hr, "failed to read string from console");
 
         cchTotalRead += cchRead;
         if (1 < cchTotalRead && '\r' == psz[cchTotalRead - 2] || '\n' == psz[cchTotalRead - 1])
@@ -351,7 +368,7 @@ extern "C" HRESULT DAPI ConsoleReadW(
         {
             cch *= 2;   // double everytime we run out of space
             hr = StrAnsiAlloc(&psz, cch);
-            ExitOnFailure(hr, "failed to allocate memory to read from console");
+            ConExitOnFailure(hr, "failed to allocate memory to read from console");
         }
     }
 
@@ -381,7 +398,7 @@ extern "C" HRESULT DAPI ConsoleReadNonBlockingW(
 
     LPSTR psz = NULL;
 
-    ExitOnNull(ppwzBuffer, hr, E_INVALIDARG, "Failed to read from console because buffer was not provided");
+    ConExitOnNull(ppwzBuffer, hr, E_INVALIDARG, "Failed to read from console because buffer was not provided");
 
     DWORD dwRead;
     DWORD dwNumInput;
@@ -412,7 +429,7 @@ extern "C" HRESULT DAPI ConsoleReadNonBlockingW(
 
         if (!GetNumberOfConsoleInputEvents(vhStdIn, &dwRead))
         {
-            ExitOnLastError(hr, "failed to peek at console input");
+            ConExitOnLastError(hr, "failed to peek at console input");
         }
 
         if (0 == dwRead)
@@ -424,7 +441,7 @@ extern "C" HRESULT DAPI ConsoleReadNonBlockingW(
         {
             if (!ReadConsoleInputW(vhStdIn, &ir, 1, &dwNumInput))
             {
-                ExitOnLastError(hr, "Failed to read input from console");
+                ConExitOnLastError(hr, "Failed to read input from console");
             }
 
             // If what we have is a KEY_EVENT, and that event signifies keyUp, we're interested
@@ -463,14 +480,14 @@ extern "C" HRESULT DAPI ConsoleReadNonBlockingW(
 
         cch = 8;
         hr = StrAnsiAlloc(&psz, cch);
-        ExitOnFailure(hr, "failed to allocate memory to read from console");
+        ConExitOnFailure(hr, "failed to allocate memory to read from console");
 
         for (/*dwRead from PeekNamedPipe*/; dwRead > 0; dwRead--)
         {
             // read one character at a time, since that seems to be the only way to make this work
             if (!::ReadFile(vhStdIn, psz + cchTotalRead, 1, &cchRead, NULL))
             {
-                ExitOnLastError(hr, "failed to read string from console");
+                ConExitOnLastError(hr, "failed to read string from console");
             }
 
             cchTotalRead += cchRead;
@@ -490,7 +507,7 @@ extern "C" HRESULT DAPI ConsoleReadNonBlockingW(
             {
                 cch *= 2;   // double everytime we run out of space
                 hr = StrAnsiAlloc(&psz, cch);
-                ExitOnFailure(hr, "failed to allocate memory to read from console");
+                ConExitOnFailure(hr, "failed to allocate memory to read from console");
             }
         }
 
@@ -510,7 +527,7 @@ LExit:
 
 *********************************************************************/
 extern "C" HRESULT DAPI ConsoleReadStringA(
-    __deref_out_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* ppszCharBuffer,
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPSTR* ppszCharBuffer,
     CONST DWORD cchCharBuffer,
     __out DWORD* pcchNumCharReturn
     )
@@ -526,11 +543,11 @@ extern "C" HRESULT DAPI ConsoleReadStringA(
             do
             {
                 hr = StrAnsiAlloc(ppszCharBuffer, cchCharBuffer * iRead);
-                ExitOnFailure(hr, "failed to allocate memory for ConsoleReadStringW");
+                ConExitOnFailure(hr, "failed to allocate memory for ConsoleReadStringW");
                 // ReadConsoleW will not return until <Return>, the last two chars are 13 and 10.
                 if (!::ReadConsoleA(vhStdIn, *ppszCharBuffer + iReadCharTotal, cchCharBuffer, pcchNumCharReturn, NULL) || *pcchNumCharReturn == 0)
                 {
-                    ExitOnLastError(hr, "failed to read string from console");
+                    ConExitOnLastError(hr, "failed to read string from console");
                 }
                 iReadCharTotal += *pcchNumCharReturn;
                 iRead += 1;
@@ -543,7 +560,7 @@ extern "C" HRESULT DAPI ConsoleReadStringA(
             if (!::ReadConsoleA(vhStdIn, *ppszCharBuffer, cchCharBuffer, pcchNumCharReturn, NULL) ||
                 *pcchNumCharReturn > cchCharBuffer || *pcchNumCharReturn == 0)
             {
-                ExitOnLastError(hr, "failed to read string from console");
+                ConExitOnLastError(hr, "failed to read string from console");
             }
             if ((*ppszCharBuffer)[*pcchNumCharReturn - 1] != 10 ||
                 (*ppszCharBuffer)[*pcchNumCharReturn - 2] != 13)
@@ -567,7 +584,7 @@ LExit:
 
 *********************************************************************/
 extern "C" HRESULT DAPI ConsoleReadStringW(
-    __deref_out_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* ppwzCharBuffer,
+    __deref_inout_ecount_part(cchCharBuffer,*pcchNumCharReturn) LPWSTR* ppwzCharBuffer,
     const DWORD cchCharBuffer,
     __out DWORD* pcchNumCharReturn
     )
@@ -583,11 +600,11 @@ extern "C" HRESULT DAPI ConsoleReadStringW(
             do
             {
                 hr = StrAlloc(ppwzCharBuffer, cchCharBuffer * iRead);
-                ExitOnFailure(hr, "failed to allocate memory for ConsoleReadStringW");
+                ConExitOnFailure(hr, "failed to allocate memory for ConsoleReadStringW");
                 // ReadConsoleW will not return until <Return>, the last two chars are 13 and 10.
                 if (!::ReadConsoleW(vhStdIn, *ppwzCharBuffer + iReadCharTotal, cchCharBuffer, pcchNumCharReturn, NULL) || *pcchNumCharReturn == 0)
                 {
-                    ExitOnLastError(hr, "failed to read string from console");
+                    ConExitOnLastError(hr, "failed to read string from console");
                 }
                 iReadCharTotal += *pcchNumCharReturn;
                 iRead += 1;
@@ -600,7 +617,7 @@ extern "C" HRESULT DAPI ConsoleReadStringW(
             if (!::ReadConsoleW(vhStdIn, *ppwzCharBuffer, cchCharBuffer, pcchNumCharReturn, NULL) ||
                 *pcchNumCharReturn > cchCharBuffer || *pcchNumCharReturn == 0)
             {
-                ExitOnLastError(hr, "failed to read string from console");
+                ConExitOnLastError(hr, "failed to read string from console");
             }
             if ((*ppwzCharBuffer)[*pcchNumCharReturn - 1] != 10 ||
                 (*ppwzCharBuffer)[*pcchNumCharReturn - 2] != 13)
@@ -630,7 +647,7 @@ extern "C" HRESULT DAPI ConsoleSetReadHidden(void)
     ::FlushConsoleInputBuffer(vhStdIn);
     if (!::SetConsoleMode(vhStdIn, ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT))
     {
-        ExitOnLastError(hr, "failed to set console input mode to be hidden");
+        ConExitOnLastError(hr, "failed to set console input mode to be hidden");
     }
 
 LExit:
@@ -647,7 +664,7 @@ extern "C" HRESULT DAPI ConsoleSetReadNormal(void)
     HRESULT hr = S_OK;
     if (!::SetConsoleMode(vhStdIn, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT))
     {
-        ExitOnLastError(hr, "failed to set console input mode to be normal");
+        ConExitOnLastError(hr, "failed to set console input mode to be normal");
     }
 
 LExit:

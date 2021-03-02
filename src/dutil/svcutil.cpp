@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define SvcExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_SVCUTIL, x, s, __VA_ARGS__)
+#define SvcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_SVCUTIL, p, x, e, s, __VA_ARGS__)
+#define SvcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_SVCUTIL, p, x, s, __VA_ARGS__)
+#define SvcExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_SVCUTIL, p, x, e, s, __VA_ARGS__)
+#define SvcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_SVCUTIL, p, x, s, __VA_ARGS__)
+#define SvcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_SVCUTIL, e, x, s, __VA_ARGS__)
+#define SvcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_SVCUTIL, g, x, s, __VA_ARGS__)
+
 /********************************************************************
 SvcQueryConfig - queries the configuration of a service
 
@@ -21,16 +36,16 @@ extern "C" HRESULT DAPI SvcQueryConfig(
         if (ERROR_INSUFFICIENT_BUFFER == er)
         {
             pConfig = static_cast<QUERY_SERVICE_CONFIGW*>(MemAlloc(cbConfig, TRUE));
-            ExitOnNull(pConfig, hr, E_OUTOFMEMORY, "Failed to allocate memory to get configuration.");
+            SvcExitOnNull(pConfig, hr, E_OUTOFMEMORY, "Failed to allocate memory to get configuration.");
 
             if (!::QueryServiceConfigW(sch, pConfig, cbConfig, &cbConfig))
             {
-                ExitWithLastError(hr, "Failed to read service configuration.");
+                SvcExitWithLastError(hr, "Failed to read service configuration.");
             }
         }
         else
         {
-            ExitOnWin32Error(er, hr, "Failed to query service configuration.");
+            SvcExitOnWin32Error(er, hr, "Failed to query service configuration.");
         }
     }
 

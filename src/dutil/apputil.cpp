@@ -2,6 +2,20 @@
 
 #include "precomp.h"
 
+// Exit macros
+#define AppExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_APPUTIL, x, s, __VA_ARGS__)
+#define AppExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_APPUTIL, p, x, e, s, __VA_ARGS__)
+#define AppExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_APPUTIL, p, x, s, __VA_ARGS__)
+#define AppExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_APPUTIL, p, x, e, s, __VA_ARGS__)
+#define AppExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_APPUTIL, p, x, s, __VA_ARGS__)
+#define AppExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_APPUTIL, e, x, s, __VA_ARGS__)
+#define AppExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_APPUTIL, g, x, s, __VA_ARGS__)
+
 const DWORD PRIVATE_LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800;
 typedef BOOL(WINAPI *LPFN_SETDEFAULTDLLDIRECTORIES)(DWORD);
 typedef BOOL(WINAPI *LPFN_SETDLLDIRECTORYW)(LPCWSTR);
@@ -33,6 +47,7 @@ extern "C" void DAPI AppInitialize(
 
     // Best effort call to initialize default DLL directories to system only.
     HMODULE hKernel32 = ::GetModuleHandleW(L"kernel32");
+    Assert(hKernel32);
     LPFN_SETDEFAULTDLLDIRECTORIES pfnSetDefaultDllDirectories = (LPFN_SETDEFAULTDLLDIRECTORIES)::GetProcAddress(hKernel32, "SetDefaultDllDirectories");
     if (pfnSetDefaultDllDirectories)
     {
@@ -90,13 +105,13 @@ extern "C" DAPI_(HRESULT) AppParseCommandLine(
     // which fails pretty miserably if your first argument is something like
     // FOO="C:\Program Files\My Company". So give it something harmless to play with.
     hr = StrAllocConcat(&sczCommandLine, L"ignored ", 0);
-    ExitOnFailure(hr, "Failed to initialize command line.");
+    AppExitOnFailure(hr, "Failed to initialize command line.");
 
     hr = StrAllocConcat(&sczCommandLine, wzCommandLine, 0);
-    ExitOnFailure(hr, "Failed to copy command line.");
+    AppExitOnFailure(hr, "Failed to copy command line.");
 
     argv = ::CommandLineToArgvW(sczCommandLine, &argc);
-    ExitOnNullWithLastError(argv, hr, "Failed to parse command line.");
+    AppExitOnNullWithLastError(argv, hr, "Failed to parse command line.");
 
     // Skip "ignored" argument/hack.
     *pArgv = argv + 1;

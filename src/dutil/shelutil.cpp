@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define ShelExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_SHELUTIL, x, s, __VA_ARGS__)
+#define ShelExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_SHELUTIL, p, x, e, s, __VA_ARGS__)
+#define ShelExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_SHELUTIL, p, x, s, __VA_ARGS__)
+#define ShelExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_SHELUTIL, p, x, e, s, __VA_ARGS__)
+#define ShelExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_SHELUTIL, p, x, s, __VA_ARGS__)
+#define ShelExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_SHELUTIL, e, x, s, __VA_ARGS__)
+#define ShelExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_SHELUTIL, g, x, s, __VA_ARGS__)
+
 static PFN_SHELLEXECUTEEXW vpfnShellExecuteExW = ::ShellExecuteExW;
 
 static HRESULT GetDesktopShellView(
@@ -55,7 +70,7 @@ extern "C" HRESULT DAPI ShelExec(
 
     if (!vpfnShellExecuteExW(&shExecInfo))
     {
-        ExitWithLastError(hr, "ShellExecEx failed with return code: %d", Dutil_er);
+        ShelExitWithLastError(hr, "ShellExecEx failed with return code: %d", Dutil_er);
     }
 
     if (phProcess)
@@ -93,44 +108,44 @@ extern "C" HRESULT DAPI ShelExecUnelevated(
     IShellDispatch2* psd = NULL;
 
     bstrTargetPath = ::SysAllocString(wzTargetPath);
-    ExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate target path BSTR.");
+    ShelExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate target path BSTR.");
 
     if (wzParameters && *wzParameters)
     {
         vtParameters.vt = VT_BSTR;
         vtParameters.bstrVal = ::SysAllocString(wzParameters);
-        ExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate parameters BSTR.");
+        ShelExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate parameters BSTR.");
     }
 
     if (wzVerb && *wzVerb)
     {
         vtVerb.vt = VT_BSTR;
         vtVerb.bstrVal = ::SysAllocString(wzVerb);
-        ExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate verb BSTR.");
+        ShelExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate verb BSTR.");
     }
 
     if (wzWorkingDirectory && *wzWorkingDirectory)
     {
         vtWorkingDirectory.vt = VT_BSTR;
         vtWorkingDirectory.bstrVal = ::SysAllocString(wzWorkingDirectory);
-        ExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate working directory BSTR.");
+        ShelExitOnNull(bstrTargetPath, hr, E_OUTOFMEMORY, "Failed to allocate working directory BSTR.");
     }
 
     vtShow.vt = VT_INT;
     vtShow.intVal = nShowCmd;
 
     hr = GetDesktopShellView(IID_PPV_ARGS(&psv));
-    ExitOnFailure(hr, "Failed to get desktop shell view.");
+    ShelExitOnFailure(hr, "Failed to get desktop shell view.");
 
     hr = GetShellDispatchFromView(psv, IID_PPV_ARGS(&psd));
-    ExitOnFailure(hr, "Failed to get shell dispatch from view.");
+    ShelExitOnFailure(hr, "Failed to get shell dispatch from view.");
 
     hr = psd->ShellExecute(bstrTargetPath, vtParameters, vtWorkingDirectory, vtVerb, vtShow);
     if (S_FALSE == hr)
     {
         hr = HRESULT_FROM_WIN32(ERROR_CANCELLED);
     }
-    ExitOnRootFailure(hr, "Failed to launch unelevate executable: %ls", bstrTargetPath);
+    ShelExitOnRootFailure(hr, "Failed to launch unelevate executable: %ls", bstrTargetPath);
 
 LExit:
     ReleaseObject(psd);
@@ -157,13 +172,13 @@ extern "C" HRESULT DAPI ShelGetFolder(
     WCHAR wzPath[MAX_PATH];
 
     hr = ::SHGetFolderPathW(NULL, csidlFolder | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wzPath);
-    ExitOnFailure(hr, "Failed to get folder path for CSIDL: %d", csidlFolder);
+    ShelExitOnFailure(hr, "Failed to get folder path for CSIDL: %d", csidlFolder);
 
     hr = StrAllocString(psczFolderPath, wzPath, 0);
-    ExitOnFailure(hr, "Failed to copy shell folder path: %ls", wzPath);
+    ShelExitOnFailure(hr, "Failed to copy shell folder path: %ls", wzPath);
 
     hr = PathBackslashTerminate(psczFolderPath);
-    ExitOnFailure(hr, "Failed to backslash terminate shell folder path: %ls", *psczFolderPath);
+    ShelExitOnFailure(hr, "Failed to backslash terminate shell folder path: %ls", *psczFolderPath);
 
 LExit:
     return hr;
@@ -206,19 +221,19 @@ extern "C" HRESULT DAPI ShelGetKnownFolder(
         TraceError(hr, "Failed to load shell32.dll");
         ExitFunction1(hr = E_NOTIMPL);
     }
-    ExitOnFailure(hr, "Failed to load shell32.dll.");
+    ShelExitOnFailure(hr, "Failed to load shell32.dll.");
 
     pfn = reinterpret_cast<PFN_SHGetKnownFolderPath>(::GetProcAddress(hShell32Dll, "SHGetKnownFolderPath"));
-    ExitOnNull(pfn, hr, E_NOTIMPL, "Failed to find SHGetKnownFolderPath entry point.");
+    ShelExitOnNull(pfn, hr, E_NOTIMPL, "Failed to find SHGetKnownFolderPath entry point.");
 
     hr = pfn(rfidFolder, KF_FLAG_CREATE, NULL, &pwzPath);
-    ExitOnFailure(hr, "Failed to get known folder path.");
+    ShelExitOnFailure(hr, "Failed to get known folder path.");
 
     hr = StrAllocString(psczFolderPath, pwzPath, 0);
-    ExitOnFailure(hr, "Failed to copy shell folder path: %ls", pwzPath);
+    ShelExitOnFailure(hr, "Failed to copy shell folder path: %ls", pwzPath);
 
     hr = PathBackslashTerminate(psczFolderPath);
-    ExitOnFailure(hr, "Failed to backslash terminate shell folder path: %ls", *psczFolderPath);
+    ShelExitOnFailure(hr, "Failed to backslash terminate shell folder path: %ls", *psczFolderPath);
 
 LExit:
     if (pwzPath)
@@ -255,32 +270,32 @@ static HRESULT GetDesktopShellView(
     // desktop web browser and then grabs its view
     // returns IShellView, IFolderView and related interfaces
     hr = ::CoCreateInstance(CLSID_ShellWindows, NULL, CLSCTX_LOCAL_SERVER, IID_PPV_ARGS(&psw));
-    ExitOnFailure(hr, "Failed to get shell view.");
+    ShelExitOnFailure(hr, "Failed to get shell view.");
 
     hr = psw->FindWindowSW(&vEmpty, &vEmpty, SWC_DESKTOP, (long*)&hwnd, SWFO_NEEDDISPATCH, &pdisp);
     if (S_OK == hr)
     {
         hr = IUnknown_QueryService(pdisp, SID_STopLevelBrowser, IID_PPV_ARGS(&psb));
-        ExitOnFailure(hr, "Failed to get desktop window.");
+        ShelExitOnFailure(hr, "Failed to get desktop window.");
 
         hr = psb->QueryActiveShellView(&psv);
-        ExitOnFailure(hr, "Failed to get active shell view.");
+        ShelExitOnFailure(hr, "Failed to get active shell view.");
 
         hr = psv->QueryInterface(riid, ppv);
-        ExitOnFailure(hr, "Failed to query for the desktop shell view.");
+        ShelExitOnFailure(hr, "Failed to query for the desktop shell view.");
     }
     else if (S_FALSE == hr)
     {
         //Windows XP
         hr = SHGetDesktopFolder(&psf);
-        ExitOnFailure(hr, "Failed to get desktop folder.");
+        ShelExitOnFailure(hr, "Failed to get desktop folder.");
 
         hr = psf->CreateViewObject(NULL, IID_IShellView, ppv);
-        ExitOnFailure(hr, "Failed to query for the desktop shell view.");
+        ShelExitOnFailure(hr, "Failed to query for the desktop shell view.");
     }
     else
     {
-        ExitOnFailure(hr, "Failed to get desktop window.");
+        ShelExitOnFailure(hr, "Failed to get desktop window.");
     }
 
 LExit:
@@ -307,16 +322,16 @@ static HRESULT GetShellDispatchFromView(
     // From a shell view object, gets its automation interface and from that get the shell
     // application object that implements IShellDispatch2 and related interfaces.
     hr = psv->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&pdispBackground));
-    ExitOnFailure(hr, "Failed to get the automation interface for shell.");
+    ShelExitOnFailure(hr, "Failed to get the automation interface for shell.");
 
     hr = pdispBackground->QueryInterface(IID_PPV_ARGS(&psfvd));
-    ExitOnFailure(hr, "Failed to get shell folder view dual.");
+    ShelExitOnFailure(hr, "Failed to get shell folder view dual.");
 
     hr = psfvd->get_Application(&pdisp);
-    ExitOnFailure(hr, "Failed to application object.");
+    ShelExitOnFailure(hr, "Failed to application object.");
 
     hr = pdisp->QueryInterface(riid, ppv);
-    ExitOnFailure(hr, "Failed to get IShellDispatch2.");
+    ShelExitOnFailure(hr, "Failed to get IShellDispatch2.");
 
 LExit:
     ReleaseObject(pdisp);

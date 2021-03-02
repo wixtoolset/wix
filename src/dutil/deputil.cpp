@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define DepExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_DEPUTIL, x, s, __VA_ARGS__)
+#define DepExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_DEPUTIL, p, x, e, s, __VA_ARGS__)
+#define DepExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEPUTIL, p, x, s, __VA_ARGS__)
+#define DepExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_DEPUTIL, p, x, e, s, __VA_ARGS__)
+#define DepExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DEPUTIL, p, x, s, __VA_ARGS__)
+#define DepExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DEPUTIL, e, x, s, __VA_ARGS__)
+#define DepExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DEPUTIL, g, x, s, __VA_ARGS__)
+
 #define ARRAY_GROWTH_SIZE 5
 
 static LPCWSTR vcszVersionValue = L"Version";
@@ -42,7 +57,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Try to open the dependency key.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
@@ -50,7 +65,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
     {
         ExitFunction1(hr = E_NOTFOUND);
     }
-    ExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
 
     // Get the Id if requested and available.
     if (psczId)
@@ -60,7 +75,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
         {
             hr = S_OK;
         }
-        ExitOnFailure(hr, "Failed to get the id for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to get the id for the dependency \"%ls\".", wzProviderKey);
     }
 
     // Get the DisplayName if requested and available.
@@ -71,7 +86,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
         {
             hr = S_OK;
         }
-        ExitOnFailure(hr, "Failed to get the name for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to get the name for the dependency \"%ls\".", wzProviderKey);
     }
 
     // Get the Version if requested and available.
@@ -82,7 +97,7 @@ DAPI_(HRESULT) DepGetProviderInformation(
         {
             hr = S_OK;
         }
-        ExitOnFailure(hr, "Failed to get the version for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to get the version for the dependency \"%ls\".", wzProviderKey);
     }
 
 LExit:
@@ -116,19 +131,19 @@ DAPI_(HRESULT) DepCheckDependency(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Try to open the key. If that fails, add the missing dependency key to the dependency array if it doesn't already exist.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the registry key for dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to open the registry key for dependency \"%ls\".", wzProviderKey);
 
         // If there are no registry values, consider the key orphaned and treat it as missing.
         hr = RegReadVersion(hkKey, vcszVersionValue, &dw64Version);
         if (E_FILENOTFOUND != hr)
         {
-            ExitOnFailure(hr, "Failed to read the %ls registry value for dependency \"%ls\".", vcszVersionValue, wzProviderKey);
+            DepExitOnFailure(hr, "Failed to read the %ls registry value for dependency \"%ls\".", vcszVersionValue, wzProviderKey);
         }
     }
 
@@ -138,15 +153,15 @@ DAPI_(HRESULT) DepCheckDependency(
         hr = DictKeyExists(sdDependencies, wzProviderKey);
         if (E_NOTFOUND != hr)
         {
-            ExitOnFailure(hr, "Failed to check the dictionary for missing dependency \"%ls\".", wzProviderKey);
+            DepExitOnFailure(hr, "Failed to check the dictionary for missing dependency \"%ls\".", wzProviderKey);
         }
         else
         {
             hr = DepDependencyArrayAlloc(prgDependencies, pcDependencies, wzProviderKey, NULL);
-            ExitOnFailure(hr, "Failed to add the missing dependency \"%ls\" to the array.", wzProviderKey);
+            DepExitOnFailure(hr, "Failed to add the missing dependency \"%ls\" to the array.", wzProviderKey);
 
             hr = DictAddKey(sdDependencies, wzProviderKey);
-            ExitOnFailure(hr, "Failed to add the missing dependency \"%ls\" to the dictionary.", wzProviderKey);
+            DepExitOnFailure(hr, "Failed to add the missing dependency \"%ls\" to the dictionary.", wzProviderKey);
         }
 
         // Exit since the check already failed.
@@ -160,7 +175,7 @@ DAPI_(HRESULT) DepCheckDependency(
         if (0 < cchMinVersion)
         {
             hr = FileVersionFromStringEx(wzMinVersion, cchMinVersion, &dw64MinVersion);
-            ExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMinVersion);
+            DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMinVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMinVersionInclusive;
             if (!(fAllowEqual && dw64MinVersion <= dw64Version || dw64MinVersion < dw64Version))
@@ -168,18 +183,18 @@ DAPI_(HRESULT) DepCheckDependency(
                 hr = DictKeyExists(sdDependencies, wzProviderKey);
                 if (E_NOTFOUND != hr)
                 {
-                    ExitOnFailure(hr, "Failed to check the dictionary for the older dependency \"%ls\".", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to check the dictionary for the older dependency \"%ls\".", wzProviderKey);
                 }
                 else
                 {
                     hr = RegReadString(hkKey, vcszDisplayNameValue, &sczName);
-                    ExitOnFailure(hr, "Failed to get the display name of the older dependency \"%ls\".", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to get the display name of the older dependency \"%ls\".", wzProviderKey);
 
                     hr = DepDependencyArrayAlloc(prgDependencies, pcDependencies, wzProviderKey, sczName);
-                    ExitOnFailure(hr, "Failed to add the older dependency \"%ls\" to the dependencies array.", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to add the older dependency \"%ls\" to the dependencies array.", wzProviderKey);
 
                     hr = DictAddKey(sdDependencies, wzProviderKey);
-                    ExitOnFailure(hr, "Failed to add the older dependency \"%ls\" to the unique dependency string list.", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to add the older dependency \"%ls\" to the unique dependency string list.", wzProviderKey);
                 }
 
                 // Exit since the check already failed.
@@ -195,7 +210,7 @@ DAPI_(HRESULT) DepCheckDependency(
         if (0 < cchMaxVersion)
         {
             hr = FileVersionFromStringEx(wzMaxVersion, cchMaxVersion, &dw64MaxVersion);
-            ExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMaxVersion);
+            DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMaxVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMaxVersionInclusive;
             if (!(fAllowEqual && dw64Version <= dw64MaxVersion || dw64Version < dw64MaxVersion))
@@ -203,18 +218,18 @@ DAPI_(HRESULT) DepCheckDependency(
                 hr = DictKeyExists(sdDependencies, wzProviderKey);
                 if (E_NOTFOUND != hr)
                 {
-                    ExitOnFailure(hr, "Failed to check the dictionary for the newer dependency \"%ls\".", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to check the dictionary for the newer dependency \"%ls\".", wzProviderKey);
                 }
                 else
                 {
                     hr = RegReadString(hkKey, vcszDisplayNameValue, &sczName);
-                    ExitOnFailure(hr, "Failed to get the display name of the newer dependency \"%ls\".", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to get the display name of the newer dependency \"%ls\".", wzProviderKey);
 
                     hr = DepDependencyArrayAlloc(prgDependencies, pcDependencies, wzProviderKey, sczName);
-                    ExitOnFailure(hr, "Failed to add the newer dependency \"%ls\" to the dependencies array.", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to add the newer dependency \"%ls\" to the dependencies array.", wzProviderKey);
 
                     hr = DictAddKey(sdDependencies, wzProviderKey);
-                    ExitOnFailure(hr, "Failed to add the newer dependency \"%ls\" to the unique dependency string list.", wzProviderKey);
+                    DepExitOnFailure(hr, "Failed to add the newer dependency \"%ls\" to the unique dependency string list.", wzProviderKey);
                 }
 
                 // Exit since the check already failed.
@@ -249,17 +264,17 @@ DAPI_(HRESULT) DepCheckDependents(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Try to open the key. If that fails, the dependency information is corrupt.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkProviderKey);
-    ExitOnFailure(hr, "Failed to open the registry key \"%ls\". The dependency store is corrupt.", sczKey);
+    DepExitOnFailure(hr, "Failed to open the registry key \"%ls\". The dependency store is corrupt.", sczKey);
 
     // Try to open the dependencies key. If that does not exist, there are no dependents.
     hr = RegOpen(hkProviderKey, vsczRegistryDependents, KEY_READ, &hkDependentsKey);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the registry key for dependents of \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to open the registry key for dependents of \"%ls\".", wzProviderKey);
     }
     else
     {
@@ -272,7 +287,7 @@ DAPI_(HRESULT) DepCheckDependents(
         hr = RegKeyEnum(hkDependentsKey, dwIndex, &sczDependentKey);
         if (E_NOMOREITEMS != hr)
         {
-            ExitOnFailure(hr, "Failed to enumerate the dependents key of \"%ls\".", wzProviderKey);
+            DepExitOnFailure(hr, "Failed to enumerate the dependents key of \"%ls\".", wzProviderKey);
         }
         else
         {
@@ -284,16 +299,16 @@ DAPI_(HRESULT) DepCheckDependents(
         hr = DictKeyExists(sdIgnoredDependents, sczDependentKey);
         if (E_NOTFOUND != hr)
         {
-            ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+            DepExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
         }
         else
         {
             // Get the name of the dependent from the key.
             hr = GetDependencyNameFromKey(hkHive, sczDependentKey, &sczDependentName);
-            ExitOnFailure(hr, "Failed to get the name of the dependent from the key \"%ls\".", sczDependentKey);
+            DepExitOnFailure(hr, "Failed to get the name of the dependent from the key \"%ls\".", sczDependentKey);
 
             hr = DepDependencyArrayAlloc(prgDependents, pcDependents, sczDependentKey, sczDependentName);
-            ExitOnFailure(hr, "Failed to add the dependent key \"%ls\" to the string array.", sczDependentKey);
+            DepExitOnFailure(hr, "Failed to add the dependent key \"%ls\" to the string array.", sczDependentKey);
         }
     }
 
@@ -323,32 +338,32 @@ DAPI_(HRESULT) DepRegisterDependency(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Create the dependency key (or open it if it already exists).
     hr = RegCreateEx(hkHive, sczKey, KEY_WRITE, FALSE, NULL, &hkKey, &fCreated);
-    ExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczKey);
+    DepExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczKey);
 
     // Set the id if it was provided.
     if (wzId)
     {
         hr = RegWriteString(hkKey, NULL, wzId);
-        ExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", L"default", wzId);
+        DepExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", L"default", wzId);
     }
 
     // Set the version.
     hr = RegWriteString(hkKey, vcszVersionValue, wzVersion);
-    ExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszVersionValue, wzVersion);
+    DepExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszVersionValue, wzVersion);
 
     // Set the display name.
     hr = RegWriteString(hkKey, vcszDisplayNameValue, wzDisplayName);
-    ExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszDisplayNameValue, wzDisplayName);
+    DepExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszDisplayNameValue, wzDisplayName);
 
     // Set the attributes if non-zero.
     if (0 != iAttributes)
     {
         hr = RegWriteNumber(hkKey, vcszAttributesValue, static_cast<DWORD>(iAttributes));
-        ExitOnFailure(hr, "Failed to set the %ls registry value to %d.", vcszAttributesValue, iAttributes);
+        DepExitOnFailure(hr, "Failed to set the %ls registry value to %d.", vcszAttributesValue, iAttributes);
     }
 
 LExit:
@@ -370,12 +385,12 @@ DAPI_(HRESULT) DepDependentExists(
 
     // Format the provider dependents registry key.
     hr = StrAllocFormatted(&sczDependentKey, L"%ls%ls\\%ls\\%ls", vsczRegistryRoot, wzDependencyProviderKey, vsczRegistryDependents, wzProviderKey);
-    ExitOnFailure(hr, "Failed to format registry key to dependent.");
+    DepExitOnFailure(hr, "Failed to format registry key to dependent.");
 
     hr = RegOpen(hkHive, sczDependentKey, KEY_READ, &hkDependentKey);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the dependent registry key at: \"%ls\".", sczDependentKey);
+        DepExitOnFailure(hr, "Failed to open the dependent registry key at: \"%ls\".", sczDependentKey);
     }
 
 LExit:
@@ -403,32 +418,32 @@ DAPI_(HRESULT) DepRegisterDependent(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzDependencyProviderKey, &sczDependencyKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzDependencyProviderKey);
 
     // Create the dependency key (or open it if it already exists).
     hr = RegCreateEx(hkHive, sczDependencyKey, KEY_WRITE, FALSE, NULL, &hkDependencyKey, &fCreated);
-    ExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczDependencyKey);
+    DepExitOnFailure(hr, "Failed to create the dependency registry key \"%ls\".", sczDependencyKey);
 
     // Create the subkey to register the dependent.
     hr = StrAllocFormatted(&sczKey, L"%ls\\%ls", vsczRegistryDependents, wzProviderKey);
-    ExitOnFailure(hr, "Failed to allocate dependent subkey \"%ls\" under dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate dependent subkey \"%ls\" under dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
 
     hr = RegCreateEx(hkDependencyKey, sczKey, KEY_WRITE, FALSE, NULL, &hkKey, &fCreated);
-    ExitOnFailure(hr, "Failed to create the dependency subkey \"%ls\".", sczKey);
+    DepExitOnFailure(hr, "Failed to create the dependency subkey \"%ls\".", sczKey);
 
     // Set the minimum version if not NULL.
     hr = RegWriteString(hkKey, vcszMinVersionValue, wzMinVersion);
-    ExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszMinVersionValue, wzMinVersion);
+    DepExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszMinVersionValue, wzMinVersion);
 
     // Set the maximum version if not NULL.
     hr = RegWriteString(hkKey, vcszMaxVersionValue, wzMaxVersion);
-    ExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszMaxVersionValue, wzMaxVersion);
+    DepExitOnFailure(hr, "Failed to set the %ls registry value to \"%ls\".", vcszMaxVersionValue, wzMaxVersion);
 
     // Set the attributes if non-zero.
     if (0 != iAttributes)
     {
         hr = RegWriteNumber(hkKey, vcszAttributesValue, static_cast<DWORD>(iAttributes));
-        ExitOnFailure(hr, "Failed to set the %ls registry value to %d.", vcszAttributesValue, iAttributes);
+        DepExitOnFailure(hr, "Failed to set the %ls registry value to %d.", vcszAttributesValue, iAttributes);
     }
 
 LExit:
@@ -451,13 +466,13 @@ DAPI_(HRESULT) DepUnregisterDependency(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Delete the entire key including all sub-keys.
     hr = RegDelete(hkHive, sczKey, REG_KEY_DEFAULT, TRUE);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to delete the key \"%ls\".", sczKey);
+        DepExitOnFailure(hr, "Failed to delete the key \"%ls\".", sczKey);
     }
 
 LExit:
@@ -484,7 +499,7 @@ DAPI_(HRESULT) DepUnregisterDependent(
     hr = RegOpen(hkHive, vsczRegistryRoot, KEY_READ, &hkRegistryRoot);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open root registry key \"%ls\".", vsczRegistryRoot);
+        DepExitOnFailure(hr, "Failed to open root registry key \"%ls\".", vsczRegistryRoot);
     }
     else
     {
@@ -495,7 +510,7 @@ DAPI_(HRESULT) DepUnregisterDependent(
     hr = RegOpen(hkRegistryRoot, wzDependencyProviderKey, KEY_READ, &hkDependencyProviderKey);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzDependencyProviderKey);
+        DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzDependencyProviderKey);
     }
     else
     {
@@ -506,7 +521,7 @@ DAPI_(HRESULT) DepUnregisterDependent(
     hr = RegOpen(hkDependencyProviderKey, vsczRegistryDependents, KEY_READ, &hkRegistryDependents);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
+        DepExitOnFailure(hr, "Failed to open the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
     }
     else
     {
@@ -515,11 +530,11 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
     // Delete the wzProviderKey dependent sub-key.
     hr = RegDelete(hkRegistryDependents, wzProviderKey, REG_KEY_DEFAULT, TRUE);
-    ExitOnFailure(hr, "Failed to delete the dependent \"%ls\" under the dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to delete the dependent \"%ls\" under the dependency \"%ls\".", wzProviderKey, wzDependencyProviderKey);
 
     // If there are no remaining dependents, delete the Dependents subkey.
     hr = RegQueryKey(hkRegistryDependents, &cSubKeys, NULL);
-    ExitOnFailure(hr, "Failed to get the number of dependent subkeys under the dependency \"%ls\".", wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to get the number of dependent subkeys under the dependency \"%ls\".", wzDependencyProviderKey);
     
     if (0 < cSubKeys)
     {
@@ -531,11 +546,11 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
     // Fail if there are any subkeys since we just checked.
     hr = RegDelete(hkDependencyProviderKey, vsczRegistryDependents, REG_KEY_DEFAULT, FALSE);
-    ExitOnFailure(hr, "Failed to delete the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to delete the dependents subkey under the dependency \"%ls\".", wzDependencyProviderKey);
 
     // If there are no values, delete the provider dependency key.
     hr = RegQueryKey(hkDependencyProviderKey, NULL, &cValues);
-    ExitOnFailure(hr, "Failed to get the number of values under the dependency \"%ls\".", wzDependencyProviderKey);
+    DepExitOnFailure(hr, "Failed to get the number of values under the dependency \"%ls\".", wzDependencyProviderKey);
 
     if (0 == cValues)
     {
@@ -544,7 +559,7 @@ DAPI_(HRESULT) DepUnregisterDependent(
 
         // Fail if there are any subkeys since we just checked.
         hr = RegDelete(hkRegistryRoot, wzDependencyProviderKey, REG_KEY_DEFAULT, FALSE);
-        ExitOnFailure(hr, "Failed to delete the dependency \"%ls\".", wzDependencyProviderKey);
+        DepExitOnFailure(hr, "Failed to delete the dependency \"%ls\".", wzDependencyProviderKey);
     }
 
 LExit:
@@ -567,21 +582,21 @@ DAPI_(HRESULT) DepDependencyArrayAlloc(
     DEPENDENCY* pDependency = NULL;
 
     hr = ::UIntAdd(*pcDependencies, 1, &cRequired);
-    ExitOnFailure(hr, "Failed to increment the number of elements required in the dependency array.");
+    DepExitOnFailure(hr, "Failed to increment the number of elements required in the dependency array.");
 
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgDependencies), cRequired, sizeof(DEPENDENCY), ARRAY_GROWTH_SIZE);
-    ExitOnFailure(hr, "Failed to allocate memory for the dependency array.");
+    DepExitOnFailure(hr, "Failed to allocate memory for the dependency array.");
 
     pDependency = static_cast<DEPENDENCY*>(&(*prgDependencies)[*pcDependencies]);
-    ExitOnNull(pDependency, hr, E_POINTER, "The dependency element in the array is invalid.");
+    DepExitOnNull(pDependency, hr, E_POINTER, "The dependency element in the array is invalid.");
 
     hr = StrAllocString(&(pDependency->sczKey), wzKey, 0);
-    ExitOnFailure(hr, "Failed to allocate the string key in the dependency array.");
+    DepExitOnFailure(hr, "Failed to allocate the string key in the dependency array.");
 
     if (wzName)
     {
         hr = StrAllocString(&(pDependency->sczName), wzName, 0);
-        ExitOnFailure(hr, "Failed to allocate the string name in the dependency array.");
+        DepExitOnFailure(hr, "Failed to allocate the string name in the dependency array.");
     }
 
     // Update the number of current elements in the dependency array.
@@ -623,18 +638,18 @@ static HRESULT AllocDependencyKeyName(
 
     // Get the length of the dependency, and add to the length of the root.
     hr = ::StringCchLengthW(wzName, STRSAFE_MAX_CCH, &cchName);
-    ExitOnFailure(hr, "Failed to get string length of dependency name.");
+    DepExitOnFailure(hr, "Failed to get string length of dependency name.");
 
     // Add the sizes together to allocate memory once (callee will add space for nul).
     hr = ::SizeTAdd(cchRegistryRoot, cchName, &cchKeyName);
-    ExitOnFailure(hr, "Failed to add the string lengths together.");
+    DepExitOnFailure(hr, "Failed to add the string lengths together.");
 
     // Allocate and concat the strings together.
     hr = StrAllocString(psczKeyName, vsczRegistryRoot, cchKeyName);
-    ExitOnFailure(hr, "Failed to allocate string for dependency registry root.");
+    DepExitOnFailure(hr, "Failed to allocate string for dependency registry root.");
 
     hr = StrAllocConcat(psczKeyName, wzName, cchName);
-    ExitOnFailure(hr, "Failed to concatenate the dependency key name.");
+    DepExitOnFailure(hr, "Failed to concatenate the dependency key name.");
 
 LExit:
     return hr;
@@ -656,13 +671,13 @@ static HRESULT GetDependencyNameFromKey(
 
     // Format the provider dependency registry key.
     hr = AllocDependencyKeyName(wzProviderKey, &sczKey);
-    ExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
+    DepExitOnFailure(hr, "Failed to allocate the registry key for dependency \"%ls\".", wzProviderKey);
 
     // Try to open the dependency key.
     hr = RegOpen(hkHive, sczKey, KEY_READ, &hkKey);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to open the registry key for the dependency \"%ls\".", wzProviderKey);
     }
     else
     {
@@ -673,7 +688,7 @@ static HRESULT GetDependencyNameFromKey(
     hr = RegReadString(hkKey, vcszDisplayNameValue, psczName);
     if (E_FILENOTFOUND != hr)
     {
-        ExitOnFailure(hr, "Failed to get the dependency name for the dependency \"%ls\".", wzProviderKey);
+        DepExitOnFailure(hr, "Failed to get the dependency name for the dependency \"%ls\".", wzProviderKey);
     }
     else
     {

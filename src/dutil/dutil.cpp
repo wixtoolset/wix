@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define DExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_DUTIL, x, s, __VA_ARGS__)
+#define DExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_DUTIL, p, x, e, s, __VA_ARGS__)
+#define DExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_DUTIL, p, x, s, __VA_ARGS__)
+#define DExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_DUTIL, p, x, e, s, __VA_ARGS__)
+#define DExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_DUTIL, p, x, s, __VA_ARGS__)
+#define DExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_DUTIL, e, x, s, __VA_ARGS__)
+#define DExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DUTIL, g, x, s, __VA_ARGS__)
+
 // No need for OACR to warn us about using non-unicode APIs in this file.
 #pragma prefast(disable:25068)
 
@@ -84,7 +99,7 @@ extern "C" void DAPI Dutil_AssertMsg(
 
     char szMsg[DUTIL_STRING_BUFFER];
     hr = ::StringCchCopyA(szMsg, countof(szMsg), szMessage);
-    ExitOnFailure(hr, "failed to copy message while building assert message");
+    DExitOnFailure(hr, "failed to copy message while building assert message");
 
     if (Dutil_pfnDisplayAssert)
     {
@@ -123,7 +138,7 @@ extern "C" void DAPI Dutil_AssertMsg(
         if (ERROR_SUCCESS != er)
         {
             hr = ::StringCchCatA(szMsg, countof(szMsg), "\nAbort=Debug, Retry=Skip, Ignore=Skip all");
-            ExitOnFailure(hr, "failed to concat string while building assert message");
+            DExitOnFailure(hr, "failed to concat string while building assert message");
 
             id = ::MessageBoxA(0, szMsg, "Debug Assert Message",
                 MB_SERVICE_NOTIFICATION | MB_TOPMOST | 
@@ -480,24 +495,24 @@ extern "C" HRESULT DAPI LoadSystemLibraryWithPath(
     WCHAR wzPath[MAX_PATH] = { };
 
     cch = ::GetSystemDirectoryW(wzPath, MAX_PATH);
-    ExitOnNullWithLastError(cch, hr, "Failed to get the Windows system directory.");
+    DExitOnNullWithLastError(cch, hr, "Failed to get the Windows system directory.");
 
     if (L'\\' != wzPath[cch - 1])
     {
         hr = ::StringCchCatNW(wzPath, MAX_PATH, L"\\", 1);
-        ExitOnRootFailure(hr, "Failed to terminate the string with a backslash.");
+        DExitOnRootFailure(hr, "Failed to terminate the string with a backslash.");
     }
 
     hr = ::StringCchCatW(wzPath, MAX_PATH, wzModuleName);
-    ExitOnRootFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
+    DExitOnRootFailure(hr, "Failed to create the fully-qualified path to %ls.", wzModuleName);
 
     *phModule = ::LoadLibraryW(wzPath);
-    ExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", wzModuleName);
+    DExitOnNullWithLastError(*phModule, hr, "Failed to load the library %ls.", wzModuleName);
 
     if (psczPath)
     {
         hr = StrAllocString(psczPath, wzPath, MAX_PATH);
-        ExitOnFailure(hr, "Failed to copy the path to library.");
+        DExitOnFailure(hr, "Failed to copy the path to library.");
     }
 
 LExit:

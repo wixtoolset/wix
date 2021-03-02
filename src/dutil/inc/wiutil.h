@@ -330,7 +330,7 @@ HRESULT DAPI WiuEnumRelatedProducts(
     );
 HRESULT DAPI WiuEnumRelatedProductCodes(
     __in_z LPCWSTR wzUpgradeCode,
-    __deref_out_ecount_opt(pcRelatedProducts) LPWSTR** prgsczProductCodes,
+    __deref_out_ecount_opt(*pcRelatedProducts) LPWSTR** prgsczProductCodes,
     __out DWORD* pcRelatedProducts,
     __in BOOL fReturnHighestVersionOnly
     );

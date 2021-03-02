@@ -693,7 +693,7 @@ DAPI_(HRESULT) ThemeCreateParentWindow(
     }
 
 LExit:
-    MemFree(pMonitorContext);
+    ReleaseMem(pMonitorContext);
 
     return hr;
 }
@@ -1514,7 +1514,7 @@ LExit:
 DAPI_(HRESULT) ThemeGetTextControl(
     __in const THEME* pTheme,
     __in DWORD dwControl,
-    __out_z LPWSTR* psczText
+    __inout_z LPWSTR* psczText
     )
 {
     HRESULT hr = S_OK;
@@ -1729,6 +1729,7 @@ static HRESULT ParseImage(
     LPWSTR sczImageFile = NULL;
     int iResourceId = 0;
     Gdiplus::Bitmap* pBitmap = NULL;
+    *phImage = NULL;
 
     hr = XmlGetAttribute(pElement, L"ImageResource", &bstr);
     ThmExitOnFailure(hr, "Failed to get image resource attribute.");
@@ -1801,6 +1802,7 @@ static HRESULT ParseIcon(
     BSTR bstr = NULL;
     LPWSTR sczImageFile = NULL;
     int iResourceId = 0;
+    *phIcon = NULL;
 
     hr = XmlGetAttribute(pElement, L"IconResource", &bstr);
     ThmExitOnFailure(hr, "Failed to get icon resource attribute.");
@@ -4720,7 +4722,7 @@ static HRESULT ShowControl(
 
             hr = S_OK;
 
-            Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczText, -1, pControl->sczValue, -1));
+            Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || (sczText && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczText, -1, pControl->sczValue, -1)));
         }
     }
 

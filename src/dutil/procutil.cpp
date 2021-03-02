@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define ProcExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PROCUTIL, x, s, __VA_ARGS__)
+#define ProcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PROCUTIL, p, x, e, s, __VA_ARGS__)
+#define ProcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
+#define ProcExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_PROCUTIL, p, x, e, s, __VA_ARGS__)
+#define ProcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_PROCUTIL, p, x, s, __VA_ARGS__)
+#define ProcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_PROCUTIL, e, x, s, __VA_ARGS__)
+#define ProcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_PROCUTIL, g, x, s, __VA_ARGS__)
+
+
 // private functions
 static HRESULT CreatePipes(
     __out HANDLE *phOutRead,
@@ -30,7 +45,7 @@ extern "C" HRESULT DAPI ProcElevated(
 
     if (!::OpenProcessToken(hProcess, TOKEN_QUERY, &hToken))
     {
-        ExitWithLastError(hr, "Failed to open process token.");
+        ProcExitWithLastError(hr, "Failed to open process token.");
     }
 
     if (::GetTokenInformation(hToken, TokenElevation, &tokenElevated, sizeof(TOKEN_ELEVATION), &cbToken))
@@ -50,7 +65,7 @@ extern "C" HRESULT DAPI ProcElevated(
         }
         else
         {
-            ExitOnRootFailure(hr, "Failed to get elevation token from process.");
+            ProcExitOnRootFailure(hr, "Failed to get elevation token from process.");
         }
     }
 
@@ -76,7 +91,7 @@ extern "C" HRESULT DAPI ProcWow64(
         USHORT pProcessMachine = IMAGE_FILE_MACHINE_UNKNOWN;
         if (!pfnIsWow64Process2(hProcess, &pProcessMachine, nullptr))
         {
-            ExitWithLastError(hr, "Failed to check WOW64 process - IsWow64Process2.");
+            ProcExitWithLastError(hr, "Failed to check WOW64 process - IsWow64Process2.");
         }
 
         if (pProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN)
@@ -93,7 +108,7 @@ extern "C" HRESULT DAPI ProcWow64(
     {
         if (!pfnIsWow64Process(hProcess, &fIsWow64))
         {
-                ExitWithLastError(hr, "Failed to check WOW64 process - IsWow64Process.");
+                ProcExitWithLastError(hr, "Failed to check WOW64 process - IsWow64Process.");
             }
         }
     }
@@ -121,7 +136,7 @@ extern "C" HRESULT DAPI ProcDisableWowFileSystemRedirection(
 
     if (!pfnWow64DisableWow64FsRedirection(&pfsr->pvRevertState))
     {
-        ExitWithLastError(hr, "Failed to disable file system redirection.");
+        ProcExitWithLastError(hr, "Failed to disable file system redirection.");
     }
 
     pfsr->fDisabled = TRUE;
@@ -143,7 +158,7 @@ extern "C" HRESULT DAPI ProcRevertWowFileSystemRedirection(
 
         if (!pfnWow64RevertWow64FsRedirection(pfsr->pvRevertState))
         {
-            ExitWithLastError(hr, "Failed to revert file system redirection.");
+            ProcExitWithLastError(hr, "Failed to revert file system redirection.");
         }
 
         pfsr->fDisabled = FALSE;
@@ -168,13 +183,13 @@ extern "C" HRESULT DAPI ProcExec(
     PROCESS_INFORMATION pi = { };
 
     hr = StrAllocFormatted(&sczFullCommandLine, L"\"%ls\" %ls", wzExecutablePath, wzCommandLine ? wzCommandLine : L"");
-    ExitOnFailure(hr, "Failed to allocate full command-line.");
+    ProcExitOnFailure(hr, "Failed to allocate full command-line.");
 
     si.cb = sizeof(si);
     si.wShowWindow = static_cast<WORD>(nCmdShow);
     if (!::CreateProcessW(wzExecutablePath, sczFullCommandLine, NULL, NULL, FALSE, 0, 0, NULL, &si, &pi))
     {
-        ExitWithLastError(hr, "Failed to create process: %ls", sczFullCommandLine);
+        ProcExitWithLastError(hr, "Failed to create process: %ls", sczFullCommandLine);
     }
 
     *phProcess = pi.hProcess;
@@ -213,7 +228,7 @@ extern "C" HRESULT DAPI ProcExecute(
 
     // Create redirect pipes.
     hr = CreatePipes(&hOutRead, &hOutWrite, &hErrWrite, &hInRead, &hInWrite);
-    ExitOnFailure(hr, "failed to create output pipes");
+    ProcExitOnFailure(hr, "failed to create output pipes");
 
     // Set up startup structure.
     si.cb = sizeof(STARTUPINFOW);
@@ -249,7 +264,7 @@ extern "C" HRESULT DAPI ProcExecute(
     }
     else
     {
-        ExitWithLastError(hr, "Process failed to execute.");
+        ProcExitWithLastError(hr, "Process failed to execute.");
     }
 
     *phProcess = pi.hProcess;
@@ -305,7 +320,7 @@ extern "C" HRESULT DAPI ProcWaitForCompletion(
     er = ::WaitForSingleObject(hProcess, dwTimeout);
     if (WAIT_FAILED == er)
     {
-        ExitWithLastError(hr, "Failed to wait for process to complete.");
+        ProcExitWithLastError(hr, "Failed to wait for process to complete.");
     }
     else if (WAIT_TIMEOUT == er)
     {
@@ -314,7 +329,7 @@ extern "C" HRESULT DAPI ProcWaitForCompletion(
 
     if (!::GetExitCodeProcess(hProcess, &er))
     {
-        ExitWithLastError(hr, "Failed to get process return code.");
+        ProcExitWithLastError(hr, "Failed to get process return code.");
     }
 
     *pReturnCode = er;
@@ -340,7 +355,7 @@ extern "C" HRESULT DAPI ProcWaitForIds(
     DWORD cProcesses = 0;
 
     rghProcesses =  static_cast<HANDLE*>(MemAlloc(sizeof(DWORD) * cProcessIds, TRUE));
-    ExitOnNull(rgdwProcessIds, hr, E_OUTOFMEMORY, "Failed to allocate array for process ID Handles.");
+    ProcExitOnNull(rgdwProcessIds, hr, E_OUTOFMEMORY, "Failed to allocate array for process ID Handles.");
 
     for (DWORD i = 0; i < cProcessIds; ++i)
     {
@@ -354,11 +369,11 @@ extern "C" HRESULT DAPI ProcWaitForIds(
     er = ::WaitForMultipleObjects(cProcesses, rghProcesses, TRUE, dwMilliseconds);
     if (WAIT_FAILED == er)
     {
-        ExitWithLastError(hr, "Failed to wait for process to complete.");
+        ProcExitWithLastError(hr, "Failed to wait for process to complete.");
     }
     else if (WAIT_TIMEOUT == er)
     {
-        ExitOnWin32Error(er, hr, "Timed out while waiting for process to complete.");
+        ProcExitOnWin32Error(er, hr, "Timed out while waiting for process to complete.");
     }
     
 LExit:
@@ -393,7 +408,7 @@ extern "C" HRESULT DAPI ProcCloseIds(
     {
         if (!::EnumWindows(&CloseWindowEnumCallback, pdwProcessIds[i]))
         {
-            ExitWithLastError(hr, "Failed to enumerate windows.");
+            ProcExitWithLastError(hr, "Failed to enumerate windows.");
         }
     }
 
@@ -430,30 +445,30 @@ static HRESULT CreatePipes(
     // Create pipes
     if (!::CreatePipe(&hOutTemp, &hOutWrite, &sa, 0))
     {
-        ExitWithLastError(hr, "failed to create output pipe");
+        ProcExitWithLastError(hr, "failed to create output pipe");
     }
 
     if (!::CreatePipe(&hInRead, &hInTemp, &sa, 0))
     {
-        ExitWithLastError(hr, "failed to create input pipe");
+        ProcExitWithLastError(hr, "failed to create input pipe");
     }
 
     // Duplicate output pipe so standard error and standard output write to the same pipe.
     if (!::DuplicateHandle(::GetCurrentProcess(), hOutWrite, ::GetCurrentProcess(), &hErrWrite, 0, TRUE, DUPLICATE_SAME_ACCESS))
     {
-        ExitWithLastError(hr, "failed to duplicate write handle");
+        ProcExitWithLastError(hr, "failed to duplicate write handle");
     }
 
     // We need to create new "output read" and "input write" handles that are non inheritable.  Otherwise CreateProcess will creates handles in 
     // the child process that can't be closed.
     if (!::DuplicateHandle(::GetCurrentProcess(), hOutTemp, ::GetCurrentProcess(), &hOutRead, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
-        ExitWithLastError(hr, "failed to duplicate output pipe");
+        ProcExitWithLastError(hr, "failed to duplicate output pipe");
     }
 
     if (!::DuplicateHandle(::GetCurrentProcess(), hInTemp, ::GetCurrentProcess(), &hInWrite, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
-        ExitWithLastError(hr, "failed to duplicate input pipe");
+        ProcExitWithLastError(hr, "failed to duplicate input pipe");
     }
 
     // now that everything has succeeded, assign to the outputs

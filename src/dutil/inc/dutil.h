@@ -44,7 +44,7 @@ void DAPI DutilUninitialize();
 void DAPI Dutil_SetAssertModule(__in HMODULE hAssertModule);
 void DAPI Dutil_SetAssertDisplayFunction(__in DUTIL_ASSERTDISPLAYFUNCTION pfn);
 void DAPI Dutil_Assert(__in_z LPCSTR szFile, __in int iLine);
-void DAPI Dutil_AssertSz(__in_z LPCSTR szFile, __in int iLine, __in_z LPCSTR szMessage);
+void DAPI Dutil_AssertSz(__in_z LPCSTR szFile, __in int iLine, __in_z __format_string LPCSTR szMessage);
 
 void DAPI Dutil_TraceSetLevel(__in REPORT_LEVEL ll, __in BOOL fTraceFilenames);
 REPORT_LEVEL DAPI Dutil_TraceGetLevel();

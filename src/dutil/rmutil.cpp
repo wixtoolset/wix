@@ -3,6 +3,21 @@
 #include "precomp.h"
 #include <restartmanager.h>
 
+
+// Exit macros
+#define RmExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_RMUTIL, x, s, __VA_ARGS__)
+#define RmExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_RMUTIL, p, x, e, s, __VA_ARGS__)
+#define RmExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_RMUTIL, p, x, s, __VA_ARGS__)
+#define RmExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_RMUTIL, p, x, e, s, __VA_ARGS__)
+#define RmExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_RMUTIL, p, x, s, __VA_ARGS__)
+#define RmExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_RMUTIL, e, x, s, __VA_ARGS__)
+#define RmExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_RMUTIL, g, x, s, __VA_ARGS__)
+
 #define ARRAY_GROWTH_SIZE 5
 
 typedef DWORD (WINAPI *PFNRMJOINSESSION)(
@@ -80,13 +95,13 @@ extern "C" HRESULT DAPI RmuJoinSession(
     *ppSession = NULL;
 
     pSession = static_cast<PRMU_SESSION>(MemAlloc(sizeof(RMU_SESSION), TRUE));
-    ExitOnNull(pSession, hr, E_OUTOFMEMORY, "Failed to allocate the RMU_SESSION structure.");
+    RmExitOnNull(pSession, hr, E_OUTOFMEMORY, "Failed to allocate the RMU_SESSION structure.");
 
     hr = RmuInitialize();
-    ExitOnFailure(hr, "Failed to initialize Restart Manager.");
+    RmExitOnFailure(hr, "Failed to initialize Restart Manager.");
 
     er = vpfnRmJoinSession(&pSession->dwSessionHandle, wzSessionKey);
-    ExitOnWin32Error(er, hr, "Failed to join Restart Manager session %ls.", wzSessionKey);
+    RmExitOnWin32Error(er, hr, "Failed to join Restart Manager session %ls.", wzSessionKey);
 
     ::InitializeCriticalSection(&pSession->cs);
     pSession->fInitialized = TRUE;
@@ -120,7 +135,7 @@ extern "C" HRESULT DAPI RmuAddFile(
 
     // Create or grow the jagged array.
     hr = StrArrayAllocString(&pSession->rgsczFilenames, &pSession->cFilenames, wzPath, 0);
-    ExitOnFailure(hr, "Failed to add the filename to the array.");
+    RmExitOnFailure(hr, "Failed to add the filename to the array.");
 
 LExit:
     ::LeaveCriticalSection(&pSession->cs);
@@ -161,29 +176,29 @@ extern "C" HRESULT DAPI RmuAddProcessById(
         // Adding SeDebugPrivilege in the event that the process targeted by ::OpenProcess() is in a another user context.
         if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
         {
-            ExitWithLastError(hr, "Failed to get process token.");
+            RmExitWithLastError(hr, "Failed to get process token.");
         }
 
         priv.PrivilegeCount = 1;
         priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
         if (!::LookupPrivilegeValueW(NULL, L"SeDebugPrivilege", &priv.Privileges[0].Luid))
         {
-            ExitWithLastError(hr, "Failed to get debug privilege LUID.");
+            RmExitWithLastError(hr, "Failed to get debug privilege LUID.");
         }
 
         cbPrevPriv = sizeof(TOKEN_PRIVILEGES);
         pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(MemAlloc(cbPrevPriv, TRUE));
-        ExitOnNull(pPrevPriv, hr, E_OUTOFMEMORY, "Failed to allocate memory for empty previous privileges.");
+        RmExitOnNull(pPrevPriv, hr, E_OUTOFMEMORY, "Failed to allocate memory for empty previous privileges.");
 
         if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
         {
             LPVOID pv = MemReAlloc(pPrevPriv, cbPrevPriv, TRUE);
-            ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for previous privileges.");
+            RmExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for previous privileges.");
             pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(pv);
 
             if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
             {
-                ExitWithLastError(hr, "Failed to get debug privilege LUID.");
+                RmExitWithLastError(hr, "Failed to get debug privilege LUID.");
             }
         }
 
@@ -195,13 +210,13 @@ extern "C" HRESULT DAPI RmuAddProcessById(
     {
         if (!::GetProcessTimes(hProcess, &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {
-            ExitWithLastError(hr, "Failed to get the process times for process ID %d.", dwProcessId);
+            RmExitWithLastError(hr, "Failed to get the process times for process ID %d.", dwProcessId);
         }
 
         ::EnterCriticalSection(&pSession->cs);
         fLocked = TRUE;
         hr = RmuApplicationArrayAlloc(&pSession->rgApplications, &pSession->cApplications, dwProcessId, CreationTime);
-        ExitOnFailure(hr, "Failed to add the application to the array.");
+        RmExitOnFailure(hr, "Failed to add the application to the array.");
     }
     else
     {
@@ -213,7 +228,7 @@ extern "C" HRESULT DAPI RmuAddProcessById(
         }
         else
         {
-            ExitOnWin32Error(er, hr, "Failed to open the process ID %d.", dwProcessId);
+            RmExitOnWin32Error(er, hr, "Failed to open the process ID %d.", dwProcessId);
         }
     }
 
@@ -258,7 +273,7 @@ extern "C" HRESULT DAPI RmuAddProcessesByName(
     BOOL fNotFound = FALSE;
 
     hr = ProcFindAllIdsFromExeName(wzProcessName, &pdwProcessIds, &cProcessIds);
-    ExitOnFailure(hr, "Failed to enumerate all the processes by name %ls.", wzProcessName);
+    RmExitOnFailure(hr, "Failed to enumerate all the processes by name %ls.", wzProcessName);
 
     for (DWORD i = 0; i < cProcessIds; ++i)
     {
@@ -270,7 +285,7 @@ extern "C" HRESULT DAPI RmuAddProcessesByName(
         }
         else
         {
-            ExitOnFailure(hr, "Failed to add process %ls (%d) to the Restart Manager session.", wzProcessName, pdwProcessIds[i]);
+            RmExitOnFailure(hr, "Failed to add process %ls (%d) to the Restart Manager session.", wzProcessName, pdwProcessIds[i]);
         }
     }
 
@@ -303,7 +318,7 @@ extern "C" HRESULT DAPI RmuAddService(
     ::EnterCriticalSection(&pSession->cs);
 
     hr = StrArrayAllocString(&pSession->rgsczServiceNames, &pSession->cServiceNames, wzServiceName, 0);
-    ExitOnFailure(hr, "Failed to add the service name to the array.");
+    RmExitOnFailure(hr, "Failed to add the service name to the array.");
 
 LExit:
     ::LeaveCriticalSection(&pSession->cs);
@@ -341,7 +356,7 @@ extern "C" HRESULT DAPI RmuRegisterResources(
         pSession->cServiceNames,
         pSession->rgsczServiceNames
         );
-    ExitOnWin32Error(er, hr, "Failed to register the resources with the Restart Manager session.");
+    RmExitOnWin32Error(er, hr, "Failed to register the resources with the Restart Manager session.");
 
     // Empty the arrays if registered in case additional resources are added later.
     ReleaseNullStrArray(pSession->rgsczFilenames, pSession->cFilenames);
@@ -373,11 +388,11 @@ extern "C" HRESULT DAPI RmuEndSession(
     if (!pSession->fStartedSessionHandle)
     {
         hr = RmuRegisterResources(pSession);
-        ExitOnFailure(hr, "Failed to register remaining resources.");
+        RmExitOnFailure(hr, "Failed to register remaining resources.");
     }
 
     er = vpfnRmEndSession(pSession->dwSessionHandle);
-    ExitOnWin32Error(er, hr, "Failed to end the Restart Manager session.");
+    RmExitOnWin32Error(er, hr, "Failed to end the Restart Manager session.");
 
 LExit:
     if (pSession->fInitialized)
@@ -404,16 +419,16 @@ static HRESULT RmuInitialize()
     if (1 == iRef && !vhModule)
     {
         hr = LoadSystemLibrary(L"rstrtmgr.dll", &hModule);
-        ExitOnFailure(hr, "Failed to load the rstrtmgr.dll module.");
+        RmExitOnFailure(hr, "Failed to load the rstrtmgr.dll module.");
 
         vpfnRmJoinSession = reinterpret_cast<PFNRMJOINSESSION>(::GetProcAddress(hModule, "RmJoinSession"));
-        ExitOnNullWithLastError(vpfnRmJoinSession, hr, "Failed to get the RmJoinSession procedure from rstrtmgr.dll.");
+        RmExitOnNullWithLastError(vpfnRmJoinSession, hr, "Failed to get the RmJoinSession procedure from rstrtmgr.dll.");
 
         vpfnRmRegisterResources = reinterpret_cast<PFNRMREGISTERRESOURCES>(::GetProcAddress(hModule, "RmRegisterResources"));
-        ExitOnNullWithLastError(vpfnRmRegisterResources, hr, "Failed to get the RmRegisterResources procedure from rstrtmgr.dll.");
+        RmExitOnNullWithLastError(vpfnRmRegisterResources, hr, "Failed to get the RmRegisterResources procedure from rstrtmgr.dll.");
 
         vpfnRmEndSession = reinterpret_cast<PFNRMENDSESSION>(::GetProcAddress(hModule, "RmEndSession"));
-        ExitOnNullWithLastError(vpfnRmEndSession, hr, "Failed to get the RmEndSession procedure from rstrtmgr.dll.");
+        RmExitOnNullWithLastError(vpfnRmEndSession, hr, "Failed to get the RmEndSession procedure from rstrtmgr.dll.");
 
         vhModule = hModule;
     }
@@ -447,7 +462,7 @@ static HRESULT RmuApplicationArrayAlloc(
     RM_UNIQUE_PROCESS *pApplication = NULL;
 
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgApplications), *pcApplications + 1, sizeof(RM_UNIQUE_PROCESS), ARRAY_GROWTH_SIZE);
-    ExitOnFailure(hr, "Failed to allocate memory for the application array.");
+    RmExitOnFailure(hr, "Failed to allocate memory for the application array.");
 
     pApplication = static_cast<RM_UNIQUE_PROCESS*>(&(*prgApplications)[*pcApplications]);
     pApplication->dwProcessId = dwProcessId;
@@ -466,7 +481,7 @@ static HRESULT RmuApplicationArrayFree(
     HRESULT hr = S_OK;
 
     hr = MemFree(rgApplications);
-    ExitOnFailure(hr, "Failed to free memory for the application array.");
+    RmExitOnFailure(hr, "Failed to free memory for the application array.");
 
 LExit:
     return hr;

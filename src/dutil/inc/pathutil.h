@@ -19,7 +19,7 @@ typedef enum PATH_EXPAND
     (i.e. quote arguments with spaces in them).
 ********************************************************************/
 DAPI_(HRESULT) PathCommandLineAppend(
-    __deref_out_z LPWSTR* psczCommandLine,
+    __deref_inout_z LPWSTR* psczCommandLine,
     __in_z LPCWSTR wzArgument
     );
 
@@ -43,7 +43,7 @@ DAPI_(LPCWSTR) PathExtension(
 ********************************************************************/
 DAPI_(HRESULT) PathGetDirectory(
     __in_z LPCWSTR wzPath,
-    __out LPWSTR *psczDirectory
+    __out_z LPWSTR *psczDirectory
     );
 
 /*******************************************************************
@@ -206,7 +206,7 @@ DAPI_(HRESULT) PathCompress(
 *******************************************************************/
 DAPI_(HRESULT) PathGetHierarchyArray(
     __in_z LPCWSTR wzPath,
-    __deref_inout_ecount_opt(*pcStrArray) LPWSTR **prgsczPathArray,
+    __deref_inout_ecount_opt(*pcPathArray) LPWSTR **prgsczPathArray,
     __inout LPUINT pcPathArray
     );
 

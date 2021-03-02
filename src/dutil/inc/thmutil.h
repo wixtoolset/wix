@@ -737,7 +737,7 @@ HRESULT DAPI ThemeSetTextControlEx(
 HRESULT DAPI ThemeGetTextControl(
     __in const THEME* pTheme,
     __in DWORD dwControl,
-    __out_z LPWSTR* psczText
+    __inout_z LPWSTR* psczText
     );
 
 /********************************************************************

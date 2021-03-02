@@ -2,6 +2,22 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define CabcExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_CABCUTIL, x, s, __VA_ARGS__)
+#define CabcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_CABCUTIL, p, x, e, s, __VA_ARGS__)
+#define CabcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_CABCUTIL, p, x, s, __VA_ARGS__)
+#define CabcExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_CABCUTIL, p, x, e, s, __VA_ARGS__)
+#define CabcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_CABCUTIL, p, x, s, __VA_ARGS__)
+#define CabcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_CABCUTIL, e, x, s, __VA_ARGS__)
+#define CabcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_CABCUTIL, g, x, s, __VA_ARGS__)
+
+
 static const WCHAR CABC_MAGIC_UNICODE_STRING_MARKER = '?';
 static const DWORD MAX_CABINET_HEADER_SIZE = 16 * 1024 * 1024;
 
@@ -144,19 +160,19 @@ static HRESULT UtcFileTimeToLocalDosDateTime(
     __out USHORT* pTime
     );
 
-static __callback int DIAMONDAPI CabCFilePlaced(__in PCCAB pccab, __in_z PSTR szFile, __in long cbFile, __in BOOL fContinuation, __out_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback int DIAMONDAPI CabCFilePlaced(__in PCCAB pccab, __in_z PSTR szFile, __in long cbFile, __in BOOL fContinuation, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
 static __callback void * DIAMONDAPI CabCAlloc(__in ULONG cb);
 static __callback void DIAMONDAPI CabCFree(__out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback INT_PTR DIAMONDAPI CabCOpen(__in_z PSTR pszFile, __in int oflag, __in int pmode, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback UINT FAR DIAMONDAPI CabCRead(__in INT_PTR hf, __out_bcount(cb) void FAR *memory, __in UINT cb, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback UINT FAR DIAMONDAPI CabCWrite(__in INT_PTR hf, __in_bcount(cb) void FAR *memory, __in UINT cb, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback long FAR DIAMONDAPI CabCSeek(__in INT_PTR hf, __in long dist, __in int seektype, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback int FAR DIAMONDAPI CabCClose(__in INT_PTR hf, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback int DIAMONDAPI CabCDelete(__in_z PSTR szFile, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-__success(return != FALSE) static __callback BOOL DIAMONDAPI CabCGetTempFile(__out_bcount_z(cbFile) char *szFile, __in int cbFile, __out_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback INT_PTR DIAMONDAPI CabCOpen(__in_z PSTR pszFile, __in int oflag, __in int pmode, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback UINT FAR DIAMONDAPI CabCRead(__in INT_PTR hf, __out_bcount(cb) void FAR *memory, __in UINT cb, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback UINT FAR DIAMONDAPI CabCWrite(__in INT_PTR hf, __in_bcount(cb) void FAR *memory, __in UINT cb, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback long FAR DIAMONDAPI CabCSeek(__in INT_PTR hf, __in long dist, __in int seektype, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback int FAR DIAMONDAPI CabCClose(__in INT_PTR hf, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback int DIAMONDAPI CabCDelete(__in_z PSTR szFile, __out int *err, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
+__success(return != FALSE) static __callback BOOL DIAMONDAPI CabCGetTempFile(__out_bcount_z(cbFile) char *szFile, __in int cbFile, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
 __success(return != FALSE) static __callback BOOL DIAMONDAPI CabCGetNextCabinet(__in PCCAB pccab, __in ULONG ul, __out_bcount(CABC_HANDLE_BYTES) void *pv);
 static __callback INT_PTR DIAMONDAPI CabCGetOpenInfo(__in_z PSTR pszName, __out USHORT *pdate, __out USHORT *ptime, __out USHORT *pattribs, __out int *err, __out_bcount(CABC_HANDLE_BYTES) void *pv);
-static __callback long DIAMONDAPI CabCStatus(__in UINT uiTypeStatus, __in ULONG cb1, __in ULONG cb2, __out_bcount(CABC_HANDLE_BYTES) void *pv);
+static __callback long DIAMONDAPI CabCStatus(__in UINT uiTypeStatus, __in ULONG cb1, __in ULONG cb2, __inout_bcount(CABC_HANDLE_BYTES) void *pv);
 
 
 /********************************************************************
@@ -174,7 +190,7 @@ extern "C" HRESULT DAPI CabCBegin(
     __in DWORD dwMaxSize,
     __in DWORD dwMaxThresh,
     __in COMPRESSION_TYPE ct,
-    __out HANDLE *phContext
+    __out_bcount(CABC_HANDLE_BYTES) HANDLE *phContext
     )
 {
     Assert(wzCab && *wzCab && phContext);
@@ -190,28 +206,28 @@ extern "C" HRESULT DAPI CabCBegin(
     if (wzCabDir)
     {
         hr = ::StringCchLengthW(wzCabDir, MAX_PATH, &cchPathBuffer);
-        ExitOnFailure(hr, "Failed to get length of cab directory");
+        CabcExitOnFailure(hr, "Failed to get length of cab directory");
 
         // Need room to terminate with L'\\' and L'\0'
         if((MAX_PATH - 1) <= cchPathBuffer || 0 == cchPathBuffer)
         {
             hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Cab directory had invalid length: %u", cchPathBuffer);
+            CabcExitOnFailure(hr, "Cab directory had invalid length: %u", cchPathBuffer);
         }
 
         hr = ::StringCchCopyW(wzPathBuffer, countof(wzPathBuffer), wzCabDir);
-        ExitOnFailure(hr, "Failed to copy cab directory to buffer");
+        CabcExitOnFailure(hr, "Failed to copy cab directory to buffer");
 
         if (L'\\' != wzPathBuffer[cchPathBuffer - 1])
         {
             hr = ::StringCchCatW(wzPathBuffer, countof(wzPathBuffer), L"\\");
-            ExitOnFailure(hr, "Failed to cat \\ to end of buffer");
+            CabcExitOnFailure(hr, "Failed to cat \\ to end of buffer");
             ++cchPathBuffer;
         }
     }
 
     pcd = static_cast<CABC_DATA*>(MemAlloc(sizeof(CABC_DATA), TRUE));
-    ExitOnNull(pcd, hr, E_OUTOFMEMORY, "failed to allocate cab creation data structure");
+    CabcExitOnNull(pcd, hr, E_OUTOFMEMORY, "failed to allocate cab creation data structure");
 
     pcd->hrLastError = S_OK;
     pcd->fGoodCab = TRUE;
@@ -266,35 +282,35 @@ extern "C" HRESULT DAPI CabCBegin(
     else
     {
         hr = E_INVALIDARG;
-        ExitOnFailure(hr, "Invalid compression type specified.");
+        CabcExitOnFailure(hr, "Invalid compression type specified.");
     }
 
     if (0 == ::WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, wzCab, -1, pcd->ccab.szCab, sizeof(pcd->ccab.szCab), NULL, NULL))
     {
-        ExitWithLastError(hr, "failed to convert cab name to multi-byte");
+        CabcExitWithLastError(hr, "failed to convert cab name to multi-byte");
     }
 
     if (0 ==  ::WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, wzPathBuffer, -1, pcd->ccab.szCabPath, sizeof(pcd->ccab.szCab), NULL, NULL))
     {
-        ExitWithLastError(hr, "failed to convert cab dir to multi-byte");
+        CabcExitWithLastError(hr, "failed to convert cab dir to multi-byte");
     }
 
     // Remember the path to the cabinet.
     hr= ::StringCchCopyW(pcd->wzCabinetPath, countof(pcd->wzCabinetPath), wzPathBuffer);
-    ExitOnFailure(hr, "Failed to copy cabinet path from path: %ls", wzPathBuffer);
+    CabcExitOnFailure(hr, "Failed to copy cabinet path from path: %ls", wzPathBuffer);
 
     hr = ::StringCchCatW(pcd->wzCabinetPath, countof(pcd->wzCabinetPath), wzCab);
-    ExitOnFailure(hr, "Failed to concat to cabinet path cabinet name: %ls", wzCab);
+    CabcExitOnFailure(hr, "Failed to concat to cabinet path cabinet name: %ls", wzCab);
 
     // Get the empty file to use as the blank marker for duplicates.
     if (!::GetTempPathW(countof(wzTempPath), wzTempPath))
     {
-        ExitWithLastError(hr, "Failed to get temp path.");
+        CabcExitWithLastError(hr, "Failed to get temp path.");
     }
 
     if (!::GetTempFileNameW(wzTempPath, L"WSC", 0, pcd->wzEmptyFile))
     {
-        ExitWithLastError(hr, "Failed to create a temp file name.");
+        CabcExitWithLastError(hr, "Failed to create a temp file name.");
     }
 
     // Try to open the newly created empty file (remember, GetTempFileName() is kind enough to create a file for us)
@@ -303,7 +319,7 @@ extern "C" HRESULT DAPI CabCBegin(
     pcd->hEmptyFile = ::CreateFileW(pcd->wzEmptyFile, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
 
     hr = DictCreateWithEmbeddedKey(&pcd->shDictHandle, dwMaxFiles, reinterpret_cast<void **>(&pcd->prgFiles), offsetof(CABC_FILE, pwzSourcePath), DICT_FLAG_CASEINSENSITIVE);
-    ExitOnFailure(hr, "Failed to create dictionary to keep track of duplicate files");
+    CabcExitOnFailure(hr, "Failed to create dictionary to keep track of duplicate files");
 
     // Make sure to allocate at least some space, or we won't be able to realloc later if they "lied" about having zero files
     if (1 > dwMaxFiles)
@@ -315,10 +331,10 @@ extern "C" HRESULT DAPI CabCBegin(
     size_t cbFileAllocSize = 0;
 
     hr = ::SizeTMult(pcd->cMaxFilePaths, sizeof(CABC_FILE), &(cbFileAllocSize));
-    ExitOnFailure(hr, "Maximum allocation exceeded on initialization.");
+    CabcExitOnFailure(hr, "Maximum allocation exceeded on initialization.");
 
     pcd->prgFiles = static_cast<CABC_FILE*>(MemAlloc(cbFileAllocSize, TRUE));
-    ExitOnNull(pcd->prgFiles, hr, E_OUTOFMEMORY, "Failed to allocate memory for files.");
+    CabcExitOnNull(pcd->prgFiles, hr, E_OUTOFMEMORY, "Failed to allocate memory for files.");
 
     // Tell cabinet API about our configuration.
     pcd->hfci = ::FCICreate(&(pcd->erf), CabCFilePlaced, CabCAlloc, CabCFree, CabCOpen, CabCRead, CabCWrite, CabCClose, CabCSeek, CabCDelete, CabCGetTempFile, &(pcd->ccab), pcd);
@@ -331,12 +347,12 @@ extern "C" HRESULT DAPI CabCBegin(
         }
         else
         {
-            ExitWithLastError(hr, "failed to create FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
+            CabcExitWithLastError(hr, "failed to create FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
         }
 
         pcd->fGoodCab = FALSE;
 
-        ExitOnFailure(hr, "failed to create FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);  // TODO: can these be converted to HRESULTS?
+        CabcExitOnFailure(hr, "failed to create FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);  // TODO: can these be converted to HRESULTS?
     }
 
     *phContext = pcd;
@@ -392,25 +408,25 @@ extern "C" HRESULT DAPI CabCAddFile(
     {
         // Store file size, primarily used to determine which files to hash for duplicates
         hr = FileSize(wzFile, &llFileSize);
-        ExitOnFailure(hr, "Failed to check size of file %ls", wzFile);
+        CabcExitOnFailure(hr, "Failed to check size of file %ls", wzFile);
 
         hr = CheckForDuplicateFile(pcd, &pcfDuplicate, wzFile, &pmfLocalHash, llFileSize);
-        ExitOnFailure(hr, "Failed while checking for duplicate of file: %ls", wzFile);
+        CabcExitOnFailure(hr, "Failed while checking for duplicate of file: %ls", wzFile);
     }
 
     if (pcfDuplicate) // This will be null for smart cabbing case
     {
         DWORD index;
         hr = ::PtrdiffTToDWord(pcfDuplicate - pcd->prgFiles, &index);
-        ExitOnFailure(hr, "Failed to calculate index of file name: %ls", pcfDuplicate->pwzSourcePath);
+        CabcExitOnFailure(hr, "Failed to calculate index of file name: %ls", pcfDuplicate->pwzSourcePath);
 
         hr = AddDuplicateFile(pcd, index, wzFile, wzToken, pcd->dwLastFileIndex);
-        ExitOnFailure(hr, "Failed to add duplicate of file name: %ls", pcfDuplicate->pwzSourcePath);
+        CabcExitOnFailure(hr, "Failed to add duplicate of file name: %ls", pcfDuplicate->pwzSourcePath);
     }
     else
     {
         hr = AddNonDuplicateFile(pcd, wzFile, wzToken, pmfLocalHash, llFileSize, pcd->dwLastFileIndex);
-        ExitOnFailure(hr, "Failed to add non-duplicated file: %ls", wzFile);
+        CabcExitOnFailure(hr, "Failed to add non-duplicated file: %ls", wzFile);
     }
 
     ++pcd->dwLastFileIndex;
@@ -483,13 +499,13 @@ extern "C" HRESULT DAPI CabCFinish(
             {
                 LPCWSTR pwzTemp = pcd->prgFiles[dwArrayFileIndex].pwzToken;
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
-                ExitOnFailure(hr, "failed to convert file token to ANSI: %ls", pwzTemp);
+                CabcExitOnFailure(hr, "failed to convert file token to ANSI: %ls", pwzTemp);
             }
             else
             {
                 LPCWSTR pwzTemp = FileFromPath(fileInfo.wzSourcePath);
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
-                ExitOnFailure(hr, "failed to convert file name to ANSI: %ls", pwzTemp);
+                CabcExitOnFailure(hr, "failed to convert file name to ANSI: %ls", pwzTemp);
             }
 
             if (pcd->prgFiles[dwArrayFileIndex].fHasDuplicates)
@@ -518,13 +534,13 @@ extern "C" HRESULT DAPI CabCFinish(
             {
                 LPCWSTR pwzTemp = pcd->prgDuplicates[dwDupeArrayFileIndex].pwzToken;
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
-                ExitOnFailure(hr, "failed to convert duplicate file token to ANSI: %ls", pwzTemp);
+                CabcExitOnFailure(hr, "failed to convert duplicate file token to ANSI: %ls", pwzTemp);
             }
             else
             {
                 LPCWSTR pwzTemp = FileFromPath(fileInfo.wzSourcePath);
                 hr = StrAnsiAllocString(&pszFileToken, pwzTemp, 0, CP_ACP);
-                ExitOnFailure(hr, "failed to convert duplicate file name to ANSI: %ls", pwzTemp);
+                CabcExitOnFailure(hr, "failed to convert duplicate file name to ANSI: %ls", pwzTemp);
             }
 
             // Flush afterward only if this isn't a duplicate of the previous file, and at least one non-duplicate file remains to be added to the cab
@@ -543,14 +559,14 @@ extern "C" HRESULT DAPI CabCFinish(
         else // If it's neither duplicate nor non-duplicate, throw an error
         {
             hr = HRESULT_FROM_WIN32(ERROR_EA_LIST_INCONSISTENT);
-            ExitOnRootFailure(hr, "Internal inconsistency in data structures while creating CAB file - a non-standard, non-duplicate file was encountered");
+            CabcExitOnRootFailure(hr, "Internal inconsistency in data structures while creating CAB file - a non-standard, non-duplicate file was encountered");
         }
 
         if (fFlushBefore && pcd->llBytesSinceLastFlush > pcd->llFlushThreshhold)
         {
             if (!::FCIFlushFolder(pcd->hfci, CabCGetNextCabinet, CabCStatus))
             {
-                ExitWithLastError(hr, "failed to flush FCI folder before adding file, Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
+                CabcExitWithLastError(hr, "failed to flush FCI folder before adding file, Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
             }
             pcd->llBytesSinceLastFlush = 0;
         }
@@ -574,10 +590,10 @@ extern "C" HRESULT DAPI CabCFinish(
             }
             else
             {
-                ExitWithLastError(hr, "failed to add file to FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);
+                CabcExitWithLastError(hr, "failed to add file to FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);
             }
 
-            ExitOnFailure(hr, "failed to add file to FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);  // TODO: can these be converted to HRESULTS?
+            CabcExitOnFailure(hr, "failed to add file to FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);  // TODO: can these be converted to HRESULTS?
         }
 
         // For Cabinet Splitting case, check for pcd->hrLastError that may be set as result of Error in CabCGetNextCabinet
@@ -585,14 +601,14 @@ extern "C" HRESULT DAPI CabCFinish(
         if (pcd->fCabinetSplittingEnabled && FAILED(pcd->hrLastError))
         {
             hr = pcd->hrLastError;
-            ExitOnFailure(hr, "Failed to create next cabinet name while splitting cabinet.");
+            CabcExitOnFailure(hr, "Failed to create next cabinet name while splitting cabinet.");
         }
 
         if (fFlushAfter && pcd->llBytesSinceLastFlush > pcd->llFlushThreshhold)
         {
             if (!::FCIFlushFolder(pcd->hfci, CabCGetNextCabinet, CabCStatus))
             {
-                ExitWithLastError(hr, "failed to flush FCI folder after adding file, Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
+                CabcExitWithLastError(hr, "failed to flush FCI folder after adding file, Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);
             }
             pcd->llBytesSinceLastFlush = 0;
         }
@@ -610,10 +626,10 @@ extern "C" HRESULT DAPI CabCFinish(
         }
         else
         {
-            ExitWithLastError(hr, "failed while creating CAB FCI object Oper: 0x%x Type: 0x%x File: %s", pcd->erf.erfOper, pcd->erf.erfType);
+            CabcExitWithLastError(hr, "failed while creating CAB FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);
         }
 
-        ExitOnFailure(hr, "failed while creating CAB FCI object Oper: 0x%x Type: 0x%x File: %s", pcd->erf.erfOper, pcd->erf.erfType);  // TODO: can these be converted to HRESULTS?
+        CabcExitOnFailure(hr, "failed while creating CAB FCI object Oper: 0x%x Type: 0x%x File: %ls", pcd->erf.erfOper, pcd->erf.erfType, fileInfo.wzSourcePath);  // TODO: can these be converted to HRESULTS?
     }
 
     // Only flush the cabinet if we actually succeeded in previous calls - otherwise we just waste time (a lot on big cabs)
@@ -621,13 +637,13 @@ extern "C" HRESULT DAPI CabCFinish(
     {
         // If we have a last error, use that, otherwise return the useless error
         hr = FAILED(pcd->hrLastError) ? pcd->hrLastError : E_FAIL;
-        ExitOnFailure(hr, "failed to flush FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);  // TODO: can these be converted to HRESULTS?
+        CabcExitOnFailure(hr, "failed to flush FCI object Oper: 0x%x Type: 0x%x", pcd->erf.erfOper, pcd->erf.erfType);  // TODO: can these be converted to HRESULTS?
     }
 
     if (pcd->fGoodCab && pcd->cDuplicates)
     {
         hr = UpdateDuplicateFiles(pcd);
-        ExitOnFailure(hr, "Failed to update duplicates in cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitOnFailure(hr, "Failed to update duplicates in cabinet: %ls", pcd->wzCabinetPath);
     }
 
 LExit:
@@ -697,8 +713,8 @@ static HRESULT CheckForDuplicateFile(
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    ExitOnNull(ppcf, hr, E_INVALIDARG, "No file structure sent while checking for duplicate file");
-    ExitOnNull(ppmfHash, hr, E_INVALIDARG, "No file hash structure pointer sent while checking for duplicate file");
+    CabcExitOnNull(ppcf, hr, E_INVALIDARG, "No file structure sent while checking for duplicate file");
+    CabcExitOnNull(ppmfHash, hr, E_INVALIDARG, "No file hash structure pointer sent while checking for duplicate file");
 
     *ppcf = NULL; // By default, we'll set our output to NULL
 
@@ -712,7 +728,7 @@ static HRESULT CheckForDuplicateFile(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failed while searching for file in dictionary of previously added files");
+    CabcExitOnFailure(hr, "Failed while searching for file in dictionary of previously added files");
 
     for (i = 0; i < pcd->cFilePaths; ++i)
     {
@@ -723,22 +739,22 @@ static HRESULT CheckForDuplicateFile(
             if (pcd->prgFiles[i].pmfHash == NULL)
             {
                 pcd->prgFiles[i].pmfHash = (PMSIFILEHASHINFO)MemAlloc(sizeof(MSIFILEHASHINFO), FALSE);
-                ExitOnNull(pcd->prgFiles[i].pmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for candidate duplicate file's MSI file hash");
+                CabcExitOnNull(pcd->prgFiles[i].pmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for candidate duplicate file's MSI file hash");
 
                 pcd->prgFiles[i].pmfHash->dwFileHashInfoSize = sizeof(MSIFILEHASHINFO);
                 er = ::MsiGetFileHashW(pcd->prgFiles[i].pwzSourcePath, 0, pcd->prgFiles[i].pmfHash);
-                ExitOnWin32Error(er, hr, "Failed while getting MSI file hash of candidate duplicate file: %ls", pcd->prgFiles[i].pwzSourcePath);
+                CabcExitOnWin32Error(er, hr, "Failed while getting MSI file hash of candidate duplicate file: %ls", pcd->prgFiles[i].pwzSourcePath);
             }
 
             // If our own file hasn't yet been hashed, hash it
             if (NULL == *ppmfHash)
             {
                 *ppmfHash = (PMSIFILEHASHINFO)MemAlloc(sizeof(MSIFILEHASHINFO), FALSE);
-                ExitOnNull(*ppmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for file's MSI file hash");
+                CabcExitOnNull(*ppmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for file's MSI file hash");
 
                 (*ppmfHash)->dwFileHashInfoSize = sizeof(MSIFILEHASHINFO);
                 er = ::MsiGetFileHashW(wzFileName, 0, *ppmfHash);
-                ExitOnWin32Error(er, hr, "Failed while getting MSI file hash of file: %ls", pcd->prgFiles[i].pwzSourcePath);
+                CabcExitOnWin32Error(er, hr, "Failed while getting MSI file hash of file: %ls", pcd->prgFiles[i].pwzSourcePath);
             }
 
             // If the two file hashes are both of the expected size, and they match, we've got a match, so return it!
@@ -779,17 +795,17 @@ static HRESULT AddDuplicateFile(
         size_t cbDuplicates = 0;
 
         hr = ::SizeTMult(pcd->cMaxDuplicates, sizeof(CABC_DUPLICATEFILE), &cbDuplicates);
-        ExitOnFailure(hr, "Maximum allocation exceeded.");
+        CabcExitOnFailure(hr, "Maximum allocation exceeded.");
 
         if (pcd->cDuplicates)
         {
             pv = MemReAlloc(pcd->prgDuplicates, cbDuplicates, FALSE);
-            ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for duplicate file.");
+            CabcExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for duplicate file.");
         }
         else
         {
             pv = MemAlloc(cbDuplicates, FALSE);
-            ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for duplicate file.");
+            CabcExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for duplicate file.");
         }
 
         ZeroMemory(reinterpret_cast<BYTE*>(pv) + (pcd->cDuplicates * sizeof(CABC_DUPLICATEFILE)), (pcd->cMaxDuplicates - pcd->cDuplicates) * sizeof(CABC_DUPLICATEFILE));
@@ -804,12 +820,12 @@ static HRESULT AddDuplicateFile(
     pcd->prgFiles[dwFileArrayIndex].fHasDuplicates = TRUE; // Mark original file as having duplicates
 
     hr = StrAllocString(&pcd->prgDuplicates[pcd->cDuplicates].pwzSourcePath, wzSourcePath, 0);
-    ExitOnFailure(hr, "Failed to copy duplicate file path: %ls", wzSourcePath);
+    CabcExitOnFailure(hr, "Failed to copy duplicate file path: %ls", wzSourcePath);
 
     if (wzToken && *wzToken)
     {
         hr = StrAllocString(&pcd->prgDuplicates[pcd->cDuplicates].pwzToken, wzToken, 0);
-        ExitOnFailure(hr, "Failed to copy duplicate file token: %ls", wzToken);
+        CabcExitOnFailure(hr, "Failed to copy duplicate file token: %ls", wzToken);
     }
 
     ++pcd->cDuplicates;
@@ -839,10 +855,10 @@ static HRESULT AddNonDuplicateFile(
         size_t cbFilePaths = 0;
 
         hr = ::SizeTMult(pcd->cMaxFilePaths, sizeof(CABC_FILE), &cbFilePaths);
-        ExitOnFailure(hr, "Maximum allocation exceeded.");
+        CabcExitOnFailure(hr, "Maximum allocation exceeded.");
 
         pv = MemReAlloc(pcd->prgFiles, cbFilePaths, FALSE);
-        ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for file.");
+        CabcExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to reallocate memory for file.");
 
         ZeroMemory(reinterpret_cast<BYTE*>(pv) + (pcd->cFilePaths * sizeof(CABC_FILE)), (pcd->cMaxFilePaths - pcd->cFilePaths) * sizeof(CABC_FILE));
 
@@ -859,7 +875,7 @@ static HRESULT AddNonDuplicateFile(
     if (pmfHash && sizeof(MSIFILEHASHINFO) == pmfHash->dwFileHashInfoSize)
     {
         pcf->pmfHash = (PMSIFILEHASHINFO)MemAlloc(sizeof(MSIFILEHASHINFO), FALSE);
-        ExitOnNull(pcf->pmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for individual file's MSI file hash");
+        CabcExitOnNull(pcf->pmfHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for individual file's MSI file hash");
 
         pcf->pmfHash->dwFileHashInfoSize = sizeof(MSIFILEHASHINFO);
         pcf->pmfHash->dwData[0] = pmfHash->dwData[0];
@@ -869,18 +885,18 @@ static HRESULT AddNonDuplicateFile(
     }
 
     hr = StrAllocString(&pcf->pwzSourcePath, wzFile, 0);
-    ExitOnFailure(hr, "Failed to copy file path: %ls", wzFile);
+    CabcExitOnFailure(hr, "Failed to copy file path: %ls", wzFile);
 
     if (wzToken && *wzToken)
     {
         hr = StrAllocString(&pcf->pwzToken, wzToken, 0);
-        ExitOnFailure(hr, "Failed to copy file token: %ls", wzToken);
+        CabcExitOnFailure(hr, "Failed to copy file token: %ls", wzToken);
     }
 
     ++pcd->cFilePaths;
 
     hr = DictAddValue(pcd->shDictHandle, pcf);
-    ExitOnFailure(hr, "Failed to add file to dictionary of added files");
+    CabcExitOnFailure(hr, "Failed to add file to dictionary of added files");
 
 LExit:
     ReleaseMem(pv);
@@ -903,14 +919,14 @@ static HRESULT UpdateDuplicateFiles(
     hCabinet = ::CreateFileW(pcd->wzCabinetPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hCabinet)
     {
-        ExitWithLastError(hr, "Failed to open cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to open cabinet: %ls", pcd->wzCabinetPath);
     }
 
     // Shouldn't need more than 16 MB to get the whole cabinet header into memory so use that as
     // the upper bound for the memory map.
     if (!::GetFileSizeEx(hCabinet, &liCabinetSize))
     {
-        ExitWithLastError(hr, "Failed to get size of cabinet: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to get size of cabinet: %ls", pcd->wzCabinetPath);
     }
 
     if (0 == liCabinetSize.HighPart && liCabinetSize.LowPart < MAX_CABINET_HEADER_SIZE)
@@ -926,11 +942,11 @@ static HRESULT UpdateDuplicateFiles(
     hCabinetMapping = ::CreateFileMappingW(hCabinet, NULL, PAGE_READWRITE | SEC_COMMIT, 0, cbCabinet, NULL);
     if (NULL == hCabinetMapping || INVALID_HANDLE_VALUE == hCabinetMapping)
     {
-        ExitWithLastError(hr, "Failed to memory map cabinet file: %ls", pcd->wzCabinetPath);
+        CabcExitWithLastError(hr, "Failed to memory map cabinet file: %ls", pcd->wzCabinetPath);
     }
 
     pv = ::MapViewOfFile(hCabinetMapping, FILE_MAP_WRITE, 0, 0, 0);
-    ExitOnNullWithLastError(pv, hr, "Failed to map view of cabinet file: %ls", pcd->wzCabinetPath);
+    CabcExitOnNullWithLastError(pv, hr, "Failed to map view of cabinet file: %ls", pcd->wzCabinetPath);
 
     pCabinetHeader = static_cast<MS_CABINET_HEADER*>(pv);
 
@@ -939,7 +955,7 @@ static HRESULT UpdateDuplicateFiles(
         const CABC_DUPLICATEFILE *pDuplicateFile = pcd->prgDuplicates + i;
 
         hr = DuplicateFile(pCabinetHeader, pcd, pDuplicateFile);
-        ExitOnFailure(hr, "Failed to find cabinet file items at index: %d and %d", pDuplicateFile->dwFileArrayIndex, pDuplicateFile->dwDuplicateCabFileIndex);
+        CabcExitOnFailure(hr, "Failed to find cabinet file items at index: %d and %d", pDuplicateFile->dwFileArrayIndex, pDuplicateFile->dwDuplicateCabFileIndex);
     }
 
 LExit:
@@ -974,7 +990,7 @@ static HRESULT DuplicateFile(
         pDuplicate->dwDuplicateCabFileIndex <= pcd->prgFiles[pDuplicate->dwFileArrayIndex].dwCabFileIndex)
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Unexpected duplicate file indices, header cFiles: %d, file index: %d, duplicate index: %d", pHeader->cFiles, pcd->prgFiles[pDuplicate->dwFileArrayIndex].dwCabFileIndex, pDuplicate->dwDuplicateCabFileIndex);
+        CabcExitOnFailure(hr, "Unexpected duplicate file indices, header cFiles: %d, file index: %d, duplicate index: %d", pHeader->cFiles, pcd->prgFiles[pDuplicate->dwFileArrayIndex].dwCabFileIndex, pDuplicate->dwDuplicateCabFileIndex);
     }
 
     // Step through each cabinet items until we get to the original
@@ -1002,7 +1018,7 @@ static HRESULT DuplicateFile(
     if (0 != pDuplicateItem->cbFile)
     {
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Failed because duplicate file does not have a file size of zero: %d", pDuplicateItem->cbFile);
+        CabcExitOnFailure(hr, "Failed because duplicate file does not have a file size of zero: %d", pDuplicateItem->cbFile);
     }
 
     pDuplicateItem->cbFile = pOriginalItem->cbFile;
@@ -1031,12 +1047,12 @@ static HRESULT UtcFileTimeToLocalDosDateTime(
 
     if (!::FileTimeToLocalFileTime(pFileTime, &ftLocal))
     {
-        ExitWithLastError(hr, "Filed to convert file time to local file time.");
+        CabcExitWithLastError(hr, "Filed to convert file time to local file time.");
     }
 
     if (!::FileTimeToDosDateTime(&ftLocal, pDate, pTime))
     {
-        ExitWithLastError(hr, "Filed to convert file time to DOS date time.");
+        CabcExitWithLastError(hr, "Filed to convert file time to DOS date time.");
     }
 
 LExit:
@@ -1053,7 +1069,7 @@ static __callback int DIAMONDAPI CabCFilePlaced(
     __in_z PSTR szFile,
     __in long cbFile,
     __in BOOL fContinuation,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     UNREFERENCED_PARAMETER(pccab);
@@ -1085,7 +1101,7 @@ static __callback INT_PTR DIAMONDAPI CabCOpen(
     __in int oflag,
     __in int pmode,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
@@ -1139,7 +1155,7 @@ static __callback INT_PTR DIAMONDAPI CabCOpen(
 
     if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(pFile))
     {
-        ExitOnLastError(hr, "failed to open file: %s", pszFile);
+        CabcExitOnLastError(hr, "failed to open file: %s", pszFile);
     }
 
 LExit:
@@ -1155,18 +1171,18 @@ static __callback UINT FAR DIAMONDAPI CabCRead(
     __out_bcount(cb) void FAR *memory,
     __in UINT cb,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
     HRESULT hr = S_OK;
     DWORD cbRead = 0;
 
-    ExitOnNull(hf, *err, E_INVALIDARG, "Failed to read during cabinet extraction because no file handle was provided");
+    CabcExitOnNull(hf, *err, E_INVALIDARG, "Failed to read during cabinet extraction because no file handle was provided");
     if (!::ReadFile(reinterpret_cast<HANDLE>(hf), memory, cb, &cbRead, NULL))
     {
         *err = ::GetLastError();
-        ExitOnLastError(hr, "failed to read during cabinet extraction");
+        CabcExitOnLastError(hr, "failed to read during cabinet extraction");
     }
 
 LExit:
@@ -1184,18 +1200,18 @@ static __callback UINT FAR DIAMONDAPI CabCWrite(
     __in_bcount(cb) void FAR *memory,
     __in UINT cb,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
     HRESULT hr = S_OK;
     DWORD cbWrite = 0;
 
-    ExitOnNull(hf, *err, E_INVALIDARG, "Failed to write during cabinet extraction because no file handle was provided");
+    CabcExitOnNull(hf, *err, E_INVALIDARG, "Failed to write during cabinet extraction because no file handle was provided");
     if (!::WriteFile(reinterpret_cast<HANDLE>(hf), memory, cb, &cbWrite, NULL))
     {
         *err = ::GetLastError();
-        ExitOnLastError(hr, "failed to write during cabinet extraction");
+        CabcExitOnLastError(hr, "failed to write during cabinet extraction");
     }
 
 LExit:
@@ -1211,7 +1227,7 @@ static __callback long FAR DIAMONDAPI CabCSeek(
     __in long dist,
     __in int seektype,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
@@ -1233,7 +1249,7 @@ static __callback long FAR DIAMONDAPI CabCSeek(
     default :
         dwMoveMethod = 0;
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "unexpected seektype in FCISeek(): %d", seektype);
+        CabcExitOnFailure(hr, "unexpected seektype in FCISeek(): %d", seektype);
     }
 
     // SetFilePointer returns -1 if it fails (this will cause FDI to quit with an FDIERROR_USER_ABORT error.
@@ -1243,7 +1259,7 @@ static __callback long FAR DIAMONDAPI CabCSeek(
     if (DWORD_MAX == lMove)
     {
         *err = ::GetLastError();
-        ExitOnLastError(hr, "failed to move file pointer %d bytes", dist);
+        CabcExitOnLastError(hr, "failed to move file pointer %d bytes", dist);
     }
 
 LExit:
@@ -1259,7 +1275,7 @@ LExit:
 static __callback int FAR DIAMONDAPI CabCClose(
     __in INT_PTR hf,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
@@ -1268,7 +1284,7 @@ static __callback int FAR DIAMONDAPI CabCClose(
     if (!::CloseHandle(reinterpret_cast<HANDLE>(hf)))
     {
         *err = ::GetLastError();
-        ExitOnLastError(hr, "failed to close file during cabinet extraction");
+        CabcExitOnLastError(hr, "failed to close file during cabinet extraction");
     }
 
 LExit:
@@ -1283,7 +1299,7 @@ LExit:
 static __callback int DIAMONDAPI CabCDelete(
     __in_z PSTR szFile,
     __out int *err,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     UNREFERENCED_PARAMETER(err);
@@ -1302,7 +1318,7 @@ __success(return != FALSE)
 static __callback BOOL DIAMONDAPI CabCGetTempFile(
     __out_bcount_z(cbFile) char *szFile,
     __in int cbFile,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(pv);
@@ -1316,7 +1332,7 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
 
     if (MAX_PATH < ::GetTempPathA(cchTempPath, szTempPath))
     {
-        ExitWithLastError(hr, "Failed to get temp path during cabinet creation.");
+        CabcExitWithLastError(hr, "Failed to get temp path during cabinet creation.");
     }
 
     for (DWORD i = 0; i < DWORD_MAX; ++i)
@@ -1324,7 +1340,7 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
         LONG dwTempIndex = ::InterlockedIncrement(reinterpret_cast<volatile LONG*>(&dwIndex));
 
         hr = ::StringCbPrintfA(szFile, cbFile, "%s\\%08x.%03x", szTempPath, dwTempIndex, dwProcessId);
-        ExitOnFailure(hr, "failed to format log file path.");
+        CabcExitOnFailure(hr, "failed to format log file path.");
 
         hTempFile = ::CreateFileA(szFile, 0, FILE_SHARE_DELETE, NULL, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
         if (INVALID_HANDLE_VALUE != hTempFile)
@@ -1338,7 +1354,7 @@ static __callback BOOL DIAMONDAPI CabCGetTempFile(
             hr = E_FAIL; // this file was taken so be pessimistic and assume we're not going to find one.
         }
     }
-    ExitOnFailure(hr, "failed to find temporary file.");
+    CabcExitOnFailure(hr, "failed to find temporary file.");
 
 LExit:
     ReleaseFileHandle(hTempFile);
@@ -1377,7 +1393,7 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
             len -= 4; // remove Extention ".cab" of 8.3 Format
         }
         hr = ::StringCchCatNW(pcd->wzFirstCabinetName, countof(pcd->wzFirstCabinetName), pwzCabinetName, len);
-        ExitOnFailure(hr, "Failed to remove extension to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Failed to remove extension to create next Cabinet File Name");
     }
 
     const int nAlphabets = 26; // Number of Alphabets from a to z
@@ -1385,9 +1401,9 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
     {
         // Construct next cab names like cab1a.cab, cab1b.cab, cab1c.cab, ........
         hr = ::StringCchPrintfA(pccab->szCab, sizeof(pccab->szCab), "%ls%c.cab", pcd->wzFirstCabinetName, char(((int)('a') - 1) + pccab->iCab));
-        ExitOnFailure(hr, "Failed to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Failed to create next Cabinet File Name");
         hr = ::StringCchPrintfW(wzNewCabName, countof(wzNewCabName), L"%ls%c.cab", pcd->wzFirstCabinetName, WCHAR(((int)('a') - 1) + pccab->iCab));
-        ExitOnFailure(hr, "Failed to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Failed to create next Cabinet File Name");
     }
     else if (pccab->iCab <= nAlphabets*nAlphabets)
     {
@@ -1401,14 +1417,14 @@ static __callback BOOL DIAMONDAPI CabCGetNextCabinet(
             char1--; // First Char must be decremented by 1
         }
         hr = ::StringCchPrintfA(pccab->szCab, sizeof(pccab->szCab), "%ls%c%c.cab", pcd->wzFirstCabinetName, char(((int)('a') - 1) + char1), char(((int)('a') - 1) + char2));
-        ExitOnFailure(hr, "Failed to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Failed to create next Cabinet File Name");
         hr = ::StringCchPrintfW(wzNewCabName, countof(wzNewCabName), L"%ls%c%c.cab", pcd->wzFirstCabinetName, WCHAR(((int)('a') - 1) + char1), WCHAR(((int)('a') - 1) + char2));
-        ExitOnFailure(hr, "Failed to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Failed to create next Cabinet File Name");
     }
     else
     {
         hr = DISP_E_BADINDEX; // Value 0x8002000B stands for Invalid index.
-        ExitOnFailure(hr, "Cannot Split Cabinet more than 26*26 = 676 times. Failed to create next Cabinet File Name");
+        CabcExitOnFailure(hr, "Cannot Split Cabinet more than 26*26 = 676 times. Failed to create next Cabinet File Name");
     }
 
     // Callback from PFNFCIGETNEXTCABINET CabCGetNextCabinet method
@@ -1478,7 +1494,7 @@ static __callback INT_PTR DIAMONDAPI CabCGetOpenInfo(
 
     if (!::GetFileAttributesExW(pFileInfo->wzSourcePath, GetFileExInfoStandard, &fad))
     {
-        ExitWithLastError(hr, "Failed to get file attributes on '%s'.", pFileInfo->wzSourcePath);
+        CabcExitWithLastError(hr, "Failed to get file attributes on '%ls'.", pFileInfo->wzSourcePath);
     }
 
     // Set the attributes but only allow the few attributes that CAB supports.
@@ -1492,7 +1508,7 @@ static __callback INT_PTR DIAMONDAPI CabCGetOpenInfo(
         // found. This would create further problems if the file was written to the CAB without this value. Windows
         // Installer would then fail to extract the file.
         hr = UtcFileTimeToLocalDosDateTime(&fad.ftCreationTime, pdate, ptime);
-        ExitOnFailure(hr, "Filed to read a valid file time stucture on file '%s'.", pszName);
+        CabcExitOnFailure(hr, "Filed to read a valid file time stucture on file '%s'.", pszName);
     }
 
     iResult = CabCOpen(pszFilePlusMagic, _O_BINARY|_O_RDONLY, 0, err, pv);
@@ -1512,7 +1528,7 @@ static __callback long DIAMONDAPI CabCStatus(
     __in UINT ui,
     __in ULONG cb1,
     __in ULONG cb2,
-    __out_bcount(CABC_HANDLE_BYTES) void *pv
+    __inout_bcount(CABC_HANDLE_BYTES) void *pv
     )
 {
     UNREFERENCED_PARAMETER(ui);

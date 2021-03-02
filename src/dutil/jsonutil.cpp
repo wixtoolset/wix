@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define JsonExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_JSONUTIL, x, s, __VA_ARGS__)
+#define JsonExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_JSONUTIL, p, x, e, s, __VA_ARGS__)
+#define JsonExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_JSONUTIL, p, x, s, __VA_ARGS__)
+#define JsonExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_JSONUTIL, p, x, e, s, __VA_ARGS__)
+#define JsonExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_JSONUTIL, p, x, s, __VA_ARGS__)
+#define JsonExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_JSONUTIL, e, x, s, __VA_ARGS__)
+#define JsonExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_JSONUTIL, g, x, s, __VA_ARGS__)
+
 const DWORD JSON_STACK_INCREMENT = 5;
 
 // Prototypes
@@ -44,7 +59,7 @@ DAPI_(HRESULT) JsonInitializeReader(
     ::InitializeCriticalSection(&pReader->cs);
 
     hr = StrAllocString(&pReader->sczJson, wzJson, 0);
-    ExitOnFailure(hr, "Failed to allocate json string.");
+    JsonExitOnFailure(hr, "Failed to allocate json string.");
 
     pReader->pwz = pReader->sczJson;
 
@@ -153,7 +168,7 @@ DAPI_(HRESULT) JsonReadNext(
     {
         ExitFunction();
     }
-    ExitOnFailure(hr, "Failed to get next token.");
+    JsonExitOnFailure(hr, "Failed to get next token.");
 
     if (JSON_TOKEN_VALUE == *pToken)
     {
@@ -214,10 +229,10 @@ DAPI_(HRESULT) JsonWriteBool(
     LPWSTR sczValue = NULL;
 
     hr = StrAllocString(&sczValue, fValue ? L"true" : L"false", 0);
-    ExitOnFailure(hr, "Failed to convert boolean to string.");
+    JsonExitOnFailure(hr, "Failed to convert boolean to string.");
 
     hr = DoValue(pWriter, sczValue);
-    ExitOnFailure(hr, "Failed to add boolean to JSON.");
+    JsonExitOnFailure(hr, "Failed to add boolean to JSON.");
 
 LExit:
     ReleaseStr(sczValue);
@@ -234,10 +249,10 @@ DAPI_(HRESULT) JsonWriteNumber(
     LPWSTR sczValue = NULL;
 
     hr = StrAllocFormatted(&sczValue, L"%u", dwValue);
-    ExitOnFailure(hr, "Failed to convert number to string.");
+    JsonExitOnFailure(hr, "Failed to convert number to string.");
 
     hr = DoValue(pWriter, sczValue);
-    ExitOnFailure(hr, "Failed to add number to JSON.");
+    JsonExitOnFailure(hr, "Failed to add number to JSON.");
 
 LExit:
     ReleaseStr(sczValue);
@@ -254,10 +269,10 @@ DAPI_(HRESULT) JsonWriteString(
     LPWSTR sczJsonString = NULL;
 
     hr = SerializeJsonString(&sczJsonString, wzValue);
-    ExitOnFailure(hr, "Failed to allocate string JSON.");
+    JsonExitOnFailure(hr, "Failed to allocate string JSON.");
 
     hr = DoValue(pWriter, sczJsonString);
-    ExitOnFailure(hr, "Failed to add string to JSON.");
+    JsonExitOnFailure(hr, "Failed to add string to JSON.");
 
 LExit:
     ReleaseStr(sczJsonString);
@@ -272,7 +287,7 @@ DAPI_(HRESULT) JsonWriteArrayStart(
     HRESULT hr = S_OK;
 
     hr = DoStart(pWriter, JSON_TOKEN_ARRAY_START, L"[");
-    ExitOnFailure(hr, "Failed to start JSON array.");
+    JsonExitOnFailure(hr, "Failed to start JSON array.");
 
 LExit:
     return hr;
@@ -286,7 +301,7 @@ DAPI_(HRESULT) JsonWriteArrayEnd(
     HRESULT hr = S_OK;
 
     hr = DoEnd(pWriter, JSON_TOKEN_ARRAY_END, L"]");
-    ExitOnFailure(hr, "Failed to end JSON array.");
+    JsonExitOnFailure(hr, "Failed to end JSON array.");
 
 LExit:
     return hr;
@@ -300,7 +315,7 @@ DAPI_(HRESULT) JsonWriteObjectStart(
     HRESULT hr = S_OK;
 
     hr = DoStart(pWriter, JSON_TOKEN_OBJECT_START, L"{");
-    ExitOnFailure(hr, "Failed to start JSON object.");
+    JsonExitOnFailure(hr, "Failed to start JSON object.");
 
 LExit:
     return hr;
@@ -316,10 +331,10 @@ DAPI_(HRESULT) JsonWriteObjectKey(
     LPWSTR sczObjectKey = NULL;
 
     hr = StrAllocFormatted(&sczObjectKey, L"\"%ls\":", wzKey);
-    ExitOnFailure(hr, "Failed to allocate JSON object key.");
+    JsonExitOnFailure(hr, "Failed to allocate JSON object key.");
 
     hr = DoKey(pWriter, sczObjectKey);
-    ExitOnFailure(hr, "Failed to add object key to JSON.");
+    JsonExitOnFailure(hr, "Failed to add object key to JSON.");
 
 LExit:
     ReleaseStr(sczObjectKey);
@@ -334,7 +349,7 @@ DAPI_(HRESULT) JsonWriteObjectEnd(
     HRESULT hr = S_OK;
 
     hr = DoEnd(pWriter, JSON_TOKEN_OBJECT_END, L"}");
-    ExitOnFailure(hr, "Failed to end JSON object.");
+    JsonExitOnFailure(hr, "Failed to end JSON object.");
 
 LExit:
     return hr;
@@ -357,7 +372,7 @@ static HRESULT DoStart(
     ::EnterCriticalSection(&pWriter->cs);
 
     hr = EnsureTokenStack(pWriter);
-    ExitOnFailure(hr, "Failed to ensure token stack for start.");
+    JsonExitOnFailure(hr, "Failed to ensure token stack for start.");
 
     token = pWriter->rgTokenStack[pWriter->cTokens - 1];
     switch (token)
@@ -381,16 +396,16 @@ static HRESULT DoStart(
         hr = E_UNEXPECTED;
         break;
     }
-    ExitOnRootFailure(hr, "Cannot start array or object to JSON serializer now.");
+    JsonExitOnRootFailure(hr, "Cannot start array or object to JSON serializer now.");
 
     if (fNeedComma)
     {
         hr = StrAllocConcat(&pWriter->sczJson, L",", 0);
-        ExitOnFailure(hr, "Failed to add comma for start array or object to JSON.");
+        JsonExitOnFailure(hr, "Failed to add comma for start array or object to JSON.");
     }
 
     hr = StrAllocConcat(&pWriter->sczJson, wzStartString, 0);
-    ExitOnFailure(hr, "Failed to start JSON array or object.");
+    JsonExitOnFailure(hr, "Failed to start JSON array or object.");
 
     pWriter->rgTokenStack[pWriter->cTokens - 1] = token;
     if (fPushToken)
@@ -418,7 +433,7 @@ static HRESULT DoEnd(
     if (!pWriter->rgTokenStack || 0 == pWriter->cTokens)
     {
         hr = E_UNEXPECTED;
-        ExitOnRootFailure(hr, "Failure to pop token because the stack is empty.");
+        JsonExitOnRootFailure(hr, "Failure to pop token because the stack is empty.");
     }
     else
     {
@@ -427,12 +442,12 @@ static HRESULT DoEnd(
             (JSON_TOKEN_OBJECT_END == tokenEnd && JSON_TOKEN_OBJECT_START != token && JSON_TOKEN_OBJECT_VALUE != token))
         {
             hr = E_UNEXPECTED;
-            ExitOnRootFailure(hr, "Failure to pop token because the stack did not match the expected token: %d", tokenEnd);
+            JsonExitOnRootFailure(hr, "Failure to pop token because the stack did not match the expected token: %d", tokenEnd);
         }
     }
 
     hr = StrAllocConcat(&pWriter->sczJson, wzEndString, 0);
-    ExitOnFailure(hr, "Failed to end JSON array or object.");
+    JsonExitOnFailure(hr, "Failed to end JSON array or object.");
 
     --pWriter->cTokens;
 
@@ -454,7 +469,7 @@ static HRESULT DoKey(
     ::EnterCriticalSection(&pWriter->cs);
 
     hr = EnsureTokenStack(pWriter);
-    ExitOnFailure(hr, "Failed to ensure token stack for key.");
+    JsonExitOnFailure(hr, "Failed to ensure token stack for key.");
 
     token = pWriter->rgTokenStack[pWriter->cTokens - 1];
     switch (token)
@@ -472,16 +487,16 @@ static HRESULT DoKey(
         hr = E_UNEXPECTED;
         break;
     }
-    ExitOnRootFailure(hr, "Cannot add key to JSON serializer now.");
+    JsonExitOnRootFailure(hr, "Cannot add key to JSON serializer now.");
 
     if (fNeedComma)
     {
         hr = StrAllocConcat(&pWriter->sczJson, L",", 0);
-        ExitOnFailure(hr, "Failed to add comma for key to JSON.");
+        JsonExitOnFailure(hr, "Failed to add comma for key to JSON.");
     }
 
     hr = StrAllocConcat(&pWriter->sczJson, wzKey, 0);
-    ExitOnFailure(hr, "Failed to add key to JSON.");
+    JsonExitOnFailure(hr, "Failed to add key to JSON.");
 
     pWriter->rgTokenStack[pWriter->cTokens - 1] = token;
 
@@ -503,7 +518,7 @@ static HRESULT DoValue(
     ::EnterCriticalSection(&pWriter->cs);
 
     hr = EnsureTokenStack(pWriter);
-    ExitOnFailure(hr, "Failed to ensure token stack for value.");
+    JsonExitOnFailure(hr, "Failed to ensure token stack for value.");
 
     token = pWriter->rgTokenStack[pWriter->cTokens - 1];
     switch (token)
@@ -528,23 +543,23 @@ static HRESULT DoValue(
         hr = E_UNEXPECTED;
         break;
     }
-    ExitOnRootFailure(hr, "Cannot add value to JSON serializer now.");
+    JsonExitOnRootFailure(hr, "Cannot add value to JSON serializer now.");
 
     if (fNeedComma)
     {
         hr = StrAllocConcat(&pWriter->sczJson, L",", 0);
-        ExitOnFailure(hr, "Failed to add comma for value to JSON.");
+        JsonExitOnFailure(hr, "Failed to add comma for value to JSON.");
     }
 
     if (wzValue)
     {
         hr = StrAllocConcat(&pWriter->sczJson, wzValue, 0);
-        ExitOnFailure(hr, "Failed to add value to JSON.");
+        JsonExitOnFailure(hr, "Failed to add value to JSON.");
     }
     else
     {
         hr = StrAllocConcat(&pWriter->sczJson, L"null", 0);
-        ExitOnFailure(hr, "Failed to add null value to JSON.");
+        JsonExitOnFailure(hr, "Failed to add null value to JSON.");
     }
 
     pWriter->rgTokenStack[pWriter->cTokens - 1] = token;
@@ -563,7 +578,7 @@ static HRESULT EnsureTokenStack(
     DWORD cNumAlloc = pWriter->cTokens != 0 ? pWriter->cTokens : 0;
 
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pWriter->rgTokenStack), cNumAlloc, sizeof(JSON_TOKEN), JSON_STACK_INCREMENT);
-    ExitOnFailure(hr, "Failed to allocate JSON token stack.");
+    JsonExitOnFailure(hr, "Failed to allocate JSON token stack.");
 
     if (0 == pWriter->cTokens)
     {
@@ -596,7 +611,7 @@ static HRESULT SerializeJsonString(
     }
 
     hr = StrAlloc(psczJsonString, cchRequired);
-    ExitOnFailure(hr, "Failed to allocate space for JSON string.");
+    JsonExitOnFailure(hr, "Failed to allocate space for JSON string.");
 
     LPWSTR pchTarget = *psczJsonString;
 

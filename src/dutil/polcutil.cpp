@@ -2,6 +2,21 @@
 
 #include "precomp.h"
 
+
+// Exit macros
+#define PolcExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_POLCUTIL, x, s, __VA_ARGS__)
+#define PolcExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_POLCUTIL, p, x, e, s, __VA_ARGS__)
+#define PolcExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_POLCUTIL, p, x, s, __VA_ARGS__)
+#define PolcExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_POLCUTIL, p, x, e, s, __VA_ARGS__)
+#define PolcExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_POLCUTIL, p, x, s, __VA_ARGS__)
+#define PolcExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_POLCUTIL, e, x, s, __VA_ARGS__)
+#define PolcExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_POLCUTIL, g, x, s, __VA_ARGS__)
+
 const LPCWSTR REGISTRY_POLICIES_KEY = L"SOFTWARE\\Policies\\";
 
 static HRESULT OpenPolicyKey(
@@ -25,14 +40,14 @@ extern "C" HRESULT DAPI PolcReadNumber(
     {
         ExitFunction1(hr = S_FALSE);
     }
-    ExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
 
     hr = RegReadNumber(hk, wzPolicyName, pdw);
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    ExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
 
 LExit:
     ReleaseRegKey(hk);
@@ -60,14 +75,14 @@ extern "C" HRESULT DAPI PolcReadString(
     {
         ExitFunction1(hr = S_FALSE);
     }
-    ExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls", wzPolicyPath);
 
     hr = RegReadString(hk, wzPolicyName, pscz);
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
         ExitFunction1(hr = S_FALSE);
     }
-    ExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
+    PolcExitOnFailure(hr, "Failed to open policy key: %ls, name: %ls", wzPolicyPath, wzPolicyName);
 
 LExit:
     ReleaseRegKey(hk);
@@ -99,10 +114,10 @@ static HRESULT OpenPolicyKey(
     LPWSTR sczPath = NULL;
 
     hr = PathConcat(REGISTRY_POLICIES_KEY, wzPolicyPath, &sczPath);
-    ExitOnFailure(hr, "Failed to combine logging path with root path.");
+    PolcExitOnFailure(hr, "Failed to combine logging path with root path.");
 
     hr = RegOpen(HKEY_LOCAL_MACHINE, sczPath, KEY_READ, phk);
-    ExitOnFailure(hr, "Failed to open policy registry key.");
+    PolcExitOnFailure(hr, "Failed to open policy registry key.");
 
 LExit:
     ReleaseStr(sczPath);

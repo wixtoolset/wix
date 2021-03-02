@@ -198,7 +198,7 @@ HRESULT DAPI StrAllocBase85Decode(
 
 HRESULT DAPI MultiSzLen(
     __in_ecount(*pcch) __nullnullterminated LPCWSTR pwzMultiSz,
-    __out SIZE_T* pcbch
+    __out SIZE_T* pcch
     );
 HRESULT DAPI MultiSzPrepend(
     __deref_inout_ecount(*pcchMultiSz) __nullnullterminated LPWSTR* ppwzMultiSz,
@@ -222,7 +222,7 @@ HRESULT DAPI MultiSzRemoveString(
     __in DWORD_PTR dwIndex
     );
 HRESULT DAPI MultiSzInsertString(
-    __deref_inout_z LPWSTR* ppwzMultiSz,
+    __deref_inout __nullnullterminated LPWSTR* ppwzMultiSz,
     __inout_opt SIZE_T* pcchMultiSz,
     __in DWORD_PTR dwIndex,
     __in_z LPCWSTR pwzInsert

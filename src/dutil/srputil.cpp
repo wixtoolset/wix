@@ -3,6 +3,21 @@
 #include "precomp.h"
 
 
+// Exit macros
+#define SrpExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_SRPUTIL, x, s, __VA_ARGS__)
+#define SrpExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_SRPUTIL, p, x, e, s, __VA_ARGS__)
+#define SrpExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_SRPUTIL, p, x, s, __VA_ARGS__)
+#define SrpExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_SRPUTIL, p, x, e, s, __VA_ARGS__)
+#define SrpExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_SRPUTIL, p, x, s, __VA_ARGS__)
+#define SrpExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_SRPUTIL, e, x, s, __VA_ARGS__)
+#define SrpExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_SRPUTIL, g, x, s, __VA_ARGS__)
+
+
 typedef BOOL (WINAPI *PFN_SETRESTOREPTW)(
     __in PRESTOREPOINTINFOW pRestorePtSpec,
     __out PSTATEMGRSTATUS pSMgrStatus
@@ -28,7 +43,7 @@ DAPI_(HRESULT) SrpInitialize(
     }
 
     vpfnSRSetRestorePointW = reinterpret_cast<PFN_SETRESTOREPTW>(::GetProcAddress(vhSrClientDll, "SRSetRestorePointW"));
-    ExitOnNullWithLastError(vpfnSRSetRestorePointW, hr, "Failed to find set restore point proc address.");
+    SrpExitOnNullWithLastError(vpfnSRSetRestorePointW, hr, "Failed to find set restore point proc address.");
 
     // If allowed, initialize COM security to enable NetworkService,
     // LocalService and System to make callbacks to the process
@@ -37,7 +52,7 @@ DAPI_(HRESULT) SrpInitialize(
     if (fInitializeComSecurity)
     {
         hr = InitializeComSecurity();
-        ExitOnFailure(hr, "Failed to initialize security for COM to talk to system restore.");
+        SrpExitOnFailure(hr, "Failed to initialize security for COM to talk to system restore.");
     }
 
 LExit:
@@ -79,7 +94,7 @@ DAPI_(HRESULT) SrpCreateRestorePoint(
 
     if (!vpfnSRSetRestorePointW(&restorePoint, &status))
     {
-        ExitOnWin32Error(status.nStatus, hr, "Failed to create system restore point.");
+        SrpExitOnWin32Error(status.nStatus, hr, "Failed to create system restore point.");
     }
 
 LExit:
@@ -116,42 +131,42 @@ static HRESULT InitializeComSecurity()
     // Initialize the security descriptor.
     if (!::InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION))
     {
-        ExitWithLastError(hr, "Failed to initialize security descriptor for system restore.");
+        SrpExitWithLastError(hr, "Failed to initialize security descriptor for system restore.");
     }
 
     // Create an administrator group security identifier (SID).
     cbSid = sizeof(rgSidBA);
     if (!::CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, rgSidBA, &cbSid))
     {
-        ExitWithLastError(hr, "Failed to create administrator SID for system restore.");
+        SrpExitWithLastError(hr, "Failed to create administrator SID for system restore.");
     }
 
     // Create a local service security identifier (SID).
     cbSid = sizeof(rgSidLS);
     if (!::CreateWellKnownSid(WinLocalServiceSid, NULL, rgSidLS, &cbSid))
     {
-        ExitWithLastError(hr, "Failed to create local service SID for system restore.");
+        SrpExitWithLastError(hr, "Failed to create local service SID for system restore.");
     }
 
     // Create a network service security identifier (SID).
     cbSid = sizeof(rgSidNS);
     if (!::CreateWellKnownSid(WinNetworkServiceSid, NULL, rgSidNS, &cbSid))
     {
-        ExitWithLastError(hr, "Failed to create network service SID for system restore.");
+        SrpExitWithLastError(hr, "Failed to create network service SID for system restore.");
     }
 
     // Create a personal account security identifier (SID).
     cbSid = sizeof(rgSidPS);
     if (!::CreateWellKnownSid(WinSelfSid, NULL, rgSidPS, &cbSid))
     {
-        ExitWithLastError(hr, "Failed to create self SID for system restore.");
+        SrpExitWithLastError(hr, "Failed to create self SID for system restore.");
     }
 
     // Create a local service security identifier (SID).
     cbSid = sizeof(rgSidSY);
     if (!::CreateWellKnownSid(WinLocalSystemSid, NULL, rgSidSY, &cbSid))
     {
-        ExitWithLastError(hr, "Failed to create local system SID for system restore.");
+        SrpExitWithLastError(hr, "Failed to create local system SID for system restore.");
     }
 
     // Setup the access control entries (ACE) for COM. COM_RIGHTS_EXECUTE and
@@ -203,29 +218,29 @@ static HRESULT InitializeComSecurity()
 
     // Create an access control list (ACL) using this ACE list.
     er = ::SetEntriesInAcl(countof(ea), ea, NULL, &pAcl);
-    ExitOnWin32Error(er, hr, "Failed to create ACL for system restore.");
+    SrpExitOnWin32Error(er, hr, "Failed to create ACL for system restore.");
 
     // Set the security descriptor owner to Administrators.
     if (!::SetSecurityDescriptorOwner(&sd, rgSidBA, FALSE))
     {
-        ExitWithLastError(hr, "Failed to set administrators owner for system restore.");
+        SrpExitWithLastError(hr, "Failed to set administrators owner for system restore.");
     }
 
     // Set the security descriptor group to Administrators.
     if (!::SetSecurityDescriptorGroup(&sd, rgSidBA, FALSE))
     {
-        ExitWithLastError(hr, "Failed to set administrators group access for system restore.");
+        SrpExitWithLastError(hr, "Failed to set administrators group access for system restore.");
     }
 
     // Set the discretionary access control list (DACL) to the ACL.
     if (!::SetSecurityDescriptorDacl(&sd, TRUE, pAcl, FALSE))
     {
-        ExitWithLastError(hr, "Failed to set DACL for system restore.");
+        SrpExitWithLastError(hr, "Failed to set DACL for system restore.");
     }
 
     // Note that an explicit security descriptor is being passed in.
     hr= ::CoInitializeSecurity(&sd, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_IMP_LEVEL_IDENTIFY, NULL, EOAC_DISABLE_AAA | EOAC_NO_CUSTOM_MARSHAL, NULL);
-    ExitOnFailure(hr, "Failed to initialize COM security for system restore.");
+    SrpExitOnFailure(hr, "Failed to initialize COM security for system restore.");
 
 LExit:
     if (pAcl)
