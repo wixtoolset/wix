@@ -2,13 +2,11 @@
 
 #include "precomp.h"
 
-#define SHA256_DIGEST_LEN 32
-
 // prototypes
 static HRESULT ProcessEntry(
     __in ATOM_ENTRY* pAtomEntry,
     __in LPCWSTR wzDefaultAppId,
-    __out APPLICATION_UPDATE_ENTRY* pApupEntry
+    __inout APPLICATION_UPDATE_ENTRY* pApupEntry
     );
 static HRESULT ParseEnclosure(
     __in ATOM_LINK* pLink,
@@ -192,7 +190,7 @@ extern "C" void DAPI ApupFreeChain(
 static HRESULT ProcessEntry(
     __in ATOM_ENTRY* pAtomEntry,
     __in LPCWSTR wzDefaultAppId,
-    __out APPLICATION_UPDATE_ENTRY* pApupEntry
+    __inout APPLICATION_UPDATE_ENTRY* pApupEntry
     )
 {
     HRESULT hr = S_OK;
@@ -325,6 +323,9 @@ static HRESULT ParseEnclosure(
     )
 {
     HRESULT hr = S_OK;
+    DWORD dwDigestLength = 0;
+    DWORD dwDigestStringLength = 0;
+    size_t cchDigestString = 0;
 
     // First search the ATOM link's custom elements to try and find the application update enclosure information.
     for (ATOM_UNKNOWN_ELEMENT* pElement = pLink->pUnknownElements; pElement; pElement = pElement->pNext)
@@ -333,36 +334,50 @@ static HRESULT ParseEnclosure(
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"digest", -1, pElement->wzElement, -1))
             {
-                // Find the digest[@algorithm='sha256'] which is required. Everything else is ignored.
+                // Find the digest[@algorithm] which is required. Everything else is ignored.
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
+                    dwDigestLength = 0;
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"algorithm", -1, pAttribute->wzAttribute, -1))
                     {
                         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"md5", -1, pAttribute->wzValue, -1))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_MD5;
+                            dwDigestLength = MD5_HASH_LEN;
                         }
                         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha1", -1, pAttribute->wzValue, -1))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA1;
+                            dwDigestLength = SHA1_HASH_LEN;
                         }
-                        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha256", -1, pAttribute->wzValue, -1))
+                        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha256", -1, pAttribute->wzValue, -1))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA256;
+                            dwDigestLength = SHA256_HASH_LEN;
+                        }
+                        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha512", -1, pAttribute->wzValue, -1))
+                        {
+                            pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA512;
+                            dwDigestLength = SHA512_HASH_LEN;
                         }
                         break;
                     }
                 }
 
-                if (APUP_HASH_ALGORITHM_SHA256 == pEnclosure->digestAlgorithm)
+                if (dwDigestLength)
                 {
-                    if (64 != lstrlenW(pElement->wzValue))
+                    dwDigestStringLength = 2 * dwDigestLength;
+
+                    hr = ::StringCchLengthW(pElement->wzValue, STRSAFE_MAX_CCH, &cchDigestString);
+                    ExitOnFailure(hr, "Failed to get string length of digest value.");
+
+                    if (dwDigestStringLength != cchDigestString)
                     {
                         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                        ExitOnRootFailure(hr, "Invalid digest length for SHA256 algorithm.");
+                        ExitOnRootFailure(hr, "Invalid digest length (%zu) for digest algorithm (%u).", cchDigestString, dwDigestStringLength);
                     }
 
-                    pEnclosure->cbDigest = sizeof(BYTE) * SHA256_DIGEST_LEN;
+                    pEnclosure->cbDigest = sizeof(BYTE) * dwDigestLength;
                     pEnclosure->rgbDigest = static_cast<BYTE*>(MemAlloc(pEnclosure->cbDigest, TRUE));
                     ExitOnNull(pEnclosure->rgbDigest, hr, E_OUTOFMEMORY, "Failed to allocate memory for digest.");
 

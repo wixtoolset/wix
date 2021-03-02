@@ -11,7 +11,10 @@ extern "C" {
 
 // Use CRYPTPROTECTMEMORY_BLOCK_SIZE, because it's larger and thus more restrictive than RTL_ENCRYPT_MEMORY_SIZE.
 #define CRYP_ENCRYPT_MEMORY_SIZE CRYPTPROTECTMEMORY_BLOCK_SIZE
+#define MD5_HASH_LEN 16
 #define SHA1_HASH_LEN 20
+#define SHA256_HASH_LEN 32
+#define SHA512_HASH_LEN 64
 
 typedef NTSTATUS (APIENTRY *PFN_RTLENCRYPTMEMORY)(
     __inout PVOID Memory,
