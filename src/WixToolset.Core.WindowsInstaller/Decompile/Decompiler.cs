@@ -1999,7 +1999,7 @@ namespace WixToolset.Core.WindowsInstaller
                         foreach (var row in table.Rows)
                         {
                             var action = row.FieldAsString(0);
-                            var actionSymbol = new WixActionSymbol(null, new Identifier(AccessModifier.Public, sequenceTable, action));
+                            var actionSymbol = new WixActionSymbol(null, new Identifier(AccessModifier.Global, sequenceTable, action));
 
                             actionSymbol.Action = action;
 
@@ -2133,7 +2133,7 @@ namespace WixToolset.Core.WindowsInstaller
                     {
                         foreach (var row in table.Rows)
                         {
-                            var actionRow = new WixActionSymbol(null, new Identifier(AccessModifier.Public, sequenceTable, row.FieldAsString(0)));
+                            var actionRow = new WixActionSymbol(null, new Identifier(AccessModifier.Global, sequenceTable, row.FieldAsString(0)));
 
                             actionRow.Action = row.FieldAsString(0);
 

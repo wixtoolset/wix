@@ -19,9 +19,9 @@ namespace WixToolset.Core
     /// </summary>
     internal partial class Compiler : ICompiler
     {
-        private static readonly Identifier BurnUXContainerId = new Identifier(AccessModifier.Private, BurnConstants.BurnUXContainerName);
-        private static readonly Identifier BurnDefaultAttachedContainerId = new Identifier(AccessModifier.Private, BurnConstants.BurnDefaultAttachedContainerName);
-        private static readonly Identifier BundleLayoutOnlyPayloads = new Identifier(AccessModifier.Private, BurnConstants.BundleLayoutOnlyPayloadsName);
+        private static readonly Identifier BurnUXContainerId = new Identifier(AccessModifier.Section, BurnConstants.BurnUXContainerName);
+        private static readonly Identifier BurnDefaultAttachedContainerId = new Identifier(AccessModifier.Section, BurnConstants.BurnDefaultAttachedContainerName);
+        private static readonly Identifier BundleLayoutOnlyPayloads = new Identifier(AccessModifier.Section, BurnConstants.BundleLayoutOnlyPayloadsName);
 
         /// <summary>
         /// Parses an ApprovedExeForElevation element.
@@ -427,25 +427,25 @@ namespace WixToolset.Core
                 });
 
                 // Ensure that the bundle stores the well-known persisted values.
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_NAME))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_NAME))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
                 {
                     Hidden = false,
                     Persisted = true,
                 });
 
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true,
@@ -946,7 +946,7 @@ namespace WixToolset.Core
                 {
                     var attributeNames = String.Join(new string(WixBundleCustomDataSymbol.AttributeNamesSeparator, 1), attributeDefinitions.Select(c => c.Name));
 
-                    this.Core.AddSymbol(new WixBundleCustomDataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, customDataId))
+                    this.Core.AddSymbol(new WixBundleCustomDataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, customDataId))
                     {
                         AttributeNames = attributeNames,
                         Type = customDataType.Value,
@@ -1052,7 +1052,7 @@ namespace WixToolset.Core
                 return null;
             }
 
-            var customDataAttribute = this.Core.AddSymbol(new WixBundleCustomDataAttributeSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, attributeName))
+            var customDataAttribute = this.Core.AddSymbol(new WixBundleCustomDataAttributeSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, customDataId, attributeName))
             {
                 CustomDataRef = customDataId,
                 Name = attributeName,
@@ -1106,7 +1106,7 @@ namespace WixToolset.Core
 
                         if (!this.Core.EncounteredError)
                         {
-                            this.Core.AddSymbol(new WixBundleCustomDataCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, elementId, attributeName))
+                            this.Core.AddSymbol(new WixBundleCustomDataCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Section, customDataId, elementId, attributeName))
                             {
                                 ElementId = elementId,
                                 AttributeRef = attributeName,
@@ -1822,7 +1822,7 @@ namespace WixToolset.Core
             }
 
             // Ensure there is always a rollback boundary at the beginning of the chain.
-            this.CreateRollbackBoundary(sourceLineNumbers, new Identifier(AccessModifier.Public, "WixDefaultBoundary"), YesNoType.Yes, YesNoType.No, ComplexReferenceParentType.PackageGroup, "WixChain", ComplexReferenceChildType.Unknown, null);
+            this.CreateRollbackBoundary(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixDefaultBoundary"), YesNoType.Yes, YesNoType.No, ComplexReferenceParentType.PackageGroup, "WixChain", ComplexReferenceChildType.Unknown, null);
 
             var previousId = "WixDefaultBoundary";
             var previousType = ComplexReferenceChildType.Package;
@@ -2856,7 +2856,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var symbol = this.Core.AddSymbol(new WixBundleMsiPropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
+                var symbol = this.Core.AddSymbol(new WixBundleMsiPropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, packageId, name))
                 {
                     PackageRef = packageId,
                     Name = name,
@@ -2910,7 +2910,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixBundleSlipstreamMspSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, id))
+                this.Core.AddSymbol(new WixBundleSlipstreamMspSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, packageId, id))
                 {
                     TargetPackageRef = packageId,
                     MspPackageRef = id
@@ -3179,7 +3179,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, name))
                 {
                     Value = value,
                     Type = type,

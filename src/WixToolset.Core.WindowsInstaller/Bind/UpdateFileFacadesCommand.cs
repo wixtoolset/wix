@@ -335,7 +335,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var lookup = String.Concat(facade.ComponentRef, "/", name);
                 if (!assemblyNameSymbols.TryGetValue(lookup, out var assemblyNameSymbol))
                 {
-                    assemblyNameSymbol = this.Section.AddSymbol(new MsiAssemblyNameSymbol(facade.SourceLineNumber, new Identifier(AccessModifier.Private, facade.ComponentRef, name))
+                    assemblyNameSymbol = this.Section.AddSymbol(new MsiAssemblyNameSymbol(facade.SourceLineNumber, new Identifier(AccessModifier.Section, facade.ComponentRef, name))
                     {
                         ComponentRef = facade.ComponentRef,
                         Name = name,

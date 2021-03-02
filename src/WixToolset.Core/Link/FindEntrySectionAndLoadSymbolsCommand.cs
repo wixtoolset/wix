@@ -92,7 +92,7 @@ namespace WixToolset.Core.Link
                         // If the duplicate symbols are both private directories, there is a chance that they
                         // point to identical symbols. Identical directory symbols are redundant and will not cause
                         // conflicts.
-                        if (AccessModifier.Private == existingSymbol.Access && AccessModifier.Private == symbolWithSection.Access &&
+                        if (AccessModifier.Section == existingSymbol.Access && AccessModifier.Section == symbolWithSection.Access &&
                             SymbolDefinitionType.Directory == existingSymbol.Symbol.Definition.Type && existingSymbol.Symbol.IsIdentical(symbolWithSection.Symbol))
                         {
                             // Ensure identical symbol's symbol is marked redundant to ensure (should the symbol be

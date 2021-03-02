@@ -1254,7 +1254,7 @@ namespace WixToolset.Core
 
         private void AddPatchMetadata(SourceLineNumber sourceLineNumbers, string company, string property, string value)
         {
-            this.Core.AddSymbol(new PatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
+            this.Core.AddSymbol(new PatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, company, property))
             {
                 Company = company,
                 Property = property,

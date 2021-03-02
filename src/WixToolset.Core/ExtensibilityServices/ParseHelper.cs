@@ -111,13 +111,13 @@ namespace WixToolset.Core.ExtensibilityServices
         public Identifier CreateIdentifier(string prefix, params string[] args)
         {
             var id = Common.GenerateIdentifier(prefix, args);
-            return new Identifier(AccessModifier.Private, id);
+            return new Identifier(AccessModifier.Section, id);
         }
 
         public Identifier CreateIdentifierFromFilename(string filename)
         {
             var id = Common.GetIdentifierFromName(filename);
-            return new Identifier(AccessModifier.Private, id);
+            return new Identifier(AccessModifier.Section, id);
         }
 
         public string CreateIdentifierValueFromPlatform(string name, Platform currentPlatform, BurnPlatforms supportedPlatforms)
@@ -425,7 +425,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public Identifier GetAttributeIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            var access = AccessModifier.Public;
+            var access = AccessModifier.Global;
             var value = Common.GetAttributeValue(this.Messaging, sourceLineNumbers, attribute, EmptyRule.CanBeEmpty);
 
             var separator = value.IndexOf(' ');
@@ -434,24 +434,26 @@ namespace WixToolset.Core.ExtensibilityServices
                 var prefix = value.Substring(0, separator);
                 switch (prefix)
                 {
+                    case "global":
                     case "public":
                     case "package":
-                        access = AccessModifier.Public;
+                        access = AccessModifier.Global;
                         break;
 
                     case "internal":
                     case "library":
-                        access = AccessModifier.Internal;
+                        access = AccessModifier.Library;
                         break;
 
-                    case "protected":
                     case "file":
-                        access = AccessModifier.Protected;
+                    case "protected":
+                        access = AccessModifier.File;
                         break;
 
                     case "private":
                     case "fragment":
-                        access = AccessModifier.Private;
+                    case "section":
+                        access = AccessModifier.Section;
                         break;
 
                     default:

@@ -236,7 +236,7 @@ namespace WixToolset.Core
                 else
                 {
                     feature = "WixSwidTag";
-                    this.Core.AddSymbol(new FeatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, feature))
+                    this.Core.AddSymbol(new FeatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, feature))
                     {
                         Title = "ISO/IEC 19770-2",
                         Level = 1,

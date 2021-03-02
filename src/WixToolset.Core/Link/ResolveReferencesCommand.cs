@@ -167,13 +167,13 @@ namespace WixToolset.Core.Link
         {
             switch (symbolWithSection.Access)
             {
-                case AccessModifier.Public:
+                case AccessModifier.Global:
                     return true;
-                case AccessModifier.Internal:
+                case AccessModifier.Library:
                     return symbolWithSection.Section.CompilationId == referencingSection.CompilationId || (null != symbolWithSection.Section.LibraryId && symbolWithSection.Section.LibraryId == referencingSection.LibraryId);
-                case AccessModifier.Protected:
+                case AccessModifier.File:
                     return symbolWithSection.Section.CompilationId == referencingSection.CompilationId;
-                case AccessModifier.Private:
+                case AccessModifier.Section:
                     return referencingSection == symbolWithSection.Section;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(symbolWithSection.Access));

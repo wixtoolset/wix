@@ -68,7 +68,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
 
-            var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+            var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
             {
                 Name = BurnCommon.BundleExtensionDataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = bextManifestPath },

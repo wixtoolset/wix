@@ -58,7 +58,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var componentId = wixDependencyProviderRow.ComponentRef;
 
                 var id = Common.GenerateIdentifier("reg", providesId, requiresId, "(Default)");
-                this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Private, id))
+                this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                 {
                     ComponentRef = componentId,
                     Root = RegistryRootType.MachineUser,
@@ -69,7 +69,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (!String.IsNullOrEmpty(wixDependencyRow.MinVersion))
                 {
                     id = Common.GenerateIdentifier("reg", providesId, requiresId, "MinVersion");
-                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Private, id))
+                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,
                         Root = RegistryRootType.MachineUser,
@@ -83,7 +83,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (!String.IsNullOrEmpty(wixDependencyRow.MaxVersion))
                 {
                     id = Common.GenerateIdentifier("reg", providesId, requiresId, "MaxVersion");
-                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Private, id))
+                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,
                         Root = RegistryRootType.MachineUser,
@@ -96,7 +96,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (wixDependencyRow.Attributes != WixDependencySymbolAttributes.None)
                 {
                     id = Common.GenerateIdentifier("reg", providesId, requiresId, "Attributes");
-                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Private, id))
+                    this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,
                         Root = RegistryRootType.MachineUser,

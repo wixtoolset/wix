@@ -57,7 +57,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < adminProperties.Count)
             {
-                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "AdminProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Section, "AdminProperties"))
                 {
                     Value = String.Join(";", adminProperties),
                 });
@@ -65,7 +65,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < secureProperties.Count)
             {
-                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "SecureCustomProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Section, "SecureCustomProperties"))
                 {
                     Value = String.Join(";", secureProperties),
                 });
@@ -73,7 +73,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < hiddenProperties.Count)
             {
-                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Private, "MsiHiddenProperties"))
+                this.Section.AddSymbol(new PropertySymbol(null, new Identifier(AccessModifier.Section, "MsiHiddenProperties"))
                 {
                     Value = String.Join(";", hiddenProperties)
                 });

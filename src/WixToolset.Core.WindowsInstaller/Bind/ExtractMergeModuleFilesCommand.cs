@@ -96,7 +96,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 // NOTE: this is very tricky - the merge module file rows are not added to the
                                 // file table because they should not be created via idt import.  Instead, these
                                 // rows are created by merging in the actual modules.
-                                var fileSymbol = new FileSymbol(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
+                                var fileSymbol = new FileSymbol(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Section, record[1]));
                                 fileSymbol.Attributes = wixMergeRow.FileAttributes;
                                 fileSymbol.DirectoryRef = record[2];
                                 fileSymbol.DiskId = wixMergeRow.DiskId;

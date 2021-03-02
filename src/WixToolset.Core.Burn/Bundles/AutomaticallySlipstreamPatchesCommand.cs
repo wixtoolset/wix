@@ -98,7 +98,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private bool TryAddSlipstreamSymbol(HashSet<string> slipstreamMspIds, WixBundleMsiPackageSymbol msiPackage, WixBundlePatchTargetCodeSymbol patchTargetCode)
         {
-            var id = new Identifier(AccessModifier.Private, msiPackage.Id.Id, patchTargetCode.PackageRef);
+            var id = new Identifier(AccessModifier.Section, msiPackage.Id.Id, patchTargetCode.PackageRef);
 
             if (slipstreamMspIds.Add(id.Id))
             {

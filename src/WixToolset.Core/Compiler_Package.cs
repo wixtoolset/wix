@@ -173,19 +173,19 @@ namespace WixToolset.Core
                 this.compilingProduct = true;
                 this.Core.CreateActiveSection(productCode, SectionType.Product, codepage, this.Context.CompilationId);
 
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "Manufacturer"), manufacturer, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ProductCode"), productCode, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ProductLanguage"), this.activeLanguage, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ProductName"), this.activeName, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ProductVersion"), version, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductCode"), productCode, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductLanguage"), this.activeLanguage, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductName"), this.activeName, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductVersion"), version, false, false, false, true);
                 if (null != upgradeCode)
                 {
-                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "UpgradeCode"), upgradeCode, false, false, false, true);
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "UpgradeCode"), upgradeCode, false, false, false, true);
                 }
 
                 if (isPerMachine)
                 {
-                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Public, "ALLUSERS"), "1", false, false, false, false);
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
                 }
 
                 this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform);
@@ -642,7 +642,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var identifier = new Identifier(AccessModifier.Private, parentId, id);
+                var identifier = new Identifier(AccessModifier.Section, parentId, id);
                 switch (symbolDefinitionType)
                 {
                     case SymbolDefinitionType.ODBCAttribute:
@@ -1305,7 +1305,7 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    var symbol = this.Core.AddSymbol(new ProgIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, progId))
+                    var symbol = this.Core.AddSymbol(new ProgIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, progId))
                     {
                         ProgId = progId,
                         ParentProgIdRef = parent,
@@ -1486,7 +1486,7 @@ namespace WixToolset.Core
             {
                 if (complianceCheck && !this.Core.EncounteredError)
                 {
-                    this.Core.AddSymbol(new CCPSearchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, sig)));
+                    this.Core.AddSymbol(new CCPSearchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, sig)));
                 }
 
                 this.AddAppSearch(sourceLineNumbers, id, sig);
@@ -2612,7 +2612,7 @@ namespace WixToolset.Core
                 {
                     if (suppress)
                     {
-                        this.Core.AddSymbol(new WixSuppressActionSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Public, sequenceTable, actionName))
+                        this.Core.AddSymbol(new WixSuppressActionSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Global, sequenceTable, actionName))
                         {
                             SequenceTable = sequenceTable,
                             Action = actionName
@@ -2620,7 +2620,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        var symbol = this.Core.AddSymbol(new WixActionSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Public, sequenceTable, actionName))
+                        var symbol = this.Core.AddSymbol(new WixActionSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Global, sequenceTable, actionName))
                         {
                             SequenceTable = sequenceTable,
                             Action = actionName,
@@ -3735,7 +3735,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
+                this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, actionName))
                 {
                     ExecutionType = executionType,
                     SourceType = CustomActionSourceType.Directory,
@@ -3746,7 +3746,7 @@ namespace WixToolset.Core
 
                 foreach (var sequence in sequences)
                 {
-                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Public, sequence, actionName, condition, afterAction: "CostInitialize");
+                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Global, sequence, actionName, condition, afterAction: "CostInitialize");
                 }
             }
         }
@@ -3864,7 +3864,7 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
                 }
 
-                this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
+                this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, actionName))
                 {
                     ExecutionType = executionType,
                     SourceType = CustomActionSourceType.Property,
@@ -3875,7 +3875,7 @@ namespace WixToolset.Core
 
                 foreach (var sequence in sequences)
                 {
-                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Public, sequence, actionName, condition, beforeAction, afterAction);
+                    this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Global, sequence, actionName, condition, beforeAction, afterAction);
                 }
             }
         }

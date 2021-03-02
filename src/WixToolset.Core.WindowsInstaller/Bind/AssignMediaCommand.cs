@@ -220,7 +220,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If there are uncompressed files and no MediaRow, create a default one.
             if (uncompressedFiles.Count > 0 && !this.Section.Symbols.OfType<MediaSymbol>().Any())
             {
-                var defaultMediaRow = this.Section.AddSymbol(new MediaSymbol(null, new Identifier(AccessModifier.Private, 1))
+                var defaultMediaRow = this.Section.AddSymbol(new MediaSymbol(null, new Identifier(AccessModifier.Section, 1))
                 {
                     DiskId = 1,
                 });
@@ -299,7 +299,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns></returns>
         private MediaSymbol AddMediaSymbol(WixMediaTemplateSymbol mediaTemplateSymbol, int cabIndex)
         {
-            return this.Section.AddSymbol(new MediaSymbol(mediaTemplateSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex))
+            return this.Section.AddSymbol(new MediaSymbol(mediaTemplateSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, cabIndex))
             {
                 DiskId = cabIndex,
                 Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex),

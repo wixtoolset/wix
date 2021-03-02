@@ -358,7 +358,7 @@ namespace WixToolset.Core.Burn.Bundles
                                         }
                                     }
 
-                                    this.Section.AddSymbol(new WixBundleMsiFeatureSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, this.Facade.PackageId, featureName))
+                                    this.Section.AddSymbol(new WixBundleMsiFeatureSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, this.Facade.PackageId, featureName))
                                     {
                                         PackageRef = this.Facade.PackageId,
                                         Name = featureName,
@@ -397,7 +397,7 @@ namespace WixToolset.Core.Burn.Bundles
                             var generatedId = Common.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
                             var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers);
 
-                            this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                            this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                             {
                                 Name = cabinetName,
                                 SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -474,7 +474,7 @@ namespace WixToolset.Core.Burn.Bundles
                                     var generatedId = Common.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
                                     var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers);
 
-                                    this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                                    this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                     {
                                         Name = name,
                                         SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -500,7 +500,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void AddMsiProperty(WixBundleMsiPackageSymbol msiPackage, string name, string value)
         {
-            this.Section.AddSymbol(new WixBundleMsiPropertySymbol(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Private, msiPackage.Id.Id, name))
+            this.Section.AddSymbol(new WixBundleMsiPropertySymbol(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Section, msiPackage.Id.Id, name))
             {
                 PackageRef = msiPackage.Id.Id,
                 Name = name,

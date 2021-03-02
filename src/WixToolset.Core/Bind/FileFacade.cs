@@ -35,7 +35,7 @@ namespace WixToolset.Core.Bind
             this.FromTransform = true;
             this.FileRow = row;
 
-            this.Identifier = new Identifier(AccessModifier.Private, row.File);
+            this.Identifier = new Identifier(AccessModifier.Section, row.File);
             this.ComponentRef = row.Component;
         }
 

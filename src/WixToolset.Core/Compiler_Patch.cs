@@ -197,7 +197,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixPatchIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
+                this.Core.AddSymbol(new WixPatchIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, patchId))
                 {
                     ClientPatchId = clientPatchId,
                     OptimizePatchSizeForLargeFiles = optimizePatchSizeForLargeFiles,
@@ -645,7 +645,7 @@ namespace WixToolset.Core
 
         private void AddMsiPatchMetadata(SourceLineNumber sourceLineNumbers, string company, string property, string value)
         {
-            this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, company, property))
+            this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, company, property))
             {
                 Company = company,
                 Property = property,

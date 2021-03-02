@@ -259,7 +259,7 @@ namespace WixToolset.Core
                         });
                     }
 
-                    var symbol = this.Core.AddSymbol(new ModuleSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
+                    var symbol = this.Core.AddSymbol(new ModuleSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, this.activeName, this.activeLanguage))
                     {
                         ModuleID = this.activeName,
                         Version = version
@@ -662,7 +662,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new ModuleIgnoreTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, id)));
+                this.Core.AddSymbol(new ModuleIgnoreTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, id)));
             }
         }
     }

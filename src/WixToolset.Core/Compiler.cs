@@ -554,7 +554,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddSymbol(new AppIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
+                    this.Core.AddSymbol(new AppIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, appId))
                     {
                         AppId = appId,
                         RemoteServerName = remoteServerName,
@@ -652,7 +652,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new MsiAssemblyNameSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
+                this.Core.AddSymbol(new MsiAssemblyNameSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, componentId, id))
                 {
                     ComponentRef = componentId,
                     Name = id,
@@ -1844,7 +1844,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Private, signature); // FileSearch signatures override parent signatures
+                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
                         break;
                     case "FileSearchRef":
                         if (oneChild)
@@ -1853,7 +1853,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Private, newId);
+                        id = new Identifier(AccessModifier.Section, newId);
                         signature = null;
                         break;
                     default:
@@ -2087,7 +2087,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new CCPSearchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, signature)));
+                this.Core.AddSymbol(new CCPSearchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, signature)));
             }
         }
 
@@ -2272,7 +2272,7 @@ namespace WixToolset.Core
             {
                 // Placeholder id for defaulting Component/@Id to keypath id.
                 componentIdPlaceholder = String.Concat(Compiler.ComponentIdPlaceholderStart, this.componentIdPlaceholders.Count, Compiler.ComponentIdPlaceholderEnd);
-                id = new Identifier(AccessModifier.Private, componentIdPlaceholder);
+                id = new Identifier(AccessModifier.Section, componentIdPlaceholder);
             }
 
             if (null == directoryId)
@@ -2506,7 +2506,7 @@ namespace WixToolset.Core
                 {
                     this.componentIdPlaceholders.Add(componentIdPlaceholder, keyPath);
 
-                    id = new Identifier(AccessModifier.Private, keyPath);
+                    id = new Identifier(AccessModifier.Section, keyPath);
                 }
                 else
                 {
@@ -2545,7 +2545,7 @@ namespace WixToolset.Core
 
                 if (0 < symbols.Count)
                 {
-                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Component, id.Id))
+                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, SymbolPathType.Component, id.Id))
                     {
                         SymbolType = SymbolPathType.Component,
                         SymbolId = id.Id,
@@ -2851,7 +2851,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Private, signature); // FileSearch signatures override parent signatures
+                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
                         break;
                     case "FileSearchRef":
                         if (oneChild)
@@ -2860,7 +2860,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Private, newId);
+                        id = new Identifier(AccessModifier.Section, newId);
                         signature = null;
                         break;
                     default:
@@ -3734,7 +3734,7 @@ namespace WixToolset.Core
                 {
                     var columnNames = String.Join(new string(WixCustomTableSymbol.ColumnNamesSeparator, 1), columns.Select(c => c.Name));
 
-                    this.Core.AddSymbol(new WixCustomTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
+                    this.Core.AddSymbol(new WixCustomTableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, tableId))
                     {
                         ColumnNames = columnNames,
                         Unreal = unreal,
@@ -4067,7 +4067,7 @@ namespace WixToolset.Core
             attributes |= nullable ? WixCustomTableColumnSymbolAttributes.Nullable : WixCustomTableColumnSymbolAttributes.None;
             attributes |= columnUnreal ? WixCustomTableColumnSymbolAttributes.Unreal : WixCustomTableColumnSymbolAttributes.None;
 
-            var column = this.Core.AddSymbol(new WixCustomTableColumnSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
+            var column = this.Core.AddSymbol(new WixCustomTableColumnSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Section, tableId, columnName))
             {
                 TableRef = tableId,
                 Name = columnName,
@@ -4134,7 +4134,7 @@ namespace WixToolset.Core
 
                         if (!this.Core.EncounteredError)
                         {
-                            this.Core.AddSymbol(new WixCustomTableCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, rowId, columnName))
+                            this.Core.AddSymbol(new WixCustomTableCellSymbol(childSourceLineNumbers, new Identifier(AccessModifier.Section, tableId, rowId, columnName))
                             {
                                 RowId = rowId,
                                 ColumnRef = columnName,
@@ -4584,7 +4584,7 @@ namespace WixToolset.Core
                 // and the row created here is for the file search.
                 if (assignToProperty)
                 {
-                    access = AccessModifier.Private;
+                    access = AccessModifier.Section;
                     rowId = signature;
 
                     // The property should be set to the directory search Id.
@@ -5377,7 +5377,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new ErrorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddSymbol(new ErrorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, id))
                 {
                     Message = message
                 });
@@ -5466,7 +5466,7 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddSymbol(new ExtensionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
+                    this.Core.AddSymbol(new ExtensionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, extension, componentId))
                     {
                         Extension = extension,
                         ComponentRef = componentId,
@@ -6044,7 +6044,7 @@ namespace WixToolset.Core
                 }
                 else // reuse parent signature in the Signature table
                 {
-                    id = new Identifier(AccessModifier.Private, parentSignature);
+                    id = new Identifier(AccessModifier.Section, parentSignature);
                 }
             }
 
@@ -6108,7 +6108,7 @@ namespace WixToolset.Core
                     {
                         // Creates the DrLocator row for the directory search while
                         // the parent DirectorySearch creates the file locator row.
-                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, parentSignature, id.Id, String.Empty))
+                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, parentSignature, id.Id, String.Empty))
                         {
                             SignatureRef = parentSignature,
                             Parent = id.Id
@@ -6116,7 +6116,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id.Id, parentSignature, String.Empty))
+                        this.Core.AddSymbol(new DrLocatorSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, id.Id, parentSignature, String.Empty))
                         {
                             SignatureRef = id.Id,
                             Parent = parentSignature
@@ -6663,7 +6663,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Private, signature); // FileSearch signatures override parent signatures
+                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
                         break;
                     case "FileSearchRef":
                         if (oneChild)
@@ -6672,7 +6672,7 @@ namespace WixToolset.Core
                         }
                         oneChild = true;
                         var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Private, newId);
+                        id = new Identifier(AccessModifier.Section, newId);
                         signature = null;
                         break;
                     default:
@@ -6945,7 +6945,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new MsiDigitalSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, "Media", diskId))
+                this.Core.AddSymbol(new MsiDigitalSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "Media", diskId))
                 {
                     Table = "Media",
                     SignObject = diskId,
@@ -7141,7 +7141,7 @@ namespace WixToolset.Core
                         break;
                 }
 
-                this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Public, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts", afterAction: after);
+                this.Core.ScheduleActionSymbol(sourceLineNumbers, AccessModifier.Global, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts", afterAction: after);
             }
         }
 
@@ -7310,7 +7310,7 @@ namespace WixToolset.Core
             // add the row to the section
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, id))
                 {
                     DiskId = id,
                     DiskPrompt = diskPrompt,
@@ -7323,7 +7323,7 @@ namespace WixToolset.Core
 
                 if (null != symbols)
                 {
-                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Media, id))
+                    this.Core.AddSymbol(new WixDeltaPatchSymbolPathsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, SymbolPathType.Media, id))
                     {
                         SymbolType = SymbolPathType.Media,
                         SymbolId = id.ToString(CultureInfo.InvariantCulture),
@@ -7419,7 +7419,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, 1))
+                this.Core.AddSymbol(new MediaSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, 1))
                 {
                     DiskId = 1
                 });
@@ -7794,7 +7794,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddSymbol(new MIMESymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
+                    this.Core.AddSymbol(new MIMESymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, contentType))
                     {
                         ContentType = contentType,
                         ExtensionRef = extension,
@@ -7873,7 +7873,7 @@ namespace WixToolset.Core
             if (patch)
             {
                 // /Patch/PatchProperty goes directly into MsiPatchMetadata table
-                this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Public, company, name))
+                this.Core.AddSymbol(new MsiPatchMetadataSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, company, name))
                 {
                     Company = company,
                     Property = name,
@@ -7900,7 +7900,7 @@ namespace WixToolset.Core
         {
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new PropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddSymbol(new PropertySymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, name))
                 {
                     Value = value
                 });
