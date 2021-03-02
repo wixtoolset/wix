@@ -129,7 +129,7 @@ namespace WixToolset.Converters.Symbolizer
                     keyPathType = ComponentKeyPathType.OdbcDataSource;
                 }
 
-                return new ComponentSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ComponentSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     ComponentId = FieldAsString(row, 1),
                     DirectoryRef = FieldAsString(row, 2),
@@ -159,7 +159,7 @@ namespace WixToolset.Converters.Symbolizer
                 var sourceType = DetermineCustomActionSourceType(caType);
                 var targetType = DetermineCustomActionTargetType(caType);
 
-                return new CustomActionSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new CustomActionSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     ExecutionType = executionType,
                     SourceType = sourceType,
@@ -180,7 +180,7 @@ namespace WixToolset.Converters.Symbolizer
                 var id = FieldAsString(row, 0);
                 var splits = SplitDefaultDir(FieldAsString(row, 2));
 
-                var symbol = new DirectorySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
+                var symbol = new DirectorySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, id))
                 {
                     ParentDirectoryRef = FieldAsString(row, 1),
                     Name = splits[0],
@@ -202,7 +202,7 @@ namespace WixToolset.Converters.Symbolizer
             {
                 var splitName = FieldAsString(row, 3)?.Split('|');
 
-                var symbol = new DuplicateFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                var symbol = new DuplicateFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     ComponentRef = FieldAsString(row, 1),
                     FileRef = FieldAsString(row, 2),
@@ -230,7 +230,7 @@ namespace WixToolset.Converters.Symbolizer
                     installDefault = FeatureInstallDefault.Source;
                 }
 
-                return new FeatureSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new FeatureSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     ParentFeatureRef = FieldAsString(row, 1),
                     Title = FieldAsString(row, 2),
@@ -263,7 +263,7 @@ namespace WixToolset.Converters.Symbolizer
                 var id = FieldAsString(row, 0);
                 var splitName = FieldAsString(row, 2).Split('|');
 
-                var symbol = new FileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, id))
+                var symbol = new FileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, id))
                 {
                     ComponentRef = FieldAsString(row, 1),
                     Name = splitName.Length > 1 ? splitName[1] : splitName[0],
@@ -309,7 +309,7 @@ namespace WixToolset.Converters.Symbolizer
                 var splitName = FieldAsString(row, 1).Split('|');
                 var action = FieldAsInt(row, 6);
 
-                var symbol = new IniFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                var symbol = new IniFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
                     ShortFileName = splitName.Length > 1 ? splitName[0] : null,
@@ -327,7 +327,7 @@ namespace WixToolset.Converters.Symbolizer
             {
                 var splitName = FieldAsString(row, 1).Split('|');
 
-                var symbol = new IniLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                var symbol = new IniLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
                     ShortFileName = splitName.Length > 1 ? splitName[0] : null,
@@ -344,7 +344,7 @@ namespace WixToolset.Converters.Symbolizer
             case "Media":
             {
                 var diskId = FieldAsInt(row, 0);
-                var symbol = new MediaSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, diskId))
+                var symbol = new MediaSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, diskId))
                 {
                     DiskId = diskId,
                     LastSequence = FieldAsNullableInt(row, 1),
@@ -375,7 +375,7 @@ namespace WixToolset.Converters.Symbolizer
                 var componentId = FieldAsString(row, 0);
                 if (componentsById.TryGetValue(componentId, out var componentRow))
                 {
-                    return new AssemblySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(componentRow, 5)))
+                    return new AssemblySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(componentRow, 5)))
                     {
                         ComponentRef = componentId,
                         FeatureRef = FieldAsString(row, 1),
@@ -446,7 +446,7 @@ namespace WixToolset.Converters.Symbolizer
                     }
                 }
 
-                return new RegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     Root = (RegistryRootType)FieldAsInt(row, 1),
                     Key = FieldAsString(row, 2),
@@ -461,7 +461,7 @@ namespace WixToolset.Converters.Symbolizer
             {
                 var type = FieldAsInt(row, 4);
 
-                return new RegLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RegLocatorSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     Root = (RegistryRootType)FieldAsInt(row, 1),
                     Key = FieldAsString(row, 2),
@@ -475,7 +475,7 @@ namespace WixToolset.Converters.Symbolizer
                 var splitName = FieldAsString(row, 2).Split('|');
                 var installMode = FieldAsInt(row, 4);
 
-                return new RemoveFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RemoveFileSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     ComponentRef = FieldAsString(row, 1),
                     FileName = splitName.Length > 1 ? splitName[1] : splitName[0],
@@ -487,7 +487,7 @@ namespace WixToolset.Converters.Symbolizer
             }
             case "RemoveRegistry":
             {
-                return new RemoveRegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new RemoveRegistrySymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     Action = RemoveRegistryActionType.RemoveOnInstall,
                     Root = (RegistryRootType)FieldAsInt(row, 1),
@@ -505,7 +505,7 @@ namespace WixToolset.Converters.Symbolizer
             {
                 var events = FieldAsInt(row, 2);
                 var wait = FieldAsNullableInt(row, 4);
-                return new ServiceControlSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ServiceControlSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     Name = FieldAsString(row, 1),
                     Arguments = FieldAsString(row, 3),
@@ -526,7 +526,7 @@ namespace WixToolset.Converters.Symbolizer
             {
                 var splitName = FieldAsString(row, 2).Split('|');
 
-                return new ShortcutSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new ShortcutSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     DirectoryRef = FieldAsString(row, 1),
                     Name = splitName.Length > 1 ? splitName[1] : splitName[0],
@@ -553,7 +553,7 @@ namespace WixToolset.Converters.Symbolizer
             case "Upgrade":
             {
                 var attributes = FieldAsInt(row, 4);
-                return new UpgradeSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
+                return new UpgradeSymbol(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Global, FieldAsString(row, 0)))
                 {
                     UpgradeCode = FieldAsString(row, 0),
                     VersionMin = FieldAsString(row, 1),
@@ -797,9 +797,9 @@ namespace WixToolset.Converters.Symbolizer
             case Wix3.ColumnType.Localized:
             case Wix3.ColumnType.Object:
             case Wix3.ColumnType.Preserved:
-                return new Identifier(AccessModifier.Public, (string)row.Fields[0].Data);
+                return new Identifier(AccessModifier.Global, (string)row.Fields[0].Data);
             case Wix3.ColumnType.Number:
-                return new Identifier(AccessModifier.Public, FieldAsInt(row, 0));
+                return new Identifier(AccessModifier.Global, FieldAsInt(row, 0));
             default:
                 return null;
             }

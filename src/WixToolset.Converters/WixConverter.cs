@@ -649,15 +649,12 @@ namespace WixToolset.Converters
 
         private void ConvertApprovedExeForElevationElement(XElement element)
         {
-            if (this.SourceVersion < 4)
+            var win64 = element.Attribute("Win64");
+            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
             {
-                var win64 = element.Attribute("Win64");
-                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-                {
-                    var value = this.UpdateWin64ValueToBitnessValue(win64);
-                    element.Add(new XAttribute("Bitness", value));
-                    win64.Remove();
-                }
+                var value = this.UpdateWin64ValueToBitnessValue(win64);
+                element.Add(new XAttribute("Bitness", value));
+                win64.Remove();
             }
         }
 
@@ -1117,15 +1114,12 @@ namespace WixToolset.Converters
 
         private void ConvertRegistrySearchElement(XElement element)
         {
-            if (this.SourceVersion < 4)
+            var win64 = element.Attribute("Win64");
+            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
             {
-                var win64 = element.Attribute("Win64");
-                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-                {
-                    var value = this.UpdateWin64ValueToBitnessValue(win64);
-                    element.Add(new XAttribute("Bitness", value));
-                    win64.Remove();
-                }
+                var value = this.UpdateWin64ValueToBitnessValue(win64);
+                element.Add(new XAttribute("Bitness", value));
+                win64.Remove();
             }
         }
 
@@ -1361,20 +1355,16 @@ namespace WixToolset.Converters
 
         private void ConvertUtilRegistrySearchElement(XElement element)
         {
+            var win64 = element.Attribute("Win64");
+            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
+            {
+                var value = this.UpdateWin64ValueToBitnessValue(win64);
+                element.Add(new XAttribute("Bitness", value));
+                win64.Remove();
+            }
+
             if (this.SourceVersion < 4)
             {
-                var win64 = element.Attribute("Win64");
-                if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-                {
-                    var value = this.UpdateWin64ValueToBitnessValue(win64);
-                    element.Add(new XAttribute("Bitness", value));
-                    win64.Remove();
-                }
-                //else if (this.OnError(ConverterTestType.BitnessAttributeRequired, element, "Use the Bitness attribute instead."))
-                //{
-                //    element.Add(new XAttribute("Bitness", "always32"));
-                //}
-
                 var result = element.Attribute("Result")?.Value;
                 if (result == null || result == "value")
                 {
