@@ -53,6 +53,38 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildSimplePatchWithNoFileChanges()
+        {
+            var folder = TestData.Get(@"TestData\PatchNoFileChanges");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var tempFolder = fs.GetFolder();
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", hasNoFiles: true);
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                Assert.True(File.Exists(baselinePdb));
+                Assert.True(File.Exists(update1Pdb));
+
+                var doc = GetExtractPatchXml(patchPath);
+                Assert.Equal("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(PatchNamespace + "TargetProductCode").Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                Assert.Equal(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(tempFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+                Assert.True(File.Exists(cab));
+
+                var files = Query.GetCabinetFiles(cab);
+                Assert.Empty(files);
+            }
+        }
+
+        [Fact]
         public void CanBuildBundleWithNonSpecificPatches()
         {
             var folder = TestData.Get(@"TestData\PatchNonSpecific");
