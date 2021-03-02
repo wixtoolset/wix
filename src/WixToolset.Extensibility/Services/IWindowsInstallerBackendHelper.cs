@@ -15,10 +15,10 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="section">Parent section.</param>
         /// <param name="symbol">Symbol with line information for the row.</param>
-        /// <param name="output">Current context.</param>
+        /// <param name="data">Windows Installer data.</param>
         /// <param name="tableDefinition">Table definition for the row.</param>
         /// <returns></returns>
-        Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinition tableDefinition);
+        Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinition tableDefinition);
 
         /// <summary>
         /// Looks up the registered <see cref="TableDefinition"/> for the given <see cref="IntermediateSymbol"/> and creates a <see cref="Row"/> in that table.
@@ -27,9 +27,9 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="section">Parent section.</param>
         /// <param name="symbol">Symbol to create the row from.</param>
-        /// <param name="output">Current context.</param>
+        /// <param name="data">Windows Installer data.</param>
         /// <param name="tableDefinitions">Table definitions that have been registered with the binder.</param>
         /// <returns>True if a row was created.</returns>
-        bool TryAddSymbolToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
+        bool TryAddSymbolToMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions);
     }
 }

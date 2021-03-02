@@ -76,7 +76,7 @@ namespace WixToolset.Extensibility
         {
             if (this.TableDefinitions.Any(t => t.SymbolDefinition == symbol.Definition))
             {
-                return this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(section, symbol, data, tableDefinitions);
+                return this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(section, symbol, data, tableDefinitions);
             }
 
             return false;
