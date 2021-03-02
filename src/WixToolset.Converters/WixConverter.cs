@@ -66,10 +66,12 @@ namespace WixToolset.Converters
         private static readonly XName LaunchElementName = WixNamespace + "Launch";
         private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
+        private static readonly XName ExePackagePayloadElementName = WixNamespace + "ExePackagePayload";
         private static readonly XName ModuleElementName = WixNamespace + "Module";
         private static readonly XName MsiPackageElementName = WixNamespace + "MsiPackage";
         private static readonly XName MspPackageElementName = WixNamespace + "MspPackage";
         private static readonly XName MsuPackageElementName = WixNamespace + "MsuPackage";
+        private static readonly XName MsuPackagePayloadElementName = WixNamespace + "MsuPackagePayload";
         private static readonly XName PackageElementName = WixNamespace + "Package";
         private static readonly XName PayloadElementName = WixNamespace + "Payload";
         private static readonly XName PermissionExElementName = WixNamespace + "PermissionEx";
@@ -1099,6 +1101,44 @@ namespace WixToolset.Converters
 
         private void ConvertRemotePayloadElement(XElement element)
         {
+            var xParent = element.Parent;
+
+            if (xParent.Name == ExePackageElementName &&
+                this.OnError(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'ExePackagePayload' instead."))
+            {
+                element.Name = ExePackagePayloadElementName;
+            }
+            else if (xParent.Name == MsuPackageElementName &&
+                     this.OnError(ConverterTestType.RemotePayloadRenamed, element, "The RemotePayload element has been renamed. Use the 'MsuPackagePayload' instead."))
+            {
+                element.Name = MsuPackagePayloadElementName;
+            }
+
+            var xName = xParent.Attribute("Name");
+            if (xName != null &&
+                this.OnError(ConverterTestType.NameAttributeMovedToRemotePayload, xParent, "The Name attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
+            {
+                element.SetAttributeValue("Name", xName.Value);
+                xName.Remove();
+            }
+
+            var xDownloadUrl = xParent.Attribute("DownloadUrl");
+            if (xDownloadUrl != null &&
+                this.OnError(ConverterTestType.DownloadUrlAttributeMovedToRemotePayload, xParent, "The DownloadUrl attribute must be specified on the child XxxPackagePayload element when using a remote payload."))
+            {
+                element.SetAttributeValue("DownloadUrl", xDownloadUrl.Value);
+                xDownloadUrl.Remove();
+            }
+
+            var xCompressed = xParent.Attribute("Compressed");
+            if (xCompressed != null &&
+                this.OnError(ConverterTestType.CompressedAttributeUnnecessaryForRemotePayload, xParent, "The Compressed attribute should not be specified when using a remote payload."))
+            {
+                xCompressed.Remove();
+            }
+
+            this.OnError(ConverterTestType.BurnHashAlgorithmChanged, element, "The hash algorithm for bundles changed from SHA1 to SHA512.");
+
             RemoveIfPresent(element.Attribute("CertificatePublicKey"));
             RemoveIfPresent(element.Attribute("CertificateThumbprint"));
 
@@ -1957,6 +1997,31 @@ namespace WixToolset.Converters
             /// Remove unused namespaces.
             /// </summary>
             RemoveUnusedNamespaces,
+
+            /// <summary>
+            /// The Remote element has been renamed. Use the "XxxPackagePayload" element instead.
+            /// </summary>
+            RemotePayloadRenamed,
+
+            /// <summary>
+            /// The XxxPackage/@Name attribute must be specified on the child XxxPackagePayload element when using a remote payload.
+            /// </summary>
+            NameAttributeMovedToRemotePayload,
+
+            /// <summary>
+            /// The XxxPackage/@Compressed attribute should not be specified when using a remote payload.
+            /// </summary>
+            CompressedAttributeUnnecessaryForRemotePayload,
+
+            /// <summary>
+            /// The XxxPackage/@DownloadUrl attribute must be specified on the child XxxPackagePayload element when using a remote payload.
+            /// </summary>
+            DownloadUrlAttributeMovedToRemotePayload,
+
+            /// <summary>
+            /// The hash algorithm used for bundles changed from SHA1 to SHA512.
+            /// </summary>
+            BurnHashAlgorithmChanged,
         }
     }
 }
