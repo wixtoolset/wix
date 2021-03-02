@@ -290,7 +290,7 @@ namespace WixToolset.Converters
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
-            this.RemoveUnusedNamspaces(document.Root);
+            this.RemoveUnusedNamespaces(document.Root);
 
             return this.Errors;
         }
@@ -343,7 +343,7 @@ namespace WixToolset.Converters
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
-            this.RemoveUnusedNamspaces(document.Root);
+            this.RemoveUnusedNamespaces(document.Root);
 
             return this.Errors;
         }
@@ -1557,7 +1557,7 @@ namespace WixToolset.Converters
         /// Removes unused namespaces from the element and its children.
         /// </summary>
         /// <param name="root">Root element to start at.</param>
-        private void RemoveUnusedNamspaces(XElement root)
+        private void RemoveUnusedNamespaces(XElement root)
         {
             var declarations = new List<XAttribute>();
             var namespaces = new HashSet<string>();

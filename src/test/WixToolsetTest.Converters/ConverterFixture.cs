@@ -157,7 +157,7 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanConvertExtensionNamespace()
+        public void CanRemoveUnusedNamespaces()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version='1.0' encoding='utf-8'?>",
