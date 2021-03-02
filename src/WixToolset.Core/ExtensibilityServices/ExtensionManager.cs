@@ -13,8 +13,12 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class ExtensionManager : IExtensionManager
     {
-        private List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
-        private Dictionary<Type, List<object>> loadedExtensionsByType = new Dictionary<Type, List<object>>();
+        private const string UserWixFolderName = ".wix4";
+        private const string MachineWixFolderName = "WixToolset4";
+        private const string ExtensionsFolderName = "extensions";
+
+        private readonly List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
+        private readonly Dictionary<Type, List<object>> loadedExtensionsByType = new Dictionary<Type, List<object>>();
 
         public ExtensionManager(IWixToolsetCoreServiceProvider serviceProvider)
         {
@@ -123,14 +127,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IEnumerable<string> CacheLocations()
         {
-            var path = Path.Combine(Environment.CurrentDirectory, ".wix", "extensions");
+            var path = Path.Combine(Environment.CurrentDirectory, UserWixFolderName, ExtensionsFolderName);
             if (Directory.Exists(path))
             {
                 yield return path;
             }
 
             path = Environment.GetEnvironmentVariable("WIX_EXTENSIONS") ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            path = Path.Combine(path, ".wix", "extensions");
+            path = Path.Combine(path, UserWixFolderName, ExtensionsFolderName);
             if (Directory.Exists(path))
             {
                 yield return path;
@@ -138,20 +142,20 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (Environment.Is64BitOperatingSystem)
             {
-                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), @"WixToolset\extensions\");
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), MachineWixFolderName, ExtensionsFolderName);
                 if (Directory.Exists(path))
                 {
                     yield return path;
                 }
             }
 
-            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), @"WixToolset\extensions\");
+            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), MachineWixFolderName, ExtensionsFolderName);
             if (Directory.Exists(path))
             {
                 yield return path;
             }
 
-            path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath), @"extensions\");
+            path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath), ExtensionsFolderName);
             if (Directory.Exists(path))
             {
                 yield return path;
