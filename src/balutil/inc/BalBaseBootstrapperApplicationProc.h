@@ -443,11 +443,11 @@ static HRESULT BalBaseBAProcOnExecuteComplete(
 
 static HRESULT BalBaseBAProcOnUnregisterBegin(
     __in IBootstrapperApplication* pBA,
-    __in BA_ONUNREGISTERBEGIN_ARGS* /*pArgs*/,
+    __in BA_ONUNREGISTERBEGIN_ARGS* pArgs,
     __inout BA_ONUNREGISTERBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnUnregisterBegin(&pResults->fCancel);
+    return pBA->OnUnregisterBegin(pArgs->fKeepRegistration, &pResults->fForceKeepRegistration);
 }
 
 static HRESULT BalBaseBAProcOnUnregisterComplete(

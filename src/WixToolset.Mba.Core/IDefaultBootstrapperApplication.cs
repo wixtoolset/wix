@@ -332,12 +332,12 @@ namespace WixToolset.Mba.Core
         event EventHandler<SystemShutdownEventArgs> SystemShutdown;
 
         /// <summary>
-        /// Fired when the engine has begun removing the registration for the location and visibility of the bundle.
+        /// Fired when the engine unregisters the bundle.
         /// </summary>
         event EventHandler<UnregisterBeginEventArgs> UnregisterBegin;
 
         /// <summary>
-        /// Fired when the engine has completed removing the registration for the location and visibility of the bundle.
+        /// Fired when the engine unregistration is complete.
         /// </summary>
         event EventHandler<UnregisterCompleteEventArgs> UnregisterComplete;
     }

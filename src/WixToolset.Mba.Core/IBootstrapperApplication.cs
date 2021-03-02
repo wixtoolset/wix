@@ -822,12 +822,14 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.UnregisterBegin"/>.
         /// </summary>
-        /// <param name="fCancel"></param>
+        /// <param name="fKeepRegistration"></param>
+        /// <param name="fForceKeepRegistration"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnUnregisterBegin(
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            [MarshalAs(UnmanagedType.Bool)] bool fKeepRegistration,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fForceKeepRegistration
             );
 
         /// <summary>

@@ -548,7 +548,8 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnUnregisterBegin(
-        __inout BOOL* /*pfCancel*/
+        __in BOOL /*fKeepRegistration*/,
+        __inout BOOL* /*pfForceKeepRegistration*/
         )
     {
         return S_OK;

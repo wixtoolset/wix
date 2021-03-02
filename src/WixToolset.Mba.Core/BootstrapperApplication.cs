@@ -1529,12 +1529,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnUnregisterBegin(ref bool fCancel)
+        int IBootstrapperApplication.OnUnregisterBegin(bool fKeepRegistration, ref bool fForceKeepRegistration)
         {
-            UnregisterBeginEventArgs args = new UnregisterBeginEventArgs(fCancel);
+            UnregisterBeginEventArgs args = new UnregisterBeginEventArgs(fKeepRegistration, fForceKeepRegistration);
             this.OnUnregisterBegin(args);
 
-            fCancel = args.Cancel;
+            fForceKeepRegistration = args.ForceKeepRegistration;
             return args.HResult;
         }
 

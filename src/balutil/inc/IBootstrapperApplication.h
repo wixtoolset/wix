@@ -465,7 +465,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnUnregisterBegin - called when the engine unregisters the bundle.
     //
     STDMETHOD(OnUnregisterBegin)(
-        __inout BOOL* pfCancel
+        __in BOOL fKeepRegistration,
+        __inout BOOL* pfForceKeepRegistration
         ) = 0;
 
     // OnUnregisterComplete - called when the engine unregistration is complete.

@@ -1187,31 +1187,41 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun removing the registration for the location and visibility of the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.UnregisterBegin"/>
     /// </summary>
     [Serializable]
-    public class UnregisterBeginEventArgs : CancellableHResultEventArgs
+    public class UnregisterBeginEventArgs : HResultEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="UnregisterBeginEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public UnregisterBeginEventArgs(bool cancelRecommendation)
-            : base(cancelRecommendation)
+        /// <param name="keepRegistration"></param>
+        /// <param name="forceKeepRegistration"></param>
+        public UnregisterBeginEventArgs(bool keepRegistration, bool forceKeepRegistration)
         {
         }
+
+        /// <summary>
+        /// Indicates whether the engine will uninstall the bundle.
+        /// </summary>
+        public bool ForceKeepRegistration { get; set; }
+
+        /// <summary>
+        /// If <see cref="KeepRegistration"/> is FALSE, then this can be set to TRUE to make the engine keep the bundle installed.
+        /// </summary>
+        public bool KeepRegistration { get; private set; }
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed removing the registration for the location and visibility of the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.UnregisterComplete"/>
     /// </summary>
     [Serializable]
     public class UnregisterCompleteEventArgs : StatusEventArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="UnregisterCompleteEventArgs"/> class.
+        /// 
         /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
+        /// <param name="hrStatus"></param>
         public UnregisterCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
