@@ -169,9 +169,6 @@ static HRESULT LoadDncConfiguration(
     HRESULT hr = S_OK;
     IXMLDOMDocument* pixdManifest = NULL;
     IXMLDOMNode* pixnHost = NULL;
-    IXMLDOMNode* pixnPayload = NULL;
-    LPWSTR sczPayloadId = NULL;
-    LPWSTR sczPayloadXPath = NULL;
     LPWSTR sczPayloadName = NULL;
     DWORD dwBool = 0;
 
@@ -187,21 +184,8 @@ static HRESULT LoadDncConfiguration(
         BalExitOnRootFailure(hr, "Failed to find WixBalBAFactoryAssembly element in bootstrapper application config.");
     }
 
-    hr = XmlGetAttributeEx(pixnHost, L"PayloadId", &sczPayloadId);
-    BalExitOnFailure(hr, "Failed to get WixBalBAFactoryAssembly/@PayloadId.");
-
-    hr = StrAllocFormatted(&sczPayloadXPath, L"/BootstrapperApplicationData/WixPayloadProperties[@Payload='%ls']", sczPayloadId);
-    BalExitOnFailure(hr, "Failed to format BAFactoryAssembly payload XPath.");
-
-    hr = XmlSelectSingleNode(pixdManifest, sczPayloadXPath, &pixnPayload);
-    if (S_FALSE == hr)
-    {
-        hr = E_NOTFOUND;
-    }
-    BalExitOnFailure(hr, "Failed to find WixPayloadProperties node for BAFactoryAssembly PayloadId: %ls.", sczPayloadId);
-
-    hr = XmlGetAttributeEx(pixnPayload, L"Name", &sczPayloadName);
-    BalExitOnFailure(hr, "Failed to get BAFactoryAssembly payload Name.");
+    hr = XmlGetAttributeEx(pixnHost, L"FilePath", &sczPayloadName);
+    BalExitOnFailure(hr, "Failed to get WixBalBAFactoryAssembly/@FilePath.");
 
     hr = PathConcat(pArgs->pCommand->wzBootstrapperWorkingFolder, sczPayloadName, &pState->sczBaFactoryAssemblyPath);
     BalExitOnFailure(hr, "Failed to create BaFactoryAssemblyPath.");
@@ -250,9 +234,6 @@ static HRESULT LoadDncConfiguration(
 
 LExit:
     ReleaseStr(sczPayloadName);
-    ReleaseObject(pixnPayload);
-    ReleaseStr(sczPayloadXPath);
-    ReleaseStr(sczPayloadId);
     ReleaseObject(pixnHost);
     ReleaseObject(pixdManifest);
 

@@ -12,6 +12,7 @@ namespace WixToolset.Bal
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixBalBAFactorySymbolFields.PayloadId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBalBAFactorySymbolFields.FilePath), IntermediateFieldType.String),
             },
             typeof(WixBalBAFactoryAssemblySymbol));
     }
@@ -24,6 +25,7 @@ namespace WixToolset.Bal.Symbols
     public enum WixBalBAFactorySymbolFields
     {
         PayloadId,
+        FilePath,
     }
 
     public class WixBalBAFactoryAssemblySymbol : IntermediateSymbol
@@ -42,6 +44,12 @@ namespace WixToolset.Bal.Symbols
         {
             get => this.Fields[(int)WixBalBAFactorySymbolFields.PayloadId].AsString();
             set => this.Set((int)WixBalBAFactorySymbolFields.PayloadId, value);
+        }
+
+        public string FilePath
+        {
+            get => this.Fields[(int)WixBalBAFactorySymbolFields.FilePath].AsString();
+            set => this.Set((int)WixBalBAFactorySymbolFields.FilePath, value);
         }
     }
 }

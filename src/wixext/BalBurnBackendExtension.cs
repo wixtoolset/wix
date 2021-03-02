@@ -43,6 +43,11 @@ namespace WixToolset.Bal
             var isDNC = baId.StartsWith("WixDotNetCoreBootstrapperApplicationHost");
             var isSCD = isDNC && this.VerifySCD(section);
 
+            if (isDNC)
+            {
+                this.FinalizeBAFactorySymbol(section);
+            }
+
             if (isStdBA || isMBA || isDNC)
             {
                 this.VerifyBAFunctions(section);
@@ -52,6 +57,25 @@ namespace WixToolset.Bal
             {
                 this.VerifyPrereqPackages(section, isDNC);
             }
+        }
+
+        private void FinalizeBAFactorySymbol(IntermediateSection section)
+        {
+            var factorySymbol = section.Symbols.OfType<WixBalBAFactoryAssemblySymbol>().SingleOrDefault();
+            if (null == factorySymbol)
+            {
+                return;
+            }
+
+            var factoryPayloadSymbol = section.Symbols.OfType<WixBundlePayloadSymbol>()
+                                                      .Where(p => p.Id.Id == factorySymbol.PayloadId)
+                                                      .SingleOrDefault();
+            if (null == factoryPayloadSymbol)
+            {
+                return;
+            }
+
+            factorySymbol.FilePath = factoryPayloadSymbol.Name;
         }
 
         private void VerifyBAFunctions(IntermediateSection section)
