@@ -402,31 +402,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
-            // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
-            WindowsInstallerData output;
+            // Time to create the WindowsInstallerData object. Try to put as much above here as possible, updating the IR is better.
+            WindowsInstallerData data;
             {
-                var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions, this.WindowsInstallerBackendHelper);
-                command.Execute();
-
-                output = command.Output;
+                var command = new CreateWindowsInstallerDataFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions, this.WindowsInstallerBackendHelper);
+                data = command.Execute();
             }
 
             IEnumerable<string> suppressedTableNames = null;
-            if (output.Type == OutputType.Module)
+            if (data.Type == OutputType.Module)
             {
                 // Modularize identifiers.
-                var modularize = new ModularizeCommand(output, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
+                var modularize = new ModularizeCommand(data, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
                 modularize.Execute();
 
                 // Ensure all sequence tables in place because, mergemod.dll requires them.
-                var unsuppress = new AddBackSuppressedSequenceTablesCommand(output, tableDefinitions);
+                var unsuppress = new AddBackSuppressedSequenceTablesCommand(data, tableDefinitions);
                 suppressedTableNames = unsuppress.Execute();
             }
-            else if (output.Type == OutputType.Patch)
+            else if (data.Type == OutputType.Patch)
             {
                 foreach (var storage in this.SubStorages)
                 {
-                    output.SubStorages.Add(storage);
+                    data.SubStorages.Add(storage);
                 }
             }
 
@@ -448,7 +446,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // create cabinet files and process uncompressed files
             var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
-            if (!this.SuppressLayout || OutputType.Module == output.Type)
+            if (!this.SuppressLayout || OutputType.Module == data.Type)
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
@@ -458,7 +456,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                command.Output = output;
+                command.Data = data;
                 command.Messaging = this.Messaging;
                 command.BackendExtensions = this.BackendExtensions;
                 command.LayoutDirectory = layoutDirectory;
@@ -481,15 +479,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // We can create instance transforms since Component Guids and Outputs are created.
-            if (output.Type == OutputType.Product)
+            if (data.Type == OutputType.Product)
             {
-                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.WindowsInstallerBackendHelper);
+                var command = new CreateInstanceTransformsCommand(section, data, tableDefinitions, this.WindowsInstallerBackendHelper);
                 command.Execute();
             }
-            else if (output.Type == OutputType.Patch)
+            else if (data.Type == OutputType.Patch)
             {
                 // Copy output data back into the transforms.
-                var command = new UpdateTransformsWithFileFacades(this.Messaging, output, this.SubStorages, tableDefinitions, fileFacades);
+                var command = new UpdateTransformsWithFileFacades(this.Messaging, data, this.SubStorages, tableDefinitions, fileFacades);
                 command.Execute();
             }
 
@@ -500,7 +498,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
                 trackedFiles.Add(trackMsi);
 
-                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, output, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
+                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
                 command.Execute();
 
                 trackedFiles.AddRange(command.GeneratedTemporaryFiles);
@@ -572,12 +570,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var result = this.ServiceProvider.GetService<IBindResult>();
             result.FileTransfers = fileTransfers;
             result.TrackedFiles = trackedFiles;
-            result.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, output);
+            result.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, data);
 
             return result;
         }
 
-        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, WindowsInstallerData output)
+        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, WindowsInstallerData data)
         {
             WixOutput wixout;
 
@@ -595,7 +593,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             intermediate.Save(wixout);
 
-            output.Save(wixout);
+            data.Save(wixout);
 
             wixout.Reopen();
 

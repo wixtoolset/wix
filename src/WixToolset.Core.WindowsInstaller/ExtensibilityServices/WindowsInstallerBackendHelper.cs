@@ -34,9 +34,9 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
 
         #region IWindowsInstallerBackendHelper interfaces
 
-        public Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinition tableDefinition)
+        public Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinition tableDefinition)
         {
-            var table = output.EnsureTable(tableDefinition);
+            var table = data.EnsureTable(tableDefinition);
 
             var row = table.CreateRow(symbol.SourceLineNumbers);
             row.SectionId = section.Id;
@@ -44,7 +44,7 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
             return row;
         }
 
-        public bool TryAddSymbolToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public bool TryAddSymbolToMatchingTableDefinitions(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinitionCollection tableDefinitions)
         {
             var tableDefinition = tableDefinitions.FirstOrDefault(t => t.SymbolDefinition?.Name == symbol.Definition.Name);
             if (tableDefinition == null)
@@ -52,7 +52,7 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
                 return false;
             }
 
-            var row = this.CreateRow(section, symbol, output, tableDefinition);
+            var row = this.CreateRow(section, symbol, data, tableDefinition);
             var rowOffset = 0;
 
             if (tableDefinition.SymbolIdIsPrimaryKey)

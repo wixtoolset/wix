@@ -72,7 +72,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { private get; set; }
 
-        public WindowsInstallerData Output { private get; set; }
+        public WindowsInstallerData Data { private get; set; }
 
         public string LayoutDirectory { private get; set; }
 
@@ -115,7 +115,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var compressionLevel = mediaSymbol.CompressionLevel ?? this.DefaultCompressionLevel ?? CompressionLevel.Medium;
                 var cabinetDir = this.ResolveMedia(mediaSymbol, mediaSymbol.Layout, this.LayoutDirectory);
 
-                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaSymbol, compressionLevel, files);
+                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Data, cabinetDir, mediaSymbol, compressionLevel, files);
                 if (null != cabinetWorkItem)
                 {
                     cabinetBuilder.Enqueue(cabinetWorkItem);
@@ -171,13 +171,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Creates a work item to create a cabinet.
         /// </summary>
-        /// <param name="output">Output for the current database.</param>
+        /// <param name="data">Windows Installer data for the current database.</param>
         /// <param name="cabinetDir">Directory to create cabinet in.</param>
         /// <param name="mediaSymbol">Media symbol containing information about the cabinet.</param>
         /// <param name="compressionLevel">Desired compression level.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
             var tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaSymbol.Cabinet);
@@ -189,7 +189,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var cabinetName = mediaSymbol.Cabinet.TrimStart('#');
 
                 // If building a patch, remind them to run -p for torch.
-                if (OutputType.Patch == output.Type)
+                if (OutputType.Patch == data.Type)
                 {
                     this.Messaging.Write(WarningMessages.EmptyCabinet(mediaSymbol.SourceLineNumbers, cabinetName, true));
                 }
@@ -234,7 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (mediaSymbol.Cabinet.StartsWith("#", StringComparison.Ordinal))
             {
-                var streamsTable = output.EnsureTable(this.TableDefinitions["_Streams"]);
+                var streamsTable = data.EnsureTable(this.TableDefinitions["_Streams"]);
 
                 var streamRow = streamsTable.CreateRow(mediaSymbol.SourceLineNumbers);
                 streamRow[0] = mediaSymbol.Cabinet.Substring(1);

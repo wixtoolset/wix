@@ -16,9 +16,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    internal class CreateOutputFromIRCommand
+    internal class CreateWindowsInstallerDataFromIRCommand
     {
-        public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
+        public CreateWindowsInstallerDataFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -37,20 +37,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
-        public WindowsInstallerData Output { get; private set; }
+        public WindowsInstallerData Data { get; private set; }
 
-        public void Execute()
+        public WindowsInstallerData Execute()
         {
-            this.Output = new WindowsInstallerData(this.Section.Symbols.First().SourceLineNumbers)
+            this.Data = new WindowsInstallerData(this.Section.Symbols.First().SourceLineNumbers)
             {
                 Codepage = this.Section.Codepage,
                 Type = SectionTypeToOutputType(this.Section.Type)
             };
 
-            this.AddSectionToOutput();
+            this.AddSectionToData();
+
+            return this.Data;
         }
 
-        private void AddSectionToOutput()
+        private void AddSectionToData()
         {
             var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellSymbol>>();
 
@@ -61,7 +63,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     case SymbolDefinitionType.AppSearch:
                         this.AddSymbolDefaultly(symbol);
-                        this.Output.EnsureTable(this.TableDefinitions["Signature"]);
+                        this.Data.EnsureTable(this.TableDefinitions["Signature"]);
                         break;
 
                     case SymbolDefinitionType.Assembly:
@@ -154,7 +156,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     case SymbolDefinitionType.ProgId:
                         this.AddSymbolDefaultly(symbol);
-                        this.Output.EnsureTable(this.TableDefinitions["Extension"]);
+                        this.Data.EnsureTable(this.TableDefinitions["Extension"]);
                         break;
 
                     case SymbolDefinitionType.Property:
@@ -452,7 +454,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = symbol.DefaultControlRef;
             row[9] = symbol.CancelControlRef;
 
-            this.Output.EnsureTable(this.TableDefinitions["ListBox"]);
+            this.Data.EnsureTable(this.TableDefinitions["ListBox"]);
         }
 
         private void AddDirectorySymbol(DirectorySymbol symbol)
@@ -976,9 +978,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             switch (symbol.SequenceTable)
             {
                 case SequenceTable.AdminExecuteSequence:
-                    if (OutputType.Module == this.Output.Type)
+                    if (OutputType.Module == this.Data.Type)
                     {
-                        this.Output.EnsureTable(this.TableDefinitions["AdminExecuteSequence"]);
+                        this.Data.EnsureTable(this.TableDefinitions["AdminExecuteSequence"]);
                         sequenceTableName = "ModuleAdminExecuteSequence";
                     }
                     else
@@ -987,9 +989,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     break;
                 case SequenceTable.AdminUISequence:
-                    if (OutputType.Module == this.Output.Type)
+                    if (OutputType.Module == this.Data.Type)
                     {
-                        this.Output.EnsureTable(this.TableDefinitions["AdminUISequence"]);
+                        this.Data.EnsureTable(this.TableDefinitions["AdminUISequence"]);
                         sequenceTableName = "ModuleAdminUISequence";
                     }
                     else
@@ -998,9 +1000,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     break;
                 case SequenceTable.AdvertiseExecuteSequence:
-                    if (OutputType.Module == this.Output.Type)
+                    if (OutputType.Module == this.Data.Type)
                     {
-                        this.Output.EnsureTable(this.TableDefinitions["AdvtExecuteSequence"]);
+                        this.Data.EnsureTable(this.TableDefinitions["AdvtExecuteSequence"]);
                         sequenceTableName = "ModuleAdvtExecuteSequence";
                     }
                     else
@@ -1009,9 +1011,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     break;
                 case SequenceTable.InstallExecuteSequence:
-                    if (OutputType.Module == this.Output.Type)
+                    if (OutputType.Module == this.Data.Type)
                     {
-                        this.Output.EnsureTable(this.TableDefinitions["InstallExecuteSequence"]);
+                        this.Data.EnsureTable(this.TableDefinitions["InstallExecuteSequence"]);
                         sequenceTableName = "ModuleInstallExecuteSequence";
                     }
                     else
@@ -1020,9 +1022,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     break;
                 case SequenceTable.InstallUISequence:
-                    if (OutputType.Module == this.Output.Type)
+                    if (OutputType.Module == this.Data.Type)
                     {
-                        this.Output.EnsureTable(this.TableDefinitions["InstallUISequence"]);
+                        this.Data.EnsureTable(this.TableDefinitions["InstallUISequence"]);
                         sequenceTableName = "ModuleInstallUISequence";
                     }
                     else
@@ -1147,14 +1149,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void AddWixEnsureTableSymbol(WixEnsureTableSymbol symbol)
         {
             var tableDefinition = this.TableDefinitions[symbol.Table];
-            this.Output.EnsureTable(tableDefinition);
+            this.Data.EnsureTable(tableDefinition);
         }
 
         private bool AddSymbolFromExtension(IntermediateSymbol symbol)
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryProcessSymbol(this.Section, symbol, this.Output, this.TableDefinitions))
+                if (extension.TryProcessSymbol(this.Section, symbol, this.Data, this.TableDefinitions))
                 {
                     return true;
                 }
@@ -1164,7 +1166,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
 
         private bool AddSymbolDefaultly(IntermediateSymbol symbol) =>
-            this.BackendHelper.TryAddSymbolToOutputMatchingTableDefinitions(this.Section, symbol, this.Output, this.TableDefinitions);
+            this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(this.Section, symbol, this.Data, this.TableDefinitions);
 
         private static OutputType SectionTypeToOutputType(SectionType type)
         {
@@ -1190,7 +1192,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.CreateRow(symbol, this.TableDefinitions[tableDefinitionName]);
 
         private Row CreateRow(IntermediateSymbol symbol, TableDefinition tableDefinition) =>
-            this.BackendHelper.CreateRow(this.Section, symbol, this.Output, tableDefinition);
+            this.BackendHelper.CreateRow(this.Section, symbol, this.Data, tableDefinition);
 
         private static string GetMsiFilenameValue(string shortName, string longName)
         {
