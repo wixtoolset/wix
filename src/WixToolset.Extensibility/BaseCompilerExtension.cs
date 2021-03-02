@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
+    using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -52,7 +53,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="ICompilerExtension.ParseAttribute(Intermediate, IntermediateSection, XElement, XAttribute, IDictionary{string, string})"/>
+        /// See <see cref="ICompilerExtension.ParseAttribute(Intermediate, IntermediateSection, XElement, XAttribute, IDictionary{String, String})"/>
         /// </summary>
         public virtual void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
@@ -60,7 +61,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="ICompilerExtension.ParseElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{string, string})"/>
+        /// See <see cref="ICompilerExtension.ParseElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{String, String})"/>
         /// </summary>
         public virtual void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
@@ -68,7 +69,7 @@ namespace WixToolset.Extensibility
         }
 
         /// <summary>
-        /// See <see cref="ICompilerExtension.ParsePossibleKeyPathElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{string, string})"/>
+        /// See <see cref="ICompilerExtension.ParsePossibleKeyPathElement(Intermediate, IntermediateSection, XElement, XElement, IDictionary{String, String})"/>
         /// </summary>
         public virtual IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
