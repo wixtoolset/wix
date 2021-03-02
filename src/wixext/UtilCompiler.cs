@@ -2404,7 +2404,7 @@ namespace WixToolset.Util
 
                 if (null != messageFile)
                 {
-                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, $"Config_{fileId}MessageFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@messageFileName[\\]]",
@@ -2416,7 +2416,7 @@ namespace WixToolset.Util
                 }
                 if (null != parameterFile)
                 {
-                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, $"Config_{fileId}ParameterFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@parameterFileName[\\]]",
@@ -2428,7 +2428,7 @@ namespace WixToolset.Util
                 }
                 if (null != resourceFile)
                 {
-                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
+                    section.AddSymbol(new XmlFileSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, $"Config_{fileId}ResourceFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@resourceFileName[\\]]",
