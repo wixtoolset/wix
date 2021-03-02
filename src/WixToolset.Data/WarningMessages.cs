@@ -589,7 +589,7 @@ namespace WixToolset.Data
 
         public static Message DefiningWellKnownDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
         {
-            return Message(null, Ids.DefiningWellKnownDirectoryDeprecated, "It is no longer necessary to define Directory with Id '{0}'. One will be provided automatically. Remove the Directory element.", directoryId);
+            return Message(sourceLineNumbers, Ids.DefiningWellKnownDirectoryDeprecated, "It is no longer necessary to define Directory with Id '{0}'. One will be provided automatically. Remove the Directory element.", directoryId);
         }
 
         public static Message TooManyProgIds(SourceLineNumber sourceLineNumbers, string clsId, string progId, string otherClsId)

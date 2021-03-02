@@ -45,21 +45,7 @@ namespace WixToolset.Data
                 return null;
             }
 
-            switch (field.Definition.Type)
-            {
-            case IntermediateFieldType.Bool:
-                return field.Value.AsBool();
-
-            case IntermediateFieldType.LargeNumber:
-            case IntermediateFieldType.Number:
-                return field.Value.AsLargeNumber() != 0;
-
-            case IntermediateFieldType.String:
-                return !String.IsNullOrEmpty(field.Value.AsString());
-
-            default:
-                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");
-            }
+            return field.AsBool();
         }
 
         public static long AsLargeNumber(this IntermediateField field)
@@ -93,21 +79,7 @@ namespace WixToolset.Data
                 return null;
             }
 
-            switch (field.Definition.Type)
-            {
-            case IntermediateFieldType.Bool:
-                return field.Value.AsBool() ? 1 : 0;
-
-            case IntermediateFieldType.LargeNumber:
-            case IntermediateFieldType.Number:
-                return field.Value.AsLargeNumber();
-
-            case IntermediateFieldType.String:
-                return Convert.ToInt64(field.Value.AsString());
-
-            default:
-                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to large number");
-            }
+            return field.AsLargeNumber();
         }
 
         public static int AsNumber(this IntermediateField field)
@@ -141,21 +113,7 @@ namespace WixToolset.Data
                 return null;
             }
 
-            switch (field.Definition.Type)
-            {
-            case IntermediateFieldType.Bool:
-                return field.Value.AsBool() ? 1 : 0;
-
-            case IntermediateFieldType.LargeNumber:
-            case IntermediateFieldType.Number:
-                return field.Value.AsNumber();
-
-            case IntermediateFieldType.String:
-                return Convert.ToInt32(field.Value.AsString());
-
-            default:
-                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to number");
-            }
+            return field.AsNumber();
         }
 
         public static IntermediateFieldPathValue AsPath(this IntermediateField field)

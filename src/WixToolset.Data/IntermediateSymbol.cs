@@ -165,7 +165,6 @@ namespace WixToolset.Data
             var id = (idJson == null) ? null : Identifier.Deserialize(idJson);
             var sourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
 
-            // TODO: this isn't sufficient.
             if (!creator.TryGetSymbolDefinitionByName(definitionName, out var definition))
             {
                 throw new WixException(ErrorMessages.UnknownSymbolType(definitionName));
