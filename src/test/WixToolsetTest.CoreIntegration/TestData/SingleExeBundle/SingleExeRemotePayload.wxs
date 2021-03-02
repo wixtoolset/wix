@@ -3,9 +3,8 @@
     <Fragment>
         <PackageGroup Id="BundlePackages">
             <ExePackage
-                InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-                RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-                UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+                InstallArguments="/q /norestart &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+                UninstallArguments="/uninstall /q /norestart &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
                 PerMachine="yes"
                 DetectCondition="A"
                 InstallCondition="B"

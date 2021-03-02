@@ -1973,7 +1973,7 @@ namespace WixToolset.Core
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
 
-            var expectedNetFx4Args = new string[] { "/q", "/norestart", "/chainingpackage" };
+            var expectedNetFx4Args = new string[] { "/q", "/norestart" };
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
