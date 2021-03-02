@@ -7,6 +7,7 @@ namespace WixToolset.Tools.Heat
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core;
+    using WixToolset.Core.Burn;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -27,7 +28,8 @@ namespace WixToolset.Tools.Heat
         [MTAThread]
         public static async Task<int> Main(string[] args)
         {
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
+                                                                  .AddBundleBackend();
             var listener = new ConsoleMessageListener("HEAT", "heat.exe");
 
             try
