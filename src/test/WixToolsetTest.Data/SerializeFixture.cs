@@ -22,7 +22,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -48,7 +48,7 @@ namespace WixToolsetTest.Data
                 var symbol = (ComponentSymbol)loaded.Sections.Single().Symbols.Single();
 
                 Assert.Equal("TestComponent", symbol.Id.Id);
-                Assert.Equal(AccessModifier.Public, symbol.Id.Access);
+                Assert.Equal(AccessModifier.Global, symbol.Id.Access);
                 Assert.Equal("TestFolder", symbol.DirectoryRef);
                 Assert.Equal(ComponentLocation.Either, symbol.Location);
             }
@@ -64,7 +64,7 @@ namespace WixToolsetTest.Data
             var sln = new SourceLineNumber("test.wxs", 1);
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -87,11 +87,11 @@ namespace WixToolsetTest.Data
                     var symbol = (ComponentSymbol)loaded.Sections.Single().Symbols.Single();
 
                     Assert.Equal("TestComponent", symbol.Id.Id);
-                    Assert.Equal(AccessModifier.Public, symbol.Id.Access);
+                    Assert.Equal(AccessModifier.Global, symbol.Id.Access);
 
                     wixout.Reopen(writable: true);
 
-                    section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "NewComponent"))
+                    section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "NewComponent"))
                     {
                         ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                     });
@@ -130,7 +130,7 @@ namespace WixToolsetTest.Data
 
             var symbolDef = new IntermediateSymbolDefinition("CustomDef2", fieldDefs, null);
 
-            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Global, "customT"));
             symbol.Set(0, "foo");
             symbol.Set(1, 2);
             symbol.Set(2, true);
@@ -173,7 +173,7 @@ namespace WixToolsetTest.Data
 
             var symbolDef = new IntermediateSymbolDefinition("CustomDef", fieldDefs, null);
 
-            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Global, "customT"));
             symbol.Set(0, "foo");
             symbol.Set(1, 2);
             symbol.Set(2, true);
@@ -194,7 +194,7 @@ namespace WixToolsetTest.Data
 
             var symbolDef2 = new IntermediateSymbolDefinition("CustomDef2", 1, fieldDefs2, null);
 
-            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT2"));
+            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Global, "customT2"));
             symbol2.Set(0, "bar");
             symbol2.Set(1, 3);
             symbol2.Set(2, false);
@@ -254,7 +254,7 @@ namespace WixToolsetTest.Data
 
             symbolDef.AddTag("customDef");
 
-            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT"));
+            var symbol = symbolDef.CreateSymbol(sln, new Identifier(AccessModifier.Global, "customT"));
             symbol.Set(0, "foo");
             symbol.Set(1, 2);
             symbol.Set(2, true);
@@ -280,7 +280,7 @@ namespace WixToolsetTest.Data
             symbolDef2.AddTag("customDef2");
             symbolDef2.AddTag("customDef2 tag2");
 
-            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Public, "customT2"));
+            var symbol2 = symbolDef2.CreateSymbol(sln, new Identifier(AccessModifier.Global, "customT2"));
             symbol2.Set(0, "bar");
             symbol2.Set(1, 3);
             symbol2.Set(2, false);
@@ -356,7 +356,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
