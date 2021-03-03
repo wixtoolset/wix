@@ -1,13 +1,19 @@
 @setlocal
 @pushd %~dp0
+@set _C=Release
+@if /i "%1"=="debug" set _C=Debug
 
-nuget restore || exit /b
+:: Restore
+msbuild -p:Configuration=%_C% -t:Restore || exit /b
 
-msbuild -p:Configuration=Release -Restore || exit /b
+:: Build
+msbuild -p:Configuration=%_C% src\test\WixToolsetTest.Util\WixToolsetTest.Util.csproj || exit /b
 
-dotnet test -c Release --no-build src\test\WixToolsetTest.Util || exit /b
+:: Test
+dotnet test -c %_C% --no-build src\test\WixToolsetTest.Util || exit /b
 
-msbuild -p:Configuration=Release -p:NoBuild=true -t:Pack src\wixext\WixToolset.Util.wixext.csproj || exit /b
+:: Pack
+msbuild -p:Configuration=%_C% -p:NoBuild=true -t:Pack src\wixext\WixToolset.Util.wixext.csproj || exit /b
 
 @popd
 @endlocal

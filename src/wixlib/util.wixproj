@@ -13,22 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x64" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\be\utilbe.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
-
-  <!-- Workaround for bug in ProjectReferenceDefineConstants, they're not needed for this project anyway -->
-  <Target Name="ClearProjectReferenceDefineConstants" AfterTargets="CalculateDefineConstants">
-    <PropertyGroup>
-      <ProjectReferenceDefineConstants></ProjectReferenceDefineConstants>
-    </PropertyGroup>
-  </Target>
 </Project>

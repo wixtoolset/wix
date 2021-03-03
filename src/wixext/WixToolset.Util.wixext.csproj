@@ -8,13 +8,10 @@
     <Description>WiX Toolset Utility Extension</Description>
     <Title>WiX Toolset Util Extension</Title>
     <DebugType>embedded</DebugType>
-    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <IncludeSymbols>true</IncludeSymbols>
-    <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\util.wixlib" />
   </ItemGroup>
 
@@ -31,11 +28,4 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
-
-  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion">
-    <PropertyGroup>
-      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
-      <NuspecProperties>$(NuspecProperties);Version=$(BuildVersionSimple);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 </Project>

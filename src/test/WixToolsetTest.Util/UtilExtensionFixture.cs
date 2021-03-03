@@ -268,6 +268,7 @@ namespace WixToolsetTest.Util
             var newArgs = args.ToList();
             newArgs.Add("-platform");
             newArgs.Add("x64");
+            newArgs.Add("-sw1072");
 
             var result = WixRunner.Execute(newArgs.ToArray());
             result.AssertSuccess();
