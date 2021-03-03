@@ -7178,7 +7178,7 @@ namespace WixToolset.Core
                         cabinet = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "CompressionLevel":
-                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, node, attrib);
+                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -7381,7 +7381,7 @@ namespace WixToolset.Core
                         }
                         break;
                     case "CompressionLevel":
-                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, node, attrib);
+                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);

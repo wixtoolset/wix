@@ -4950,7 +4950,7 @@ namespace WixToolset.Core
             }
         }
 
-        private CompressionLevel? ParseCompressionLevel(SourceLineNumber sourceLineNumbers, XElement node, XAttribute attribute)
+        private CompressionLevel? ParseCompressionLevel(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             var compressionLevel = this.Core.GetAttributeValue(sourceLineNumbers, attribute);
             switch (compressionLevel)

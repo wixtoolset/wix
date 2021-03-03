@@ -7,7 +7,7 @@
 
         <CustomTable Id="CustomTable1">
             <Column Id="Column1" Type="string" PrimaryKey="yes" Category="text" Modularize="column" Description="The first custom column." />
-            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Description="The custom table's Component reference" />
+            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Description="The custom table's Component reference" Modularize="column" />
             <Row>
                 <Data Column="Column1" Value="Row1" />
                 <Data Column="Component_" Value="test.txt" />
@@ -20,7 +20,7 @@
 
         <CustomTable Id="CustomTable2" Unreal="yes">
             <Column Id="ColumnA" Type="string" PrimaryKey="yes" />
-            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" />
+            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Modularize="column" />
             <Row>
                 <Data Column="ColumnA" Value="RowA" />
                 <Data Column="Component_" Value="test.txt" />

@@ -17,7 +17,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private const string DependencyRegistryRoot = @"Software\Classes\Installer\Dependencies\";
         private const string RegistryDependents = "Dependents";
 
-        public ProcessDependencyReferencesCommand(IWindowsInstallerBackendHelper backendHelper, IntermediateSection section, IEnumerable<WixDependencyRefSymbol> dependencyRefSymbols)
+        public ProcessDependencyReferencesCommand(IntermediateSection section, IEnumerable<WixDependencyRefSymbol> dependencyRefSymbols)
         {
             this.Section = section;
             this.DependencyRefSymbols = dependencyRefSymbols;

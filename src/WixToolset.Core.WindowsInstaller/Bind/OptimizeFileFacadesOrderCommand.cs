@@ -36,7 +36,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var canonicalComponentTargetPaths = this.ComponentTargetPaths();
 
-            this.FileFacades.Sort(new FileFacadeOptimizer(canonicalComponentTargetPaths));
+            this.FileFacades.Sort(new FileFacadeOptimizer(canonicalComponentTargetPaths, this.Section.Type == SectionType.Module));
 
             return this.FileFacades;
         }
@@ -71,17 +71,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private class FileFacadeOptimizer : IComparer<FileFacade>
         {
-            public FileFacadeOptimizer(Dictionary<string, string> componentTargetPaths)
+            public FileFacadeOptimizer(Dictionary<string, string> componentTargetPaths, bool optimizingMergeModule)
             {
                 this.ComponentTargetPaths = componentTargetPaths;
+                this.OptimizingMergeModule = optimizingMergeModule;
             }
 
             private Dictionary<string, string> ComponentTargetPaths { get; }
 
+            private bool OptimizingMergeModule { get; }
+
             public int Compare(FileFacade x, FileFacade y)
             {
-                // First group files by DiskId.
-                var compare = x.DiskId.CompareTo(y.DiskId);
+                // First group files by DiskId but ignore if processing a Merge Module
+                // because Merge Modules don't have separate disks.
+                var compare = this.OptimizingMergeModule ? 0 : x.DiskId.CompareTo(y.DiskId);
 
                 if (compare != 0)
                 {

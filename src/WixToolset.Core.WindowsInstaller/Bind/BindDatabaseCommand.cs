@@ -192,6 +192,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            if (section.Type == SectionType.Product || section.Type == SectionType.Module)
             {
                 var command = new AddRequiredStandardDirectories(section, platform);
                 command.Execute();
@@ -329,7 +330,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (dependencyRefs.Any())
                 {
-                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, section, dependencyRefs);
+                    var command = new ProcessDependencyReferencesCommand(section, dependencyRefs);
                     command.Execute();
                 }
             }

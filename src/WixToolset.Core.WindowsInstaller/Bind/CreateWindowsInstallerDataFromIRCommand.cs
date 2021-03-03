@@ -25,6 +25,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.TableDefinitions = tableDefinitions;
             this.BackendExtensions = backendExtensions;
             this.BackendHelper = backendHelper;
+            this.GeneratedShortNames = new Dictionary<string, List<FileSymbol>>();
         }
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
@@ -36,6 +37,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private TableDefinitionCollection TableDefinitions { get; }
 
         private IntermediateSection Section { get; }
+
+        private Dictionary<string, List<FileSymbol>> GeneratedShortNames { get; }
 
         public WindowsInstallerData Data { get; private set; }
 
@@ -136,6 +139,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     case SymbolDefinitionType.ModuleConfiguration:
                         this.AddModuleConfigurationSymbol((ModuleConfigurationSymbol)symbol);
+                        this.EnsureModuleIgnoredTable(symbol, "ModuleConfiguration");
+                        break;
+
+                    case SymbolDefinitionType.ModuleSubstitution:
+                        this.EnsureModuleIgnoredTable(symbol, "ModuleSubstitution");
                         break;
 
                     case SymbolDefinitionType.MsiEmbeddedUI:
@@ -262,6 +270,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.AddIndexedCellSymbols(cellsByTableAndRowId);
+            this.EnsureRequiredTables();
+            this.ReportGeneratedShortFileNameConflicts();
+            this.ReportIllegalTables();
+            this.ReportMismatchedModularizations();
+            this.ReportWindowsInstallerDataInconsistencies();
         }
 
         private void AddAssemblySymbol(AssemblySymbol symbol)
@@ -426,6 +439,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = symbol.Source;
             row[3] = symbol.Target;
             row[4] = symbol.PatchUninstall ? (int?)WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : null;
+
+            if (OutputType.Module == this.Data.Type)
+            {
+                this.Data.EnsureTable(this.TableDefinitions["AdminExecuteSequence"]);
+                this.Data.EnsureTable(this.TableDefinitions["AdminUISequence"]);
+                this.Data.EnsureTable(this.TableDefinitions["AdvtExecuteSequence"]);
+                this.Data.EnsureTable(this.TableDefinitions["InstallExecuteSequence"]);
+                this.Data.EnsureTable(this.TableDefinitions["InstallUISequence"]);
+            }
         }
 
         private void AddDialogSymbol(DialogSymbol symbol)
@@ -483,6 +505,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[0] = symbol.Id.Id;
             row[1] = symbol.ParentDirectoryRef;
             row[2] = defaultDir;
+
+            if (OutputType.Module == this.Data.Type)
+            {
+                var directoryId = symbol.Id.Id;
+
+                if (WindowsInstallerStandard.IsStandardDirectory(directoryId))
+                {
+                    // If the directory table contains references to standard windows folders
+                    // mergemod.dll will add customactions to set the MSM directory to
+                    // the same directory as the standard windows folder and will add references to
+                    // custom action to all the standard sequence tables. A problem will occur
+                    // if the MSI does not have these tables as mergemod.dll does not add these
+                    // tables to the MSI if absent. This code adds the tables in case mergemod.dll
+                    // needs them.
+                    this.Data.EnsureTable(this.TableDefinitions["CustomAction"]);
+                    this.Data.EnsureTable(this.TableDefinitions["AdminExecuteSequence"]);
+                    this.Data.EnsureTable(this.TableDefinitions["AdminUISequence"]);
+                    this.Data.EnsureTable(this.TableDefinitions["AdvtExecuteSequence"]);
+                    this.Data.EnsureTable(this.TableDefinitions["InstallExecuteSequence"]);
+                    this.Data.EnsureTable(this.TableDefinitions["InstallUISequence"]);
+                }
+                else
+                {
+                    foreach (var standardDirectory in WindowsInstallerStandard.StandardDirectories())
+                    {
+                        if (directoryId.StartsWith(standardDirectory.Id.Id, StringComparison.Ordinal))
+                        {
+                            this.Messaging.Write(WarningMessages.StandardDirectoryConflictInMergeModule(symbol.SourceLineNumbers, directoryId, standardDirectory.Id.Id));
+                        }
+                    }
+                }
+            }
         }
 
         private void AddDuplicateFileSymbol(DuplicateFileSymbol symbol)
@@ -570,6 +624,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (null == symbol.ShortName && null != name && !Common.IsValidShortFilename(name, false))
             {
                 symbol.ShortName = CreateShortName(name, true, false, "File", symbol.DirectoryRef);
+
+                if (!this.GeneratedShortNames.TryGetValue(symbol.ShortName, out var potentialConflicts))
+                {
+                    potentialConflicts = new List<FileSymbol>();
+                    this.GeneratedShortNames.Add(symbol.ShortName, potentialConflicts);
+                }
+
+                potentialConflicts.Add(symbol);
             }
 
             var row = (FileRow)this.CreateRow(symbol, "File");
@@ -612,7 +674,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var tableName = (IniFileActionType.AddLine == symbol.Action || IniFileActionType.AddTag == symbol.Action || IniFileActionType.CreateLine == symbol.Action) ? "IniFile" : "RemoveIniFile";
 
             var name = symbol.FileName;
-            if (null == symbol.ShortFileName  && null != name && !Common.IsValidShortFilename(name, false))
+            if (null == symbol.ShortFileName && null != name && !Common.IsValidShortFilename(name, false))
             {
                 symbol.ShortFileName = CreateShortName(name, true, false, "IniFile", symbol.ComponentRef);
             }
@@ -1167,6 +1229,238 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private bool AddSymbolDefaultly(IntermediateSymbol symbol) =>
             this.BackendHelper.TryAddSymbolToMatchingTableDefinitions(this.Section, symbol, this.Data, this.TableDefinitions);
+
+        private void EnsureModuleIgnoredTable(IntermediateSymbol symbol, string ignoredTable)
+        {
+            var tableDefinition = this.TableDefinitions["ModuleIgnoreTable"];
+            var table = this.Data.EnsureTable(tableDefinition);
+            if (!table.Rows.Any(r => r.FieldAsString(0) == ignoredTable))
+            {
+                var row = this.CreateRow(symbol, tableDefinition);
+                row[0] = ignoredTable;
+            }
+        }
+
+        private void EnsureRequiredTables()
+        {
+            // check for missing table and add them or display an error as appropriate
+            switch (this.Data.Type)
+            {
+                case OutputType.Module:
+                    this.Data.EnsureTable(this.TableDefinitions["Component"]);
+                    this.Data.EnsureTable(this.TableDefinitions["Directory"]);
+                    this.Data.EnsureTable(this.TableDefinitions["FeatureComponents"]);
+                    this.Data.EnsureTable(this.TableDefinitions["File"]);
+                    this.Data.EnsureTable(this.TableDefinitions["ModuleComponents"]);
+                    this.Data.EnsureTable(this.TableDefinitions["ModuleSignature"]);
+                    break;
+
+                case OutputType.PatchCreation:
+                    var imageFamiliesCount = this.Data.Tables["ImageFamilies"]?.Rows.Count ?? 0;
+                    var targetImagesCount = this.Data.Tables["TargetImages"]?.Rows.Count ?? 0;
+                    var upgradedImagesCount = this.Data.Tables["UpgradedImages"]?.Rows.Count ?? 0;
+
+                    if (imageFamiliesCount < 1)
+                    {
+                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("ImageFamilies"));
+                    }
+
+                    if (targetImagesCount < 1)
+                    {
+                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("TargetImages"));
+                    }
+
+                    if (upgradedImagesCount < 1)
+                    {
+                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("UpgradedImages"));
+                    }
+
+                    this.Data.EnsureTable(this.TableDefinitions["Properties"]);
+                    break;
+
+                case OutputType.Product:
+                    this.Data.EnsureTable(this.TableDefinitions["File"]);
+                    this.Data.EnsureTable(this.TableDefinitions["Media"]);
+                    break;
+            }
+        }
+
+        private void ReportGeneratedShortFileNameConflicts()
+        {
+            foreach (var conflicts in this.GeneratedShortNames.Values.Where(l => l.Count > 1))
+            {
+                this.Messaging.Write(WarningMessages.GeneratedShortFileNameConflict(conflicts[0].SourceLineNumbers, conflicts[0].ShortName));
+                for (var i = 1; i < conflicts.Count; ++i)
+                {
+                    this.Messaging.Write(WarningMessages.GeneratedShortFileNameConflict2(conflicts[i].SourceLineNumbers));
+                }
+            }
+        }
+
+        private void ReportIllegalTables()
+        {
+            foreach (var table in this.Data.Tables)
+            {
+                switch (this.Data.Type)
+                {
+                    case OutputType.Module:
+                        if ("BBControl" == table.Name ||
+                            "Billboard" == table.Name ||
+                            "CCPSearch" == table.Name ||
+                            "Feature" == table.Name ||
+                            "LaunchCondition" == table.Name ||
+                            "Media" == table.Name ||
+                            "Patch" == table.Name ||
+                            "Upgrade" == table.Name ||
+                            "WixMerge" == table.Name)
+                        {
+                            foreach (Row row in table.Rows)
+                            {
+                                this.Messaging.Write(ErrorMessages.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        else if ("Error" == table.Name)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(WarningMessages.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        break;
+
+                    case OutputType.PatchCreation:
+                        if (!table.Definition.Unreal &&
+                            "_SummaryInformation" != table.Name &&
+                            "ExternalFiles" != table.Name &&
+                            "FamilyFileRanges" != table.Name &&
+                            "ImageFamilies" != table.Name &&
+                            "PatchMetadata" != table.Name &&
+                            "PatchSequence" != table.Name &&
+                            "Properties" != table.Name &&
+                            "TargetFiles_OptionalData" != table.Name &&
+                            "TargetImages" != table.Name &&
+                            "UpgradedFiles_OptionalData" != table.Name &&
+                            "UpgradedFilesToIgnore" != table.Name &&
+                            "UpgradedImages" != table.Name)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(ErrorMessages.UnexpectedTableInPatchCreationPackage(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        break;
+
+                    case OutputType.Patch:
+                        if (!table.Definition.Unreal &&
+                            "_SummaryInformation" != table.Name &&
+                            "Media" != table.Name &&
+                            "MsiFileHash" != table.Name &&
+                            "MsiPatchMetadata" != table.Name &&
+                            "MsiPatchSequence" != table.Name)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(ErrorMessages.UnexpectedTableInPatch(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        break;
+
+                    case OutputType.Product:
+                        if ("ModuleAdminExecuteSequence" == table.Name ||
+                            "ModuleAdminUISequence" == table.Name ||
+                            "ModuleAdvtExecuteSequence" == table.Name ||
+                            "ModuleAdvtUISequence" == table.Name ||
+                            "ModuleComponents" == table.Name ||
+                            "ModuleConfiguration" == table.Name ||
+                            "ModuleDependency" == table.Name ||
+                            "ModuleExclusion" == table.Name ||
+                            "ModuleIgnoreTable" == table.Name ||
+                            "ModuleInstallExecuteSequence" == table.Name ||
+                            "ModuleInstallUISequence" == table.Name ||
+                            "ModuleSignature" == table.Name ||
+                            "ModuleSubstitution" == table.Name)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(WarningMessages.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void ReportMismatchedModularizations()
+        {
+            // verify that modularization types match for foreign key relationships
+            foreach (var tableDefinition in this.TableDefinitions)
+            {
+                foreach (var columnDefinition in tableDefinition.Columns)
+                {
+                    if (null != columnDefinition.KeyTable && 0 > columnDefinition.KeyTable.IndexOf(';') && columnDefinition.KeyColumn.HasValue)
+                    {
+                        if (this.TableDefinitions.TryGet(columnDefinition.KeyTable, out var keyTableDefinition))
+                        {
+                            var keyColumnIndex = columnDefinition.KeyColumn ?? -1;
+
+                            if (keyColumnIndex <= 0 || keyColumnIndex > keyTableDefinition.Columns.Length)
+                            {
+                                this.Messaging.Write(ErrorMessages.InvalidKeyColumn(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex));
+                            }
+                            else if (keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType != columnDefinition.ModularizeType && ColumnModularizeType.CompanionFile != columnDefinition.ModularizeType)
+                            {
+                                this.Messaging.Write(ErrorMessages.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType.ToString()));
+                            }
+                        }
+                        // else - ignore missing table definitions as that error is caught in other places
+                    }
+                }
+            }
+        }
+
+        private void ReportWindowsInstallerDataInconsistencies()
+        {
+            // Get the output's minimum installer version
+            var outputInstallerVersion = Int32.MaxValue;
+
+            if (this.Data.Tables.TryGetTable("_SummaryInformation", out var summaryInformationTable))
+            {
+                outputInstallerVersion = summaryInformationTable.Rows.FirstOrDefault(r => 14 == r.FieldAsInteger(0))?.FieldAsInteger(1) ?? Int32.MaxValue;
+            }
+
+            // Ensure the Error table exists if output is marked for MSI 1.0 or below (see ICE40).
+            if (outputInstallerVersion <= 100 && OutputType.Product == this.Data.Type)
+            {
+                this.Data.EnsureTable(this.TableDefinitions["Error"]);
+            }
+
+            // Check for the presence of tables/rows/columns that require MSI 1.1 or later.
+            if (outputInstallerVersion < 110)
+            {
+                if (this.Data.Tables.TryGetTable("IsolatedComponent", out var isolatedComponentTable))
+                {
+                    foreach (var row in isolatedComponentTable.Rows)
+                    {
+                        this.Messaging.Write(WarningMessages.TableIncompatibleWithInstallerVersion(row.SourceLineNumbers, "IsolatedComponent", outputInstallerVersion));
+                    }
+                }
+            }
+
+            // Check for the presence of tables/rows/columns that require MSI 4.0 or later
+            if (outputInstallerVersion < 400)
+            {
+                if (this.Data.Tables.TryGetTable("Shortcut", out var shortcutTable))
+                {
+                    foreach (var row in shortcutTable.Rows)
+                    {
+                        if (null != row[12] || null != row[13] || null != row[14] || null != row[15])
+                        {
+                            this.Messaging.Write(WarningMessages.ColumnsIncompatibleWithInstallerVersion(row.SourceLineNumbers, "Shortcut", outputInstallerVersion));
+                        }
+                    }
+                }
+            }
+        }
 
         private static OutputType SectionTypeToOutputType(SectionType type)
         {

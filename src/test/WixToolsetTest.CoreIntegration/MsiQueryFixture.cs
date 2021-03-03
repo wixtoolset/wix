@@ -1022,7 +1022,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Empty(section.Symbols.OfType<FileSymbol>());
 
                 var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
-                Assert.Null(data.Tables["File"]);
+                Assert.Empty(data.Tables["File"].Rows);
 
                 var results = Query.QueryDatabase(msiPath, new[] { "File" });
                 WixAssert.CompareLineByLine(new[]
