@@ -4,24 +4,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>embedded</DebugType>
     <RootNamespace>WixToolset.Netfx</RootNamespace>
     <Description>WiX Toolset .NET Framework Extension</Description>
     <Title>WiX Toolset .NET Framework Extension</Title>
-    <DebugType>embedded</DebugType>
-    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <IncludeSymbols>true</IncludeSymbols>
-    <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\netfx.wixlib" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,13 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion">
-    <PropertyGroup>
-      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
-      <NuspecProperties>$(NuspecProperties);Version=$(BuildVersionSimple);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

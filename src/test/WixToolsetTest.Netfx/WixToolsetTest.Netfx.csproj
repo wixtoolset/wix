@@ -4,21 +4,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\UsingDotNetCorePackages\BundleLatest.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingDotNetCorePackages\BundleLatest_x64.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingNativeImage\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingNativeImage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingNativeImage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingNativeImage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
-  <Target Name="CopyExtensions" AfterTargets="Build">
-    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(WixExtension)" />
-  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\..\wixext\WixToolset.Netfx.wixext.csproj" />
@@ -41,4 +33,8 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
   </ItemGroup>
+
+  <Target Name="CopyExtensions" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(WixExtension)" />
+  </Target>
 </Project>

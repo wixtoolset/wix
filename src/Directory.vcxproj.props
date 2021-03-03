@@ -10,6 +10,9 @@
     <!-- NBGV properties -->
     <AssemblyCompany>$(Company)</AssemblyCompany>
     <AssemblyCopyright>$(Copyright)</AssemblyCopyright>
+
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <NuGetTargetMoniker>native,Version=v0.0</NuGetTargetMoniker>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' AND '$(VisualStudioVersion)'>='15.0'">
@@ -78,6 +81,12 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" '$(Configuration)'=='Debug' and '$(CLRSupport)'=='true' ">
+    <ClCompile>
+      <BasicRuntimeChecks></BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition=" '$(Configuration)'=='Release' ">
     <ClCompile>
       <Optimization>MinSpace</Optimization>
@@ -89,6 +98,18 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" '$(Configuration)'=='Release' and '$(CLRSupport)'=='true' ">
+    <ClCompile>
+      <BasicRuntimeChecks></BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" '$(CLRSupport)'=='true' ">
+    <Link>
+      <KeyFile>$(LinkKeyFile)</KeyFile>
+      <DelaySign>$(LinkDelaySign)</DelaySign>
     </Link>
   </ItemDefinitionGroup>
 </Project>

@@ -10,11 +10,6 @@
 -->
 <Project>
   <PropertyGroup>
-    <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
-    <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <ReplacePackageReferences>true</ReplacePackageReferences>
     <TheSolutionPath Condition=" '$(NCrunch)'=='' ">$(SolutionPath)</TheSolutionPath>
     <TheSolutionPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalSolutionPath)</TheSolutionPath>
@@ -45,12 +40,12 @@
         <ProjectReference  Include="@(PackageInSolution->'$(SmartSolutionDir)\%(SmartPath)' )"/>
 
         <!-- Remove the package references that are now referenced as projects -->
-        <PackageReference Remove="@(PackageInSolution->'%(PackageName)' )"/>
+        <PackageReference Remove="@(PackageInSolution->'%(PackageName)')"/>
       </ItemGroup>
 
     </When>
   </Choose>
 
-  <Import Project="Wix.Build.targets" Condition=" Exists('Wix.Build.targets') And '$(MSBuildProjectExtension)'=='.wixproj' " />
+  <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
   <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
 </Project>
