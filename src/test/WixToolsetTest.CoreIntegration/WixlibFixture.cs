@@ -144,6 +144,63 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6376")]
+        public void CanOverridePathWixVariable()
+        {
+            var folder = TestData.Get(@"TestData\WixVariableOverride");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-bf",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                result.AssertSuccess();
+
+                var wixlib = Intermediate.Load(wixlibPath);
+
+                Assert.True(wixlib.HasLevel(IntermediateLevels.Compiled));
+                Assert.True(wixlib.HasLevel(IntermediateLevels.Combined));
+                Assert.False(wixlib.HasLevel(IntermediateLevels.Linked));
+                Assert.False(wixlib.HasLevel(IntermediateLevels.Resolved));
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-lib", Path.Combine(intermediateFolder, @"test.wixlib"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+
+                Assert.False(intermediate.HasLevel(IntermediateLevels.Compiled));
+                Assert.False(intermediate.HasLevel(IntermediateLevels.Combined));
+                Assert.True(intermediate.HasLevel(IntermediateLevels.Linked));
+                Assert.True(intermediate.HasLevel(IntermediateLevels.Resolved));
+
+                var section = intermediate.Sections.Single();
+
+                var wixFile = section.Symbols.OfType<BinarySymbol>().First();
+                Assert.Equal(Path.Combine(folder, @"data\test2.txt"), wixFile.Data.Path);
+            }
+        }
+
         [Fact]
         public void CanBuildWithExtensionUsingWixlib()
         {
