@@ -3,11 +3,15 @@
 @set _C=Release
 @set _P=%~dp0build\%_C%\publish
 @set _RCO=/S /R:1 /W:1 /NP /XO  /NS /NC /NFL /NDL /NJH /NJS
+@if /i "%1"=="debug" set _C=Debug
 
+:: Restore
 nuget restore || exit /b
 
-dotnet test -c %_C% src\test\WixToolsetTest.BuildTasks || exit /b
+:: Build
+msbuild -p:Configuration=%_C% || exit /b
 
+:: Test
 dotnet publish -c %_C% -o %_P%\dotnet-wix\ -f netcoreapp2.1 src\wix || exit /b
 
 dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\net461\x86\buildtasks\ -f net461 -r win-x86 src\WixToolset.BuildTasks || exit /b
@@ -36,6 +40,7 @@ dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\broken\net461\ -f net461 -r dne sr
 
 dotnet test -c %_C% src\test\WixToolsetTest.Sdk || exit /b
 
+:: Pack
 dotnet pack -c %_C% src\dotnet-wix || exit /b
 dotnet pack -c %_C% src\WixToolset.Sdk || exit /b
 
