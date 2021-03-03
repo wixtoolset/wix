@@ -14,9 +14,9 @@
     -->
 
   <?define NetFx452MinRelease = 379893 ?>
-  <?define NetFx452WebLink = http://go.microsoft.com/fwlink/?LinkId=397707 ?>
-  <?define NetFx452RedistLink = http://go.microsoft.com/fwlink/?LinkId=397708 ?>
-  <?define NetFx452EulaLink = http://wixtoolset.org/licenses/netfx452 ?>
+  <?define NetFx452WebLink = https://go.microsoft.com/fwlink/?LinkId=397707 ?>
+  <?define NetFx452RedistLink = https://go.microsoft.com/fwlink/?LinkId=397708 ?>
+  <?define NetFx452EulaLink = https://wixtoolset.org/licenses/netfx452 ?>
   <?define NetFx452WebId = NetFx452Web ?>
   <?define NetFx452RedistId = NetFx452Redist ?>
 
@@ -35,9 +35,8 @@
 
     <PackageGroup Id="$(var.NetFx452WebId)">
       <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullWebLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullWebLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullWebLog].html&quot;"
+          InstallArguments="/q /norestart /log &quot;[NetFx452FullWebLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullWebLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx452WebDetectCondition)"
           InstallCondition="!(wix.NetFx452WebInstallCondition)"
@@ -45,13 +44,12 @@
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
+          LogPathVariable="NetFx452FullWebLog">
+        <ExePackagePayload 
+          Name="!(wix.NetFx452WebPackageDirectory)NDP452-KB2901954-Web.exe"
           DownloadUrl="$(var.NetFx452WebLink)"
-          LogPathVariable="NetFx452FullWebLog"
-          Compressed="no"
-          Name="!(wix.NetFx452WebPackageDirectory)NDP452-KB2901954-Web.exe">
-        <RemotePayload 
           Description="Microsoft .NET Framework 4.5.2 Setup"
-          Hash="5B71B20A455F6EEAB79DD1EDCAB0BA66AD0D2208"
+          Hash="90A3A5A57EA8A6508EEE0D129303C7CB012AABF651DD9A6BEFC20DA3BBDB09FC47FD087645051D3D45BFF909DFC6E6039C22C4816FBC793A847E81701248639E"
           ProductName="Microsoft .NET Framework 4.5.2"
           Size="1118920"
           Version="4.5.51209.34209" />
@@ -76,9 +74,8 @@
 
     <PackageGroup Id="$(var.NetFx452RedistId)">
       <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx452FullLog].html&quot;"
+          InstallArguments="/q /norestart /log &quot;[NetFx452FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx452RedistDetectCondition)"
           InstallCondition="!(wix.NetFx452RedistInstallCondition)"
@@ -86,13 +83,12 @@
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
+          LogPathVariable="NetFx452FullLog">
+        <ExePackagePayload 
+          Name="!(wix.NetFx452RedistPackageDirectory)NDP452-KB2901907-x86-x64-AllOS-ENU.exe"
           DownloadUrl="$(var.NetFx452RedistLink)"
-          LogPathVariable="NetFx452FullLog"
-          Compressed="no"
-          Name="!(wix.NetFx452RedistPackageDirectory)NDP452-KB2901907-x86-x64-AllOS-ENU.exe">
-        <RemotePayload 
           Description="Microsoft .NET Framework 4.5.2 Setup"
-          Hash="89F86F9522DC7A8A965FACCE839ABB790A285A63"
+          Hash="033D457229C4FE6EEA7B1E42A3A39DD4CF6A054C5E996CE036942DD2FE9623FD3A0634BE5DCB88506C1C61BF9FF6076F27B4ECEC38F8CF85603AF018111E584D"
           ProductName="Microsoft .NET Framework 4.5.2"
           Size="69999448"
           Version="4.5.51209.34209" />

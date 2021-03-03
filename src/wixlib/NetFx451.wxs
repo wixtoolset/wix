@@ -3,7 +3,6 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
@@ -25,87 +24,5 @@
     <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
     <Property Id="WIX_IS_NETFRAMEWORK_451_OR_LATER_INSTALLED" Secure="yes" />
     <SetProperty Id="WIX_IS_NETFRAMEWORK_451_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx451MinRelease)&quot;" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
-
-    <WixVariable Id="NetFx451WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx451MinRelease)" Overridable="yes" />
-    <WixVariable Id="NetFx451WebInstallCondition" Value="" Overridable="yes" />
-    <WixVariable Id="NetFx451WebPackageDirectory" Value="redist\" Overridable="yes" />
-
-    <PackageGroup Id="$(var.NetFx451WebId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx451WebDetectCondition)"
-          InstallCondition="!(wix.NetFx451WebInstallCondition)"
-          Id="$(var.NetFx451WebId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx451WebLink)"
-          LogPathVariable="NetFx451FullWebLog"
-          Compressed="no"
-          Name="!(wix.NetFx451WebPackageDirectory)NDP451-KB2859818-Web.exe">
-        <RemotePayload
-            Size="1021432"
-            Version="4.5.50938.18408"
-            ProductName="Microsoft .NET Framework 4.5.1"
-            Description="Microsoft .NET Framework 4.5.1 Setup"
-            Hash="4CBEA1E408DB5B423E130931B9478972E6798431" />
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx451WebId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx451WebId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx451WebId)" LicenseUrl="$(var.NetFx451EulaLink)" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
-
-    <WixVariable Id="NetFx451RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx451MinRelease)" Overridable="yes" />
-    <WixVariable Id="NetFx451RedistInstallCondition" Value="" Overridable="yes" />
-    <WixVariable Id="NetFx451RedistPackageDirectory" Value="redist\" Overridable="yes" />
-
-    <PackageGroup Id="$(var.NetFx451RedistId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx451RedistDetectCondition)"
-          InstallCondition="!(wix.NetFx451RedistInstallCondition)"
-          Id="$(var.NetFx451RedistId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx451RedistLink)"
-          LogPathVariable="NetFx451FullLog"
-          Compressed="no"
-          Name="!(wix.NetFx451RedistPackageDirectory)NDP451-KB2858728-x86-x64-AllOS-ENU.exe">
-        <RemotePayload
-            Size="70087104"
-            Version="4.5.50938.18408"
-            ProductName="Microsoft .NET Framework 4.5.1"
-            Description="Microsoft .NET Framework 4.5.1 Setup"
-            Hash="5934DD101414BBC0B7F1EE2780D2FC8B9BEC5C4D" />
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx451RedistId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx451RedistId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx451RedistId)" LicenseUrl="$(var.NetFx451EulaLink)" />
   </Fragment>
 </Wix>

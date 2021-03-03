@@ -3,7 +3,6 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
@@ -35,88 +34,6 @@
         Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
         Value="Release"
         Result="value" />
-  </Fragment>
-  
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
-
-    <WixVariable Id="NetFx45WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx45MinRelease)" Overridable="yes" />
-    <WixVariable Id="NetFx45WebInstallCondition" Value="" Overridable="yes" />
-    <WixVariable Id="NetFx45WebPackageDirectory" Value="redist\" Overridable="yes" />
-
-    <PackageGroup Id="$(var.NetFx45WebId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullWebLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullWebLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullWebLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx45WebDetectCondition)"
-          InstallCondition="!(wix.NetFx45WebInstallCondition)"
-          Id="$(var.NetFx45WebId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx45WebLink)"
-          LogPathVariable="NetFx45FullWebLog"
-          Compressed="no"
-          Name="!(wix.NetFx45WebPackageDirectory)dotNetFx45_Full_setup.exe">
-        <RemotePayload
-            Size="1005568"
-            Version="4.5.50709.17929"
-            ProductName="Microsoft .NET Framework 4.5"
-            Description="Microsoft .NET Framework 4.5 Setup"
-            Hash="F6BA6F03C65C3996A258F58324A917463B2D6FF4"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx45WebId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx45WebId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx45WebId)" LicenseUrl="$(var.NetFx45EulaLink)" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
-
-    <WixVariable Id="NetFx45RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx45MinRelease)" Overridable="yes" />
-    <WixVariable Id="NetFx45RedistInstallCondition" Value="" Overridable="yes" />
-    <WixVariable Id="NetFx45RedistPackageDirectory" Value="redist\" Overridable="yes" />
-
-    <PackageGroup Id="$(var.NetFx45RedistId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx45FullLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx45RedistDetectCondition)"
-          InstallCondition="!(wix.NetFx45RedistInstallCondition)"
-          Id="$(var.NetFx45RedistId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx45RedistLink)"
-          LogPathVariable="NetFx45FullLog"
-          Compressed="no"
-          Name="!(wix.NetFx45RedistPackageDirectory)dotNetFx45_Full_x86_x64.exe">
-        <RemotePayload
-            Size="50352408" 
-            Version="4.5.50709.17929"
-            ProductName="Microsoft .NET Framework 4.5"
-            Description="Microsoft .NET Framework 4.5 Setup"
-            Hash="B2FF712CA0947040CA0B8E9BD7436A3C3524BB5D"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx45RedistId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx45RedistId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx45RedistId)" LicenseUrl="$(var.NetFx45EulaLink)" />
   </Fragment>
 
   <!-- set to Release number of the .NET Framework 4.5 if installed (not set otherwise) -->

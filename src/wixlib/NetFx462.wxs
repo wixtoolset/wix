@@ -14,9 +14,9 @@
     -->
 
   <?define NetFx462MinRelease = 394802 ?>
-  <?define NetFx462WebLink = http://go.microsoft.com/fwlink/?LinkId=780596 ?>
-  <?define NetFx462RedistLink = http://go.microsoft.com/fwlink/?LinkId=780600 ?>
-  <?define NetFx462EulaLink = http://referencesource.microsoft.com/license.html ?>
+  <?define NetFx462WebLink = https://go.microsoft.com/fwlink/?LinkId=780596 ?>
+  <?define NetFx462RedistLink = https://go.microsoft.com/fwlink/?LinkId=780600 ?>
+  <?define NetFx462EulaLink = https://referencesource.microsoft.com/license.html ?>
   <?define NetFx462WebId = NetFx462Web ?>
   <?define NetFx462RedistId = NetFx462Redist ?>
 
@@ -35,9 +35,8 @@
 
     <PackageGroup Id="$(var.NetFx462WebId)">
       <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx462WebDetectCondition)"
           InstallCondition="!(wix.NetFx462WebInstallCondition)"
@@ -45,13 +44,12 @@
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
+          LogPathVariable="NetFx462FullLog">
+        <ExePackagePayload 
+          Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe"
           DownloadUrl="$(var.NetFx462WebLink)"
-          LogPathVariable="NetFx462FullLog"
-          Compressed="no"
-          Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe">
-        <RemotePayload 
           Description="Microsoft .NET Framework 4.6.2 Setup" 
-          Hash="C42E6ED280290648BBD59F664008852F4CFE4548" 
+          Hash="31D7081BFFEEB5F32457096E51A29236306E5D971DE7EDB80A51188BCCDA9B9F17F0C3593D30828FC140B7A023F5B6842BC922F2023C7B8EA3786C2DBEC40472" 
           ProductName="Microsoft .NET Framework 4.6.2" 
           Size="1429344" 
           Version="4.6.1590.0" />
@@ -76,9 +74,8 @@
 
     <PackageGroup Id="$(var.NetFx462RedistId)">
       <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+          InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;"
+          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;"
           PerMachine="yes"
           DetectCondition="!(wix.NetFx462RedistDetectCondition)"
           InstallCondition="!(wix.NetFx462RedistInstallCondition)"
@@ -86,13 +83,12 @@
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
+          LogPathVariable="NetFx462FullLog">
+        <ExePackagePayload
+          Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe"
           DownloadUrl="$(var.NetFx462RedistLink)"
-          LogPathVariable="NetFx462FullLog"
-          Compressed="no"
-          Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe">
-        <RemotePayload
           Description="Microsoft .NET Framework 4.6.2 Setup" 
-          Hash="A70F856BDA33D45AD0A8AD035F73092441715431" 
+          Hash="E183B33F93FD5F9AA93A1EC02103D2548CA22E3447EF2CEEDE89A5DEBEFC4F2C20990567EB17AFA412E0698D577ADDA373E433847EC8B79EC04BE3C86EDD9F0E" 
           ProductName="Microsoft .NET Framework 4.6.2" 
           Size="62008080" 
           Version="4.6.1590.0" />

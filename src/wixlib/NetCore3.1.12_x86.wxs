@@ -4,14 +4,14 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
-    <?define NetCorePlatform = x64?>
-    <?define NetCoreIdVersion = 318?>
-    <?define NetCoreVersion = 3.1.8?>
+    <?define NetCorePlatform = x86?>
+    <?define NetCoreIdVersion = 3112?>
+    <?define NetCoreVersion = 3.1.12?>
     <?include NetCore3_Platform.wxi?>
 
-    <?define AspNetCoreRedistLink = https://go.microsoft.com/fwlink/?linkid=2143792?>
-    <?define DesktopNetCoreRedistLink = https://go.microsoft.com/fwlink/?linkid=2143950?>
-    <?define DotNetCoreRedistLink = https://go.microsoft.com/fwlink/?linkid=2143846?>
+    <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/55d6ff56-2725-4657-bffd-fdf35d6816fd/7431d1d3533f0b1ac97df734c45c33f2/aspnetcore-runtime-3.1.12-win-x86.exe?>
+    <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/5d89a010-88bf-4e4e-ac12-a07258ddbf5f/1ff5dfe312c5bd9760f3b500b1b37597/windowsdesktop-runtime-3.1.12-win-x86.exe?>
+    <?define DotNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/cbdd1603-7fa9-4957-8869-94e24963ba6c/ca0b7d1be494882d5a7433accfa3c94c/dotnet-runtime-3.1.12-win-x86.exe?>
 
     <Fragment>
         <util:DirectorySearchRef Id="$(var.AspNetCoreId)" />
@@ -23,7 +23,6 @@
 
         <PackageGroup Id="$(var.AspNetCoreRedistId)">
             <ExePackage
-                Name="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)aspnetcore-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
                 InstallArguments="$(var.AspNetCoreRedistInstallArguments)"
                 RepairArguments="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments)"
                 UninstallArguments="$(var.AspNetCoreRedistUninstallArguments)"
@@ -34,15 +33,15 @@
                 Vital="yes"
                 Permanent="yes"
                 Protocol="burn"
-                DownloadUrl="$(var.AspNetCoreRedistLink)"
-                LogPathVariable="$(var.AspNetCoreRedistLog)"
-                Compressed="no">
-                <RemotePayload
-                    Description="Microsoft ASP.NET Core 3.1.8 - Shared Framework"
-                    Hash="61DC9EAA0C8968E48E13C5913ED202A2F8F94DBA"
-                    ProductName="Microsoft ASP.NET Core 3.1.8 - Shared Framework"
-                    Size="7841880"
-                    Version="3.1.8.20421" />
+                LogPathVariable="$(var.AspNetCoreRedistLog)">
+                <ExePackagePayload
+                    Name="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)aspnetcore-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                    DownloadUrl="$(var.AspNetCoreRedistLink)"
+                    Description="Microsoft ASP.NET Core 3.1.12 - Shared Framework"
+                    Hash="03EE5F6D3B2AF8FFE2A5154BB05E50938E2D36E98D996D9E67A3C349DD0C8B3051D5A9628F48C51E006CEA0B1F4484B4BE51920FE5CA841060B0D2C6A12FD5D2"
+                    ProductName="Microsoft ASP.NET Core 3.1.12 - Shared Framework"
+                    Size="7841808"
+                    Version="3.1.12.21070" />
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -57,7 +56,6 @@
 
         <PackageGroup Id="$(var.DesktopNetCoreRedistId)">
             <ExePackage
-                Name="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)windowsdesktop-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
                 InstallArguments="$(var.DesktopNetCoreRedistInstallArguments)"
                 RepairArguments="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments)"
                 UninstallArguments="$(var.DesktopNetCoreRedistUninstallArguments)"
@@ -68,15 +66,15 @@
                 Vital="yes"
                 Permanent="yes"
                 Protocol="burn"
-                DownloadUrl="$(var.DesktopNetCoreRedistLink)"
-                LogPathVariable="$(var.DesktopNetCoreRedistLog)"
-                Compressed="no">
-                <RemotePayload
-                    Description="Microsoft Windows Desktop Runtime - 3.1.8 (x64)"
-                    Hash="6DEE30E0C636B13650E7CE1D13E8CCC99CB2A7AC"
-                    ProductName="Microsoft Windows Desktop Runtime - 3.1.8 (x64)"
-                    Size="54253328"
-                    Version="3.1.8.29220" />
+                LogPathVariable="$(var.DesktopNetCoreRedistLog)">
+                <ExePackagePayload
+                    Name="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)windowsdesktop-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                    DownloadUrl="$(var.DesktopNetCoreRedistLink)"
+                    Description="Microsoft Windows Desktop Runtime - 3.1.12 (x86)"
+                    Hash="C211A7F29D9B6FEEFCF0379B153FFBFB815157D3D494CFD7D0D84D619701EEA284BF12502094BCFF2BB2968213190454E7CE0E865FD623E78C2FCDAEBEF963DA"
+                    ProductName="Microsoft Windows Desktop Runtime - 3.1.12 (x86)"
+                    Size="48590696"
+                    Version="3.1.12.29719" />
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -91,7 +89,6 @@
 
         <PackageGroup Id="$(var.DotNetCoreRedistId)">
             <ExePackage
-                Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
                 InstallArguments="$(var.DotNetCoreRedistInstallArguments)"
                 RepairArguments="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairArguments)"
                 UninstallArguments="$(var.DotNetCoreRedistUninstallArguments)"
@@ -102,15 +99,15 @@
                 Vital="yes"
                 Permanent="yes"
                 Protocol="burn"
-                DownloadUrl="$(var.DotNetCoreRedistLink)"
-                LogPathVariable="$(var.DotNetCoreRedistLog)"
-                Compressed="no">
-                <RemotePayload
-                    Description="Microsoft .NET Core Runtime - 3.1.8 (x64)"
-                    Hash="C51D55F163788404ECADE0BF32B3D7796EEAE449"
-                    ProductName="Microsoft .NET Core Runtime - 3.1.8 (x64)"
-                    Size="26089480"
-                    Version="3.1.8.29220" />
+                LogPathVariable="$(var.DotNetCoreRedistLog)">
+                <ExePackagePayload
+                    Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                    DownloadUrl="$(var.DotNetCoreRedistLink)"
+                    Description="Microsoft .NET Core Runtime - 3.1.12 (x86)"
+                    Hash="BA18F9028B19630D91017BEACCD8D79388125C228A83B5A62306108F3BB283617A7ED9B98785BC73192EC00E5D186DA767E940DCAB388699FAF274E437D0C16F"
+                    ProductName="Microsoft .NET Core Runtime - 3.1.12 (x86)"
+                    Size="23392184"
+                    Version="3.1.12.29719" />
             </ExePackage>
         </PackageGroup>
     </Fragment>

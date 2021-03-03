@@ -3,7 +3,6 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
@@ -41,76 +40,6 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40" />
-
-    <PackageGroup Id="$(var.NetFx40WebId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          PerMachine="yes"
-          DetectCondition="NETFRAMEWORK40"
-          Id="$(var.NetFx40WebId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx40WebLink)"
-          Compressed="no"
-          Name="redist\dotNetFx40_Full_setup.exe">
-        <RemotePayload
-            Size="889416"
-            Version="4.0.30319.1"
-            ProductName="Microsoft .NET Framework 4"
-            Description="Microsoft .NET Framework 4 Setup"
-            Hash="06BECADB92A5FCCA2529C0B93687C2A0C6D0D610"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx40WebId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx40WebId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40WebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40" />
-
-    <PackageGroup Id="$(var.NetFx40RedistId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          PerMachine="yes"
-          DetectCondition="NETFRAMEWORK40"
-          Id="$(var.NetFx40RedistId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx40RedistLink)"
-          Compressed="no"
-          Name="redist\dotNetFx40_Full_x86_x64.exe">
-        <RemotePayload
-            Size="50449456"
-            Version="4.0.30319.1"
-            ProductName="Microsoft .NET Framework 4"
-            Description="Microsoft .NET Framework 4 Setup"
-            Hash="58DA3D74DB353AAD03588CBB5CEA8234166D8B99"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx40RedistId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx40RedistId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40RedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
-  </Fragment>
-
-  <Fragment>
     <util:RegistrySearch
         Id="NETFRAMEWORK40CLIENT"
         Variable="NETFRAMEWORK40CLIENT"
@@ -118,76 +47,6 @@
         Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client"
         Value="Install"
         Result="value" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT" />
-
-    <PackageGroup Id="$(var.NetFx40ClientWebId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          PerMachine="yes"
-          DetectCondition="NETFRAMEWORK40CLIENT"
-          Id="$(var.NetFx40ClientWebId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx40ClientWebLink)"
-          Compressed="no"
-          Name="redist\dotNetFx40_Client_setup.exe">
-        <RemotePayload
-            Size="887896"
-            Version="4.0.30319.1"
-            ProductName="Microsoft .NET Framework 4 Client Profile"
-            Description="Microsoft .NET Framework 4 Client Profile Setup"
-            Hash="E15AD80FC74277EF2048312E9A71AF56B2EBA622"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx40ClientWebId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx40ClientWebId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientWebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
-  </Fragment>
-
-  <Fragment>
-    <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT" />
-
-    <PackageGroup Id="$(var.NetFx40ClientRedistId)">
-      <ExePackage
-          InstallArguments="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          RepairArguments="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
-          UninstallArguments="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
-          PerMachine="yes"
-          DetectCondition="NETFRAMEWORK40CLIENT"
-          Id="$(var.NetFx40ClientRedistId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          DownloadUrl="$(var.NetFx40ClientRedistLink)"
-          Compressed="no"
-          Name="redist\dotNetFx40_Client_x86_x64.exe">
-        <RemotePayload
-            Size="43000680"
-            Version="4.0.30319.1"
-            ProductName="Microsoft .NET Framework 4 Client Profile"
-            Description="Microsoft .NET Framework 4 Client Profile Setup"
-            Hash="4CD67F609F89D617D2B206341B8C211E1B88B287"/>
-      </ExePackage>
-    </PackageGroup>
-  </Fragment>
-
-  <Fragment>
-    <PackageGroup Id="$(var.NetFx40ClientRedistId)AsPrereq">
-      <PackageGroupRef Id="$(var.NetFx40ClientRedistId)" />
-    </PackageGroup>
-
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientRedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>
 
   <!-- set to #1 if the .NET Framework 4.0 client is installed (not set otherwise) -->

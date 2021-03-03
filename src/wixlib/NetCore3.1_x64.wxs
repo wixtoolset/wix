@@ -6,19 +6,19 @@
 
     <Fragment>
         <PackageGroup Id="AspNetCoreRuntime31Redist_x64">
-            <PackageGroupRef Id="AspNetCoreRuntime318Redist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime3112Redist_x64" />
         </PackageGroup>
     </Fragment>
 
     <Fragment>
         <PackageGroup Id="DesktopNetCoreRuntime31Redist_x64">
-            <PackageGroupRef Id="DesktopNetCoreRuntime318Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime3112Redist_x64" />
         </PackageGroup>
     </Fragment>
 
     <Fragment>
         <PackageGroup Id="DotNetCoreRuntime31Redist_x64">
-            <PackageGroupRef Id="DotNetCoreRuntime318Redist_x64" />
+            <PackageGroupRef Id="DotNetCoreRuntime3112Redist_x64" />
         </PackageGroup>
     </Fragment>
 </Wix>
