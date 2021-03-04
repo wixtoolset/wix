@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 
-class CBalBootstrapperEngine : public IBootstrapperEngine, public IMarshal
+class CBalBootstrapperEngine : public IBootstrapperEngine
 {
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
@@ -24,7 +24,7 @@ public: // IUnknown
         }
         else if (::IsEqualIID(IID_IMarshal, riid))
         {
-            *ppvObject = static_cast<IMarshal*>(this);
+            return m_pFreeThreadedMarshaler->QueryInterface(riid, ppvObject);
         }
         else if (::IsEqualIID(IID_IUnknown, riid))
         {
@@ -561,158 +561,12 @@ public: // IBootstrapperEngine
         return hr;
     }
 
-public: // IMarshal
-    virtual STDMETHODIMP GetUnmarshalClass(
-        __in REFIID /*riid*/,
-        __in_opt LPVOID /*pv*/,
-        __in DWORD /*dwDestContext*/,
-        __reserved LPVOID /*pvDestContext*/,
-        __in DWORD /*mshlflags*/,
-        __out LPCLSID /*pCid*/
-        )
-    {
-        return E_NOTIMPL;
-    }
-
-    virtual STDMETHODIMP GetMarshalSizeMax(
-        __in REFIID riid,
-        __in_opt LPVOID /*pv*/,
-        __in DWORD dwDestContext,
-        __reserved LPVOID /*pvDestContext*/,
-        __in DWORD /*mshlflags*/,
-        __out DWORD *pSize
-        )
-    {
-        HRESULT hr = S_OK;
-
-        // We only support marshaling the IBootstrapperEngine interface in-proc.
-        if (__uuidof(IBootstrapperEngine) != riid)
-        {
-            // Skip logging the following message since it appears way too often in the log.
-            // "Unexpected IID requested to be marshalled. BootstrapperEngineForApplication can only marshal the IBootstrapperEngine interface."
-            ExitFunction1(hr = E_NOINTERFACE);
-        }
-        else if (0 == (MSHCTX_INPROC & dwDestContext))
-        {
-            hr = E_FAIL;
-            ExitOnRootFailure(hr, "Cannot marshal IBootstrapperEngine interface out of proc.");
-        }
-
-        // E_FAIL is used because E_INVALIDARG is not a supported return value.
-        ExitOnNull(pSize, hr, E_FAIL, "Invalid size output parameter is NULL.");
-
-        // Specify enough size to marshal just the interface pointer across threads.
-        *pSize = sizeof(LPVOID);
-
-    LExit:
-        return hr;
-    }
-
-    virtual STDMETHODIMP MarshalInterface(
-        __in IStream* pStm,
-        __in REFIID riid,
-        __in_opt LPVOID pv,
-        __in DWORD dwDestContext,
-        __reserved LPVOID /*pvDestContext*/,
-        __in DWORD /*mshlflags*/
-        )
-    {
-        HRESULT hr = S_OK;
-        IBootstrapperEngine *pThis = NULL;
-        ULONG ulWritten = 0;
-
-        // We only support marshaling the IBootstrapperEngine interface in-proc.
-        if (__uuidof(IBootstrapperEngine) != riid)
-        {
-            // Skip logging the following message since it appears way too often in the log.
-            // "Unexpected IID requested to be marshalled. BootstrapperEngineForApplication can only marshal the IBootstrapperEngine interface."
-            ExitFunction1(hr = E_NOINTERFACE);
-        }
-        else if (0 == (MSHCTX_INPROC & dwDestContext))
-        {
-            hr = E_FAIL;
-            ExitOnRootFailure(hr, "Cannot marshal IBootstrapperEngine interface out of proc.");
-        }
-
-        // "pv" may not be set, so we should us "this" otherwise.
-        if (pv)
-        {
-            pThis = reinterpret_cast<IBootstrapperEngine*>(pv);
-        }
-        else
-        {
-            pThis = static_cast<IBootstrapperEngine*>(this);
-        }
-
-        // E_INVALIDARG is not a supported return value.
-        ExitOnNull(pStm, hr, E_FAIL, "The marshaling stream parameter is NULL.");
-
-        // Marshal the interface pointer in-proc as is.
-        hr = pStm->Write(pThis, sizeof(pThis), &ulWritten);
-        if (STG_E_MEDIUMFULL == hr)
-        {
-            ExitOnFailure(hr, "Failed to write the stream because the stream is full.");
-        }
-        else if (FAILED(hr))
-        {
-            // All other STG error must be converted into E_FAIL based on IMarshal documentation.
-            hr = E_FAIL;
-            ExitOnFailure(hr, "Failed to write the IBootstrapperEngine interface pointer to the marshaling stream.");
-        }
-
-    LExit:
-        return hr;
-    }
-
-    virtual STDMETHODIMP UnmarshalInterface(
-        __in IStream* pStm,
-        __in REFIID riid,
-        __deref_out LPVOID* ppv
-        )
-    {
-        HRESULT hr = S_OK;
-        ULONG ulRead = 0;
-
-        // We only support marshaling the engine in-proc.
-        if (__uuidof(IBootstrapperEngine) != riid)
-        {
-            // Skip logging the following message since it appears way too often in the log.
-            // "Unexpected IID requested to be marshalled. BootstrapperEngineForApplication can only marshal the IBootstrapperEngine interface."
-            ExitFunction1(hr = E_NOINTERFACE);
-        }
-
-        // E_FAIL is used because E_INVALIDARG is not a supported return value.
-        ExitOnNull(pStm, hr, E_FAIL, "The marshaling stream parameter is NULL.");
-        ExitOnNull(ppv, hr, E_FAIL, "The interface output parameter is NULL.");
-
-        // Unmarshal the interface pointer in-proc as is.
-        hr = pStm->Read(*ppv, sizeof(LPVOID), &ulRead);
-        if (FAILED(hr))
-        {
-            // All STG errors must be converted into E_FAIL based on IMarshal documentation.
-            hr = E_FAIL;
-            ExitOnFailure(hr, "Failed to read the IBootstrapperEngine interface pointer from the marshaling stream.");
-        }
-
-    LExit:
-        return hr;
-    }
-
-    virtual STDMETHODIMP ReleaseMarshalData(
-        __in IStream* /*pStm*/
-        )
-    {
-        return E_NOTIMPL;
-    }
-
-    virtual STDMETHODIMP DisconnectObject(
-        __in DWORD /*dwReserved*/
-        )
-    {
-        return E_NOTIMPL;
-    }
-
 public:
+    HRESULT Init()
+    {
+        return ::CoCreateFreeThreadedMarshaler(this, &m_pFreeThreadedMarshaler);
+    }
+
     CBalBootstrapperEngine(
         __in PFN_BOOTSTRAPPER_ENGINE_PROC pfnBAEngineProc,
         __in_opt LPVOID pvBAEngineProcContext
@@ -721,12 +575,19 @@ public:
         m_cReferences = 1;
         m_pfnBAEngineProc = pfnBAEngineProc;
         m_pvBAEngineProcContext = pvBAEngineProcContext;
+        m_pFreeThreadedMarshaler = NULL;
+    }
+
+    ~CBalBootstrapperEngine()
+    {
+        ReleaseObject(m_pFreeThreadedMarshaler);
     }
 
 private:
     long m_cReferences;
     PFN_BOOTSTRAPPER_ENGINE_PROC m_pfnBAEngineProc;
     LPVOID m_pvBAEngineProcContext;
+    IUnknown* m_pFreeThreadedMarshaler;
 };
 
 HRESULT BalBootstrapperEngineCreate(
@@ -740,6 +601,9 @@ HRESULT BalBootstrapperEngineCreate(
 
     pBootstrapperEngine = new CBalBootstrapperEngine(pfnBAEngineProc, pvBAEngineProcContext);
     ExitOnNull(pBootstrapperEngine, hr, E_OUTOFMEMORY, "Failed to allocate new BalBootstrapperEngine object.");
+
+    hr = pBootstrapperEngine->Init();
+    ExitOnFailure(hr, "Failed to initialize CBalBootstrapperEngine.");
 
     hr = pBootstrapperEngine->QueryInterface(IID_PPV_ARGS(ppBootstrapperEngine));
     ExitOnFailure(hr, "Failed to QI for IBootstrapperEngine from BalBootstrapperEngine object.");
