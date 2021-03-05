@@ -30,14 +30,14 @@ namespace WixToolset.Dependency
             switch (parentElement.Name.LocalName)
             {
                 case "Provides":
-                    if (attribute.Name.LocalName == "Check" && parentElement.Parent.Name.LocalName == "Component")
+                    if (attribute.Name.LocalName == "Check" && parentElement.Parent?.Name.LocalName == "Component")
                     {
                         addCheck = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute);
                     }
                     break;
                 case "Requires":
                 case "RequiresRef":
-                    if (attribute.Name.LocalName == "Enforce" && parentElement.Parent.Name.LocalName == "Component")
+                    if (attribute.Name.LocalName == "Enforce" && parentElement.Parent?.Parent?.Name.LocalName == "Component")
                     {
                         addRequire = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute);
                     }

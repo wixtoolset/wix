@@ -7,7 +7,7 @@
     <Fragment>
         <CustomAction Id="$(var.Prefix)DependencyRequire$(var.Suffix)" DllEntry="WixDependencyRequire" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="DependencyCA$(var.Suffix)" />
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)DependencyRequire$(var.Suffix)" Before="WixDependencyCheck$(var.Suffix)" Overridable="yes" Condition="NOT DISABLEDEPENDENCYCHECK" />
+            <Custom Action="$(var.Prefix)DependencyRequire$(var.Suffix)" Before="$(var.Prefix)DependencyCheck$(var.Suffix)" Overridable="yes" Condition="NOT DISABLEDEPENDENCYCHECK" />
         </InstallExecuteSequence>
         <UIRef Id="WixDependencyErrors" />
         <PropertyRef Id="DISABLEDEPENDENCYCHECK" />

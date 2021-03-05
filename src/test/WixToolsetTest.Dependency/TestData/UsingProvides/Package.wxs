@@ -9,6 +9,9 @@
       <Component Directory="INSTALLFOLDER">
         <File Name="example.txt" Source="Package.wxs" />
         <Provides Key="UsingProvides" dep:Check="yes" />
+        <Provides>
+          <Requires ProviderKey="UsingRequires" Minimum="1.0.0.0" dep:Enforce="yes" />
+        </Provides>
       </Component>
     </Feature>
 
