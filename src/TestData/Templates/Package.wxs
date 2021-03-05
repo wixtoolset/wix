@@ -19,6 +19,10 @@
     <MediaTemplate CabinetTemplate="{0}$(var.CabPrefix).cab" />
     <?endif?>
 
+    <?ifdef SoftwareTag?>
+    <SoftwareTag Regid="regid.1995-08.com.example" InstallDirectory="CommonAppDataFolder" />
+    <?endif?>
+
     <PropertyRef Id="TestVersion" />
 
     <Feature Id="Complete" Level="1">
@@ -32,6 +36,7 @@
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="CommonAppDataFolder" />
       <Directory Id="ProgramFilesFolder">
         <Directory Id="WixDir" Name="~Test WiX">
           <Directory Id="TestDir" Name="$(var.TestGroupName)">

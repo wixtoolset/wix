@@ -4,7 +4,7 @@
 <?define Version = 1.0.0.0?>
 <?endif?>
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:swid="http://wixtoolset.org/schemas/v4/wxs/tag">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Patch AllowRemoval="yes" Classification="Update" Description="Patch A in test $(var.TestGroupName)" DisplayName="$(var.TestGroupName) - Patch A" Manufacturer="Example Corporation" MinorUpdateTargetRTM="yes">
         <Media Id="100" Cabinet="PatchA" EmbedCab="yes">
             <PatchBaseline
@@ -15,7 +15,7 @@
         </Media>
 
         <PatchFamily Id="A" Version="$(var.Version)" Supersede="yes">
-          <!-- <swid:TagRef Regid="regid.1995-08.com.example" /> -->
+          <SoftwareTagRef Regid="regid.1995-08.com.example" />
 
           <ComponentRef Id="RegistryComponent"/>
           <PropertyRef Id="TestVersion"/>

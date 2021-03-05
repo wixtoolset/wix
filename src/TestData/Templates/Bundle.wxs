@@ -10,6 +10,10 @@
 
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 
+    <?ifdef SoftwareTag?>
+    <SoftwareTag Regid="regid.1995-08.com.example" InstallPath="[CommonAppDataFolder]regid.1995-08.com.example" />
+    <?endif?>
+
     <?ifndef BA?>
       <!-- pulled in through the PackageGroupRef below -->
     <?elseif $(var.BA) = "TestBAdnc"?>

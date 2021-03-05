@@ -2,6 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
+    <IncludeSoftwareTag>true</IncludeSoftwareTag>
     <UpgradeCode>{486FC795-69A5-4130-8727-4068F645A0A1}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

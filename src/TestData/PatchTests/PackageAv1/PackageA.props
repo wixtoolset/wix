@@ -4,6 +4,7 @@
     <PackageName>PackageA</PackageName>
     <ProductComponentsRef>true</ProductComponentsRef>
     <ProductCode>{724F9BA5-DD9D-4851-855E-ECC35B27BF11}</ProductCode>
+    <IncludeSoftwareTag>true</IncludeSoftwareTag>
     <UpgradeCode>{C56DA396-7A9A-4177-8264-638161CE9EB8}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

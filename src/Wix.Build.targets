@@ -7,6 +7,7 @@
     <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);BundleName=$(BundleName);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(BA)' != '' ">BA=$(BA);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(CabPrefix)' != '' ">CabPrefix=$(CabPrefix);$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition=" '$(IncludeSoftwareTag)' == 'true' ">SoftwareTag=1;$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(ProductCode)' != '' ">ProductCode=$(ProductCode);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(ProductComponentsRef)' == 'true' ">ProductComponents=1;$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(UpgradeCode)' != '' ">UpgradeCode=$(UpgradeCode);$(DefineConstants)</DefineConstants>
