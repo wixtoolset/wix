@@ -197,7 +197,7 @@ namespace WixToolset.Core
                         parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "ProviderKey":
-                        this.ParseBundleProviderKeyAttribute(sourceLineNumbers, node, attrib);
+                        // This can't be processed until we create the section.
                         break;
                     case "SplashScreenSourceFile":
                         splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -261,10 +261,20 @@ namespace WixToolset.Core
             this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
             this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, 0, this.Context.CompilationId);
 
-            // Now that the active section is initialized, process only extension attributes.
+            // Now that the active section is initialized, process only extension attributes and the special ProviderKey attribute.
             foreach (var attrib in node.Attributes())
             {
-                if (!String.IsNullOrEmpty(attrib.Name.NamespaceName) && CompilerCore.WixNamespace != attrib.Name.Namespace)
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "ProviderKey":
+                            this.ParseBundleProviderKeyAttribute(sourceLineNumbers, node, attrib);
+                            break;
+                        // Unknown attributes were reported earlier.
+                    }
+                }
+                else
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }

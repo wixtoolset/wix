@@ -57,12 +57,61 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var provides = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:Provides");
+                var provides = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:MsiPackage/burn:Provides")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml())
+                                            .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "<Provides Key='UsingProvides' Imported='yes' />",
                     "<Provides Key='{A81D50F9-B696-4F3D-ABE0-E64D61590E5F}' Version='1.0.0.0' DisplayName='MsiPackage' />",
-                }, provides.Cast<XmlElement>().Select(e => e.GetTestXml()).ToArray());
+                }, provides);
+            }
+        }
+
+        [Fact]
+        public void CanBuildBundleWithCustomProviderKey()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Dependency", "CustomProviderKeyBundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "Registration", new List<string> { "Id" } },
+                };
+                var registration = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration")
+                                                .Cast<XmlElement>()
+                                                .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                                .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Registration Id='*' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='MyProviderKey,v1.0'><Arp Register='yes' DisplayName='BurnBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' /></Registration>",
+                }, registration);
             }
         }
 
