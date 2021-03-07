@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
@@ -10,6 +11,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
+    using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
@@ -81,6 +83,25 @@ namespace WixToolsetTest.CoreIntegration
 
                 var files = Query.GetCabinetFiles(cab);
                 Assert.Empty(files);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void CanBuildPatchFromProductWithFilesFromWixlib()
+        {
+            var folder = TestData.Get(@"TestData\PatchFromWixlib");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var tempFolder = fs.GetFolder();
+
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", hasNoFiles: true);
+                var patchPath = Path.ChangeExtension(patchPdb, ".msp");
+
+                Assert.True(File.Exists(baselinePdb));
+                Assert.True(File.Exists(update1Pdb));
             }
         }
 
@@ -164,6 +185,7 @@ namespace WixToolsetTest.CoreIntegration
 
         private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB)
         {
+            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
             var result = WixRunner.Execute(new[]
@@ -175,7 +197,8 @@ namespace WixToolsetTest.CoreIntegration
                 "-d", "B=" + defineB,
                 "-bindpath", Path.Combine(sourceFolder, ".data"),
                 "-intermediateFolder", Path.Combine(baseFolder, "obj"),
-                "-o", outputPath
+                "-o", outputPath,
+                "-ext", extensionPath,
             });
 
             result.AssertSuccess();

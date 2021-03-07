@@ -1,0 +1,30 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="~Test Package" Version="$(var.V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="{6B8097B9-A5D0-4BDE-B21E-AF6622DDCA01}" Scope="perMachine" ProductCode="{7C871EC1-1F89-4850-A6A9-D7A4C21769F6}">
+    <MajorUpgrade DowngradeErrorMessage="Newer version already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <CustomAction Id="CAFromExtension" DllEntry="DoesntExist" BinaryRef="BinFromWir" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="~Test App" />
+      </Directory>
+    </Directory>
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="Components" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="$(sys.SOURCEFILEPATH)" />
+      </Component>
+
+      <Component>
+        <RegistryValue Root="HKLM" Key="SOFTWARE\!(bind.property.ProductName)\Patch" Name="Version" Value="$(var.V)" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
