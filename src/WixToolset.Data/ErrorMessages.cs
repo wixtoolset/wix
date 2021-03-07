@@ -1489,6 +1489,11 @@ namespace WixToolset.Data
             return Message(null, Ids.MissingDependencyVersion, "The provider dependency version was not authored for the package with Id '{0}'. Please author the Provides/@Version attribute for this package.", packageId);
         }
 
+        public static Message MissingEntrySection()
+        {
+            return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.");
+        }
+
         public static Message MissingEntrySection(string sectionType)
         {
             return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Expected section of type '{0}'.", sectionType);
