@@ -79,5 +79,95 @@ namespace WixToolsetTest.CoreIntegration
                 //Assert.Equal(@"test.txt", wixFile[WixFileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
+
+        [Fact]
+        public void MissingEntrySectionDetectedProduct()
+        {
+            var folder = TestData.Get(@"TestData\OverridableActions");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                try
+                {
+                    WixRunner.Execute(new[]
+                    {
+                        "build",
+                        Path.Combine(folder, "PackageComponents.wxs"),
+                        "-intermediateFolder", intermediateFolder,
+                        "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                    });
+                }
+                catch (WixException we)
+                {
+                    Assert.Equal("Could not find entry section in provided list of intermediates. Expected section of type 'Product'.", we.Message);
+                    return;
+                }
+
+                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+            }
+        }
+
+        [Fact]
+        public void MissingEntrySectionDetectedWixipl()
+        {
+            var folder = TestData.Get(@"TestData\OverridableActions");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                try
+                {
+                    WixRunner.Execute(new[]
+                    {
+                        "build",
+                        Path.Combine(folder, "PackageComponents.wxs"),
+                        "-intermediateFolder", intermediateFolder,
+                        "-o", Path.Combine(baseFolder, @"bin\test.wixipl")
+                    });
+                }
+                catch (WixException we)
+                {
+                    Assert.Equal("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    return;
+                }
+
+                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+            }
+        }
+
+        [Fact]
+        public void MissingEntrySectionDetectedUnknown()
+        {
+            var folder = TestData.Get(@"TestData\OverridableActions");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                try
+                {
+                    WixRunner.Execute(new[]
+                    {
+                        "build",
+                        Path.Combine(folder, "PackageComponents.wxs"),
+                        "-intermediateFolder", intermediateFolder,
+                        "-o", Path.Combine(baseFolder, @"bin\test.bob")
+                    });
+                }
+                catch (WixException we)
+                {
+                    Assert.Equal("Could not find entry section in provided list of intermediates. Supported entry section types are: Product, Bundle, Patch, PatchCreation, Module.", we.Message);
+                    return;
+                }
+
+                Assert.True(false, "Expected WixException for missing entry section but expectations were not met.");
+            }
+        }
     }
 }

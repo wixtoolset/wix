@@ -106,7 +106,14 @@ namespace WixToolset.Core
                 // Must have found the entry section by now.
                 if (null == find.EntrySection)
                 {
-                    throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
+                    if (this.Context.ExpectedOutputType == OutputType.IntermediatePostLink || this.Context.ExpectedOutputType == OutputType.Unknown)
+                    {
+                        throw new WixException(ErrorMessages.MissingEntrySection());
+                    }
+                    else
+                    {
+                        throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
+                    }
                 }
 
                 // Add the missing standard action and directory symbols.
