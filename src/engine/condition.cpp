@@ -896,7 +896,7 @@ static HRESULT CompareOperands(
     else
     {
         // not a combination that can be compared
-        *pfResult = (BURN_SYMBOL_TYPE_NE == comparison);
+        *pfResult = (BURN_SYMBOL_TYPE_NE == comparison || BURN_SYMBOL_TYPE_NE_I == comparison);
     }
 
 LExit:
