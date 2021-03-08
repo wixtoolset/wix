@@ -1,0 +1,12 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project>
+  <PropertyGroup>
+    <PackageName>PackageE</PackageName>
+    <ProductComponentsRef>true</ProductComponentsRef>
+    <ProductCode>{70FA13C7-0338-483F-A256-E5C83750BDE5}</ProductCode>
+    <UpgradeCode>{212A5698-457E-440F-88CC-98FC49A17378}</UpgradeCode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Package.wxs" Link="Package.wxs" />
+  </ItemGroup>
+</Project>

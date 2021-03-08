@@ -58,6 +58,13 @@ namespace WixTestTools
             Assert.Equal(installed, MsiUtilities.IsProductInstalled(productCode));
         }
 
+        public void VerifyInstalledWithVersion(bool installed)
+        {
+            var productCode = this.GetProperty("ProductCode");
+            Version prodVersion = new Version(this.GetProperty("ProductVersion"));
+            Assert.Equal(installed, MsiUtilities.IsProductInstalledWithVersion(productCode, prodVersion));
+        }
+
         public void DeleteTestRegistryValue(string name)
         {
             using (var root = this.TestContext.GetTestRegistryRoot())

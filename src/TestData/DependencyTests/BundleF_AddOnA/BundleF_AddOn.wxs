@@ -1,0 +1,22 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?define TestExeRegistryKey = Software\WiX\Tests\$(var.TestGroupName)\ExeA?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Fragment>
+    <RelatedBundle Id="583B5ECB-04E6-4837-A30C-A1ADCBE24235" Action="Addon" />
+    <util:RegistrySearch Root="HKLM" Key="$(var.TestExeRegistryKey)" Value="Version" Variable="ExeA_Version" />
+
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />
+      <ExePackage Id="ExeA" Cache="no" PerMachine="yes"
+                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.Version)"
+                  InstallArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
+                  RepairArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
+                  UninstallArguments="/regd &quot;HKLM\$(var.TestExeRegistryKey),Version&quot;">
+        <Provides Key="$(var.TestGroupName)_ExeA,v1.0" Version="$(var.Version)" />
+        <PayloadGroupRef Id="TestExePayloads" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+</Wix>

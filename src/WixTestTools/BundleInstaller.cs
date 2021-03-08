@@ -12,11 +12,14 @@ namespace WixTestTools
         {
             this.Bundle = Path.Combine(testContext.TestDataFolder, $"{name}.exe");
             this.BundlePdb = Path.Combine(testContext.TestDataFolder, $"{name}.wixpdb");
+            this.TestContext = testContext;
             this.TestGroupName = testContext.TestGroupName;
             this.TestName = testContext.TestName;
         }
 
         public string Bundle { get; }
+
+        private WixTestContext TestContext { get; }
 
         public string TestGroupName { get; }
 

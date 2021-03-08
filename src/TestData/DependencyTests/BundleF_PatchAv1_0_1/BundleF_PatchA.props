@@ -1,0 +1,11 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project>
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <BundleName>BundleF_PatchA</BundleName>
+    <UpgradeCode>{90F41437-BEF8-4ED8-8902-C5DED74E4F6C}</UpgradeCode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+  </ItemGroup>
+</Project>

@@ -19,7 +19,7 @@
     </Feature>
 
     <util:FailWhenDeferred />
-    <Property Id="WIXFAILWHENDEFERRED" Value="1" />
+    <Property Id="WIXFAILWHENDEFERRED" Secure="yes" Value="1" />
   </Package>
 
   <Fragment>

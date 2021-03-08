@@ -7,7 +7,8 @@ namespace WixTestTools
 
     public class BundleRegistration
     {
-        public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+        public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+        public const string BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY_WOW6432NODE = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
         public const string BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH = "BundleCachePath";
         public const string BURN_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE = "BundleAddonCode";
         public const string BURN_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE = "BundleDetectCode";
@@ -89,8 +90,17 @@ namespace WixTestTools
 
         public static bool TryGetPerMachineBundleRegistrationById(string bundleId, out BundleRegistration registration)
         {
-            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
+            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY_WOW6432NODE}\\{bundleId}";
             using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
+            var success = registrationKey != null;
+            registration = success ? GetBundleRegistration(registrationKey) : null;
+            return success;
+        }
+
+        public static bool TryGetPerUserBundleRegistrationById(string bundleId, out BundleRegistration registration)
+        {
+            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY}\\{bundleId}";
+            using var registrationKey = Registry.CurrentUser.OpenSubKey(registrationKeyPath);
             var success = registrationKey != null;
             registration = success ? GetBundleRegistration(registrationKey) : null;
             return success;

@@ -33,31 +33,46 @@ namespace WixTestTools
             return this.BundleSymbol;
         }
 
-        public string GetPackageCachePathForCacheId(string cacheId)
+        public string GetPackageCachePathForCacheId(string cacheId, bool perMachine)
         {
-            using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
-            var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
-            var cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
+            string cachePath;
+            if (perMachine)
+            {
+                using var policyKey = Registry.LocalMachine.OpenSubKey(FULL_BURN_POLICY_REGISTRY_PATH);
+                var redirectedCachePath = policyKey?.GetValue("PackageCache") as string;
+                cachePath = redirectedCachePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), PACKAGE_CACHE_FOLDER_NAME);
+            }
+            else
+            {
+                cachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), PACKAGE_CACHE_FOLDER_NAME);
+            }
             return Path.Combine(cachePath, cacheId);
         }
 
         public string GetExpectedCachedBundlePath()
         {
             var bundleSymbol = this.GetBundleSymbol();
-            var cachePath = this.GetPackageCachePathForCacheId(bundleSymbol.BundleId);
+            var cachePath = this.GetPackageCachePathForCacheId(bundleSymbol.BundleId, bundleSymbol.PerMachine);
             return Path.Combine(cachePath, Path.GetFileName(this.Bundle));
         }
 
-        public bool TryGetPerMachineRegistration(out BundleRegistration registration)
+        public bool TryGetRegistration(out BundleRegistration registration)
         {
             var bundleSymbol = this.GetBundleSymbol();
             var bundleId = bundleSymbol.BundleId;
-            return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleId, out registration);
+            if (bundleSymbol.PerMachine)
+            {
+                return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleId, out registration);
+            }
+            else
+            {
+                return BundleRegistration.TryGetPerUserBundleRegistrationById(bundleId, out registration);
+            }
         }
 
         public string VerifyRegisteredAndInPackageCache()
         {
-            Assert.True(this.TryGetPerMachineRegistration(out var registration));
+            Assert.True(this.TryGetRegistration(out var registration));
 
             Assert.NotNull(registration.CachePath);
             Assert.True(File.Exists(registration.CachePath));
@@ -76,7 +91,7 @@ namespace WixTestTools
 
         public void VerifyUnregisteredAndRemovedFromPackageCache(string cachedBundlePath)
         {
-            Assert.False(this.TryGetPerMachineRegistration(out _));
+            Assert.False(this.TryGetRegistration(out _));
             Assert.False(File.Exists(cachedBundlePath));
         }
 
@@ -86,10 +101,40 @@ namespace WixTestTools
             var intermediate = Intermediate.Load(wixOutput);
             var section = intermediate.Sections.Single();
             var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
-            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId);
+            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
             if (Directory.Exists(cachePath))
             {
                 Directory.Delete(cachePath, true);
+            }
+        }
+
+        public void VerifyPackageIsCached(string packageId)
+        {
+            using var wixOutput = WixOutput.Read(this.BundlePdb);
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Single(p => p.Id.Id == packageId);
+            var cachePath = this.GetPackageCachePathForCacheId(packageSymbol.CacheId, packageSymbol.PerMachine == YesNoDefaultType.Yes);
+            Assert.True(Directory.Exists(cachePath));
+        }
+
+        public void VerifyExeTestRegistryRootDeleted(string name)
+        {
+            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot(name);
+            if (testRegistryRoot != null)
+            {
+                var actualValue = testRegistryRoot.GetValue("Version") as string;
+                Assert.Null(actualValue);
+            }
+        }
+
+        public void VerifyExeTestRegistryValue(string name, string expectedValue)
+        {
+            using (var root = this.TestContext.GetTestRegistryRoot(name))
+            {
+                Assert.NotNull(root);
+                var actualValue = root.GetValue("Version") as string;
+                Assert.Equal(expectedValue, actualValue);
             }
         }
     }

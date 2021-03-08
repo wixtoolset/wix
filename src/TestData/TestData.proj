@@ -5,6 +5,14 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <TestDataProject Include="**\*.wixproj" />
+    
+    <!-- https://github.com/wixtoolset/issues/issues/6387 -->
+    <TestDataProject Remove="DependencyTests\BundleC\BundleC.wixproj" />
+    <TestDataProject Remove="DependencyTests\BundleF_PatchAv1_0_1\BundleF_PatchAv1_0_1.wixproj" />
+    <TestDataProject Remove="DependencyTests\BundleF_PatchAv1_0_2\BundleF_PatchAv1_0_2.wixproj" />
+    <TestDataProject Remove="DependencyTests\BundleJ_Patch\BundleJ_Patch.wixproj" />
+    <TestDataProject Remove="DependencyTests\PatchA\PatchA.wixproj" />
+    <TestDataProject Remove="DependencyTests\PatchB\PatchB.wixproj" />
   </ItemGroup>
 
   <Target Name="Build">

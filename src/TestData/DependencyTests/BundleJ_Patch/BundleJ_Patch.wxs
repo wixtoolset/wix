@@ -1,0 +1,16 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?define TestExeRegistryKey = Software\WiX\Tests\$(var.TestGroupName)\ExeA?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <RelatedBundle Id="{B1617DA6-F824-4B9F-B9B2-A6AFD07A652D}" Action="Patch" />
+
+    <PackageGroup Id="BundlePackages">
+      <MspPackage Id="PatchA" SourceFile="$(var.PatchA.TargetPath)">
+        <Provides Key="$(var.TestGroupName)_PatchA" Version="$(var.Version)" />
+      </MspPackage>
+      <MsiPackage Id="PackageE" Name="PackageEv1.msi" SourceFile="$(var.PackageEv1_0_1.TargetPath)" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

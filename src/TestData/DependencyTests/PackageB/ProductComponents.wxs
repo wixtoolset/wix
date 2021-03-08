@@ -1,0 +1,18 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:dep="http://wixtoolset.org/schemas/v4/wxs/dependency">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents">
+      <ComponentRef Id="FileComponent2" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="FileComponent2" Guid="A1866388-65B4-4215-A8FB-9A7AADBE4E8E" Directory="INSTALLFOLDER">
+      <File Source="$(sys.SOURCEFILEPATH)" />
+      <Provides>
+        <Requires ProviderKey="WiX.$(var.TestGroupName).A,v1.0" Minimum="1.0.0.0" IncludeMinimum="yes" dep:Enforce="yes" />
+      </Provides>
+    </Component>
+  </Fragment>
+</Wix>
