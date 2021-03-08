@@ -461,11 +461,11 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.Property:
                     return SymbolDefinitions.Property;
 
-                case SymbolDefinitionType.PublishComponent:
-                    return SymbolDefinitions.PublishComponent;
-
                 case SymbolDefinitionType.ProvidesDependency:
                     return SymbolDefinitions.ProvidesDependency;
+
+                case SymbolDefinitionType.PublishComponent:
+                    return SymbolDefinitions.PublishComponent;
 
                 case SymbolDefinitionType.RadioButton:
                     return SymbolDefinitions.RadioButton;
@@ -674,6 +674,9 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixDependencyRef:
                     return SymbolDefinitions.WixDependencyRef;
 
+                case SymbolDefinitionType.WixDependencyProvider:
+                    return SymbolDefinitions.WixDependencyProvider;
+
                 case SymbolDefinitionType.WixEnsureTable:
                     return SymbolDefinitions.WixEnsureTable;
 
@@ -765,7 +768,7 @@ namespace WixToolset.Data
                     return SymbolDefinitions.WixVariable;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type));
+                    throw new ArgumentOutOfRangeException($"{nameof(type)} ({type})");
             }
         }
     }
