@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage DetectCondition="DetectedSomething" SourceFile="burn.exe">
+                <Provides Key="DependencyTests_ExeA,v1.0" Version="1.0.0.0" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

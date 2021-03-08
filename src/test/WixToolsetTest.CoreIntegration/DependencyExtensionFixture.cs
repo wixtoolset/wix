@@ -12,6 +12,49 @@ namespace WixToolsetTest.CoreIntegration
 
     public class DependencyExtensionFixture
     {
+        [Fact(Skip = "Test demonstrates failure")]
+        public void CanBuildBundleUsingExePackageWithProvides()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Dependency", "ExePackageProvidesBundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var provides = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Chain/burn:ExePackage/burn:Provides")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml())
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Provides Key='DependencyTests_ExeA,v1.0' Version='1.0.0.0' />",
+                }, provides);
+            }
+        }
+
         [Fact]
         public void CanBuildBundleUsingMsiWithProvides()
         {
