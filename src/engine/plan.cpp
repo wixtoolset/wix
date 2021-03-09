@@ -523,6 +523,19 @@ extern "C" HRESULT PlanRegistration(
 
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
 
+    // Ensure the bundle is cached if not running from the cache.
+    if (!CacheBundleRunningFromCache())
+    {
+        pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
+    }
+
+    // Always write registration since things may have changed or it just needs to be "fixed up".
+    pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
+
+    // Always update our estimated size registration when installing/modify/repair since things
+    // may have been added or removed or it just needs to be "fixed up".
+    pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_UPDATE_SIZE;
+
     if (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action)
     {
         // If our provider key was detected and it points to our current bundle then we can
@@ -620,26 +633,6 @@ extern "C" HRESULT PlanRegistration(
     else
     {
         BOOL fAddonOrPatchBundle = (pRegistration->cAddonCodes || pRegistration->cPatchCodes);
-
-        // If the bundle is not cached or will not be cached after restart, ensure the bundle is cached.
-        if (!FileExistsAfterRestart(pRegistration->sczCacheExecutablePath, NULL))
-        {
-            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
-            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
-        }
-        else if (BOOTSTRAPPER_ACTION_REPAIR == pPlan->action && !CacheBundleRunningFromCache()) // repairing but not running from the cache.
-        {
-            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
-            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
-        }
-        else if (BOOTSTRAPPER_ACTION_REPAIR == pPlan->action) // just repair, make sure the registration is "fixed up".
-        {
-            pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION;
-        }
-
-        // Always update our estimated size registration when installing/modify/repair since things
-        // may have been added or removed or it just needs to be "fixed up".
-        pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_UPDATE_SIZE;
 
         // Always plan to write our provider key registration when installing/modify/repair to "fix it"
         // if broken.
