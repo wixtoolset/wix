@@ -237,7 +237,7 @@ MessageId=107
 Severity=Success
 SymbolicName=MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE
 Language=English
-Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, enabled: %5!hs!
+Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!
 .
 
 MessageId=120

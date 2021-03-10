@@ -20,9 +20,8 @@ void DetectReset(
     __in BURN_PACKAGES* pPackages
     );
 
-HRESULT DetectForwardCompatibleBundle(
+HRESULT DetectForwardCompatibleBundles(
     __in BURN_USER_EXPERIENCE* pUX,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_REGISTRATION* pRegistration
     );
 

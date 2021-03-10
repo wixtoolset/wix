@@ -234,6 +234,8 @@ extern "C" HRESULT DependencyDetect(
     BURN_REGISTRATION* pRegistration = &pEngineState->registration;
     STRINGDICT_HANDLE sdIgnoredDependents = NULL;
     BURN_PACKAGE* pPackage = NULL;
+    BOOL fSelfDependent = NULL != pRegistration->wzSelfDependent;
+    BOOL fActiveParent = NULL != pRegistration->sczActiveParent && NULL != *pRegistration->sczActiveParent;
 
     // Always leave this empty so that all dependents get detected. Plan will ignore dependents based on its own logic.
     hr = DictCreateStringList(&sdIgnoredDependents, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
@@ -263,16 +265,20 @@ extern "C" HRESULT DependencyDetect(
         ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
     }
 
-    if (pRegistration->wzSelfDependent)
+    if (fSelfDependent || fActiveParent)
     {
         for (DWORD i = 0; i < pRegistration->cDependents; ++i)
         {
             DEPENDENCY* pDependent = pRegistration->rgDependents + i;
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->wzSelfDependent, -1, pDependent->sczKey, -1))
+            if (fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczActiveParent, -1, pDependent->sczKey, -1))
+            {
+                pRegistration->fParentRegisteredAsDependent = TRUE;
+            }
+
+            if (fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->wzSelfDependent, -1, pDependent->sczKey, -1))
             {
                 pRegistration->fSelfRegisteredAsDependent = TRUE;
-                break;
             }
         }
     }
@@ -346,17 +352,6 @@ extern "C" HRESULT DependencyAddIgnoreDependencies(
 
 LExit:
     return hr;
-}
-
-extern "C" BOOL DependencyDependentExists(
-    __in const BURN_REGISTRATION* pRegistration,
-    __in_z LPCWSTR wzDependentProviderKey
-    )
-{
-    HRESULT hr = S_OK;
-
-    hr = DepDependentExists(pRegistration->hkRoot, pRegistration->sczProviderKey, wzDependentProviderKey);
-    return SUCCEEDED(hr);
 }
 
 extern "C" HRESULT DependencyPlanPackageBegin(

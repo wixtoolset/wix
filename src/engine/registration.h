@@ -58,6 +58,7 @@ typedef struct _BURN_UPDATE_REGISTRATION
 typedef struct _BURN_RELATED_BUNDLE
 {
     BOOTSTRAPPER_RELATION_TYPE relationType;
+    BOOL fForwardCompatible;
 
     VERUTIL_VERSION* pVersion;
     LPWSTR sczTag;
@@ -146,14 +147,13 @@ typedef struct _BURN_REGISTRATION
     UINT cDependents;                    // Only valid after detect.
     LPCWSTR wzSelfDependent;             // Only valid after detect.
     BOOL fSelfRegisteredAsDependent;     // Only valid after detect.
+    BOOL fParentRegisteredAsDependent;   // Only valid after detect.
+    BOOL fForwardCompatibleBundleExists; // Only valid after detect.
     BOOL fEligibleForCleanup;            // Only valid after detect.
 
     LPWSTR sczDetectedProviderKeyBundleId;
     LPWSTR sczAncestors;
     LPWSTR sczBundlePackageAncestors;
-
-    BOOL fEnabledForwardCompatibleBundle;
-    BURN_PACKAGE forwardCompatibleBundle;
 } BURN_REGISTRATION;
 
 

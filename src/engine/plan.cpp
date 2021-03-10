@@ -194,6 +194,8 @@ extern "C" void PlanReset(
     __in BURN_PACKAGES* pPackages
     )
 {
+    PackageUninitialize(&pPlan->forwardCompatibleBundle);
+
     if (pPlan->rgRegistrationActions)
     {
         for (DWORD i = 0; i < pPlan->cRegistrationActions; ++i)
@@ -485,6 +487,72 @@ LExit:
     ReleaseStr(sczLayoutDirectory);
     ReleaseStr(sczExecutablePath);
 
+    return hr;
+}
+
+extern "C" HRESULT PlanForwardCompatibleBundles(
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BURN_PLAN* pPlan,
+    __in BURN_REGISTRATION* pRegistration,
+    __in BOOTSTRAPPER_ACTION action
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fRecommendIgnore = TRUE;
+    BOOL fIgnoreBundle = FALSE;
+
+    if (!pRegistration->fForwardCompatibleBundleExists)
+    {
+        ExitFunction();
+    }
+
+    // Only change the recommendation if an active parent was provided.
+    if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
+    {
+        // On install, recommend running the forward compatible bundle because there is an active parent. This
+        // will essentially register the parent with the forward compatible bundle.
+        if (BOOTSTRAPPER_ACTION_INSTALL == action)
+        {
+            fRecommendIgnore = FALSE;
+        }
+        else if (BOOTSTRAPPER_ACTION_UNINSTALL == action ||
+                    BOOTSTRAPPER_ACTION_MODIFY == action ||
+                    BOOTSTRAPPER_ACTION_REPAIR == action)
+        {
+            // When modifying the bundle, only recommend running the forward compatible bundle if the parent
+            // is already registered as a dependent of the provider key.
+            if (pRegistration->fParentRegisteredAsDependent)
+            {
+                fRecommendIgnore = FALSE;
+            }
+        }
+    }
+
+    for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
+    {
+        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
+        if (!pRelatedBundle->fForwardCompatible)
+        {
+            continue;
+        }
+
+        fIgnoreBundle = fRecommendIgnore;
+
+        hr = UserExperienceOnPlanForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
+        ExitOnRootFailure(hr, "BA aborted plan forward compatible bundle.");
+
+        if (!fIgnoreBundle)
+        {
+            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pCommand, NULL, pRegistration->sczActiveParent, pRegistration->sczAncestors, &pRelatedBundle->package);
+            ExitOnFailure(hr, "Failed to initialize pass through bundle.");
+
+            pPlan->fEnabledForwardCompatibleBundle = TRUE;
+            break;
+        }
+    }
+
+LExit:
     return hr;
 }
 

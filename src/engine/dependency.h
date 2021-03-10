@@ -85,16 +85,6 @@ HRESULT DependencyAddIgnoreDependencies(
     );
 
 /********************************************************************
- DependencyDependentExists - Checks to see if the provider key is
-  already dependent on this bundle.
-
-*********************************************************************/
-BOOL DependencyDependentExists(
-    __in const BURN_REGISTRATION* pRegistration,
-    __in_z LPCWSTR wzDependentProviderKey
-    );
-
-/********************************************************************
  DependencyPlanPackageBegin - Updates the dependency registration
   action depending on the calculated state for the package.
 

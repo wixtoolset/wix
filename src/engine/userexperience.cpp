@@ -763,8 +763,7 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in VERUTIL_VERSION* pVersion,
-    __inout BOOL* pfIgnoreBundle
+    __in VERUTIL_VERSION* pVersion
     )
 {
     HRESULT hr = S_OK;
@@ -779,7 +778,6 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     args.wzVersion = pVersion->sczVersion;
 
     results.cbSize = sizeof(results);
-    results.fIgnoreBundle = *pfIgnoreBundle;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE, &args, &results);
     ExitOnFailure(hr, "BA OnDetectForwardCompatibleBundle failed.");
@@ -788,7 +786,6 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
-    *pfIgnoreBundle = results.fIgnoreBundle;
 
 LExit:
     return hr;
@@ -1562,6 +1559,44 @@ EXTERN_C BAAPI UserExperienceOnPlanComplete(
 
     hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnPlanComplete failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlanForwardCompatibleBundle(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzBundleId,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in_z LPCWSTR wzBundleTag,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion,
+    __inout BOOL* pfIgnoreBundle
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS args = { };
+    BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzBundleId = wzBundleId;
+    args.relationType = relationType;
+    args.wzBundleTag = wzBundleTag;
+    args.fPerMachine = fPerMachine;
+    args.wzVersion = pVersion->sczVersion;
+    args.fRecommendedIgnoreBundle = *pfIgnoreBundle;
+
+    results.cbSize = sizeof(results);
+    results.fIgnoreBundle = *pfIgnoreBundle;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanForwardCompatibleBundle failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pfIgnoreBundle = results.fIgnoreBundle;
 
 LExit:
     return hr;

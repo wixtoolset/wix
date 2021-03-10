@@ -322,6 +322,9 @@ typedef struct _BURN_PLAN
     DWORD cExecutePackagesTotal;
     DWORD cOverallProgressTicksTotal;
 
+    BOOL fEnabledForwardCompatibleBundle;
+    BURN_PACKAGE forwardCompatibleBundle;
+
     BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction;
 
     BURN_DEPENDENT_REGISTRATION_ACTION* rgRegistrationActions;
@@ -391,6 +394,13 @@ HRESULT PlanLayoutBundle(
     __in BURN_VARIABLES* pVariables,
     __in BURN_PAYLOADS* pPayloads,
     __out_z LPWSTR* psczLayoutDirectory
+    );
+HRESULT PlanForwardCompatibleBundles(
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BURN_PLAN* pPlan,
+    __in BURN_REGISTRATION* pRegistration,
+    __in BOOTSTRAPPER_ACTION action
     );
 HRESULT PlanPackages(
     __in BURN_USER_EXPERIENCE* pUX,

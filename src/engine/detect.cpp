@@ -39,9 +39,9 @@ extern "C" void DetectReset(
 {
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
     ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
-    pRegistration->fEnabledForwardCompatibleBundle = FALSE;
-    PackageUninitialize(&pRegistration->forwardCompatibleBundle);
     pRegistration->fSelfRegisteredAsDependent = FALSE;
+    pRegistration->fParentRegisteredAsDependent = FALSE;
+    pRegistration->fForwardCompatibleBundleExists = FALSE;
     pRegistration->fEligibleForCleanup = FALSE;
 
     if (pRegistration->rgIgnoredDependencies)
@@ -120,46 +120,20 @@ extern "C" void DetectReset(
     }
 }
 
-extern "C" HRESULT DetectForwardCompatibleBundle(
+extern "C" HRESULT DetectForwardCompatibleBundles(
     __in BURN_USER_EXPERIENCE* pUX,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
-    BOOL fRecommendIgnore = TRUE;
-    BOOL fIgnoreBundle = FALSE;
     int nCompareResult = 0;
 
     if (pRegistration->sczDetectedProviderKeyBundleId &&
         CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRegistration->sczId, -1))
     {
-        // Only change the recommendation if an active parent was provided.
-        if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
-        {
-            // On install, recommend running the forward compatible bundle because there is an active parent. This
-            // will essentially register the parent with the forward compatible bundle.
-            if (BOOTSTRAPPER_ACTION_INSTALL == pCommand->action)
-            {
-                fRecommendIgnore = FALSE;
-            }
-            else if (BOOTSTRAPPER_ACTION_UNINSTALL == pCommand->action ||
-                     BOOTSTRAPPER_ACTION_MODIFY == pCommand->action ||
-                     BOOTSTRAPPER_ACTION_REPAIR == pCommand->action)
-            {
-                // When modifying the bundle, only recommend running the forward compatible bundle if the parent
-                // is already registered as a dependent of the provider key.
-                if (DependencyDependentExists(pRegistration, pRegistration->sczActiveParent))
-                {
-                    fRecommendIgnore = FALSE;
-                }
-            }
-        }
-
         for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
         {
             BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
-            fIgnoreBundle = fRecommendIgnore;
 
             if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->relationType &&
                 CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRelatedBundle->package.sczId, -1))
@@ -169,19 +143,13 @@ extern "C" HRESULT DetectForwardCompatibleBundle(
 
                 if (nCompareResult <= 0)
                 {
-                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
+                    pRelatedBundle->fForwardCompatible = TRUE;
+                    pRegistration->fForwardCompatibleBundleExists = TRUE;
+
+                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion);
                     ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
 
-                    if (!fIgnoreBundle)
-                    {
-                        hr = PseudoBundleInitializePassthrough(&pRegistration->forwardCompatibleBundle, pCommand, NULL, pRegistration->sczActiveParent, pRegistration->sczAncestors, &pRelatedBundle->package);
-                        ExitOnFailure(hr, "Failed to initialize update bundle.");
-
-                        pRegistration->fEnabledForwardCompatibleBundle = TRUE;
-                    }
-
-                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRegistration->fEnabledForwardCompatibleBundle));
-                    break;
+                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion);
                 }
             }
         }

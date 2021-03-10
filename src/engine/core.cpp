@@ -319,15 +319,8 @@ extern "C" HRESULT CoreDetect(
     hr = DependencyDetectProviderKeyBundleId(&pEngineState->registration);
     if (SUCCEEDED(hr))
     {
-        hr = DetectForwardCompatibleBundle(&pEngineState->userExperience, &pEngineState->command, &pEngineState->registration);
+        hr = DetectForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->registration);
         ExitOnFailure(hr, "Failed to detect forward compatible bundle.");
-
-        // If a forward compatible bundle was detected, skip rest of bundle detection
-        // since we will passthrough.
-        if (pEngineState->registration.fEnabledForwardCompatibleBundle)
-        {
-            ExitFunction();
-        }
     }
     else if (E_NOTFOUND == hr)
     {
@@ -504,39 +497,45 @@ extern "C" HRESULT CorePlan(
         hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
         ExitOnFailure(hr, "Failed to plan update.");
     }
-    else if (pEngineState->registration.fEnabledForwardCompatibleBundle)
+    else
     {
-        Assert(!pEngineState->plan.fPerMachine);
+        hr = PlanForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->command, &pEngineState->plan, &pEngineState->registration, action);
+        ExitOnFailure(hr, "Failed to plan forward compatible bundles.");
 
-        pForwardCompatibleBundlePackage = &pEngineState->registration.forwardCompatibleBundle;
-
-        hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
-        ExitOnFailure(hr, "Failed to plan passthrough.");
-    }
-    else // doing an action that modifies the machine state.
-    {
-        pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
-
-        hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
-        ExitOnFailure(hr, "Failed to plan registration.");
-
-        if (fContinuePlanning)
+        if (pEngineState->plan.fEnabledForwardCompatibleBundle)
         {
-            // Remember the early index, because we want to be able to insert some related bundles
-            // into the plan before other executed packages. This particularly occurs for uninstallation
-            // of addons and patches, which should be uninstalled before the main product.
-            DWORD dwExecuteActionEarlyIndex = pEngineState->plan.cExecuteActions;
+            Assert(!pEngineState->plan.fPerMachine);
 
-            // Plan the related bundles first to support downgrades with ref-counting.
-            hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
-            ExitOnFailure(hr, "Failed to plan related bundles.");
+            pForwardCompatibleBundlePackage = &pEngineState->plan.forwardCompatibleBundle;
 
-            hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, NULL, &hSyncpointEvent);
-            ExitOnFailure(hr, "Failed to plan packages.");
+            hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
+            ExitOnFailure(hr, "Failed to plan passthrough.");
+        }
+        else // doing an action that modifies the machine state.
+        {
+            pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
 
-            // Schedule the update of related bundles last.
-            hr = PlanRelatedBundlesComplete(&pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, &hSyncpointEvent, dwExecuteActionEarlyIndex);
-            ExitOnFailure(hr, "Failed to schedule related bundles.");
+            hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
+            ExitOnFailure(hr, "Failed to plan registration.");
+
+            if (fContinuePlanning)
+            {
+                // Remember the early index, because we want to be able to insert some related bundles
+                // into the plan before other executed packages. This particularly occurs for uninstallation
+                // of addons and patches, which should be uninstalled before the main product.
+                DWORD dwExecuteActionEarlyIndex = pEngineState->plan.cExecuteActions;
+
+                // Plan the related bundles first to support downgrades with ref-counting.
+                hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
+                ExitOnFailure(hr, "Failed to plan related bundles.");
+
+                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, NULL, &hSyncpointEvent);
+                ExitOnFailure(hr, "Failed to plan packages.");
+
+                // Schedule the update of related bundles last.
+                hr = PlanRelatedBundlesComplete(&pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, &hSyncpointEvent, dwExecuteActionEarlyIndex);
+                ExitOnFailure(hr, "Failed to schedule related bundles.");
+            }
         }
     }
 

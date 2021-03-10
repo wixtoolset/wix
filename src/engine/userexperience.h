@@ -200,8 +200,7 @@ BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in VERUTIL_VERSION* pVersion,
-    __inout BOOL* pfIgnoreBundle
+    __in VERUTIL_VERSION* pVersion
     );
 BAAPI UserExperienceOnDetectMsiFeature(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -356,6 +355,15 @@ BAAPI UserExperienceOnPlanBegin(
 BAAPI UserExperienceOnPlanComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
+    );
+BAAPI UserExperienceOnPlanForwardCompatibleBundle(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzBundleId,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in_z LPCWSTR wzBundleTag,
+    __in BOOL fPerMachine,
+    __in VERUTIL_VERSION* pVersion,
+    __inout BOOL* pfIgnoreBundle
     );
 BAAPI UserExperienceOnPlanMsiFeature(
     __in BURN_USER_EXPERIENCE* pUserExperience,
