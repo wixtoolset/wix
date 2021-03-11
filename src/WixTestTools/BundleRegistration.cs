@@ -151,5 +151,31 @@ namespace WixTestTools
 
             return registration;
         }
+
+        public static bool TryGetDependencyProviderValue(string providerId, string name, out string value)
+        {
+            value = null;
+
+            string key = String.Format(@"Installer\Dependencies\{0}", providerId);
+            using (RegistryKey providerKey = Registry.ClassesRoot.OpenSubKey(key))
+            {
+                if (null == providerKey)
+                {
+                    return false;
+                }
+
+                value = providerKey.GetValue(name) as string;
+                return value != null;
+            }
+        }
+
+        public static bool DependencyDependentExists(string providerId, string dependentId)
+        {
+            string key = String.Format(@"Installer\Dependencies\{0}\Dependents\{1}", providerId, dependentId);
+            using (RegistryKey dependentKey = Registry.ClassesRoot.OpenSubKey(key))
+            {
+                return null != dependentKey;
+            }
+        }
     }
 }
