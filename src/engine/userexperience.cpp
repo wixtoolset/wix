@@ -763,7 +763,8 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in VERUTIL_VERSION* pVersion
+    __in VERUTIL_VERSION* pVersion,
+    __in BOOL fMissingFromCache
     )
 {
     HRESULT hr = S_OK;
@@ -776,6 +777,7 @@ EXTERN_C BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
     args.wzVersion = pVersion->sczVersion;
+    args.fMissingFromCache = fMissingFromCache;
 
     results.cbSize = sizeof(results);
 
@@ -879,7 +881,8 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion,
-    __in BOOTSTRAPPER_RELATED_OPERATION operation
+    __in BOOTSTRAPPER_RELATED_OPERATION operation,
+    __in BOOL fMissingFromCache
     )
 {
     HRESULT hr = S_OK;
@@ -893,6 +896,7 @@ EXTERN_C BAAPI UserExperienceOnDetectRelatedBundle(
     args.fPerMachine = fPerMachine;
     args.wzVersion = pVersion->sczVersion;
     args.operation = operation;
+    args.fMissingFromCache = fMissingFromCache;
 
     results.cbSize = sizeof(results);
 

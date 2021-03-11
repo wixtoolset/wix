@@ -1292,6 +1292,12 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
     {
         BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
+
+        if (!pRelatedBundle->fPlannable)
+        {
+            continue;
+        }
+
         pRelatedBundle->package.defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
         pRelatedBundle->package.requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
 
@@ -1416,6 +1422,11 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     {
         DWORD *pdwInsertIndex = NULL;
         BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
+
+        if (!pRelatedBundle->fPlannable)
+        {
+            continue;
+        }
 
         // Do not execute if a major upgrade to the related bundle is an embedded bundle (Provider keys are the same)
         if (0 < pRelatedBundle->package.cDependencyProviders)

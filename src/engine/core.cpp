@@ -59,6 +59,10 @@ static void LogPackages(
     __in const BURN_RELATED_BUNDLES* pRelatedBundles,
     __in const BOOTSTRAPPER_ACTION action
     );
+static void LogRelatedBundles(
+    __in const BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in BOOL fReverse
+    );
 
 
 // function definitions
@@ -1793,15 +1797,9 @@ static void LogPackages(
     else
     {
         // Display related bundles first if uninstalling.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL == action && 0 < pRelatedBundles->cRelatedBundles)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL == action)
         {
-            for (int i = pRelatedBundles->cRelatedBundles - 1; 0 <= i; --i)
-            {
-                const BURN_RELATED_BUNDLE* pRelatedBundle = &pRelatedBundles->rgRelatedBundles[i];
-                const BURN_PACKAGE* pPackage = &pRelatedBundle->package;
-
-                LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingDependencyActionToString(pPackage->dependencyExecute));
-            }
+            LogRelatedBundles(pRelatedBundles, TRUE);
         }
 
         // Display all the packages in the log.
@@ -1852,13 +1850,28 @@ static void LogPackages(
         }
 
         // Display related bundles last if caching, installing, modifying, or repairing.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL < action && 0 < pRelatedBundles->cRelatedBundles)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL < action)
         {
-            for (DWORD i = 0; i < pRelatedBundles->cRelatedBundles; ++i)
-            {
-                const BURN_RELATED_BUNDLE* pRelatedBundle = &pRelatedBundles->rgRelatedBundles[i];
-                const BURN_PACKAGE* pPackage = &pRelatedBundle->package;
+            LogRelatedBundles(pRelatedBundles, FALSE);
+        }
+    }
+}
 
+static void LogRelatedBundles(
+    __in const BURN_RELATED_BUNDLES* pRelatedBundles,
+    __in BOOL fReverse
+    )
+{
+    if (0 < pRelatedBundles->cRelatedBundles)
+    {
+        for (DWORD i = 0; i < pRelatedBundles->cRelatedBundles; ++i)
+        {
+            const DWORD iRelatedBundle = fReverse ? pRelatedBundles->cRelatedBundles - 1 - i : i;
+            const BURN_RELATED_BUNDLE* pRelatedBundle = pRelatedBundles->rgRelatedBundles + iRelatedBundle;
+            const BURN_PACKAGE* pPackage = &pRelatedBundle->package;
+
+            if (pRelatedBundle->fPlannable)
+            {
                 LogId(REPORT_STANDARD, MSG_PLANNED_RELATED_BUNDLE, pPackage->sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingDependencyActionToString(pPackage->dependencyExecute));
             }
         }

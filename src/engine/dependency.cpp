@@ -260,7 +260,13 @@ extern "C" HRESULT DependencyDetect(
 
     for (DWORD iRelatedBundle = 0; iRelatedBundle < pEngineState->registration.relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {
-        pPackage = &pEngineState->registration.relatedBundles.rgRelatedBundles[iRelatedBundle].package;
+        BURN_RELATED_BUNDLE* pRelatedBundle = pEngineState->registration.relatedBundles.rgRelatedBundles + iRelatedBundle;
+        if (!pRelatedBundle->fPlannable)
+        {
+            continue;
+        }
+
+        pPackage = &pRelatedBundle->package;
         hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
         ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
     }

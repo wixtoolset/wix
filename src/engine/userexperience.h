@@ -200,7 +200,8 @@ BAAPI UserExperienceOnDetectForwardCompatibleBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
-    __in VERUTIL_VERSION* pVersion
+    __in VERUTIL_VERSION* pVersion,
+    __in BOOL fMissingFromCache
     );
 BAAPI UserExperienceOnDetectMsiFeature(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -225,7 +226,8 @@ BAAPI UserExperienceOnDetectRelatedBundle(
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion,
-    __in BOOTSTRAPPER_RELATED_OPERATION operation
+    __in BOOTSTRAPPER_RELATED_OPERATION operation,
+    __in BOOL fMissingFromCache
     );
 BAAPI UserExperienceOnDetectRelatedMsiPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,

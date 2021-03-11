@@ -62,6 +62,7 @@ typedef struct _BURN_RELATED_BUNDLE
 
     VERUTIL_VERSION* pVersion;
     LPWSTR sczTag;
+    BOOL fPlannable;
 
     BURN_PACKAGE package;
 } BURN_RELATED_BUNDLE;

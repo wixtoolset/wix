@@ -327,7 +327,7 @@ HRESULT ExternalEngineSetUpdate(
             sczId = pEngineState->registration.sczId;
         }
 
-        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, rpr), &pEngineState->update.package, FALSE, sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, pEngineState->registration.sczExecutableName, sczLocalSource ? sczLocalSource : wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
+        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, rpr), &pEngineState->update.package, FALSE, sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, BURN_CACHE_STATE_NONE, pEngineState->registration.sczExecutableName, sczLocalSource ? sczLocalSource : wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
         ExitOnFailure(hr, "Failed to set update bundle.");
 
         pEngineState->update.fUpdateAvailable = TRUE;

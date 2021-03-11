@@ -202,7 +202,7 @@ MessageId=102
 Severity=Success
 SymbolicName=MSG_DETECTED_RELATED_BUNDLE
 Language=English
-Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, operation: %5!hs!
+Detected related bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, operation: %5!hs!, cached: %6!hs!
 .
 
 MessageId=103
@@ -237,7 +237,14 @@ MessageId=107
 Severity=Success
 SymbolicName=MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE
 Language=English
-Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!
+Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version: %4!ls!, cached: %5!hs!
+.
+
+MessageId=108
+Severity=Warning
+SymbolicName=MSG_DETECT_RELATED_BUNDLE_NOT_FULLY_CACHED
+Language=English
+Detected partially cached related bundle: %1!ls!, cache path: %2!ls!, reason: 0x%3!x!
 .
 
 MessageId=120
