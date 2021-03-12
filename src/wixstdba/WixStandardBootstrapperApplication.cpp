@@ -266,22 +266,27 @@ public: // IBootstrapperApplication
         __in BOOL fPerMachine,
         __in LPCWSTR wzVersion,
         __in BOOTSTRAPPER_RELATED_OPERATION operation,
+        __in BOOL fMissingFromCache,
         __inout BOOL* pfCancel
         )
     {
         BAL_INFO_PACKAGE* pPackage = NULL;
-        if (SUCCEEDED(BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine, &pPackage)))
+
+        if (!fMissingFromCache)
         {
-            InitializePackageInfoForPackage(pPackage);
+            if (SUCCEEDED(BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine, &pPackage)))
+            {
+                InitializePackageInfoForPackage(pPackage);
+            }
+
+            // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
+            if (!m_fPrereq && BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE == operation)
+            {
+                m_fDowngrading = TRUE;
+            }
         }
 
-        // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
-        if (!m_fPrereq && BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE == operation)
-        {
-            m_fDowngrading = TRUE;
-        }
-
-        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, operation, pfCancel);
+        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fMissingFromCache, pfCancel);
     }
 
 
@@ -1346,9 +1351,7 @@ private: // privates
         __inout BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
         )
     {
-        BOOL fIgnoreBundle = pResults->fIgnoreBundle;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_DETECTED_FORWARD_COMPATIBLE_BUNDLE, m_hModule, pArgs->wzBundleId, fIgnoreBundle ? "ignore" : "enable", pResults->fIgnoreBundle ? "ignore" : "enable");
     }
 
     void OnDetectUpdateBeginFallback(
@@ -1809,6 +1812,16 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONSYSTEMRESTOREPOINTCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnPlanForwardCompatibleBundleFallback(
+        __in BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS* pArgs,
+        __inout BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
+        )
+    {
+        BOOL fIgnoreBundle = pResults->fIgnoreBundle;
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_FORWARD_COMPATIBLE_BUNDLE, m_hModule, pArgs->wzBundleId, fIgnoreBundle ? "ignore" : "enable", pResults->fIgnoreBundle ? "ignore" : "enable");
     }
 
     //

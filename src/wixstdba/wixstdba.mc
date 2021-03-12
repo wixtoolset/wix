@@ -31,9 +31,9 @@ LanguageNames=(English=0x409:MSG00409)
 
 MessageId=1
 Severity=Success
-SymbolicName=MSG_WIXSTDBA_DETECTED_FORWARD_COMPATIBLE_BUNDLE
+SymbolicName=MSG_WIXSTDBA_PLANNED_FORWARD_COMPATIBLE_BUNDLE
 Language=English
-WIXSTDBA: Detected forward compatible bundle: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
+WIXSTDBA: Planned forward compatible bundle: %1!ls!, wixstdba requested: %2!hs!, bafunctions requested: %3!hs!
 .
 
 MessageId=2
