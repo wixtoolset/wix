@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class RollbackBoundaryFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanStartChainWithRollbackBoundary()
         {
             var folder = TestData.Get(@"TestData");

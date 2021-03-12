@@ -1726,11 +1726,8 @@ namespace WixToolset.Core
                 }
             }
 
-            // Ensure there is always a rollback boundary at the beginning of the chain.
-            this.CreateRollbackBoundary(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixDefaultBoundary"), YesNoType.Yes, YesNoType.No, ComplexReferenceParentType.PackageGroup, "WixChain", ComplexReferenceChildType.Unknown, null);
-
-            var previousId = "WixDefaultBoundary";
-            var previousType = ComplexReferenceChildType.Package;
+            string previousId = null;
+            var previousType = ComplexReferenceChildType.Unknown;
 
             foreach (var child in node.Elements())
             {

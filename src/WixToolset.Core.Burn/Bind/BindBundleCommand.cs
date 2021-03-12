@@ -357,10 +357,7 @@ namespace WixToolset.Core.Burn
             IEnumerable<PackageFacade> orderedFacades;
             IEnumerable<WixBundleRollbackBoundarySymbol> boundaries;
             {
-                var groupSymbols = section.Symbols.OfType<WixGroupSymbol>();
-                var boundarySymbolsById = section.Symbols.OfType<WixBundleRollbackBoundarySymbol>().ToDictionary(b => b.Id.Id);
-
-                var command = new OrderPackagesAndRollbackBoundariesCommand(this.Messaging, groupSymbols, boundarySymbolsById, facades);
+                var command = new OrderPackagesAndRollbackBoundariesCommand(this.Messaging, section, facades);
                 command.Execute();
 
                 orderedFacades = command.OrderedPackageFacades;
