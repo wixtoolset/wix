@@ -29,6 +29,8 @@ namespace WixToolset.Converters
 
         protected bool ShowHelp { get; set; }
 
+        protected CustomTableTarget CustomTableSetting { get; set; }
+
         protected bool DryRun { get; set; }
 
         protected HashSet<string> ErrorsAsWarnings { get; }
@@ -66,6 +68,22 @@ namespace WixToolset.Converters
                     this.ShowHelp = true;
                     this.ShowLogo = true;
                     this.StopParsing = true;
+                    return true;
+
+                case "-custom-table":
+                    var customTableSetting = parser.GetNextArgumentOrError(argument);
+                    switch (customTableSetting)
+                    {
+                        case "bundle":
+                            this.CustomTableSetting = CustomTableTarget.Bundle;
+                            break;
+                        case "msi":
+                            this.CustomTableSetting = CustomTableTarget.Msi;
+                            break;
+                        default:
+                            parser.ReportErrorArgument(argument);
+                            break;
+                    }
                     return true;
 
                 case "n":

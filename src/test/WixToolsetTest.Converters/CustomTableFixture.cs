@@ -83,7 +83,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
@@ -126,7 +126,7 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
@@ -162,14 +162,154 @@ namespace WixToolsetTest.Converters
             var converter = new WixConverter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
         }
 
         [Fact]
-        public void CanConvertCustomTableBootstrapperApplicationData()
+        public void CanConvertBundleCustomTableBootstrapperApplicationData()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes'>",
+                "    <Column Id='Column1' PrimaryKey='yes' Type='string' Width='0' Category='text' Description='The first custom column.' />",
+                "    <Row>",
+                "      <Data Column='Column1'>Row1</Data>",
+                "    </Row>",
+                "  </CustomTable>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <BundleCustomData Id=\"FgAppx\">",
+                "    <BundleAttributeDefinition Id=\"Column1\" />",
+                "    <BundleElement>",
+                "      <BundleAttribute Id=\"Column1\" Value=\"Row1\" />",
+                "    </BundleElement>",
+                "  </BundleCustomData>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, customTableTarget: CustomTableTarget.Bundle);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(2, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanConvertBundleCustomTableRef()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx'>",
+                "    <Row>",
+                "      <Data Column='Column1'>Row1</Data>",
+                "    </Row>",
+                "  </CustomTable>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <BundleCustomDataRef Id=\"FgAppx\">",
+                "    <BundleElement>",
+                "      <BundleAttribute Id=\"Column1\" Value=\"Row1\" />",
+                "    </BundleElement>",
+                "  </BundleCustomDataRef>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, customTableTarget: CustomTableTarget.Bundle);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(2, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanConvertMsiCustomTableBootstrapperApplicationData()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes'>",
+                "    <Column Id='Column1' PrimaryKey='yes' Type='string' Width='0' Category='text' Description='The first custom column.' />",
+                "    <Row>",
+                "      <Data Column='Column1'>Row1</Data>",
+                "    </Row>",
+                "  </CustomTable>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\">",
+                "    <Column Id=\"Column1\" PrimaryKey=\"yes\" Type=\"string\" Width=\"0\" Category=\"text\" Description=\"The first custom column.\" />",
+                "    <Row>",
+                "      <Data Column=\"Column1\" Value=\"Row1\" />",
+                "    </Row>",
+                "  </CustomTable>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, customTableTarget: CustomTableTarget.Msi);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(2, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanConvertMsiCustomTableRef()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx'>",
+                "    <Row>",
+                "      <Data Column='Column1'>Row1</Data>",
+                "    </Row>",
+                "  </CustomTable>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <CustomTableRef Id=\"FgAppx\">",
+                "    <Row>",
+                "      <Data Column=\"Column1\" Value=\"Row1\" />",
+                "    </Row>",
+                "  </CustomTableRef>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, customTableTarget: CustomTableTarget.Msi);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(2, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanDetectAmbiguousCustomTableBootstrapperApplicationData()
         {
             var parse = String.Join(Environment.NewLine,
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
@@ -178,13 +318,39 @@ namespace WixToolsetTest.Converters
 
             var expected = String.Join(Environment.NewLine,
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\" />",
+                "  <CustomTable Id=\"FgAppx\" BootstrapperApplicationData=\"yes\" />",
                 "</Wix>");
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
             var messaging = new MockMessaging();
-            var converter = new WixConverter(messaging, 2, null, null);
+            var converter = new WixConverter(messaging, 2);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(1, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanRemoveBootstrapperApplicationDataFromRealCustomTable()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='no' />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <CustomTable Id=\"FgAppx\" />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2);
 
             var errors = converter.ConvertDocument(document);
 

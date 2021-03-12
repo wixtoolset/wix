@@ -15,6 +15,27 @@ namespace WixToolset.Converters
     using WixToolset.Extensibility.Services;
 
     /// <summary>
+    /// How to convert CustomTable elements.
+    /// </summary>
+    public enum CustomTableTarget
+    {
+        /// <summary>
+        /// Ambiguous elements will be left alone.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
+        /// Use CustomTable, CustomTableRef, and Unreal.
+        /// </summary>
+        Msi,
+
+        /// <summary>
+        /// Use BundleCustomData and BundleCustomDataRef.
+        /// </summary>
+        Bundle,
+    }
+
+    /// <summary>
     /// WiX source code converter.
     /// </summary>
     public sealed class WixConverter
@@ -45,19 +66,25 @@ namespace WixToolset.Converters
         private static readonly XName BootstrapperApplicationDllElementName = WixNamespace + "BootstrapperApplicationDll";
         private static readonly XName BootstrapperApplicationRefElementName = WixNamespace + "BootstrapperApplicationRef";
         private static readonly XName ApprovedExeForElevationElementName = WixNamespace + "ApprovedExeForElevation";
-        private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
+        private static readonly XName BundleAttributeElementName = WixNamespace + "BundleAttribute";
+        private static readonly XName BundleAttributeDefinitionElementName = WixNamespace + "BundleAttributeDefinition";
+        private static readonly XName BundleCustomDataElementName = WixNamespace + "BundleCustomData";
+        private static readonly XName BundleCustomDataRefElementName = WixNamespace + "BundleCustomDataRef";
+        private static readonly XName BundleElementElementName = WixNamespace + "BundleElement";
+        private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
+        private static readonly XName CustomTableRefElementName = WixNamespace + "CustomTableRef";
         private static readonly XName CatalogElementName = WixNamespace + "Catalog";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName ComponentElementName = WixNamespace + "Component";
         private static readonly XName ControlElementName = WixNamespace + "Control";
         private static readonly XName ConditionElementName = WixNamespace + "Condition";
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
-        private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DataElementName = WixNamespace + "Data";
         private static readonly XName OldProvidesElementName = WixDependencyNamespace + "Provides";
         private static readonly XName OldRequiresElementName = WixDependencyNamespace + "Requires";
         private static readonly XName OldRequiresRefElementName = WixDependencyNamespace + "RequiresRef";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
+        private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ErrorElementName = WixNamespace + "Error";
         private static readonly XName FeatureElementName = WixNamespace + "Feature";
         private static readonly XName FileElementName = WixNamespace + "File";
@@ -85,6 +112,7 @@ namespace WixToolset.Converters
         private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
         private static readonly XName RegistrySearchElementName = WixNamespace + "RegistrySearch";
         private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
+        private static readonly XName RowElementName = WixNamespace + "Row";
         private static readonly XName ServiceArgumentElementName = WixNamespace + "ServiceArgument";
         private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
         private static readonly XName SetPropertyElementName = WixNamespace + "SetProperty";
@@ -156,7 +184,8 @@ namespace WixToolset.Converters
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="errorsAsWarnings">Test errors to display as warnings.</param>
         /// <param name="ignoreErrors">Test errors to ignore.</param>
-        public WixConverter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
+        /// <param name="customTableTarget">How to convert CustomTable elements.</param>
+        public WixConverter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null, CustomTableTarget customTableTarget = CustomTableTarget.Unknown)
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
@@ -170,9 +199,10 @@ namespace WixToolset.Converters
                 { WixConverter.ApprovedExeForElevationElementName, this.ConvertApprovedExeForElevationElement },
                 { WixConverter.CatalogElementName, this.ConvertCatalogElement },
                 { WixConverter.ColumnElementName, this.ConvertColumnElement },
-                { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
-                { WixConverter.ControlElementName, this.ConvertControlElement },
                 { WixConverter.ComponentElementName, this.ConvertComponentElement },
+                { WixConverter.ControlElementName, this.ConvertControlElement },
+                { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
+                { WixConverter.CustomTableElementName, this.ConvertCustomTableElement },
                 { WixConverter.DataElementName, this.ConvertDataElement },
                 { WixConverter.DirectoryElementName, this.ConvertDirectoryElement },
                 { WixConverter.FeatureElementName, this.ConvertFeatureElement },
@@ -198,7 +228,6 @@ namespace WixToolset.Converters
                 { WixConverter.RegistrySearchElementName, this.ConvertRegistrySearchElement },
                 { WixConverter.RemotePayloadElementName, this.ConvertRemotePayloadElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
-                { WixConverter.CustomActionElementName, this.ConvertCustomActionElement },
                 { WixConverter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
                 { WixConverter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
                 { WixConverter.SetPropertyElementName, this.ConvertSetPropertyElement },
@@ -224,7 +253,11 @@ namespace WixToolset.Converters
             this.ErrorsAsWarnings = new HashSet<ConverterTestType>(this.YieldConverterTypes(errorsAsWarnings));
 
             this.IgnoreErrors = new HashSet<ConverterTestType>(this.YieldConverterTypes(ignoreErrors));
+
+            this.CustomTableSetting = customTableTarget;
         }
+
+        private CustomTableTarget CustomTableSetting { get; }
 
         private int Errors { get; set; }
 
@@ -717,11 +750,104 @@ namespace WixToolset.Converters
         private void ConvertCustomTableElement(XElement element)
         {
             var bootstrapperApplicationData = element.Attribute("BootstrapperApplicationData");
-            if (bootstrapperApplicationData != null
-                && this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
+            if (bootstrapperApplicationData?.Value == "no")
             {
-                element.Add(new XAttribute("Unreal", bootstrapperApplicationData.Value));
-                bootstrapperApplicationData.Remove();
+                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
+                {
+                    bootstrapperApplicationData.Remove();
+                }
+            }
+            else
+            {
+                if (element.Elements(ColumnElementName).Any() || bootstrapperApplicationData != null)
+                {
+                    // Table definition
+                    if (bootstrapperApplicationData != null)
+                    {
+                        switch (this.CustomTableSetting)
+                        {
+                            case CustomTableTarget.Bundle:
+                                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'BundleCustomData' element for Bundles.", bootstrapperApplicationData.Name))
+                                {
+                                    element.Name = WixConverter.BundleCustomDataElementName;
+                                    bootstrapperApplicationData.Remove();
+                                    this.ConvertCustomTableElementToBundle(element);
+                                }
+                                break;
+                            case CustomTableTarget.Msi:
+                                if (this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
+                                {
+                                    element.Add(new XAttribute("Unreal", bootstrapperApplicationData.Value));
+                                    bootstrapperApplicationData.Remove();
+                                }
+                                break;
+                            default:
+                                this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains deprecated '{0}' attribute so can't be converted. Use the 'Unreal' attribute for MSI. Use the 'BundleCustomData' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'", bootstrapperApplicationData.Name);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Table ref
+                    switch (this.CustomTableSetting)
+                    {
+                        case CustomTableTarget.Bundle:
+                            if (this.OnError(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now BundleCustomDataRef for Bundles."))
+                            {
+                                element.Name = WixConverter.BundleCustomDataRefElementName;
+                                this.ConvertCustomTableElementToBundle(element);
+                            }
+                            break;
+                        case CustomTableTarget.Msi:
+                            if (this.OnError(ConverterTestType.CustomTableRef, element, "CustomTable elements that don't contain the table definition are now CustomTableRef for MSI."))
+                            {
+                                element.Name = WixConverter.CustomTableRefElementName;
+                            }
+                            break;
+                        default:
+                            this.OnError(ConverterTestType.CustomTableNotAlwaysConvertable, element, "The CustomTable element contains no 'Column' elements so can't be converted. Use the 'CustomTableRef' element for MSI. Use the 'BundleCustomDataRef' element for Bundles. Use the --custom-table argument to force conversion to 'msi' or 'bundle'");
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ConvertCustomTableElementToBundle(XElement element)
+        {
+            foreach (var xColumn in element.Elements(ColumnElementName))
+            {
+                xColumn.Name = WixConverter.BundleAttributeDefinitionElementName;
+
+                foreach (var xAttribute in xColumn.Attributes().ToList())
+                {
+                    if (xAttribute.Name.LocalName != "Id" &&
+                        (xAttribute.Name.Namespace == WixConverter.Wix3Namespace ||
+                        xAttribute.Name.Namespace == WixConverter.WixNamespace ||
+                        String.IsNullOrEmpty(xAttribute.Name.Namespace.NamespaceName)))
+                    {
+                        xAttribute.Remove();
+                    }
+                }
+            }
+
+            foreach (var xRow in element.Elements(RowElementName))
+            {
+                xRow.Name = WixConverter.BundleElementElementName;
+
+                foreach (var xData in xRow.Elements(DataElementName))
+                {
+                    xData.Name = WixConverter.BundleAttributeElementName;
+
+                    var xColumn = xData.Attribute("Column");
+                    if (xColumn != null)
+                    {
+                        xData.Add(new XAttribute("Id", xColumn.Value));
+                        xColumn.Remove();
+                    }
+
+                    this.ConvertInnerTextToAttribute(xData, "Value");
+                }
             }
         }
 
@@ -1164,8 +1290,6 @@ namespace WixToolset.Converters
         }
 
         private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
-
-        private void ConvertRowElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
         private void ConvertDataElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
@@ -1854,7 +1978,7 @@ namespace WixToolset.Converters
             AssignDirectoryNameFromShortName,
 
             /// <summary>
-            /// BootstrapperApplicationData attribute is deprecated and replaced with Unreal.
+            /// BootstrapperApplicationData attribute is deprecated and replaced with Unreal for MSI. Use BundleCustomData element for Bundles.
             /// </summary>
             BootstrapperApplicationDataDeprecated,
 
@@ -2022,6 +2146,16 @@ namespace WixToolset.Converters
             /// The hash algorithm used for bundles changed from SHA1 to SHA512.
             /// </summary>
             BurnHashAlgorithmChanged,
+
+            /// <summary>
+            /// CustomTable elements can't always be converted.
+            /// </summary>
+            CustomTableNotAlwaysConvertable,
+
+            /// <summary>
+            /// CustomTable elements that don't contain the table definition are now CustomTableRef.
+            /// </summary>
+            CustomTableRef,
         }
     }
 }
