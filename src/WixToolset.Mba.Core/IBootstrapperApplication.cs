@@ -64,8 +64,8 @@ namespace WixToolset.Mba.Core
         /// <param name="wzBundleTag"></param>
         /// <param name="fPerMachine"></param>
         /// <param name="wzVersion"></param>
+        /// <param name="fMissingFromCache"></param>
         /// <param name="fCancel"></param>
-        /// <param name="fIgnoreBundle"></param>
         /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
@@ -75,8 +75,8 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fIgnoreBundle
+            [MarshalAs(UnmanagedType.Bool)] bool fMissingFromCache,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
@@ -143,6 +143,7 @@ namespace WixToolset.Mba.Core
         /// <param name="fPerMachine"></param>
         /// <param name="wzVersion"></param>
         /// <param name="operation"></param>
+        /// <param name="fMissingFromCache"></param>
         /// <param name="fCancel"></param>
         /// <returns></returns>
         [PreserveSig]
@@ -154,6 +155,7 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
             [MarshalAs(UnmanagedType.U4)] RelatedOperation operation,
+            [MarshalAs(UnmanagedType.Bool)] bool fMissingFromCache,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
@@ -998,6 +1000,31 @@ namespace WixToolset.Mba.Core
         [return: MarshalAs(UnmanagedType.I4)]
         int OnSystemRestorePointComplete(
             int hrStatus
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanForwardCompatibleBundle"/>.
+        /// </summary>
+        /// <param name="wzBundleId"></param>
+        /// <param name="relationType"></param>
+        /// <param name="wzBundleTag"></param>
+        /// <param name="fPerMachine"></param>
+        /// <param name="wzVersion"></param>
+        /// <param name="fRecommendedIgnoreBundle"></param>
+        /// <param name="fCancel"></param>
+        /// <param name="fIgnoreBundle"></param>
+        /// <returns></returns>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanForwardCompatibleBundle(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.U4)] RelationType relationType,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
+            [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,
+            [MarshalAs(UnmanagedType.Bool)] bool fRecommendedIgnoreBundle,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fIgnoreBundle
             );
 
         /// <summary>

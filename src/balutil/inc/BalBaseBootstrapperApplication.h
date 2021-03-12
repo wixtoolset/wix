@@ -102,8 +102,8 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzBundleTag*/,
         __in BOOL /*fPerMachine*/,
         __in LPCWSTR /*wzVersion*/,
-        __inout BOOL* pfCancel,
-        __inout BOOL* /*pfIgnoreBundle*/
+        __in BOOL /*fMissingFromCache*/,
+        __inout BOOL* pfCancel
         )
     {
         *pfCancel |= CheckCanceled();
@@ -151,6 +151,7 @@ public: // IBootstrapperApplication
         __in BOOL /*fPerMachine*/,
         __in LPCWSTR /*wzVersion*/,
         __in BOOTSTRAPPER_RELATED_OPERATION /*operation*/,
+        __in BOOL /*fMissingFromCache*/,
         __inout BOOL* pfCancel
         )
     {
@@ -842,6 +843,21 @@ public: // IBootstrapperApplication
         __in HRESULT /*hrStatus*/
         )
     {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnPlanForwardCompatibleBundle(
+        __in_z LPCWSTR /*wzBundleId*/,
+        __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
+        __in_z LPCWSTR /*wzBundleTag*/,
+        __in BOOL /*fPerMachine*/,
+        __in LPCWSTR /*wzVersion*/,
+        __in BOOL /*fRecommendedIgnoreBundle*/,
+        __inout BOOL* pfCancel,
+        __inout BOOL* /*pfIgnoreBundle*/
+        )
+    {
+        *pfCancel |= CheckCanceled();
         return S_OK;
     }
 

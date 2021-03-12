@@ -226,6 +226,9 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public event EventHandler<SystemRestorePointCompleteEventArgs> SystemRestorePointComplete;
 
+        /// <inheritdoc/>
+        public event EventHandler<PlanForwardCompatibleBundleEventArgs> PlanForwardCompatibleBundle;
+
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
@@ -1083,6 +1086,18 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlanForwardCompatibleBundle"/> event.
+        /// </summary>
+        protected virtual void OnPlanForwardCompatibleBundle(PlanForwardCompatibleBundleEventArgs args)
+        {
+            EventHandler<PlanForwardCompatibleBundleEventArgs> handler = this.PlanForwardCompatibleBundle;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
 
         int IBootstrapperApplication.OnStartup()
@@ -1120,13 +1135,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, ref bool fCancel, ref bool fIgnoreBundle)
+        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fMissingFromCache, ref bool fCancel)
         {
-            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fCancel, fIgnoreBundle);
+            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, fCancel);
             this.OnDetectForwardCompatibleBundle(args);
 
             fCancel = args.Cancel;
-            fIgnoreBundle = args.IgnoreBundle;
             return args.HResult;
         }
 
@@ -1159,9 +1173,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, RelatedOperation operation, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectRelatedBundle(string wzProductCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, RelatedOperation operation, bool fMissingFromCache, ref bool fCancel)
         {
-            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fCancel);
+            DetectRelatedBundleEventArgs args = new DetectRelatedBundleEventArgs(wzProductCode, relationType, wzBundleTag, fPerMachine, wzVersion, operation, fMissingFromCache, fCancel);
             this.OnDetectRelatedBundle(args);
 
             fCancel = args.Cancel;
@@ -1653,6 +1667,16 @@ namespace WixToolset.Mba.Core
             SystemRestorePointCompleteEventArgs args = new SystemRestorePointCompleteEventArgs(hrStatus);
             this.OnSystemRestorePointComplete(args);
 
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlanForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fRecommendedIgnoreBundle, ref bool fCancel, ref bool fIgnoreBundle)
+        {
+            PlanForwardCompatibleBundleEventArgs args = new PlanForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fRecommendedIgnoreBundle, fCancel, fIgnoreBundle);
+            this.OnPlanForwardCompatibleBundle(args);
+
+            fCancel = args.Cancel;
+            fIgnoreBundle = args.IgnoreBundle;
             return args.HResult;
         }
 

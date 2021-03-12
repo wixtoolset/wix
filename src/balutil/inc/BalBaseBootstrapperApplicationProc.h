@@ -78,7 +78,7 @@ static HRESULT BalBaseBAProcOnDetectForwardCompatibleBundle(
     __inout BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, &pResults->fCancel, &pResults->fIgnoreBundle);
+    return pBA->OnDetectForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectUpdateBegin(
@@ -114,7 +114,7 @@ static HRESULT BalBaseBAProcOnDetectRelatedBundle(
     __inout BA_ONDETECTRELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->operation, &pResults->fCancel);
+    return pBA->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->operation, pArgs->fMissingFromCache, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectPackageBegin(
@@ -585,6 +585,15 @@ static HRESULT BalBaseBAProcOnSystemRestorePointComplete(
     return pBA->OnSystemRestorePointComplete(pArgs->hrStatus);
 }
 
+static HRESULT BalBaseBAProcOnPlanForwardCompatibleBundle(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS* pArgs,
+    __inout BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
+    )
+{
+    return pBA->OnPlanForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fRecommendedIgnoreBundle, &pResults->fCancel, &pResults->fIgnoreBundle);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -795,6 +804,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDPACKAGE:
             hr = BalBaseBAProcOnPlannedPackage(pBA, reinterpret_cast<BA_ONPLANNEDPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDPACKAGE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE:
+            hr = BalBaseBAProcOnPlanForwardCompatibleBundle(pBA, reinterpret_cast<BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS*>(pvResults));
             break;
         }
     }

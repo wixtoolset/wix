@@ -104,8 +104,8 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR /*wzBundleTag*/,
         __in BOOL /*fPerMachine*/,
         __in LPCWSTR /*wzVersion*/,
-        __inout BOOL* /*pfCancel*/,
-        __inout BOOL* /*pfIgnoreBundle*/
+        __in BOOL /*fMissingFromCache*/,
+        __inout BOOL* /*pfCancel*/
         )
     {
         return S_OK;
@@ -150,6 +150,7 @@ public: // IBootstrapperApplication
         __in BOOL /*fPerMachine*/,
         __in LPCWSTR /*wzVersion*/,
         __in BOOTSTRAPPER_RELATED_OPERATION /*operation*/,
+        __in BOOL /*fMissingFromCache*/,
         __inout BOOL* /*pfCancel*/
         )
     {
@@ -655,6 +656,20 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnSystemRestorePointComplete(
         __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnPlanForwardCompatibleBundle(
+        __in_z LPCWSTR /*wzBundleId*/,
+        __in BOOTSTRAPPER_RELATION_TYPE /*relationType*/,
+        __in_z LPCWSTR /*wzBundleTag*/,
+        __in BOOL /*fPerMachine*/,
+        __in LPCWSTR /*wzVersion*/,
+        __in BOOL /*fRecommendedIgnoreBundle*/,
+        __inout BOOL* /*pfCancel*/,
+        __inout BOOL* /*pfIgnoreBundle*/
         )
     {
         return S_OK;

@@ -230,6 +230,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanCompleteEventArgs> PlanComplete;
 
         /// <summary>
+        /// Fired when the engine is about to plan a forward compatible bundle.
+        /// </summary>
+        event EventHandler<PlanForwardCompatibleBundleEventArgs> PlanForwardCompatibleBundle;
+
+        /// <summary>
         /// Fired when the engine has completed planning a package.
         /// </summary>
         event EventHandler<PlannedPackageEventArgs> PlannedPackage;

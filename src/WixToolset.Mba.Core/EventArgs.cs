@@ -226,22 +226,13 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when detected a forward compatible bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectForwardCompatibleBundle"/>
     /// </summary>
     [Serializable]
     public class DetectForwardCompatibleBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectUpdateBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="bundleId">The identity of the forward compatible bundle.</param>
-        /// <param name="relationType">Relationship type for this forward compatible bundle.</param>
-        /// <param name="bundleTag">The tag of the forward compatible bundle.</param>
-        /// <param name="perMachine">Whether the detected forward compatible bundle is per machine.</param>
-        /// <param name="version">The version of the forward compatible bundle detected.</param>
-        /// <param name="cancelRecommendation">The cancel recommendation from the engine.</param>
-        /// <param name="ignoreBundleRecommendation">The ignore recommendation from the engine.</param>
-        public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool cancelRecommendation, bool ignoreBundleRecommendation)
+        /// <summary />
+        public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.BundleId = bundleId;
@@ -249,7 +240,7 @@ namespace WixToolset.Mba.Core
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
             this.Version = version;
-            this.IgnoreBundle = ignoreBundleRecommendation;
+            this.MissingFromCache = missingFromCache;
         }
 
         /// <summary>
@@ -278,9 +269,9 @@ namespace WixToolset.Mba.Core
         public string Version { get; private set; }
 
         /// <summary>
-        /// Instructs the engine whether to use the forward compatible bundle.
+        /// Whether the forward compatible bundle is missing from the package cache.
         /// </summary>
-        public bool IgnoreBundle { get; set; }
+        public bool MissingFromCache { get; set; }
     }
 
     /// <summary>
@@ -408,22 +399,13 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when a related bundle has been detected for a bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectRelatedBundle"/>
     /// </summary>
     [Serializable]
     public class DetectRelatedBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectRelatedBundleEventArgs"/> class.
-        /// </summary>
-        /// <param name="productCode">The identity of the related package bundle.</param>
-        /// <param name="relationType">Relationship type for this related bundle.</param>
-        /// <param name="bundleTag">The tag of the related package bundle.</param>
-        /// <param name="perMachine">Whether the detected bundle is per machine.</param>
-        /// <param name="version">The version of the related bundle detected.</param>
-        /// <param name="operation">The operation that will be taken on the detected bundle.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, RelatedOperation operation, bool cancelRecommendation)
+        /// <summary />
+        public DetectRelatedBundleEventArgs(string productCode, RelationType relationType, string bundleTag, bool perMachine, string version, RelatedOperation operation, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.ProductCode = productCode;
@@ -432,6 +414,7 @@ namespace WixToolset.Mba.Core
             this.PerMachine = perMachine;
             this.Version = version;
             this.Operation = operation;
+            this.MissingFromCache = missingFromCache;
         }
 
         /// <summary>
@@ -463,6 +446,11 @@ namespace WixToolset.Mba.Core
         /// Gets the operation that will be taken on the detected bundle.
         /// </summary>
         public RelatedOperation Operation { get; private set; }
+
+        /// <summary>
+        /// Whether the related bundle is missing from the package cache.
+        /// </summary>
+        public bool MissingFromCache { get; set; }
     }
 
     /// <summary>
@@ -1007,6 +995,61 @@ namespace WixToolset.Mba.Core
             : base(hrStatus)
         {
         }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanForwardCompatibleBundle"/>
+    /// </summary>
+    [Serializable]
+    public class PlanForwardCompatibleBundleEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public PlanForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool recommendedIgnoreBundle, bool cancelRecommendation, bool ignoreBundle)
+            : base(cancelRecommendation)
+        {
+            this.BundleId = bundleId;
+            this.RelationType = relationType;
+            this.BundleTag = bundleTag;
+            this.PerMachine = perMachine;
+            this.Version = version;
+            this.RecommendedIgnoreBundle = recommendedIgnoreBundle;
+            this.IgnoreBundle = ignoreBundle;
+        }
+
+        /// <summary>
+        /// Gets the identity of the forward compatible bundle detected.
+        /// </summary>
+        public string BundleId { get; private set; }
+
+        /// <summary>
+        /// Gets the relationship type of the forward compatible bundle.
+        /// </summary>
+        public RelationType RelationType { get; private set; }
+
+        /// <summary>
+        /// Gets the tag of the forward compatible bundle.
+        /// </summary>
+        public string BundleTag { get; private set; }
+
+        /// <summary>
+        /// Gets whether the forward compatible bundle is per machine.
+        /// </summary>
+        public bool PerMachine { get; private set; }
+
+        /// <summary>
+        /// Gets the version of the forward compatible bundle.
+        /// </summary>
+        public string Version { get; private set; }
+
+        /// <summary>
+        /// Gets the recommendation of whether the engine should use the forward compatible bundle.
+        /// </summary>
+        public bool RecommendedIgnoreBundle { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the engine will use the forward compatible bundle.
+        /// </summary>
+        public bool IgnoreBundle { get; set; }
     }
 
     /// <summary>

@@ -33,8 +33,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
         __in_z LPCWSTR wzVersion,
-        __inout BOOL* pfCancel,
-        __inout BOOL* pfIgnoreBundle
+        __in BOOL fMissingFromCache,
+        __inout BOOL* pfCancel
         ) = 0;
 
     // OnDetectUpdateBegin - called when the engine begins detection for bundle update.
@@ -71,6 +71,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOL fPerMachine,
         __in_z LPCWSTR wzVersion,
         __in BOOTSTRAPPER_RELATED_OPERATION operation,
+        __in BOOL fMissingFromCache,
         __inout BOOL* pfCancel
         ) = 0;
 
@@ -538,6 +539,17 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     STDMETHOD(OnSystemRestorePointComplete)(
         __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnPlanForwardCompatibleBundle)(
+        __in_z LPCWSTR wzBundleId,
+        __in BOOTSTRAPPER_RELATION_TYPE relationType,
+        __in_z LPCWSTR wzBundleTag,
+        __in BOOL fPerMachine,
+        __in_z LPCWSTR wzVersion,
+        __in BOOL fRecommendedIgnoreBundle,
+        __inout BOOL* pfCancel,
+        __inout BOOL* pfIgnoreBundle
         ) = 0;
 
     // BAProc - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method to give the BA raw access to the callback from the engine.
