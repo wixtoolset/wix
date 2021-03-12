@@ -37,6 +37,18 @@ namespace WixTestTools
         }
 
         /// <summary>
+        /// Installs the bundle with optional arguments.
+        /// </summary>
+        /// <param name="bundlePath">This should be the bundle in the package cache.</param>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string Install(string bundlePath, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.Install, arguments, bundlePath: bundlePath);
+        }
+
+        /// <summary>
         /// Modify the bundle with optional arguments.
         /// </summary>
         /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>

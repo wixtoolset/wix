@@ -56,6 +56,20 @@ namespace WixTestTools
             return Path.Combine(cachePath, Path.GetFileName(this.Bundle));
         }
 
+        public string ManuallyCache()
+        {
+            var expectedCachePath = this.GetExpectedCachedBundlePath();
+            Directory.CreateDirectory(Path.GetDirectoryName(expectedCachePath));
+            File.Copy(this.Bundle, expectedCachePath);
+            return expectedCachePath;
+        }
+
+        public void ManuallyUncache()
+        {
+            var expectedCachePath = this.GetExpectedCachedBundlePath();
+            File.Delete(expectedCachePath);
+        }
+
         public bool TryGetRegistration(out BundleRegistration registration)
         {
             var bundleSymbol = this.GetBundleSymbol();

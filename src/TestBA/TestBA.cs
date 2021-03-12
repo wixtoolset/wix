@@ -236,6 +236,11 @@ namespace WixToolset.Test.BA
             }
         }
 
+        protected override void OnDetectRelatedBundle(DetectRelatedBundleEventArgs args)
+        {
+            this.Log("OnDetectRelatedBundle() - id: {0}, missing from cache: {1}", args.ProductCode, args.MissingFromCache);
+        }
+
         protected override void OnElevateBegin(ElevateBeginEventArgs args)
         {
             if (this.explicitlyElevateAndPlanFromOnElevateBegin)

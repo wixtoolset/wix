@@ -11,6 +11,21 @@ namespace WixToolsetTest.BurnE2E
         public RegistrationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
+        public void AutomaticallyUncachesBundleWhenNotInstalled()
+        {
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+
+            var cachedBundlePath = bundleA.ManuallyCache();
+
+            testBAController.SetQuitAfterDetect();
+
+            bundleA.Install(cachedBundlePath);
+
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [Fact]
         public void AutomaticallyUninstallsBundleWithoutBADoingApply()
         {
             this.InstallBundleThenManuallyUninstallPackageAndRemovePackageFromCacheThenRunAndQuitWithoutApply(true);
@@ -20,6 +35,18 @@ namespace WixToolsetTest.BurnE2E
         public void AutomaticallyUninstallsBundleWithoutBADoingDetect()
         {
             this.InstallBundleThenManuallyUninstallPackageAndRemovePackageFromCacheThenRunAndQuitWithoutApply(false);
+        }
+
+        [Fact]
+        public void RegistersInARPIfPrecached()
+        {
+            var bundleA = this.CreateBundleInstaller("BundleA");
+
+            bundleA.ManuallyCache();
+
+            // Verifies https://github.com/wixtoolset/issues/issues/5702
+            bundleA.Install();
+            bundleA.VerifyRegisteredAndInPackageCache();
         }
 
         private void InstallBundleThenManuallyUninstallPackageAndRemovePackageFromCacheThenRunAndQuitWithoutApply(bool detect)
