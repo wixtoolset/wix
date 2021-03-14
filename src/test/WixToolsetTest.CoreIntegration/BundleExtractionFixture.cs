@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
     using Xunit;
 
     public class BundleExtractionFixture

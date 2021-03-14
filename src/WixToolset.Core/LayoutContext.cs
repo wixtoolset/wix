@@ -2,20 +2,20 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
     internal class LayoutContext : ILayoutContext
     {
-        internal LayoutContext(IWixToolsetServiceProvider serviceProvider)
+        internal LayoutContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IEnumerable<ILayoutExtension> Extensions { get; set; }
 

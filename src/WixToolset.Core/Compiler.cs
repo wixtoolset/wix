@@ -57,7 +57,7 @@ namespace WixToolset.Core
             Icon,
         }
 
-        internal Compiler(IWixToolsetServiceProvider serviceProvider)
+        internal Compiler(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
@@ -4298,9 +4298,9 @@ namespace WixToolset.Core
                 }
             }
             else if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !("SourceDir".Equals(name, StringComparison.Ordinal) && shortName == null && shortSourceName == null && sourceName == null))
-            {
-                this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, name));
-            }
+                {
+                    this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, name));
+                }
 
             // Update the file source path appropriately.
             if (fileSourceAttribSet)

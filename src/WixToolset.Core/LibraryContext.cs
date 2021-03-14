@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using WixToolset.Data;
@@ -11,12 +12,12 @@ namespace WixToolset.Core
 
     internal class LibraryContext : ILibraryContext
     {
-        internal LibraryContext(IWixToolsetServiceProvider serviceProvider)
+        internal LibraryContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; set; }
 

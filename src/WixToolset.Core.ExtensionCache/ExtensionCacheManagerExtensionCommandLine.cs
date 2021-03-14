@@ -14,12 +14,12 @@ namespace WixToolset.Core.ExtensionCache
     /// </summary>
     internal class ExtensionCacheManagerExtensionCommandLine : BaseExtensionCommandLine
     {
-        public ExtensionCacheManagerExtensionCommandLine(IWixToolsetServiceProvider serviceProvider)
+        public ExtensionCacheManagerExtensionCommandLine(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
         {

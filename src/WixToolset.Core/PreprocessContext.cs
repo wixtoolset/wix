@@ -2,21 +2,21 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
     internal class PreprocessContext : IPreprocessContext
     {
-        internal PreprocessContext(IWixToolsetServiceProvider serviceProvider)
+        internal PreprocessContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IEnumerable<IPreprocessorExtension> Extensions { get; set; }
 

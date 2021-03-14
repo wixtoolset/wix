@@ -12,7 +12,7 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLineArguments : ICommandLineArguments
     {
-        public CommandLineArguments(IWixToolsetServiceProvider serviceProvider)
+        public CommandLineArguments(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }

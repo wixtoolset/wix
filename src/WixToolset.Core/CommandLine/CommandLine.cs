@@ -21,9 +21,9 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLine : ICommandLine
     {
-        public CommandLine(IWixToolsetServiceProvider serviceProvider) => this.ServiceProvider = serviceProvider;
+        public CommandLine(IServiceProvider serviceProvider) => this.ServiceProvider = serviceProvider;
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public ICommandLineCommand CreateCommand(string[] args)
         {

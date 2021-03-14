@@ -2,17 +2,17 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
     internal class UnbindContext : IUnbindContext
     {
-        internal UnbindContext(IWixToolsetServiceProvider serviceProvider)
+        internal UnbindContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public string ExportBasePath { get; set; }
 

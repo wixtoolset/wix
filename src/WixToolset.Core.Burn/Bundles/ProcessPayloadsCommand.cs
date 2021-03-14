@@ -15,7 +15,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class ProcessPayloadsCommand
     {
-        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IServiceProvider serviceProvider, IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
 

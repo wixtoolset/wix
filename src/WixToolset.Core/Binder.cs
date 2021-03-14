@@ -17,12 +17,12 @@ namespace WixToolset.Core
     /// </summary>
     internal class Binder : IBinder
     {
-        internal Binder(IWixToolsetServiceProvider serviceProvider)
+        internal Binder(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IBindResult Bind(IBindContext context)
         {

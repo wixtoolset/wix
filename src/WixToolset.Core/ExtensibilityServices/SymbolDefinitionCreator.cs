@@ -10,12 +10,12 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class SymbolDefinitionCreator : ISymbolDefinitionCreator
     {
-        public SymbolDefinitionCreator(IWixToolsetServiceProvider serviceProvider)
+        public SymbolDefinitionCreator(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IEnumerable<IExtensionData> ExtensionData { get; set; }
 

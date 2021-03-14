@@ -8,12 +8,12 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLineContext : ICommandLineContext
     {
-        public CommandLineContext(IWixToolsetServiceProvider serviceProvider)
+        public CommandLineContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IExtensionManager ExtensionManager { get; set; }
 

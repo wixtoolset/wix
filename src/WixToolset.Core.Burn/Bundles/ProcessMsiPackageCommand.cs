@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private const string PropertySqlFormat = "SELECT `Value` FROM `Property` WHERE `Property` = '{0}'";
 
-        public ProcessMsiPackageCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
+        public ProcessMsiPackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();

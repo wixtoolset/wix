@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using WixToolset.Data;
@@ -11,12 +12,12 @@ namespace WixToolset.Core
 
     internal class LinkContext : ILinkContext
     {
-        internal LinkContext(IWixToolsetServiceProvider serviceProvider)
+        internal LinkContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IEnumerable<ILinkerExtension> Extensions { get; set; }
 

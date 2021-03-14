@@ -13,14 +13,14 @@ namespace WixToolset.Core.CommandLine
 
     internal class CompileCommand : ICommandLineCommand
     {
-        public CompileCommand(IWixToolsetServiceProvider serviceProvider)
+        public CompileCommand(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
         }
 
-        public CompileCommand(IWixToolsetServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, Platform platform)
+        public CompileCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, Platform platform)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -30,7 +30,7 @@ namespace WixToolset.Core.CommandLine
             this.Platform = platform;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; }
 

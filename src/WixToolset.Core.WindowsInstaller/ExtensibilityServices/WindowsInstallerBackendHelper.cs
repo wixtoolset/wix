@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller.ExtensibilityServices
     {
         private readonly IBackendHelper backendHelper;
 
-        public WindowsInstallerBackendHelper(IWixToolsetServiceProvider serviceProvider)
+        public WindowsInstallerBackendHelper(IServiceProvider serviceProvider)
         {
             this.backendHelper = serviceProvider.GetService<IBackendHelper>();
         }

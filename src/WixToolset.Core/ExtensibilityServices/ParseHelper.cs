@@ -18,14 +18,14 @@ namespace WixToolset.Core.ExtensibilityServices
     {
         private static readonly char[] InlineDirectorySeparators = new char[] { ':', '\\', '/' };
 
-        public ParseHelper(IWixToolsetServiceProvider serviceProvider)
+        public ParseHelper(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

@@ -25,7 +25,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         private Dictionary<string, ManifestData> BundleExtensionDataById { get; } = new Dictionary<string, ManifestData>();
 
-        public BurnBackendHelper(IWixToolsetServiceProvider serviceProvider)
+        public BurnBackendHelper(IServiceProvider serviceProvider)
         {
             this.backendHelper = serviceProvider.GetService<IBackendHelper>();
         }

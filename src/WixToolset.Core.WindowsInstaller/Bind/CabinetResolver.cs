@@ -14,7 +14,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CabinetResolver
     {
-        public CabinetResolver(IWixToolsetServiceProvider serviceProvider, string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
+        public CabinetResolver(IServiceProvider serviceProvider, string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -23,7 +23,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.BackendExtensions = backendExtensions;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private string CabCachePath { get; }
 

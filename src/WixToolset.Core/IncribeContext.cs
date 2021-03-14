@@ -8,12 +8,12 @@ namespace WixToolset.Core
 
     internal class InscribeContext : IInscribeContext
     {
-        public InscribeContext(IWixToolsetServiceProvider serviceProvider)
+        public InscribeContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public string IntermediateFolder { get; set; }
 

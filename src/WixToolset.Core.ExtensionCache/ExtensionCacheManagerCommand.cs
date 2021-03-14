@@ -22,7 +22,7 @@ namespace WixToolset.Core.ExtensionCache
             List
         }
 
-        public ExtensionCacheManagerCommand(IWixToolsetServiceProvider serviceProvider)
+        public ExtensionCacheManagerCommand(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.ExtensionReferences = new List<string>();

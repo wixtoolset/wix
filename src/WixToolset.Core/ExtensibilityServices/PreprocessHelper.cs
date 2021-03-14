@@ -17,14 +17,14 @@ namespace WixToolset.Core.ExtensibilityServices
         private static readonly char[] VariableSplitter = new char[] { '.' };
         private static readonly char[] ArgumentSplitter = new char[] { ',' };
 
-        public PreprocessHelper(IWixToolsetServiceProvider serviceProvider)
+        public PreprocessHelper(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -133,7 +133,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     }
 
                 default:
-                    var extensionsByPrefix = this.GetExtensionsByPrefix(context);
+                    var extensionsByPrefix = this.GetExtensionsByPrefix();
                     if (extensionsByPrefix.TryGetValue(prefix, out var extension))
                     {
                         try
@@ -259,7 +259,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     return context.Variables.TryGetValue(name, out var result) ? result : null;
 
                 default:
-                    var extensionsByPrefix = this.GetExtensionsByPrefix(context);
+                    var extensionsByPrefix = this.GetExtensionsByPrefix();
                     if (extensionsByPrefix.TryGetValue(prefix, out var extension))
                     {
                         try
@@ -309,7 +309,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     break;
 
                 default:
-                    var extensionsByPrefix = this.GetExtensionsByPrefix(context);
+                    var extensionsByPrefix = this.GetExtensionsByPrefix();
                     if (extensionsByPrefix.TryGetValue(prefix, out var extension))
                     {
                         if (!extension.ProcessPragma(prefix, pragma, args, parent))
@@ -468,7 +468,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        private Dictionary<string, IPreprocessorExtension> GetExtensionsByPrefix(IPreprocessContext context)
+        private Dictionary<string, IPreprocessorExtension> GetExtensionsByPrefix()
         {
             if (this.ExtensionsByPrefix == null)
             {

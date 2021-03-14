@@ -8,12 +8,12 @@ namespace WixToolset.Core.ExtensionCache
 
     internal class ExtensionCacheManagerExtensionFactory : IExtensionFactory
     {
-        public ExtensionCacheManagerExtensionFactory(IWixToolsetServiceProvider serviceProvider)
+        public ExtensionCacheManagerExtensionFactory(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public bool TryCreateExtension(Type extensionType, out object extension)
         {

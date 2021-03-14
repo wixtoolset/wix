@@ -16,14 +16,14 @@ namespace WixToolset.Core
     /// </summary>
     internal class Librarian : ILibrarian
     {
-        internal Librarian(IWixToolsetServiceProvider serviceProvider)
+        internal Librarian(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

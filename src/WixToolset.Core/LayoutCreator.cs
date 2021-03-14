@@ -16,14 +16,14 @@ namespace WixToolset.Core
     /// </summary>
     internal class LayoutCreator : ILayoutCreator
     {
-        internal LayoutCreator(IWixToolsetServiceProvider serviceProvider)
+        internal LayoutCreator(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

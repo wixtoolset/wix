@@ -11,12 +11,12 @@ namespace WixToolset.Core
 
     internal class DecompileContext : IDecompileContext
     {
-        internal DecompileContext(IWixToolsetServiceProvider serviceProvider)
+        internal DecompileContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public string DecompilePath { get; set; }
 

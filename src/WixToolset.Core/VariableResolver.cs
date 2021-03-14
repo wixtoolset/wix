@@ -21,7 +21,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Instantiate a new VariableResolver.
         /// </summary>
-        internal VariableResolver(IWixToolsetServiceProvider serviceProvider)
+        internal VariableResolver(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -31,7 +31,7 @@ namespace WixToolset.Core
             this.localizedControls = new Dictionary<string, LocalizedControl>();
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

@@ -27,14 +27,14 @@ namespace WixToolset.Core
         /// <summary>
         /// Creates a linker.
         /// </summary>
-        internal Linker(IWixToolsetServiceProvider serviceProvider)
+        internal Linker(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
             this.sectionIdOnRows = true; // TODO: what is the correct value for this?
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

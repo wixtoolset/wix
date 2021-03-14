@@ -31,7 +31,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
 
-        public CreateCabinetsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, WixMediaTemplateSymbol mediaTemplate)
+        public CreateCabinetsCommand(IServiceProvider serviceProvider, IBackendHelper backendHelper, WixMediaTemplateSymbol mediaTemplate)
         {
             this.fileTransfers = new List<IFileTransfer>();
 
@@ -46,7 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.MediaTemplate = mediaTemplate;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         private IBackendHelper BackendHelper { get; }
 

@@ -10,6 +10,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
     using Xunit;
 
     public class PreprocessorFixture

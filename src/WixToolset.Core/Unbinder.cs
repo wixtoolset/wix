@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using WixToolset.Data;
@@ -13,7 +14,7 @@ namespace WixToolset.Core
     /// </summary>
     internal sealed class Unbinder : IUnbinder
     {
-        public Unbinder(IWixToolsetServiceProvider serviceProvider)
+        public Unbinder(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -21,7 +22,7 @@ namespace WixToolset.Core
             this.BackendFactories = extensionManager.GetServices<IBackendFactory>();
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IEnumerable<IBackendFactory> BackendFactories { get; }
 

@@ -12,12 +12,12 @@ namespace WixToolset.Core
     /// </summary>
     internal class Decompiler : IDecompiler
     {
-        internal Decompiler(IWixToolsetServiceProvider serviceProvider)
+        internal Decompiler(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
         public IDecompileResult Decompile(IDecompileContext context)
         {
