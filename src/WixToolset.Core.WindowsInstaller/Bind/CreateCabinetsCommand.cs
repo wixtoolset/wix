@@ -8,7 +8,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;

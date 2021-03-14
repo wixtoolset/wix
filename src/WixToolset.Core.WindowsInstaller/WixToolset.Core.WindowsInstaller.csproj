@@ -13,12 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,7 +8,6 @@ namespace WixToolset.Core.Burn
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.Burn.Bind;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Burn.Interfaces;
