@@ -8,7 +8,7 @@ namespace WixToolset.Extensibility.Data
 #pragma warning disable 1591 // TODO: add documentation
     public interface IInscribeContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         string InputFilePath { get; set; }
 

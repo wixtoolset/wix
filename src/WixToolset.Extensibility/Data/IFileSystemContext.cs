@@ -9,7 +9,7 @@ namespace WixToolset.Extensibility.Data
 #pragma warning disable 1591 // TODO: add documentation
     public interface IFileSystemContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         string CabCachePath { get; set; }
 

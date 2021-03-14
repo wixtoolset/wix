@@ -8,7 +8,7 @@ namespace WixToolset.Extensibility.Services
     /// <summary>
     /// The core of the service provider used to add services to the service provider.
     /// </summary>
-    public interface IWixToolsetCoreServiceProvider : IWixToolsetServiceProvider
+    public interface IWixToolsetCoreServiceProvider : IServiceProvider
     {
         /// <summary>
         /// Adds a service to the service locator.

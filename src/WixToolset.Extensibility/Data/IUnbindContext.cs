@@ -3,12 +3,11 @@
 namespace WixToolset.Extensibility.Data
 {
     using System;
-    using WixToolset.Extensibility.Services;
 
 #pragma warning disable 1591 // TODO: add documentation
     public interface IUnbindContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         string ExportBasePath { get; set; }
 

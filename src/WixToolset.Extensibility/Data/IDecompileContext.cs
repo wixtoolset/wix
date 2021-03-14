@@ -10,7 +10,7 @@ namespace WixToolset.Extensibility.Data
 #pragma warning disable 1591 // TODO: add documentation
     public interface IDecompileContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         string DecompilePath { get; set; }
 

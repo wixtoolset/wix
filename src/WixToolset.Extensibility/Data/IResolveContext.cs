@@ -2,15 +2,15 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
 
 #pragma warning disable 1591 // TODO: add documentation
     public interface IResolveContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         IEnumerable<IBindPath> BindPaths { get; set; }
 

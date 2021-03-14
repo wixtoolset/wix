@@ -2,11 +2,11 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Context provided to the compiler.
@@ -16,7 +16,7 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Service provider made available to the compiler and its extensions.
         /// </summary>
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         /// <summary>
         /// Unique identifier for the compilation.

@@ -5,30 +5,44 @@ namespace WixToolset.Extensibility.Services
     using System;
 
     /// <summary>
-    /// Service provider.
+    /// Service provider extensions.
     /// </summary>
-    public interface IWixToolsetServiceProvider : IServiceProvider
+    public static class ServiceProviderExtensions
     {
         /// <summary>
         /// Gets a service from the service provider.
         /// </summary>
         /// <typeparam name="T">Type of service to get.</typeparam>
-        T GetService<T>() where T : class;
+        /// <param name="provider">Service provider.</param>
+        public static T GetService<T>(this IServiceProvider provider) where T : class
+        {
+            return provider.GetService(typeof(T)) as T;
+        }
 
         /// <summary>
         /// Gets a service from the service provider.
         /// </summary>
+        /// <param name="provider">Service provider.</param>
         /// <param name="serviceType">Type of service to get.</param>
         /// <param name="service">Retrieved service.</param>
         /// <returns>True if the service was found, otherwise false</returns>
-        bool TryGetService(Type serviceType, out object service);
+        public static bool TryGetService(this IServiceProvider provider, Type serviceType, out object service)
+        {
+            service = provider.GetService(serviceType);
+            return service != null;
+        }
 
         /// <summary>
         /// Gets a service from the service provider.
         /// </summary>
         /// <typeparam name="T">Type of service to get.</typeparam>
+        /// <param name="provider">Service provider.</param>
         /// <param name="service">Retrieved service.</param>
         /// <returns>True if the service was found, otherwise false</returns>
-        bool TryGetService<T>(out T service) where T : class;
+        public static bool TryGetService<T>(this IServiceProvider provider, out T service) where T : class
+        {
+            service = provider.GetService(typeof(T)) as T;
+            return service != null;
+        }
     }
 }

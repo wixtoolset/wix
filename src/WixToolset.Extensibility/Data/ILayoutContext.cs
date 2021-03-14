@@ -2,14 +2,14 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
-    using WixToolset.Extensibility.Services;
 
 #pragma warning disable 1591 // TODO: add documentation
     public interface ILayoutContext
     {
-        IWixToolsetServiceProvider ServiceProvider { get; }
+        IServiceProvider ServiceProvider { get; }
 
         IEnumerable<ILayoutExtension> Extensions { get; set; }
 
