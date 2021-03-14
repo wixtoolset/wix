@@ -108,17 +108,6 @@ namespace WixToolset.Extensibility.Services
         Identifier CreateRegistrySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         /// <summary>
-        /// Creates a short file/directory name using an identifier and long file/directory name as input.
-        /// </summary>
-        /// <param name="longName">The long file/directory name.</param>
-        /// <param name="keepExtension">The option to keep the extension on generated short names.</param>
-        /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
-        /// <param name="args">Any additional information to include in the hash for the generated short name.</param>
-        /// <returns>The generated 8.3-compliant short file/directory name.</returns>
-        [Obsolete]
-        string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args);
-
-        /// <summary>
         /// Create a WixSimpleReference symbol in the active section.
         /// </summary>
         /// <param name="section">Active section.</param>
@@ -394,9 +383,9 @@ namespace WixToolset.Extensibility.Services
         /// Verifies if a filename is a valid short filename.
         /// </summary>
         /// <param name="filename">Filename to verify.</param>
-        /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
+        /// <param name="allowWildcards">Indicates whether wildcards are allowed in the filename.</param>
         /// <returns>True if the filename is a valid short filename</returns>
-        bool IsValidShortFilename(string filename, bool allowWildcards = false);
+        bool IsValidShortFilename(string filename, bool allowWildcards);
 
         /// <summary>
         /// Attempts to use an extension to parse the attribute.

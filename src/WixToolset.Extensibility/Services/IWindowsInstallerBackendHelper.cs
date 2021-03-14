@@ -17,7 +17,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="symbol">Symbol with line information for the row.</param>
         /// <param name="data">Windows Installer data.</param>
         /// <param name="tableDefinition">Table definition for the row.</param>
-        /// <returns></returns>
+        /// <returns>Row created in the <paramref name="data"/>.</returns>
         Row CreateRow(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData data, TableDefinition tableDefinition);
 
         /// <summary>

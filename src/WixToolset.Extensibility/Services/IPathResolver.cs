@@ -6,9 +6,10 @@ namespace WixToolset.Extensibility.Services
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Support for processing paths.
+    /// </summary>
     public interface IPathResolver
-#pragma warning restore 1591
     {
         /// <summary>
         /// Get the canonical source path of a directory.
