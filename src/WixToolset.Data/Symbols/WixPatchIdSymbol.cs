@@ -20,11 +20,41 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixPatchIdSymbolFields
     {
         ClientPatchId,
         OptimizePatchSizeForLargeFiles,
         ApiPatchingSymbolFlags,
+    }
+
+    /// <summary>
+    /// The following flags are used with PATCH_OPTION_DATA SymbolOptionFlags:
+    /// </summary>
+    [Flags]
+    [CLSCompliant(false)]
+    public enum PatchSymbolFlags : uint
+    {
+        /// <summary>
+        /// Don't use imagehlp.dll
+        /// </summary>
+        PatchSymbolNoImagehlp = 0x00000001,
+
+        /// <summary>
+        /// Don't fail patch due to imagehlp failures.
+        /// </summary>
+        PatchSymbolNoFailures = 0x00000002,
+
+        /// <summary>
+        /// After matching decorated symbols, try to match remaining by undecorated names.
+        /// </summary>
+        PatchSymbolUndecoratedToo = 0x00000004,
+
+        /// <summary>
+        /// (used internally)
+        /// </summary>
+        PatchSymbolReserved = 0x80000000,
     }
 
     public class WixPatchIdSymbol : IntermediateSymbol

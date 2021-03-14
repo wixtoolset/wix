@@ -12,8 +12,8 @@ namespace WixToolset.Data
     /// </summary>
     public sealed class Localization
     {
-        private Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
-        private Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
+        private readonly Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
+        private readonly Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
         /// <summary>
         /// Instantiates a new localization object.

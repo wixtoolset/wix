@@ -45,6 +45,29 @@ namespace WixToolset.Data.Symbols
         ActionProperty,
     }
 
+    public static class WixUpgradeConstants
+    {
+        /// <summary>
+        /// Standard property for detecting upgrades.
+        /// </summary>
+        public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
+
+        /// <summary>
+        /// Standard condition to prevent upgrades.
+        /// </summary>
+        public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
+
+        /// <summary>
+        /// Standard property for downgrade detected.
+        /// </summary>
+        public const string DowngradeDetectedProperty = "WIX_DOWNGRADE_DETECTED";
+
+        /// <summary>
+        /// Standard condition to prevent downgrades.
+        /// </summary>
+        public const string DowngradePreventedCondition = "NOT WIX_DOWNGRADE_DETECTED";
+    }
+
     public class UpgradeSymbol : IntermediateSymbol
     {
         public UpgradeSymbol() : base(SymbolDefinitions.Upgrade, null, null)
