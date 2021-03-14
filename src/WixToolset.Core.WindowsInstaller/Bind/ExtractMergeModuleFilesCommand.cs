@@ -11,19 +11,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Runtime.InteropServices;
     using WixToolset.Data;
     using WixToolset.Core.Native;
-    using WixToolset.Core.Bind;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
     using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Retrieve files information and extract them from merge modules.
     /// </summary>
     internal class ExtractMergeModuleFilesCommand
     {
-        public ExtractMergeModuleFilesCommand(IMessaging messaging, IEnumerable<WixMergeSymbol> wixMergeSymbols, IEnumerable<FileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
+        public ExtractMergeModuleFilesCommand(IMessaging messaging, IWindowsInstallerBackendHelper backendHelper, IEnumerable<WixMergeSymbol> wixMergeSymbols, IEnumerable<IFileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.WixMergeSymbols = wixMergeSymbols;
             this.FileFacades = fileFacades;
             this.OutputInstallerVersion = installerVersion;
@@ -33,9 +34,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IMessaging Messaging { get; }
 
+        private IWindowsInstallerBackendHelper BackendHelper { get; }
+
         private IEnumerable<WixMergeSymbol> WixMergeSymbols { get; }
 
-        private IEnumerable<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
         private int OutputInstallerVersion { get; }
 
@@ -43,11 +46,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private bool SuppressLayout { get; }
 
-        public IEnumerable<FileFacade> MergeModulesFileFacades { get; private set; }
+        public IEnumerable<IFileFacade> MergeModulesFileFacades { get; private set; }
 
         public void Execute()
         {
-            var mergeModulesFileFacades = new List<FileFacade>();
+            var mergeModulesFileFacades = new List<IFileFacade>();
 
             var interop = new MsmInterop();
             var merge = interop.GetMsmMerge();
@@ -75,7 +78,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.MergeModulesFileFacades = mergeModulesFileFacades;
         }
 
-        private bool CreateFacadesForMergeModuleFiles(WixMergeSymbol wixMergeRow, List<FileFacade> mergeModulesFileFacades, Dictionary<string, FileFacade> indexedFileFacades)
+        private bool CreateFacadesForMergeModuleFiles(WixMergeSymbol wixMergeRow, List<IFileFacade> mergeModulesFileFacades, Dictionary<string, IFileFacade> indexedFileFacades)
         {
             var containsFiles = false;
 
@@ -86,7 +89,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (db.TableExists("File") && db.TableExists("Component"))
                     {
-                        var uniqueModuleFileIdentifiers = new Dictionary<string, FileFacade>(StringComparer.OrdinalIgnoreCase);
+                        var uniqueModuleFileIdentifiers = new Dictionary<string, IFileFacade>(StringComparer.OrdinalIgnoreCase);
 
                         using (var view = db.OpenExecuteView("SELECT `File`, `Directory_` FROM `File`, `Component` WHERE `Component_`=`Component`"))
                         {
@@ -102,7 +105,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 fileSymbol.DiskId = wixMergeRow.DiskId;
                                 fileSymbol.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
 
-                                var mergeModuleFileFacade = new FileFacade(true, fileSymbol);
+                                var mergeModuleFileFacade = this.BackendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
 
                                 // If case-sensitive collision with another merge module or a user-authored file identifier.
                                 if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.Id, out var collidingFacade))

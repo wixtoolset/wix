@@ -30,10 +30,10 @@ namespace WixToolset.Core
 
         public Localization ParseLocalization(XDocument document)
         {
-            XElement root = document.Root;
+            var root = document.Root;
             Localization localization = null;
 
-            SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(root);
+            var sourceLineNumbers = SourceLineNumber.CreateFromXObject(root);
             if (LocalizationParser.XmlElementName == root.Name.LocalName)
             {
                 if (LocalizationParser.WxlNamespace == root.Name.Namespace)
@@ -85,11 +85,11 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         private static Localization ParseWixLocalizationElement(IMessaging messaging, XElement node)
         {
-            int codepage = -1;
+            var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
+            var codepage = -1;
             string culture = null;
-            SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {
@@ -115,10 +115,10 @@ namespace WixToolset.Core
                 }
             }
 
-            Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
-            Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
+            var variables = new Dictionary<string, BindVariable>();
+            var localizedControls = new Dictionary<string, LocalizedControl>();
 
-            foreach (XElement child in node.Elements())
+            foreach (var child in node.Elements())
             {
                 if (LocalizationParser.WxlNamespace == child.Name.Namespace)
                 {
@@ -155,10 +155,10 @@ namespace WixToolset.Core
         private static void ParseString(IMessaging messaging, XElement node, IDictionary<string, BindVariable> variables)
         {
             string id = null;
-            bool overridable = false;
-            SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
+            var overridable = false;
+            var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {
@@ -184,7 +184,7 @@ namespace WixToolset.Core
                 }
             }
 
-            string value = Common.GetInnerText(node);
+            var value = Common.GetInnerText(node);
 
             if (null == id)
             {
@@ -228,7 +228,7 @@ namespace WixToolset.Core
             var rightAligned = false;
             var leftScroll = false;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {

@@ -55,15 +55,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private readonly TableDefinitionCollection tableDefinitions;
 
-        public AttachPatchTransformsCommand(IMessaging messaging, Intermediate intermediate, IEnumerable<PatchTransform> transforms)
+        public AttachPatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, Intermediate intermediate, IEnumerable<PatchTransform> transforms)
         {
             this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.Intermediate = intermediate;
             this.Transforms = transforms;
         }
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private Intermediate Intermediate { get; }
 
@@ -797,7 +800,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (!deletedComponent.ContainsKey(componentId))
                         {
                             var foundRemoveFileEntry = false;
-                            var filename = Common.GetName(row.FieldAsString(2), false, true);
+                            var filename = this.BackendHelper.GetMsiFileName(row.FieldAsString(2), false, true);
 
                             if (transform.TryGetTable("RemoveFile", out var removeFileTable))
                             {
@@ -813,7 +816,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                         // Check if there is a RemoveFile entry for this file
                                         if (null != removeFileRow[2])
                                         {
-                                            var removeFileName = Common.GetName(removeFileRow.FieldAsString(2), false, true);
+                                            var removeFileName = this.BackendHelper.GetMsiFileName(removeFileRow.FieldAsString(2), false, true);
 
                                             // Convert the MSI format for a wildcard string to Regex format.
                                             removeFileName = removeFileName.Replace('.', '|').Replace('?', '.').Replace("*", ".*").Replace("|", "\\.");

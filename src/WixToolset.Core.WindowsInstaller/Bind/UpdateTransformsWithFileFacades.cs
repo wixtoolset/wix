@@ -5,16 +5,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class UpdateTransformsWithFileFacades
     {
-        public UpdateTransformsWithFileFacades(IMessaging messaging, WindowsInstallerData output, IEnumerable<SubStorage> subStorages, TableDefinitionCollection tableDefinitions, IEnumerable<FileFacade> fileFacades)
+        public UpdateTransformsWithFileFacades(IMessaging messaging, WindowsInstallerData output, IEnumerable<SubStorage> subStorages, TableDefinitionCollection tableDefinitions, IEnumerable<IFileFacade> fileFacades)
         {
             this.Messaging = messaging;
             this.Output = output;
@@ -31,18 +31,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private TableDefinitionCollection TableDefinitions { get; }
 
-        private IEnumerable<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
         public void Execute()
         {
-            var fileFacadesByDiskId = new Dictionary<int, Dictionary<string, FileFacade>>();
+            var fileFacadesByDiskId = new Dictionary<int, Dictionary<string, IFileFacade>>();
 
             // Index patch file facades by diskId+fileId.
             foreach (var facade in this.FileFacades)
             {
                 if (!fileFacadesByDiskId.TryGetValue(facade.DiskId, out var mediaFacades))
                 {
-                    mediaFacades = new Dictionary<string, FileFacade>();
+                    mediaFacades = new Dictionary<string, IFileFacade>();
                     fileFacadesByDiskId.Add(facade.DiskId, mediaFacades);
                 }
 
@@ -97,7 +97,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // Index patch files by diskId+fileId
                         if (!fileFacadesByDiskId.TryGetValue(mainFileRow.DiskId, out var mediaFacades))
                         {
-                            mediaFacades = new Dictionary<string, FileFacade>();
+                            mediaFacades = new Dictionary<string, IFileFacade>();
                             fileFacadesByDiskId.Add(mainFileRow.DiskId, mediaFacades);
                         }
 

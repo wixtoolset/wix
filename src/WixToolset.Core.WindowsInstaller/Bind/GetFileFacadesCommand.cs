@@ -6,36 +6,45 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class GetFileFacadesCommand
     {
-        public GetFileFacadesCommand(IntermediateSection section)
+        public GetFileFacadesCommand(IntermediateSection section, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Section = section;
+            this.BackendHelper = backendHelper;
         }
 
         private IntermediateSection Section { get; }
 
-        public List<FileFacade> FileFacades { get; private set; }
+        private IWindowsInstallerBackendHelper BackendHelper { get; }
+
+        public List<IFileFacade> FileFacades { get; private set; }
 
         public void Execute()
         {
-            var facades = new List<FileFacade>();
+            var facades = new List<IFileFacade>();
 
             var assemblyFile = this.Section.Symbols.OfType<AssemblySymbol>().ToDictionary(t => t.Id.Id);
+#if TODO_PATCHING_DELTA
             //var deltaPatchFiles = this.Section.Symbols.OfType<WixDeltaPatchFileSymbol>().ToDictionary(t => t.Id.Id);
+#endif
 
             foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
             {
                 assemblyFile.TryGetValue(file.Id.Id, out var assembly);
 
+#if TODO_PATCHING_DELTA
                 //deltaPatchFiles.TryGetValue(file.Id.Id, out var deltaPatchFile);
+                // TODO: should we be passing along delta information to the file facade? Probably, right?
+#endif
+                var fileFacade = this.BackendHelper.CreateFileFacade(file, assembly);
 
-                facades.Add(new FileFacade(file, assembly));
-                //facades.Add(new FileFacade(file, wixFile, deltaPatchFile));
+                facades.Add(fileFacade);
             }
 
 #if TODO_PATCHING_DELTA

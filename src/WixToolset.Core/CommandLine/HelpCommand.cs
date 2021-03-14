@@ -19,9 +19,10 @@ namespace WixToolset.Core.CommandLine
             new ExtensionCommandLineSwitch { Switch = "decompile", Description = "Decompile a package or bundle into source code." },
         };
 
-        public HelpCommand(IEnumerable<IExtensionCommandLine> extensions)
+        public HelpCommand(IEnumerable<IExtensionCommandLine> extensions, IWixBranding branding)
         {
             this.Extensions = extensions;
+            this.Branding = branding;
         }
 
         public bool ShowLogo => true;
@@ -29,6 +30,8 @@ namespace WixToolset.Core.CommandLine
         public bool StopParsing => true;
 
         private IEnumerable<IExtensionCommandLine> Extensions { get; }
+
+        private IWixBranding Branding { get; }
 
         public Task<int> ExecuteAsync(CancellationToken _)
         {
@@ -52,7 +55,8 @@ namespace WixToolset.Core.CommandLine
 
             Console.WriteLine();
             Console.WriteLine("Run 'wix [command] --help' for more information on a command.");
-            AppCommon.DisplayToolFooter();
+            Console.WriteLine();
+            Console.WriteLine(this.Branding.ReplacePlaceholders("For more information see: [SupportUrl]"));
 
             return Task.FromResult(-1);
         }

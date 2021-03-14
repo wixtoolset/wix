@@ -3,8 +3,8 @@
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System.Collections.Generic;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// A cabinet builder work item.
@@ -20,7 +20,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="compressionLevel">The compression level of the cabinet.</param>
         /// <param name="modularizationSuffix">Modularization suffix used when building a Merge Module.</param>
         /// <!--<param name="binderFileManager">The binder file manager.</param>-->
-        public CabinetWorkItem(IEnumerable<FileFacade> fileFacades, string cabinetFile, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix /*, BinderFileManager binderFileManager*/)
+        public CabinetWorkItem(IEnumerable<IFileFacade> fileFacades, string cabinetFile, int maxThreshold, CompressionLevel compressionLevel, string modularizationSuffix /*, BinderFileManager binderFileManager*/)
         {
             this.CabinetFile = cabinetFile;
             this.CompressionLevel = compressionLevel;
@@ -51,7 +51,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Gets the collection of files in this cabinet.
         /// </summary>
         /// <value>The collection of files in this cabinet.</value>
-        public IEnumerable<FileFacade> FileFacades { get;  }
+        public IEnumerable<IFileFacade> FileFacades { get;  }
 
         // <summary>
         // Gets the binder file manager.

@@ -130,10 +130,9 @@ namespace WixToolset.Core.Burn
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var command = new ExtractEmbeddedFilesCommand(this.BackendHelper, this.ExpectedEmbeddedFiles);
-                command.Execute();
+                var extractedFiles = this.BackendHelper.ExtractEmbeddedFiles(this.ExpectedEmbeddedFiles);
 
-                trackedFiles.AddRange(command.TrackedFiles);
+                trackedFiles.AddRange(extractedFiles);
             }
 
             // Get the explicit payloads.
@@ -367,8 +366,7 @@ namespace WixToolset.Core.Burn
             // Resolve any delayed fields before generating the manifest.
             if (this.DelayedFields.Any())
             {
-                var resolveDelayedFieldsCommand = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
-                resolveDelayedFieldsCommand.Execute();
+                this.BackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
             Dictionary<string, ProvidesDependencySymbol> dependencySymbolsByKey;

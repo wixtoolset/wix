@@ -138,8 +138,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (fileRow.Id.Id == componentSymbol.KeyPath)
                         {
                             // calculate the key file's canonical target path
-                            string directoryPath = this.PathResolver.GetCanonicalDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentSymbol.DirectoryRef, this.Platform);
-                            string fileName = Common.GetName(fileRow.Name, false, true).ToLowerInvariant();
+                            var directoryPath = this.PathResolver.GetCanonicalDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentSymbol.DirectoryRef, this.Platform);
+                            var fileName = this.BackendHelper.GetMsiFileName(fileRow.Name, false, true).ToLowerInvariant();
                             path = Path.Combine(directoryPath, fileName);
 
                             // find paths that are not canonicalized

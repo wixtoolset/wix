@@ -9,12 +9,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class MergeModulesCommand
     {
-        public MergeModulesCommand(IMessaging messaging, IEnumerable<FileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
+        public MergeModulesCommand(IMessaging messaging, IEnumerable<IFileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.FileFacades = fileFacades;
@@ -34,7 +34,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IMessaging Messaging { get; }
 
-        private IEnumerable<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
         private IntermediateSection Section { get; }
 

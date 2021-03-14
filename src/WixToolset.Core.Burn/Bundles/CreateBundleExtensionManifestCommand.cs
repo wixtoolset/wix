@@ -66,7 +66,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private WixBundlePayloadSymbol CreateBundleExtensionManifestPayloadRow(string bextManifestPath)
         {
-            var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
+            var generatedId = this.InternalBurnBackendHelper.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
 
             var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
             {

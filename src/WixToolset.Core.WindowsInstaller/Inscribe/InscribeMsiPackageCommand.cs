@@ -21,12 +21,15 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
         {
             this.Context = context;
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+            this.WindowsInstallerBackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
             this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
         }
 
         private IInscribeContext Context { get; }
 
         private IMessaging Messaging { get; }
+
+        private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 
@@ -197,7 +200,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                         if (!certificates.ContainsKey(cert2.Thumbprint))
                         {
                             // generate a stable identifier
-                            var certificateGeneratedId = Common.GenerateIdentifier("cer", cert2.Thumbprint);
+                            var certificateGeneratedId = this.WindowsInstallerBackendHelper.GenerateIdentifier("cer", cert2.Thumbprint);
 
                             // Add it to our "add to MsiDigitalCertificate" table dictionary
                             var digitalCertificateRow = digitalCertificateTable.CreateRow(null);

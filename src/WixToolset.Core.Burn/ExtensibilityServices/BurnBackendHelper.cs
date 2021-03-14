@@ -9,6 +9,8 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
     using System.Xml;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -30,13 +32,43 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         #region IBackendHelper interfaces
 
+        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly) => this.backendHelper.CreateFileFacade(file, assembly);
+
+        public IFileFacade CreateFileFacade(FileRow fileRow) => this.backendHelper.CreateFileFacade(fileRow);
+
+        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol) => this.backendHelper.CreateFileFacadeFromMergeModule(fileSymbol);
+
         public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.CreateFileTransfer(source, destination, move, sourceLineNumbers);
+
+        public string CreateGuid() => this.backendHelper.CreateGuid();
 
         public string CreateGuid(Guid namespaceGuid, string value) => this.backendHelper.CreateGuid(namespaceGuid, value);
 
         public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name) => this.backendHelper.CreateResolvedDirectory(directoryParent, name);
 
+        public IEnumerable<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles) => this.backendHelper.ExtractEmbeddedFiles(embeddedFiles);
+
+        public string GenerateIdentifier(string prefix, params string[] args) => this.backendHelper.GenerateIdentifier(prefix, args);
+
         public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath) => this.backendHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+
+        public int GetValidCodePage(string value, bool allowNoChange, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.GetValidCodePage(value, allowNoChange, onlyAnsi, sourceLineNumbers);
+
+        public string GetMsiFileName(string value, bool source, bool longName) => this.backendHelper.GetMsiFileName(value, source, longName);
+
+        public bool IsValidBinderVariable(string variable) => this.backendHelper.IsValidBinderVariable(variable);
+
+        public bool IsValidFourPartVersion(string version) => this.backendHelper.IsValidFourPartVersion(version);
+
+        public bool IsValidIdentifier(string id) => this.backendHelper.IsValidIdentifier(id);
+
+        public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative) => this.backendHelper.IsValidLongFilename(filename, allowWildcards, allowRelative);
+
+        public bool IsValidShortFilename(string filename, bool allowWildcards) => this.backendHelper.IsValidShortFilename(filename, allowWildcards);
+
+        public void ResolveDelayedFields(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache) => this.backendHelper.ResolveDelayedFields(delayedFields, variableCache);
+
+        public string[] SplitMsiFileName(string value) => this.backendHelper.SplitMsiFileName(value);
 
         public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null) => this.backendHelper.TrackFile(path, type, sourceLineNumbers);
 
@@ -87,7 +119,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         private ManifestData GetBundleExtensionManifestData(string extensionId)
         {
-            if (!Common.IsIdentifier(extensionId))
+            if (!this.backendHelper.IsValidIdentifier(extensionId))
             {
                 throw new ArgumentException($"'{extensionId}' is not a valid extensionId");
             }

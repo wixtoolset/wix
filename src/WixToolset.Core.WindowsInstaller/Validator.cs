@@ -25,10 +25,10 @@ namespace WixToolset.Core.WindowsInstaller
     internal sealed class Validator
     {
         private string actionName;
-        private StringCollection cubeFiles;
+        private readonly StringCollection cubeFiles;
         private ValidatorExtension extension;
         private WindowsInstallerData output;
-        private InstallUIHandler validationUIHandler;
+        private readonly InstallUIHandler validationUIHandler;
         private bool validationSessionComplete;
         private readonly IMessaging messaging;
 
@@ -57,7 +57,6 @@ namespace WixToolset.Core.WindowsInstaller
         /// Gets or sets the list of ICEs to run.
         /// </summary>
         /// <value>The list of ICEs.</value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         public ISet<string> ICEs { get; set; }
 
         /// <summary>
@@ -75,7 +74,6 @@ namespace WixToolset.Core.WindowsInstaller
         /// Gets or sets the suppressed ICEs.
         /// </summary>
         /// <value>The suppressed ICEs.</value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         public ISet<string> SuppressedICEs { get; set; }
 
         /// <summary>
@@ -103,13 +101,8 @@ namespace WixToolset.Core.WindowsInstaller
             IntPtr previousHwnd = IntPtr.Zero;
             InstallUIHandler previousUIHandler = null;
 
-            if (null == databaseFile)
-            {
-                throw new ArgumentNullException("databaseFile");
-            }
-
             // initialize the validator extension
-            this.extension.DatabaseFile = databaseFile;
+            this.extension.DatabaseFile = databaseFile ?? throw new ArgumentNullException(nameof(databaseFile));
             this.extension.Output = this.output;
             this.extension.InitializeValidator();
 

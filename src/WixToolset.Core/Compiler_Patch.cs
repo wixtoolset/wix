@@ -95,13 +95,13 @@ namespace WixToolset.Core
                         targetProductName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "ApiPatchingSymbolNoImagehlpFlag":
-                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_NO_IMAGEHLP : 0;
+                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlags.PatchSymbolNoImagehlp : 0;
                         break;
                     case "ApiPatchingSymbolNoFailuresFlag":
-                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_NO_FAILURES : 0;
+                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlags.PatchSymbolNoFailures : 0;
                         break;
                     case "ApiPatchingSymbolUndecoratedTooFlag":
-                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_UNDECORATED_TOO : 0;
+                        apiPatchingSymbolFlags |= (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlags.PatchSymbolUndecoratedToo : 0;
                         break;
                     case "OptimizePatchSizeForLargeFiles":
                         optimizePatchSizeForLargeFiles = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
@@ -275,7 +275,7 @@ namespace WixToolset.Core
         private int ParseOptimizeCustomActionsElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var optimizeCA = OptimizeCA.None;
+            var optimizeCA = OptimizeCAFlags.None;
 
             foreach (var attrib in node.Attributes())
             {
@@ -286,19 +286,19 @@ namespace WixToolset.Core
                     case "SkipAssignment":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
-                            optimizeCA |= OptimizeCA.SkipAssignment;
+                            optimizeCA |= OptimizeCAFlags.SkipAssignment;
                         }
                         break;
                     case "SkipImmediate":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
-                            optimizeCA |= OptimizeCA.SkipImmediate;
+                            optimizeCA |= OptimizeCAFlags.SkipImmediate;
                         }
                         break;
                     case "SkipDeferred":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
-                            optimizeCA |= OptimizeCA.SkipDeferred;
+                            optimizeCA |= OptimizeCAFlags.SkipDeferred;
                         }
                         break;
                     default:

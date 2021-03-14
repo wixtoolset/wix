@@ -6,7 +6,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -33,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string DatabasePath { private get; set; }
 
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        public IEnumerable<IFileFacade> FileFacades { private get; set; }
 
         public string LayoutDirectory { private get; set; }
 
@@ -63,7 +62,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     foreach (var directoryRecord in directoryView.Records)
                     {
-                        var sourceName = Common.GetName(directoryRecord.GetString(3), true, this.LongNamesInImage);
+                        var sourceName = this.BackendHelper.GetMsiFileName(directoryRecord.GetString(3), true, this.LongNamesInImage);
 
                         var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(directoryRecord.GetString(2), sourceName);
 
@@ -71,16 +70,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                using (View fileView = db.OpenView("SELECT `Directory_`, `FileName` FROM `Component`, `File` WHERE `Component`.`Component`=`File`.`Component_` AND `File`.`File`=?"))
+                using (var fileView = db.OpenView("SELECT `Directory_`, `FileName` FROM `Component`, `File` WHERE `Component`.`Component`=`File`.`Component_` AND `File`.`File`=?"))
                 {
-                    using (Record fileQueryRecord = new Record(1))
+                    using (var fileQueryRecord = new Record(1))
                     {
                         // for each file in the array of uncompressed files
-                        foreach (FileFacade facade in this.FileFacades)
+                        foreach (var facade in this.FileFacades)
                         {
                             var mediaSymbol = mediaRows[facade.DiskId];
                             string relativeFileLayoutPath = null;
-                            string mediaLayoutFolder = mediaSymbol.Layout;
+                            var mediaLayoutFolder = mediaSymbol.Layout;
 
                             var mediaLayoutDirectory = this.ResolveMedia(mediaSymbol, mediaLayoutFolder, this.LayoutDirectory);
 
@@ -89,7 +88,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             fileQueryRecord[1] = facade.Id;
                             fileView.Execute(fileQueryRecord);
 
-                            using (Record fileRecord = fileView.Fetch())
+                            using (var fileRecord = fileView.Fetch())
                             {
                                 if (null == fileRecord)
                                 {

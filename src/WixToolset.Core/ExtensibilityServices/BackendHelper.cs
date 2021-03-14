@@ -3,8 +3,12 @@
 namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using WixToolset.Core.Bind;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -15,12 +19,24 @@ namespace WixToolset.Core.ExtensibilityServices
         public BackendHelper(IWixToolsetServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
-            this.ParseHelper = serviceProvider.GetService<IParseHelper>();
         }
 
         private IMessaging Messaging { get; }
 
-        private IParseHelper ParseHelper { get; }
+        public IFileFacade CreateFileFacade(FileSymbol file, AssemblySymbol assembly)
+        {
+            return new FileFacade(file, assembly);
+        }
+
+        public IFileFacade CreateFileFacade(FileRow fileRow)
+        {
+            return new FileFacade(fileRow);
+        }
+
+        public IFileFacade CreateFileFacadeFromMergeModule(FileSymbol fileSymbol)
+        {
+            return new FileFacade(true, fileSymbol);
+        }
 
         public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
         {
@@ -38,6 +54,11 @@ namespace WixToolset.Core.ExtensibilityServices
             };
         }
 
+        public string CreateGuid()
+        {
+            return Common.GenerateGuid();
+        }
+
         public string CreateGuid(Guid namespaceGuid, string value)
         {
             return Uuid.NewUuid(namespaceGuid, value).ToString("B").ToUpperInvariant();
@@ -52,14 +73,73 @@ namespace WixToolset.Core.ExtensibilityServices
             };
         }
 
+        public IEnumerable<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles)
+        {
+            var command = new ExtractEmbeddedFilesCommand(this, embeddedFiles);
+            command.Execute();
+
+            return command.TrackedFiles;
+        }
+
+        public string GenerateIdentifier(string prefix, params string[] args)
+        {
+            return Common.GenerateIdentifier(prefix, args);
+        }
+
         public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
         {
-            return this.ParseHelper.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath);
+            return Common.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath, this.Messaging);
+        }
+
+        public int GetValidCodePage(string value, bool allowNoChange = false, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
+        {
+            return Common.GetValidCodePage(value, allowNoChange, onlyAnsi, sourceLineNumbers);
+        }
+
+        public string GetMsiFileName(string value, bool source, bool longName)
+        {
+            return Common.GetName(value, source, longName);
+        }
+
+        public void ResolveDelayedFields(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
+        {
+            var command = new ResolveDelayedFieldsCommand(this.Messaging, delayedFields, variableCache);
+            command.Execute();
+        }
+
+        public string[] SplitMsiFileName(string value)
+        {
+            return Common.GetNames(value);
         }
 
         public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)
         {
             return new TrackedFile(path, type, sourceLineNumbers);
+        }
+
+        public bool IsValidBinderVariable(string variable)
+        {
+            return Common.IsValidBinderVariable(variable);
+        }
+
+        public bool IsValidFourPartVersion(string version)
+        {
+            return Common.IsValidFourPartVersion(version);
+        }
+
+        public bool IsValidIdentifier(string id)
+        {
+            return Common.IsIdentifier(id);
+        }
+
+        public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
+        {
+            return Common.IsValidLongFilename(filename, allowWildcards, allowRelative);
+        }
+
+        public bool IsValidShortFilename(string filename, bool allowWildcards)
+        {
+            return Common.IsValidShortFilename(filename, allowWildcards);
         }
 
         private string GetValidatedFullPath(SourceLineNumber sourceLineNumbers, string path)

@@ -10,19 +10,18 @@ namespace WixToolset.Core.Bind
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: this shouldn't be public, need interface in Extensibility
     /// <summary>
     /// Resolves the fields which had variables that needed to be resolved after the file information
     /// was loaded.
     /// </summary>
-    public class ResolveDelayedFieldsCommand
+    internal class ResolveDelayedFieldsCommand
     {
         /// <summary>
         /// Resolve delayed fields.
         /// </summary>
         /// <param name="messaging"></param>
         /// <param name="delayedFields">The fields which had resolution delayed.</param>
-        /// <param name="variableCache">The file information to use when resolving variables.</param>
+        /// <param name="variableCache">The cached variable values used when resolving delayed fields.</param>
         public ResolveDelayedFieldsCommand(IMessaging messaging, IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
         {
             this.Messaging = messaging;
@@ -49,7 +48,7 @@ namespace WixToolset.Core.Bind
                     // process properties first in case they refer to other binder variables
                     if (delayedField.Symbol.Definition.Type == SymbolDefinitionType.Property)
                     {
-                        var value = ResolveDelayedVariables(propertySymbol.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
+                        var value = this.ResolveDelayedVariables(propertySymbol.SourceLineNumbers, delayedField.Field.AsString());
 
                         // update the variable cache with the new value
                         var key = String.Concat("property.", propertySymbol.Id.Id);
@@ -72,7 +71,7 @@ namespace WixToolset.Core.Bind
 
             // add specialization for ProductVersion fields
             var keyProductVersion = "property.ProductVersion";
-            if (this.VariableCache.TryGetValue(keyProductVersion, out var versionValue) && Version.TryParse(versionValue, out Version productVersion))
+            if (this.VariableCache.TryGetValue(keyProductVersion, out var versionValue) && Version.TryParse(versionValue, out var productVersion))
             {
                 // Don't add the variable if it already exists (developer defined a property with the same name).
                 var fieldKey = String.Concat(keyProductVersion, ".Major");
@@ -105,7 +104,7 @@ namespace WixToolset.Core.Bind
             {
                 try
                 {
-                    var value = ResolveDelayedVariables(delayedField.Symbol.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
+                    var value = this.ResolveDelayedVariables(delayedField.Symbol.SourceLineNumbers, delayedField.Field.AsString());
                     delayedField.Field.Set(value);
                 }
                 catch (WixException we)
@@ -115,7 +114,7 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        private static string ResolveDelayedVariables(SourceLineNumber sourceLineNumbers, string value, IDictionary<string, string> resolutionData)
+        private string ResolveDelayedVariables(SourceLineNumber sourceLineNumbers, string value)
         {
             var start = 0;
 
@@ -125,7 +124,7 @@ namespace WixToolset.Core.Bind
                 {
                     var key = String.Concat(parsed.Name, ".", parsed.Scope);
 
-                    if (!resolutionData.TryGetValue(key, out var resolvedValue))
+                    if (!this.VariableCache.TryGetValue(key, out var resolvedValue))
                     {
                         resolvedValue = parsed.DefaultValue;
                     }
@@ -149,7 +148,7 @@ namespace WixToolset.Core.Bind
                     }
                     else
                     {
-                        throw new WixException(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
+                        this.Messaging.Write(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
                     }
                 }
                 else

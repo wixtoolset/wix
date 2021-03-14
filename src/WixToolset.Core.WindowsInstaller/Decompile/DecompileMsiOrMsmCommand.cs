@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Unbind
+namespace WixToolset.Core.WindowsInstaller.Decompile
 {
     using System;
     using System.Collections.Generic;
@@ -8,6 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.IO;
     using System.Linq;
     using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
@@ -43,11 +44,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         Directory.Delete(this.Context.ExtractFolder, true);
                     }
 
-                    var unbindCommand = new UnbindDatabaseCommand(this.Messaging, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, suppressDemodularization: false, skipSummaryInfo: false);
+                    var backendHelper = this.Context.ServiceProvider.GetService<IBackendHelper>();
+
+                    var unbindCommand = new UnbindDatabaseCommand(this.Messaging, backendHelper, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, suppressDemodularization: false, skipSummaryInfo: false);
                     var output = unbindCommand.Execute();
                     var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);
 
-                    var decompiler = new Decompiler(this.Messaging, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
+                    var decompiler = new Decompiler(this.Messaging, backendHelper, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
                     result.Document = decompiler.Decompile(output);
 
                     result.Platform = GetPlatformFromOutput(output);

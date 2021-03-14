@@ -25,6 +25,7 @@ namespace WixToolset.Core
             this.AddService((provider, singletons) => AddSingleton<IPreprocessHelper>(singletons, new PreprocessHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IBackendHelper>(singletons, new BackendHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IPathResolver>(singletons, new PathResolver()));
+            this.AddService((provider, singletons) => AddSingleton<IWixBranding>(singletons, new WixBranding()));
 
             // Transients.
             this.AddService<ICommandLineArguments>((provider, singletons) => new CommandLineArguments(provider));

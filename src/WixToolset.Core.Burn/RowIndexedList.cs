@@ -13,9 +13,9 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal sealed class RowIndexedList<T> : IList<T> where T : Row
     {
-        private Dictionary<string, T> index;
-        private List<T> rows;
-        private List<T> duplicates;
+        private readonly Dictionary<string, T> index;
+        private readonly List<T> rows;
+        private readonly List<T> duplicates;
 
         /// <summary>
         /// Creates an empty <see cref="RowIndexedList{T}"/>.
@@ -34,7 +34,7 @@ namespace WixToolset.Core.Burn
         public RowIndexedList(IEnumerable<T> rows)
             : this()
         {
-            foreach (T row in rows)
+            foreach (var row in rows)
             {
                 this.Add(row);
             }
@@ -81,8 +81,7 @@ namespace WixToolset.Core.Burn
         /// <returns>Row or null if key is not found.</returns>
         public T Get(string key)
         {
-            T result;
-            return this.TryGet(key, out result) ? result : null;
+            return this.TryGet(key, out var result) ? result : null;
         }
 
         /// <summary>
@@ -169,12 +168,11 @@ namespace WixToolset.Core.Burn
         /// <param name="index">Index to remove the row at.</param>
         public void RemoveAt(int index)
         {
-            T row = this.rows[index];
+            var row = this.rows[index];
 
             this.rows.RemoveAt(index);
 
-            T indexRow;
-            if (this.index.TryGetValue(row.GetKey(), out indexRow) && indexRow == row)
+            if (this.index.TryGetValue(row.GetKey(), out var indexRow) && indexRow == row)
             {
                 this.index.Remove(row.GetKey());
             }
@@ -264,11 +262,10 @@ namespace WixToolset.Core.Burn
         /// <returns></returns>
         public bool Remove(T row)
         {
-            bool removed = this.rows.Remove(row);
+            var removed = this.rows.Remove(row);
             if (removed)
             {
-                T indexRow;
-                if (this.index.TryGetValue(row.GetKey(), out indexRow) && indexRow == row)
+                if (this.index.TryGetValue(row.GetKey(), out var indexRow) && indexRow == row)
                 {
                     this.index.Remove(row.GetKey());
                 }

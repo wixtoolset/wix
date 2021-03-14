@@ -4,13 +4,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
 
     internal class UpdateMediaSequencesCommand
     {
-        public UpdateMediaSequencesCommand(IntermediateSection section, List<FileFacade> fileFacades)
+        public UpdateMediaSequencesCommand(IntermediateSection section, IEnumerable<IFileFacade> fileFacades)
         {
             this.Section = section;
             this.FileFacades = fileFacades;
@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
-        private List<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
         public void Execute()
         {
@@ -38,9 +38,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 var lastSequence = 0;
                 MediaSymbol mediaSymbol = null;
-                var patchGroups = new Dictionary<int, List<FileFacade>>();
+                var patchGroups = new Dictionary<int, List<IFileFacade>>();
 
-                // sequence the non-patch-added files
+                // Sequence the non-patch-added files.
                 foreach (var facade in this.FileFacades)
                 {
                     if (null == mediaSymbol)
@@ -62,7 +62,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (patchGroups.TryGetValue(facade.PatchGroup.Value, out var patchGroup))
                         {
-                            patchGroup = new List<FileFacade>();
+                            patchGroup = new List<IFileFacade>();
                             patchGroups.Add(facade.PatchGroup.Value, patchGroup);
                         }
 
@@ -80,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     mediaSymbol = null;
                 }
 
-                // sequence the patch-added files
+                // Sequence the patch-added files.
                 foreach (var patchGroup in patchGroups.Values)
                 {
                     foreach (var facade in patchGroup)

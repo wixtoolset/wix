@@ -2,7 +2,6 @@
 
 namespace WixToolset.Core
 {
-    using System;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 

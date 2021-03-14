@@ -21,6 +21,8 @@ namespace WixToolset.Core
             this.BackendFactories = extensionManager.GetServices<IBackendFactory>();
         }
 
+        public IWixToolsetServiceProvider ServiceProvider { get; }
+
         public IEnumerable<IBackendFactory> BackendFactories { get; }
 
         /// <summary>
@@ -28,8 +30,6 @@ namespace WixToolset.Core
         /// </summary>
         /// <value>Set to true if the input msi is part of an admin image.</value>
         public bool IsAdminImage { get; set; }
-
-        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         /// <summary>
         /// Gets or sets the option to suppress demodularizing values.

@@ -5,35 +5,35 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class GetFileFacadesFromTransforms
     {
-        public GetFileFacadesFromTransforms(IMessaging messaging, FileSystemManager fileSystemManager, IEnumerable<SubStorage> subStorages)
+        public GetFileFacadesFromTransforms(IMessaging messaging, IWindowsInstallerBackendHelper backendHelper, FileSystemManager fileSystemManager, IEnumerable<SubStorage> subStorages)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.FileSystemManager = fileSystemManager;
             this.SubStorages = subStorages;
         }
 
         private IMessaging Messaging { get; }
 
+        private IWindowsInstallerBackendHelper BackendHelper { get; }
+
         private FileSystemManager FileSystemManager { get; }
 
         private IEnumerable<SubStorage> SubStorages { get; }
 
-        public List<FileFacade> FileFacades { get; private set; }
+        public List<IFileFacade> FileFacades { get; private set; }
 
         public void Execute()
         {
-            var allFileRows = new List<FileFacade>();
-
-            var patchMediaRows = new RowDictionary<MediaRow>();
+            var allFileRows = new List<IFileFacade>();
 
             var patchMediaFileRows = new Dictionary<int, RowDictionary<FileRow>>();
 
@@ -143,7 +143,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         mediaFileRows.Add(patchFileRow);
 
-                        allFileRows.Add(new FileFacade(patchFileRow)); // TODO: should we be passing along delta information? Probably, right?
+#if TODO_PATCHING_DELTA
+                        // TODO: should we be passing along delta information to the file facade? Probably, right?
+#endif
+                        var fileFacade = this.BackendHelper.CreateFileFacade(patchFileRow);
+
+                        allFileRows.Add(fileFacade);
                     }
                     else
                     {

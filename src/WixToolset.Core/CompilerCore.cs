@@ -297,20 +297,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Creates a short file/directory name using an identifier and long file/directory name as input.
-        /// </summary>
-        /// <param name="longName">The long file/directory name.</param>
-        /// <param name="keepExtension">The option to keep the extension on generated short names.</param>
-        /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
-        /// <param name="args">Any additional information to include in the hash for the generated short name.</param>
-        /// <returns>The generated 8.3-compliant short file/directory name.</returns>
-        [Obsolete]
-        public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
-        {
-            return this.parseHelper.CreateShortName(longName, keepExtension, allowWildcards, args);
-        }
-
-        /// <summary>
         /// Verifies the given string is a valid product version.
         /// </summary>
         /// <param name="version">The product version to verify.</param>
@@ -337,7 +323,7 @@ namespace WixToolset.Core
         /// <returns>True if version is a valid module or bundle version.</returns>
         public static bool IsValidModuleOrBundleVersion(string version)
         {
-            return Common.IsValidModuleOrBundleVersion(version);
+            return Common.IsValidFourPartVersion(version);
         }
 
         /// <summary>
@@ -547,15 +533,14 @@ namespace WixToolset.Core
         {
             if (null == attribute)
             {
-                throw new ArgumentNullException("attribute");
+                throw new ArgumentNullException(nameof(attribute));
             }
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             try
             {
-                int codePage = Common.GetValidCodePage(value);
-                return codePage;
+                return Common.GetValidCodePage(value);
             }
             catch (NotSupportedException)
             {
@@ -576,12 +561,12 @@ namespace WixToolset.Core
         {
             if (null == attribute)
             {
-                throw new ArgumentNullException("attribute");
+                throw new ArgumentNullException(nameof(attribute));
             }
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
-            // allow for localization of code page names and values
+            // Allow for localization of code page names and values.
             if (this.IsValidLocIdentifier(value))
             {
                 return value;
@@ -589,13 +574,13 @@ namespace WixToolset.Core
 
             try
             {
-                int codePage = Common.GetValidCodePage(value, false, onlyAnsi, sourceLineNumbers);
+                var codePage = Common.GetValidCodePage(value, false, onlyAnsi, sourceLineNumbers);
                 return codePage.ToString(CultureInfo.InvariantCulture);
             }
             catch (NotSupportedException)
             {
-                // not a valid windows code page
-                this.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
+                // Not a valid windows code page.
+                this.messaging.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
             }
             catch (WixException e)
             {
@@ -805,7 +790,7 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                if (!this.IsValidShortFilename(value, allowWildcards) && !Common.ContainsValidBinderVariable(value))
+                if (!this.parseHelper.IsValidShortFilename(value, allowWildcards) && !Common.ContainsValidBinderVariable(value))
                 {
                     this.Write(ErrorMessages.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }

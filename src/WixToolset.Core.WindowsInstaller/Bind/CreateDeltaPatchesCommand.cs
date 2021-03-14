@@ -9,20 +9,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Creates delta patches and updates the appropriate rows to point to the newly generated patches.
     /// </summary>
     internal class CreateDeltaPatchesCommand
     {
-        public CreateDeltaPatchesCommand(List<FileFacade> fileFacades, string intermediateFolder, WixPatchIdSymbol wixPatchId)
+        public CreateDeltaPatchesCommand(List<IFileFacade> fileFacades, string intermediateFolder, WixPatchIdSymbol wixPatchId)
         {
             this.FileFacades = fileFacades;
             this.IntermediateFolder = intermediateFolder;
             this.WixPatchId = wixPatchId;
         }
 
-        private IEnumerable<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
         private WixPatchIdSymbol WixPatchId { get; }
 
@@ -31,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void Execute()
         {
             var optimizePatchSizeForLargeFiles = this.WixPatchId?.OptimizePatchSizeForLargeFiles ?? false;
-            var apiPatchingSymbolFlags = (PatchSymbolFlagsType)(this.WixPatchId?.ApiPatchingSymbolFlags ?? 0);
+            var apiPatchingSymbolFlags = (PatchSymbolFlags)(this.WixPatchId?.ApiPatchingSymbolFlags ?? 0);
 
 #if TODO_PATCHING_DELTA
             foreach (FileFacade facade in this.FileFacades)

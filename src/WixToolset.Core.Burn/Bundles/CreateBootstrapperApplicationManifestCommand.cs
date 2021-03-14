@@ -244,7 +244,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private WixBundlePayloadSymbol CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
         {
-            var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BADataFileName);
+            var generatedId = this.InternalBurnBackendHelper.GenerateIdentifier("ux", BurnCommon.BADataFileName);
 
             var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
             {

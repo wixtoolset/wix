@@ -17,9 +17,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class UnbindTransformCommand
     {
-        public UnbindTransformCommand(IMessaging messaging, string transformFile, string exportBasePath, string intermediateFolder)
+        public UnbindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, string transformFile, string exportBasePath, string intermediateFolder)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.TransformFile = transformFile;
             this.ExportBasePath = exportBasePath;
             this.IntermediateFolder = intermediateFolder;
@@ -28,6 +29,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         }
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private string TransformFile { get; }
 
@@ -87,7 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 msiDatabase.ApplyTransform(this.TransformFile, TransformErrorConditions.All | TransformErrorConditions.ViewTransform);
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
                 var transformViewOutput = unbindCommand.Execute();
 
                 // index the added and possibly modified rows (added rows may also appears as modified rows)
@@ -157,7 +160,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
 
                 // unbind the database
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
                 var output = unbindCommand.Execute();
 
                 // index all the rows to easily find modified rows

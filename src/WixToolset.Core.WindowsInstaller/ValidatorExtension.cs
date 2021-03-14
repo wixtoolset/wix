@@ -181,7 +181,7 @@ namespace WixToolset.Extensibility
                 throw new ArgumentNullException("message");
             }
 
-            string[] messageParts = message.Split('\t');
+            var messageParts = message.Split('\t');
             if (3 > messageParts.Length)
             {
                 if (null == action)
@@ -194,10 +194,10 @@ namespace WixToolset.Extensibility
                 }
             }
 
-            SourceLineNumber messageSourceLineNumbers = null;
+            SourceLineNumber messageSourceLineNumbers;
             if (6 < messageParts.Length)
             {
-                string[] primaryKeys = new string[messageParts.Length - 6];
+                var primaryKeys = new string[messageParts.Length - 6];
 
                 Array.Copy(messageParts, 6, primaryKeys, 0, primaryKeys.Length);
 
@@ -242,7 +242,7 @@ namespace WixToolset.Extensibility
                     this.indexedSourceLineNumbers = new Hashtable();
 
                     // index each real table
-                    foreach (Table table in this.output.Tables)
+                    foreach (var table in this.output.Tables)
                     {
                         // skip unreal tables
                         if (table.Definition.Unreal)
@@ -251,7 +251,7 @@ namespace WixToolset.Extensibility
                         }
 
                         // index each row
-                        foreach (Row row in table.Rows)
+                        foreach (var row in table.Rows)
                         {
                             // skip rows that don't contain source line information
                             if (null == row.SourceLineNumbers)
@@ -260,10 +260,10 @@ namespace WixToolset.Extensibility
                             }
 
                             // index the row using its table name and primary key
-                            string primaryKey = row.GetPrimaryKey(';');
+                            var primaryKey = row.GetPrimaryKey(';');
                             if (null != primaryKey)
                             {
-                                string key = String.Concat(table.Name, ":", primaryKey);
+                                var key = String.Concat(table.Name, ":", primaryKey);
 
                                 if (this.indexedSourceLineNumbers.ContainsKey(key))
                                 {

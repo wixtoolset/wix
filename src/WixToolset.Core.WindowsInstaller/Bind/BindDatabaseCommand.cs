@@ -6,7 +6,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -133,7 +132,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             Platform platform;
             string modularizationSuffix;
             {
-                var command = new BindSummaryInfoCommand(section);
+                var branding = this.ServiceProvider.GetService<IWixBranding>();
+
+                var command = new BindSummaryInfoCommand(section, this.WindowsInstallerBackendHelper, branding);
                 command.Execute();
 
                 compressed = command.Compressed;
@@ -151,7 +152,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Set the ProductCode if it is to be generated.
                     if ("ProductCode".Equals(propertyRow.Id.Id, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
                     {
-                        propertyRow.Value = Common.GenerateGuid();
+                        propertyRow.Value = this.WindowsInstallerBackendHelper.CreateGuid();
 
 #if TODO_PATCHING // Is this still necessary?
 
@@ -235,24 +236,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var command = new ExtractEmbeddedFilesCommand(this.WindowsInstallerBackendHelper, this.ExpectedEmbeddedFiles);
-                command.Execute();
+                var extractedFiles = this.WindowsInstallerBackendHelper.ExtractEmbeddedFiles(this.ExpectedEmbeddedFiles);
 
-                trackedFiles.AddRange(command.TrackedFiles);
+                trackedFiles.AddRange(extractedFiles);
             }
 
             // This must occur after all variables and source paths have been resolved.
-            List<FileFacade> fileFacades;
+            List<IFileFacade> fileFacades;
             if (SectionType.Patch == section.Type)
             {
-                var command = new GetFileFacadesFromTransforms(this.Messaging, this.FileSystemManager, this.SubStorages);
+                var command = new GetFileFacadesFromTransforms(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, this.SubStorages);
                 command.Execute();
 
                 fileFacades = command.FileFacades;
             }
             else
             {
-                var command = new GetFileFacadesCommand(section);
+                var command = new GetFileFacadesCommand(section, this.WindowsInstallerBackendHelper);
                 command.Execute();
 
                 fileFacades = command.FileFacades;
@@ -267,7 +267,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     containsMergeModules = true;
 
-                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, wixMergeSymbols, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, this.WindowsInstallerBackendHelper, wixMergeSymbols, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
                     command.Execute();
 
                     fileFacades.AddRange(command.MergeModulesFileFacades);
@@ -307,8 +307,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Now that the variable cache is populated, resolve any delayed fields.
             if (this.DelayedFields.Any())
             {
-                var command = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
-                command.Execute();
+                this.WindowsInstallerBackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
             // Update symbols that reference text files on disk.
@@ -330,7 +329,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (dependencyRefs.Any())
                 {
-                    var command = new ProcessDependencyReferencesCommand(section, dependencyRefs);
+                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, section, dependencyRefs);
                     command.Execute();
                 }
             }
@@ -379,8 +378,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Assign files to media and update file sequences.
-            Dictionary<MediaSymbol, IEnumerable<FileFacade>> filesByCabinetMedia;
-            IEnumerable<FileFacade> uncompressedFiles;
+            Dictionary<MediaSymbol, IEnumerable<IFileFacade>> filesByCabinetMedia;
+            IEnumerable<IFileFacade> uncompressedFiles;
             {
                 var order = new OptimizeFileFacadesOrderCommand(this.WindowsInstallerBackendHelper, this.PathResolver, section, platform, fileFacades);
                 order.Execute();
@@ -414,7 +413,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (data.Type == OutputType.Module)
             {
                 // Modularize identifiers.
-                var modularize = new ModularizeCommand(data, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
+                var modularize = new ModularizeCommand(this.WindowsInstallerBackendHelper, data, modularizationSuffix, section.Symbols.OfType<WixSuppressModularizationSymbol>());
                 modularize.Execute();
 
                 // Ensure all sequence tables in place because, mergemod.dll requires them.

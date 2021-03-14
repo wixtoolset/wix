@@ -22,6 +22,8 @@ namespace WixToolset.Core.WindowsInstaller
         {
             var messaging = context.ServiceProvider.GetService<IMessaging>();
 
+            var backendHelper = context.ServiceProvider.GetService<IBackendHelper>();
+
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
             var backendExtensions = extensionManager.GetServices<IWindowsInstallerBackendBinderExtension>();
@@ -34,14 +36,14 @@ namespace WixToolset.Core.WindowsInstaller
             // Create transforms named in patch transforms.
             IEnumerable<PatchTransform> patchTransforms;
             {
-                var command = new CreatePatchTransformsCommand(messaging, context.IntermediateRepresentation, context.IntermediateFolder);
+                var command = new CreatePatchTransformsCommand(messaging, backendHelper, context.IntermediateRepresentation, context.IntermediateFolder);
                 patchTransforms = command.Execute();
             }
 
             // Enhance the intermediate by attaching the created patch transforms.
             IEnumerable<SubStorage> subStorages;
             {
-                var command = new AttachPatchTransformsCommand(messaging, context.IntermediateRepresentation, patchTransforms);
+                var command = new AttachPatchTransformsCommand(messaging, backendHelper, context.IntermediateRepresentation, patchTransforms);
                 subStorages = command.Execute();
             }
 

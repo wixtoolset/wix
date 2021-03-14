@@ -15,14 +15,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreatePatchTransformsCommand
     {
-        public CreatePatchTransformsCommand(IMessaging messaging, Intermediate intermediate, string intermediateFolder)
+        public CreatePatchTransformsCommand(IMessaging messaging, IBackendHelper backendHelper, Intermediate intermediate, string intermediateFolder)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.Intermediate = intermediate;
             this.IntermediateFolder = intermediateFolder;
         }
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private Intermediate Intermediate { get; }
 
@@ -52,7 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     var exportBasePath = Path.Combine(this.IntermediateFolder, "_trans"); // TODO: come up with a better path.
 
-                    var command = new UnbindTransformCommand(this.Messaging, symbol.TransformFile.Path, exportBasePath, this.IntermediateFolder);
+                    var command = new UnbindTransformCommand(this.Messaging, this.BackendHelper, symbol.TransformFile.Path, exportBasePath, this.IntermediateFolder);
                     transform = command.Execute();
                 }
 
@@ -76,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     var isAdminImage = false; // TODO: need a better way to set this
 
-                    var command = new UnbindDatabaseCommand(this.Messaging, database, path, OutputType.Product, exportBasePath, this.IntermediateFolder, isAdminImage, suppressDemodularization: true, skipSummaryInfo: true);
+                    var command = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, database, path, OutputType.Product, exportBasePath, this.IntermediateFolder, isAdminImage, suppressDemodularization: true, skipSummaryInfo: true);
                     return command.Execute();
                 }
             }

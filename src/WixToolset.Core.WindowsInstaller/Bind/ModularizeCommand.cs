@@ -12,17 +12,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Services;
 
     internal class ModularizeCommand
     {
-        public ModularizeCommand(WindowsInstallerData output, string modularizationSuffix, IEnumerable<WixSuppressModularizationSymbol> suppressSymbols)
+        public ModularizeCommand(IBackendHelper backendHelper, WindowsInstallerData output, string modularizationSuffix, IEnumerable<WixSuppressModularizationSymbol> suppressSymbols)
         {
+            this.BackendHelper = backendHelper;
             this.Output = output;
             this.ModularizationSuffix = modularizationSuffix;
 
             // Gather all the unique suppress modularization identifiers.
             this.SuppressModularizationIdentifiers = new HashSet<string>(suppressSymbols.Select(s => s.SuppressIdentifier));
         }
+
+        private IBackendHelper BackendHelper { get; }
 
         private WindowsInstallerData Output { get; }
 
@@ -90,7 +94,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         case "SetTargetPath":
                         case "SpawnDialog":
                         case "SpawnWaitDialog":
-                            if (Common.IsIdentifier(fieldData))
+                            if (this.BackendHelper.IsValidIdentifier(fieldData))
                             {
                                 modularizeType = ColumnModularizeType.Column;
                             }
@@ -107,7 +111,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 else if (ColumnModularizeType.ControlText == field.Column.ModularizeType)
                 {
                     // icons are stored in the Binary table, so they get column-type modularization
-                    if (("Bitmap" == row[2].ToString() || "Icon" == row[2].ToString()) && Common.IsIdentifier(fieldData))
+                    if (("Bitmap" == row[2].ToString() || "Icon" == row[2].ToString()) && this.BackendHelper.IsValidIdentifier(fieldData))
                     {
                         modularizeType = ColumnModularizeType.Column;
                     }
@@ -121,7 +125,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     case ColumnModularizeType.Column:
                         // ensure the value is an identifier (otherwise it shouldn't be modularized this way)
-                        if (!Common.IsIdentifier(fieldData))
+                        if (!this.BackendHelper.IsValidIdentifier(fieldData))
                         {
                             throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixDataStrings.EXP_CannotModularizeIllegalID, fieldData));
                         }

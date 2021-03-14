@@ -17,11 +17,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private const string DependencyRegistryRoot = @"Software\Classes\Installer\Dependencies\";
         private const string RegistryDependents = "Dependents";
 
-        public ProcessDependencyReferencesCommand(IntermediateSection section, IEnumerable<WixDependencyRefSymbol> dependencyRefSymbols)
+        public ProcessDependencyReferencesCommand(IBackendHelper backendHelper, IntermediateSection section, IEnumerable<WixDependencyRefSymbol> dependencyRefSymbols)
         {
+            this.BackendHelper = backendHelper;
             this.Section = section;
             this.DependencyRefSymbols = dependencyRefSymbols;
         }
+
+        private IBackendHelper BackendHelper { get; }
 
         private IntermediateSection Section { get; }
 
@@ -57,7 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Get the component ID from the provider.
                 var componentId = wixDependencyProviderRow.ComponentRef;
 
-                var id = Common.GenerateIdentifier("reg", providesId, requiresId, "(Default)");
+                var id = this.BackendHelper.GenerateIdentifier("reg", providesId, requiresId, "(Default)");
                 this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                 {
                     ComponentRef = componentId,
@@ -68,7 +71,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (!String.IsNullOrEmpty(wixDependencyRow.MinVersion))
                 {
-                    id = Common.GenerateIdentifier("reg", providesId, requiresId, "MinVersion");
+                    id = this.BackendHelper.GenerateIdentifier("reg", providesId, requiresId, "MinVersion");
                     this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,
@@ -79,10 +82,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     });
                 }
 
-                string maxVersion = (string)wixDependencyRow[3];
+                var maxVersion = (string)wixDependencyRow[3];
                 if (!String.IsNullOrEmpty(wixDependencyRow.MaxVersion))
                 {
-                    id = Common.GenerateIdentifier("reg", providesId, requiresId, "MaxVersion");
+                    id = this.BackendHelper.GenerateIdentifier("reg", providesId, requiresId, "MaxVersion");
                     this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,
@@ -95,7 +98,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (wixDependencyRow.Attributes != WixDependencySymbolAttributes.None)
                 {
-                    id = Common.GenerateIdentifier("reg", providesId, requiresId, "Attributes");
+                    id = this.BackendHelper.GenerateIdentifier("reg", providesId, requiresId, "Attributes");
                     this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))
                     {
                         ComponentRef = componentId,

@@ -11,16 +11,16 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
 
     internal class UnbindDatabaseCommand
     {
         private List<string> exportedFiles;
 
-        public UnbindDatabaseCommand(IMessaging messaging, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
+        public UnbindDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.Database = database;
             this.DatabasePath = databasePath;
             this.OutputType = outputType;
@@ -34,6 +34,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         }
 
         public IMessaging Messaging { get; }
+
+        public IBackendHelper BackendHelper { get; }
 
         public Database Database { get; }
 
@@ -527,7 +529,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// </summary>
         /// <param name="value">The Filename value.</param>
         /// <returns>The source name of the directory in an admin image.</returns>
-        private static string GetAdminSourceName(string value)
+        private string GetAdminSourceName(string value)
         {
             string name = null;
             string[] names;
@@ -535,7 +537,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             string shortsourcename = null;
             string sourcename = null;
 
-            names = Common.GetNames(value);
+            names = this.BackendHelper.SplitMsiFileName(value);
 
             if (null != names[0] && "." != names[0])
             {

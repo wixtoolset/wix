@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller
+namespace WixToolset.Core.WindowsInstaller.Decompile
 {
     using System;
     using System.Collections.Generic;
@@ -10,8 +10,6 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
-    using WixToolset.Core;
-    using WixToolset.Core.WindowsInstaller.Decompile;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -45,9 +43,10 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Creates a new decompiler object with a default set of table definitions.
         /// </summary>
-        public Decompiler(IMessaging messaging, IEnumerable<IWindowsInstallerBackendDecompilerExtension> extensions, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressUI, bool treatProductAsModule)
+        public Decompiler(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IWindowsInstallerBackendDecompilerExtension> extensions, string baseSourcePath, bool suppressCustomTables, bool suppressDroppingEmptyTables, bool suppressUI, bool treatProductAsModule)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.Extensions = extensions;
             this.BaseSourcePath = baseSourcePath ?? "SourceDir";
             this.SuppressCustomTables = suppressCustomTables;
@@ -62,6 +61,8 @@ namespace WixToolset.Core.WindowsInstaller
         }
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private IEnumerable<IWindowsInstallerBackendDecompilerExtension> Extensions { get; }
 
@@ -2196,11 +2197,11 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 foreach (var launchRow in launchConditionTable.Rows)
                 {
-                    if (Common.DowngradePreventedCondition == Convert.ToString(launchRow[0]))
+                    if (WixUpgradeConstants.DowngradePreventedCondition == Convert.ToString(launchRow[0]))
                     {
                         downgradeErrorMessage = Convert.ToString(launchRow[1]);
                     }
-                    else if (Common.UpgradePreventedCondition == Convert.ToString(launchRow[0]))
+                    else if (WixUpgradeConstants.UpgradePreventedCondition == Convert.ToString(launchRow[0]))
                     {
                         disallowUpgradeErrorMessage = Convert.ToString(launchRow[1]);
                     }
@@ -2213,7 +2214,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                 foreach (UpgradeRow upgradeRow in upgradeTable.Rows)
                 {
-                    if (Common.UpgradeDetectedProperty == upgradeRow.ActionProperty)
+                    if (WixUpgradeConstants.UpgradeDetectedProperty == upgradeRow.ActionProperty)
                     {
                         var attr = upgradeRow.Attributes;
                         var removeFeatures = upgradeRow.Remove;
@@ -2239,7 +2240,7 @@ namespace WixToolset.Core.WindowsInstaller
                             xMajorUpgrade.SetAttributeValue("RemoveFeatures", removeFeatures);
                         }
                     }
-                    else if (Common.DowngradeDetectedProperty == upgradeRow.ActionProperty)
+                    else if (WixUpgradeConstants.DowngradeDetectedProperty == upgradeRow.ActionProperty)
                     {
                         xMajorUpgrade = xMajorUpgrade ?? new XElement(Names.MajorUpgradeElement);
                         xMajorUpgrade.SetAttributeValue("DowngradeErrorMessage", downgradeErrorMessage);
@@ -4291,7 +4292,7 @@ namespace WixToolset.Core.WindowsInstaller
                 var xDirectory = new XElement(Names.DirectoryElement,
                     new XAttribute("Id", id));
 
-                var names = Common.GetNames(row.FieldAsString(2));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(2));
 
                 if (String.Equals(id, "TARGETDIR", StringComparison.Ordinal) && !String.Equals(names[0], "SourceDir", StringComparison.Ordinal))
                 {
@@ -4396,7 +4397,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                 if (!row.IsColumnNull(3))
                 {
-                    var names = Common.GetNames(row.FieldAsString(3));
+                    var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(3));
                     if (null != names[0] && null != names[1])
                     {
                         xCopyFile.SetAttributeValue("DestinationShortName", names[0]);
@@ -4782,7 +4783,7 @@ namespace WixToolset.Core.WindowsInstaller
                     WindowsInstallerConstants.MsidbFileAttributesVital != (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesVital) ? new XAttribute("Vital", "no") : null,
                     null != fileRow.Version && 0 < fileRow.Version.Length && !Char.IsDigit(fileRow.Version[0]) ? new XAttribute("CompanionFile", fileRow.Version) : null);
 
-                var names = Common.GetNames(fileRow.FileName);
+                var names = this.BackendHelper.SplitMsiFileName(fileRow.FileName);
                 if (null != names[0] && null != names[1])
                 {
                     xFile.SetAttributeValue("ShortName", names[0]);
@@ -4904,7 +4905,7 @@ namespace WixToolset.Core.WindowsInstaller
                     new XAttribute("Value", row.FieldAsString(5)),
                     row.IsColumnNull(2) ? null : new XAttribute("Directory", row.FieldAsString(2)));
 
-                var names = Common.GetNames(row.FieldAsString(1));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(1));
 
                 if (null != names[0])
                 {
@@ -4957,7 +4958,7 @@ namespace WixToolset.Core.WindowsInstaller
                     new XAttribute("Key", row.FieldAsString(3)),
                     row.IsColumnNull(4) || row.FieldAsInteger(4) == 0 ? null : new XAttribute("Field", row.FieldAsInteger(4)));
 
-                var names = Common.GetNames(row.FieldAsString(1));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(1));
                 if (null != names[0] && null != names[1])
                 {
                     xIniFileSearch.SetAttributeValue("ShortName", names[0]);
@@ -5014,7 +5015,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             foreach (var row in table.Rows)
             {
-                if (Common.DowngradePreventedCondition == row.FieldAsString(0) || Common.UpgradePreventedCondition == row.FieldAsString(0))
+                if (WixUpgradeConstants.DowngradePreventedCondition == row.FieldAsString(0) || WixUpgradeConstants.UpgradePreventedCondition == row.FieldAsString(0))
                 {
                     continue; // MajorUpgrade rows processed in FinalizeUpgradeTable
                 }
@@ -5101,13 +5102,13 @@ namespace WixToolset.Core.WindowsInstaller
                 switch (row.FieldAsString(1))
                 {
                     case "CreateFolder":
-                        specialPermissions = Common.FolderPermissions;
+                        specialPermissions = LockPermissionConstants.FolderPermissions;
                         break;
                     case "File":
-                        specialPermissions = Common.FilePermissions;
+                        specialPermissions = LockPermissionConstants.FilePermissions;
                         break;
                     case "Registry":
-                        specialPermissions = Common.RegistryPermissions;
+                        specialPermissions = LockPermissionConstants.RegistryPermissions;
                         break;
                     default:
                         this.Messaging.Write(WarningMessages.IllegalColumnValue(row.SourceLineNumbers, row.Table.Name, row.Fields[1].Column.Name, row[1]));
@@ -5129,13 +5130,13 @@ namespace WixToolset.Core.WindowsInstaller
                         {
                             name = "SpecificRightsAll";
                         }
-                        else if (28 > i && Common.StandardPermissions.Length > (i - 16))
+                        else if (28 > i && LockPermissionConstants.StandardPermissions.Length > (i - 16))
                         {
-                            name = Common.StandardPermissions[i - 16];
+                            name = LockPermissionConstants.StandardPermissions[i - 16];
                         }
-                        else if (0 <= (i - 28) && Common.GenericPermissions.Length > (i - 28))
+                        else if (0 <= (i - 28) && LockPermissionConstants.GenericPermissions.Length > (i - 28))
                         {
-                            name = Common.GenericPermissions[i - 28];
+                            name = LockPermissionConstants.GenericPermissions[i - 28];
                         }
 
                         if (null == name)
@@ -5412,7 +5413,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                 if (!row.IsColumnNull(3))
                 {
-                    var names = Common.GetNames(row.FieldAsString(3));
+                    var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(3));
                     if (null != names[0] && null != names[1])
                     {
                         xCopyFile.SetAttributeValue("DestinationShortName", names[0]);
@@ -5922,17 +5923,17 @@ namespace WixToolset.Core.WindowsInstaller
                         case "OptimizeCA":
                             var xOptimizeCustomActions = new XElement(Names.OptimizeCustomActionsElement);
                             var optimizeCA = Int32.Parse(value, CultureInfo.InvariantCulture);
-                            if (0 != (Convert.ToInt32(OptimizeCA.SkipAssignment) & optimizeCA))
+                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipAssignment) & optimizeCA))
                             {
                                 xOptimizeCustomActions.SetAttributeValue("SkipAssignment", "yes");
                             }
 
-                            if (0 != (Convert.ToInt32(OptimizeCA.SkipImmediate) & optimizeCA))
+                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipImmediate) & optimizeCA))
                             {
                                 xOptimizeCustomActions.SetAttributeValue("SkipImmediate", "yes");
                             }
 
-                            if (0 != (Convert.ToInt32(OptimizeCA.SkipDeferred) & optimizeCA))
+                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipDeferred) & optimizeCA))
                             {
                                 xOptimizeCustomActions.SetAttributeValue("SkipDeferred", "yes");
                             }
@@ -6165,7 +6166,7 @@ namespace WixToolset.Core.WindowsInstaller
                     {
                         foreach (var propertyId in value.Split(';'))
                         {
-                            if (Common.DowngradeDetectedProperty == propertyId || Common.UpgradeDetectedProperty == propertyId)
+                            if (WixUpgradeConstants.DowngradeDetectedProperty == propertyId || WixUpgradeConstants.UpgradeDetectedProperty == propertyId)
                             {
                                 continue;
                             }
@@ -6547,7 +6548,7 @@ namespace WixToolset.Core.WindowsInstaller
                     var xRemoveFile = new XElement(Names.RemoveFileElement,
                         new XAttribute("Id", row.FieldAsString(0)));
 
-                    var names = Common.GetNames(row.FieldAsString(2));
+                    var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(2));
                     if (null != names[0] && null != names[1])
                     {
                         xRemoveFile.SetAttributeValue("ShortName", names[0]);
@@ -6597,7 +6598,7 @@ namespace WixToolset.Core.WindowsInstaller
                         new XAttribute("Key", row.FieldAsString(4)),
                         XAttributeIfNotNull("Value", row, 5));
 
-                var names = Common.GetNames(row.FieldAsString(1));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(1));
                 if (null != names[0] && null != names[1])
                 {
                     xIniFile.SetAttributeValue("ShortName", names[0]);
@@ -6941,7 +6942,7 @@ namespace WixToolset.Core.WindowsInstaller
                     XAttributeIfNotNull("IconIndex", row, 9),
                     XAttributeIfNotNull("WorkingDirectory", row, 11));
 
-                var names = Common.GetNames(row.FieldAsString(2));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(2));
                 if (null != names[0] && null != names[1])
                 {
                     xShortcut.SetAttributeValue("ShortName", names[0]);
@@ -7016,11 +7017,11 @@ namespace WixToolset.Core.WindowsInstaller
                     XAttributeIfNotNull("MaxSize", row, 5),
                     XAttributeIfNotNull("Languages", row, 8));
 
-                var names = Common.GetNames(row.FieldAsString(1));
+                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(1));
                 if (null != names[0])
                 {
                     // it is permissable to just have a long name
-                    if (!Common.IsValidShortFilename(names[0], false) && null == names[1])
+                    if (!this.BackendHelper.IsValidShortFilename(names[0], false) && null == names[1])
                     {
                         fileSearch.SetAttributeValue("Name", names[0]);
                     }
@@ -7248,7 +7249,7 @@ namespace WixToolset.Core.WindowsInstaller
 
             foreach (UpgradeRow upgradeRow in table.Rows)
             {
-                if (Common.UpgradeDetectedProperty == upgradeRow.ActionProperty || Common.DowngradeDetectedProperty == upgradeRow.ActionProperty)
+                if (WixUpgradeConstants.UpgradeDetectedProperty == upgradeRow.ActionProperty || WixUpgradeConstants.DowngradeDetectedProperty == upgradeRow.ActionProperty)
                 {
                     continue; // MajorUpgrade rows processed in FinalizeUpgradeTable
                 }

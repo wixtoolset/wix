@@ -7,18 +7,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Binds the summary information table of a database.
     /// </summary>
     internal class BindSummaryInfoCommand
     {
-        public BindSummaryInfoCommand(IntermediateSection section)
+        public BindSummaryInfoCommand(IntermediateSection section, IBackendHelper backendHelper, IWixBranding branding)
         {
             this.Section = section;
+            this.BackendHelper = backendHelper;
+            this.Branding = branding;
         }
 
         private IntermediateSection Section { get; }
+
+        private IBackendHelper BackendHelper { get; }
+
+        private IWixBranding Branding { get; }
 
         /// <summary>
         /// Returns a flag indicating if files are compressed by default.
@@ -66,7 +73,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            summaryInformationSymbol.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationSymbol.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
+                            summaryInformationSymbol.Value = this.BackendHelper.GetValidCodePage(codepage, false, false, summaryInformationSymbol.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
                         }
                         break;
                     case SummaryInformationType.PlatformAndLanguage:
@@ -116,7 +123,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
                     PropertyId = SummaryInformationType.PackageCode,
-                    Value = Common.GenerateGuid(),
+                    Value = this.BackendHelper.CreateGuid(),
                 });
             }
 
@@ -146,7 +153,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Section.AddSymbol(new SummaryInformationSymbol(null)
                 {
                     PropertyId = SummaryInformationType.CreatingApplication,
-                    Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString()),
+                    Value = this.Branding.GetCreatingApplication(),
                 });
             }
         }

@@ -6,7 +6,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -30,7 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
-        public IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<FileFacade> fileFacades)
+        public IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IFileFacade> fileFacades)
         {
             var filesWithPath = fileFacades.Select(this.CreateBindFileWithPath).ToList();
 
@@ -109,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return resolved;
         }
 
-        private IBindFileWithPath CreateBindFileWithPath(FileFacade facade)
+        private IBindFileWithPath CreateBindFileWithPath(IFileFacade facade)
         {
             var result = this.ServiceProvider.GetService<IBindFileWithPath>();
             result.Id = facade.Id;

@@ -80,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string ModularizationSuffix { private get; set; }
 
-        public Dictionary<MediaSymbol, IEnumerable<FileFacade>> FileFacadesByCabinet { private get; set; }
+        public Dictionary<MediaSymbol, IEnumerable<IFileFacade>> FileFacadesByCabinet { private get; set; }
 
         public Func<MediaSymbol, string, string, string> ResolveMedia { private get; set; }
 
@@ -177,7 +177,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="compressionLevel">Desired compression level.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData data, string cabinetDir, MediaSymbol mediaSymbol, CompressionLevel compressionLevel, IEnumerable<IFileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
             var tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaSymbol.Cabinet);

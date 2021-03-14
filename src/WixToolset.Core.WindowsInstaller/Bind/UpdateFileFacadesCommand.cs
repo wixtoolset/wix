@@ -8,10 +8,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<FileFacade> fileFacades, IEnumerable<FileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
+        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IFileFacade> fileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -33,9 +33,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
-        private IEnumerable<FileFacade> FileFacades { get; }
+        private IEnumerable<IFileFacade> FileFacades { get; }
 
-        private IEnumerable<FileFacade> UpdateFileFacades { get; }
+        private IEnumerable<IFileFacade> UpdateFileFacades { get; }
 
         private bool OverwriteHash { get; }
 
@@ -51,7 +51,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void UpdateFileFacade(FileFacade facade, Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols)
+        private void UpdateFileFacade(IFileFacade facade, Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols)
         {
             FileInfo fileInfo = null;
             try
@@ -314,7 +314,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="facade">FileFacade containing the assembly read for the MsiAssemblyName row.</param>
         /// <param name="name">MsiAssemblyName name.</param>
         /// <param name="value">MsiAssemblyName value.</param>
-        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols, FileFacade facade, string name, string value)
+        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameSymbol> assemblyNameSymbols, IFileFacade facade, string name, string value)
         {
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))

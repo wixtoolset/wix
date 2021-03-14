@@ -6,9 +6,6 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
-    using System.Security.Cryptography;
-    using System.Text;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -290,56 +287,6 @@ namespace WixToolset.Core.ExtensibilityServices
         public IntermediateSymbol CreateSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateSymbolDefinition symbolDefinition, Identifier identifier = null)
         {
             return section.AddSymbol(symbolDefinition.CreateSymbol(sourceLineNumbers, identifier));
-        }
-
-        public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
-        {
-            // canonicalize the long name if its not a localization identifier (they are case-sensitive)
-            if (!this.IsValidLocIdentifier(longName))
-            {
-                longName = longName.ToLowerInvariant();
-            }
-
-            // collect all the data
-            var strings = new List<string>(1 + args.Length);
-            strings.Add(longName);
-            strings.AddRange(args);
-
-            // prepare for hashing
-            var stringData = String.Join("|", strings);
-            var data = Encoding.UTF8.GetBytes(stringData);
-
-            // hash the data
-            byte[] hash;
-            using (var sha1 = new SHA1CryptoServiceProvider())
-            {
-                hash = sha1.ComputeHash(data);
-            }
-
-            // generate the short file/directory name without an extension
-            var shortName = new StringBuilder(Convert.ToBase64String(hash));
-            shortName.Remove(8, shortName.Length - 8).Replace('+', '-').Replace('/', '_');
-
-            if (keepExtension)
-            {
-                var extension = Path.GetExtension(longName);
-
-                if (4 < extension.Length)
-                {
-                    extension = extension.Substring(0, 4);
-                }
-
-                shortName.Append(extension);
-
-                // check the generated short name to ensure its still legal (the extension may not be legal)
-                if (!this.IsValidShortFilename(shortName.ToString(), allowWildcards))
-                {
-                    // remove the extension (by truncating the generated file name back to the generated characters)
-                    shortName.Length -= extension.Length;
-                }
-            }
-
-            return shortName.ToString().ToLowerInvariant();
         }
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
@@ -673,23 +620,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath)
         {
-            const string root = @"C:\";
-            if (!Path.IsPathRooted(relativePath))
-            {
-                var normalizedPath = Path.GetFullPath(root + relativePath);
-                if (normalizedPath.StartsWith(root))
-                {
-                    var canonicalizedPath = normalizedPath.Substring(root.Length);
-                    if (canonicalizedPath != relativePath)
-                    {
-                        this.Messaging.Write(WarningMessages.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
-                    }
-                    return canonicalizedPath;
-                }
-            }
-
-            this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, elementName, attributeName, relativePath));
-            return relativePath;
+            return Common.GetCanonicalRelativePath(sourceLineNumbers, elementName, attributeName, relativePath, this.Messaging);
         }
 
         public SourceLineNumber GetSourceLineNumbers(XElement element)
@@ -723,46 +654,10 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
         {
-            if (String.IsNullOrEmpty(filename))
-            {
-                return false;
-            }
-            else if (filename.Length > 259)
-            {
-                return false;
-            }
-
-            // Check for a non-period character (all periods is not legal)
-            var allPeriods = true;
-            foreach (var character in filename)
-            {
-                if ('.' != character)
-                {
-                    allPeriods = false;
-                    break;
-                }
-            }
-
-            if (allPeriods)
-            {
-                return false;
-            }
-
-            if (allowWildcards)
-            {
-                return filename.IndexOfAny(Common.IllegalWildcardLongFilenameCharacters) == -1;
-            }
-            else if (allowRelative)
-            {
-                return filename.IndexOfAny(Common.IllegalRelativeLongFilenameCharacters) == -1;
-            }
-            else
-            {
-                return filename.IndexOfAny(Common.IllegalLongFilenameCharacters) == -1;
-            }
+            return Common.IsValidLongFilename(filename, allowWildcards, allowRelative);
         }
 
-        public bool IsValidShortFilename(string filename, bool allowWildcards = false)
+        public bool IsValidShortFilename(string filename, bool allowWildcards)
         {
             return Common.IsValidShortFilename(filename, allowWildcards);
         }

@@ -55,7 +55,9 @@ namespace WixToolset.Core.CommandLine
 
             if (command.ShowLogo)
             {
-                AppCommon.DisplayToolHeader();
+                var branding = this.ServiceProvider.GetService<IWixBranding>();
+                Console.WriteLine(branding.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [FileVersion]"));
+                Console.WriteLine(branding.ReplacePlaceholders("[AssemblyCopyright]"));
             }
 
             return command;
@@ -73,6 +75,7 @@ namespace WixToolset.Core.CommandLine
 
         private ICommandLineCommand Parse(ICommandLineContext context)
         {
+            var branding = context.ServiceProvider.GetService<IWixBranding>();
             var extensions = context.ExtensionManager.GetServices<IExtensionCommandLine>();
 
             foreach (var extension in extensions)
@@ -118,7 +121,7 @@ namespace WixToolset.Core.CommandLine
                 extension.PostParse();
             }
 
-            return command ?? new HelpCommand(extensions);
+            return command ?? new HelpCommand(extensions, branding);
         }
 
         private bool TryParseCommand(string arg, ICommandLineParser parser, IEnumerable<IExtensionCommandLine> extensions, out ICommandLineCommand command)
@@ -134,7 +137,8 @@ namespace WixToolset.Core.CommandLine
                     case "h":
                     case "help":
                     case "-help":
-                        command = new HelpCommand(extensions);
+                        var branding = this.ServiceProvider.GetService<IWixBranding>();
+                        command = new HelpCommand(extensions, branding);
                         break;
 
                     case "version":

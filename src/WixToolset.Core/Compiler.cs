@@ -7073,7 +7073,7 @@ namespace WixToolset.Core
                     Remove = removeFeatures,
                     MigrateFeatures = migrateFeatures,
                     IgnoreRemoveFailures = ignoreRemoveFailure,
-                    ActionProperty = Common.UpgradeDetectedProperty
+                    ActionProperty = WixUpgradeConstants.UpgradeDetectedProperty
                 });
 
                 if (allowDowngrades)
@@ -7094,7 +7094,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                     {
-                        Condition = Common.UpgradePreventedCondition,
+                        Condition = WixUpgradeConstants.UpgradePreventedCondition,
                         Description = downgradeErrorMessage
                     });
                 }
@@ -7109,12 +7109,12 @@ namespace WixToolset.Core
                         Language = productLanguage,
                         OnlyDetect = true,
                         IgnoreRemoveFailures = ignoreRemoveFailure,
-                        ActionProperty = Common.DowngradeDetectedProperty
+                        ActionProperty = WixUpgradeConstants.DowngradeDetectedProperty
                     });
 
                     this.Core.AddSymbol(new LaunchConditionSymbol(sourceLineNumbers)
                     {
-                        Condition = Common.DowngradePreventedCondition,
+                        Condition = WixUpgradeConstants.DowngradePreventedCondition,
                         Description = downgradeErrorMessage
                     });
                 }

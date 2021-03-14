@@ -7,7 +7,7 @@ namespace WixToolset.PatchAPI
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Runtime.InteropServices;
-    using WixToolset.Core;
+    using WixToolset.Data.Symbols;
 
     /// <summary>
     /// Interop class for the mspatchc.dll.
@@ -25,7 +25,7 @@ namespace WixToolset.PatchAPI
         static internal UInt32 ParseHexOrDecimal(string source)
         {
             string value = source.Trim();
-            if (String.Equals(value.Substring(0,2), "0x", StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(value.Substring(0, 2), "0x", StringComparison.OrdinalIgnoreCase))
             {
                 return UInt32.Parse(value.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat);
             }
@@ -63,13 +63,13 @@ namespace WixToolset.PatchAPI
                 string[] basisIgnoreOffsets,
                 string[] basisRetainLengths,
                 string[] basisRetainOffsets,
-                PatchSymbolFlagsType apiPatchingSymbolFlags,
+                PatchSymbolFlags apiPatchingSymbolFlags,
                 bool optimizePatchSizeForLargeFiles,
                 out bool retainRangesIgnored
                 )
         {
             retainRangesIgnored = false;
-            if (0 != (apiPatchingSymbolFlags & ~(PatchSymbolFlagsType.PATCH_SYMBOL_NO_IMAGEHLP | PatchSymbolFlagsType.PATCH_SYMBOL_NO_FAILURES | PatchSymbolFlagsType.PATCH_SYMBOL_UNDECORATED_TOO)))
+            if (0 != (apiPatchingSymbolFlags & ~(PatchSymbolFlags.PatchSymbolNoImagehlp | PatchSymbolFlags.PatchSymbolNoFailures | PatchSymbolFlags.PatchSymbolUndecoratedToo)))
             {
                 throw new ArgumentOutOfRangeException("apiPatchingSymbolFlags");
             }
@@ -88,13 +88,13 @@ namespace WixToolset.PatchAPI
             {
                 return false;
             }
-            uint countOldFiles = (uint) basisFiles.Length;
+            uint countOldFiles = (uint)basisFiles.Length;
 
             if (null != basisSymbolPaths)
             {
                 if (0 != basisSymbolPaths.Length)
                 {
-                    if ((uint) basisSymbolPaths.Length != countOldFiles)
+                    if ((uint)basisSymbolPaths.Length != countOldFiles)
                     {
                         throw new ArgumentOutOfRangeException("basisSymbolPaths");
                     }
@@ -106,7 +106,7 @@ namespace WixToolset.PatchAPI
             {
                 if (0 != basisIgnoreLengths.Length)
                 {
-                    if ((uint) basisIgnoreLengths.Length != countOldFiles)
+                    if ((uint)basisIgnoreLengths.Length != countOldFiles)
                     {
                         throw new ArgumentOutOfRangeException("basisIgnoreLengths");
                     }
@@ -121,7 +121,7 @@ namespace WixToolset.PatchAPI
             {
                 if (0 != basisIgnoreOffsets.Length)
                 {
-                    if ((uint) basisIgnoreOffsets.Length != countOldFiles)
+                    if ((uint)basisIgnoreOffsets.Length != countOldFiles)
                     {
                         throw new ArgumentOutOfRangeException("basisIgnoreOffsets");
                     }
@@ -136,7 +136,7 @@ namespace WixToolset.PatchAPI
             {
                 if (0 != basisRetainLengths.Length)
                 {
-                    if ((uint) basisRetainLengths.Length != countOldFiles)
+                    if ((uint)basisRetainLengths.Length != countOldFiles)
                     {
                         throw new ArgumentOutOfRangeException("basisRetainLengths");
                     }
@@ -151,7 +151,7 @@ namespace WixToolset.PatchAPI
             {
                 if (0 != basisRetainOffsets.Length)
                 {
-                    if ((uint) basisRetainOffsets.Length != countOldFiles)
+                    if ((uint)basisRetainOffsets.Length != countOldFiles)
                     {
                         throw new ArgumentOutOfRangeException("basisRetainOffsets");
                     }
@@ -253,15 +253,15 @@ namespace WixToolset.PatchAPI
 
             // determine if this is an error or a need to use whole file.
             int err = Marshal.GetLastWin32Error();
-            switch(err)
+            switch (err)
             {
-            case unchecked((int) ERROR_PATCH_BIGGER_THAN_COMPRESSED):
-                break;
+                case unchecked((int)ERROR_PATCH_BIGGER_THAN_COMPRESSED):
+                    break;
 
-            // too late to exclude this file -- should have been caught before
-            case unchecked((int) ERROR_PATCH_SAME_FILE):
-            default:
-                throw new System.ComponentModel.Win32Exception(err);
+                // too late to exclude this file -- should have been caught before
+                case unchecked((int)ERROR_PATCH_SAME_FILE):
+                default:
+                    throw new System.ComponentModel.Win32Exception(err);
             }
             return false;
         }
@@ -302,44 +302,44 @@ namespace WixToolset.PatchAPI
         // The following contants can be combined and used as the OptionFlags
         // parameter in the patch creation apis.
 
-        internal const uint PATCH_OPTION_USE_BEST          = 0x00000000; // auto choose best (slower)
+        internal const uint PATCH_OPTION_USE_BEST = 0x00000000; // auto choose best (slower)
 
-        internal const uint PATCH_OPTION_USE_LZX_BEST      = 0x00000003; // auto choose best of LXZ A/B (but not large)
-        internal const uint PATCH_OPTION_USE_LZX_A         = 0x00000001; // normal
-        internal const uint PATCH_OPTION_USE_LXZ_B         = 0x00000002; // better on some x86 binaries
-        internal const uint PATCH_OPTION_USE_LZX_LARGE     = 0x00000004; // better support for large files (requires 5.1 or higher applyer)
+        internal const uint PATCH_OPTION_USE_LZX_BEST = 0x00000003; // auto choose best of LXZ A/B (but not large)
+        internal const uint PATCH_OPTION_USE_LZX_A = 0x00000001; // normal
+        internal const uint PATCH_OPTION_USE_LXZ_B = 0x00000002; // better on some x86 binaries
+        internal const uint PATCH_OPTION_USE_LZX_LARGE = 0x00000004; // better support for large files (requires 5.1 or higher applyer)
 
-        internal const uint PATCH_OPTION_NO_BINDFIX        = 0x00010000; // PE bound imports
-        internal const uint PATCH_OPTION_NO_LOCKFIX        = 0x00020000; // PE smashed locks
-        internal const uint PATCH_OPTION_NO_REBASE         = 0x00040000; // PE rebased image
+        internal const uint PATCH_OPTION_NO_BINDFIX = 0x00010000; // PE bound imports
+        internal const uint PATCH_OPTION_NO_LOCKFIX = 0x00020000; // PE smashed locks
+        internal const uint PATCH_OPTION_NO_REBASE = 0x00040000; // PE rebased image
         internal const uint PATCH_OPTION_FAIL_IF_SAME_FILE = 0x00080000; // don't create if same
-        internal const uint PATCH_OPTION_FAIL_IF_BIGGER    = 0x00100000; // fail if patch is larger than simply compressing new file (slower)
-        internal const uint PATCH_OPTION_NO_CHECKSUM       = 0x00200000; // PE checksum zero
-        internal const uint PATCH_OPTION_NO_RESTIMEFIX     = 0x00400000; // PE resource timestamps
-        internal const uint PATCH_OPTION_NO_TIMESTAMP      = 0x00800000; // don't store new file timestamp in patch
-        internal const uint PATCH_OPTION_SIGNATURE_MD5     = 0x01000000; // use MD5 instead of CRC (reserved for future support)
-        internal const uint PATCH_OPTION_INTERLEAVE_FILES  = 0x40000000; // better support for large files (requires 5.2 or higher applyer)
-        internal const uint PATCH_OPTION_RESERVED1         = 0x80000000; // (used internally)
+        internal const uint PATCH_OPTION_FAIL_IF_BIGGER = 0x00100000; // fail if patch is larger than simply compressing new file (slower)
+        internal const uint PATCH_OPTION_NO_CHECKSUM = 0x00200000; // PE checksum zero
+        internal const uint PATCH_OPTION_NO_RESTIMEFIX = 0x00400000; // PE resource timestamps
+        internal const uint PATCH_OPTION_NO_TIMESTAMP = 0x00800000; // don't store new file timestamp in patch
+        internal const uint PATCH_OPTION_SIGNATURE_MD5 = 0x01000000; // use MD5 instead of CRC (reserved for future support)
+        internal const uint PATCH_OPTION_INTERLEAVE_FILES = 0x40000000; // better support for large files (requires 5.2 or higher applyer)
+        internal const uint PATCH_OPTION_RESERVED1 = 0x80000000; // (used internally)
 
-        internal const uint PATCH_OPTION_VALID_FLAGS       = 0xC0FF0007;
+        internal const uint PATCH_OPTION_VALID_FLAGS = 0xC0FF0007;
 
         //
         // The following flags are used with PATCH_OPTION_DATA ExtendedOptionFlags:
         //
 
-        internal const uint PATCH_TRANSFORM_PE_RESOURCE_2  = 0x00000100; // better handling of PE resources (requires 5.2 or higher applyer)
-        internal const uint PATCH_TRANSFORM_PE_IRELOC_2    = 0x00000200; // better handling of PE stripped relocs (requires 5.2 or higher applyer)
+        internal const uint PATCH_TRANSFORM_PE_RESOURCE_2 = 0x00000100; // better handling of PE resources (requires 5.2 or higher applyer)
+        internal const uint PATCH_TRANSFORM_PE_IRELOC_2 = 0x00000200; // better handling of PE stripped relocs (requires 5.2 or higher applyer)
 
         //
         // In addition to the standard Win32 error codes, the following error codes may
         // be returned via GetLastError() when one of the patch APIs fails.
 
-        internal const uint ERROR_PATCH_ENCODE_FAILURE         = 0xC00E3101; // create
-        internal const uint ERROR_PATCH_INVALID_OPTIONS        = 0xC00E3102; // create
-        internal const uint ERROR_PATCH_SAME_FILE              = 0xC00E3103; // create
-        internal const uint ERROR_PATCH_RETAIN_RANGES_DIFFER   = 0xC00E3104; // create
+        internal const uint ERROR_PATCH_ENCODE_FAILURE = 0xC00E3101; // create
+        internal const uint ERROR_PATCH_INVALID_OPTIONS = 0xC00E3102; // create
+        internal const uint ERROR_PATCH_SAME_FILE = 0xC00E3103; // create
+        internal const uint ERROR_PATCH_RETAIN_RANGES_DIFFER = 0xC00E3104; // create
         internal const uint ERROR_PATCH_BIGGER_THAN_COMPRESSED = 0xC00E3105; // create
-        internal const uint ERROR_PATCH_IMAGEHLP_FALURE        = 0xC00E3106; // create
+        internal const uint ERROR_PATCH_IMAGEHLP_FALURE = 0xC00E3106; // create
 
         /// <summary>
         /// Delegate type that the PatchAPI calls for progress notification.
@@ -441,14 +441,14 @@ namespace WixToolset.PatchAPI
         [BestFitMapping(false, ThrowOnUnmappableChar = true)]
         internal class PatchOptionData
         {
-            public PatchSymbolFlagsType symbolOptionFlags;          // PATCH_SYMBOL_xxx flags
-            [MarshalAs(UnmanagedType.LPStr)] public string               newFileSymbolPath;          // always ANSI, never Unicode
-            [MarshalAs(UnmanagedType.LPStr)] public string[]             oldFileSymbolPathArray;     // array[ OldFileCount ]
-            public uint                 extendedOptionFlags;
+            public PatchSymbolFlags symbolOptionFlags;                               // PATCH_SYMBOL_xxx flags
+            [MarshalAs(UnmanagedType.LPStr)] public string newFileSymbolPath;        // always ANSI, never Unicode
+            [MarshalAs(UnmanagedType.LPStr)] public string[] oldFileSymbolPathArray; // array[ OldFileCount ]
+            public uint extendedOptionFlags;
             public PatchSymloadCallback symLoadCallback = null;
             public IntPtr symLoadContext = IntPtr.Zero;
             public PatchInterleaveMap[] interleaveMapArray = null;  // array[ OldFileCount ] (requires 5.2 or higher applyer)
-            public uint maxLzxWindowSize = 0;       // limit memory requirements (requires 5.2 or higher applyer)
+            public uint maxLzxWindowSize = 0;                       // limit memory requirements (requires 5.2 or higher applyer)
         }
 
         //
@@ -534,7 +534,7 @@ namespace WixToolset.PatchAPI
 
             private PatchAPIMarshaler(string cookie)
             {
-                this.marshalType = (PatchAPIMarshaler.MarshalType) Enum.Parse(typeof(PatchAPIMarshaler.MarshalType), cookie);
+                this.marshalType = (PatchAPIMarshaler.MarshalType)Enum.Parse(typeof(PatchAPIMarshaler.MarshalType), cookie);
             }
 
             //
@@ -575,12 +575,12 @@ namespace WixToolset.PatchAPI
 
                 switch (this.marshalType)
                 {
-                case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
-                    this.CleanUpPOD(pNativeData);
-                    break;
-                default:
-                    this.CleanUpPOFI_A(pNativeData);
-                    break;
+                    case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
+                        this.CleanUpPOD(pNativeData);
+                        break;
+                    default:
+                        this.CleanUpPOFI_A(pNativeData);
+                        break;
                 }
             }
 
@@ -601,14 +601,14 @@ namespace WixToolset.PatchAPI
                     return IntPtr.Zero;
                 }
 
-                switch(this.marshalType)
+                switch (this.marshalType)
                 {
-                case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
-                    return this.MarshalPOD(ManagedObj as PatchOptionData);
-                case PatchAPIMarshaler.MarshalType.PATCH_OLD_FILE_INFO_W:
-                    return this.MarshalPOFIW_A(ManagedObj as PatchOldFileInfoW[]);
-                default:
-                    throw new InvalidOperationException();
+                    case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
+                        return this.MarshalPOD(ManagedObj as PatchOptionData);
+                    case PatchAPIMarshaler.MarshalType.PATCH_OLD_FILE_INFO_W:
+                        return this.MarshalPOFIW_A(ManagedObj as PatchOldFileInfoW[]);
+                    default:
+                        throw new InvalidOperationException();
                 }
             }
 
@@ -631,23 +631,23 @@ namespace WixToolset.PatchAPI
             // Implementation *************************************************
 
             // PATCH_OPTION_DATA offsets
-            private static readonly int symbolOptionFlagsOffset      =   Marshal.SizeOf(typeof(Int32));
-            private static readonly int newFileSymbolPathOffset      = 2*Marshal.SizeOf(typeof(Int32));
-            private static readonly int oldFileSymbolPathArrayOffset = 2*Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int extendedOptionFlagsOffset    = 2*Marshal.SizeOf(typeof(Int32)) + 2*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int symLoadCallbackOffset        = 3*Marshal.SizeOf(typeof(Int32)) + 2*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int symLoadContextOffset         = 3*Marshal.SizeOf(typeof(Int32)) + 3*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int interleaveMapArrayOffset     = 3*Marshal.SizeOf(typeof(Int32)) + 4*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int maxLzxWindowSizeOffset       = 3*Marshal.SizeOf(typeof(Int32)) + 5*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int patchOptionDataSize          = 4*Marshal.SizeOf(typeof(Int32)) + 5*Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int symbolOptionFlagsOffset = Marshal.SizeOf(typeof(Int32));
+            private static readonly int newFileSymbolPathOffset = 2 * Marshal.SizeOf(typeof(Int32));
+            private static readonly int oldFileSymbolPathArrayOffset = 2 * Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int extendedOptionFlagsOffset = 2 * Marshal.SizeOf(typeof(Int32)) + 2 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int symLoadCallbackOffset = 3 * Marshal.SizeOf(typeof(Int32)) + 2 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int symLoadContextOffset = 3 * Marshal.SizeOf(typeof(Int32)) + 3 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int interleaveMapArrayOffset = 3 * Marshal.SizeOf(typeof(Int32)) + 4 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int maxLzxWindowSizeOffset = 3 * Marshal.SizeOf(typeof(Int32)) + 5 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int patchOptionDataSize = 4 * Marshal.SizeOf(typeof(Int32)) + 5 * Marshal.SizeOf(typeof(IntPtr));
 
             // PATCH_OLD_FILE_INFO offsets
-            private static readonly int oldFileOffset          =   Marshal.SizeOf(typeof(Int32));
-            private static readonly int ignoreRangeCountOffset =   Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int ignoreRangeArrayOffset = 2*Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int retainRangeCountOffset = 2*Marshal.SizeOf(typeof(Int32)) + 2*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int retainRangeArrayOffset = 3*Marshal.SizeOf(typeof(Int32)) + 2*Marshal.SizeOf(typeof(IntPtr));
-            private static readonly int patchOldFileInfoSize   = 3*Marshal.SizeOf(typeof(Int32)) + 3*Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int oldFileOffset = Marshal.SizeOf(typeof(Int32));
+            private static readonly int ignoreRangeCountOffset = Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int ignoreRangeArrayOffset = 2 * Marshal.SizeOf(typeof(Int32)) + Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int retainRangeCountOffset = 2 * Marshal.SizeOf(typeof(Int32)) + 2 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int retainRangeArrayOffset = 3 * Marshal.SizeOf(typeof(Int32)) + 2 * Marshal.SizeOf(typeof(IntPtr));
+            private static readonly int patchOldFileInfoSize = 3 * Marshal.SizeOf(typeof(Int32)) + 3 * Marshal.SizeOf(typeof(IntPtr));
 
             // Methods and data used to preserve data needed for cleanup
 
@@ -658,16 +658,16 @@ namespace WixToolset.PatchAPI
             private IntPtr CreateMainStruct(int oldFileCount)
             {
                 int nativeSize;
-                switch(this.marshalType)
+                switch (this.marshalType)
                 {
-                case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
-                    nativeSize = patchOptionDataSize;
-                    break;
-                case PatchAPIMarshaler.MarshalType.PATCH_OLD_FILE_INFO_W:
-                    nativeSize = oldFileCount*patchOldFileInfoSize;
-                    break;
-                default:
-                    throw new InvalidOperationException();
+                    case PatchAPIMarshaler.MarshalType.PATCH_OPTION_DATA:
+                        nativeSize = patchOptionDataSize;
+                        break;
+                    case PatchAPIMarshaler.MarshalType.PATCH_OLD_FILE_INFO_W:
+                        nativeSize = oldFileCount * patchOldFileInfoSize;
+                        break;
+                    default:
+                        throw new InvalidOperationException();
                 }
 
                 IntPtr native = Marshal.AllocCoTaskMem(nativeSize);
@@ -722,7 +722,7 @@ namespace WixToolset.PatchAPI
 
                 for (int i = 0; i < managed.Length; ++i)
                 {
-                    Marshal.WriteIntPtr(native, i*Marshal.SizeOf(typeof(IntPtr)), OptionalAnsiString(managed[i]));
+                    Marshal.WriteIntPtr(native, i * Marshal.SizeOf(typeof(IntPtr)), OptionalAnsiString(managed[i]));
                 }
 
                 return native;
@@ -741,7 +741,7 @@ namespace WixToolset.PatchAPI
 
                 for (int i = 0; i < managed.Length; ++i)
                 {
-                    Marshal.WriteIntPtr(native, i*Marshal.SizeOf(typeof(IntPtr)), OptionalUnicodeString(managed[i]));
+                    Marshal.WriteIntPtr(native, i * Marshal.SizeOf(typeof(IntPtr)), OptionalUnicodeString(managed[i]));
                 }
 
                 return native;
@@ -765,12 +765,12 @@ namespace WixToolset.PatchAPI
                 }
 
                 IntPtr native = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(UInt32))
-                                        + managed.ranges.Length*(Marshal.SizeOf(typeof(PatchInterleaveMap))));
-                WriteUInt32(native, (uint) managed.ranges.Length);
+                                        + managed.ranges.Length * (Marshal.SizeOf(typeof(PatchInterleaveMap))));
+                WriteUInt32(native, (uint)managed.ranges.Length);
 
                 for (int i = 0; i < managed.ranges.Length; ++i)
                 {
-                    Marshal.StructureToPtr(managed.ranges[i], (IntPtr)((Int64)native + i*Marshal.SizeOf(typeof(PatchInterleaveMap))), false);
+                    Marshal.StructureToPtr(managed.ranges[i], (IntPtr)((Int64)native + i * Marshal.SizeOf(typeof(PatchInterleaveMap))), false);
                 }
                 return native;
             }
@@ -786,7 +786,7 @@ namespace WixToolset.PatchAPI
 
                 for (int i = 0; i < managed.Length; ++i)
                 {
-                    Marshal.WriteIntPtr(native, i*Marshal.SizeOf(typeof(IntPtr)), CreateInterleaveMapRange(managed[i]));
+                    Marshal.WriteIntPtr(native, i * Marshal.SizeOf(typeof(IntPtr)), CreateInterleaveMapRange(managed[i]));
                 }
 
                 return native;
@@ -794,12 +794,12 @@ namespace WixToolset.PatchAPI
 
             private static void WriteUInt32(IntPtr native, uint data)
             {
-                Marshal.WriteInt32(native, unchecked((int) data));
+                Marshal.WriteInt32(native, unchecked((int)data));
             }
 
             private static void WriteUInt32(IntPtr native, int offset, uint data)
             {
-                Marshal.WriteInt32(native, offset, unchecked((int) data));
+                Marshal.WriteInt32(native, offset, unchecked((int)data));
             }
 
             // Marshal operations
@@ -813,7 +813,7 @@ namespace WixToolset.PatchAPI
 
                 IntPtr native = this.CreateMainStruct(managed.oldFileSymbolPathArray.Length);
                 Marshal.WriteInt32(native, patchOptionDataSize); // SizeOfThisStruct
-                WriteUInt32(native, symbolOptionFlagsOffset, (uint) managed.symbolOptionFlags);
+                WriteUInt32(native, symbolOptionFlagsOffset, (uint)managed.symbolOptionFlags);
                 Marshal.WriteIntPtr(native, newFileSymbolPathOffset, PatchAPIMarshaler.OptionalAnsiString(managed.newFileSymbolPath));
                 Marshal.WriteIntPtr(native, oldFileSymbolPathArrayOffset, PatchAPIMarshaler.CreateArrayOfStringA(managed.oldFileSymbolPathArray));
                 WriteUInt32(native, extendedOptionFlagsOffset, managed.extendedOptionFlags);
@@ -866,10 +866,10 @@ namespace WixToolset.PatchAPI
             {
                 Marshal.WriteInt32(native, patchOldFileInfoSize); // SizeOfThisStruct
                 WriteUInt32(native, ignoreRangeCountOffset,
-                                    (null == managed.ignoreRange) ? 0 : (uint) managed.ignoreRange.Length); // IgnoreRangeCount // maximum 255
+                                    (null == managed.ignoreRange) ? 0 : (uint)managed.ignoreRange.Length); // IgnoreRangeCount // maximum 255
                 Marshal.WriteIntPtr(native, ignoreRangeArrayOffset, MarshalPIRArray(managed.ignoreRange));  // IgnoreRangeArray
                 WriteUInt32(native, retainRangeCountOffset,
-                                    (null == managed.retainRange) ? 0 : (uint) managed.retainRange.Length); // RetainRangeCount // maximum 255
+                                    (null == managed.retainRange) ? 0 : (uint)managed.retainRange.Length); // RetainRangeCount // maximum 255
                 Marshal.WriteIntPtr(native, retainRangeArrayOffset, MarshalPRRArray(managed.retainRange));  // RetainRangeArray
             }
 
@@ -885,11 +885,11 @@ namespace WixToolset.PatchAPI
                     return IntPtr.Zero;
                 }
 
-                IntPtr native = Marshal.AllocCoTaskMem(array.Length*Marshal.SizeOf(typeof(PatchIgnoreRange)));
+                IntPtr native = Marshal.AllocCoTaskMem(array.Length * Marshal.SizeOf(typeof(PatchIgnoreRange)));
 
                 for (int i = 0; i < array.Length; ++i)
                 {
-                    Marshal.StructureToPtr(array[i], (IntPtr)((Int64)native + (i*Marshal.SizeOf(typeof(PatchIgnoreRange)))), false);
+                    Marshal.StructureToPtr(array[i], (IntPtr)((Int64)native + (i * Marshal.SizeOf(typeof(PatchIgnoreRange)))), false);
                 }
 
                 return native;
@@ -907,11 +907,11 @@ namespace WixToolset.PatchAPI
                     return IntPtr.Zero;
                 }
 
-                IntPtr native = Marshal.AllocCoTaskMem(array.Length*Marshal.SizeOf(typeof(PatchRetainRange)));
+                IntPtr native = Marshal.AllocCoTaskMem(array.Length * Marshal.SizeOf(typeof(PatchRetainRange)));
 
                 for (int i = 0; i < array.Length; ++i)
                 {
-                    Marshal.StructureToPtr(array[i], (IntPtr)((Int64)native + (i*Marshal.SizeOf(typeof(PatchRetainRange)))), false);
+                    Marshal.StructureToPtr(array[i], (IntPtr)((Int64)native + (i * Marshal.SizeOf(typeof(PatchRetainRange)))), false);
                 }
 
                 return native;
@@ -930,7 +930,7 @@ namespace WixToolset.PatchAPI
                         Marshal.FreeCoTaskMem(
                                 Marshal.ReadIntPtr(
                                         Marshal.ReadIntPtr(native, oldFileSymbolPathArrayOffset),
-                                        i*Marshal.SizeOf(typeof(IntPtr))));
+                                        i * Marshal.SizeOf(typeof(IntPtr))));
                     }
 
                     Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(native, oldFileSymbolPathArrayOffset));
@@ -943,7 +943,7 @@ namespace WixToolset.PatchAPI
                         Marshal.FreeCoTaskMem(
                                 Marshal.ReadIntPtr(
                                         Marshal.ReadIntPtr(native, interleaveMapArrayOffset),
-                                        i*Marshal.SizeOf(typeof(IntPtr))));
+                                        i * Marshal.SizeOf(typeof(IntPtr))));
                     }
 
                     Marshal.FreeCoTaskMem(Marshal.ReadIntPtr(native, interleaveMapArrayOffset));
@@ -956,7 +956,7 @@ namespace WixToolset.PatchAPI
             {
                 for (int i = 0; i < GetOldFileCount(native); ++i)
                 {
-                    PatchAPIMarshaler.CleanUpPOFI((IntPtr)((Int64)native + i*patchOldFileInfoSize));
+                    PatchAPIMarshaler.CleanUpPOFI((IntPtr)((Int64)native + i * patchOldFileInfoSize));
                 }
 
                 PatchAPIMarshaler.ReleaseMainStruct(native);

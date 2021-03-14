@@ -99,7 +99,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        codePage = Common.GetValidCodePage(codePage).ToString(CultureInfo.InvariantCulture);
+                        codePage = this.BackendHelper.GetValidCodePage(codePage).ToString(CultureInfo.InvariantCulture);
                     }
 
                     var previousCodePage = row.Fields[1].PreviousData;
@@ -109,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        previousCodePage = Common.GetValidCodePage(previousCodePage).ToString(CultureInfo.InvariantCulture);
+                        previousCodePage = this.BackendHelper.GetValidCodePage(previousCodePage).ToString(CultureInfo.InvariantCulture);
                     }
 
                     var targetCodePageRow = targetSummaryInfo.CreateRow(null);

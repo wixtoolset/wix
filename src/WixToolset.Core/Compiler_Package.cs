@@ -1024,13 +1024,13 @@ namespace WixToolset.Core
             switch (tableName)
             {
             case "CreateFolder":
-                specialPermissions = Common.FolderPermissions;
+                specialPermissions = LockPermissionConstants.FolderPermissions;
                 break;
             case "File":
-                specialPermissions = Common.FilePermissions;
+                specialPermissions = LockPermissionConstants.FilePermissions;
                 break;
             case "Registry":
-                specialPermissions = Common.RegistryPermissions;
+                specialPermissions = LockPermissionConstants.RegistryPermissions;
                 break;
             default:
                 this.Core.UnexpectedElement(node.Parent, node);
@@ -1059,9 +1059,9 @@ namespace WixToolset.Core
                         break;
                     default:
                         var attribValue = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (!this.Core.TrySetBitFromName(Common.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
+                        if (!this.Core.TrySetBitFromName(LockPermissionConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
                         {
-                            if (!this.Core.TrySetBitFromName(Common.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
+                            if (!this.Core.TrySetBitFromName(LockPermissionConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
                             {
                                 if (!this.Core.TrySetBitFromName(specialPermissions, attrib.Name.LocalName, attribValue, bits, 0))
                                 {

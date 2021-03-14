@@ -21,19 +21,6 @@ namespace WixToolset.Core.WindowsInstaller
         }
 
         /// <summary>
-        /// Creates and populates a <see cref="RowDictionary{T}"/> with the rows from the given enumerator.
-        /// </summary>
-        /// <param name="rows">Rows to add.</param>
-        public RowDictionary(IEnumerable<T> rows)
-            : this()
-        {
-            foreach (T row in rows)
-            {
-                this.Add(row);
-            }
-        }
-
-        /// <summary>
         /// Creates and populates a <see cref="RowDictionary{T}"/> with the rows from the given <see cref="Table"/>.
         /// </summary>
         /// <param name="table">The table to index.</param>

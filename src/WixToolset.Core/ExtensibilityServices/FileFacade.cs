@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.Bind
+namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
     using System.Collections.Generic;
@@ -8,9 +8,9 @@ namespace WixToolset.Core.Bind
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: this shouldn't be public, need interface in Extensibility
-    public class FileFacade
+    internal class FileFacade : IFileFacade
     {
         public FileFacade(FileSymbol file, AssemblySymbol assembly)
         {

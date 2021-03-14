@@ -7,7 +7,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Data returned from build file manager ResolveCabinet callback.
     /// </summary>
-    public class ResolvedCabinet : IResolvedCabinet
+    internal class ResolvedCabinet : IResolvedCabinet
     {
         /// <summary>
         /// Gets or sets the build option for the resolved cabinet.

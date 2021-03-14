@@ -18,7 +18,7 @@ namespace WixToolset
     /// </summary>
     public sealed class Melter
     {
-#if TODO
+#if TODO_MELT
         private MelterCore core;
         private Decompiler decompiler;
 

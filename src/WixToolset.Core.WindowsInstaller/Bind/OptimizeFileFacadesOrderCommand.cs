@@ -5,7 +5,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
@@ -13,7 +12,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class OptimizeFileFacadesOrderCommand
     {
-        public OptimizeFileFacadesOrderCommand(IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section, Platform platform, List<FileFacade> fileFacades)
+        public OptimizeFileFacadesOrderCommand(IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section, Platform platform, List<IFileFacade> fileFacades)
         {
             this.BackendHelper = helper;
             this.PathResolver = pathResolver;
@@ -22,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.FileFacades = fileFacades;
         }
 
-        public List<FileFacade> FileFacades { get; private set; }
+        public List<IFileFacade> FileFacades { get; private set; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -32,7 +31,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Platform Platform { get; }
 
-        public List<FileFacade> Execute()
+        public List<IFileFacade> Execute()
         {
             var canonicalComponentTargetPaths = this.ComponentTargetPaths();
 
@@ -69,7 +68,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return targetPathsByDirectoryId;
         }
 
-        private class FileFacadeOptimizer : IComparer<FileFacade>
+        private class FileFacadeOptimizer : IComparer<IFileFacade>
         {
             public FileFacadeOptimizer(Dictionary<string, string> componentTargetPaths, bool optimizingMergeModule)
             {
@@ -81,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             private bool OptimizingMergeModule { get; }
 
-            public int Compare(FileFacade x, FileFacade y)
+            public int Compare(IFileFacade x, IFileFacade y)
             {
                 // First group files by DiskId but ignore if processing a Merge Module
                 // because Merge Modules don't have separate disks.

@@ -18,124 +18,35 @@ namespace WixToolset.Core
     /// <summary>
     /// Common Wix utility methods and types.
     /// </summary>
-    public static class Common
+    internal static class Common
     {
-        // TODO: Find a place to put all of these so they doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string DowngradeDetectedProperty = "WIX_DOWNGRADE_DETECTED";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string DowngradePreventedCondition = "NOT WIX_DOWNGRADE_DETECTED";
-
-        //-------------------------------------------------------------------------------------------------
-        // Layout of an Access Mask (from http://technet.microsoft.com/en-us/library/cc783530(WS.10).aspx)
-        //
-        //  -------------------------------------------------------------------------------------------------
-        //  |31|30|29|28|27|26|25|24|23|22|21|20|19|18|17|16|15|14|13|12|11|10|09|08|07|06|05|04|03|02|01|00|
-        //  -------------------------------------------------------------------------------------------------
-        //  |GR|GW|GE|GA| Reserved  |AS|StandardAccessRights|        Object-Specific Access Rights          |
-        //
-        //  Key
-        //  GR = Generic Read
-        //  GW = Generic Write
-        //  GE = Generic Execute
-        //  GA = Generic All
-        //  AS = Right to access SACL
-        //
-        // TODO: what is the expected decompile behavior if a bit is found that is not explicitly enumerated
-        //
-        //-------------------------------------------------------------------------------------------------
-        // Generic Access Rights (per WinNT.h)
-        // ---------------------
-        // GENERIC_ALL                      (0x10000000L)
-        // GENERIC_EXECUTE                  (0x20000000L)
-        // GENERIC_WRITE                    (0x40000000L)
-        // GENERIC_READ                     (0x80000000L)
-        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly string[] GenericPermissions = { "GenericAll", "GenericExecute", "GenericWrite", "GenericRead" };
-
-        // Standard Access Rights (per WinNT.h)
-        // ----------------------
-        // DELETE                           (0x00010000L)
-        // READ_CONTROL                     (0x00020000L)
-        // WRITE_DAC                        (0x00040000L)
-        // WRITE_OWNER                      (0x00080000L)
-        // SYNCHRONIZE                      (0x00100000L)
-        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly string[] StandardPermissions = { "Delete", "ReadPermission", "ChangePermission", "TakeOwnership", "Synchronize" };
-
-        // Object-Specific Access Rights
-        // =============================
-        // Directory Access Rights (per WinNT.h)
-        // -----------------------
-        // FILE_LIST_DIRECTORY       ( 0x0001 )
-        // FILE_ADD_FILE             ( 0x0002 )
-        // FILE_ADD_SUBDIRECTORY     ( 0x0004 )
-        // FILE_READ_EA              ( 0x0008 )
-        // FILE_WRITE_EA             ( 0x0010 )
-        // FILE_TRAVERSE             ( 0x0020 )
-        // FILE_DELETE_CHILD         ( 0x0040 )
-        // FILE_READ_ATTRIBUTES      ( 0x0080 )
-        // FILE_WRITE_ATTRIBUTES     ( 0x0100 )
-        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly string[] FolderPermissions = { "Read", "CreateFile", "CreateChild", "ReadExtendedAttributes", "WriteExtendedAttributes", "Traverse", "DeleteChild", "ReadAttributes", "WriteAttributes" };
-
-        // Registry Access Rights (per TODO)
-        // ----------------------
-        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly string[] RegistryPermissions = { "Read", "Write", "CreateSubkeys", "EnumerateSubkeys", "Notify", "CreateLink" };
-
-        // File Access Rights (per WinNT.h)
-        // ------------------
-        // FILE_READ_DATA            ( 0x0001 )
-        // FILE_WRITE_DATA           ( 0x0002 )
-        // FILE_APPEND_DATA          ( 0x0004 )
-        // FILE_READ_EA              ( 0x0008 )
-        // FILE_WRITE_EA             ( 0x0010 )
-        // FILE_EXECUTE              ( 0x0020 )
-        // via mask FILE_ALL_ACCESS  ( 0x0040 )
-        // FILE_READ_ATTRIBUTES      ( 0x0080 )
-        // FILE_WRITE_ATTRIBUTES     ( 0x0100 )
-        //
-        // STANDARD_RIGHTS_REQUIRED  (0x000F0000L)
-        // FILE_ALL_ACCESS           (STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0x1FF)
-        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
+        private static readonly char[] IllegalShortFilenameCharacters = new[] { '\\', '?', '|', '>', '<', ':', '/', '*', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
+        private static readonly char[] IllegalWildcardShortFilenameCharacters = new[] { '\\', '|', '>', '<', ':', '/', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
 
         internal static readonly char[] IllegalLongFilenameCharacters = new[] { '\\', '/', '?', '*', '|', '>', '<', ':', '\"' }; // illegal: \ / ? | > < : / * "
         internal static readonly char[] IllegalRelativeLongFilenameCharacters = new[] { '?', '*', '|', '>', '<', ':', '\"' }; // like illegal, but we allow '\' and '/'
         internal static readonly char[] IllegalWildcardLongFilenameCharacters = new[] { '\\', '/', '|', '>', '<', ':', '\"' };   // like illegal: but we allow '*' and '?'
 
-        private static readonly char[] IllegalShortFilenameCharacters = new[] { '\\', '?', '|', '>', '<', ':', '/', '*', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
-        private static readonly char[] IllegalWildcardShortFilenameCharacters = new[] { '\\', '|', '>', '<', ':', '/', '\"', '+', ',', ';', '=', '[', ']', '.', ' ' };
+        public static string GetCanonicalRelativePath(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string relativePath, IMessaging messageHandler)
+        {
+            const string root = @"C:\";
+            if (!Path.IsPathRooted(relativePath))
+            {
+                var normalizedPath = Path.GetFullPath(root + relativePath);
+                if (normalizedPath.StartsWith(root))
+                {
+                    var canonicalizedPath = normalizedPath.Substring(root.Length);
+                    if (canonicalizedPath != relativePath)
+                    {
+                        messageHandler.Write(WarningMessages.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
+                    }
+                    return canonicalizedPath;
+                }
+            }
 
-
+            messageHandler.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, elementName, attributeName, relativePath));
+            return relativePath;
+        }
 
         /// <summary>
         /// Gets a valid code page from the given web name or integer value.
@@ -157,8 +68,8 @@ namespace WixToolset.Core
             {
                 Encoding encoding;
 
-                // check if a integer as a string was passed
-                if (Int32.TryParse(value, out int codePage))
+                // Check if a integer as a string was passed.
+                if (Int32.TryParse(value, out var codePage))
                 {
                     if (0 == codePage)
                     {
@@ -198,18 +109,91 @@ namespace WixToolset.Core
             }
             catch (ArgumentException ex)
             {
-                // rethrow as NotSupportedException since either can be thrown
-                // if the system does not support the specified code page
+                // Rethrow as NotSupportedException since either can be thrown
+                // if the system does not support the specified code page.
                 throw new NotSupportedException(ex.Message, ex);
             }
         }
 
         /// <summary>
-        /// Verifies if a filename is a valid short filename.
+        /// Verifies if an identifier is a valid binder variable name.
         /// </summary>
-        /// <param name="filename">Filename to verify.</param>
-        /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
-        /// <returns>True if the filename is a valid short filename</returns>
+        /// <param name="variable">Binder variable name to verify.</param>
+        /// <returns>True if the identifier is a valid binder variable name.</returns>
+        public static bool IsValidBinderVariable(string variable)
+        {
+            return TryParseWixVariable(variable, 0, out var parsed) && parsed.Index == 0 && parsed.Length == variable.Length && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
+        }
+
+        /// <summary>
+        /// Verifies if a string contains a valid binder variable name.
+        /// </summary>
+        /// <param name="verify">String to verify.</param>
+        /// <returns>True if the string contains a valid binder variable name.</returns>
+        public static bool ContainsValidBinderVariable(string verify)
+        {
+            return TryParseWixVariable(verify, 0, out var parsed) && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
+        }
+
+        /// <summary>
+        /// Verifies the given string is a valid 4-part version module or bundle version.
+        /// </summary>
+        /// <param name="version">The version to verify.</param>
+        /// <returns>True if version is a valid module or bundle version.</returns>
+        public static bool IsValidFourPartVersion(string version)
+        {
+            if (!Common.IsValidBinderVariable(version))
+            {
+                if (!Version.TryParse(version, out var ver) || 65535 < ver.Major || 65535 < ver.Minor || 65535 < ver.Build || 65535 < ver.Revision)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsValidLongFilename(string filename, bool allowWildcards, bool allowRelative)
+        {
+            if (String.IsNullOrEmpty(filename))
+            {
+                return false;
+            }
+            else if (filename.Length > 259)
+            {
+                return false;
+            }
+
+            // Check for a non-period character (all periods is not legal)
+            var allPeriods = true;
+            foreach (var character in filename)
+            {
+                if ('.' != character)
+                {
+                    allPeriods = false;
+                    break;
+                }
+            }
+
+            if (allPeriods)
+            {
+                return false;
+            }
+
+            if (allowWildcards)
+            {
+                return filename.IndexOfAny(Common.IllegalWildcardLongFilenameCharacters) == -1;
+            }
+            else if (allowRelative)
+            {
+                return filename.IndexOfAny(Common.IllegalRelativeLongFilenameCharacters) == -1;
+            }
+            else
+            {
+                return filename.IndexOfAny(Common.IllegalLongFilenameCharacters) == -1;
+            }
+        }
+
         public static bool IsValidShortFilename(string filename, bool allowWildcards)
         {
             if (String.IsNullOrEmpty(filename))
@@ -288,55 +272,6 @@ namespace WixToolset.Core
                 var validExtension = filename.IndexOfAny(IllegalShortFilenameCharacters, expectedDot + 1);
                 return validExtension == -1;
             }
-        }
-
-        /// <summary>
-        /// Verifies if an identifier is a valid binder variable name.
-        /// </summary>
-        /// <param name="variable">Binder variable name to verify.</param>
-        /// <returns>True if the identifier is a valid binder variable name.</returns>
-        public static bool IsValidBinderVariable(string variable)
-        {
-            return TryParseWixVariable(variable, 0, out var parsed) && parsed.Index == 0 && parsed.Length == variable.Length && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
-        }
-
-        /// <summary>
-        /// Verifies if a string contains a valid binder variable name.
-        /// </summary>
-        /// <param name="verify">String to verify.</param>
-        /// <returns>True if the string contains a valid binder variable name.</returns>
-        public static bool ContainsValidBinderVariable(string verify)
-        {
-            return TryParseWixVariable(verify, 0, out var parsed) && (parsed.Namespace == "bind" || parsed.Namespace == "wix");
-        }
-
-        /// <summary>
-        /// Verifies the given string is a valid module or bundle version.
-        /// </summary>
-        /// <param name="version">The version to verify.</param>
-        /// <returns>True if version is a valid module or bundle version.</returns>
-        public static bool IsValidModuleOrBundleVersion(string version)
-        {
-            if (!Common.IsValidBinderVariable(version))
-            {
-                Version ver;
-                
-                try
-                {
-                    ver = new Version(version);
-                }
-                catch (ArgumentException)
-                {
-                    return false;
-                }
-
-                if (65535 < ver.Major || 65535 < ver.Minor || 65535 < ver.Build || 65535 < ver.Revision)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -451,14 +386,14 @@ namespace WixToolset.Core
         /// <param name="markAttribute">If true, add the attribute to each file. If false, remove it.</param>
         private static void RecursiveFileAttributes(string path, FileAttributes fileAttribute, bool markAttribute, IMessaging messageHandler)
         {
-            foreach (string subDirectory in Directory.GetDirectories(path))
+            foreach (var subDirectory in Directory.GetDirectories(path))
             {
                 RecursiveFileAttributes(subDirectory, fileAttribute, markAttribute, messageHandler);
             }
 
-            foreach (string filePath in Directory.GetFiles(path))
+            foreach (var filePath in Directory.GetFiles(path))
             {
-                FileAttributes attributes = File.GetAttributes(filePath);
+                var attributes = File.GetAttributes(filePath);
                 if (markAttribute)
                 {
                     attributes = attributes | fileAttribute; // add to list of attributes
@@ -506,16 +441,15 @@ namespace WixToolset.Core
         /// <returns>An array of strings of length 4.  The contents are: short target, long target, short source, and long source.</returns>
         /// <remarks>
         /// If any particular file name part is not parsed, its set to null in the appropriate location of the returned array of strings.
-        /// However, the returned array will always be of length 4.
+        /// Thus the returned array will always be of length 4.
         /// </remarks>
         public static string[] GetNames(string value)
         {
-            string[] names = new string[4];
-            int targetSeparator = value.IndexOf(':');
+            var targetSeparator = value.IndexOf(':');
 
             // split source and target
             string sourceName = null;
-            string targetName = value;
+            var targetName = value;
             if (0 <= targetSeparator)
             {
                 sourceName = value.Substring(targetSeparator + 1);
@@ -526,7 +460,7 @@ namespace WixToolset.Core
             string sourceLongName = null;
             if (null != sourceName)
             {
-                int sourceLongNameSeparator = sourceName.IndexOf('|');
+                var sourceLongNameSeparator = sourceName.IndexOf('|');
                 if (0 <= sourceLongNameSeparator)
                 {
                     sourceLongName = sourceName.Substring(sourceLongNameSeparator + 1);
@@ -535,7 +469,7 @@ namespace WixToolset.Core
             }
 
             // split the target short and long names
-            int targetLongNameSeparator = targetName.IndexOf('|');
+            var targetLongNameSeparator = targetName.IndexOf('|');
             string targetLongName = null;
             if (0 <= targetLongNameSeparator)
             {
@@ -543,19 +477,19 @@ namespace WixToolset.Core
                 targetName = targetName.Substring(0, targetLongNameSeparator);
             }
 
-            // remove the long source name when its identical to the long source name
+            // Remove the long source name when its identical to the short source name.
             if (null != sourceName && sourceName == sourceLongName)
             {
                 sourceLongName = null;
             }
 
-            // remove the long target name when its identical to the long target name
+            // Remove the long target name when its identical to the long target name.
             if (null != targetName && targetName == targetLongName)
             {
                 targetLongName = null;
             }
 
-            // remove the source names when they are identical to the target names
+            // Remove the source names when they are identical to the target names.
             if (sourceName == targetName && sourceLongName == targetLongName)
             {
                 sourceName = null;
@@ -563,28 +497,28 @@ namespace WixToolset.Core
             }
 
             // target name(s)
-            if ("." != targetName)
+            if ("." == targetName)
             {
-                names[0] = targetName;
+                targetName = null;
             }
 
-            if (null != targetLongName && "." != targetLongName)
+            if ("." == targetLongName)
             {
-                names[1] = targetLongName;
+                targetLongName = null;
             }
 
             // source name(s)
-            if (null != sourceName)
+            if ("." == sourceName)
             {
-                names[2] = sourceName;
+                sourceName = null;
             }
 
-            if (null != sourceLongName && "." != sourceLongName)
+            if ("." == sourceLongName)
             {
-                names[3] = sourceLongName;
+                sourceLongName = null;
             }
 
-            return names;
+            return new[] { targetName, targetLongName, sourceName, sourceLongName };
         }
 
         /// <summary>
@@ -596,7 +530,7 @@ namespace WixToolset.Core
         /// <returns>The name.</returns>
         public static string GetName(string value, bool source, bool longName)
         {
-            string[] names = GetNames(value);
+            var names = GetNames(value);
 
             if (source)
             {
@@ -674,7 +608,7 @@ namespace WixToolset.Core
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         internal static string GetAttributeIdentifierValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
+            var value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
 
             if (Common.IsIdentifier(value))
             {
@@ -713,8 +647,8 @@ namespace WixToolset.Core
         {
             Debug.Assert(minimum > CompilerConstants.IntegerNotSet && minimum > CompilerConstants.IllegalInteger, "The legal values for this attribute collide with at least one sentinel used during parsing.");
 
-            string value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
-            int integer = CompilerConstants.IllegalInteger;
+            var value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
+            var integer = CompilerConstants.IllegalInteger;
 
             if (0 < value.Length)
             {
@@ -748,8 +682,8 @@ namespace WixToolset.Core
         /// <returns>The attribute's YesNoType value.</returns>
         internal static YesNoType GetAttributeYesNoValue(IMessaging messaging, SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
-            YesNoType yesNo = YesNoType.IllegalValue;
+            var value = Common.GetAttributeValue(messaging, sourceLineNumbers, attribute, EmptyRule.CanBeWhitespaceOnly);
+            var yesNo = YesNoType.IllegalValue;
 
             if ("yes".Equals(value) || "true".Equals(value))
             {

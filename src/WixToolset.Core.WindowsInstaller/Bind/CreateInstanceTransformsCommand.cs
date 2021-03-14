@@ -110,7 +110,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var productCode = instanceSymbol.ProductCode;
                     if ("*" == productCode)
                     {
-                        productCode = Common.GenerateGuid();
+                        productCode = this.BackendHelper.CreateGuid();
                     }
 
                     var productCodeRow = propertyTable.CreateRow(instanceSymbol.SourceLineNumbers);

@@ -94,7 +94,7 @@ namespace WixToolset.Core.Burn.Bundles
                     msiPackage.ProductLanguage = Convert.ToInt32(ProcessMsiPackageCommand.GetProperty(db, "ProductLanguage"), CultureInfo.InvariantCulture);
                     msiPackage.ProductVersion = ProcessMsiPackageCommand.GetProperty(db, "ProductVersion");
 
-                    if (!Common.IsValidModuleOrBundleVersion(msiPackage.ProductVersion))
+                    if (!this.BackendHelper.IsValidFourPartVersion(msiPackage.ProductVersion))
                     {
                         // not a proper .NET version (e.g., five fields); can we get a valid four-part version number?
                         string version = null;
@@ -109,7 +109,7 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                         }
 
-                        if (!String.IsNullOrEmpty(version) && Common.IsValidModuleOrBundleVersion(version))
+                        if (!String.IsNullOrEmpty(version) && this.BackendHelper.IsValidFourPartVersion(version))
                         {
                             this.Messaging.Write(WarningMessages.VersionTruncated(this.Facade.PackageSymbol.SourceLineNumbers, msiPackage.ProductVersion, sourcePath, version));
                             msiPackage.ProductVersion = version;
@@ -394,7 +394,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                         if (!payloadNames.Contains(cabinetName))
                         {
-                            var generatedId = Common.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
+                            var generatedId = this.BackendHelper.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
                             var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers);
 
                             this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
@@ -437,7 +437,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 break;
                             }
 
-                            var sourceName = Common.GetName(record.GetString(3), true, longNamesInImage);
+                            var sourceName = this.BackendHelper.GetMsiFileName(record.GetString(3), true, longNamesInImage);
 
                             var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(record.GetString(2), sourceName);
 
@@ -471,7 +471,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                                 if (!payloadNames.Contains(name))
                                 {
-                                    var generatedId = Common.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
+                                    var generatedId = this.BackendHelper.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
                                     var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers);
 
                                     this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
@@ -526,7 +526,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 break;
                             }
 
-                            var id = new Identifier(AccessModifier.Section, Common.GenerateIdentifier("dep", msiPackage.Id.Id, record.GetString(1)));
+                            var id = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", msiPackage.Id.Id, record.GetString(1)));
 
                             // Import the provider key and attributes.
                             this.Section.AddSymbol(new ProvidesDependencySymbol(msiPackage.SourceLineNumbers, id)
