@@ -9,16 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\test.cab" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

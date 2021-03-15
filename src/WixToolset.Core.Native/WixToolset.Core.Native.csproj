@@ -5,82 +5,35 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
-    <Description>Core Native</Description>
     <DebugType>embedded</DebugType>
+    <Description>WiX Toolset Native Processing</Description>
     <IncludeSymbols>true</IncludeSymbols>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
-      <PrivateAssets>All</PrivateAssets>
-      <Properties>Platform=ARM64</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
-      <PrivateAssets>All</PrivateAssets>
-      <Properties>Platform=Win32</Properties>
-    </ProjectReference>
-    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
-      <PrivateAssets>All</PrivateAssets>
-      <Properties>Platform=x64</Properties>
-    </ProjectReference>
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=Win32" />
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=x64" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(NCrunch)'=='1' ">
+    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <NativeFileListPath Condition=" '$(NCrunch)'=='' ">$(MSBuildProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
-    <NativeFileListPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
-    <MergeModDirectory>$(MSBuildThisFileDirectory)..\wixnative\</MergeModDirectory>
-  </PropertyGroup>
-
-  <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems" Condition=" '$(NCrunch)'=='' ">
-    <ItemGroup>
-      <_NativeProjectOutput Include="$(MergeModDirectory)x64\mergemod.dll" />
-      <_NativeProjectOutput Include="$(OutputPath)..\x64\wixnative.exe" />
-      <_NativeProjectOutput Include="$(OutputPath)..\x64\wixnative.pdb" />
-    </ItemGroup>
-
-    <WriteLinesToFile File="$(NativeFileListPath)" Lines="@(_NativeProjectOutput)" Overwrite="true" />
-
-    <ItemGroup>
-      <FileWrites Include="$(NativeFileListPath)" />
-
-      <AllItemsFullPathWithTargetPath Include="@(_NativeProjectOutput->'%(FullPath)')">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <TargetPath>%(Filename)%(Extension)</TargetPath>
-      </AllItemsFullPathWithTargetPath>
-    </ItemGroup>
-  </Target>
-
-  <Target Name="NCrunchCopyNative" AfterTargets="AfterBuild" Condition=" '$(NCrunch)'=='1' ">
-    <ReadLinesFromFile File="$(NativeFileListPath)">
-      <Output TaskParameter="Lines" ItemName="_NCrunchNativeProjectOutput" />
-    </ReadLinesFromFile>
-
-    <Error Text="You must build $(MSBuildProjectName) to create the referenced native projects. Once built, 'Reload and rebuild' the project in the NCrunch Tests. The $(NativeFileListPath) file must not be empty." Condition=" '@(_NCrunchNativeProjectOutput)'=='' " />
-
-    <Copy SourceFiles="@(_NCrunchNativeProjectOutput)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true">
-      <Output TaskParameter="CopiedFiles" ItemName="_NCrunchNativeCopied" />
-    </Copy>
-
-    <ItemGroup>
-      <FileWrites Include="@(_NCrunchNativeCopied)" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="SetNuspecProperties" AfterTargets="CoreBuild">
-    <PropertyGroup>
-      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
-      <NuspecProperties>Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);MergeModDir=$(MergeModDirectory)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 </Project>
