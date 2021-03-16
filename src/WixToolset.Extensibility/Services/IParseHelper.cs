@@ -357,6 +357,12 @@ namespace WixToolset.Extensibility.Services
         string GetTrimmedInnerText(XElement element);
 
         /// <summary>
+        /// Validates that the element does not contain inner text.
+        /// </summary>
+        /// <param name="element">Element to check for inner text.</param>
+        void InnerTextDisallowed(XElement element);
+
+        /// <summary>
         /// Verifies that a value is a legal identifier.
         /// </summary>
         /// <param name="value">The value to verify.</param>
