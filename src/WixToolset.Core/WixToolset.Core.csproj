@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
   </ItemGroup>
 
   <!--

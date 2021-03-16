@@ -1,10 +1,10 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.Burn.Inscribe
 {
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Extensibility;
+    using WixToolset.Core.Native;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -23,19 +23,19 @@ namespace WixToolset.Core.Burn.Inscribe
 
         public bool Execute()
         {
-            bool inscribed = false;
-            string tempFile = Path.Combine(this.Context.IntermediateFolder, "bundle_engine_signed.exe");
+            var inscribed = false;
+            var tempFile = Path.Combine(this.Context.IntermediateFolder, "bundle_engine_signed.exe");
 
-            using (BurnReader reader = BurnReader.Open(this.Context.InputFilePath))
+            using (var reader = BurnReader.Open(this.Context.InputFilePath))
             {
-                File.Copy(this.Context.SignedEngineFile, tempFile, true);
+                FileSystem.CopyFile(this.Context.SignedEngineFile, tempFile, allowHardlink: false);
 
                 // If there was an attached container on the original (unsigned) bundle, put it back.
                 if (reader.AttachedContainerSize > 0)
                 {
                     reader.Stream.Seek(reader.AttachedContainerAddress, SeekOrigin.Begin);
 
-                    using (BurnWriter writer = BurnWriter.Open(this.Messaging, tempFile))
+                    using (var writer = BurnWriter.Open(this.Messaging, tempFile))
                     {
                         writer.RememberThenResetSignature();
                         writer.AppendContainer(reader.Stream, reader.AttachedContainerSize, BurnCommon.Container.Attached);
@@ -45,13 +45,8 @@ namespace WixToolset.Core.Burn.Inscribe
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(this.Context.OutputFile));
-            if (File.Exists(this.Context.OutputFile))
-            {
-                File.Delete(this.Context.OutputFile);
-            }
 
-            File.Move(tempFile, this.Context.OutputFile);
-            WixToolset.Core.Native.NativeMethods.ResetAcls(new string[] { this.Context.OutputFile }, 1);
+            FileSystem.MoveFile(tempFile, this.Context.OutputFile);
 
             return inscribed;
         }

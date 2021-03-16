@@ -9,8 +9,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Core.WindowsInstaller.Bind;
-    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;

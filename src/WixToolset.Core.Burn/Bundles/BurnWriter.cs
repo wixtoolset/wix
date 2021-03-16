@@ -80,7 +80,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_MAGIC, BURN_SECTION_MAGIC);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_VERSION, BURN_SECTION_VERSION);
 
-            this.messaging.Write(VerboseMessages.BundleGuid(bundleId));
+            this.Messaging.Write(VerboseMessages.BundleGuid(bundleId));
             this.binaryWriter.BaseStream.Seek(this.wixburnDataOffset + BURN_SECTION_OFFSET_BUNDLEGUID, SeekOrigin.Begin);
             this.binaryWriter.Write(bundleGuid.ToByteArray());
 

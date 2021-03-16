@@ -111,7 +111,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="fileExe">File to modify in-place.</param>
         public BurnCommon(IMessaging messaging, string fileExe)
         {
-            this.messaging = messaging;
+            this.Messaging = messaging;
             this.fileExe = fileExe;
         }
 
@@ -130,7 +130,7 @@ namespace WixToolset.Core.Burn.Bundles
         public UInt32 AttachedContainerAddress { get; protected set; }
         public UInt32 AttachedContainerSize { get; protected set; }
 
-        protected IMessaging messaging { get; }
+        protected IMessaging Messaging { get; }
 
         public void Dispose()
         {
@@ -147,12 +147,11 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="size">Optional count of bytes to copy. 0 indicates whole input stream from current should be copied.</param>
         protected static int CopyStream(Stream input, Stream output, int size)
         {
-            byte[] bytes = new byte[4096];
-            int total = 0;
-            int read = 0;
+            var bytes = new byte[4096];
+            var total = 0;
             do
             {
-                read = Math.Min(bytes.Length, size - total);
+                var read = Math.Min(bytes.Length, size - total);
                 read = input.Read(bytes, 0, read);
                 if (0 == read)
                 {
@@ -185,21 +184,21 @@ namespace WixToolset.Core.Burn.Bundles
             uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_MAGIC);
             if (BURN_SECTION_MAGIC != uint32)
             {
-                this.messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
                 return false;
             }
 
             this.Version = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_VERSION);
             if (BURN_SECTION_VERSION != this.Version)
             {
-                this.messaging.Write(ErrorMessages.BundleTooNew(this.fileExe, this.Version));
+                this.Messaging.Write(ErrorMessages.BundleTooNew(this.fileExe, this.Version));
                 return false;
             }
 
             uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_FORMAT); // We only know how to deal with CABs right now
             if (1 != uint32)
             {
-                this.messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
                 return false;
             }
 
@@ -266,7 +265,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (UInt32.MaxValue == wixburnSectionOffset)
                 {
-                    this.messaging.Write(ErrorMessages.StubMissingWixburnSection(this.fileExe));
+                    this.Messaging.Write(ErrorMessages.StubMissingWixburnSection(this.fileExe));
                     return false;
                 }
 
@@ -274,7 +273,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // the smallest alignment (512 bytes), but just to be paranoid...
                 if (BURN_SECTION_SIZE > BurnCommon.ReadUInt32(bytes, IMAGE_SECTION_HEADER_OFFSET_SIZEOFRAWDATA))
                 {
-                    this.messaging.Write(ErrorMessages.StubWixburnSectionTooSmall(this.fileExe));
+                    this.Messaging.Write(ErrorMessages.StubWixburnSectionTooSmall(this.fileExe));
                     return false;
                 }
 
@@ -303,7 +302,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // Verify the NT signature...
                 if (IMAGE_NT_SIGNATURE != BurnCommon.ReadUInt32(bytes, IMAGE_NT_HEADER_OFFSET_SIGNATURE))
                 {
-                    this.messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
+                    this.Messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
                     return false;
                 }
 
@@ -338,7 +337,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // Verify the DOS 'MZ' signature.
                 if (IMAGE_DOS_SIGNATURE != BurnCommon.ReadUInt16(bytes, IMAGE_DOS_HEADER_OFFSET_MAGIC))
                 {
-                    this.messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
+                    this.Messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
                     return false;
                 }
 

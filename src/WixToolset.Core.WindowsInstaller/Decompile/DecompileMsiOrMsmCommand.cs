@@ -7,7 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
     using System.ComponentModel;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;

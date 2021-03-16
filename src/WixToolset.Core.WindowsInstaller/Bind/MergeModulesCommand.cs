@@ -9,8 +9,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
-    using WixToolset.Core.Native;
-    using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.Native.Msi;
+    using WixToolset.Core.Native.Msm;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -60,8 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             try
             {
-                var interop = new MsmInterop();
-                merge = interop.GetMsmMerge();
+                merge = MsmInterop.GetMsmMerge();
 
                 merge.OpenLog(logPath);
                 logOpen = true;

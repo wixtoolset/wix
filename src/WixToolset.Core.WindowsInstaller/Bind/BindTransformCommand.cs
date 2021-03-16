@@ -5,7 +5,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Globalization;
     using System.IO;
-    using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;

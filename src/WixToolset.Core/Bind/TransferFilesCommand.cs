@@ -6,6 +6,7 @@ namespace WixToolset.Core.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Security.AccessControl;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -15,15 +16,15 @@ namespace WixToolset.Core.Bind
     {
         public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool suppressAclReset)
         {
-            this.FileSystem = new FileSystem(extensions);
+            this.Extensions = extensions;
             this.Messaging = messaging;
             this.FileTransfers = fileTransfers;
             this.SuppressAclReset = suppressAclReset;
         }
 
-        private FileSystem FileSystem { get; }
-
         private IMessaging Messaging { get; }
+
+        private IEnumerable<ILayoutExtension> Extensions { get; }
 
         private IEnumerable<IFileTransfer> FileTransfers { get; }
 
@@ -31,7 +32,7 @@ namespace WixToolset.Core.Bind
 
         public void Execute()
         {
-            List<string> destinationFiles = new List<string>();
+            var destinationFiles = new List<string>();
 
             foreach (var fileTransfer in this.FileTransfers)
             {
@@ -42,7 +43,7 @@ namespace WixToolset.Core.Bind
                     continue;
                 }
 
-                bool retry = false;
+                var retry = false;
                 do
                 {
                     try
@@ -50,12 +51,12 @@ namespace WixToolset.Core.Bind
                         if (fileTransfer.Move)
                         {
                             this.Messaging.Write(VerboseMessages.MoveFile(fileTransfer.Source, fileTransfer.Destination));
-                            this.TransferFile(true, fileTransfer.Source, fileTransfer.Destination);
+                            this.MoveFile(fileTransfer.Source, fileTransfer.Destination);
                         }
                         else
                         {
                             this.Messaging.Write(VerboseMessages.CopyFile(fileTransfer.Source, fileTransfer.Destination));
-                            this.TransferFile(false, fileTransfer.Source, fileTransfer.Destination);
+                            this.CopyFile(fileTransfer.Source, fileTransfer.Destination);
                         }
 
                         retry = false;
@@ -73,7 +74,7 @@ namespace WixToolset.Core.Bind
                             throw;
                         }
 
-                        string directory = Path.GetDirectoryName(fileTransfer.Destination);
+                        var directory = Path.GetDirectoryName(fileTransfer.Destination);
                         this.Messaging.Write(VerboseMessages.CreateDirectory(directory));
                         Directory.CreateDirectory(directory);
                         retry = true;
@@ -91,7 +92,7 @@ namespace WixToolset.Core.Bind
                             this.Messaging.Write(VerboseMessages.RemoveDestinationFile(fileTransfer.Destination));
 
                             // try to ensure the file is not read-only
-                            FileAttributes attributes = File.GetAttributes(fileTransfer.Destination);
+                            var attributes = File.GetAttributes(fileTransfer.Destination);
                             try
                             {
                                 File.SetAttributes(fileTransfer.Destination, attributes & ~FileAttributes.ReadOnly);
@@ -131,7 +132,7 @@ namespace WixToolset.Core.Bind
                             this.Messaging.Write(VerboseMessages.RemoveDestinationFile(fileTransfer.Destination));
 
                             // ensure the file is not read-only, then delete it
-                            FileAttributes attributes = File.GetAttributes(fileTransfer.Destination);
+                            var attributes = File.GetAttributes(fileTransfer.Destination);
                             File.SetAttributes(fileTransfer.Destination, attributes & ~FileAttributes.ReadOnly);
                             try
                             {
@@ -161,8 +162,6 @@ namespace WixToolset.Core.Bind
 
                 try
                 {
-                    //WixToolset.Core.Native.NativeMethods.ResetAcls(destinationFiles.ToArray(), (uint)destinationFiles.Count);
-
                     foreach (var file in destinationFiles)
                     {
                         new FileInfo(file).SetAccessControl(aclReset);
@@ -175,23 +174,30 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        private void TransferFile(bool move, string source, string destination)
+        private void CopyFile(string source, string destination)
         {
-            bool complete = false;
-
-            if (move)
+            foreach (var extension in this.Extensions)
             {
-                complete = this.FileSystem.MoveFile(source, destination);
-            }
-            else
-            {
-                complete = this.FileSystem.CopyFile(source, destination);
+                if (extension.CopyFile(source, destination))
+                {
+                    return;
+                }
             }
 
-            if (!complete)
+            FileSystem.CopyFile(source, destination, allowHardlink: true);
+        }
+
+        private void MoveFile(string source, string destination)
+        {
+            foreach (var extension in this.Extensions)
             {
-                throw new InvalidOperationException(); // TODO: something needs to be said here that none of the binder file managers returned a result.
+                if (extension.MoveFile(source, destination))
+                {
+                    return;
+                }
             }
+
+            FileSystem.MoveFile(source, destination);
         }
     }
 }

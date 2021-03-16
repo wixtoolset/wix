@@ -8,7 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Globalization;
     using System.IO;
     using System.Text.RegularExpressions;
-    using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
@@ -288,8 +288,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             ColumnDefinition[] columns;
-            using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
-                          columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
+            using (Record columnNameRecord = tableView.GetColumnNames(),
+                          columnTypeRecord = tableView.GetColumnTypes())
             {
                 // index the primary keys
                 var tablePrimaryKeys = new HashSet<string>();

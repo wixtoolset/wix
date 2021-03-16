@@ -9,12 +9,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using WixToolset.Data;
     using WixToolset.Core.Native;
+    using WixToolset.Core.Native.Msi;
+    using WixToolset.Core.Native.Msm;
+    using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using WixToolset.Extensibility.Services;
-    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Retrieve files information and extract them from merge modules.
@@ -52,8 +53,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var mergeModulesFileFacades = new List<IFileFacade>();
 
-            var interop = new MsmInterop();
-            var merge = interop.GetMsmMerge();
+            var merge = MsmInterop.GetMsmMerge();
 
             // Index all of the file rows to be able to detect collisions with files in the Merge Modules.
             // It may seem a bit expensive to build up this index solely for the purpose of checking collisions

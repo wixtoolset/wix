@@ -8,7 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using System.Text;
-    using WixToolset.Core.WindowsInstaller.Msi;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
@@ -337,7 +337,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 }
 
                                 // check for a stream name that is more than 62 characters long (the maximum allowed length)
-                                if (needStream && MsiInterop.MsiMaxStreamNameLength < streamName.Length)
+                                if (needStream && Database.MsiMaxStreamNameLength < streamName.Length)
                                 {
                                     this.Messaging.Write(ErrorMessages.StreamNameTooLong(row.SourceLineNumbers, table.Name, streamName.ToString(), streamName.Length));
                                 }

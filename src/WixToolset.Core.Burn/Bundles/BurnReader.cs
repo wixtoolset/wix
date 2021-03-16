@@ -27,7 +27,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private bool invalidBundle;
         private BinaryReader binaryReader;
-        private List<DictionaryEntry> attachedContainerPayloadNames;
+        private readonly List<DictionaryEntry> attachedContainerPayloadNames;
 
         /// <summary>
         /// Creates a BurnReader for reading a PE file.
@@ -43,13 +43,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <summary>
         /// Gets the underlying stream.
         /// </summary>
-        public Stream Stream
-        {
-            get
-            {
-                return (null != this.binaryReader) ? this.binaryReader.BaseStream : null;
-            }
-        }
+        public Stream Stream => this.binaryReader?.BaseStream;
 
         internal static BurnReader Open(object inputFilePath)
         {
@@ -64,7 +58,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>Burn reader.</returns>
         public static BurnReader Open(IMessaging messaging, string fileExe)
         {
-            BurnReader reader = new BurnReader(messaging, fileExe);
+            var reader = new BurnReader(messaging, fileExe);
 
             reader.binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
             if (!reader.Initialize(reader.binaryReader))
@@ -109,8 +103,7 @@ namespace WixToolset.Core.Burn.Bundles
             cabinet.Extract(outputDirectory);
 
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
-            File.Delete(manifestPath);
-            File.Move(manifestOriginalPath, manifestPath);
+            FileSystem.MoveFile(manifestOriginalPath, manifestPath);
 
             XmlDocument document = new XmlDocument();
             document.Load(manifestPath);
@@ -128,8 +121,7 @@ namespace WixToolset.Core.Burn.Bundles
                 string destinationPath = Path.Combine(outputDirectory, filePathNode.Value);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
-                File.Delete(destinationPath);
-                File.Move(sourcePath, destinationPath);
+                FileSystem.MoveFile(sourcePath, destinationPath);
             }
 
             foreach (XmlNode payload in payloads)
@@ -193,8 +185,7 @@ namespace WixToolset.Core.Burn.Bundles
                 string destinationPath = Path.Combine(outputDirectory, (string)entry.Value);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
-                File.Delete(destinationPath);
-                File.Move(sourcePath, destinationPath);
+                FileSystem.MoveFile(sourcePath, destinationPath);
             }
 
             return true;

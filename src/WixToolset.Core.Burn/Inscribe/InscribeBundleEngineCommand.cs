@@ -1,33 +1,40 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.Burn.Inscribe
 {
     using System;
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
+    using WixToolset.Core.Native;
     using WixToolset.Extensibility.Data;
 
     internal class InscribeBundleEngineCommand
     {
         public InscribeBundleEngineCommand(IInscribeContext context)
         {
-            this.Context = context;
+            this.IntermediateFolder = context.IntermediateFolder;
+            this.InputFilePath = context.InputFilePath;
+            this.OutputFile = context.OutputFile;
         }
 
-        private IInscribeContext Context { get; }
+        private string IntermediateFolder { get; }
+
+        private string InputFilePath { get; }
+
+        private string OutputFile { get; }
 
         public bool Execute()
         {
-            string tempFile = Path.Combine(this.Context.IntermediateFolder, "bundle_engine_unsigned.exe");
+            var tempFile = Path.Combine(this.IntermediateFolder, "bundle_engine_unsigned.exe");
 
-            using (BurnReader reader = BurnReader.Open(this.Context.InputFilePath))
-            using (FileStream writer = File.Open(tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
+            using (var reader = BurnReader.Open(this.InputFilePath))
+            using (var writer = File.Open(tempFile, FileMode.Create, FileAccess.Write, FileShare.Read | FileShare.Delete))
             {
                 reader.Stream.Seek(0, SeekOrigin.Begin);
 
-                byte[] buffer = new byte[4 * 1024];
-                int total = 0;
-                int read = 0;
+                var buffer = new byte[4 * 1024];
+                var total = 0;
+                var read = 0;
                 do
                 {
                     read = Math.Min(buffer.Length, (int)reader.EngineSize - total);
@@ -46,14 +53,9 @@ namespace WixToolset.Core.Burn.Inscribe
                 // TODO: update writer with detached container signatures.
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(this.Context.OutputFile));
-            if (File.Exists(this.Context.OutputFile))
-            {
-                File.Delete(this.Context.OutputFile);
-            }
+            Directory.CreateDirectory(Path.GetDirectoryName(this.OutputFile));
 
-            File.Move(tempFile, this.Context.OutputFile);
-            WixToolset.Core.Native.NativeMethods.ResetAcls(new string[] { this.Context.OutputFile }, 1);
+            FileSystem.MoveFile(tempFile, this.OutputFile);
 
             return true;
         }

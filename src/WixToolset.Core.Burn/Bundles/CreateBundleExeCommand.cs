@@ -8,6 +8,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Reflection;
     using System.Text;
     using System.Xml;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
@@ -72,7 +73,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleSymbol.SourceLineNumbers);
 
-            File.Copy(stubFile, bundleTempPath, true);
+            FileSystem.CopyFile(stubFile, bundleTempPath, allowHardlink: false);
             File.SetAttributes(bundleTempPath, FileAttributes.Normal);
 
             var windowsAssemblyVersion = GetWindowsAssemblyVersion(this.BundleSymbol);

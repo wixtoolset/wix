@@ -8,8 +8,8 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography.X509Certificates;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Core.WindowsInstaller.Bind;
-    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
@@ -150,7 +150,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                         Row digitalSignatureRow = null;
 
                         var cabName = mediaRecord.GetString(4); // get the name of the cab
-                                                                   // If there is no cabinet or it's an internal cab, skip it.
+                                                                // If there is no cabinet or it's an internal cab, skip it.
                         if (String.IsNullOrEmpty(cabName) || cabName.StartsWith("#", StringComparison.Ordinal))
                         {
                             continue;
