@@ -24,13 +24,11 @@ namespace WixToolset.Core.WindowsInstaller
                 extension.PreBackendBind(context);
             }
 
-            var validator = Validator.CreateFromContext(context, "darice.cub");
-
             IBindResult result = null;
             var dispose = true;
             try
             {
-                var command = new BindDatabaseCommand(context, backendExtensions, validator);
+                var command = new BindDatabaseCommand(context, backendExtensions, "darice.cub");
                 result = command.Execute();
 
                 foreach (var extension in backendExtensions)

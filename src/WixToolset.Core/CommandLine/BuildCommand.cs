@@ -344,14 +344,14 @@ namespace WixToolset.Core.CommandLine
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
                     context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
                     context.FileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
-                    context.Ices = Array.Empty<string>(); // TODO: set this correctly
+                    context.Ices = this.commandLine.Ices;
                     context.IntermediateFolder = intermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
                     context.OutputPath = this.OutputFile;
                     context.PdbType = this.PdbType;
                     context.PdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(this.OutputFile, ".wixpdb");
-                    context.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
-                    context.SuppressValidation = true; // TODO: set this correctly
+                    context.SuppressIces = this.commandLine.SuppressIces;
+                    context.SuppressValidation = this.commandLine.SuppressValidation;
                     context.CancellationToken = cancellationToken;
 
                     var binder = this.ServiceProvider.GetService<IBinder>();
@@ -541,6 +541,12 @@ namespace WixToolset.Core.CommandLine
 
             public string BuiltOutputsFile { get; private set; }
 
+            public List<string> Ices { get; } = new List<string>();
+
+            public List<string> SuppressIces { get; } = new List<string>();
+
+            public bool SuppressValidation { get; set; }
+
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
             {
                 this.ServiceProvider = serviceProvider;
@@ -634,6 +640,13 @@ namespace WixToolset.Core.CommandLine
                             parser.GetNextArgumentOrError(arg, this.IncludeSearchPaths);
                             return true;
 
+                        case "ice":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            this.Ices.Add(value);
+                            return true;
+                        }
+
                         case "intermediatefolder":
                             this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
                             return true;
@@ -670,6 +683,13 @@ namespace WixToolset.Core.CommandLine
                                 return false;
                             }
 
+                        case "sice":
+                        {
+                            var value = parser.GetNextArgumentOrError(arg);
+                            this.SuppressIces.Add(value);
+                            return true;
+                        }
+
                         case "nologo":
                             this.ShowLogo = false;
                             return true;
@@ -680,7 +700,7 @@ namespace WixToolset.Core.CommandLine
                             return true;
 
                         case "sval":
-                            // todo: implement
+                            this.SuppressValidation = true;
                             return true;
                     }
 

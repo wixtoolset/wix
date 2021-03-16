@@ -21,11 +21,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator) : this(context, backendExtension, null, validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, string cubeFile) : this(context, backendExtension, null, cubeFile)
         {
         }
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> subStorages, Validator validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, IEnumerable<SubStorage> subStorages, string cubeFile)
         {
             this.ServiceProvider = context.ServiceProvider;
 
@@ -50,7 +50,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.SuppressLayout = context.SuppressLayout;
 
             this.SubStorages = subStorages;
-            this.Validator = validator;
+
+            this.SuppressValidation = context.SuppressValidation;
+            this.Ices = context.Ices;
+            this.SuppressedIces = context.SuppressIces;
+            this.CubeFiles = String.IsNullOrEmpty(cubeFile) ? null : new[] { cubeFile };
 
             this.BackendExtensions = backendExtension;
         }
@@ -97,7 +101,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string IntermediateFolder { get; }
 
-        private Validator Validator { get; }
+        private bool SuppressValidation { get; }
+
+        private IEnumerable<string> Ices { get; }
+
+        private IEnumerable<string> SuppressedIces { get; }
+
+        private IEnumerable<string> CubeFiles { get; }
 
         public IBindResult Execute()
         {
@@ -522,34 +532,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.Messaging.EncounteredError)
             {
                 return null;
-            }
+            } 
 
-#if TODO_FINISH_VALIDATION
-            // Validate the output if there is an MSI validator.
-            if (null != this.Validator)
+            // Validate the output if there are CUBe files and we're not explicitly suppressing validation.
+            if (this.CubeFiles != null && !this.SuppressValidation)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                // set the output file for source line information
-                this.Validator.Output = this.Output;
-
-                Messaging.Instance.Write(WixVerboses.ValidatingDatabase());
-
-                this.Validator.Validate(this.OutputPath);
-
-                stopwatch.Stop();
-                Messaging.Instance.Write(WixVerboses.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
-
-                // Stop processing if an error occurred.
-                if (Messaging.Instance.EncounteredError)
-                {
-                    return;
-                }
+                var command = new ValidateDatabaseCommand(this.Messaging, this.IntermediateFolder, data, this.OutputPath, this.CubeFiles, this.Ices, this.SuppressedIces);
+                command.Execute();
             }
-#endif
+
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
 
             // Process uncompressed files.
-            if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
+            if (!this.SuppressLayout && uncompressedFiles.Any())
             {
                 var command = new ProcessUncompressedFilesCommand(section, this.WindowsInstallerBackendHelper, this.PathResolver);
                 command.Compressed = compressed;

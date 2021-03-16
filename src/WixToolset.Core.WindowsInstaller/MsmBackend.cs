@@ -23,12 +23,10 @@ namespace WixToolset.Core.WindowsInstaller
                 extension.PreBackendBind(context);
             }
 
-            var validator = Validator.CreateFromContext(context, "mergemod.cub");
-
             IBindResult result = null;
             try
             {
-                var command = new BindDatabaseCommand(context, backendExtensions, validator);
+                var command = new BindDatabaseCommand(context, backendExtensions, "mergemod.cub");
                 result = command.Execute();
 
                 foreach (var extension in backendExtensions)
