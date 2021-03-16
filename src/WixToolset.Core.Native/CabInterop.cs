@@ -3,131 +3,7 @@
 namespace WixToolset.Core.Native
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
-
-    /// <summary>
-    /// The native methods.
-    /// </summary>
-    public sealed class NativeMethods
-    {
-        /// <summary>
-        /// Starts creating a cabinet.
-        /// </summary>
-        /// <param name="cabinetName">Name of cabinet to create.</param>
-        /// <param name="cabinetDirectory">Directory to create cabinet in.</param>
-        /// <param name="maxFiles">Maximum number of files that will be added to cabinet.</param>
-        /// <param name="maxSize">Maximum size of the cabinet.</param>
-        /// <param name="maxThreshold">Maximum threshold in the cabinet.</param>
-        /// <param name="compressionType">Type of compression to use in the cabinet.</param>
-        /// <param name="contextHandle">Handle to opened cabinet.</param>
-        [DllImport("winterop.dll", EntryPoint = "CreateCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void CreateCabBegin(string cabinetName, string cabinetDirectory, uint maxFiles, uint maxSize, uint maxThreshold, uint compressionType, out IntPtr contextHandle);
-
-        /// <summary>
-        /// Adds a file to an open cabinet.
-        /// </summary>
-        /// <param name="file">Full path to file to add to cabinet.</param>
-        /// <param name="token">Name of file in cabinet.</param>
-        /// <param name="fileHash"></param>
-        /// <param name="contextHandle">Handle to open cabinet.</param>
-        [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void CreateCabAddFile(string file, string token, MSIFILEHASHINFO fileHash, IntPtr contextHandle);
-
-        /// <summary>
-        /// Closes a cabinet.
-        /// </summary>
-        /// <param name="contextHandle">Handle to open cabinet to close.</param>
-        /// <param name="newCabNamesCallBackAddress">Address of Binder's cabinet split callback</param>
-        [DllImport("winterop.dll", EntryPoint = "CreateCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void CreateCabFinish(IntPtr contextHandle, IntPtr newCabNamesCallBackAddress);
-
-        /// <summary>
-        /// Cancels cabinet creation.
-        /// </summary>
-        /// <param name="contextHandle">Handle to open cabinet to cancel.</param>
-        [DllImport("winterop.dll", EntryPoint = "CreateCabCancel", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void CreateCabCancel(IntPtr contextHandle);
-
-        /// <summary>
-        /// Initializes cabinet extraction.
-        /// </summary>
-        [DllImport("winterop.dll", EntryPoint = "ExtractCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void ExtractCabBegin();
-
-        /// <summary>
-        /// Extracts files from cabinet.
-        /// </summary>
-        /// <param name="cabinet">Path to cabinet to extract files from.</param>
-        /// <param name="extractDirectory">Directory to extract files to.</param>
-        [DllImport("winterop.dll", EntryPoint = "ExtractCab", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true, PreserveSig = false)]
-        public static extern void ExtractCab(string cabinet, string extractDirectory);
-
-        /// <summary>
-        /// Cleans up after cabinet extraction.
-        /// </summary>
-        [DllImport("winterop.dll", EntryPoint = "ExtractCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        public static extern void ExtractCabFinish();
-
-        /// <summary>
-        /// Initializes cabinet enumeration.
-        /// </summary>
-        [DllImport("winterop.dll", EntryPoint = "EnumerateCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void EnumerateCabBegin();
-
-        /// <summary>
-        /// Enumerates files from cabinet.
-        /// </summary>
-        /// <param name="cabinet">Path to cabinet to enumerate files from.</param>
-        /// <param name="notify">callback that gets each file.</param>
-        [DllImport("winterop.dll", EntryPoint = "EnumerateCab", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true, PreserveSig = false)]
-        public static extern void EnumerateCab(string cabinet, CabInterop.PFNNOTIFY notify);
-
-        /// <summary>
-        /// Cleans up after cabinet enumeration.
-        /// </summary>
-        [DllImport("winterop.dll", EntryPoint = "EnumerateCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        public static extern void EnumerateCabFinish();
-
-        /// <summary>
-        /// Resets the DACL on an array of files to "empty".
-        /// </summary>
-        /// <param name="files">Array of file reset ACL to "empty".</param>
-        /// <param name="fileCount">Number of file paths in array.</param>
-        [DllImport("winterop.dll", EntryPoint = "ResetAcls", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void ResetAcls(string[] files, uint fileCount);
-
-        /// <summary>
-        /// Gets the hash of the pCertContext->pCertInfo->SubjectPublicKeyInfo using ::CryptHashPublicKeyInfo() which does not seem
-        /// to be exposed by .NET Frameowkr.
-        /// </summary>
-        /// <param name="certContext">Pointer to a CERT_CONTEXT struct with public key information to hash.</param>
-        /// <param name="publicKeyInfoHashed"></param>
-        /// <param name="sizePublicKeyInfoHashed"></param>
-        [DllImport("winterop.dll", EntryPoint = "HashPublicKeyInfo", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void HashPublicKeyInfo(IntPtr certContext, byte[] publicKeyInfoHashed, ref uint sizePublicKeyInfoHashed);
-
-        /// <summary>
-        /// Converts file time to a local file time.
-        /// </summary>
-        /// <param name="fileTime">file time</param>
-        /// <param name="localTime">local file time</param>
-        /// <returns>true if successful, false otherwise</returns>
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FileTimeToLocalFileTime(ref long fileTime, ref long localTime);
-
-        /// <summary>
-        /// Converts file time to a MS-DOS time.
-        /// </summary>
-        /// <param name="fileTime">file time</param>
-        /// <param name="wFatDate">MS-DOS date</param>
-        /// <param name="wFatTime">MS-DOS time</param>
-        /// <returns>true if successful, false otherwise</returns>
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FileTimeToDosDateTime(ref long fileTime, out ushort wFatDate, out ushort wFatTime);
-    }
 
     /// <summary>
     /// Interop class for the winterop.dll.
@@ -180,7 +56,6 @@ namespace WixToolset.Core.Native
         /// <summary>
         /// Wraps FDINOTIFICATION.
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public class NOTIFICATION
         {
@@ -306,6 +181,129 @@ namespace WixToolset.Core.Native
             {
                 get { return this.fdie; }
             }
+        }
+
+        /// <summary>
+        /// The native methods.
+        /// </summary>
+        private class NativeMethods
+        {
+            /// <summary>
+            /// Starts creating a cabinet.
+            /// </summary>
+            /// <param name="cabinetName">Name of cabinet to create.</param>
+            /// <param name="cabinetDirectory">Directory to create cabinet in.</param>
+            /// <param name="maxFiles">Maximum number of files that will be added to cabinet.</param>
+            /// <param name="maxSize">Maximum size of the cabinet.</param>
+            /// <param name="maxThreshold">Maximum threshold in the cabinet.</param>
+            /// <param name="compressionType">Type of compression to use in the cabinet.</param>
+            /// <param name="contextHandle">Handle to opened cabinet.</param>
+            [DllImport("winterop.dll", EntryPoint = "CreateCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void CreateCabBegin(string cabinetName, string cabinetDirectory, uint maxFiles, uint maxSize, uint maxThreshold, uint compressionType, out IntPtr contextHandle);
+
+            /// <summary>
+            /// Adds a file to an open cabinet.
+            /// </summary>
+            /// <param name="file">Full path to file to add to cabinet.</param>
+            /// <param name="token">Name of file in cabinet.</param>
+            /// <param name="fileHash"></param>
+            /// <param name="contextHandle">Handle to open cabinet.</param>
+            [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void CreateCabAddFile(string file, string token, MSIFILEHASHINFO fileHash, IntPtr contextHandle);
+
+            /// <summary>
+            /// Closes a cabinet.
+            /// </summary>
+            /// <param name="contextHandle">Handle to open cabinet to close.</param>
+            /// <param name="newCabNamesCallBackAddress">Address of Binder's cabinet split callback</param>
+            [DllImport("winterop.dll", EntryPoint = "CreateCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void CreateCabFinish(IntPtr contextHandle, IntPtr newCabNamesCallBackAddress);
+
+            /// <summary>
+            /// Cancels cabinet creation.
+            /// </summary>
+            /// <param name="contextHandle">Handle to open cabinet to cancel.</param>
+            [DllImport("winterop.dll", EntryPoint = "CreateCabCancel", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void CreateCabCancel(IntPtr contextHandle);
+
+            /// <summary>
+            /// Initializes cabinet extraction.
+            /// </summary>
+            [DllImport("winterop.dll", EntryPoint = "ExtractCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void ExtractCabBegin();
+
+            /// <summary>
+            /// Extracts files from cabinet.
+            /// </summary>
+            /// <param name="cabinet">Path to cabinet to extract files from.</param>
+            /// <param name="extractDirectory">Directory to extract files to.</param>
+            [DllImport("winterop.dll", EntryPoint = "ExtractCab", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true, PreserveSig = false)]
+            public static extern void ExtractCab(string cabinet, string extractDirectory);
+
+            /// <summary>
+            /// Cleans up after cabinet extraction.
+            /// </summary>
+            [DllImport("winterop.dll", EntryPoint = "ExtractCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+            public static extern void ExtractCabFinish();
+
+            /// <summary>
+            /// Initializes cabinet enumeration.
+            /// </summary>
+            [DllImport("winterop.dll", EntryPoint = "EnumerateCabBegin", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void EnumerateCabBegin();
+
+            /// <summary>
+            /// Enumerates files from cabinet.
+            /// </summary>
+            /// <param name="cabinet">Path to cabinet to enumerate files from.</param>
+            /// <param name="notify">callback that gets each file.</param>
+            [DllImport("winterop.dll", EntryPoint = "EnumerateCab", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true, PreserveSig = false)]
+            public static extern void EnumerateCab(string cabinet, CabInterop.PFNNOTIFY notify);
+
+            /// <summary>
+            /// Cleans up after cabinet enumeration.
+            /// </summary>
+            [DllImport("winterop.dll", EntryPoint = "EnumerateCabFinish", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+            public static extern void EnumerateCabFinish();
+
+            /// <summary>
+            /// Resets the DACL on an array of files to "empty".
+            /// </summary>
+            /// <param name="files">Array of file reset ACL to "empty".</param>
+            /// <param name="fileCount">Number of file paths in array.</param>
+            [DllImport("winterop.dll", EntryPoint = "ResetAcls", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void ResetAcls(string[] files, uint fileCount);
+
+            /// <summary>
+            /// Gets the hash of the pCertContext->pCertInfo->SubjectPublicKeyInfo using ::CryptHashPublicKeyInfo() which does not seem
+            /// to be exposed by .NET Frameowkr.
+            /// </summary>
+            /// <param name="certContext">Pointer to a CERT_CONTEXT struct with public key information to hash.</param>
+            /// <param name="publicKeyInfoHashed"></param>
+            /// <param name="sizePublicKeyInfoHashed"></param>
+            [DllImport("winterop.dll", EntryPoint = "HashPublicKeyInfo", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+            public static extern void HashPublicKeyInfo(IntPtr certContext, byte[] publicKeyInfoHashed, ref uint sizePublicKeyInfoHashed);
+
+            /// <summary>
+            /// Converts file time to a local file time.
+            /// </summary>
+            /// <param name="fileTime">file time</param>
+            /// <param name="localTime">local file time</param>
+            /// <returns>true if successful, false otherwise</returns>
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool FileTimeToLocalFileTime(ref long fileTime, ref long localTime);
+
+            /// <summary>
+            /// Converts file time to a MS-DOS time.
+            /// </summary>
+            /// <param name="fileTime">file time</param>
+            /// <param name="wFatDate">MS-DOS date</param>
+            /// <param name="wFatTime">MS-DOS time</param>
+            /// <returns>true if successful, false otherwise</returns>
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool FileTimeToDosDateTime(ref long fileTime, out ushort wFatDate, out ushort wFatTime);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace WixToolsetTest.CoreNative
 {
-    using WixToolset.Core.Native;
+    using WixToolset.Core.Native.Msm;
     using Xunit;
 
     public class MsmFixture
@@ -10,8 +10,7 @@ namespace WixToolsetTest.CoreNative
         [Fact]
         public void CanCreateMsmInterface()
         {
-            var msm = new MsmInterop();
-            var merge = msm.GetMsmMerge();
+            var merge = MsmInterop.GetMsmMerge();
             Assert.NotNull(merge);
         }
     }

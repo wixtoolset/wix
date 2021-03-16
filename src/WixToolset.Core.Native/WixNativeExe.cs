@@ -8,7 +8,6 @@ namespace WixToolset.Core.Native
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-    using System.Runtime.InteropServices;
 
     internal class WixNativeExe
     {

@@ -56,11 +56,7 @@ namespace WixToolset.Core.Native
         /// </returns>
         public bool SameAsDateTime(DateTime dateTime)
         {
-            long filetime = dateTime.ToFileTime();
-            long localTime = 0;
-            NativeMethods.FileTimeToLocalFileTime(ref filetime, ref localTime);
-            NativeMethods.FileTimeToDosDateTime(ref localTime, out var cabDate, out var cabTime);
-
+            CabInterop.DateTimeToCabDateAndTime(dateTime, out var cabDate, out var cabTime);
             return this.Date == cabDate && this.Time == cabTime;
         }
     }
