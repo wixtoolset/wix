@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
