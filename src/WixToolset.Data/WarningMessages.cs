@@ -678,6 +678,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.VersionTruncated, "Product version {0} in package '{1}' is not valid per the MSI SDK and cannot be represented in a bundle. It has been truncated to {2}.", originalVersion, package, truncatedVersion);
         }
 
+        public static Message CollidingModularizationTypes(string tableName, string columnName, string foreignTableName, int foreignColumnNumber, string modularizationType, string foreignModularizationType)
+        {
+            return Message(null, Ids.CollidingModularizationTypes, "The definition for the '{0}' table's '{1}' column is a foreign key relationship to the '{2}' table's column number {3}. The modularization types of the two column definitions differ: table '{0}' uses type {4} and table '{2}' uses type {5}. Change one of the modularization types so that they match.", tableName, columnName, foreignTableName, foreignColumnNumber, modularizationType, foreignModularizationType);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -815,6 +820,7 @@ namespace WixToolset.Data
             DetectConditionRecommended = 1153,
             ExperimentalBundlePlatform = 1154,
             DefiningWellKnownDirectoryDeprecated = 1155,
+            CollidingModularizationTypes = 1156,
         }
     }
 }
