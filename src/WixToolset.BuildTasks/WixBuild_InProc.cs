@@ -3,6 +3,7 @@
 #if !NETCOREAPP
 namespace WixToolset.BuildTasks
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn;

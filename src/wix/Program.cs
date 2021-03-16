@@ -79,7 +79,7 @@ namespace WixToolset.Tools
         /// <param name="args">Command-line arguments to execute.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Returns the application error code.</returns>
-        public static Task<int> Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args, CancellationToken cancellationToken)
+        public static Task<int> Run(IServiceProvider serviceProvider, IMessageListener listener, string[] args, CancellationToken cancellationToken)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);

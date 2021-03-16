@@ -62,7 +62,7 @@ namespace WixToolset.Tools.Heat
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
         /// <param name="args">The commandline arguments.</param>
         /// <returns>Returns the application error code.</returns>
-        public Task<int> Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args)
+        public Task<int> Run(IServiceProvider serviceProvider, IMessageListener listener, string[] args)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
