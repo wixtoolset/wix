@@ -11,6 +11,30 @@ namespace WixToolset.Data
     public class WixException : Exception
     {
         /// <summary>
+        /// Instantiate a new WixException.
+        /// </summary>
+        public WixException()
+        {
+        }
+
+        /// <summary>
+        /// Instantiate a new WixException with a simple string message.
+        /// </summary>
+        /// <param name="message">Simple string message.</param>
+        public WixException(string message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// Instantiate a new WixException with a simple message and exception.
+        /// </summary>
+        /// <param name="message">Simple string message.</param>
+        /// <param name="innerException">Inner exception.</param>
+        public WixException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        /// <summary>
         /// Instantiate a new WixException with a given WixError.
         /// </summary>
         /// <param name="error">The localized error information.</param>
