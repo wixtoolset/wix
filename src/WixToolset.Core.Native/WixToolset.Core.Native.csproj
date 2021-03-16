@@ -11,6 +11,11 @@
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="cubes\darice.cub" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="cubes\mergemod.cub" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=ARM64" />
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=Win32" />
@@ -29,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>
