@@ -1409,7 +1409,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                             else if (keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType != columnDefinition.ModularizeType && ColumnModularizeType.CompanionFile != columnDefinition.ModularizeType)
                             {
-                                this.Messaging.Write(ErrorMessages.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType.ToString()));
+                                this.Messaging.Write(WarningMessages.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType.ToString()));
                             }
                         }
                         // else - ignore missing table definitions as that error is caught in other places
