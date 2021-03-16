@@ -12,7 +12,9 @@
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
     <dependencies>
-      <group targetFramework="netstandard2.0" />
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.IO.FileSystem.AccessControl" version="4.6.0" exclude="Build,Analyzers" />
+      </group>
     </dependencies>
   </metadata>
 

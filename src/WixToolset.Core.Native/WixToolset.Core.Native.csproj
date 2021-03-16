@@ -35,6 +35,8 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
+
+    <!-- Warning: The version for System.IO.FileSystem.AccessControl must be kept in sync with WixToolset.Core.nuspec -->
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
   </ItemGroup>
 
