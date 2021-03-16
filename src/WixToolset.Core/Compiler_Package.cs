@@ -1157,8 +1157,6 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if (null == sddl)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Sddl"));
@@ -1447,8 +1445,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if ("ErrorDialog" == id.Id)
             {
                 this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Dialog, value);
@@ -1472,6 +1468,8 @@ namespace WixToolset.Core
                     }
                 }
             }
+
+            this.Core.InnerTextDisallowed(node);
 
             // see if this property is used for appSearch
             var signatures = this.ParseSearchSignatures(node);
@@ -1985,8 +1983,6 @@ namespace WixToolset.Core
                     }
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             this.Core.ParseForExtensionElements(node);
 
@@ -2547,8 +2543,6 @@ namespace WixToolset.Core
                     }
                 }
 
-                this.Core.VerifyNoInnerText(childSourceLineNumbers, node);
-
                 if (customAction && "Custom" == actionName)
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
@@ -2637,6 +2631,8 @@ namespace WixToolset.Core
                     }
                 }
             }
+
+            this.Core.InnerTextDisallowed(node);
         }
 
 
@@ -3012,8 +3008,6 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if (privilege == null)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
@@ -3375,8 +3369,6 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if (argument == null)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
@@ -3715,8 +3707,6 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if (null == id)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
@@ -3823,8 +3813,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (null == id)
             {
@@ -4303,8 +4291,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (String.IsNullOrEmpty(key))
             {

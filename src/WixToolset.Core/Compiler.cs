@@ -3399,8 +3399,6 @@ namespace WixToolset.Core
                 win64 = true;
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
@@ -4125,7 +4123,7 @@ namespace WixToolset.Core
                             }
                         }
 
-                        this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+                        this.Core.InnerTextDisallowed(node);
 
                         if (null == columnName)
                         {
@@ -5364,8 +5362,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (CompilerConstants.IntegerNotSet == id)
             {

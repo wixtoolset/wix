@@ -80,8 +80,6 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             if (null == id)
             {
                 id = this.Core.CreateIdentifier("mec", source, type.ToString());
@@ -91,6 +89,8 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinarySource", "FileSource", "PropertySource"));
             }
+
+            this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {

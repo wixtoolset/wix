@@ -6,6 +6,8 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Linq;
+    using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -642,6 +644,19 @@ namespace WixToolset.Core.ExtensibilityServices
             return value?.Trim();
         }
 
+        public void InnerTextDisallowed(XElement element)
+        {
+            if (element.Nodes().Any(n => XmlNodeType.Text == n.NodeType || XmlNodeType.CDATA == n.NodeType))
+            {
+                var innerText = Common.GetInnerText(element);
+                if (!String.IsNullOrWhiteSpace(innerText))
+                {
+                    var sourceLineNumbers = this.GetSourceLineNumbers(element);
+                    this.Messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
+                }
+            }
+        }
+
         public bool IsValidIdentifier(string value)
         {
             return Common.IsIdentifier(value);
@@ -714,16 +729,30 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            foreach (var child in element.Elements())
+            var checkInnerText = false;
+
+            foreach (var child in element.Nodes())
             {
-                if (element.Name.Namespace == child.Name.Namespace)
+                if (child is XElement childElement)
                 {
-                    this.UnexpectedElement(element, child);
+                    if (element.Name.Namespace == childElement.Name.Namespace)
+                    {
+                        this.UnexpectedElement(element, childElement);
+                    }
+                    else
+                    {
+                        this.ParseExtensionElement(extensions, intermediate, section, element, childElement);
+                    }
                 }
                 else
                 {
-                    this.ParseExtensionElement(extensions, intermediate, section, element, child);
+                    checkInnerText = true;
                 }
+            }
+
+            if (checkInnerText)
+            {
+                this.InnerTextDisallowed(element);
             }
         }
 

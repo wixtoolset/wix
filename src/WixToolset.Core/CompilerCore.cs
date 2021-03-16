@@ -206,6 +206,11 @@ namespace WixToolset.Core
             return false;
         }
 
+        internal void InnerTextDisallowed(XElement element)
+        {
+            this.parseHelper.InnerTextDisallowed(element);
+        }
+
         /// <summary>
         /// Verifies that a filename is ambiguous.
         /// </summary>
@@ -1101,15 +1106,6 @@ namespace WixToolset.Core
         internal WixActionSymbol ScheduleActionSymbol(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
         {
             return this.parseHelper.ScheduleActionSymbol(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
-        }
-
-        internal void VerifyNoInnerText(SourceLineNumber sourceLineNumbers, XElement element)
-        {
-            var innerText = Common.GetInnerText(element);
-            if (!String.IsNullOrWhiteSpace(innerText))
-            {
-                this.messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
-            }
         }
 
         private static string CreateValueList(ValueListKind kind, IEnumerable<string> values)

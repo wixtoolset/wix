@@ -700,8 +700,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
-
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
@@ -747,8 +745,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (null == id)
             {
@@ -1425,7 +1421,7 @@ namespace WixToolset.Core
                             }
                         }
 
-                        this.Core.VerifyNoInnerText(sourceLineNumbers, node);
+                        this.Core.InnerTextDisallowed(child);
 
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
                         {
@@ -1442,6 +1438,8 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionElement(node, child);
                 }
             }
+
+            this.Core.InnerTextDisallowed(node);
 
             // If the radio buttons have icons, then we need to add the icon attribute.
             switch (radioButtonsType)
@@ -1693,8 +1691,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
-            this.Core.VerifyNoInnerText(sourceLineNumbers, node);
 
             if (null == control)
             {
