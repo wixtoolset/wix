@@ -5,7 +5,6 @@ namespace WixToolset.Core.Bind
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Security.AccessControl;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -157,19 +156,13 @@ namespace WixToolset.Core.Bind
             // during the file transfer process.
             if (0 < destinationFiles.Count && !this.SuppressAclReset)
             {
-                var aclReset = new FileSecurity();
-                aclReset.SetAccessRuleProtection(false, false);
-
                 try
                 {
-                    foreach (var file in destinationFiles)
-                    {
-                        new FileInfo(file).SetAccessControl(aclReset);
-                    }
+                    FileSystem.ResetAcls(destinationFiles);
                 }
-                catch
+                catch (Exception e)
                 {
-                    this.Messaging.Write(WarningMessages.UnableToResetAcls());
+                    this.Messaging.Write(WarningMessages.UnableToResetAcls(e.Message));
                 }
             }
         }
