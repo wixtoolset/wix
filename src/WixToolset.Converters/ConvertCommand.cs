@@ -11,7 +11,7 @@ namespace WixToolset.Converters
     {
         private const string SettingsFileDefault = "wix.convert.settings.xml";
 
-        public ConvertCommand(IWixToolsetServiceProvider serviceProvider)
+        public ConvertCommand(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }

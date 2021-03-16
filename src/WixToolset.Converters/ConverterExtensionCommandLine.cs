@@ -14,12 +14,12 @@ namespace WixToolset.Converters
     /// </summary>
     internal class ConverterExtensionCommandLine : BaseExtensionCommandLine
     {
-        public ConverterExtensionCommandLine(IWixToolsetServiceProvider serviceProvider)
+        public ConverterExtensionCommandLine(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
         {

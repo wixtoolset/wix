@@ -8,12 +8,12 @@ namespace WixToolset.Converters
 
     internal class ConverterExtensionFactory : IExtensionFactory
     {
-        public ConverterExtensionFactory(IWixToolsetServiceProvider serviceProvider)
+        public ConverterExtensionFactory(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         public bool TryCreateExtension(Type extensionType, out object extension)
         {
