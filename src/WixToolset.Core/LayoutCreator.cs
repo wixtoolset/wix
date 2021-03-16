@@ -18,12 +18,8 @@ namespace WixToolset.Core
     {
         internal LayoutCreator(IServiceProvider serviceProvider)
         {
-            this.ServiceProvider = serviceProvider;
-
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
-
-        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -44,7 +40,7 @@ namespace WixToolset.Core
                 {
                     this.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                    var command = new TransferFilesCommand(this.Messaging, context.Extensions, context.FileTransfers, context.SuppressAclReset);
+                    var command = new TransferFilesCommand(this.Messaging, context.Extensions, context.FileTransfers, context.ResetAcls);
                     command.Execute();
                 }
 

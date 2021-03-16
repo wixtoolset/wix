@@ -372,7 +372,7 @@ namespace WixToolset.Core.CommandLine
                     context.ContentsFile = this.ContentsFile;
                     context.OutputsFile = this.OutputsFile;
                     context.BuiltOutputsFile = this.BuiltOutputsFile;
-                    context.SuppressAclReset = false; // TODO: correctly set SuppressAclReset
+                    context.ResetAcls = this.commandLine.ResetAcls;
                     context.CancellationToken = cancellationToken;
 
                     var layout = this.ServiceProvider.GetService<ILayoutCreator>();
@@ -547,6 +547,8 @@ namespace WixToolset.Core.CommandLine
 
             public bool SuppressValidation { get; set; }
 
+            public bool ResetAcls { get; set; }
+
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
             {
                 this.ServiceProvider = serviceProvider;
@@ -701,6 +703,10 @@ namespace WixToolset.Core.CommandLine
 
                         case "sval":
                             this.SuppressValidation = true;
+                            return true;
+
+                        case "resetacls":
+                            this.ResetAcls = true;
                             return true;
                     }
 

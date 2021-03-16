@@ -33,7 +33,7 @@ namespace WixToolset.Core
 
         public string BuiltOutputsFile { get; set; }
 
-        public bool SuppressAclReset { get; set; }
+        public bool ResetAcls { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
     }

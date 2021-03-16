@@ -13,12 +13,12 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool suppressAclReset)
+        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool resetAcls)
         {
             this.Extensions = extensions;
             this.Messaging = messaging;
             this.FileTransfers = fileTransfers;
-            this.SuppressAclReset = suppressAclReset;
+            this.ResetAcls = resetAcls;
         }
 
         private IMessaging Messaging { get; }
@@ -27,7 +27,7 @@ namespace WixToolset.Core.Bind
 
         private IEnumerable<IFileTransfer> FileTransfers { get; }
 
-        private bool SuppressAclReset { get; }
+        private bool ResetAcls { get; }
 
         public void Execute()
         {
@@ -152,9 +152,9 @@ namespace WixToolset.Core.Bind
                 } while (retry);
             }
 
-            // Finally, if there were any files remove the ACL that may have been added to
+            // Finally, if directed then reset remove ACLs that may may have been picked up
             // during the file transfer process.
-            if (0 < destinationFiles.Count && !this.SuppressAclReset)
+            if (this.ResetAcls && 0 < destinationFiles.Count)
             {
                 try
                 {
