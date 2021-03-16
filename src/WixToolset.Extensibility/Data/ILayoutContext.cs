@@ -6,27 +6,59 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using System.Threading;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Context for laying out files.
+    /// </summary>
     public interface ILayoutContext
     {
+        /// <summary>
+        /// Service provider.
+        /// </summary>
         IServiceProvider ServiceProvider { get; }
 
+        /// <summary>
+        /// Extensions for use during layout.
+        /// </summary>
         IEnumerable<ILayoutExtension> Extensions { get; set; }
 
+        /// <summary>
+        /// Set of tracked of files created during processing to be cleaned up.
+        /// </summary>
         IEnumerable<ITrackedFile> TrackedFiles { get; set; }
 
+        /// <summary>
+        /// Set of files to transfer.
+        /// </summary>
         IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
+        /// <summary>
+        /// File to capture list of content files.
+        /// </summary>
         string ContentsFile { get; set; }
 
+        /// <summary>
+        /// File to capture list of output files.
+        /// </summary>
         string OutputsFile { get; set; }
 
+        /// <summary>
+        /// Intermediate folder.
+        /// </summary>
         string IntermediateFolder { get; set; }
 
+        /// <summary>
+        /// List of built output files.
+        /// </summary>
         string BuiltOutputsFile { get; set; }
 
-        bool SuppressAclReset { get; set; }
+        /// <summary>
+        /// Reset ACLs on file transfers.
+        /// </summary>
+        bool ResetAcls { get; set; }
 
+        /// <summary>
+        /// Cancellation token.
+        /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
 }
