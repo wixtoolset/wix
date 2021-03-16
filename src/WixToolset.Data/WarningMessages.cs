@@ -608,9 +608,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.UnableToFindFileFromCabOrImage, "Unable to find existing file {0} to place in src location {1}.  Will likely cause a linker break.", existingFileSpec, srcFileSpec);
         }
 
-        public static Message UnableToResetAcls()
+        public static Message UnableToResetAcls(string error)
         {
-            return Message(null, Ids.UnableToResetAcls, "Unable to reset acls on destination files.");
+            return Message(null, Ids.UnableToResetAcls, "Unable to reset acls on destination files. Exception detail: {0}", error);
         }
 
         public static Message UnclearShortcut(SourceLineNumber sourceLineNumbers, string shortcutId, string fileId, string componentId)
