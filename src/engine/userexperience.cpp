@@ -2117,16 +2117,6 @@ extern "C" int UserExperienceCheckExecuteResult(
     return nResult;
 }
 
-extern "C" HRESULT UserExperienceInterpretResult(
-    __in BURN_USER_EXPERIENCE* /*pUserExperience*/,
-    __in DWORD dwAllowedResults,
-    __in int nResult
-    )
-{
-    int nFilteredResult = FilterResult(dwAllowedResults, nResult);
-    return IDOK == nFilteredResult || IDNOACTION == nFilteredResult ? S_OK : IDCANCEL == nFilteredResult || IDABORT == nFilteredResult ? HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) : HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE);
-}
-
 extern "C" HRESULT UserExperienceInterpretExecuteResult(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fRollback,

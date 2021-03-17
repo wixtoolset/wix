@@ -214,6 +214,7 @@ typedef struct _BURN_ROLLBACK_BOUNDARY
     BOOL fVital;
     BOOL fTransaction;
     BOOL fActiveTransaction; // only valid during Apply.
+    LPWSTR sczLogPath;
 } BURN_ROLLBACK_BOUNDARY;
 
 typedef struct _BURN_PATCH_TARGETCODE
@@ -385,6 +386,11 @@ HRESULT PackageGetProperty(
     __in const BURN_PACKAGE* pPackage,
     __in_z LPCWSTR wzProperty,
     __out_z_opt LPWSTR* psczValue
+    );
+HRESULT PackageFindRollbackBoundaryById(
+    __in BURN_PACKAGES* pPackages,
+    __in_z LPCWSTR wzId,
+    __out BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
     );
 
 

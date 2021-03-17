@@ -821,16 +821,16 @@ extern "C" HRESULT ApplyExecute(
                 break;
             }
 
-            // If inside a MSI transaction, roll it back.
-            if (pCheckpoint && pCheckpoint->pActiveRollbackBoundary && pCheckpoint->pActiveRollbackBoundary->fActiveTransaction)
-            {
-                hrRollback = ExecuteMsiRollbackTransaction(pEngineState, pCheckpoint->pActiveRollbackBoundary, &context);
-                IgnoreRollbackError(hrRollback, "Failed rolling back transaction");
-            }
-
-            // The action failed, roll back to previous rollback boundary.
             if (pCheckpoint)
             {
+                // If inside a MSI transaction, roll it back.
+                if (pCheckpoint->pActiveRollbackBoundary && pCheckpoint->pActiveRollbackBoundary->fActiveTransaction)
+                {
+                    hrRollback = ExecuteMsiRollbackTransaction(pEngineState, pCheckpoint->pActiveRollbackBoundary, &context);
+                    IgnoreRollbackError(hrRollback, "Failed rolling back transaction");
+                }
+
+                // The action failed, roll back to previous rollback boundary.
                 hrRollback = DoRollbackActions(pEngineState, &context, pCheckpoint->dwId, pRestart);
                 IgnoreRollbackError(hrRollback, "Failed rollback actions");
             }
@@ -2316,12 +2316,12 @@ static HRESULT ExecuteMsiBeginTransaction(
 
     if (pEngineState->plan.fPerMachine)
     {
-        hr = ElevationMsiBeginTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary->sczId);
+        hr = ElevationMsiBeginTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary);
         ExitOnFailure(hr, "Failed to begin an elevated MSI transaction.");
     }
     else
     {
-        hr = MsiEngineBeginTransaction(pRollbackBoundary->sczId);
+        hr = MsiEngineBeginTransaction(pRollbackBoundary);
     }
 
     if (SUCCEEDED(hr))
@@ -2347,25 +2347,25 @@ static HRESULT ExecuteMsiCommitTransaction(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBeginCalled = FALSE;
+    BOOL fCommitBeginCalled = FALSE;
 
     if (!pRollbackBoundary->fActiveTransaction)
     {
         ExitFunction1(hr = E_INVALIDSTATE);
     }
 
-    fBeginCalled = TRUE;
+    fCommitBeginCalled = TRUE;
     hr = UserExperienceOnCommitMsiTransactionBegin(&pEngineState->userExperience, pRollbackBoundary->sczId);
     ExitOnRootFailure(hr, "BA aborted execute commit MSI transaction.");
 
     if (pEngineState->plan.fPerMachine)
     {
-        hr = ElevationMsiCommitTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary->sczId);
+        hr = ElevationMsiCommitTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary);
         ExitOnFailure(hr, "Failed to commit an elevated MSI transaction.");
     }
     else
     {
-        hr = MsiEngineCommitTransaction(pRollbackBoundary->sczId);
+        hr = MsiEngineCommitTransaction(pRollbackBoundary);
     }
 
     if (SUCCEEDED(hr))
@@ -2376,7 +2376,7 @@ static HRESULT ExecuteMsiCommitTransaction(
     }
 
 LExit:
-    if (fBeginCalled)
+    if (fCommitBeginCalled)
     {
         UserExperienceOnCommitMsiTransactionComplete(&pEngineState->userExperience, pRollbackBoundary->sczId, hr);
     }
@@ -2391,24 +2391,24 @@ static HRESULT ExecuteMsiRollbackTransaction(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fBeginCalled = FALSE;
+    BOOL fRollbackBeginCalled = FALSE;
 
     if (!pRollbackBoundary->fActiveTransaction)
     {
         ExitFunction();
     }
 
-    fBeginCalled = TRUE;
+    fRollbackBeginCalled = TRUE;
     UserExperienceOnRollbackMsiTransactionBegin(&pEngineState->userExperience, pRollbackBoundary->sczId);
 
     if (pEngineState->plan.fPerMachine)
     {
-        hr = ElevationMsiRollbackTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary->sczId);
+        hr = ElevationMsiRollbackTransaction(pEngineState->companionConnection.hPipe, pRollbackBoundary);
         ExitOnFailure(hr, "Failed to rollback an elevated MSI transaction.");
     }
     else
     {
-        hr = MsiEngineRollbackTransaction(pRollbackBoundary->sczId);
+        hr = MsiEngineRollbackTransaction(pRollbackBoundary);
     }
 
 LExit:
@@ -2416,7 +2416,7 @@ LExit:
 
     ResetTransactionRegistrationState(pEngineState, FALSE);
 
-    if (fBeginCalled)
+    if (fRollbackBeginCalled)
     {
         UserExperienceOnRollbackMsiTransactionComplete(&pEngineState->userExperience, pRollbackBoundary->sczId, hr);
     }

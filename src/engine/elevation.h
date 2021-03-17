@@ -156,15 +156,15 @@ HRESULT ElevationChildResumeAutomaticUpdates();
 
 HRESULT ElevationMsiBeginTransaction(
     __in HANDLE hPipe,
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT ElevationMsiCommitTransaction(
     __in HANDLE hPipe,
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT ElevationMsiRollbackTransaction(
     __in HANDLE hPipe,
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 
 #ifdef __cplusplus

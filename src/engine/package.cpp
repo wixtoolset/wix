@@ -377,6 +377,7 @@ extern "C" void PackagesUninitialize(
         for (DWORD i = 0; i < pPackages->cRollbackBoundaries; ++i)
         {
             ReleaseStr(pPackages->rgRollbackBoundaries[i].sczId);
+            ReleaseStr(pPackages->rgRollbackBoundaries[i].sczLogPath);
         }
         MemFree(pPackages->rgRollbackBoundaries);
     }
@@ -506,6 +507,32 @@ extern "C" HRESULT PackageGetProperty(
             ExitFunction1(hr = S_OK);
         }
     }
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT PackageFindRollbackBoundaryById(
+    __in BURN_PACKAGES* pPackages,
+    __in_z LPCWSTR wzId,
+    __out BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
+
+    for (DWORD i = 0; i < pPackages->cRollbackBoundaries; ++i)
+    {
+        pRollbackBoundary = &pPackages->rgRollbackBoundaries[i];
+
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pRollbackBoundary->sczId, -1, wzId, -1))
+        {
+            *ppRollbackBoundary = pRollbackBoundary;
+            ExitFunction1(hr = S_OK);
+        }
+    }
+
+    hr = E_NOTFOUND;
 
 LExit:
     return hr;

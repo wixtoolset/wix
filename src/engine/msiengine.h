@@ -54,13 +54,13 @@ HRESULT MsiEnginePlanAddPackage(
     __in BOOL fPlanPackageCacheRollback
     );
 HRESULT MsiEngineBeginTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT MsiEngineCommitTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT MsiEngineRollbackTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT MsiEngineExecutePackage(
     __in_opt HWND hwndParent,

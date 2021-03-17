@@ -1016,40 +1016,41 @@ LExit:
 }
 
 extern "C" HRESULT MsiEngineBeginTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     )
 {
     HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
     MSIHANDLE hTransactionHandle = NULL;
     HANDLE hChangeOfOwnerEvent = NULL;
 
-    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_BEGIN, wzName);
+    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_BEGIN, pRollbackBoundary->sczId);
 
-    uResult = ::MsiBeginTransaction(wzName, 0, &hTransactionHandle, &hChangeOfOwnerEvent);
+    hr = WiuBeginTransaction(pRollbackBoundary->sczId, 0, &hTransactionHandle, &hChangeOfOwnerEvent, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath);
 
-    if (ERROR_ROLLBACK_DISABLED == uResult)
+    if (HRESULT_FROM_WIN32(ERROR_ROLLBACK_DISABLED) == hr)
     {
         LogId(REPORT_ERROR, MSG_MSI_TRANSACTIONS_DISABLED);
     }
 
-    ExitOnWin32Error(uResult, hr, "Failed to begin an MSI transaction");
+    ExitOnFailure(hr, "Failed to begin an MSI transaction");
 
 LExit:
+    ReleaseMsi(hTransactionHandle);
+    ReleaseHandle(hChangeOfOwnerEvent);
+
     return hr;
 }
 
 extern "C" HRESULT MsiEngineCommitTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     )
 {
     HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
 
-    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_COMMIT, wzName);
+    LogId(REPORT_STANDARD, MSG_MSI_TRANSACTION_COMMIT, pRollbackBoundary->sczId);
 
-    uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_COMMIT);
-    ExitOnWin32Error(uResult, hr, "Failed to commit the MSI transaction");
+    hr = WiuEndTransaction(MSITRANSACTIONSTATE_COMMIT, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath);
+    ExitOnFailure(hr, "Failed to commit the MSI transaction");
 
 LExit:
 
@@ -1057,16 +1058,15 @@ LExit:
 }
 
 extern "C" HRESULT MsiEngineRollbackTransaction(
-    __in LPCWSTR wzName
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     )
 {
     HRESULT hr = S_OK;
-    UINT uResult = ERROR_SUCCESS;
 
-    LogId(REPORT_WARNING, MSG_MSI_TRANSACTION_ROLLBACK, wzName);
+    LogId(REPORT_WARNING, MSG_MSI_TRANSACTION_ROLLBACK, pRollbackBoundary->sczId);
 
-    uResult = ::MsiEndTransaction(MSITRANSACTIONSTATE_ROLLBACK);
-    ExitOnWin32Error(uResult, hr, "Failed to rollback the MSI transaction");
+    hr = WiuEndTransaction(MSITRANSACTIONSTATE_ROLLBACK, WIU_LOG_DEFAULT | INSTALLLOGMODE_VERBOSE, pRollbackBoundary->sczLogPath);
+    ExitOnFailure(hr, "Failed to rollback the MSI transaction");
 
 LExit:
 
