@@ -14,6 +14,7 @@
   <ItemGroup>
     <None Include="cubes\darice.cub" CopyToOutputDirectory="PreserveNewest" />
     <None Include="cubes\mergemod.cub" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="targets\WixToolset.Core.Native.targets" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">

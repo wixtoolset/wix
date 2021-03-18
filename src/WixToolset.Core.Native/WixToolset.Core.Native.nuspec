@@ -22,6 +22,7 @@
     <file src="netstandard2.0\$id$.dll" target="lib\netstandard2.0" />
     <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
 
+    <file src="netstandard2.0\targets\WixToolset.Core.Native.targets" target="build\WixToolset.Core.Native.targets" />
     <file src="netstandard2.0\cubes\darice.cub" target="lib\netstandard2.0\cubes" />
     <file src="netstandard2.0\cubes\mergemod.cub" target="lib\netstandard2.0\cubes" />
 
