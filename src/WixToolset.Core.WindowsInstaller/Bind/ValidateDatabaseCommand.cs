@@ -4,15 +4,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using WixToolset.Core.Native;
-    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class ValidateDatabaseCommand : IWindowsInstallerValidatorCallback
@@ -20,9 +18,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // Set of ICEs that have equivalent-or-better checks in WiX.
         private static readonly string[] WellKnownSuppressedIces = new[] { "ICE08", "ICE33", "ICE47", "ICE66" };
 
-        public ValidateDatabaseCommand(IMessaging messaging, string intermediateFolder, WindowsInstallerData data, string outputPath, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
+        public ValidateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, WindowsInstallerData data, string outputPath, IEnumerable<string> cubeFiles, IEnumerable<string> ices, IEnumerable<string> suppressedIces)
         {
             this.Messaging = messaging;
+            this.BackendHelper = backendHelper;
             this.Data = data;
             this.OutputPath = outputPath;
             this.CubeFiles = cubeFiles;
@@ -33,12 +32,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.OutputSourceLineNumber = new SourceLineNumber(outputPath);
         }
 
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+
         /// <summary>
         /// Encountered error implementation for <see cref="IWindowsInstallerValidatorCallback"/>.
         /// </summary>
         public bool EncounteredError => this.Messaging.EncounteredError;
 
         private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private WindowsInstallerData Data { get; }
 
@@ -61,6 +64,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
+            var trackedFiles = new List<ITrackedFile>();
             var stopwatch = Stopwatch.StartNew();
 
             this.Messaging.Write(VerboseMessages.ValidatingDatabase());
@@ -74,6 +78,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var workingDatabasePath = Path.Combine(workingFolder, Path.GetFileName(this.OutputPath));
             FileSystem.CopyFile(this.OutputPath, workingDatabasePath, allowHardlink: false);
 
+            var trackWorkingDatabase = this.BackendHelper.TrackFile(workingDatabasePath, TrackedFileType.Temporary);
+            trackedFiles.Add(trackWorkingDatabase);
+
             var attributes = File.GetAttributes(workingDatabasePath);
             File.SetAttributes(workingDatabasePath, attributes & ~FileAttributes.ReadOnly);
 
@@ -82,6 +89,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             stopwatch.Stop();
             this.Messaging.Write(VerboseMessages.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
+
+
+            this.TrackedFiles = trackedFiles;
         }
 
         private void LogValidationMessage(ValidationMessage message)

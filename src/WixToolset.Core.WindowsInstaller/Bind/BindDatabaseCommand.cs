@@ -537,8 +537,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Validate the output if there are CUBe files and we're not explicitly suppressing validation.
             if (this.CubeFiles != null && !this.SuppressValidation)
             {
-                var command = new ValidateDatabaseCommand(this.Messaging, this.IntermediateFolder, data, this.OutputPath, this.CubeFiles, this.Ices, this.SuppressedIces);
+                var command = new ValidateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.IntermediateFolder, data, this.OutputPath, this.CubeFiles, this.Ices, this.SuppressedIces);
                 command.Execute();
+
+                trackedFiles.AddRange(command.TrackedFiles);
             }
 
             if (this.Messaging.EncounteredError)
