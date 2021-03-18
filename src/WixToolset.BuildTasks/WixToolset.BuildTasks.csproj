@@ -20,6 +20,7 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net461'">
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>

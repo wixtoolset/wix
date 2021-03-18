@@ -1,9 +1,9 @@
 @setlocal
 @pushd %~dp0
 @set _C=Release
+@if /i "%1"=="debug" set _C=Debug
 @set _P=%~dp0build\%_C%\publish
 @set _RCO=/S /R:1 /W:1 /NP /XO  /NS /NC /NFL /NDL /NJH /NJS
-@if /i "%1"=="debug" set _C=Debug
 
 :: Restore
 nuget restore || exit /b
