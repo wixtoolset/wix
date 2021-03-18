@@ -9,6 +9,8 @@
     <Description>WiX Toolset Native Processing</Description>
     <IncludeSymbols>true</IncludeSymbols>
     <CreateDocumentationFile>true</CreateDocumentationFile>
+    <!-- https://github.com/NuGet/Home/issues/10665 -->
+    <NoWarn>NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
