@@ -12,7 +12,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class DependencyExtensionFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6388")]
         public void CanBuildBundleUsingExePackageWithProvides()
         {
             var folder = TestData.Get(@"TestData");

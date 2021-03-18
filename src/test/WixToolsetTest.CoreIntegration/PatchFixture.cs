@@ -86,7 +86,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6387")]
         public void CanBuildPatchFromProductWithFilesFromWixlib()
         {
             var folder = TestData.Get(@"TestData\PatchFromWixlib");

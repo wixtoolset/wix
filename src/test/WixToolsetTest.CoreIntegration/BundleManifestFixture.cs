@@ -51,7 +51,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6372")]
         public void PopulatesBAManifestWithPackageInformation()
         {
             var folder = TestData.Get(@"TestData");
@@ -94,7 +94,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6370")]
         public void PopulatesBAManifestWithPayloadInformation()
         {
             var folder = TestData.Get(@"TestData");
@@ -278,7 +278,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6370")]
         public void PopulatesManifestWithExePackages()
         {
             var folder = TestData.Get(@"TestData");
