@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Harvesters" Version="4.0.*" />
   </ItemGroup>
 

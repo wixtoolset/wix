@@ -27,7 +27,6 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Converters" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.ExtensionCache" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
