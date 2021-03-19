@@ -56,7 +56,7 @@ namespace WixToolset.Core.Native
         /// </returns>
         public bool SameAsDateTime(DateTime dateTime)
         {
-            CabInterop.DateTimeToCabDateAndTime(dateTime, out var cabDate, out var cabTime);
+            DateTimeInterop.DateTimeToCabDateAndTime(dateTime, out var cabDate, out var cabTime);
             return this.Date == cabDate && this.Time == cabTime;
         }
     }

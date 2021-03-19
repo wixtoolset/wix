@@ -47,30 +47,6 @@ namespace WixToolsetTest.CoreNative
         }
 
         [Fact]
-        public void CanExtractSingleFileCabinet()
-        {
-            var cabinetPath = TestData.Get(@"TestData\test.cab");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var extractFolder = fs.GetFolder(true);
-
-                var cabinet = new Cabinet(cabinetPath);
-                var reportedFiles = cabinet.Extract(extractFolder);
-                var files = Directory.EnumerateFiles(extractFolder);
-                Assert.Equal(reportedFiles, files.Select(f => Path.GetFileName(f)));
-
-                var file = new FileInfo(files.Single());
-                CabInterop.DateTimeToCabDateAndTime(file.CreationTime, out var date, out var time);
-
-                Assert.Equal("test.txt", file.Name);
-                Assert.Equal(17, file.Length);
-                Assert.Equal(19259, date);
-                Assert.Equal(47731, time);
-            }
-        }
-
-        [Fact]
         public void IntegrationTest()
         {
             using (var fs = new DisposableFileSystem())

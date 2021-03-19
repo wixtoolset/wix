@@ -8,7 +8,7 @@ namespace WixToolset.Core.Native
     using WixToolset.Data;
 
     /// <summary>
-    /// Wrapper class around interop with wixcab.dll to compress files into a cabinet.
+    /// Cabinet create, enumerate and extract mechanism.
     /// </summary>
     public sealed class Cabinet
     {
@@ -16,7 +16,7 @@ namespace WixToolset.Core.Native
         private static readonly char[] TextLineSplitter = new[] { '\t' };
 
         /// <summary>
-        /// 
+        /// Creates a cabinet creation, enumeration, extraction mechanism.
         /// </summary>
         /// <param name="path">Path of cabinet</param>
         public Cabinet(string path)
@@ -116,90 +116,5 @@ namespace WixToolset.Core.Native
             var wixnative = new WixNativeExe("extractcab", this.Path, outputFolder);
             return wixnative.Run().Where(output => !String.IsNullOrWhiteSpace(output));
         }
-
-#if TOOD_ERROR_HANDLING
-        /// <summary>
-        /// Adds a file to the cabinet with an optional MSI file hash.
-        /// </summary>
-        /// <param name="file">The file to add.</param>
-        /// <param name="token">The token for the file.</param>
-        /// <param name="fileHash">The MSI file hash of the file.</param>
-        //private void AddFile(string file, string token, MsiInterop.MSIFILEHASHINFO fileHash)
-        //{
-        //    try
-        //    {
-        //        NativeMethods.CreateCabAddFile(file, token, fileHash, this.handle);
-        //    }
-        //    catch (COMException ce)
-        //    {
-        //        if (0x80004005 == unchecked((uint)ce.ErrorCode)) // E_FAIL
-        //        {
-        //            throw new WixException(WixErrors.CreateCabAddFileFailed());
-        //        }
-        //        else if (0x80070070 == unchecked((uint)ce.ErrorCode)) // ERROR_DISK_FULL
-        //        {
-        //            throw new WixException(WixErrors.CreateCabInsufficientDiskSpace());
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //    catch (DirectoryNotFoundException)
-        //    {
-        //        throw new WixFileNotFoundException(file);
-        //    }
-        //    catch (FileNotFoundException)
-        //    {
-        //        throw new WixFileNotFoundException(file);
-        //    }
-        //}
-
-        /// <summary>
-        /// Complete/commit the cabinet - this must be called before Dispose so that errors will be
-        /// reported on the same thread.
-        /// </summary>
-        /// <param name="newCabNamesCallBackAddress">Address of Binder's callback function for Cabinet Splitting</param>
-        public void Complete(IntPtr newCabNamesCallBackAddress)
-        {
-            if (IntPtr.Zero != this.handle)
-            {
-                try
-                {
-                    if (newCabNamesCallBackAddress != IntPtr.Zero && this.maxSize != 0)
-                    {
-                        NativeMethods.CreateCabFinish(this.handle, newCabNamesCallBackAddress);
-                    }
-                    else
-                    {
-                        NativeMethods.CreateCabFinish(this.handle, IntPtr.Zero);
-                    }
-
-                    GC.SuppressFinalize(this);
-                    this.disposed = true;
-                }
-                catch (COMException ce)
-                {
-                    //if (0x80004005 == unchecked((uint)ce.ErrorCode)) // E_FAIL
-                    //{
-                    //    // This error seems to happen, among other situations, when cabbing more than 0xFFFF files
-                    //    throw new WixException(WixErrors.FinishCabFailed());
-                    //}
-                    //else if (0x80070070 == unchecked((uint)ce.ErrorCode)) // ERROR_DISK_FULL
-                    //{
-                    //    throw new WixException(WixErrors.CreateCabInsufficientDiskSpace());
-                    //}
-                    //else
-                    //{
-                    //    throw;
-                    //}
-                }
-                finally
-                {
-                    this.handle = IntPtr.Zero;
-                }
-            }
-        }
-#endif
     }
 }
