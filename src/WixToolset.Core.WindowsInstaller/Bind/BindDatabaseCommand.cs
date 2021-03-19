@@ -502,9 +502,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Generate database file.
-            this.Messaging.Write(VerboseMessages.GeneratingDatabase());
-
             {
+                this.Messaging.Write(VerboseMessages.GeneratingDatabase());
+
                 var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
                 trackedFiles.Add(trackMsi);
 

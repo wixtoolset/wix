@@ -16,6 +16,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class GenerateDatabaseCommand
     {
+        private const string IdtsSubFolder = "_idts";
+
         public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, int codepage, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
         {
             this.Messaging = messaging;
@@ -77,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 baseDirectory = Path.Combine(baseDirectory, filename);
             }
 
-            var idtFolder = Path.Combine(baseDirectory, "_idts");
+            var idtFolder = Path.Combine(baseDirectory, IdtsSubFolder);
 
             var type = OpenDatabase.CreateDirect;
 
@@ -94,10 +96,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             try
             {
-#if DEBUG
-                Console.WriteLine("Opening database at: {0}", this.OutputPath);
-#endif
-
                 Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
 
                 Directory.CreateDirectory(idtFolder);
@@ -221,8 +219,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         var command = new CreateIdtFileCommand(this.Messaging, importTable, this.Data.Codepage, idtDirectory, this.KeepAddedColumns);
                         command.Execute();
 
-                        var buildOutput = this.BackendHelper.TrackFile(command.IdtPath, TrackedFileType.Temporary);
-                        this.GeneratedTemporaryFiles.Add(buildOutput);
+                        var trackIdt = this.BackendHelper.TrackFile(command.IdtPath, TrackedFileType.Temporary);
+                        this.GeneratedTemporaryFiles.Add(trackIdt);
 
                         db.Import(command.IdtPath);
                     }
@@ -401,8 +399,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 idtFile.WriteLine("\t_ForceCodepage");
             }
 
-            var trackId = this.BackendHelper.TrackFile(idtPath, TrackedFileType.Temporary);
-            this.GeneratedTemporaryFiles.Add(trackId);
+            var trackIdt = this.BackendHelper.TrackFile(idtPath, TrackedFileType.Temporary);
+            this.GeneratedTemporaryFiles.Add(trackIdt);
 
             // Try to import the table into the MSI.
             try
@@ -411,7 +409,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (WixInvalidIdtException)
             {
-                // The IDT should be valid, so an invalid code page was given.
+                // The IDT should always be generated correctly, so an invalid code page was given.
                 throw new WixException(ErrorMessages.IllegalCodepage(codepage));
             }
         }

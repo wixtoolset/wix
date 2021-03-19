@@ -3,7 +3,7 @@
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
-    using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -17,9 +17,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal sealed class CabinetBuilder
     {
-        private readonly object lockObject = new object();
-
-        private readonly Queue cabinetWorkItems;
+        private readonly Queue<CabinetWorkItem> cabinetWorkItems;
         private int threadCount;
 
         // Address of Binder's callback function for Cabinet Splitting
@@ -35,10 +33,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             if (0 >= threadCount)
             {
-                throw new ArgumentOutOfRangeException("threadCount");
+                throw new ArgumentOutOfRangeException(nameof(threadCount));
             }
 
-            this.cabinetWorkItems = new Queue();
+            this.cabinetWorkItems = new Queue<CabinetWorkItem>();
             this.Messaging = messaging;
             this.threadCount = threadCount;
 
@@ -65,23 +63,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void CreateQueuedCabinets()
         {
             // don't create more threads than the number of cabinets to build
-            if (this.cabinetWorkItems.Count < this.threadCount)
-            {
-                this.threadCount = this.cabinetWorkItems.Count;
-            }
+            var numberOfThreads = Math.Min(this.threadCount, this.cabinetWorkItems.Count);
 
-            if (0 < this.threadCount)
+            if (0 < numberOfThreads)
             {
-                Thread[] threads = new Thread[this.threadCount];
+                var threads = new Thread[numberOfThreads];
 
-                for (int i = 0; i < threads.Length; i++)
+                for (var i = 0; i < threads.Length; i++)
                 {
                     threads[i] = new Thread(new ThreadStart(this.ProcessWorkItems));
                     threads[i].Start();
                 }
 
                 // wait for all threads to finish
-                foreach (Thread thread in threads)
+                foreach (var thread in threads)
                 {
                     thread.Join();
                 }
@@ -109,7 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             break;
                         }
 
-                        cabinetWorkItem = (CabinetWorkItem)this.cabinetWorkItems.Dequeue();
+                        cabinetWorkItem = this.cabinetWorkItems.Dequeue();
                     }
 
                     // create a cabinet
@@ -134,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             this.Messaging.Write(VerboseMessages.CreateCabinet(cabinetWorkItem.CabinetFile));
 
-            int maxCabinetSize = 0; // The value of 0 corresponds to default of 2GB which means no cabinet splitting
+            var maxCabinetSize = 0; // The value of 0 corresponds to default of 2GB which means no cabinet splitting
             ulong maxPreCompressedSizeInBytes = 0;
 
             if (this.MaximumCabinetSizeForLargeFileSplitting != 0)
