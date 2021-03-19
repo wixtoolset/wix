@@ -96,7 +96,7 @@ namespace WixToolsetTest.Util
         public void CanBuildInternetShortcutInMergeModule()
         {
             var folder = TestData.Get(@"TestData\InternetShortcutModule");
-            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder }, "test.msm");
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveFile", "Wix4InternetShortcut");
             WixAssert.CompareLineByLine(new[]
