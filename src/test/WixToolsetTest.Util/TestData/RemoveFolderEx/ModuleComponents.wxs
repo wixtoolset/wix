@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ModuleComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="ModuleComponents.wxs" />
+                <util:RemoveFolderEx On="both" Property="RemoveProp" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

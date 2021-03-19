@@ -130,6 +130,21 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildRemoveFolderExInMergeModule()
+        {
+            var folder = TestData.Get(@"TestData\RemoveFolderEx");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder }, "test.msm");
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveFile", "Wix4RemoveFolderEx");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:Wix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\t[Binary data]",
+                "CustomAction:Wix4RemoveFoldersEx_X64.047730A5_30FE_4A62_A520_DA9381B8226A\t65\tWix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A	WixRemoveFoldersEx\t",
+                "Wix4RemoveFolderEx:wrfB3e9CDihkNwm06LohylbJcjZ91w.047730A5_30FE_4A62_A520_DA9381B8226A\tfilh4juyUVjoUcWWtcQmd5L07FoON4.047730A5_30FE_4A62_A520_DA9381B8226A\tRemoveProp.047730A5_30FE_4A62_A520_DA9381B8226A\t3",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildWithEventManifest()
         {
             var folder = TestData.Get(@"TestData\EventManifest");
