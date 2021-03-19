@@ -97,6 +97,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.CabbingThreadCount <= 0)
             {
                 this.CabbingThreadCount = this.CalculateCabbingThreadCount();
+
+                this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
             }
 
             // Send Binder object to Facilitate NewCabNamesCallBack Callback
@@ -137,31 +139,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private int CalculateCabbingThreadCount()
         {
-            var cabbingThreadCount = 1;  // default to 1 if the environment variable is not set.
+            var cabbingThreadCount = Environment.ProcessorCount;
 
-            var numberOfProcessors = Environment.GetEnvironmentVariable("NUMBER_OF_PROCESSORS");
-
-            try
+            if (cabbingThreadCount <= 0)
             {
-                if (!String.IsNullOrEmpty(numberOfProcessors))
-                {
-                    cabbingThreadCount = Convert.ToInt32(numberOfProcessors, CultureInfo.InvariantCulture.NumberFormat);
+                cabbingThreadCount = 1; // reset to 1 when the environment variable is invalid.
 
-                    if (cabbingThreadCount <= 0)
-                    {
-                        throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
-                    }
-                }
-
-                this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
-            }
-            catch (ArgumentException)
-            {
-                throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
-            }
-            catch (FormatException)
-            {
-                throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+                this.Messaging.Write(WarningMessages.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), cabbingThreadCount.ToString()));
             }
 
             return cabbingThreadCount;
