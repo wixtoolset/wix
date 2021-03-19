@@ -8,16 +8,19 @@ namespace WixBuildTools.TestSupport
 
     public class Builder
     {
-        public Builder(string sourceFolder, Type extensionType = null, string[] bindPaths = null)
+        public Builder(string sourceFolder, Type extensionType = null, string[] bindPaths = null, string outputFile = null)
         {
             this.SourceFolder = sourceFolder;
             this.ExtensionType = extensionType;
             this.BindPaths = bindPaths;
+            this.OutputFile = outputFile ?? "test.msi";
         }
 
-        public string[] BindPaths { get; }
+        public string[] BindPaths { get; set; }
 
-        public Type ExtensionType { get; }
+        public Type ExtensionType { get; set; }
+
+        public string OutputFile { get; set; }
 
         public string SourceFolder { get; }
 
@@ -29,7 +32,7 @@ namespace WixBuildTools.TestSupport
             using (var fs = new DisposableFileSystem())
             {
                 var intermediateFolder = fs.GetFolder();
-                var outputPath = Path.Combine(intermediateFolder, @"bin\test.msi");
+                var outputPath = Path.Combine(intermediateFolder, "bin", this.OutputFile);
 
                 var args = new List<string>
                 {
