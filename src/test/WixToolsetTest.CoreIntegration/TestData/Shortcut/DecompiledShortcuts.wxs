@@ -6,7 +6,7 @@
           <Component Id="ShortcutComp" Guid="{5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8}" Bitness="always32">
             <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
             <Shortcut Id="FileTargetShortcut" Directory="INSTALLFOLDER" Name="FileTargetShortcut" ShortName="lm2tdtqp" Target="[#test.txt]" />
-            <Shortcut Id="CustomTargetShortcut" Directory="INSTALLFOLDER" Name="CustomTargetShortcut" ShortName="treusbt_" Target="[INSTALLFOLDER]custom.target" />
+            <Shortcut Id="CustomTargetShortcut" Directory="INSTALLFOLDER" Name="Planner" ShortName="PLANNER" Target="[INSTALLFOLDER]custom.target" />
             <Shortcut Id="AdvtShortcut" Directory="INSTALLFOLDER" Name="AdvtShortcut" ShortName="mdbqel9r" Advertise="yes" />
           </Component>
         </Directory>

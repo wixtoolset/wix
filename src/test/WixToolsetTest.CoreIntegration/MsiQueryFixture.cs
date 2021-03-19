@@ -716,40 +716,6 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void PopulatesMsiShortcutPropertyTable()
-        {
-            var folder = TestData.Get(@"TestData");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Shortcut", "ShortcutProperty.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", msiPath
-                });
-
-                result.AssertSuccess();
-
-                Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "MsiShortcutProperty", "Shortcut" });
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "MsiShortcutProperty:scp4GOCIx4Eskci4nBG1MV_vSUOZt4\tTheShortcut\tCustomShortcutKey\tCustomShortcutValue",
-                    "Shortcut:TheShortcut\tINSTALLFOLDER\td\tShortcutComp\t[#filcV1yrx0x8wJWj4qMzcH21jwkPko]\t\t\t\t\t\t\t\t\t\t\t",
-                }, results);
-            }
-        }
-
-        [Fact]
         public void PopulatesReserveCostTable()
         {
             var folder = TestData.Get(@"TestData");
