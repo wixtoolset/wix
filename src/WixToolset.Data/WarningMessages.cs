@@ -683,6 +683,11 @@ namespace WixToolset.Data
             return Message(null, Ids.CollidingModularizationTypes, "The definition for the '{0}' table's '{1}' column is a foreign key relationship to the '{2}' table's column number {3}. The modularization types of the two column definitions differ: table '{0}' uses type {4} and table '{2}' uses type {5}. Change one of the modularization types so that they match.", tableName, columnName, foreignTableName, foreignColumnNumber, modularizationType, foreignModularizationType);
         }
 
+        public static Message InvalidEnvironmentVariable(string environmentVariable, string value, string defaultValue)
+        {
+            return Message(null, Ids.InvalidEnvironmentVariable, "The {0} environment variable is set to an invalid value of '{1}'. The default value '{2}' will be used instead.", environmentVariable, value, defaultValue);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -821,6 +826,7 @@ namespace WixToolset.Data
             ExperimentalBundlePlatform = 1154,
             DefiningWellKnownDirectoryDeprecated = 1155,
             CollidingModularizationTypes = 1156,
+            InvalidEnvironmentVariable = 1157,
         }
     }
 }
