@@ -86,9 +86,6 @@ namespace WixToolset.Core.Native
             var previousHwnd = IntPtr.Zero;
             InstallUIHandler previousUIHandler = null;
 
-            var baseCubePath = Path.Combine(Path.GetDirectoryName(typeof(WindowsInstallerValidator).Assembly.Location), CubesFolder);
-            var cubeFiles = this.CubeFiles.Select(s => Path.Combine(baseCubePath, s)).ToList();
-
             try
             {
                 using (var database = new Database(this.DatabasePath, OpenDatabase.Direct))
@@ -116,11 +113,18 @@ namespace WixToolset.Core.Native
                     }
 
                     // Merge in the cube databases.
-                    foreach (var cubeFile in cubeFiles)
+                    foreach (var cubeFile in this.CubeFiles)
                     {
+                        var findCubeFile = typeof(WindowsInstallerValidator).Assembly.FindFileRelativeToAssembly(Path.Combine(CubesFolder, cubeFile), searchNativeDllDirectories: false);
+
+                        if (!findCubeFile.Found)
+                        {
+                            throw new WixException(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
+                        }
+
                         try
                         {
-                            using (var cubeDatabase = new Database(cubeFile, OpenDatabase.ReadOnly))
+                            using (var cubeDatabase = new Database(findCubeFile.Path, OpenDatabase.ReadOnly))
                             {
                                 try
                                 {
@@ -136,7 +140,7 @@ namespace WixToolset.Core.Native
                         {
                             if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
                             {
-                                throw new WixException(ErrorMessages.CubeFileNotFound(cubeFile));
+                                throw new WixException(ErrorMessages.CubeFileNotFound(findCubeFile.Path));
                             }
 
                             throw;

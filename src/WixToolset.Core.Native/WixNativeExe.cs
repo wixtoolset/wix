@@ -7,7 +7,6 @@ namespace WixToolset.Core.Native
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
 
     internal class WixNativeExe
     {
@@ -81,35 +80,16 @@ namespace WixToolset.Core.Native
         {
             if (String.IsNullOrEmpty(PathToWixNativeExe))
             {
-                var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), WixNativeExeFileName);
-                var possiblePaths = path;
+                var result = typeof(WixNativeExe).Assembly.FindFileRelativeToAssembly(WixNativeExeFileName, searchNativeDllDirectories: true);
 
-                var found = File.Exists(path);
-                if (!found && AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES") is string searchDirectoriesString)
-                {
-                    possiblePaths = searchDirectoriesString;
-                    var separatorChar = Path.PathSeparator;
-                    var searchDirectories = searchDirectoriesString?.Split(separatorChar);
-                    foreach (var directoryPath in searchDirectories)
-                    {
-                        var possiblePath = Path.Combine(directoryPath, WixNativeExeFileName);
-                        if (File.Exists(possiblePath))
-                        {
-                            path = possiblePath;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!found)
+                if (!result.Found)
                 {
                     throw new PlatformNotSupportedException(
                         $"Could not find platform specific '{WixNativeExeFileName}'",
-                        new FileNotFoundException($"Could not find internal piece of WiX Toolset from: {possiblePaths}", WixNativeExeFileName));
+                        new FileNotFoundException($"Could not find internal piece of WiX Toolset from: {result.PossiblePaths}", WixNativeExeFileName));
                 }
 
-                PathToWixNativeExe = path;
+                PathToWixNativeExe = result.Path;
             }
         }
 
