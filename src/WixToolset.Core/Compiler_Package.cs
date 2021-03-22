@@ -1550,27 +1550,6 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
-                    case "Action":
-                        this.Core.Write(WarningMessages.DeprecatedRegistryKeyActionAttribute(sourceLineNumbers));
-                        var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (actionValue)
-                        {
-                        case "create":
-                            forceCreateOnInstall = true;
-                            break;
-                        case "createAndRemoveOnUninstall":
-                            forceCreateOnInstall = true;
-                            forceDeleteOnUninstall = true;
-                            break;
-                        case "none":
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, actionValue, "create", "createAndRemoveOnUninstall", "none"));
-                            break;
-                        }
-                        break;
                     case "ForceCreateOnInstall":
                         forceCreateOnInstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
