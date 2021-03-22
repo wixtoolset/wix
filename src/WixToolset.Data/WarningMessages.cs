@@ -167,16 +167,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DeprecatedLongNameAttribute, "The {0}/@{1} attribute has been deprecated.  Since WiX now has the ability to generate short file/directory names, the desired name should be specified in the {2} attribute instead.  If the name specified in the {2} attribute is a short name, then WiX will not generate a short name.  If the name specified in the {2} attribute is a long name and you want to manually specify the short name, please set the short name value in the {3} attribute.", elementName, longNameAttributeName, nameAttributeName, shortNameAttributeName);
         }
 
-        public static Message DeprecatedModuleGuidAttribute(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.DeprecatedModuleGuidAttribute, "The Module/@Guid attribute is deprecated merge modules use their package code as the modularization guid.  Use the Package/@Id attribute instead.");
-        }
-
-        public static Message DeprecatedPackageCompressedAttribute(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.DeprecatedPackageCompressedAttribute, "The Package/@Compressed attribute is deprecated under the Module element because merge modules must always be compressed.");
-        }
-
         public static Message DeprecatedPatchSequenceTargetAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
         {
             return Message(sourceLineNumbers, Ids.DeprecatedPatchSequenceTargetAttribute, "The {0}/@{1} attribute has been deprecated in favor of the more strongly-typed ProductCode or TargetImage attributes.  Please use the ProductCode attribute for indicating the ProductCode of a patch family directly, or the TargetImage attribute to specify the TargetImage which in turn will retrieve the ProductCode of the patch family.", elementName, attributeName);
@@ -762,7 +752,6 @@ namespace WixToolset.Data
             DeprecatedIgnoreModularizationElement = 1085,
             PropertyModularizationSuppressed = 1086,
             DeprecatedPackageCompressedAttribute = 1087,
-            DeprecatedModuleGuidAttribute = 1088,
             DeprecatedQuestionMarksGuid = 1090,
             PackageCodeSet = 1091,
             InvalidModuleOrBundleVersion = 1093,
