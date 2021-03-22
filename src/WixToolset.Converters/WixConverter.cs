@@ -110,6 +110,7 @@ namespace WixToolset.Converters
         private static readonly XName RequiresRefElementName = WixNamespace + "RequiresRef";
         private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
         private static readonly XName RemotePayloadElementName = WixNamespace + "RemotePayload";
+        private static readonly XName RegistryKeyElementName = WixNamespace + "RegistryKey";
         private static readonly XName RegistrySearchElementName = WixNamespace + "RegistrySearch";
         private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
         private static readonly XName RowElementName = WixNamespace + "Row";
@@ -225,6 +226,7 @@ namespace WixToolset.Converters
                 { WixConverter.ProgressTextElementName, this.ConvertProgressTextElement },
                 { WixConverter.PublishElementName, this.ConvertPublishElement },
                 { WixConverter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
+                { WixConverter.RegistryKeyElementName, this.ConvertRegistryKeyElement },
                 { WixConverter.RegistrySearchElementName, this.ConvertRegistrySearchElement },
                 { WixConverter.RemotePayloadElementName, this.ConvertRemotePayloadElement },
                 { WixConverter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
@@ -1225,6 +1227,28 @@ namespace WixToolset.Converters
 
         private void ConvertMultiStringValueElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
+        private void ConvertRegistryKeyElement(XElement element)
+        {
+            var xAction = element.Attribute("Action");
+
+            if (xAction != null
+                && this.OnError(ConverterTestType.RegistryKeyActionObsolete, element, "The RegistryKey element's Action attribute is obsolete. Action='create' will be converted to ForceCreateOnInstall='yes'. Action='createAndRemoveOnUninstall' will be converted to ForceCreateOnInstall='yes' and ForceDeleteOnUninstall='yes'."))
+            {
+                switch (xAction?.Value)
+                {
+                    case "create":
+                        element.SetAttributeValue("ForceCreateOnInstall", "yes");
+                        break;
+                    case "createAndRemoveOnUninstall":
+                        element.SetAttributeValue("ForceCreateOnInstall", "yes");
+                        element.SetAttributeValue("ForceDeleteOnUninstall", "yes");
+                        break;
+                }
+
+                xAction.Remove();
+            }
+        }
+
         private void ConvertRemotePayloadElement(XElement element)
         {
             var xParent = element.Parent;
@@ -2156,6 +2180,11 @@ namespace WixToolset.Converters
             /// CustomTable elements that don't contain the table definition are now CustomTableRef.
             /// </summary>
             CustomTableRef,
+
+            /// <summary>
+            /// The RegistryKey element's Action attribute is obsolete.
+            /// </summary>
+            RegistryKeyActionObsolete,
         }
     }
 }
