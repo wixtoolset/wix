@@ -461,9 +461,6 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.Property:
                     return SymbolDefinitions.Property;
 
-                case SymbolDefinitionType.ProvidesDependency:
-                    return SymbolDefinitions.ProvidesDependency;
-
                 case SymbolDefinitionType.PublishComponent:
                     return SymbolDefinitions.PublishComponent;
 

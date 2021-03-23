@@ -10,7 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixDependencyProvider,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ParentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyProviderSymbolFields.DisplayName), IntermediateFieldType.String),
@@ -27,7 +27,7 @@ namespace WixToolset.Data.Symbols
 
     public enum WixDependencyProviderSymbolFields
     {
-        ComponentRef,
+        ParentRef,
         ProviderKey,
         Version,
         DisplayName,
@@ -37,7 +37,8 @@ namespace WixToolset.Data.Symbols
     [Flags]
     public enum WixDependencyProviderAttributes
     {
-        ProvidesAttributesBundle = 0x10000
+        ProvidesAttributesBundle = 0x10000,
+        ProvidesAttributesImported = 0x20000
     }
 
     public class WixDependencyProviderSymbol : IntermediateSymbol
@@ -52,10 +53,10 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixDependencyProviderSymbolFields index] => this.Fields[(int)index];
 
-        public string ComponentRef
+        public string ParentRef
         {
-            get => this.Fields[(int)WixDependencyProviderSymbolFields.ComponentRef].AsString();
-            set => this.Set((int)WixDependencyProviderSymbolFields.ComponentRef, value);
+            get => this.Fields[(int)WixDependencyProviderSymbolFields.ParentRef].AsString();
+            set => this.Set((int)WixDependencyProviderSymbolFields.ParentRef, value);
         }
 
         public string ProviderKey
@@ -83,5 +84,7 @@ namespace WixToolset.Data.Symbols
         }
 
         public bool Bundle => (this.Attributes & WixDependencyProviderAttributes.ProvidesAttributesBundle) == WixDependencyProviderAttributes.ProvidesAttributesBundle;
+
+        public bool Imported => (this.Attributes & WixDependencyProviderAttributes.ProvidesAttributesImported) == WixDependencyProviderAttributes.ProvidesAttributesImported;
     }
 }
