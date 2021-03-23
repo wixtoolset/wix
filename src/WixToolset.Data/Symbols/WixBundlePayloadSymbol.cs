@@ -21,7 +21,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContainerRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.ContentFile), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.EmbeddedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadSymbolFields.LayoutOnly), IntermediateFieldType.Bool),
@@ -49,7 +48,6 @@ namespace WixToolset.Data.Symbols
         Version,
         Hash,
         ContainerRef,
-        PackageRef,
         ContentFile,
         EmbeddedId,
         LayoutOnly,
@@ -133,12 +131,6 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.ContainerRef];
             set => this.Set((int)WixBundlePayloadSymbolFields.ContainerRef, value);
-        }
-
-        public string PackageRef
-        {
-            get => (string)this.Fields[(int)WixBundlePayloadSymbolFields.PackageRef];
-            set => this.Set((int)WixBundlePayloadSymbolFields.PackageRef, value);
         }
 
         public bool ContentFile

@@ -21,7 +21,7 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
-    using System;
+    using System.Diagnostics;
 
     public enum WixGroupSymbolFields
     {
@@ -31,6 +31,7 @@ namespace WixToolset.Data.Symbols
         ChildType,
     }
 
+    [DebuggerDisplay("WixGroupSymbol {ParentType} {ParentId,nq} -> {ChildType} {ChildId,nq}")]
     public class WixGroupSymbol : IntermediateSymbol
     {
         public WixGroupSymbol() : base(SymbolDefinitions.WixGroup, null, null)
