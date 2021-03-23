@@ -119,7 +119,9 @@ namespace WixToolset.Converters
         private static readonly XName SetPropertyElementName = WixNamespace + "SetProperty";
         private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
         private static readonly XName SoftwareTagElementName = WixNamespace + "SoftwareTag";
+        private static readonly XName SoftwareTagRefElementName = WixNamespace + "SoftwareTagRef";
         private static readonly XName TagElementName = XNamespace.None + "Tag";
+        private static readonly XName TagRefElementName = XNamespace.None + "TagRef";
         private static readonly XName TextElementName = WixNamespace + "Text";
         private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName VariableElementName = WixNamespace + "Variable";
@@ -235,6 +237,7 @@ namespace WixToolset.Converters
                 { WixConverter.SetPropertyElementName, this.ConvertSetPropertyElement },
                 { WixConverter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
                 { WixConverter.TagElementName, this.ConvertTagElement },
+                { WixConverter.TagRefElementName, this.ConvertTagRefElement },
                 { WixConverter.TextElementName, this.ConvertTextElement },
                 { WixConverter.UITextElementName, this.ConvertUITextElement },
                 { WixConverter.VariableElementName, this.ConvertVariableElement },
@@ -686,13 +689,7 @@ namespace WixToolset.Converters
 
         private void ConvertApprovedExeForElevationElement(XElement element)
         {
-            var win64 = element.Attribute("Win64");
-            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-            {
-                var value = this.UpdateWin64ValueToBitnessValue(win64);
-                element.Add(new XAttribute("Bitness", value));
-                win64.Remove();
-            }
+            this.RenameWin64ToBitness(element);
         }
 
         private void ConvertBalBootstrapperApplicationRef(XElement element, string theme, XName balBAElementName, XName oldBalBAElementName = null)
@@ -897,13 +894,7 @@ namespace WixToolset.Converters
                 }
             }
 
-            var win64 = element.Attribute("Win64");
-            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-            {
-                var value = this.UpdateWin64ValueToBitnessValue(win64);
-                element.Add(new XAttribute("Bitness", value));
-                win64.Remove();
-            }
+            this.RenameWin64ToBitness(element);
         }
 
         private void ConvertDirectoryElement(XElement element)
@@ -1289,28 +1280,13 @@ namespace WixToolset.Converters
 
             this.OnError(ConverterTestType.BurnHashAlgorithmChanged, element, "The hash algorithm for bundles changed from SHA1 to SHA512.");
 
-            RemoveIfPresent(element.Attribute("CertificatePublicKey"));
-            RemoveIfPresent(element.Attribute("CertificateThumbprint"));
-
-            void RemoveIfPresent(XAttribute xAttribute)
-            {
-                if (null != xAttribute
-                    && this.OnError(ConverterTestType.BundleSignatureValidationObsolete, element, "The chain package element contains obsolete '{0}' attribute. Signature validation is no longer supported. The attribute will be removed.", xAttribute.Name))
-                {
-                    xAttribute.Remove();
-                }
-            }
+            this.RemoveAttributeIfPresent(element, "CertificatePublicKey", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
+            this.RemoveAttributeIfPresent(element, "CertificateThumbprint", ConverterTestType.BundleSignatureValidationObsolete, "The {0} element contains obsolete '{1}' attribute. Signature validation is no longer supported. The attribute will be removed.");
         }
 
         private void ConvertRegistrySearchElement(XElement element)
         {
-            var win64 = element.Attribute("Win64");
-            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-            {
-                var value = this.UpdateWin64ValueToBitnessValue(win64);
-                element.Add(new XAttribute("Bitness", value));
-                win64.Remove();
-            }
+            this.RenameWin64ToBitness(element);
         }
 
         private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
@@ -1393,6 +1369,18 @@ namespace WixToolset.Converters
             if (this.OnError(ConverterTestType.TagElementRenamed, element, "The Tag element has been renamed. Use the 'SoftwareTag' element instead."))
             {
                 element.Name = SoftwareTagElementName;
+            }
+
+            this.RemoveAttributeIfPresent(element, "Licensed", ConverterTestType.SoftwareTagLicensedObsolete, "The {0} element contains obsolete '{1}' attribute. The attribute will be removed.");
+            this.RemoveAttributeIfPresent(element, "Type", ConverterTestType.SoftwareTagLicensedObsolete, "The {0} element contains obsolete '{1}' attribute. The attribute will be removed.");
+            this.RenameWin64ToBitness(element);
+        }
+
+        private void ConvertTagRefElement(XElement element)
+        {
+            if (this.OnError(ConverterTestType.TagRefElementRenamed, element, "The TagRef element has been renamed. Use the 'SoftwareTagRef' element instead."))
+            {
+                element.Name = SoftwareTagRefElementName;
             }
         }
 
@@ -1543,13 +1531,7 @@ namespace WixToolset.Converters
 
         private void ConvertUtilRegistrySearchElement(XElement element)
         {
-            var win64 = element.Attribute("Win64");
-            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The Win64 attribute has been renamed. Use the Bitness attribute instead."))
-            {
-                var value = this.UpdateWin64ValueToBitnessValue(win64);
-                element.Add(new XAttribute("Bitness", value));
-                win64.Remove();
-            }
+            this.RenameWin64ToBitness(element);
 
             if (this.SourceVersion < 4)
             {
@@ -1590,6 +1572,26 @@ namespace WixToolset.Converters
             {
                 element.Add(new XAttribute(attributeName, text));
                 RemoveChildren(element);
+            }
+        }
+
+        void RemoveAttributeIfPresent(XElement element, string attributeName, ConverterTestType type, string format)
+        {
+            var xAttribute = element.Attribute(attributeName);
+            if (null != xAttribute && this.OnError(type, element, format, element.Name.LocalName, xAttribute.Name))
+            {
+                xAttribute.Remove();
+            }
+        }
+
+        private void RenameWin64ToBitness(XElement element)
+        {
+            var win64 = element.Attribute("Win64");
+            if (win64 != null && this.OnError(ConverterTestType.Win64AttributeRenamed, element, "The {0} element's Win64 attribute has been renamed. Use the Bitness attribute instead.", element.Name.LocalName))
+            {
+                var value = this.UpdateWin64ValueToBitnessValue(win64);
+                element.Add(new XAttribute("Bitness", value));
+                win64.Remove();
             }
         }
 
@@ -2185,6 +2187,21 @@ namespace WixToolset.Converters
             /// The RegistryKey element's Action attribute is obsolete.
             /// </summary>
             RegistryKeyActionObsolete,
+
+            /// <summary>
+            /// The TagRef element has been renamed. Use the element 'SoftwareTagRef' name.
+            /// </summary>
+            TagRefElementRenamed,
+
+            /// <summary>
+            /// The SoftwareTag element's Licensed attribute is obsolete.
+            /// </summary>
+            SoftwareTagLicensedObsolete,
+
+            /// <summary>
+            /// The SoftwareTag element's Type attribute is obsolete.
+            /// </summary>
+            SoftwareTagTypeObsolete,
         }
     }
 }
