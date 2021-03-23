@@ -2,11 +2,11 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage SourceFile="burn.exe" Permanent="yes" />
-            <ExePackage Id="RemotePayloadExe" Name="fake.exe" Compressed="no" DownloadUrl="example.com" Description="Override RemotePayload description" DisplayName="Override RemotePayload display name" Permanent="yes">
-                <RemotePayload Description="RemotePayload description" Hash="a" ProductName="RemotePayload product name" Size="1" Version="1.0.0.0" />
+            <ExePackage DetectCondition="ForTestPurposesOnly" SourceFile="burn.exe" Permanent="yes" />
+            <ExePackage Id="RemotePayloadExe" DetectCondition="ForTestPurposesOnly" Description="Override RemotePayload description" DisplayName="Override RemotePayload display name" Permanent="yes">
+                <ExePackagePayload Description="RemotePayload description" Hash="a" ProductName="RemotePayload product name" Size="1" Version="1.0.0.0" Name="fake.exe" DownloadUrl="example.com" />
             </ExePackage>
-            <ExePackage SourceFile="C:\Windows\system32\calc.exe" Permanent="yes" Description="Override harvested description" DisplayName="Override harvested display name" />
+            <ExePackage DetectCondition="ForTestPurposesOnly" SourceFile="C:\Windows\system32\calc.exe" Permanent="yes" Description="Override harvested description" DisplayName="Override harvested display name" />
         </PackageGroup>
     </Fragment>
 </Wix>

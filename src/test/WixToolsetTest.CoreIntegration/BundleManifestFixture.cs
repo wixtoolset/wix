@@ -51,7 +51,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6372")]
+        [Fact]
         public void PopulatesBAManifestWithPackageInformation()
         {
             var folder = TestData.Get(@"TestData");
@@ -278,7 +278,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6370")]
+        [Fact]
         public void PopulatesManifestWithExePackages()
         {
             var folder = TestData.Get(@"TestData");
@@ -315,8 +315,8 @@ namespace WixToolsetTest.CoreIntegration
                     { "ExePackage", new List<string> { "CacheId", "InstallSize", "Size" } },
                 };
                 Assert.Equal(2, exePackageElements.Count);
-                Assert.Equal("<ExePackage Id='credwiz.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='payue_e5DuhsDGlzJxWYPhqr6S7rkc' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<ExePackage Id='cscript.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='cscript.exe' /><PayloadRef Id='payue_e5DuhsDGlzJxWYPhqr6S7rkc' /></ExePackage>", exePackageElements[1].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<ExePackage Id='credwiz.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>", exePackageElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<ExePackage Id='cscript.exe' Cache='yes' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' DetectCondition='' InstallArguments='' UninstallArguments='' RepairArguments='' Repairable='no'><PayloadRef Id='cscript.exe' /><PayloadRef Id='SourceFilePayload' /></ExePackage>", exePackageElements[1].GetTestXml(ignoreAttributesByElementName));
             }
         }
 

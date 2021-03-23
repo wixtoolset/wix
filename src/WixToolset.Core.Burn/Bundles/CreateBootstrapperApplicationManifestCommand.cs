@@ -129,7 +129,7 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("Permanent", package.PackageSymbol.Permanent ? "yes" : "no");
                 writer.WriteAttributeString("LogPathVariable", package.PackageSymbol.LogPathVariable);
                 writer.WriteAttributeString("RollbackLogPathVariable", package.PackageSymbol.RollbackLogPathVariable);
-                writer.WriteAttributeString("Compressed", packagePayload.Compressed == true ? "yes" : "no");
+                writer.WriteAttributeString("Compressed", packagePayload.Packaging == PackagingType.Embedded ? "yes" : "no");
 
                 if (package.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
                 {

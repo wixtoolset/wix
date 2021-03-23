@@ -1961,6 +1961,8 @@ namespace WixToolset.Core
             string installCondition = null;
             var cache = YesNoAlwaysType.Yes; // the default is to cache everything in tradeoff for stability over disk space.
             string cacheId = null;
+            string description = null;
+            string displayName = null;
             var logPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
             var rollbackPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
             var permanent = YesNoType.NotSet;
@@ -2038,10 +2040,10 @@ namespace WixToolset.Core
                         cacheId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Description":
-                        compilerPayload.ParseDescription(attrib);
+                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "DisplayName":
-                        compilerPayload.ParseDisplayName(attrib);
+                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "EnableFeatureSelection":
                         enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2302,6 +2304,8 @@ namespace WixToolset.Core
                     Attributes = attributes,
                     InstallCondition = installCondition,
                     CacheId = cacheId,
+                    Description = description,
+                    DisplayName = displayName,
                     LogPathVariable = logPathVariable,
                     RollbackLogPathVariable = rollbackPathVariable,
                 });
