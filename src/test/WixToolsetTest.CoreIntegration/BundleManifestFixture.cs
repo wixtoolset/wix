@@ -94,7 +94,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6370")]
+        [Fact]
         public void PopulatesBAManifestWithPayloadInformation()
         {
             var folder = TestData.Get(@"TestData");
@@ -131,10 +131,10 @@ namespace WixToolsetTest.CoreIntegration
                     { "WixPayloadProperties", new List<string> { "Size" } },
                 };
                 Assert.Equal(4, payloadElements.Count);
-                Assert.Equal("<WixPayloadProperties Payload='credwiz.exe' Package='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' LayoutOnly='no' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Payload='payue_e5DuhsDGlzJxWYPhqr6S7rkc' Package='credwiz.exe' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Payload='cscript.exe' Package='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' LayoutOnly='no' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Payload='payue_e5DuhsDGlzJxWYPhqr6S7rkc' Package='cscript.exe' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' LayoutOnly='no' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' LayoutOnly='no' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
             }
         }
 

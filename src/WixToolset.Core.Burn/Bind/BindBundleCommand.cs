@@ -63,7 +63,7 @@ namespace WixToolset.Core.Burn
 
         private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
-        private Intermediate Output {  get; }
+        private Intermediate Output { get; }
 
         private string OutputPath { get; }
 
@@ -95,7 +95,7 @@ namespace WixToolset.Core.Burn
 
             var wixGroupSymbols = this.GetRequiredSymbols<WixGroupSymbol>();
 
-            // Ensure there is one and only one row in the WixBundle table.
+            // Ensure there is one and only one WixBundleSymbol.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
             var bundleSymbol = this.GetSingleSymbol<WixBundleSymbol>();
@@ -104,12 +104,12 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
-            // Ensure there is one and only one row in the WixBootstrapperApplicationDll table.
+            // Ensure there is one and only one WixBootstrapperApplicationDllSymbol.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
             var bundleApplicationDllSymbol = this.GetSingleSymbol<WixBootstrapperApplicationDllSymbol>();
 
-            // Ensure there is one and only one row in the WixChain table.
+            // Ensure there is one and only one WixChainSymbol.
             // The compiler and linker behavior should have colluded to get
             // this behavior.
             var chainSymbol = this.GetSingleSymbol<WixChainSymbol>();
@@ -122,10 +122,15 @@ namespace WixToolset.Core.Burn
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
 
-            var orderSearchesCommand = new OrderSearchesCommand(this.Messaging, section);
-            orderSearchesCommand.Execute();
-            var orderedSearches = orderSearchesCommand.OrderedSearchFacades;
-            var extensionSearchSymbolsById = orderSearchesCommand.ExtensionSearchSymbolsByExtensionId;
+            IEnumerable<ISearchFacade> orderedSearches;
+            IDictionary<string, IEnumerable<IntermediateSymbol>> extensionSearchSymbolsById;
+            {
+                var orderSearchesCommand = new OrderSearchesCommand(this.Messaging, section);
+                orderSearchesCommand.Execute();
+
+                orderedSearches = orderSearchesCommand.OrderedSearchFacades;
+                extensionSearchSymbolsById = orderSearchesCommand.ExtensionSearchSymbolsByExtensionId;
+            }
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
@@ -136,8 +141,9 @@ namespace WixToolset.Core.Burn
 
             // Get the explicit payloads.
             var payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
+            var packagesPayloads = RecalculatePackagesPayloads(payloadSymbols, wixGroupSymbols);
 
-            // Update explicitly authored payloads with their parent package and container (as appropriate)
+            // Update explicitly authored payloads with their parent container
             // to make it easier to gather the payloads later.
             foreach (var groupSymbol in wixGroupSymbols)
             {
@@ -145,14 +151,10 @@ namespace WixToolset.Core.Burn
                 {
                     var payloadSymbol = payloadSymbols[groupSymbol.ChildId];
 
-                    if (ComplexReferenceParentType.Package == groupSymbol.ParentType)
+                    if (ComplexReferenceParentType.Container == groupSymbol.ParentType)
                     {
-                        Debug.Assert(String.IsNullOrEmpty(payloadSymbol.PackageRef));
-                        payloadSymbol.PackageRef = groupSymbol.ParentId;
-                    }
-                    else if (ComplexReferenceParentType.Container == groupSymbol.ParentType)
-                    {
-                        Debug.Assert(String.IsNullOrEmpty(payloadSymbol.ContainerRef));
+                        // TODO: v3 didn't warn if we overwrote the payload's container.
+                        // Should we warn now?
                         payloadSymbol.ContainerRef = groupSymbol.ParentId;
                     }
                     else if (ComplexReferenceParentType.Layout == groupSymbol.ParentType)
@@ -167,7 +169,7 @@ namespace WixToolset.Core.Burn
             // Process the explicitly authored payloads.
             ISet<string> processedPayloads;
             {
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, this.PayloadHarvester, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.BackendHelper, this.PayloadHarvester, payloadSymbols.Values, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -204,7 +206,7 @@ namespace WixToolset.Core.Burn
 
                 case WixBundlePackageType.Msi:
                 {
-                    var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, payloadSymbols);
+                    var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, packagesPayloads[facade.PackageId]);
                     command.Execute();
 
                     if (null != variableCache)
@@ -249,12 +251,13 @@ namespace WixToolset.Core.Burn
             // Reindex the payloads now that all the payloads (minus the manifest payloads that will be created later)
             // are present.
             payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
+            packagesPayloads = RecalculatePackagesPayloads(payloadSymbols, wixGroupSymbols);
 
             // Process the payloads that were added by processing the packages.
             {
                 var toProcess = payloadSymbols.Values.Where(r => !processedPayloads.Contains(r.Id.Id)).ToList();
 
-                var command = new ProcessPayloadsCommand(this.ServiceProvider, this.BackendHelper, this.PayloadHarvester, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
+                var command = new ProcessPayloadsCommand(this.BackendHelper, this.PayloadHarvester, toProcess, bundleSymbol.DefaultPackagingType, layoutDirectory);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -265,15 +268,13 @@ namespace WixToolset.Core.Burn
 
             // Set the package metadata from the payloads now that we have the complete payload information.
             {
-                var payloadsByPackageId = payloadSymbols.Values.ToLookup(p => p.PackageRef);
-
                 foreach (var facade in facades.Values)
                 {
                     facade.PackageSymbol.Size = 0;
 
-                    var packagePayloads = payloadsByPackageId[facade.PackageId];
+                    var packagePayloads = packagesPayloads[facade.PackageId];
 
-                    foreach (var payload in packagePayloads)
+                    foreach (var payload in packagePayloads.Values)
                     {
                         facade.PackageSymbol.Size += payload.FileSize.Value;
                     }
@@ -415,7 +416,7 @@ namespace WixToolset.Core.Burn
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
-                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, orderedFacades, uxPayloadIndex, payloadSymbols, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, orderedFacades, uxPayloadIndex, packagesPayloads, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
@@ -462,7 +463,7 @@ namespace WixToolset.Core.Burn
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, orderedSearches, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;
@@ -580,7 +581,7 @@ namespace WixToolset.Core.Burn
 
             if (0 == symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+                this.Messaging.Write(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
             return symbols;
@@ -592,10 +593,36 @@ namespace WixToolset.Core.Burn
 
             if (1 != symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+                this.Messaging.Write(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
             return symbols[0];
+        }
+
+        private static Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> RecalculatePackagesPayloads(Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, IEnumerable<WixGroupSymbol> wixGroupSymbols)
+        {
+            var packagesPayloads = new Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>>();
+
+            foreach (var groupSymbol in wixGroupSymbols)
+            {
+                if (ComplexReferenceChildType.Payload == groupSymbol.ChildType)
+                {
+                    var payloadSymbol = payloadSymbols[groupSymbol.ChildId];
+
+                    if (ComplexReferenceParentType.Package == groupSymbol.ParentType)
+                    {
+                        if (!packagesPayloads.TryGetValue(groupSymbol.ParentId, out var packagePayloadsById))
+                        {
+                            packagePayloadsById = new Dictionary<string, WixBundlePayloadSymbol>();
+                            packagesPayloads.Add(groupSymbol.ParentId, packagePayloadsById);
+                        }
+
+                        packagePayloadsById.Add(payloadSymbol.Id.Id, payloadSymbol);
+                    }
+                }
+            }
+
+            return packagesPayloads;
         }
     }
 }

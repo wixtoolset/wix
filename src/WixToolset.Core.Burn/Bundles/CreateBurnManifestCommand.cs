@@ -18,7 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
+        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendExtensions = backendExtensions;
@@ -31,6 +31,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.RollbackBoundaries = boundaries;
             this.UXContainerPayloads = uxPayloads;
             this.Payloads = allPayloadsById;
+            this.PackagesPayloads = packagesPayloads;
             this.OrderedSearches = orderedSearches;
             this.IntermediateFolder = intermediateFolder;
         }
@@ -56,6 +57,8 @@ namespace WixToolset.Core.Burn.Bundles
         private IEnumerable<ISearchFacade> OrderedSearches { get; }
 
         private Dictionary<string, WixBundlePayloadSymbol> Payloads { get; }
+
+        private Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> PackagesPayloads { get; }
 
         private IEnumerable<WixBundleContainerSymbol> Containers { get; }
 
@@ -328,7 +331,6 @@ namespace WixToolset.Core.Burn.Bundles
                 var targetCodesByPatch = this.Section.Symbols.OfType<WixBundlePatchTargetCodeSymbol>().ToLookup(r => r.PackageRef);
                 var msiFeaturesByPackage = this.Section.Symbols.OfType<WixBundleMsiFeatureSymbol>().ToLookup(r => r.PackageRef);
                 var msiPropertiesByPackage = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>().ToLookup(r => r.PackageRef);
-                var payloadsByPackage = this.Payloads.Values.ToLookup(p => p.PackageRef);
                 var relatedPackagesByPackage = this.Section.Symbols.OfType<WixBundleRelatedPackageSymbol>().ToLookup(r => r.PackageRef);
                 var slipstreamMspsByPackage = this.Section.Symbols.OfType<WixBundleSlipstreamMspSymbol>().ToLookup(r => r.TargetPackageRef);
                 var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
@@ -569,9 +571,9 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("Id", packagePayloadId);
                     writer.WriteEndElement();
 
-                    var packagePayloads = payloadsByPackage[package.PackageId];
+                    var packagePayloads = this.PackagesPayloads[package.PackageId];
 
-                    foreach (var payload in packagePayloads)
+                    foreach (var payload in packagePayloads.Values)
                     {
                         if (payload.Id.Id != packagePayloadId)
                         {

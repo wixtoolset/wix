@@ -68,6 +68,14 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var generatedId = this.InternalBurnBackendHelper.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
 
+            this.Section.AddSymbol(new WixGroupSymbol(this.BundleSymbol.SourceLineNumbers)
+            {
+                ParentType = ComplexReferenceParentType.Container,
+                ParentId = BurnConstants.BurnUXContainerName,
+                ChildType = ComplexReferenceChildType.Payload,
+                ChildId = generatedId
+            });
+
             var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
             {
                 Name = BurnCommon.BundleExtensionDataFileName,

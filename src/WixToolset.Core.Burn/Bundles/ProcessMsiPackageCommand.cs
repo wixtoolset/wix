@@ -23,7 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private const string PropertySqlFormat = "SELECT `Value` FROM `Property` WHERE `Property` = '{0}'";
 
-        public ProcessMsiPackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
+        public ProcessMsiPackageCommand(IServiceProvider serviceProvider, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> packagePayloads)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.BackendHelper = serviceProvider.GetService<IBackendHelper>();
@@ -31,7 +31,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.BackendExtensions = backendExtensions;
 
-            this.AuthoredPayloads = payloadSymbols;
+            this.PackagePayloads = packagePayloads;
             this.Section = section;
             this.Facade = facade;
         }
@@ -44,7 +44,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
-        private Dictionary<string, WixBundlePayloadSymbol> AuthoredPayloads { get; }
+        private Dictionary<string, WixBundlePayloadSymbol> PackagePayloads { get; }
 
         private PackageFacade Facade { get; }
 
@@ -55,7 +55,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         public void Execute()
         {
-            var packagePayload = this.AuthoredPayloads[this.Facade.PackageSymbol.PayloadRef];
+            var packagePayload = this.PackagePayloads[this.Facade.PackageSymbol.PayloadRef];
 
             var msiPackage = (WixBundleMsiPackageSymbol)this.Facade.SpecificPackageSymbol;
 
@@ -182,9 +182,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private ISet<string> GetPayloadTargetNames(string packageId)
         {
-            var payloadNames = this.Section.Symbols.OfType<WixBundlePayloadSymbol>()
-                .Where(p => p.PackageRef == packageId)
-                .Select(p => p.Name);
+            var payloadNames = this.PackagePayloads.Values.Select(p => p.Name);
 
             return new HashSet<string>(payloadNames, StringComparer.OrdinalIgnoreCase);
         }
@@ -397,13 +395,20 @@ namespace WixToolset.Core.Burn.Bundles
                             var generatedId = this.BackendHelper.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
                             var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageSymbol.SourceLineNumbers);
 
+                            this.Section.AddSymbol(new WixGroupSymbol(this.Facade.PackageSymbol.SourceLineNumbers)
+                            {
+                                ParentType = ComplexReferenceParentType.Package,
+                                ParentId = this.Facade.PackageId,
+                                ChildType = ComplexReferenceChildType.Payload,
+                                ChildId = generatedId
+                            });
+
                             this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                             {
                                 Name = cabinetName,
                                 SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
                                 Compressed = packagePayload.Compressed,
                                 UnresolvedSourceFile = cabinetName,
-                                PackageRef = packagePayload.PackageRef,
                                 ContainerRef = packagePayload.ContainerRef,
                                 ContentFile = true,
                                 Packaging = packagePayload.Packaging,
@@ -466,7 +471,7 @@ namespace WixToolset.Core.Burn.Bundles
                             if (WindowsInstallerConstants.MsidbFileAttributesNoncompressed == (compressionBit & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) ||
                                 (!compressed && 0 == (compressionBit & WindowsInstallerConstants.MsidbFileAttributesCompressed)))
                             {
-                                string fileSourcePath = this.PathResolver.GetFileSourcePath(directories, record.GetString(1), record.GetString(3), compressed, longNamesInImage);
+                                var fileSourcePath = this.PathResolver.GetFileSourcePath(directories, record.GetString(1), record.GetString(3), compressed, longNamesInImage);
                                 var name = Path.Combine(Path.GetDirectoryName(packagePayload.Name), fileSourcePath);
 
                                 if (!payloadNames.Contains(name))
@@ -474,13 +479,20 @@ namespace WixToolset.Core.Burn.Bundles
                                     var generatedId = this.BackendHelper.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
                                     var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageSymbol.SourceLineNumbers);
 
+                                    this.Section.AddSymbol(new WixGroupSymbol(this.Facade.PackageSymbol.SourceLineNumbers)
+                                    {
+                                        ParentType = ComplexReferenceParentType.Package,
+                                        ParentId = this.Facade.PackageId,
+                                        ChildType = ComplexReferenceChildType.Payload,
+                                        ChildId = generatedId
+                                    });
+
                                     this.Section.AddSymbol(new WixBundlePayloadSymbol(this.Facade.PackageSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
                                     {
                                         Name = name,
                                         SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
                                         Compressed = packagePayload.Compressed,
                                         UnresolvedSourceFile = name,
-                                        PackageRef = packagePayload.PackageRef,
                                         ContainerRef = packagePayload.ContainerRef,
                                         ContentFile = true,
                                         Packaging = packagePayload.Packaging,

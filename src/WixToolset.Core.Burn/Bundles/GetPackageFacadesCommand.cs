@@ -27,6 +27,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void Execute()
         {
+            var wixGroupPackagesGroupedById = this.Section.Symbols.OfType<WixGroupSymbol>().Where(g => g.ParentType == ComplexReferenceParentType.Package).ToLookup(g => g.ParentId);
             var exePackages = this.Section.Symbols.OfType<WixBundleExePackageSymbol>().ToDictionary(t => t.Id.Id);
             var msiPackages = this.Section.Symbols.OfType<WixBundleMsiPackageSymbol>().ToDictionary(t => t.Id.Id);
             var mspPackages = this.Section.Symbols.OfType<WixBundleMspPackageSymbol>().ToDictionary(t => t.Id.Id);
@@ -43,7 +44,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var id = package.Id.Id;
 
                 IntermediateSymbol packagePayload = null;
-                foreach (var wixGroup in this.Section.Symbols.OfType<WixGroupSymbol>().Where(g => g.ParentType == ComplexReferenceParentType.Package && g.ParentId == id))
+                foreach (var wixGroup in wixGroupPackagesGroupedById[id])
                 {
                     if (wixGroup.ChildType == ComplexReferenceChildType.PackagePayload)
                     {

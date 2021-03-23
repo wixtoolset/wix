@@ -15,13 +15,13 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
             this.ChainPackages = chainPackages;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
-            this.Payloads = payloadSymbols;
+            this.PackagesPayloads = packagesPayloads;
             this.IntermediateFolder = intermediateFolder;
             this.InternalBurnBackendHelper = internalBurnBackendHelper;
         }
@@ -36,7 +36,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private int LastUXPayloadIndex { get; }
 
-        private Dictionary<string, WixBundlePayloadSymbol> Payloads { get; }
+        private Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> PackagesPayloads { get; }
 
         private string IntermediateFolder { get; }
 
@@ -98,7 +98,12 @@ namespace WixToolset.Core.Burn.Bundles
         {
             foreach (var package in this.ChainPackages)
             {
-                var packagePayload = this.Payloads[package.PackageSymbol.PayloadRef];
+                if (!this.PackagesPayloads.TryGetValue(package.PackageId, out var payloads))
+                {
+                    continue;
+                }
+
+                var packagePayload = payloads[package.PackageSymbol.PayloadRef];
 
                 var size = package.PackageSymbol.Size.ToString(CultureInfo.InvariantCulture);
 
@@ -212,33 +217,36 @@ namespace WixToolset.Core.Burn.Bundles
         private void WritePayloadInfo(XmlTextWriter writer)
         {
             // TODO: check v3 - should this be only include package payloads or include all non-UX container payloads?
-            var payloadSymbols = this.Section.Symbols.OfType<WixBundlePayloadSymbol>()
-                                                     .Where(p => !String.IsNullOrEmpty(p.PackageRef));
-
-            foreach (var payloadSymbol in payloadSymbols)
+            foreach (var kvp in this.PackagesPayloads.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
             {
-                writer.WriteStartElement("WixPayloadProperties");
+                var packageId = kvp.Key;
+                var payloadsById = kvp.Value;
 
-                writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
-
-                writer.WriteAttributeString("Package", payloadSymbol.PackageRef);
-
-                if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
+                foreach (var payloadSymbol in payloadsById.Values.OrderBy(p => p.Id.Id, StringComparer.Ordinal))
                 {
-                    writer.WriteAttributeString("Container", payloadSymbol.ContainerRef);
+                    writer.WriteStartElement("WixPayloadProperties");
+
+                    writer.WriteAttributeString("Package", packageId);
+
+                    writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
+
+                    if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
+                    {
+                        writer.WriteAttributeString("Container", payloadSymbol.ContainerRef);
+                    }
+
+                    writer.WriteAttributeString("Name", payloadSymbol.Name);
+                    writer.WriteAttributeString("Size", payloadSymbol.FileSize.Value.ToString(CultureInfo.InvariantCulture));
+
+                    if (!String.IsNullOrEmpty(payloadSymbol.DownloadUrl))
+                    {
+                        writer.WriteAttributeString("DownloadUrl", payloadSymbol.DownloadUrl);
+                    }
+
+                    writer.WriteAttributeString("LayoutOnly", payloadSymbol.LayoutOnly ? "yes" : "no");
+
+                    writer.WriteEndElement();
                 }
-
-                writer.WriteAttributeString("Name", payloadSymbol.Name);
-                writer.WriteAttributeString("Size", payloadSymbol.FileSize.Value.ToString(CultureInfo.InvariantCulture));
-
-                if (!String.IsNullOrEmpty(payloadSymbol.DownloadUrl))
-                {
-                    writer.WriteAttributeString("DownloadUrl", payloadSymbol.DownloadUrl);
-                }
-
-                writer.WriteAttributeString("LayoutOnly", payloadSymbol.LayoutOnly ? "yes" : "no");
-
-                writer.WriteEndElement();
             }
         }
 

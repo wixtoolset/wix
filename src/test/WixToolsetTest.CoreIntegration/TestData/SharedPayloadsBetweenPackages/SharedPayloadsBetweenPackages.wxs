@@ -12,7 +12,7 @@
     </Fragment>
     <Fragment>
         <PayloadGroup Id="SharedPayloads">
-            <Payload SourceFile="$(sys.SOURCEFILEPATH)" />
+            <Payload Id="SourceFilePayload" SourceFile="$(sys.SOURCEFILEPATH)" />
         </PayloadGroup>
     </Fragment>
 </Wix>
