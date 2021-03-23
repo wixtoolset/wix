@@ -581,7 +581,7 @@ namespace WixToolset.Core.Burn
 
             if (0 == symbols.Count)
             {
-                this.Messaging.Write(ErrorMessages.MissingBundleInformation(nameof(T)));
+                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
             return symbols;
@@ -593,7 +593,7 @@ namespace WixToolset.Core.Burn
 
             if (1 != symbols.Count)
             {
-                this.Messaging.Write(ErrorMessages.MissingBundleInformation(nameof(T)));
+                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
             }
 
             return symbols[0];

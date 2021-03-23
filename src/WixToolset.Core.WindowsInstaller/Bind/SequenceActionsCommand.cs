@@ -67,7 +67,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else // not a supported unscheduled action.
                         {
-                            throw new InvalidOperationException($"Found an action [{actionSymbol.Id.Id}] at [{actionSymbol.SourceLineNumbers}] with no Sequence, Before, or After column set.");
+                            throw new WixException($"Found action '{actionSymbol.Id.Id}' at {actionSymbol.SourceLineNumbers}' with no Sequence, Before, or After column set. The compiler should have prevented this.");
                         }
                     }
 
@@ -580,7 +580,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (actionSymbol.Before == null)
             {
-                throw new InvalidOperationException($"Found an action [{actionSymbol.Id.Id}] at [{actionSymbol.SourceLineNumbers}] with no Sequence, Before, or After column set.");
+                throw new WixException($"Found action '{actionSymbol.Id.Id}' at {actionSymbol.SourceLineNumbers}' with no Sequence, Before, or After column set. The compiler should have prevented this.");
             }
 
             var parentActionName = (after ? actionSymbol.After : actionSymbol.Before);
@@ -598,7 +598,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an action with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
+                    throw new WixException($"Found action {actionSymbol.Id.Id} with a non-existent {(after ? "After" : "Before")} action '{parentActionName}'. The linker should have prevented this.");
                 }
             }
 
@@ -639,11 +639,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else if (existingInitialActionSymbol == actionSymbol)
                 {
-                    throw new WixException(ErrorMessages.ActionCircularDependency(currentActionSymbol.SourceLineNumbers, currentActionSymbol.SequenceTable.ToString(), currentActionSymbol.Action, previousActionSymbol.Action));
+                    this.Messaging.Write(ErrorMessages.ActionCircularDependency(currentActionSymbol.SourceLineNumbers, currentActionSymbol.SequenceTable.ToString(), currentActionSymbol.Action, previousActionSymbol.Action));
                 }
 
                 parentActionSymbol = this.GetParentActionSymbol(currentActionSymbol, requiredActionSymbols);
-            } while (null != parentActionSymbol);
+            } while (null != parentActionSymbol && !this.Messaging.EncounteredError);
         }
 
         /// <summary>
