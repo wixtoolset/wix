@@ -336,7 +336,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
                 var commandLinesByPackage = this.Section.Symbols.OfType<WixBundlePackageCommandLineSymbol>().ToLookup(r => r.WixBundlePackageRef);
 
-                var dependenciesByPackage = this.Section.Symbols.OfType<ProvidesDependencySymbol>().ToLookup(p => p.PackageRef);
+                var dependenciesByPackage = this.Section.Symbols.OfType<WixDependencyProviderSymbol>().ToLookup(p => p.ParentRef);
 
 
                 // Build up the list of target codes from all the MSPs in the chain.
@@ -511,7 +511,7 @@ namespace WixToolset.Core.Burn.Bundles
                     foreach (var dependency in dependencies)
                     {
                         writer.WriteStartElement("Provides");
-                        writer.WriteAttributeString("Key", dependency.Key);
+                        writer.WriteAttributeString("Key", dependency.ProviderKey);
 
                         if (!String.IsNullOrEmpty(dependency.Version))
                         {

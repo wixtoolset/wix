@@ -369,7 +369,7 @@ namespace WixToolset.Core.Burn
                 this.BackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
-            Dictionary<string, ProvidesDependencySymbol> dependencySymbolsByKey;
+            Dictionary<string, WixDependencyProviderSymbol> dependencySymbolsByKey;
             {
                 var command = new ProcessDependencyProvidersCommand(this.Messaging, section, facades);
                 command.Execute();
@@ -542,7 +542,7 @@ namespace WixToolset.Core.Burn
 
         private void ResolveBundleInstallScope(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> facades)
         {
-            var dependencySymbolsById = section.Symbols.OfType<ProvidesDependencySymbol>().ToDictionary(t => t.Id.Id);
+            var dependencySymbolsById = section.Symbols.OfType<WixDependencyProviderSymbol>().ToDictionary(t => t.Id.Id);
 
             foreach (var facade in facades)
             {

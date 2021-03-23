@@ -58,7 +58,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var keyRequires = String.Format(@"{0}{1}\{2}\{3}", DependencyRegistryRoot, requiresKey, RegistryDependents, providesKey);
 
                 // Get the component ID from the provider.
-                var componentId = wixDependencyProviderRow.ComponentRef;
+                var componentId = wixDependencyProviderRow.ParentRef;
 
                 var id = this.BackendHelper.GenerateIdentifier("reg", providesId, requiresId, "(Default)");
                 this.Section.AddSymbol(new RegistrySymbol(wixDependencyRefRow.SourceLineNumbers, new Identifier(AccessModifier.Section, id))

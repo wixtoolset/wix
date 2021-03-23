@@ -22,7 +22,7 @@ namespace WixToolset.Core.Burn.Bind
 
         public string BundleProviderKey { get; private set; }
 
-        public Dictionary<string, ProvidesDependencySymbol> DependencySymbolsByKey { get; private set; }
+        public Dictionary<string, WixDependencyProviderSymbol> DependencySymbolsByKey { get; private set; }
 
         private IMessaging Messaging { get; }
 
@@ -38,43 +38,34 @@ namespace WixToolset.Core.Burn.Bind
         /// </summary>
         public void Execute()
         {
-            var wixDependencyProviderSymbols = this.Section.Symbols.OfType<WixDependencyProviderSymbol>();
+            var dependencySymbols = this.Section.Symbols.OfType<WixDependencyProviderSymbol>();
 
-            foreach (var wixDependencyProviderSymbol in wixDependencyProviderSymbols)
+            foreach (var dependency in dependencySymbols)
             {
                 // Sets the provider key for the bundle, if it is not set already.
                 if (String.IsNullOrEmpty(this.BundleProviderKey))
                 {
-                    if (wixDependencyProviderSymbol.Bundle)
+                    if (dependency.Bundle)
                     {
-                        this.BundleProviderKey = wixDependencyProviderSymbol.ProviderKey;
+                        this.BundleProviderKey = dependency.ProviderKey;
                     }
                 }
 
                 // Import any authored dependencies. These may merge with imported provides from MSI packages.
-                var packageId = wixDependencyProviderSymbol.Id.Id;
+                var packageId = dependency.ParentRef;
 
                 if (this.Facades.TryGetValue(packageId, out var facade))
                 {
-                    var dependency = this.Section.AddSymbol(new ProvidesDependencySymbol(wixDependencyProviderSymbol.SourceLineNumbers, wixDependencyProviderSymbol.Id)
-                    {
-                        PackageRef = packageId,
-                        Key = wixDependencyProviderSymbol.ProviderKey,
-                        Version = wixDependencyProviderSymbol.Version,
-                        DisplayName = wixDependencyProviderSymbol.DisplayName,
-                        Attributes = (int)wixDependencyProviderSymbol.Attributes
-                    });
-
-                    if (String.IsNullOrEmpty(dependency.Key))
+                    if (String.IsNullOrEmpty(dependency.ProviderKey))
                     {
                         switch (facade.SpecificPackageSymbol)
                         {
                             // The WixDependencyExtension allows an empty Key for MSIs and MSPs.
                             case WixBundleMsiPackageSymbol msiPackage:
-                                dependency.Key = msiPackage.ProductCode;
+                                dependency.ProviderKey = msiPackage.ProductCode;
                                 break;
                             case WixBundleMspPackageSymbol mspPackage:
-                                dependency.Key = mspPackage.PatchCode;
+                                dependency.ProviderKey = mspPackage.PatchCode;
                                 break;
                         }
                     }
@@ -84,7 +75,7 @@ namespace WixToolset.Core.Burn.Bind
                         dependency.Version = facade.PackageSymbol.Version;
                     }
 
-                    // If the version is still missing, a version could not be harvested from the package and was not authored.
+                    // If the version is still missing, a version could not be gathered from the package and was not authored.
                     if (String.IsNullOrEmpty(dependency.Version))
                     {
                         this.Messaging.Write(ErrorMessages.MissingDependencyVersion(facade.PackageId));
@@ -97,62 +88,56 @@ namespace WixToolset.Core.Burn.Bind
                 }
             }
 
-            this.DependencySymbolsByKey = this.GetDependencySymbolsByKey();
+            this.DependencySymbolsByKey = this.GetDependencySymbolsByKey(dependencySymbols);
 
             // Generate providers for MSI and MSP packages that still do not have providers.
             foreach (var facade in this.Facades.Values)
             {
                 string key = null;
 
-                //if (WixBundlePackageType.Msi == facade.PackageSymbol.Type)
                 if (facade.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
                 {
-                    //var msiPackage = (WixBundleMsiPackageSymbol)facade.SpecificPackageSymbol;
                     key = msiPackage.ProductCode;
                 }
-                //else if (WixBundlePackageType.Msp == facade.PackageSymbol.Type)
                 else if (facade.SpecificPackageSymbol is WixBundleMspPackageSymbol mspPackage)
                 {
-                    //var mspPackage = (WixBundleMspPackageSymbol)facade.SpecificPackageSymbol;
                     key = mspPackage.PatchCode;
                 }
 
                 if (!String.IsNullOrEmpty(key) && !this.DependencySymbolsByKey.ContainsKey(key))
                 {
-                    var dependency = this.Section.AddSymbol(new ProvidesDependencySymbol(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.Id)
+                    var dependency = this.Section.AddSymbol(new WixDependencyProviderSymbol(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.Id)
                     {
-                        PackageRef = facade.PackageId,
-                        Key = key,
+                        ParentRef = facade.PackageId,
+                        ProviderKey = key,
                         Version = facade.PackageSymbol.Version,
                         DisplayName = facade.PackageSymbol.DisplayName
                     });
 
-                    this.DependencySymbolsByKey.Add(dependency.Key, dependency);
+                    this.DependencySymbolsByKey.Add(dependency.ProviderKey, dependency);
                 }
             }
         }
 
-        private Dictionary<string, ProvidesDependencySymbol> GetDependencySymbolsByKey()
+        private Dictionary<string, WixDependencyProviderSymbol> GetDependencySymbolsByKey(IEnumerable<WixDependencyProviderSymbol> dependencySymbols)
         {
-            var dependencySymbolsByKey = new Dictionary<string, ProvidesDependencySymbol>();
-
-            var dependencySymbols = this.Section.Symbols.OfType<ProvidesDependencySymbol>();
+            var dependencySymbolsByKey = new Dictionary<string, WixDependencyProviderSymbol>();
 
             foreach (var dependency in dependencySymbols)
             {
-                if (dependencySymbolsByKey.TryGetValue(dependency.Key, out var collision))
+                if (dependencySymbolsByKey.TryGetValue(dependency.ProviderKey, out var collision))
                 {
                     // If not a perfect dependency collision, display an error.
-                    if (dependency.Key != collision.Key ||
+                    if (dependency.ProviderKey != collision.ProviderKey ||
                         dependency.Version != collision.Version ||
                         dependency.DisplayName != collision.DisplayName)
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateProviderDependencyKey(dependency.Key, dependency.PackageRef));
+                        this.Messaging.Write(ErrorMessages.DuplicateProviderDependencyKey(dependency.ProviderKey, dependency.ParentRef));
                     }
                 }
                 else
                 {
-                    dependencySymbolsByKey.Add(dependency.Key, dependency);
+                    dependencySymbolsByKey.Add(dependency.ProviderKey, dependency);
                 }
             }
 

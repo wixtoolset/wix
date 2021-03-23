@@ -53,7 +53,7 @@ namespace WixToolset.Core
                 // in the table definition but unused for bundles, so just set it to the valid ID.
                 this.Core.AddSymbol(new WixDependencyProviderSymbol(sourceLineNumbers, id)
                 {
-                    ComponentRef = id.Id,
+                    ParentRef = id.Id,
                     ProviderKey = providerKey,
                     Attributes = WixDependencyProviderAttributes.ProvidesAttributesBundle,
                 });
@@ -187,7 +187,7 @@ namespace WixToolset.Core
             {
                 var symbol = this.Core.AddSymbol(new WixDependencyProviderSymbol(sourceLineNumbers, id)
                 {
-                    ComponentRef = parentId,
+                    ParentRef = parentId,
                     ProviderKey = key,
                 });
 

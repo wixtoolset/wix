@@ -541,14 +541,13 @@ namespace WixToolset.Core.Burn.Bundles
                             var id = new Identifier(AccessModifier.Section, this.BackendHelper.GenerateIdentifier("dep", msiPackage.Id.Id, record.GetString(1)));
 
                             // Import the provider key and attributes.
-                            this.Section.AddSymbol(new ProvidesDependencySymbol(msiPackage.SourceLineNumbers, id)
+                            this.Section.AddSymbol(new WixDependencyProviderSymbol(msiPackage.SourceLineNumbers, id)
                             {
-                                PackageRef = msiPackage.Id.Id,
-                                Key = record.GetString(2),
+                                ParentRef = msiPackage.Id.Id,
+                                ProviderKey = record.GetString(2),
                                 Version = record.GetString(3) ?? msiPackage.ProductVersion,
                                 DisplayName = record.GetString(4) ?? this.Facade.PackageSymbol.DisplayName,
-                                Attributes = record.GetInteger(5),
-                                Imported = true
+                                Attributes = WixDependencyProviderAttributes.ProvidesAttributesImported | (WixDependencyProviderAttributes)record.GetInteger(5),
                             });
                         }
                     }
