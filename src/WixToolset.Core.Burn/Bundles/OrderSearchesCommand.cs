@@ -23,33 +23,28 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IntermediateSection Section { get; }
 
-        public IDictionary<string, IList<IntermediateSymbol>> ExtensionSearchSymbolsByExtensionId { get; private set; }
+        public IDictionary<string, IEnumerable<IntermediateSymbol>> ExtensionSearchSymbolsByExtensionId { get; private set; }
 
-        public IList<ISearchFacade> OrderedSearchFacades { get; private set; }
+        public IEnumerable<ISearchFacade> OrderedSearchFacades { get; private set; }
 
         public void Execute()
         {
-            this.ExtensionSearchSymbolsByExtensionId = new Dictionary<string, IList<IntermediateSymbol>>();
-            this.OrderedSearchFacades = new List<ISearchFacade>();
+            this.ExtensionSearchSymbolsByExtensionId = new Dictionary<string, IEnumerable<IntermediateSymbol>>();
+            this.OrderedSearchFacades = Array.Empty<ISearchFacade>();
 
-            var searchRelationSymbols = this.Section.Symbols.OfType<WixSearchRelationSymbol>().ToList();
-            var searchSymbols = this.Section.Symbols.OfType<WixSearchSymbol>().ToList();
+            var searchSymbols = this.Section.Symbols.OfType<WixSearchSymbol>().ToDictionary(t => t.Id.Id);
             if (searchSymbols.Count == 0)
             {
-                // nothing to do!
+                // Nothing to do!
                 return;
             }
 
-            var symbolDictionary = searchSymbols.ToDictionary(t => t.Id.Id);
-
             var constraints = new Constraints();
-            if (searchRelationSymbols.Count > 0)
+
+            // Add relational info to our data...
+            foreach (var searchRelationSymbol in this.Section.Symbols.OfType<WixSearchRelationSymbol>())
             {
-                // add relational info to our data...
-                foreach (var searchRelationSymbol in searchRelationSymbols)
-                {
-                    constraints.AddConstraint(searchRelationSymbol.Id.Id, searchRelationSymbol.ParentSearchRef);
-                }
+                constraints.AddConstraint(searchRelationSymbol.Id.Id, searchRelationSymbol.ParentSearchRef);
             }
 
             this.FindCircularReference(constraints);
@@ -67,10 +62,13 @@ namespace WixToolset.Core.Burn.Bundles
             // lexicographically at each step to ensure a deterministic ordering
             // based on 'after' dependencies and ID.
             var sorter = new TopologicalSort();
-            var sortedIds = sorter.Sort(symbolDictionary.Keys, constraints);
+            var sortedIds = sorter.Sort(searchSymbols.Keys, constraints);
 
             // Now, create the search facades with the searches in order...
-            this.OrderSearches(sortedIds, symbolDictionary);
+            (var orderedSearchFacades, var extensionSearchSymbolsByExtensionId) = this.OrderSearches(sortedIds, searchSymbols);
+
+            this.OrderedSearchFacades = orderedSearchFacades;
+            this.ExtensionSearchSymbolsByExtensionId = extensionSearchSymbolsByExtensionId;
         }
 
         /// <summary>
@@ -102,11 +100,11 @@ namespace WixToolset.Core.Burn.Bundles
         /// <remarks>This is not particularly performant, but it works.</remarks>
         private void FindCircularReference(Constraints constraints)
         {
-            foreach (string id in constraints.Keys)
+            foreach (var id in constraints.Keys)
             {
                 var seenIds = new List<string>();
-                string chain = null;
-                if (this.FindCircularReference(constraints, id, id, seenIds, out chain))
+
+                if (this.FindCircularReference(constraints, id, id, seenIds, out var chain))
                 {
                     // We will show a separate message for every ID that's in
                     // the loop. We could bail after the first one, but then
@@ -313,8 +311,11 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void OrderSearches(List<string> sortedIds, Dictionary<string, WixSearchSymbol> searchSymbolDictionary)
+        private (IEnumerable<ISearchFacade>, Dictionary<string, IEnumerable<IntermediateSymbol>>) OrderSearches(IEnumerable<string> sortedIds, Dictionary<string, WixSearchSymbol> searchSymbolDictionary)
         {
+            var orderedSearchFacades = new List<ISearchFacade>();
+            var extensionSearchSymbolsByExtensionId = new Dictionary<string, List<IntermediateSymbol>>();
+
             // TODO: Although the WixSearch tables are defined in the Util extension,
             // the Bundle Binder has to know all about them. We hope to revisit all
             // of this in the 4.0 timeframe.
@@ -334,22 +335,23 @@ namespace WixToolset.Core.Burn.Bundles
             foreach (var searchId in sortedIds)
             {
                 var searchSymbol = searchSymbolDictionary[searchId];
+
                 if (legacySearchesById.TryGetValue(searchId, out var specificSearchSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new LegacySearchFacade(searchSymbol, specificSearchSymbol));
+                    orderedSearchFacades.Add(new LegacySearchFacade(searchSymbol, specificSearchSymbol));
                 }
                 else if (setVariablesById.TryGetValue(searchId, out var setVariableSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new SetVariableSearchFacade(searchSymbol, setVariableSymbol));
+                    orderedSearchFacades.Add(new SetVariableSearchFacade(searchSymbol, setVariableSymbol));
                 }
                 else if (extensionSearchesById.TryGetValue(searchId, out var extensionSearchSymbol))
                 {
-                    this.OrderedSearchFacades.Add(new ExtensionSearchFacade(searchSymbol));
+                    orderedSearchFacades.Add(new ExtensionSearchFacade(searchSymbol));
 
-                    if (!this.ExtensionSearchSymbolsByExtensionId.TryGetValue(searchSymbol.BundleExtensionRef, out var extensionSearchSymbols))
+                    if (!extensionSearchSymbolsByExtensionId.TryGetValue(searchSymbol.BundleExtensionRef, out var extensionSearchSymbols))
                     {
                         extensionSearchSymbols = new List<IntermediateSymbol>();
-                        this.ExtensionSearchSymbolsByExtensionId[searchSymbol.BundleExtensionRef] = extensionSearchSymbols;
+                        extensionSearchSymbolsByExtensionId[searchSymbol.BundleExtensionRef] = extensionSearchSymbols;
                     }
                     extensionSearchSymbols.Add(extensionSearchSymbol);
                 }
@@ -358,6 +360,8 @@ namespace WixToolset.Core.Burn.Bundles
                     this.Messaging.Write(ErrorMessages.MissingBundleSearch(searchSymbol.SourceLineNumbers, searchId));
                 }
             }
+
+            return (orderedSearchFacades, extensionSearchSymbolsByExtensionId.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<IntermediateSymbol>)kvp.Value));
         }
     }
 }

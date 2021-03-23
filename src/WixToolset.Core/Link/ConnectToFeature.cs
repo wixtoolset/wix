@@ -15,16 +15,6 @@ namespace WixToolset.Core.Link
         /// </summary>
         /// <param name="section">Section this connect belongs to.</param>
         /// <param name="childId">Id of the child.</param>
-        public ConnectToFeature(IntermediateSection section, string childId) :
-            this(section, childId, null, false)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new connect to feature.
-        /// </summary>
-        /// <param name="section">Section this connect belongs to.</param>
-        /// <param name="childId">Id of the child.</param>
         /// <param name="primaryFeature">Sets the primary feature for the connection.</param>
         /// <param name="explicitPrimaryFeature">Sets if this is explicit primary.</param>
         public ConnectToFeature(IntermediateSection section, string childId, string primaryFeature, bool explicitPrimaryFeature)

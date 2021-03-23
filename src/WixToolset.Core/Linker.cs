@@ -901,51 +901,6 @@ namespace WixToolset.Core
             }
         }
 
-#if DEAD_CODE
-        /// <summary>
-        /// Copies a table's rows to an output table.
-        /// </summary>
-        /// <param name="table">Source table to copy rows from.</param>
-        /// <param name="outputTable">Destination table in output to copy rows into.</param>
-        /// <param name="sectionId">Id of the section that the table lives in.</param>
-        private void CopyTableRowsToOutputTable(Table table, Table outputTable, string sectionId)
-        {
-            int[] localizedColumns = new int[table.Definition.Columns.Count];
-            int localizedColumnCount = 0;
-
-            // if there are localization strings, figure out which columns can be localized in this table
-            if (null != this.Localizer)
-            {
-                for (int i = 0; i < table.Definition.Columns.Count; i++)
-                {
-                    if (table.Definition.Columns[i].IsLocalizable)
-                    {
-                        localizedColumns[localizedColumnCount++] = i;
-                    }
-                }
-            }
-
-            // process each row in the table doing the string resource substitutions
-            // then add the row to the output
-            foreach (Row row in table.Rows)
-            {
-                for (int j = 0; j < localizedColumnCount; j++)
-                {
-                    Field field = row.Fields[localizedColumns[j]];
-
-                    if (null != field.Data)
-                    {
-                        field.Data = this.WixVariableResolver.ResolveVariables(row.SourceLineNumbers, (string)field.Data, true);
-                    }
-                }
-
-                row.SectionId = (this.sectionIdOnRows ? sectionId : null);
-                outputTable.Rows.Add(row);
-            }
-        }
-#endif
-
-
         /// <summary>
         /// Resolve features for columns that have null guid placeholders.
         /// </summary>

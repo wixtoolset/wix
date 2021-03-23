@@ -16,7 +16,7 @@ namespace WixToolset.Core.Burn.Bind
 
     internal class GenerateManifestDataFromIRCommand
     {
-        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IList<IntermediateSymbol>> extensionSearchSymbolsById)
+        public GenerateManifestDataFromIRCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IBurnBackendBinderExtension> backendExtensions, IBurnBackendHelper backendHelper, IDictionary<string, IEnumerable<IntermediateSymbol>> extensionSearchSymbolsById)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -29,7 +29,7 @@ namespace WixToolset.Core.Burn.Bind
 
         private IBurnBackendHelper BackendHelper { get; }
 
-        private IDictionary<string, IList<IntermediateSymbol>> ExtensionSearchSymbolsById { get; }
+        private IDictionary<string, IEnumerable<IntermediateSymbol>> ExtensionSearchSymbolsById { get; }
 
         private IMessaging Messaging { get; }
 

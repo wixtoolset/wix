@@ -15,10 +15,8 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class ProcessPayloadsCommand
     {
-        public ProcessPayloadsCommand(IServiceProvider serviceProvider, IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IBackendHelper backendHelper, IPayloadHarvester payloadHarvester, IEnumerable<WixBundlePayloadSymbol> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
-            this.Messaging = serviceProvider.GetService<IMessaging>();
-
             this.BackendHelper = backendHelper;
             this.PayloadHarvester = payloadHarvester;
             this.Payloads = payloads;
@@ -29,8 +27,6 @@ namespace WixToolset.Core.Burn.Bundles
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
-
-        private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
 
