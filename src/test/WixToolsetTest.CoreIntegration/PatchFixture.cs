@@ -93,11 +93,13 @@ namespace WixToolsetTest.CoreIntegration
 
             using (var fs = new DisposableFileSystem())
             {
-                var tempFolder = fs.GetFolder();
+                var tempFolderBaseline = fs.GetFolder();
+                var tempFolderUpdate = fs.GetFolder();
+                var tempFolderPatch = fs.GetFolder();
 
-                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
-                var update1Pdb = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1");
-                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", hasNoFiles: true);
+                var baselinePdb = BuildMsi("Baseline.msi", folder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var update1Pdb = BuildMsi("Update.msi", folder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPdb = BuildMsp("Patch1.msp", folder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePdb), Path.GetDirectoryName(update1Pdb) }, hasNoFiles: true);
                 var patchPath = Path.ChangeExtension(patchPdb, ".msp");
 
                 Assert.True(File.Exists(baselinePdb));
@@ -116,9 +118,9 @@ namespace WixToolsetTest.CoreIntegration
 
                 var baselinePdb = BuildMsi("Baseline.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.0", "A", "B");
                 var updatePdb = BuildMsi("Update.msi", Path.Combine(folder, "PackageA"), tempFolder, "1.0.1", "A", "B");
-                var patchAPdb = BuildMsp("PatchA.msp", Path.Combine(folder, "PatchA"), tempFolder, "1.0.1", true);
-                var patchBPdb = BuildMsp("PatchB.msp", Path.Combine(folder, "PatchB"), tempFolder, "1.0.1", true);
-                var patchCPdb = BuildMsp("PatchC.msp", Path.Combine(folder, "PatchC"), tempFolder, "1.0.1", true);
+                var patchAPdb = BuildMsp("PatchA.msp", Path.Combine(folder, "PatchA"), tempFolder, "1.0.1", hasNoFiles: true);
+                var patchBPdb = BuildMsp("PatchB.msp", Path.Combine(folder, "PatchB"), tempFolder, "1.0.1", hasNoFiles: true);
+                var patchCPdb = BuildMsp("PatchC.msp", Path.Combine(folder, "PatchC"), tempFolder, "1.0.1", hasNoFiles: true);
                 var bundleAPdb = BuildBundle("BundleA.exe", Path.Combine(folder, "BundleA"), tempFolder);
                 var bundleBPdb = BuildBundle("BundleB.exe", Path.Combine(folder, "BundleB"), tempFolder);
                 var bundleCPdb = BuildBundle("BundleC.exe", Path.Combine(folder, "BundleC"), tempFolder);
@@ -206,11 +208,11 @@ namespace WixToolsetTest.CoreIntegration
             return Path.ChangeExtension(outputPath, ".wixpdb");
         }
 
-        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, bool hasNoFiles = false)
+        private static string BuildMsp(string outputName, string sourceFolder, string baseFolder, string defineV, IEnumerable<string> bindpaths = null, bool hasNoFiles = false)
         {
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
-            var result = WixRunner.Execute(new[]
+            var args = new List<string>
             {
                 "build",
                 hasNoFiles ? "-sw1079" : " ",
@@ -219,7 +221,15 @@ namespace WixToolsetTest.CoreIntegration
                 "-bindpath", Path.Combine(baseFolder, "bin"),
                 "-intermediateFolder", Path.Combine(baseFolder, "obj"),
                 "-o", outputPath
-            });
+            };
+
+            foreach (var additionaBindPath in bindpaths ?? Enumerable.Empty<string>())
+            {
+                args.Add("-bindpath");
+                args.Add(additionaBindPath);
+            }
+
+            var result = WixRunner.Execute(args.ToArray());
 
             result.AssertSuccess();
 
