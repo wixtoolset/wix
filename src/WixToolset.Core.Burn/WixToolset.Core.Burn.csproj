@@ -27,7 +27,6 @@
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
     <PackageReference Include="WixToolset.Dtf.Resources" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
   </ItemGroup>
 

@@ -4,23 +4,27 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Xml;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
-    using Dtf = WixToolset.Dtf.WindowsInstaller;
 
     /// <summary>
     /// Initializes package state from the Msp contents.
     /// </summary>
     internal class ProcessMspPackageCommand
     {
-        private const string PatchMetadataFormat = "SELECT `Value` FROM `MsiPatchMetadata` WHERE `Property` = '{0}'";
-        private static readonly Encoding XmlOutputEncoding = new UTF8Encoding(false);
+        private const string PatchMetadataQuery = "SELECT `Value` FROM `MsiPatchMetadata` WHERE `Property` = ?";
+        private static readonly XmlWriterSettings XmlSettings = new XmlWriterSettings()
+        {
+            Encoding = new UTF8Encoding(false),
+            Indent = false,
+            NewLineChars = String.Empty,
+            NewLineHandling = NewLineHandling.Replace,
+        };
 
         public ProcessMspPackageCommand(IMessaging messaging, IntermediateSection section, PackageFacade facade, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols)
         {
@@ -52,30 +56,34 @@ namespace WixToolset.Core.Burn.Bundles
 
             try
             {
-                // Read data out of the msp database...
-                using (var sumInfo = new Dtf.SummaryInfo(sourcePath, false))
+                using (var db = new Database(sourcePath, OpenDatabase.ReadOnly | OpenDatabase.OpenPatchFile))
                 {
-                    mspPackage.PatchCode = sumInfo.RevisionNumber.Substring(0, 38);
-                }
-
-                using (var db = new Dtf.Database(sourcePath))
-                {
-                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
+                    // Read data out of the msp database...
+                    using (var sumInfo = new SummaryInformation(db))
                     {
-                        this.Facade.PackageSymbol.DisplayName = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "DisplayName");
+                        var patchCode = sumInfo.GetProperty(SummaryInformation.Patch.PatchCode);
+                        mspPackage.PatchCode = patchCode.Substring(0, 38);
                     }
 
-                    if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Description))
+                    using (var view = db.OpenView(PatchMetadataQuery))
                     {
-                        this.Facade.PackageSymbol.Description = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "Description");
-                    }
+                        if (String.IsNullOrEmpty(this.Facade.PackageSymbol.DisplayName))
+                        {
+                            this.Facade.PackageSymbol.DisplayName = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "DisplayName");
+                        }
 
-                    mspPackage.Manufacturer = ProcessMspPackageCommand.GetPatchMetadataProperty(db, "ManufacturerName");
+                        if (String.IsNullOrEmpty(this.Facade.PackageSymbol.Description))
+                        {
+                            this.Facade.PackageSymbol.Description = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "Description");
+                        }
+
+                        mspPackage.Manufacturer = ProcessMspPackageCommand.GetPatchMetadataProperty(view, "ManufacturerName");
+                    }
                 }
 
                 this.ProcessPatchXml(packagePayload, mspPackage, sourcePath);
             }
-            catch (Dtf.InstallerException e)
+            catch (MsiException e)
             {
                 this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(packagePayload.SourceLineNumbers, sourcePath, e.Message));
                 return;
@@ -91,7 +99,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var uniqueTargetCodes = new HashSet<string>();
 
-            var patchXml = Dtf.Installer.ExtractPatchXmlData(sourcePath);
+            var patchXml = Installer.ExtractPatchXml(sourcePath);
 
             var doc = new XmlDocument();
             doc.LoadXml(patchXml);
@@ -146,15 +154,7 @@ namespace WixToolset.Core.Burn.Bundles
             // Save the XML as compact as possible.
             using (var writer = new StringWriter())
             {
-                var settings = new XmlWriterSettings()
-                {
-                    Encoding = ProcessMspPackageCommand.XmlOutputEncoding,
-                    Indent = false,
-                    NewLineChars = String.Empty,
-                    NewLineHandling = NewLineHandling.Replace,
-                };
-
-                using (var xmlWriter = XmlWriter.Create(writer, settings))
+                using (var xmlWriter = XmlWriter.Create(writer, XmlSettings))
                 {
                     doc.WriteTo(xmlWriter);
                 }
@@ -163,32 +163,19 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        /// <summary>
-        /// Queries a Windows Installer patch database for a Property value from the MsiPatchMetadata table.
-        /// </summary>
-        /// <param name="db">Database to query.</param>
-        /// <param name="property">Property to examine.</param>
-        /// <returns>String value for result or null if query doesn't match a single result.</returns>
-        private static string GetPatchMetadataProperty(Dtf.Database db, string property)
+        private static string GetPatchMetadataProperty(View view, string property)
         {
-            try
+            using (var queryRecord = new Record(1))
             {
-                return db.ExecuteScalar(PatchMetadataPropertyQuery(property)).ToString();
+                queryRecord[1] = property;
+
+                view.Execute(queryRecord);
+
+                using (var record = view.Fetch())
+                {
+                    return record?.GetString(1);
+                }
             }
-            catch (Dtf.InstallerException)
-            {
-            }
-
-            return null;
-        }
-
-        private static string PatchMetadataPropertyQuery(string property)
-        {
-            // quick sanity check that we'll be creating a valid query...
-            // TODO: Are there any other special characters we should be looking for?
-            Debug.Assert(!property.Contains("'"));
-
-            return String.Format(CultureInfo.InvariantCulture, ProcessMspPackageCommand.PatchMetadataFormat, property);
         }
 
         private static bool TargetsCode(XmlNode node) => "true" == node?.Attributes["Validate"]?.Value;

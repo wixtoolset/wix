@@ -8,9 +8,9 @@ namespace WixToolset.Core.Burn.Bind
     using System.Linq;
     using System.Text;
     using System.Xml;
+    using WixToolset.Core.Native.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using WixToolset.Dtf.WindowsInstaller;
 
     internal class ProcessBundleSoftwareTagsCommand
     {
@@ -69,22 +69,13 @@ namespace WixToolset.Core.Burn.Bind
                 {
                     var payload = payloadSymbolsById[msiPackage.PayloadRef];
 
-                    using (var db = new Database(payload.SourceFile.Path))
+                    using (var db = new Database(payload.SourceFile.Path, OpenDatabase.ReadOnly))
                     {
-                        using (var view = db.OpenView("SELECT `Regid`, `TagId` FROM `SoftwareIdentificationTag`"))
+                        using (var view = db.OpenExecuteView("SELECT `Regid`, `TagId` FROM `SoftwareIdentificationTag`"))
                         {
-                            view.Execute();
-                            while (true)
+                            foreach (var record in view.Records)
                             {
-                                using (var record = view.Fetch())
-                                {
-                                    if (null == record)
-                                    {
-                                        break;
-                                    }
-
-                                    tags.Add(new SoftwareTag { Regid = record.GetString(1), Id = record.GetString(2) });
-                                }
+                                tags.Add(new SoftwareTag { Regid = record.GetString(1), Id = record.GetString(2) });
                             }
                         }
                     }
@@ -98,7 +89,7 @@ namespace WixToolset.Core.Burn.Bind
         {
             var versionScheme = Version.TryParse(version, out _) ? "multipartnumeric" : "alphanumeric";
 
-            using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true}))
+            using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("SoftwareIdentity", "http://standards.iso.org/iso/19770/-2/2015/schema.xsd");
