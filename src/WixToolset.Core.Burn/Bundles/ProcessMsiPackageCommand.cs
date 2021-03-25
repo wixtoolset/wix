@@ -140,7 +140,7 @@ namespace WixToolset.Core.Burn.Bundles
                         this.Facade.PackageSymbol.Version = msiPackage.ProductVersion;
                     }
 
-                    var payloadNames = this.GetPayloadTargetNames(packagePayload.Id.Id);
+                    var payloadNames = this.GetPayloadTargetNames();
 
                     var msiPropertyNames = this.GetMsiPropertyNames(packagePayload.Id.Id);
 
@@ -180,7 +180,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private ISet<string> GetPayloadTargetNames(string packageId)
+        private ISet<string> GetPayloadTargetNames()
         {
             var payloadNames = this.PackagePayloads.Values.Select(p => p.Name);
 
