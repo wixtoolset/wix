@@ -190,7 +190,7 @@ namespace WixToolset.Core.Burn.Bundles
         private ISet<string> GetMsiPropertyNames(string packageId)
         {
             var properties = this.Section.Symbols.OfType<WixBundleMsiPropertySymbol>()
-                .Where(p => p.Id.Id == packageId)
+                .Where(p => p.PackageRef == packageId)
                 .Select(p => p.Name);
 
             return new HashSet<string>(properties, StringComparer.Ordinal);
