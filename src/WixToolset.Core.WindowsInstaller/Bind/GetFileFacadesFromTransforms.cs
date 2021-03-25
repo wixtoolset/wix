@@ -91,7 +91,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             // TODO: should this entire condition be placed in the binder file manager?
                             if (/*(0 == (PatchAttributeType.Ignore & mainWixFileRow.PatchAttributes)) &&*/
-                                !this.FileSystemManager.CompareFiles(objectField.PreviousData.ToString(), objectField.Data.ToString()))
+                                !this.FileSystemManager.CompareFiles(objectField.PreviousData, objectField.Data.ToString()))
                             {
                                 // If the file is different, we need to mark the mainFileRow and pairedFileRow as modified.
                                 mainFileRow.Operation = RowOperation.Modify;

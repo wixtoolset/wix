@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using WixToolset.Extensibility;
@@ -31,6 +32,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private static bool BuiltinCompareFiles(string firstPath, string secondPath)
         {
+            if (String.Equals(firstPath, secondPath, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
             using (var firstStream = File.OpenRead(firstPath))
             using (var secondStream = File.OpenRead(secondPath))
             {
