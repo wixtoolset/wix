@@ -24,6 +24,31 @@ namespace WixToolset.Core.Native.Msi
     public static class Installer
     {
         /// <summary>
+        /// Extacts the patch metadata as XML.
+        /// </summary>
+        /// <param name="path">Path to patch.</param>
+        /// <returns>String XML.</returns>
+        public static string ExtractPatchXml(string path)
+        {
+            var buffer = new StringBuilder(65535);
+            var size = buffer.Capacity;
+
+            var error = MsiInterop.MsiExtractPatchXMLData(path, 0, buffer, ref size);
+            if (234 == error)
+            {
+                buffer.EnsureCapacity(++size);
+                error = MsiInterop.MsiExtractPatchXMLData(path, 0, buffer, ref size);
+            }
+
+            if (error != 0)
+            {
+                throw new MsiException(error);
+            }
+
+            return buffer.ToString();
+        }
+
+        /// <summary>
         /// Takes the path to a file and returns a 128-bit hash of that file.
         /// </summary>
         /// <param name="filePath">Path to file that is to be hashed.</param>

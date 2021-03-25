@@ -153,6 +153,17 @@ namespace WixToolset.Core.Native.Msi
         internal static extern int MsiDatabaseOpenView(uint database, string query, out uint view);
 
         /// <summary>
+        /// PInvoke of MsiExtractPatchXMLDataW.
+        /// </summary>
+        /// <param name="szPatchPath">Path to patch.</param>
+        /// <param name="dwReserved">Reserved for future use.</param>
+        /// <param name="szXMLData">Output XML data.</param>
+        /// <param name="pcchXMLData">Count of characters in XML.</param>
+        /// <returns></returns>
+        [DllImport("msi.dll", EntryPoint = "MsiExtractPatchXMLDataW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern int MsiExtractPatchXMLData(string szPatchPath, int dwReserved, StringBuilder szXMLData, ref int pcchXMLData);
+
+        /// <summary>
         /// PInvoke of MsiGetFileHashW.
         /// </summary>
         /// <param name="filePath">File path.</param>

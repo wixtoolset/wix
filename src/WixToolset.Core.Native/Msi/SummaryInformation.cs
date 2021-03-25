@@ -13,6 +13,63 @@ namespace WixToolset.Core.Native.Msi
     public sealed class SummaryInformation : MsiHandle
     {
         /// <summary>
+        /// Summary information properties for products.
+        /// </summary>
+        public enum Package
+        {
+            /// <summary>PID_CODEPAGE = code page of the summary information stream</summary>
+            CodePage = 1,
+
+            /// <summary>PID_TITLE = a brief description of the package type</summary>
+            Title = 2,
+
+            /// <summary>PID_SUBJECT = package name</summary>
+            PackageName = 3,
+
+            /// <summary>PID_AUTHOR = manufacturer of the patch package</summary>
+            Manufacturer = 4,
+
+            /// <summary>PID_KEYWORDS = list of keywords used by file browser</summary>
+            Keywords = 5,
+
+            /// <summary>PID_COMMENTS = general purpose of the package</summary>
+            Comments = 6,
+
+            /// <summary>PID_TEMPLATE = supported platforms and languages</summary>
+            PlatformsAndLanguages = 7,
+
+            /// <summary>PID_LASTAUTHOR should be null for packages</summary>
+            Reserved8 = 8,
+
+            /// <summary>PID_REVNUMBER = GUID package code</summary>
+            PackageCode = 9,
+
+            /// <summary>PID_LASTPRINTED should be null for packages</summary>
+            Reserved11 = 11,
+
+            /// <summary>PID_CREATED datetime when package was created</summary>
+            Created = 12,
+
+            /// <summary>PID_SAVED datetime when package was last modified</summary>
+            LastModified = 13,
+
+            /// <summary>PID_PAGECOUNT minimum required Windows Installer</summary>
+            InstallerRequirement = 14,
+
+            /// <summary>PID_WORDCOUNT elevation privileges of package</summary>
+            FileAndElevatedFlags = 15,
+
+            /// <summary>PID_CHARCOUNT should be null for patches</summary>
+            Reserved16 = 16,
+
+            /// <summary>PID_APPLICATION tool used to create package</summary>
+            BuildTool = 18,
+
+            /// <summary>PID_SECURITY = read-only attribute of the package</summary>
+            Security = 19,
+        }
+
+        /// <summary>
         /// Summary information properties for transforms.
         /// </summary>
         public enum Transform
@@ -140,7 +197,7 @@ namespace WixToolset.Core.Native.Msi
         {
             if (null == db)
             {
-                throw new ArgumentNullException("db");
+                throw new ArgumentNullException(nameof(db));
             }
 
             uint handle = 0;
@@ -160,7 +217,7 @@ namespace WixToolset.Core.Native.Msi
         {
             if (null == databaseFile)
             {
-                throw new ArgumentNullException("databaseFile");
+                throw new ArgumentNullException(nameof(databaseFile));
             }
 
             uint handle = 0;
@@ -173,20 +230,113 @@ namespace WixToolset.Core.Native.Msi
         }
 
         /// <summary>
+        /// Gets a summary information package property.
+        /// </summary>
+        /// <param name="property">The summary information package property.</param>
+        /// <returns>The summary information property.</returns>
+        public string GetProperty(Package property)
+        {
+            return this.GetProperty((int)property);
+        }
+
+        /// <summary>
+        /// Gets a summary information package property as a number.
+        /// </summary>
+        /// <param name="property">The summary information package property.</param>
+        /// <returns>The summary information property.</returns>
+        public long GetNumericProperty(Package property)
+        {
+            return this.GetNumericProperty((int)property);
+        }
+
+        /// <summary>
+        /// Gets a summary information patch property.
+        /// </summary>
+        /// <param name="property">The summary information patch property.</param>
+        /// <returns>The summary information property.</returns>
+        public string GetProperty(Patch property)
+        {
+            return this.GetProperty((int)property);
+        }
+
+        /// <summary>
+        /// Gets a summary information transform property.
+        /// </summary>
+        /// <param name="property">The summary information transform property.</param>
+        /// <returns>The summary information property.</returns>
+        public long GetNumericProperty(Transform property)
+        {
+            return this.GetNumericProperty((int)property);
+        }
+
+        /// <summary>
         /// Gets a summary information property.
         /// </summary>
         /// <param name="index">Index of the summary information property.</param>
         /// <returns>The summary information property.</returns>
         public string GetProperty(int index)
         {
-            var bufSize = 64;
-            var stringValue = new StringBuilder(bufSize);
+            this.GetSummaryInformationValue(index, out var dataType, out var intValue, out var stringValue, out var timeValue);
 
-            FILETIME timeValue;
+            switch ((VT)dataType)
+            {
+                case VT.EMPTY:
+                    return String.Empty;
+
+                case VT.LPSTR:
+                    return stringValue.ToString();
+
+                case VT.I2:
+                case VT.I4:
+                    return Convert.ToString(intValue, CultureInfo.InvariantCulture);
+
+                case VT.FILETIME:
+                    var longFileTime = (((long)timeValue.dwHighDateTime) << 32) | unchecked((uint)timeValue.dwLowDateTime);
+                    var dateTime = DateTime.FromFileTime(longFileTime);
+                    return dateTime.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        /// <summary>
+        /// Gets a summary information property as a number.
+        /// </summary>
+        /// <param name="index">Index of the summary information property.</param>
+        /// <returns>The summary information property.</returns>
+        public long GetNumericProperty(int index)
+        {
+            this.GetSummaryInformationValue(index, out var dataType, out var intValue, out var stringValue, out var timeValue);
+
+            switch ((VT)dataType)
+            {
+                case VT.EMPTY:
+                    return 0;
+
+                case VT.LPSTR:
+                    return Int64.Parse(stringValue.ToString(), CultureInfo.InvariantCulture);
+
+                case VT.I2:
+                case VT.I4:
+                    return intValue;
+
+                case VT.FILETIME:
+                    return (((long)timeValue.dwHighDateTime) << 32) | unchecked((uint)timeValue.dwLowDateTime);
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        private void GetSummaryInformationValue(int index, out uint dataType, out int intValue, out StringBuilder stringValue, out FILETIME timeValue)
+        {
+            var bufSize = 64;
+            stringValue = new StringBuilder(bufSize);
             timeValue.dwHighDateTime = 0;
             timeValue.dwLowDateTime = 0;
 
-            var error = MsiInterop.MsiSummaryInfoGetProperty(this.Handle, index, out var dataType, out var intValue, ref timeValue, stringValue, ref bufSize);
+            var error = MsiInterop.MsiSummaryInfoGetProperty(this.Handle, index, out dataType, out intValue, ref timeValue, stringValue, ref bufSize);
             if (234 == error)
             {
                 stringValue.EnsureCapacity(++bufSize);
@@ -196,23 +346,6 @@ namespace WixToolset.Core.Native.Msi
             if (0 != error)
             {
                 throw new MsiException(error);
-            }
-
-            switch ((VT)dataType)
-            {
-                case VT.EMPTY:
-                    return String.Empty;
-                case VT.LPSTR:
-                    return stringValue.ToString();
-                case VT.I2:
-                case VT.I4:
-                    return Convert.ToString(intValue, CultureInfo.InvariantCulture);
-                case VT.FILETIME:
-                    var longFileTime = (((long)timeValue.dwHighDateTime) << 32) | unchecked((uint)timeValue.dwLowDateTime);
-                    var dateTime = DateTime.FromFileTime(longFileTime);
-                    return dateTime.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-                default:
-                    throw new InvalidOperationException();
             }
         }
 

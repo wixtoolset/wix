@@ -3,7 +3,6 @@
 namespace WixToolset.Core.Native.Msi
 {
     using System;
-    using System.Globalization;
     using System.IO;
     using System.Threading;
 
@@ -44,10 +43,9 @@ namespace WixToolset.Core.Native.Msi
             var conditions = TransformErrorConditions.None;
             using (var summaryInfo = new SummaryInformation(transformFile))
             {
-                var value = summaryInfo.GetProperty((int)SummaryInformation.Transform.ValidationFlags);
                 try
                 {
-                    var validationFlags = Int32.Parse(value, CultureInfo.InvariantCulture);
+                    var validationFlags = summaryInfo.GetNumericProperty(SummaryInformation.Transform.ValidationFlags);
                     conditions = (TransformErrorConditions)(validationFlags & 0xffff);
                 }
                 catch (FormatException)
@@ -192,13 +190,20 @@ namespace WixToolset.Core.Native.Msi
         /// </summary>
         /// <param name="mergeDatabase">The database to merge into the base database.</param>
         /// <param name="tableName">The name of the table to receive merge conflict information.</param>
-        public void Merge(Database mergeDatabase, string tableName)
+        /// <returns>True if there were merge conflicts, otherwise false.</returns>
+        public bool Merge(Database mergeDatabase, string tableName)
         {
             var error = MsiInterop.MsiDatabaseMerge(this.Handle, mergeDatabase.Handle, tableName);
-            if (0 != error)
+            if (error == 1627)
+            {
+                return true;
+            }
+            else if (error != 0)
             {
                 throw new MsiException(error);
             }
+
+            return false;
         }
 
         /// <summary>
