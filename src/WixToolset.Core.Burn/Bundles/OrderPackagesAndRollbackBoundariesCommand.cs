@@ -65,7 +65,7 @@ namespace WixToolset.Core.Burn.Bundles
                             // If we used the default boundary, ensure the symbol is added to the section.
                             if (pendingRollbackBoundary.Id.Id == DefaultBoundaryId)
                             {
-                                this.Section.Symbols.Add(pendingRollbackBoundary);
+                                this.Section.AddSymbol(pendingRollbackBoundary);
                             }
 
                             if (insideMsiTransaction && !warnedMsiTransaction)

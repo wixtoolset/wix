@@ -23,7 +23,7 @@ namespace WixToolset.Core.Link
         private List<string> groupTypes;
         private List<string> itemTypes;
         private ItemCollection items;
-        private readonly List<int> rowsUsed;
+        private readonly List<IntermediateSymbol> symbolsUsed;
         private bool loaded;
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace WixToolset.Core.Link
             this.EntrySection = entrySections;
             this.Messaging = messageHandler;
 
-            this.rowsUsed = new List<int>();
+            this.symbolsUsed = new List<IntermediateSymbol>();
             this.loaded = false;
         }
 
@@ -144,16 +144,9 @@ namespace WixToolset.Core.Link
         /// </summary>
         public void RemoveUsedGroupRows()
         {
-            var sortedIndexes = this.rowsUsed.Distinct().OrderByDescending(i => i).ToList();
-
-            //Table wixGroupTable = this.output.Tables["WixGroup"];
-            //Debug.Assert(null != wixGroupTable);
-            //Debug.Assert(sortedIndexes[0] < wixGroupTable.Rows.Count);
-
-            foreach (int rowIndex in sortedIndexes)
+            foreach (var symbol in this.symbolsUsed)
             {
-                //wixGroupTable.Rows.RemoveAt(rowIndex);
-                this.EntrySection.Symbols.RemoveAt(rowIndex);
+                this.EntrySection.RemoveSymbol(symbol);
             }
         }
 
@@ -236,39 +229,36 @@ namespace WixToolset.Core.Link
             //}
 
             // Collect all of the groups
-            for (int rowIndex = 0; rowIndex < this.EntrySection.Symbols.Count; ++rowIndex)
+            foreach (var symbol in this.EntrySection.Symbols.OfType<WixGroupSymbol>())
             {
-                if (this.EntrySection.Symbols[rowIndex] is WixGroupSymbol row)
+                var rowParentName = symbol.ParentId;
+                var rowParentType = symbol.ParentType.ToString();
+                var rowChildName = symbol.ChildId;
+                var rowChildType = symbol.ChildType.ToString();
+
+                // If this row specifies a parent or child type that's not in our
+                // lists, we assume it's not a row that we're concerned about.
+                if (!this.groupTypes.Contains(rowParentType) ||
+                    !this.itemTypes.Contains(rowChildType))
                 {
-                    var rowParentName = row.ParentId;
-                    var rowParentType = row.ParentType.ToString();
-                    var rowChildName = row.ChildId;
-                    var rowChildType = row.ChildType.ToString();
-
-                    // If this row specifies a parent or child type that's not in our
-                    // lists, we assume it's not a row that we're concerned about.
-                    if (!this.groupTypes.Contains(rowParentType) ||
-                        !this.itemTypes.Contains(rowChildType))
-                    {
-                        continue;
-                    }
-
-                    this.rowsUsed.Add(rowIndex);
-
-                    if (!this.items.TryGetValue(rowParentType, rowParentName, out var parentItem))
-                    {
-                        parentItem = new Item(row, rowParentType, rowParentName);
-                        this.items.Add(parentItem);
-                    }
-
-                    if (!this.items.TryGetValue(rowChildType, rowChildName, out var childItem))
-                    {
-                        childItem = new Item(row, rowChildType, rowChildName);
-                        this.items.Add(childItem);
-                    }
-
-                    parentItem.ChildItems.Add(childItem);
+                    continue;
                 }
+
+                this.symbolsUsed.Add(symbol);
+
+                if (!this.items.TryGetValue(rowParentType, rowParentName, out var parentItem))
+                {
+                    parentItem = new Item(symbol, rowParentType, rowParentName);
+                    this.items.Add(parentItem);
+                }
+
+                if (!this.items.TryGetValue(rowChildType, rowChildName, out var childItem))
+                {
+                    childItem = new Item(symbol, rowChildType, rowChildName);
+                    this.items.Add(childItem);
+                }
+
+                parentItem.ChildItems.Add(childItem);
             }
         }
 

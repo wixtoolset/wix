@@ -241,23 +241,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var section in this.Intermediate.Sections)
             {
-                for (var i = section.Symbols.Count - 1; i >= 0; i--)
+                // Remove all summary information from the symbols and remember those that
+                // are not calculated or reserved.
+                foreach (var patchSummaryInfo in section.Symbols.OfType<SummaryInformationSymbol>().ToList())
                 {
-                    if (section.Symbols[i] is SummaryInformationSymbol patchSummaryInfo)
-                    {
-                        // Remove all summary information from the symbols and remember those that
-                        // are not calculated or reserved.
-                        section.Symbols.RemoveAt(i);
+                    section.RemoveSymbol(patchSummaryInfo);
 
-                        if (patchSummaryInfo.PropertyId != SummaryInformationType.PatchProductCodes &&
-                            patchSummaryInfo.PropertyId != SummaryInformationType.PatchCode &&
-                            patchSummaryInfo.PropertyId != SummaryInformationType.PatchInstallerRequirement &&
-                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved11 &&
-                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved14 &&
-                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved16)
-                        {
-                            result.Add(patchSummaryInfo.PropertyId, patchSummaryInfo);
-                        }
+                    if (patchSummaryInfo.PropertyId != SummaryInformationType.PatchProductCodes &&
+                        patchSummaryInfo.PropertyId != SummaryInformationType.PatchCode &&
+                        patchSummaryInfo.PropertyId != SummaryInformationType.PatchInstallerRequirement &&
+                        patchSummaryInfo.PropertyId != SummaryInformationType.Reserved11 &&
+                        patchSummaryInfo.PropertyId != SummaryInformationType.Reserved14 &&
+                        patchSummaryInfo.PropertyId != SummaryInformationType.Reserved16)
+                    {
+                        result.Add(patchSummaryInfo.PropertyId, patchSummaryInfo);
                     }
                 }
             }

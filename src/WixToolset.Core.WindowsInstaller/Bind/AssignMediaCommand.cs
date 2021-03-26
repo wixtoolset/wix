@@ -86,25 +86,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 this.UncompressedFileFacades = Array.Empty<IFileFacade>();
             }
-            else if (mediaTemplateSymbols.Count == 0)
-            {
-                var filesByCabinetMedia = new Dictionary<MediaSymbol, List<IFileFacade>>();
-
-                var uncompressedFiles = new List<IFileFacade>();
-
-                this.ManuallyAssignFiles(mediaSymbols, filesByCabinetMedia, uncompressedFiles);
-
-                this.FileFacadesByCabinetMedia = filesByCabinetMedia.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<IFileFacade>)kvp.Value);
-
-                this.UncompressedFileFacades = uncompressedFiles;
-            }
             else
             {
                 var filesByCabinetMedia = new Dictionary<MediaSymbol, List<IFileFacade>>();
-
                 var uncompressedFiles = new List<IFileFacade>();
 
-                this.AutoAssignFiles(mediaSymbols, filesByCabinetMedia, uncompressedFiles);
+                if (mediaTemplateSymbols.Count > 0)
+                {
+                    this.AutoAssignFiles(mediaTemplateSymbols, mediaSymbols, filesByCabinetMedia, uncompressedFiles);
+                }
+                else
+                {
+                    this.ManuallyAssignFiles(mediaSymbols, filesByCabinetMedia, uncompressedFiles);
+                }
 
                 this.FileFacadesByCabinetMedia = filesByCabinetMedia.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<IFileFacade>)kvp.Value);
 
@@ -115,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Assign files to cabinets based on MediaTemplate authoring.
         /// </summary>
-        private void AutoAssignFiles(List<MediaSymbol> mediaTable, Dictionary<MediaSymbol, List<IFileFacade>> filesByCabinetMedia, List<IFileFacade> uncompressedFiles)
+        private void AutoAssignFiles(List<WixMediaTemplateSymbol> mediaTemplateTable, List<MediaSymbol> mediaSymbols, Dictionary<MediaSymbol, List<IFileFacade>> filesByCabinetMedia, List<IFileFacade> uncompressedFiles)
         {
             const int MaxCabIndex = 999;
 
@@ -126,13 +120,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             MediaSymbol currentMediaRow = null;
 
-            var mediaTemplateTable = this.Section.Symbols.OfType<WixMediaTemplateSymbol>();
-
             // Remove all previous media symbols since they will be replaced with
             // media template.
-            foreach (var mediaSymbol in mediaTable)
+            foreach (var mediaSymbol in mediaSymbols)
             {
-                this.Section.Symbols.Remove(mediaSymbol);
+                this.Section.RemoveSymbol(mediaSymbol);
             }
 
             // Auto assign files to cabinets based on maximum uncompressed media size
@@ -218,7 +210,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // If there are uncompressed files and no MediaRow, create a default one.
-            if (uncompressedFiles.Count > 0 && !this.Section.Symbols.OfType<MediaSymbol>().Any())
+            if (uncompressedFiles.Count > 0 && mediaSymbolsByDiskId.Count == 0)
             {
                 var defaultMediaRow = this.Section.AddSymbol(new MediaSymbol(null, new Identifier(AccessModifier.Section, 1))
                 {

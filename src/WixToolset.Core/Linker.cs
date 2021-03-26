@@ -585,13 +585,15 @@ namespace WixToolset.Core
             // now and after processing added back in Step 3 below.
             foreach (var section in sections)
             {
+                var removeSymbols = new List<IntermediateSymbol>();
+
                 // Count down because we'll sometimes remove items from the list.
-                for (var i = section.Symbols.Count - 1; i >= 0; --i)
+                foreach (var symbol in section.Symbols)
                 {
                     // Only process the "grouping parents" such as FeatureGroup, ComponentGroup, Feature,
                     // and Module. Non-grouping complex references are simple and
                     // resolved during normal complex reference resolutions.
-                    if (section.Symbols[i] is WixComplexReferenceSymbol wixComplexReferenceRow &&
+                    if (symbol is WixComplexReferenceSymbol wixComplexReferenceRow &&
                         (ComplexReferenceParentType.FeatureGroup == wixComplexReferenceRow.ParentType ||
                          ComplexReferenceParentType.ComponentGroup == wixComplexReferenceRow.ParentType ||
                          ComplexReferenceParentType.Feature == wixComplexReferenceRow.ParentType ||
@@ -611,7 +613,7 @@ namespace WixToolset.Core
                         }
 
                         childrenComplexRefs.Add(wixComplexReferenceRow);
-                        section.Symbols.RemoveAt(i);
+                        removeSymbols.Add(wixComplexReferenceRow);
 
                         // Remember the mapping from set of complex references with a common
                         // parent to their section. We'll need this to add them back to the
@@ -634,6 +636,11 @@ namespace WixToolset.Core
                             }
                         }
                     }
+                }
+
+                foreach (var removeSymbol in removeSymbols)
+                {
+                    section.RemoveSymbol(removeSymbol);
                 }
             }
 

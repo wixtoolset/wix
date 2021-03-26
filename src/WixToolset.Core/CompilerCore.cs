@@ -1059,8 +1059,7 @@ namespace WixToolset.Core
         /// <returns>New section.</returns>
         internal IntermediateSection CreateSection(string id, SectionType type, int codepage, string compilationId)
         {
-            var section = new IntermediateSection(id, type, codepage);
-            section.CompilationId = compilationId;
+            var section = new IntermediateSection(id, type, codepage, compilationId);
 
             this.intermediate.Sections.Add(section);
 

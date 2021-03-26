@@ -60,7 +60,7 @@ namespace WixToolset.Core
 
                 foreach (var section in sections)
                 {
-                    section.LibraryId = context.LibraryId;
+                    section.AssignToLibrary(context.LibraryId);
                 }
 
                 library = new Intermediate(context.LibraryId, IntermediateLevels.Compiled, sections, localizationsByCulture);

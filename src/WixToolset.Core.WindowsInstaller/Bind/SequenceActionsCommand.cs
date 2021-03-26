@@ -173,21 +173,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Remove all existing WixActionSymbols from the section then add the
-            // scheduled actions back to the section. Note: we add the indices in
-            // reverse order to make it easy to remove them from the list later.
-            var removeIndices = new List<int>();
-            for (var i = this.Section.Symbols.Count - 1; i >= 0; --i)
-            {
-                var symbol = this.Section.Symbols[i];
-                if (symbol.Definition.Type == SymbolDefinitionType.WixAction)
-                {
-                    removeIndices.Add(i);
-                }
-            }
+            // scheduled actions back to the section.
+            var removeActionSymbols = this.Section.Symbols.Where(s => s.Definition.Type == SymbolDefinitionType.WixAction).ToList();
 
-            foreach (var removeIndex in removeIndices)
+            foreach (var removeSymbol in removeActionSymbols)
             {
-                this.Section.Symbols.RemoveAt(removeIndex);
+                this.Section.RemoveSymbol(removeSymbol);
             }
 
             foreach (var action in scheduledActionSymbols)
