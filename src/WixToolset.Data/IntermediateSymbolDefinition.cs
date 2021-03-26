@@ -48,11 +48,11 @@ namespace WixToolset.Data
 
         public IntermediateSymbol CreateSymbol(SourceLineNumber sourceLineNumber = null, Identifier id = null)
         {
-            var result = (this.StrongSymbolType == typeof(IntermediateSymbol)) ? (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType, this) : (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType);
-            result.SourceLineNumbers = sourceLineNumber;
-            result.Id = id;
+            var symbol = (this.StrongSymbolType == typeof(IntermediateSymbol)) ? (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType, this) : (IntermediateSymbol)Activator.CreateInstance(this.StrongSymbolType);
+            symbol.SourceLineNumbers = sourceLineNumber;
+            symbol.Id = id;
 
-            return result;
+            return symbol;
         }
 
         public bool AddTag(string add)

@@ -47,7 +47,7 @@ namespace WixToolset.Data
         public string Id { get; }
 
         /// <summary>
-        /// Get the id for the intermediate.
+        /// Get the level of the intermediate.
         /// </summary>
         public string Level { get; private set; }
 

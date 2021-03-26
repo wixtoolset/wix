@@ -6,15 +6,28 @@ namespace WixToolset.Data
     using System.Diagnostics;
     using SimpleJson;
 
+    /// <summary>
+    /// Intermediate symbol.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IntermediateSymbol
     {
         private object tags;
 
+        /// <summary>
+        /// Creates an intermediate symbol.
+        /// </summary>
+        /// <param name="definition">Symbol definition.</param>
         public IntermediateSymbol(IntermediateSymbolDefinition definition) : this(definition, null, null)
         {
         }
 
+        /// <summary>
+        /// Creates an intermediate symbol with source line number and identifier. 
+        /// </summary>
+        /// <param name="definition">Symbol definition.</param>
+        /// <param name="sourceLineNumber">Source line number.</param>
+        /// <param name="id">Symbol identifier.</param>
         public IntermediateSymbol(IntermediateSymbolDefinition definition, SourceLineNumber sourceLineNumber, Identifier id = null)
         {
             this.Definition = definition;
@@ -23,18 +36,40 @@ namespace WixToolset.Data
             this.Id = id;
         }
 
+        /// <summary>
+        /// Gets the symbol's definition.
+        /// </summary>
         public IntermediateSymbolDefinition Definition { get; }
 
+        /// <summary>
+        /// Gets the symbol's fields.
+        /// </summary>
         public IntermediateField[] Fields { get; }
 
-        public SourceLineNumber SourceLineNumbers { get; set; }
+        /// <summary>
+        /// Gets the optional source line number of the symbol.
+        /// </summary>
+        public SourceLineNumber SourceLineNumbers { get; internal set; }
 
-        public Identifier Id { get; set; }
+        /// <summary>
+        /// Gets the optional identifier for the symbol.
+        /// </summary>
+        public Identifier Id { get; internal set; }
 
+        /// <summary>
+        /// Direct access by index to the symbol's fields.
+        /// </summary>
+        /// <param name="index">Index of the field to access.</param>
+        /// <returns>Symbol's field.</returns>
         public IntermediateField this[int index] => this.Fields[index];
 
         private string DebuggerDisplay => $"{this.Definition?.Name} {this.Id?.Id}";
 
+        /// <summary>
+        /// Add a custom tag to the symbol.
+        /// </summary>
+        /// <param name="add">String tag to add to the symbol.</param>
+        /// <returns>True if the tag was added; otherwise false if th tag was already present.</returns>
         public bool AddTag(string add)
         {
             if (this.tags == null)
@@ -73,6 +108,11 @@ namespace WixToolset.Data
             return true;
         }
 
+        /// <summary>
+        /// Tests whether a symbol has a tag.
+        /// </summary>
+        /// <param name="has">String tag to find.</param>
+        /// <returns>True if the symbol has the tag; otherwise false.</returns>
         public bool HasTag(string has)
         {
             if (this.tags == null)
@@ -97,6 +137,11 @@ namespace WixToolset.Data
             return false;
         }
 
+        /// <summary>
+        /// Removes a tag from the symbol.
+        /// </summary>
+        /// <param name="remove">String tag to remove.</param>
+        /// <returns>True if the tag was removed; otherwise false if the tag was not present.</returns>
         public bool RemoveTag(string remove)
         {
             if (this.tags is string tag)

@@ -22,7 +22,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
+            section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -64,7 +64,7 @@ namespace WixToolsetTest.Data
             var sln = new SourceLineNumber("test.wxs", 1);
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
+            section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",
@@ -91,7 +91,7 @@ namespace WixToolsetTest.Data
 
                     wixout.Reopen(writable: true);
 
-                    section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "NewComponent"))
+                    section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "NewComponent"))
                     {
                         ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                     });
@@ -135,7 +135,7 @@ namespace WixToolsetTest.Data
             symbol.Set(1, 2);
             symbol.Set(2, true);
 
-            section.Symbols.Add(symbol);
+            section.AddSymbol(symbol);
 
             var intermediate = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -179,7 +179,7 @@ namespace WixToolsetTest.Data
             symbol.Set(2, true);
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
-            section.Symbols.Add(symbol);
+            section.AddSymbol(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -201,7 +201,7 @@ namespace WixToolsetTest.Data
             symbol2.Set(3, "baz");
 
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
-            section2.Symbols.Add(symbol2);
+            section2.AddSymbol(symbol2);
 
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
@@ -262,7 +262,7 @@ namespace WixToolsetTest.Data
             symbol.AddTag("symbol1tag");
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
-            section.Symbols.Add(symbol);
+            section.AddSymbol(symbol);
 
             var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
@@ -290,7 +290,7 @@ namespace WixToolsetTest.Data
             symbol2.AddTag("symbol2tag2");
 
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
-            section2.Symbols.Add(symbol2);
+            section2.AddSymbol(symbol2);
 
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
@@ -356,7 +356,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Symbols.Add(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
+            section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 DirectoryRef = "TestFolder",

@@ -11,18 +11,22 @@ namespace WixToolset.Data
     /// </summary>
     public class IntermediateSection
     {
+        private readonly List<IntermediateSymbol> symbols;
+
         /// <summary>
         /// Creates a new section as part of an intermediate.
         /// </summary>
         /// <param name="id">Identifier for section.</param>
         /// <param name="type">Type of section.</param>
         /// <param name="codepage">Codepage for resulting database.</param>
-        public IntermediateSection(string id, SectionType type, int codepage)
+        /// <param name="compilationId">Optional compilation identifier</param>
+        public IntermediateSection(string id, SectionType type, int codepage, string compilationId = null)
         {
             this.Id = id;
             this.Type = type;
             this.Codepage = codepage;
-            this.Symbols = new List<IntermediateSymbol>();
+            this.CompilationId = compilationId;
+            this.symbols = new List<IntermediateSymbol>();
         }
 
         /// <summary>
@@ -41,22 +45,53 @@ namespace WixToolset.Data
         /// Gets the codepage for the section.
         /// </summary>
         /// <value>Codepage for the section.</value>
-        public int Codepage { get; set; }
+        public int Codepage { get; }
 
         /// <summary>
         /// Gets and sets the identifier of the compilation of the source file containing the section.
         /// </summary>
-        public string CompilationId { get; set; }
+        public string CompilationId { get; }
 
         /// <summary>
         /// Gets and sets the identifier of the library that combined the section.
         /// </summary>
-        public string LibraryId { get; set; }
+        public string LibraryId { get; private set; }
 
         /// <summary>
         /// Symbols in the section.
         /// </summary>
-        public IList<IntermediateSymbol> Symbols { get; }
+        public IReadOnlyCollection<IntermediateSymbol> Symbols => this.symbols;
+
+        /// <summary>
+        /// Adds a symbol to the section.
+        /// </summary>
+        /// <typeparam name="T">Type of IntermediateSymbol to add to the section.</typeparam>
+        /// <param name="symbol">Symbol to add to the section.</param>
+        /// <returns>Symbol added to the section.</returns>
+        public T AddSymbol<T>(T symbol) where T : IntermediateSymbol
+        {
+            this.symbols.Add(symbol);
+            return symbol;
+        }
+
+        /// <summary>
+        /// Assigns the section to a library.
+        /// </summary>
+        /// <param name="libraryId">Identifier of the library.</param>
+        public void AssignToLibrary(string libraryId)
+        {
+            this.LibraryId = libraryId;
+        }
+
+        /// <summary>
+        /// Removes a symbol from the section.
+        /// </summary>
+        /// <param name="symbol">Symbol to remove.</param>
+        /// <returns>True if the symbol was removed; otherwise false.</returns>
+        public bool RemoveSymbol(IntermediateSymbol symbol)
+        {
+            return this.symbols.Remove(symbol);
+        }
 
         /// <summary>
         /// Parse a section from the JSON data.
@@ -79,7 +114,7 @@ namespace WixToolset.Data
             foreach (JsonObject symbolJson in symbolsJson)
             {
                 var symbol = IntermediateSymbol.Deserialize(creator, baseUri, symbolJson);
-                section.Symbols.Add(symbol);
+                section.symbols.Add(symbol);
             }
 
             return section;
