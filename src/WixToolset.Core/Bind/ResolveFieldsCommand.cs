@@ -82,8 +82,6 @@ namespace WixToolset.Core.Bind
                             }
                         }
 
-                        var isDefault = true;
-
                         // Check to make sure we're in a scenario where we can handle variable resolution.
                         if (null != delayedFields)
                         {
@@ -103,8 +101,6 @@ namespace WixToolset.Core.Bind
                                     {
                                         delayedFields.Add(new DelayedField(symbol, field));
                                     }
-
-                                    isDefault = resolution.IsDefault;
                                 }
                             }
                         }
@@ -118,76 +114,7 @@ namespace WixToolset.Core.Bind
                         // Resolve file paths
                         if (fieldType == IntermediateFieldType.Path)
                         {
-                            var objectField = field.AsPath();
-
-#if TODO_PATCHING
-                            // Skip file resolution if the file is to be deleted.
-                            if (RowOperation.Delete == symbol.Operation)
-                            {
-                                continue;
-                            }
-#endif
-
-                            // File is embedded and path to it was not modified above.
-                            if (isDefault && objectField.Embed)
-                            {
-                                var extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileToExtract(objectField.BaseUri, objectField.Path, this.IntermediateFolder);
-
-                                // Set the path to the embedded file once where it will be extracted.
-                                field.Set(extractPath);
-                            }
-                            else if (null != objectField.Path) // non-compressed file (or localized value)
-                            {
-                                try
-                                {
-                                    if (!this.BuildingPatch) // Normal binding for non-Patch scenario such as link (light.exe)
-                                    {
-#if TODO_PATCHING
-                                        // keep a copy of the un-resolved data for future replay. This will be saved into wixpdb file
-                                        if (null == objectField.UnresolvedData)
-                                        {
-                                            objectField.UnresolvedData = (string)objectField.Data;
-                                        }
-#endif
-
-                                        // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
-                                        field.Set(value);
-                                    }
-                                    else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
-                                    {
-                                        // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
-                                        field.Set(value);
-                                    }
-#if TODO_PATCHING
-                                    else // Re-base binding path scenario caused by pyro.exe -bt -bu
-                                    {
-                                        // by default, use the resolved Data for file lookup
-                                        string filePathToResolve = (string)objectField.Data;
-
-                                        // if -bu is used in pyro command, this condition holds true and the tool
-                                        // will use pre-resolved source for new wixpdb file
-                                        if (fileResolver.RebaseUpdated)
-                                        {
-                                            // try to use the unResolved Source if it exists.
-                                            // New version of wixpdb file keeps a copy of pre-resolved Source. i.e. !(bindpath.test)\foo.dll
-                                            // Old version of winpdb file does not contain this attribute and the value is null.
-                                            if (null != objectField.UnresolvedData)
-                                            {
-                                                filePathToResolve = objectField.UnresolvedData;
-                                            }
-                                        }
-
-                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, symbol.Definition.Name, symbol.SourceLineNumbers, BindStage.Updated);
-                                    }
-#endif
-                                }
-                                catch (WixException e)
-                                {
-                                    this.Messaging.Write(e.Error);
-                                }
-                            }
+                            this.ResolvePathField(fileResolver, symbol, field);
 
 #if TODO_PATCHING
                             if (null != objectField.PreviousData)
@@ -254,6 +181,96 @@ namespace WixToolset.Core.Bind
             }
 
             this.DelayedFields = delayedFields;
+        }
+
+        private void ResolvePathField(FileResolver fileResolver, IntermediateSymbol symbol, IntermediateField field)
+        {
+            var fieldValue = field.AsPath();
+            var originalFieldPath = fieldValue.Path;
+
+#if TODO_PATCHING
+            // Skip file resolution if the file is to be deleted.
+            if (RowOperation.Delete == symbol.Operation)
+            {
+                continue;
+            }
+#endif
+
+            // If the file is embedded and if the previous value has a bind variable in the path
+            // which gets modified by resolving the previous value again then switch to that newly
+            // resolved path instead of using the embedded file.
+            if (fieldValue.Embed && field.PreviousValue != null)
+            {
+                var resolution = this.VariableResolver.ResolveVariables(symbol.SourceLineNumbers, field.PreviousValue.AsString(), errorOnUnknown: false);
+
+                if (resolution.UpdatedValue && !resolution.IsDefault)
+                {
+                    fieldValue = new IntermediateFieldPathValue { Path = resolution.Value };
+                }
+            }
+
+            // If we're still using the embedded file.
+            if (fieldValue.Embed)
+            {
+                // Set the path to the embedded file once where it will be extracted.
+                var extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileToExtract(fieldValue.BaseUri, fieldValue.Path, this.IntermediateFolder);
+
+                field.Set(extractPath);
+            }
+            else if (fieldValue.Path != null)
+            {
+                try
+                {
+                    var resolvedPath = fieldValue.Path;
+
+                    if (!this.BuildingPatch) // Normal binding for non-Patch scenario such as link (light.exe)
+                    {
+#if TODO_PATCHING
+                        // keep a copy of the un-resolved data for future replay. This will be saved into wixpdb file
+                        if (null == objectField.UnresolvedData)
+                        {
+                            objectField.UnresolvedData = (string)objectField.Data;
+                        }
+#endif
+                        resolvedPath = fileResolver.ResolveFile(fieldValue.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
+                    }
+                    else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
+                    {
+                        resolvedPath = fileResolver.ResolveFile(fieldValue.Path, symbol.Definition, symbol.SourceLineNumbers, BindStage.Normal);
+                    }
+#if TODO_PATCHING
+                    else // Re-base binding path scenario caused by pyro.exe -bt -bu
+                    {
+                        // by default, use the resolved Data for file lookup
+                        string filePathToResolve = (string)objectField.Data;
+
+                        // if -bu is used in pyro command, this condition holds true and the tool
+                        // will use pre-resolved source for new wixpdb file
+                        if (fileResolver.RebaseUpdated)
+                        {
+                            // try to use the unResolved Source if it exists.
+                            // New version of wixpdb file keeps a copy of pre-resolved Source. i.e. !(bindpath.test)\foo.dll
+                            // Old version of winpdb file does not contain this attribute and the value is null.
+                            if (null != objectField.UnresolvedData)
+                            {
+                                filePathToResolve = objectField.UnresolvedData;
+                            }
+                        }
+
+                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, symbol.Definition.Name, symbol.SourceLineNumbers, BindStage.Updated);
+                    }
+#endif
+
+                    if (!String.Equals(originalFieldPath, resolvedPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        field.Set(resolvedPath);
+                    }
+                }
+                catch (WixException e)
+                {
+                    this.Messaging.Write(e.Error);
+                }
+            }
         }
     }
 }

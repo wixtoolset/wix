@@ -144,7 +144,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6376")]
+        [Fact]
         public void CanOverridePathWixVariable()
         {
             var folder = TestData.Get(@"TestData\WixVariableOverride");
