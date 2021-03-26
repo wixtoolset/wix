@@ -354,7 +354,7 @@ namespace WixToolset.Core
                         this.ParseRelatedBundleElement(child);
                         break;
                     case "Requires":
-                        this.ParseRequiresElement(child, null, false);
+                        this.ParseRequiresElement(child, null);
                         break;
                     case "SetVariable":
                         this.ParseSetVariableElement(child);

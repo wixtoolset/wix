@@ -307,7 +307,7 @@ namespace WixToolset.Core
                             this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
                             break;
                         case "Requires":
-                            this.ParseRequiresElement(child, null, false);
+                            this.ParseRequiresElement(child, null);
                             break;
                         case "SetDirectory":
                             this.ParseSetDirectoryElement(child);

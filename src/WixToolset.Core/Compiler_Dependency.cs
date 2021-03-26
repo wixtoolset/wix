@@ -167,7 +167,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Requires":
-                            this.ParseRequiresElement(child, id.Id, requiresAction: !packageType.HasValue);
+                            this.ParseRequiresElement(child, id.Id);
                             break;
                         case "RequiresRef":
                             this.ParseRequiresRefElement(child, id.Id, requiresAction: !packageType.HasValue);
@@ -229,8 +229,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">The XML node for the Requires element.</param>
         /// <param name="providerId">The parent provider identifier.</param>
-        /// <param name="requiresAction">Whether the Requires custom action should be referenced.</param>
-        private void ParseRequiresElement(XElement node, string providerId, bool requiresAction)
+        private void ParseRequiresElement(XElement node, string providerId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -310,7 +309,7 @@ namespace WixToolset.Core
 
             if (!this.Messaging.EncounteredError)
             {
-                var symbol = this.Core.AddSymbol(new WixDependencySymbol(sourceLineNumbers, id)
+                this.Core.AddSymbol(new WixDependencySymbol(sourceLineNumbers, id)
                 {
                     ProviderKey = providerKey,
                     MinVersion = minVersion,
