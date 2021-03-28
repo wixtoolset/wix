@@ -1,0 +1,32 @@
+<?xml version='1.0' ?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:as="http://appsyndication.org/2006/appsyn">
+  <title type="text">BundleB v1.0</title>
+  <subtitle type="text">Bundle Subtitle.</subtitle>
+  <as:application type="application/exe">1116353B-7C6E-4C29-BFA1-D4A972CD421D</as:application>
+  <updated>2014-07-14T12:39:00.000Z</updated>
+  <id>http://localhost:9999/e2e/BundleB/feed</id>
+  <link rel="self" type="application/atom+xml" href="http://localhost:9999/e2e/BundleB/feed"/>
+  <generator version="0.1">manual build</generator>
+  <entry>
+    <title>Bundle v1.0</title>
+    <id>v1.0</id>
+    <author>
+      <name>Bundle_Author</name>
+      <uri>http://mycompany.com/software</uri>
+      <email>Bundle_Author@mycompany.com</email>
+    </author>
+    <link rel="alternate" href="http://www.mycompany.com/content/view/software"/>
+    <link rel="enclosure" href="http://localhost:9999/e2e/BundleB/1.0/BundleB.exe" length="0" type="application/octet-stream"/>
+    <content type="html">
+      &lt;p&gt;Change list:&lt;/p&gt;&lt;ul&gt;
+      &lt;li&gt;Initial release.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <as:upgrade version="1.0.0.0-preview" />
+    <as:version>1.0.0.0</as:version>
+    <updated>2014-07-14T12:39:00.000Z</updated>
+  </entry>
+</feed>

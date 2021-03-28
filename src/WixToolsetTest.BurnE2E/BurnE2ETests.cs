@@ -36,6 +36,13 @@ namespace WixToolsetTest.BurnE2E
             return controller;
         }
 
+        protected IWebServer CreateWebServer()
+        {
+            var webServer = new CoreOwinWebServer();
+            this.Installers.Push(webServer);
+            return webServer;
+        }
+
         public void Dispose()
         {
             while (this.Installers.TryPop(out var installer))

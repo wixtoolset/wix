@@ -155,6 +155,12 @@ namespace WixToolsetTest.BurnE2E
             Registry.LocalMachine.DeleteSubKey(key);
         }
 
+        public void SetVerifyArguments(string verifyArguments)
+        {
+            this.SetBurnTestValue("VerifyArguments", verifyArguments);
+
+        }
+
         private void SetPackageState(string packageId, string name, string value)
         {
             var key = String.Format(@"{0}\{1}", this.TestBaseRegKeyPath, packageId ?? String.Empty);

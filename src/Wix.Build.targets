@@ -4,7 +4,8 @@
   <PropertyGroup>
     <BundleName Condition=" '$(BundleName)' == '' ">$(MSBuildProjectName)</BundleName>
     <PackageName Condition=" '$(PackageName)' == '' ">$(MSBuildProjectName)</PackageName>
-    <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);BundleName=$(BundleName);$(DefineConstants)</DefineConstants>
+    <WebServerBaseUrl Condition=" '$(WebServerBaseUrl)' == '' ">http://localhost:9999/e2e/</WebServerBaseUrl>
+    <DefineConstants>TestGroupName=$(TestGroupName);PackageName=$(PackageName);BundleName=$(BundleName);WebServerBaseUrl=$(WebServerBaseUrl);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(BA)' != '' ">BA=$(BA);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(CabPrefix)' != '' ">CabPrefix=$(CabPrefix);$(DefineConstants)</DefineConstants>
     <DefineConstants Condition=" '$(IncludeSoftwareTag)' == 'true' ">SoftwareTag=1;$(DefineConstants)</DefineConstants>

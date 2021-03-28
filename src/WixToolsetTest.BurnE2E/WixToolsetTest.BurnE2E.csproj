@@ -13,10 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixTestTools\WixTestTools.csproj"  />
+    <ProjectReference Include="..\WixTestTools\WixTestTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.48" />
