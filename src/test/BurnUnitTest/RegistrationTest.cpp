@@ -73,6 +73,7 @@ namespace Bootstrapper
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+
             try
             {
                 // set mock API's
@@ -232,6 +233,115 @@ namespace Bootstrapper
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
                 Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+
+                // delete registration
+                hr = RegistrationSessionEnd(&registration, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER);
+                TestThrowOnFailure(hr, L"Failed to unregister bundle.");
+
+                // verify that registration was removed
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+            }
+            finally
+            {
+                ReleaseStr(sczCurrentProcess);
+                ReleaseObject(pixeBundle);
+                UserExperienceUninitialize(&userExperience);
+                RegistrationUninitialize(&registration);
+                VariablesUninitialize(&variables);
+
+                Registry::CurrentUser->DeleteSubKeyTree(gcnew String(ROOT_PATH));
+                if (Directory::Exists(cacheDirectory))
+                {
+                    Directory::Delete(cacheDirectory, true);
+                }
+
+                RegFunctionOverride(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+            }
+        }
+
+        [Fact]
+        void RegisterVariablesTest()
+        {
+            HRESULT hr = S_OK;
+            IXMLDOMElement* pixeBundle = NULL;
+            LPWSTR sczCurrentProcess = NULL;
+            BURN_VARIABLES variables = { };
+            BURN_USER_EXPERIENCE userExperience = { };
+            BOOTSTRAPPER_COMMAND command = { };
+            BURN_REGISTRATION registration = { };
+            BURN_LOGGING logging = { };
+            BURN_PACKAGES packages = { };
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            try
+            {
+                // set mock API's
+                RegFunctionOverride(RegistrationTest_RegCreateKeyExW, RegistrationTest_RegOpenKeyExW, RegistrationTest_RegDeleteKeyExW, NULL, NULL, NULL, NULL, NULL, NULL);
+
+                Registry::CurrentUser->CreateSubKey(gcnew String(HKCU_PATH));
+
+                logging.sczPath = L"BurnUnitTest.txt";
+
+                LPCWSTR wzDocument =
+                    L"<Bundle>"
+                    L"    <UX>"
+                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    </UX>"
+                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' DisplayVersion='1.0.0.0' />"
+                    L"    </Registration>"
+                    L"</Bundle>";
+
+                // load XML document
+                LoadBundleXmlHelper(wzDocument, &pixeBundle);
+
+                hr = VariableInitialize(&variables);
+                TestThrowOnFailure(hr, L"Failed to initialize variables.");
+
+                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
+
+                hr = RegistrationParseFromXml(&registration, pixeBundle);
+                TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                TestThrowOnFailure(hr, L"Failed to set registration resume command.");
+
+                hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
+                TestThrowOnFailure(hr, L"Failed to get current process path.");
+
+                //
+                // install
+                //
+
+                // write registration
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                TestThrowOnFailure(hr, L"Failed to register bundle.");
+
+                // verify that registration was created
+                Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+
+                // complete registration
+                hr = RegistrationSessionEnd(&registration, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER);
+                TestThrowOnFailure(hr, L"Failed to unregister bundle.");
+
+                // verify that registration variables were updated
+                registration.fInstalled = TRUE;
+
+                hr = RegistrationSetVariables(&registration, &variables);
+                TestThrowOnFailure(hr, L"Failed to set registration variables.");
+
+                Assert::Equal(1ll, VariableGetNumericHelper(&variables, BURN_BUNDLE_INSTALLED));
+                Assert::Equal(1ll, VariableGetNumericHelper(&variables, BURN_REBOOT_PENDING));
+                Assert::Equal<String^>(gcnew String(L"foo"), VariableGetStringHelper(&variables, BURN_BUNDLE_TAG));
+                Assert::Equal<String^>(gcnew String(L"bar"), VariableGetStringHelper(&variables, BURN_BUNDLE_PROVIDER_KEY));
+                Assert::Equal<String^>(gcnew String(L"1.0.0.0"), VariableGetVersionHelper(&variables, BURN_BUNDLE_VERSION));
+
+                //
+                // uninstall
+                //
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER);

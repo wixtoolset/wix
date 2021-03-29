@@ -92,6 +92,10 @@ static HRESULT UpdateBundleNameRegistration(
     __in BURN_VARIABLES* pVariables,
     __in HKEY hkRegistration
     );
+static BOOL IsWuRebootPending();
+static BOOL IsBundleRebootPending(
+    __in BURN_REGISTRATION* pRegistration
+);
 
 // function definitions
 
@@ -443,7 +447,10 @@ extern "C" HRESULT RegistrationSetVariables(
     ExitOnFailure(hr, "Failed to overwrite the bundle tag built-in variable.");
 
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
-    ExitOnFailure(hr, "Failed to overwrite the bundle tag built-in variable.");
+    ExitOnFailure(hr, "Failed to overwrite the bundle version built-in variable.");
+
+    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsBundleRebootPending(pRegistration) || IsWuRebootPending(), TRUE);
+    ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:
     ReleaseStr(sczBundleManufacturer);
@@ -491,17 +498,10 @@ extern "C" HRESULT RegistrationDetectResumeType(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczRebootRequiredKey = NULL;
-    HKEY hkRebootRequired = NULL;
     HKEY hkRegistration = NULL;
     DWORD dwResume = 0;
 
-    // Check to see if a restart is pending for this bundle.
-    hr = StrAllocFormatted(&sczRebootRequiredKey, REGISTRY_REBOOT_PENDING_FORMAT, pRegistration->sczRegistrationKey);
-    ExitOnFailure(hr, "Failed to format pending restart registry key to read.");
-
-    hr = RegOpen(pRegistration->hkRoot, sczRebootRequiredKey, KEY_QUERY_VALUE, &hkRebootRequired);
-    if (SUCCEEDED(hr))
+    if (IsBundleRebootPending(pRegistration))
     {
         *pResumeType = BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING;
         ExitFunction1(hr = S_OK);
@@ -554,8 +554,6 @@ extern "C" HRESULT RegistrationDetectResumeType(
 
 LExit:
     ReleaseRegKey(hkRegistration);
-    ReleaseRegKey(hkRebootRequired);
-    ReleaseStr(sczRebootRequiredKey);
 
     return hr;
 }
@@ -1590,4 +1588,47 @@ LExit:
     ReleaseStr(sczDisplayName);
 
     return hr;
+}
+
+static BOOL IsWuRebootPending()
+{
+    HRESULT hr = S_OK;
+    BOOL fRebootPending = FALSE;
+
+    // Do a best effort to ask WU if a reboot is required. If anything goes
+    // wrong then let's pretend a reboot is not required.
+    hr = ::CoInitialize(NULL);
+    if (SUCCEEDED(hr) || RPC_E_CHANGED_MODE == hr)
+    {
+        hr = WuaRestartRequired(&fRebootPending);
+        if (FAILED(hr))
+        {
+            fRebootPending = FALSE;
+        }
+
+        ::CoUninitialize();
+    }
+
+    return fRebootPending;
+}
+
+static BOOL IsBundleRebootPending(BURN_REGISTRATION* pRegistration)
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczRebootRequiredKey = NULL;
+    HKEY hkRebootRequired = NULL;
+    BOOL fBundleRebootPending = FALSE;
+
+    // Check to see if a restart is pending for this bundle.
+    hr = StrAllocFormatted(&sczRebootRequiredKey, REGISTRY_REBOOT_PENDING_FORMAT, pRegistration->sczRegistrationKey);
+    ExitOnFailure(hr, "Failed to format pending restart registry key to read.");
+
+    hr = RegOpen(pRegistration->hkRoot, sczRebootRequiredKey, KEY_QUERY_VALUE, &hkRebootRequired);
+    fBundleRebootPending = SUCCEEDED(hr);
+
+LExit:
+    ReleaseStr(sczRebootRequiredKey);
+    ReleaseRegKey(hkRebootRequired);
+
+    return fBundleRebootPending;
 }

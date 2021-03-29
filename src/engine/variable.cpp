@@ -133,10 +133,6 @@ static HRESULT InitializeVariablePrivileged(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     );
-static HRESULT InitializeVariableRebootPending(
-    __in DWORD_PTR dwpData,
-    __inout BURN_VARIANT* pValue
-    );
 static HRESULT InitializeSystemLanguageID(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -247,7 +243,6 @@ extern "C" HRESULT VariableInitialize(
 #endif
         {L"ProgramFiles6432Folder", InitializeVariable6432Folder, CSIDL_PROGRAM_FILES},
         {L"ProgramMenuFolder", InitializeVariableCsidlFolder, CSIDL_PROGRAMS},
-        {L"RebootPending", InitializeVariableRebootPending, 0},
         {L"SendToFolder", InitializeVariableCsidlFolder, CSIDL_SENDTO},
         {L"ServicePackLevel", InitializeVariableVersionNT, OS_INFO_VARIABLE_ServicePackLevel},
         {L"StartMenuFolder", InitializeVariableCsidlFolder, CSIDL_STARTMENU},
@@ -2028,44 +2023,6 @@ static HRESULT InitializeVariablePrivileged(
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:
-    return hr;
-}
-
-static HRESULT InitializeVariableRebootPending(
-    __in DWORD_PTR dwpData,
-    __inout BURN_VARIANT* pValue
-    )
-{
-    UNREFERENCED_PARAMETER(dwpData);
-
-    HRESULT hr = S_OK;
-    BOOL fRebootPending = FALSE;
-    BOOL fComInitialized = FALSE;
-
-    // Do a best effort to ask WU if a reboot is required. If anything goes
-    // wrong then let's pretend a reboot is not required.
-    hr = ::CoInitialize(NULL);
-    if (SUCCEEDED(hr) || RPC_E_CHANGED_MODE == hr)
-    {
-        fComInitialized = TRUE;
-
-        hr = WuaRestartRequired(&fRebootPending);
-        if (FAILED(hr))
-        {
-            fRebootPending = FALSE;
-            hr = S_OK;
-        }
-    }
-
-    hr = BVariantSetNumeric(pValue, fRebootPending);
-    ExitOnFailure(hr, "Failed to set reboot pending variant value.");
-
-LExit:
-    if (fComInitialized)
-    {
-        ::CoUninitialize();
-    }
-
     return hr;
 }
 
