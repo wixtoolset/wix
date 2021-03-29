@@ -407,5 +407,43 @@ namespace WixToolsetTest.Converters
             Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void CanConvertDeprecatedPrefix()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "<Fragment>",
+                "<ComponentGroup Id=\"$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$$$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$$$$(loc.Variable)\" />",
+                "</Fragment>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "<Fragment>",
+                "<ComponentGroup Id=\"!(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$!(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$$$(loc.Variable)\" />",
+                "<ComponentGroup Id=\"$$$$!(loc.Variable)\" />",
+                "</Fragment>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(3, errors);
+            Assert.Equal(expected, actual);
+        }
     }
 }

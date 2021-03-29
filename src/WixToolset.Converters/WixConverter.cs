@@ -179,6 +179,8 @@ namespace WixToolset.Converters
         };
 
         private readonly Dictionary<XName, Action<XElement>> ConvertElementMapping;
+        private readonly Regex DeprecatedPrefixRegex = new Regex(@"(?<=(^|[^\$])(\$\$)*)\$(?=\(loc\.[^.].*\))",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
         /// <summary>
         /// Instantiate a new Converter class.
@@ -427,6 +429,13 @@ namespace WixToolset.Converters
             {
                 if (node is XText text)
                 {
+                    if (null != text.Value)
+                    {
+                        if (this.TryFixDeprecatedLocalizationPrefixes(node, text.Value, out var newValue, ConverterTestType.DeprecatedLocalizationVariablePrefixInTextValue))
+                        {
+                            text.Value = newValue;
+                        }
+                    }
                     if (!String.IsNullOrWhiteSpace(text.Value))
                     {
                         text.Value = text.Value.Trim();
@@ -464,6 +473,20 @@ namespace WixToolset.Converters
             }
         }
 
+        private bool TryFixDeprecatedLocalizationPrefixes(XNode node, string value, out string newValue, ConverterTestType testType)
+        {
+            newValue = this.DeprecatedPrefixRegex.Replace(value, "!");
+
+            if (object.ReferenceEquals(newValue, value))
+            {
+                return false;
+            }
+
+            var message = testType == ConverterTestType.DeprecatedLocalizationVariablePrefixInTextValue ? "The prefix on the localization variable in the inner text is incorrect." : "The prefix on the localization variable in the attribute value is incorrect.";
+
+            return this.OnError(testType, node, message);
+        }
+
         private void EnsurePrecedingWhitespaceCorrect(XText whitespace, XNode node, int level, ConverterTestType testType)
         {
             if (!WixConverter.LeadingWhitespaceValid(this.IndentationAmount, level, whitespace.Value))
@@ -492,25 +515,40 @@ namespace WixToolset.Converters
 
         private void ConvertElement(XElement element)
         {
-            // Gather any deprecated namespaces, then update this element tree based on those deprecations.
             var deprecatedToUpdatedNamespaces = new Dictionary<XNamespace, XNamespace>();
 
-            foreach (var declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
+            foreach (var attribute in element.Attributes())
             {
-                if (element.Name == Wix3ElementName || element.Name == Include3ElementName)
+                if (attribute.IsNamespaceDeclaration)
                 {
-                    this.SourceVersion = 3;
-                }
-                else if (element.Name == Wix4ElementName || element.Name == Include4ElementName)
-                {
-                    this.SourceVersion = 4;
-                }
+                    // Gather any deprecated namespaces, then update this element tree based on those deprecations.
+                    var declaration = attribute;
 
-                if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
-                {
-                    if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
+                    if (element.Name == Wix3ElementName || element.Name == Include3ElementName)
                     {
-                        deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);
+                        this.SourceVersion = 3;
+                    }
+                    else if (element.Name == Wix4ElementName || element.Name == Include4ElementName)
+                    {
+                        this.SourceVersion = 4;
+                    }
+
+                    if (WixConverter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
+                    {
+                        if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
+                        {
+                            deprecatedToUpdatedNamespaces.Add(declaration.Value, ns);
+                        }
+                    }
+                }
+                else
+                {
+                    if (null != attribute.Value)
+                    {
+                        if (this.TryFixDeprecatedLocalizationPrefixes(element, attribute.Value, out var newValue, ConverterTestType.DeprecatedLocalizationVariablePrefixInAttributeValue))
+                        {
+                            attribute.Value = newValue;
+                        }
                     }
                 }
             }
@@ -1958,10 +1996,14 @@ namespace WixToolset.Converters
             /// </summary>
             WhitespacePrecedingEndElementWrong,
 
+            // Before this point, ignore errors on convert operation
+
             /// <summary>
             /// Displayed when the XML declaration is present in the source file.
             /// </summary>
             DeclarationPresent,
+
+            // After this point, ignore errors on format operation
 
             /// <summary>
             /// Displayed when the xmlns attribute is missing from the document element.
@@ -1972,6 +2014,16 @@ namespace WixToolset.Converters
             /// Displayed when the xmlns attribute on the document element is wrong.
             /// </summary>
             XmlnsValueWrong,
+
+            /// <summary>
+            /// Displayed when inner text contains a deprecated $(loc.xxx) reference.
+            /// </summary>
+            DeprecatedLocalizationVariablePrefixInTextValue,
+
+            /// <summary>
+            /// Displayed when an attribute value contains a deprecated $(loc.xxx) reference.
+            /// </summary>
+            DeprecatedLocalizationVariablePrefixInAttributeValue,
 
             /// <summary>
             /// Assign an identifier to a File element when on Id attribute is specified.
