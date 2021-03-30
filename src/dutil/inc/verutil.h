@@ -34,8 +34,8 @@ typedef struct _VERUTIL_VERSION
 
 *******************************************************************/
 HRESULT DAPI VerCompareParsedVersions(
-    __in VERUTIL_VERSION* pVersion1,
-    __in VERUTIL_VERSION* pVersion2,
+    __in_opt VERUTIL_VERSION* pVersion1,
+    __in_opt VERUTIL_VERSION* pVersion2,
     __out int* pnResult
     );
 

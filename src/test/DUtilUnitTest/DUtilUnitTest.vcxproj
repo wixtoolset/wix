@@ -30,6 +30,7 @@
     <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="ApupUtilTests.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="DictUtilTest.cpp" />
     <ClCompile Include="DirUtilTests.cpp" />
@@ -58,6 +59,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <ResourceCompile Include="UnitTest.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestData\ApupUtilTests\FeedBv2.0.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

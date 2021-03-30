@@ -208,7 +208,6 @@ static HRESULT ProcessEntry(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fVersionFound = FALSE;
     int nCompareResult = 0;
 
     // First search the ATOM entry's custom elements to try and find the application update information.
@@ -255,25 +254,26 @@ static HRESULT ProcessEntry(
             {
                 hr = VerParseVersion(pElement->wzValue, 0, FALSE, &pApupEntry->pVersion);
                 ApupExitOnFailure(hr, "Failed to parse version string '%ls' from ATOM entry.", pElement->wzValue);
-
-                fVersionFound = TRUE;
             }
         }
     }
 
     // If there is no application identity or no version, skip the whole thing.
-    if ((!pApupEntry->wzApplicationId && !wzDefaultAppId) || !fVersionFound)
+    if ((!pApupEntry->wzApplicationId && !wzDefaultAppId) || !pApupEntry->pVersion)
     {
         ExitFunction1(hr = S_FALSE); // skip this update since it has no application id or version.
     }
 
-    hr = VerCompareParsedVersions(pApupEntry->pUpgradeVersion, pApupEntry->pVersion, &nCompareResult);
-    ApupExitOnFailure(hr, "Failed to compare version to upgrade version.");
-
-    if (nCompareResult >= 0)
+    if (pApupEntry->pUpgradeVersion)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ApupExitOnRootFailure(hr, "Upgrade version is greater than or equal to application version.");
+        hr = VerCompareParsedVersions(pApupEntry->pUpgradeVersion, pApupEntry->pVersion, &nCompareResult);
+        ApupExitOnFailure(hr, "Failed to compare version to upgrade version.");
+
+        if (nCompareResult >= 0)
+        {
+            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+            ApupExitOnRootFailure(hr, "Upgrade version is greater than or equal to application version.");
+        }
     }
 
     if (pAtomEntry->wzTitle)
@@ -443,10 +443,13 @@ static __callback int __cdecl CompareEntries(
         VerCompareParsedVersions(pEntryLeft->pUpgradeVersion, pEntryRight->pUpgradeVersion, &ret);
         if (0 == ret)
         {
-            ret = (pEntryRight->dw64TotalSize < pEntryLeft->dw64TotalSize) ? -1 :
-                  (pEntryRight->dw64TotalSize > pEntryLeft->dw64TotalSize) ?  1 : 0;
+            ret = (pEntryLeft->dw64TotalSize < pEntryRight->dw64TotalSize) ? -1 :
+                  (pEntryLeft->dw64TotalSize > pEntryRight->dw64TotalSize) ?  1 : 0;
         }
     }
+
+    // Sort descending.
+    ret = -ret;
 
     return ret;
 }

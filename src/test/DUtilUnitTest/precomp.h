@@ -11,6 +11,8 @@
 #include "error.h"
 #include <dutil.h>
 
+#include <verutil.h>
+#include <atomutil.h>
 #include <dictutil.h>
 #include <dirutil.h>
 #include <fileutil.h>
@@ -21,8 +23,10 @@
 #include <strutil.h>
 #include <monutil.h>
 #include <regutil.h>
+#include <rssutil.h>
+#include <apuputil.h> // NOTE: this must come after atomutil.h and rssutil.h since it uses them.
 #include <uriutil.h>
-#include <verutil.h>
+#include <xmlutil.h>
 
 #pragma managed
 #include <vcclr.h>

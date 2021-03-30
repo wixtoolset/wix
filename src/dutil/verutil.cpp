@@ -40,8 +40,8 @@ static HRESULT CompareVersionSubstring(
 
 
 DAPI_(HRESULT) VerCompareParsedVersions(
-    __in VERUTIL_VERSION* pVersion1,
-    __in VERUTIL_VERSION* pVersion2,
+    __in_opt VERUTIL_VERSION* pVersion1,
+    __in_opt VERUTIL_VERSION* pVersion2,
     __out int* pnResult
     )
 {
@@ -50,8 +50,8 @@ DAPI_(HRESULT) VerCompareParsedVersions(
     DWORD cMaxReleaseLabels = 0;
     BOOL fCompareMetadata = FALSE;
 
-    if (!pVersion1 || !pVersion1->sczVersion ||
-        !pVersion2 || !pVersion2->sczVersion)
+    if (pVersion1 && !pVersion1->sczVersion ||
+        pVersion2 && !pVersion2->sczVersion)
     {
         ExitFunction1(hr = E_INVALIDARG);
     }
@@ -59,6 +59,14 @@ DAPI_(HRESULT) VerCompareParsedVersions(
     if (pVersion1 == pVersion2)
     {
         ExitFunction1(nResult = 0);
+    }
+    else if (pVersion1 && !pVersion2)
+    {
+        ExitFunction1(nResult = 1);
+    }
+    else if (!pVersion1 && pVersion2)
+    {
+        ExitFunction1(nResult = -1);
     }
 
     nResult = CompareDword(pVersion1->dwMajor, pVersion2->dwMajor);
