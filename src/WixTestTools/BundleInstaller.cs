@@ -49,6 +49,31 @@ namespace WixTestTools
         }
 
         /// <summary>
+        /// Calls Layout for the bundle with optional arguments.
+        /// </summary>
+        /// <param name="layoutDirectory">The destination directory.</param>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string Layout(string layoutDirectory, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.AdministrativeInstall, arguments, layoutDirectory: layoutDirectory);
+        }
+
+        /// <summary>
+        /// Calls Layout for the bundle with optional arguments.
+        /// </summary>
+        /// <param name="bundlePath">Path to the bundle to run.</param>
+        /// <param name="layoutDirectory">The destination directory.</param>
+        /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
+        /// <param name="arguments">Optional arguments to pass to the tool.</param>
+        /// <returns>Path to the generated log file.</returns>
+        public string Layout(string bundlePath, string layoutDirectory, int expectedExitCode = (int)MSIExec.MSIExecReturnCode.SUCCESS, params string[] arguments)
+        {
+            return this.RunBundleWithArguments(expectedExitCode, MSIExec.MSIExecMode.AdministrativeInstall, arguments, bundlePath: bundlePath, layoutDirectory: layoutDirectory);
+        }
+
+        /// <summary>
         /// Modify the bundle with optional arguments.
         /// </summary>
         /// <param name="expectedExitCode">Expected exit code, defaults to success.</param>
@@ -100,7 +125,7 @@ namespace WixTestTools
         /// <param name="mode">Install mode.</param>
         /// <param name="arguments">Optional arguments to pass to the tool.</param>
         /// <returns>Path to the generated log file.</returns>
-        private string RunBundleWithArguments(int expectedExitCode, MSIExec.MSIExecMode mode, string[] arguments, bool assertOnError = true, string bundlePath = null)
+        private string RunBundleWithArguments(int expectedExitCode, MSIExec.MSIExecMode mode, string[] arguments, bool assertOnError = true, string bundlePath = null, string layoutDirectory = null)
         {
             TestTool bundle = new TestTool(bundlePath ?? this.Bundle);
             var sb = new StringBuilder();
@@ -115,6 +140,10 @@ namespace WixTestTools
             // Set operation.
             switch (mode)
             {
+                case MSIExec.MSIExecMode.AdministrativeInstall:
+                    sb.Append($" -layout \"{layoutDirectory}\"");
+                    break;
+
                 case MSIExec.MSIExecMode.Modify:
                     sb.Append(" -modify");
                     break;

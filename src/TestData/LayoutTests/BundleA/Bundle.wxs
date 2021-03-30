@@ -1,0 +1,42 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?ifndef Version?>
+<?define Version = 1.0.0.0?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes">
+    <!-- PayloadGroupRef should be the only thing different from the template -->
+    <PayloadGroupRef Id="LayoutOnlyPayloads" />
+
+    <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
+
+    <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
+
+    <?ifdef SoftwareTag?>
+    <SoftwareTag Regid="regid.1995-08.com.example" InstallPath="[CommonAppDataFolder]regid.1995-08.com.example" />
+    <?endif?>
+
+    <?ifndef BA?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(var.BA) = "TestBAdnc"?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(var.BA) = "hyperlinkLicense"?>
+      <BootstrapperApplication>
+        <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
+      </BootstrapperApplication>
+    <?else?>
+      <BootstrapperApplicationRef Id="$(var.BA)" />
+    <?endif?>
+
+    <Chain>
+      <?ifndef BA?>
+        <PackageGroupRef Id="TestBA" />
+      <?elseif $(var.BA) = "TestBAdnc"?>
+        <PackageGroupRef Id="TestBAdnc" />
+      <?endif?>
+
+      <PackageGroupRef Id="BundlePackages" />
+    </Chain>
+  </Bundle>
+</Wix>

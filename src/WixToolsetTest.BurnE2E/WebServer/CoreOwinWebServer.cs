@@ -49,7 +49,8 @@ namespace WixToolsetTest.BurnE2E
 
         public void Dispose()
         {
-            this.WebHost?.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+            var waitTime = TimeSpan.FromSeconds(5);
+            this.WebHost?.StopAsync(waitTime).Wait(waitTime);
         }
 
         public IDirectoryContents GetDirectoryContents(string subpath) => throw new NotImplementedException();
