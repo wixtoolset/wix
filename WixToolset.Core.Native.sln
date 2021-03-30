@@ -3,12 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winterop", "src\winterop\winterop.vcxproj", "{26D45E58-E703-431D-B67E-493C72C9DA0B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.Native", "src\WixToolset.Core.Native\WixToolset.Core.Native.csproj", "{C1F36B7C-6A5B-44CB-BD05-3C9CDEC2DD63}"
-	ProjectSection(ProjectDependencies) = postProject
-		{26D45E58-E703-431D-B67E-493C72C9DA0B} = {26D45E58-E703-431D-B67E-493C72C9DA0B}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wixnative", "src\wixnative\wixnative.vcxproj", "{8497EC72-B8D0-4272-A9D0-7E9D871CEFBF}"
 EndProject
@@ -24,16 +19,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Debug|x64.ActiveCfg = Debug|x64
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Debug|x64.Build.0 = Debug|x64
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Debug|x86.ActiveCfg = Debug|Win32
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Debug|x86.Build.0 = Debug|Win32
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Release|Any CPU.ActiveCfg = Release|Win32
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Release|x64.ActiveCfg = Release|x64
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Release|x64.Build.0 = Release|x64
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Release|x86.ActiveCfg = Release|Win32
-		{26D45E58-E703-431D-B67E-493C72C9DA0B}.Release|x86.Build.0 = Release|Win32
 		{C1F36B7C-6A5B-44CB-BD05-3C9CDEC2DD63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1F36B7C-6A5B-44CB-BD05-3C9CDEC2DD63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1F36B7C-6A5B-44CB-BD05-3C9CDEC2DD63}.Debug|x64.ActiveCfg = Debug|Any CPU
