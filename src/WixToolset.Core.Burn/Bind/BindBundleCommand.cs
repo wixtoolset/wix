@@ -251,6 +251,7 @@ namespace WixToolset.Core.Burn
             // Reindex the payloads now that all the payloads (minus the manifest payloads that will be created later)
             // are present.
             payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
+            wixGroupSymbols = this.GetRequiredSymbols<WixGroupSymbol>();
             packagesPayloads = RecalculatePackagesPayloads(payloadSymbols, wixGroupSymbols);
 
             // Process the payloads that were added by processing the packages.
