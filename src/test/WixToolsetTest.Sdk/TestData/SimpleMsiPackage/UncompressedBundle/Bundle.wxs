@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="UncompressedBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{AB04C2A5-8312-4464-AE01-7F3A3D9C2BCF}" Compressed="no">
+        <BootstrapperApplication>
+            <BootstrapperApplicationDll SourceFile="test.txt" />
+        </BootstrapperApplication>
+
+        <Chain>
+            <ExePackage Permanent="yes" DetectCondition="none" SourceFile="test.txt" />
+        </Chain>
+    </Bundle>
+</Wix>

@@ -44,6 +44,40 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+        [Theory(Skip = "Test demonstrates failure")]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildUncompressedBundle(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "UncompressedBundle");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "UncompressedBundle.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Empty(warnings);
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"bin\x86\Release\SimpleBundle.exe",
+                    @"bin\x86\Release\SimpleBundle.wixpdb",
+                    @"bin\x86\Release\test.txt",
+                }, paths);
+            }
+        }
+
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]

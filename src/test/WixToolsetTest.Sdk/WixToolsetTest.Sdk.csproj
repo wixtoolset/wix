@@ -40,6 +40,8 @@
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\UncompressedBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\UncompressedBundle\UncompressedBundle.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\SimpleBundle\SimpleBundle.wixproj" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
