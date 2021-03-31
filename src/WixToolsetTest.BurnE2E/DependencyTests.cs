@@ -268,7 +268,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6388")]
+        [Fact]
         public void CanUninstallDependencyPackagesWithBundlesUninstalledInFifoOrder()
         {
             var testRegistryValueExe = "ExeA";
@@ -394,7 +394,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6388")]
+        [Fact]
         public void DoesntRegisterDependencyOnPackageNotSelectedForInstall()
         {
             var testRegistryValueExe = "ExeA";
@@ -424,6 +424,9 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(true);
             bundleA.VerifyExeTestRegistryValue(testRegistryValueExe, "1.0.0.0");
             packageB.VerifyInstalled(false);
+
+            testBAController.ResetPackageStates("PackageA");
+            testBAController.ResetPackageStates("PackageB");
 
             bundleA.Uninstall();
             bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
