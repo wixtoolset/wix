@@ -12,6 +12,8 @@ nuget restore || exit /b
 msbuild -p:Configuration=%_C% || exit /b
 
 :: Test
+dotnet test -c %_C% --no-build src\test\WixToolsetTest.BuildTasks || exit /b
+
 dotnet publish -c %_C% -o %_P%\dotnet-wix\ -f netcoreapp2.1 src\wix || exit /b
 
 dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\net461\x86\buildtasks\ -f net461 -r win-x86 src\WixToolset.BuildTasks || exit /b
