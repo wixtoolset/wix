@@ -116,15 +116,15 @@ extern "C" HRESULT PackagesParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"Cache", &scz);
         if (SUCCEEDED(hr))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"no", -1))
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"remove", -1))
             {
                 pPackage->cacheType = BURN_CACHE_TYPE_NO;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"yes", -1))
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"keep", -1))
             {
                 pPackage->cacheType = BURN_CACHE_TYPE_YES;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"always", -1))
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"force", -1))
             {
                 pPackage->cacheType = BURN_CACHE_TYPE_ALWAYS;
             }
