@@ -19,7 +19,8 @@ static HRESULT DetectPackageDependents(
 static HRESULT SplitIgnoreDependencies(
     __in_z LPCWSTR wzIgnoreDependencies,
     __deref_inout_ecount_opt(*pcDependencies) DEPENDENCY** prgDependencies,
-    __inout LPUINT pcDependencies
+    __inout LPUINT pcDependencies,
+    __out BOOL* pfIgnoreAll
     );
 
 static HRESULT JoinIgnoreDependencies(
@@ -194,7 +195,7 @@ extern "C" HRESULT DependencyInitialize(
     // Add the list of dependencies to ignore.
     if (wzIgnoreDependencies)
     {
-        hr = SplitIgnoreDependencies(wzIgnoreDependencies, &pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies);
+        hr = SplitIgnoreDependencies(wzIgnoreDependencies, &pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, &pRegistration->fIgnoreAllDependents);
         ExitOnFailure(hr, "Failed to split the list of dependencies to ignore.");
     }
 
@@ -816,12 +817,14 @@ LExit:
 static HRESULT SplitIgnoreDependencies(
     __in_z LPCWSTR wzIgnoreDependencies,
     __deref_inout_ecount_opt(*pcDependencies) DEPENDENCY** prgDependencies,
-    __inout LPUINT pcDependencies
+    __inout LPUINT pcDependencies,
+    __out BOOL* pfIgnoreAll
     )
 {
     HRESULT hr = S_OK;
     LPWSTR wzContext = NULL;
     STRINGDICT_HANDLE sdIgnoreDependencies = NULL;
+    *pfIgnoreAll = FALSE;
 
     // Create a dictionary to hold unique dependencies.
     hr = DictCreateStringList(&sdIgnoreDependencies, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
@@ -842,6 +845,11 @@ static HRESULT SplitIgnoreDependencies(
 
             hr = DictAddKey(sdIgnoreDependencies, wzToken);
             ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", wzToken);
+
+            if (!*pfIgnoreAll && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, L"ALL", -1, wzToken, -1))
+            {
+                *pfIgnoreAll = TRUE;
+            }
         }
     }
 

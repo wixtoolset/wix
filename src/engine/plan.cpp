@@ -588,8 +588,8 @@ extern "C" HRESULT PlanRegistration(
     STRINGDICT_HANDLE sdIgnoreDependents = NULL;
 
     pPlan->fCanAffectMachineState = TRUE; // register the bundle since we're modifying machine state.
-
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
+    pPlan->fIgnoreAllDependents = pRegistration->fIgnoreAllDependents;
 
     // Ensure the bundle is cached if not running from the cache.
     if (!CacheBundleRunningFromCache())
@@ -633,68 +633,71 @@ extern "C" HRESULT PlanRegistration(
             ExitOnFailure(hr, "Failed to add self-dependent to ignore dependents.");
         }
 
-        // If we are not doing an upgrade, we check to see if there are still dependents on us and if so we skip planning.
-        // However, when being upgraded, we always execute our uninstall because a newer version of us is probably
-        // already on the machine and we need to clean up the stuff specific to this bundle.
-        if (BOOTSTRAPPER_RELATION_UPGRADE != relationType)
+        if (!pPlan->fIgnoreAllDependents)
         {
-            // If there were other dependencies to ignore, add them.
-            for (DWORD iDependency = 0; iDependency < pRegistration->cIgnoredDependencies; ++iDependency)
+            // If we are not doing an upgrade, we check to see if there are still dependents on us and if so we skip planning.
+            // However, when being upgraded, we always execute our uninstall because a newer version of us is probably
+            // already on the machine and we need to clean up the stuff specific to this bundle.
+            if (BOOTSTRAPPER_RELATION_UPGRADE != relationType)
             {
-                DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + iDependency;
-
-                hr = DictKeyExists(sdIgnoreDependents, pDependency->sczKey);
-                if (E_NOTFOUND != hr)
+                // If there were other dependencies to ignore, add them.
+                for (DWORD iDependency = 0; iDependency < pRegistration->cIgnoredDependencies; ++iDependency)
                 {
-                    ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
-                }
-                else
-                {
-                    hr = DictAddKey(sdIgnoreDependents, pDependency->sczKey);
-                    ExitOnFailure(hr, "Failed to add dependent key to ignored dependents.");
-                }
-            }
+                    DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + iDependency;
 
-            // For addon or patch bundles, dependent related bundles should be ignored. This allows
-            // that addon or patch to be removed even though bundles it targets still are registered.
-            for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
-            {
-                const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
-
-                if (BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType)
-                {
-                    for (DWORD j = 0; j < pRelatedBundle->package.cDependencyProviders; ++j)
+                    hr = DictKeyExists(sdIgnoreDependents, pDependency->sczKey);
+                    if (E_NOTFOUND != hr)
                     {
-                        const BURN_DEPENDENCY_PROVIDER* pProvider = pRelatedBundle->package.rgDependencyProviders + j;
-
-                        hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pProvider->sczKey);
-                        ExitOnFailure(hr, "Failed to add dependent bundle provider key to ignore dependents.");
+                        ExitOnFailure(hr, "Failed to check the dictionary of ignored dependents.");
+                    }
+                    else
+                    {
+                        hr = DictAddKey(sdIgnoreDependents, pDependency->sczKey);
+                        ExitOnFailure(hr, "Failed to add dependent key to ignored dependents.");
                     }
                 }
-            }
 
-            // If there are any (non-ignored and not-planned-to-be-removed) dependents left, skip planning.
-            for (DWORD iDependent = 0; iDependent < pRegistration->cDependents; ++iDependent)
-            {
-                DEPENDENCY* pDependent = pRegistration->rgDependents + iDependent;
-
-                hr = DictKeyExists(sdIgnoreDependents, pDependent->sczKey);
-                if (E_NOTFOUND == hr)
+                // For addon or patch bundles, dependent related bundles should be ignored. This allows
+                // that addon or patch to be removed even though bundles it targets still are registered.
+                for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
                 {
-                    hr = S_OK;
+                    const BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + i;
 
-                    // TODO: callback to the BA and let it have the option to ignore this dependent?
-                    if (!pPlan->fDisallowRemoval)
+                    if (BOOTSTRAPPER_RELATION_DEPENDENT == pRelatedBundle->relationType)
                     {
-                        pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
-                        *pfContinuePlanning = FALSE; // skip the rest of planning.
+                        for (DWORD j = 0; j < pRelatedBundle->package.cDependencyProviders; ++j)
+                        {
+                            const BURN_DEPENDENCY_PROVIDER* pProvider = pRelatedBundle->package.rgDependencyProviders + j;
 
-                        LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS);
+                            hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pProvider->sczKey);
+                            ExitOnFailure(hr, "Failed to add dependent bundle provider key to ignore dependents.");
+                        }
                     }
-
-                    LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_DEPENDENT, pDependent->sczKey, LoggingStringOrUnknownIfNull(pDependent->sczName));
                 }
-                ExitOnFailure(hr, "Failed to check for remaining dependents during planning.");
+
+                // If there are any (non-ignored and not-planned-to-be-removed) dependents left, skip planning.
+                for (DWORD iDependent = 0; iDependent < pRegistration->cDependents; ++iDependent)
+                {
+                    DEPENDENCY* pDependent = pRegistration->rgDependents + iDependent;
+
+                    hr = DictKeyExists(sdIgnoreDependents, pDependent->sczKey);
+                    if (E_NOTFOUND == hr)
+                    {
+                        hr = S_OK;
+
+                        // TODO: callback to the BA and let it have the option to ignore this dependent?
+                        if (!pPlan->fDisallowRemoval)
+                        {
+                            pPlan->fDisallowRemoval = TRUE; // ensure the registration stays
+                            *pfContinuePlanning = FALSE; // skip the rest of planning.
+
+                            LogId(REPORT_STANDARD, MSG_PLAN_SKIPPED_DUE_TO_DEPENDENTS);
+                        }
+
+                        LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_DEPENDENT, pDependent->sczKey, LoggingStringOrUnknownIfNull(pDependent->sczName));
+                    }
+                    ExitOnFailure(hr, "Failed to check for remaining dependents during planning.");
+                }
             }
         }
     }

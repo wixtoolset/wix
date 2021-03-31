@@ -146,6 +146,7 @@ typedef struct _BURN_REGISTRATION
     UINT cIgnoredDependencies;           // Only valid after detect.
     DEPENDENCY* rgDependents;            // Only valid after detect.
     UINT cDependents;                    // Only valid after detect.
+    BOOL fIgnoreAllDependents;           // Only valid after detect.
     LPCWSTR wzSelfDependent;             // Only valid after detect.
     BOOL fSelfRegisteredAsDependent;     // Only valid after detect.
     BOOL fParentRegisteredAsDependent;   // Only valid after detect.
