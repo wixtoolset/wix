@@ -14,6 +14,6 @@
     <ProjectReference Include="..\..\..\TestExe\TestExe.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.90" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.91" />
   </ItemGroup>
 </Project>

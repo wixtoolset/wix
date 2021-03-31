@@ -2,6 +2,6 @@
 <Project Sdk="WixToolset.Sdk">
   <Import Project="PackageE.props" />
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.24" />
+    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.25" />
   </ItemGroup>
 </Project>

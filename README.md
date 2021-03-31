@@ -29,12 +29,13 @@ The VM must have:
 Use the `updatepackage.ps1` script from https://github.com/wixtoolset/Home.
 For example:
 
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Bal.wixext -NewVersion 4.0.80
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Data -NewVersion 4.0.180
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Mba.Core -NewVersion 4.0.45
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.NetFx.wixext -NewVersion 4.0.57
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Util.wixext -NewVersion 4.0.67
-* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Sdk -NewVersion 4.0.0-build-0176
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Bal.wixext -NewVersion 4.0.91
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Data -NewVersion 4.0.199
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Dependency.wixext -NewVersion 4.0.25
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Mba.Core -NewVersion 4.0.52
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.NetFx.wixext -NewVersion 4.0.67
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Util.wixext -NewVersion 4.0.82
+* updatepackage.ps1 -TargetFolder path\to\repo -PackageName WixToolset.Sdk -NewVersion 4.0.0-build-0204
 
 ## Building with local changes
 
