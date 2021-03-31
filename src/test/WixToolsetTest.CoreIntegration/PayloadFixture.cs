@@ -6,6 +6,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
@@ -139,6 +140,66 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 Assert.InRange(result.ExitCode, 2, int.MaxValue);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void ReplacesDownloadUrlPlaceholders()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Payload", "DownloadUrlPlaceholdersBundle.wxs"),
+                    Path.Combine(folder, "SimpleBundle", "MultiFileBootstrapperApplication.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "Container", new List<string> { "FileSize", "Hash" } },
+                    { "Payload", new List<string> { "FileSize", "Hash" } },
+                };
+                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Payload Id='burn.exe' FilePath='burn.exe' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='PackagesContainer' />",
+                    "<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/test.msi/test.msi' Packaging='external' SourcePath='test.msi' />",
+                    "<Payload Id='LayoutOnlyPayload' FilePath='DownloadUrlPlaceholdersBundle.wxs' FileSize='*' Hash='*' LayoutOnly='yes' DownloadUrl='http://example.com/id/LayoutOnlyPayload/DownloadUrlPlaceholdersBundle.wxs' Packaging='external' SourcePath='DownloadUrlPlaceholdersBundle.wxs' />",
+                   @"<Payload Id='fhuZsOcBDTuIX8rF96kswqI6SnuI' FilePath='MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='external' SourcePath='MsiPackage\test.txt' />",
+                   @"<Payload Id='faf_OZ741BG7SJ6ZkcIvivZ2Yzo8' FilePath='MsiPackage\Shared.dll' FileSize='*' Hash='*' Packaging='external' SourcePath='MsiPackage\Shared.dll' />",
+                }, payloads);
+
+                var containers = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Container")
+                                              .Cast<XmlElement>()
+                                              .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                              .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Container Id='PackagesContainer' FileSize='*' Hash='*' DownloadUrl='http://example.com/id/PackagesContainer/packages.cab' FilePath='packages.cab' />",
+                }, containers);
             }
         }
     }

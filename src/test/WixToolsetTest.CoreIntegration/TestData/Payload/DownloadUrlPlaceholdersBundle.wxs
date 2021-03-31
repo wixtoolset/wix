@@ -1,0 +1,30 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="DownloadUrlPlaceholders" Version="1.0.0.0" Manufacturer="test" UpgradeCode="{B04C20B8-70C3-4DE1-8D91-4F11C7C68DED}">
+        <BootstrapperApplicationRef Id="fakeba" />
+
+        <Chain>
+            <PackageGroupRef Id="ContainerPackages" />
+            <PackageGroupRef Id="UncompressedPackages" />
+        </Chain>
+
+        <PayloadGroupRef Id="LayoutOnlyPayloads" />
+        <Container Id="PackagesContainer" Name="packages.cab" DownloadUrl="http://example.com/{0}id/{1}/{2}">
+            <PackageGroupRef Id="ContainerPackages" />
+        </Container>
+    </Bundle>
+    <Fragment>
+        <PackageGroup Id="ContainerPackages">
+            <ExePackage SourceFile="burn.exe" DetectCondition="none" />
+        </PackageGroup>
+    </Fragment>
+    <Fragment>
+        <PackageGroup Id="UncompressedPackages">
+            <MsiPackage SourceFile="test.msi" DownloadUrl="http://example.com/{0}id/{1}/{2}" Compressed="no" />
+        </PackageGroup>
+    </Fragment>
+    <Fragment>
+        <PayloadGroup Id="LayoutOnlyPayloads">
+            <Payload Id="LayoutOnlyPayload" SourceFile="$(sys.SOURCEFILEPATH)" DownloadUrl="http://example.com/{0}id/{1}/{2}" Compressed="no" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>
