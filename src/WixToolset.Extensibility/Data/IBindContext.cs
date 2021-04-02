@@ -28,11 +28,6 @@ namespace WixToolset.Extensibility.Data
         string CabCachePath { get; set; }
 
         /// <summary>
-        /// Codepage for result.
-        /// </summary>
-        int Codepage { get; set; }
-
-        /// <summary>
         /// Default compression level.
         /// </summary>
         CompressionLevel? DefaultCompressionLevel { get; set; }
@@ -86,6 +81,21 @@ namespace WixToolset.Extensibility.Data
         /// Output path for PDB.
         /// </summary>
         string PdbPath { get; set; }
+
+        /// <summary>
+        /// Codepage from resolve.
+        /// </summary>
+        int? ResolvedCodepage { get; set; }
+
+        /// <summary>
+        /// Summary information codepage from resolve.
+        /// </summary>
+        int? ResolvedSummaryInformationCodepage { get; set; }
+
+        /// <summary>
+        /// LCID from resolve.
+        /// </summary>
+        int? ResolvedLcid { get; set; }
 
         /// <summary>
         /// Set of ICEs to skip.

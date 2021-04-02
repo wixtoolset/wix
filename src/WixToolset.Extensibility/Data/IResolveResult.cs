@@ -5,15 +5,39 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using WixToolset.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Result of resolving localization and bind variables.
+    /// </summary>
     public interface IResolveResult
     {
-        int Codepage { get; set; }
+        /// <summary>
+        /// Resolved codepage, if provided.
+        /// </summary>
+        int? Codepage { get; set; }
 
+        /// <summary>
+        /// Resolved summary information codepage, if provided.
+        /// </summary>
+        int? SummaryInformationCodepage { get; set; }
+
+        /// <summary>
+        /// Resolved package language, if provided.
+        /// </summary>
+        int? PackageLcid { get; set; }
+
+        /// <summary>
+        /// Fields still requiring resolution.
+        /// </summary>
         IEnumerable<IDelayedField> DelayedFields { get; set; }
 
+        /// <summary>
+        /// Files to extract from embedded .wixlibs.
+        /// </summary>
         IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
+        /// <summary>
+        /// Resolved intermediate.
+        /// </summary>
         Intermediate IntermediateRepresentation { get; set; }
     }
 }
