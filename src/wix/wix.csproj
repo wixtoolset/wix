@@ -3,14 +3,14 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Compiler</Description>
     <Title>WiX Toolset Compiler</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <!-- <PackAsTool>true</PackAsTool> -->
-    <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp2.1' ">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp3.1' ">win-x86</RuntimeIdentifier>
     <AppConfig>app.config</AppConfig>
     <ApplicationManifest>wix.exe.manifest</ApplicationManifest>
     <RollForward>Major</RollForward>

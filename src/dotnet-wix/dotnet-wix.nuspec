@@ -14,7 +14,7 @@
   </metadata>
 
   <files>
-    <file src="$projectFolder$DotnetToolSettings.xml" target="tools\netcoreapp2.1\any" />
-    <file src="**" target="tools\netcoreapp2.1\any" />
+    <file src="$projectFolder$DotnetToolSettings.xml" target="tools\netcoreapp3.1\any" />
+    <file src="**" target="tools\netcoreapp3.1\any" />
   </files>
 </package>

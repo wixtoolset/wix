@@ -19,7 +19,7 @@
 
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
-    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp2.1\</WixBinDir>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp3.1\</WixBinDir>
     <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net461\x86\</WixBinDir>
     <WixBinDir64 Condition=" '$(WixBinDir64)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net461\x64\</WixBinDir64>
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>

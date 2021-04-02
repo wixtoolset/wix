@@ -13,7 +13,7 @@
   <files>
     <file src="$projectFolder$$id$.props" target="build" />
 
-    <file src="netcoreapp2.1\*" target="tools\netcoreapp2.1" />
+    <file src="netcoreapp3.1\*" target="tools\netcoreapp3.1" />
     <file src="net461\*" target="tools\net461" />
     <file src="net461\redirects\*" target="msbuild" />
   </files>

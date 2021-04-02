@@ -14,7 +14,7 @@ msbuild -p:Configuration=%_C% || exit /b
 :: Test
 dotnet test -c %_C% --no-build src\test\WixToolsetTest.BuildTasks || exit /b
 
-dotnet publish -c %_C% -o %_P%\dotnet-wix\ -f netcoreapp2.1 src\wix || exit /b
+dotnet publish -c %_C% -o %_P%\dotnet-wix\ -f netcoreapp3.1 src\wix || exit /b
 
 dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\net461\x86\buildtasks\ -f net461 -r win-x86 src\WixToolset.BuildTasks || exit /b
 dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\net461\x86\heat\ -f net461 -r win-x86 src\heat || exit /b
@@ -30,15 +30,15 @@ robocopy %_P%\WixToolset.Sdk\separate\net461\x64\buildtasks %_P%\WixToolset.Sdk\
 robocopy %_P%\WixToolset.Sdk\separate\net461\x64\heat %_P%\WixToolset.Sdk\tools\net461\x64 %_RCO%
 robocopy %_P%\WixToolset.Sdk\separate\net461\x64\wix %_P%\WixToolset.Sdk\tools\net461\x64 %_RCO%
 
-dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\netcoreapp2.1\buildtasks\ -f netcoreapp2.1 src\WixToolset.BuildTasks || exit /b
-dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\netcoreapp2.1\heat\ -f netcoreapp2.1 src\heat || exit /b
-dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\separate\netcoreapp2.1\wix\ -f netcoreapp2.1 src\wix || exit /b
-robocopy %_P%\WixToolset.Sdk\separate\netcoreapp2.1\buildtasks %_P%\WixToolset.Sdk\tools\netcoreapp2.1 %_RCO% /XF Microsoft.Build.*.dll
-robocopy %_P%\WixToolset.Sdk\separate\netcoreapp2.1\heat %_P%\WixToolset.Sdk\tools\netcoreapp2.1 %_RCO%
-robocopy %_P%\WixToolset.Sdk\separate\netcoreapp2.1\wix %_P%\WixToolset.Sdk\tools\netcoreapp2.1 %_RCO%
+dotnet publish -c %_C% -p:UseAppHost=false -o %_P%\WixToolset.Sdk\separate\netcoreapp3.1\buildtasks\ -f netcoreapp3.1 src\WixToolset.BuildTasks || exit /b
+dotnet publish -c %_C% -p:UseAppHost=false -o %_P%\WixToolset.Sdk\separate\netcoreapp3.1\heat\ -f netcoreapp3.1 src\heat || exit /b
+dotnet publish -c %_C% -p:UseAppHost=false -o %_P%\WixToolset.Sdk\separate\netcoreapp3.1\wix\ -f netcoreapp3.1 src\wix || exit /b
+robocopy %_P%\WixToolset.Sdk\separate\netcoreapp3.1\buildtasks %_P%\WixToolset.Sdk\tools\netcoreapp3.1 %_RCO% /XF Microsoft.Build.*.dll
+robocopy %_P%\WixToolset.Sdk\separate\netcoreapp3.1\heat %_P%\WixToolset.Sdk\tools\netcoreapp3.1 %_RCO%
+robocopy %_P%\WixToolset.Sdk\separate\netcoreapp3.1\wix %_P%\WixToolset.Sdk\tools\netcoreapp3.1 %_RCO%
 
 dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\ src\WixToolset.Sdk || exit /b
-dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\broken\net461\ -f net461 -r dne src\wix || exit /b
+dotnet publish -c %_C% -o %_P%\WixToolset.Sdk\broken\net461\ -f net461 -r linux-x64 src\wix || exit /b
 
 dotnet test -c %_C% src\test\WixToolsetTest.Sdk || exit /b
 
