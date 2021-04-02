@@ -56,7 +56,7 @@ namespace WixToolset.Data
         ModuleDependency,
         ModuleExclusion,
         ModuleIgnoreTable,
-        ModuleSignature,
+        WixModule,
         ModuleSubstitution,
         MoveFile,
         Assembly,
@@ -172,9 +172,10 @@ namespace WixToolset.Data
         WixMediaTemplate,
         WixMerge,
         WixOrdering,
+        WixPackage,
         WixPatchBaseline,
         WixPatchFamilyGroup,
-        WixPatchId,
+        WixPatch,
         WixPatchRef,
         WixPatchTarget,
         WixProductSearch,
@@ -362,8 +363,8 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.ModuleIgnoreTable:
                     return SymbolDefinitions.ModuleIgnoreTable;
 
-                case SymbolDefinitionType.ModuleSignature:
-                    return SymbolDefinitions.ModuleSignature;
+                case SymbolDefinitionType.WixModule:
+                    return SymbolDefinitions.WixModule;
 
                 case SymbolDefinitionType.ModuleSubstitution:
                     return SymbolDefinitions.ModuleSubstitution;
@@ -707,13 +708,16 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixOrdering:
                     return SymbolDefinitions.WixOrdering;
 
+                case SymbolDefinitionType.WixPackage:
+                    return SymbolDefinitions.WixPackage;
+
                 case SymbolDefinitionType.WixPatchBaseline:
                     return SymbolDefinitions.WixPatchBaseline;
 
                 case SymbolDefinitionType.WixPatchFamilyGroup:
                     return SymbolDefinitions.WixPatchFamilyGroup;
 
-                case SymbolDefinitionType.WixPatchId:
+                case SymbolDefinitionType.WixPatch:
                     return SymbolDefinitions.WixPatchId;
 
                 case SymbolDefinitionType.WixPatchRef:

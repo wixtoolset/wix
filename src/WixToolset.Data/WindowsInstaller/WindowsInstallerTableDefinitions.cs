@@ -1440,7 +1440,7 @@ namespace WixToolset.Data.WindowsInstaller
 
         public static readonly TableDefinition ModuleSignature = new TableDefinition(
             "ModuleSignature",
-            SymbolDefinitions.ModuleSignature,
+            SymbolDefinitions.WixModule,
             new[]
             {
                 new ColumnDefinition("ModuleID", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Module identifier (String.GUID).", modularizeType: ColumnModularizeType.Column),

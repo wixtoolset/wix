@@ -18,9 +18,10 @@ namespace WixToolset.Data
         /// <summary>
         /// Instantiates a new localization object.
         /// </summary>
-        public Localization(int codepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls)
+        public Localization(int? codepage, int? summaryInformationCodepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls)
         {
             this.Codepage = codepage;
+            this.SummaryInformationCodepage = summaryInformationCodepage;
             this.Culture = culture?.ToLowerInvariant() ?? String.Empty;
             this.variables = new Dictionary<string, BindVariable>(variables);
             this.localizedControls = new Dictionary<string, LocalizedControl>(localizedControls);
@@ -30,7 +31,13 @@ namespace WixToolset.Data
         /// Gets the codepage.
         /// </summary>
         /// <value>The codepage.</value>
-        public int Codepage { get; private set; }
+        public int? Codepage { get; private set; }
+
+        /// <summary>
+        /// Gets the summary information codepage.
+        /// </summary>
+        /// <value>The summary information codepage.</value>
+        public int? SummaryInformationCodepage { get; private set; }
 
         /// <summary>
         /// Gets the culture.
@@ -52,10 +59,17 @@ namespace WixToolset.Data
 
         internal JsonObject Serialize()
         {
-            var jsonObject = new JsonObject
+            var jsonObject = new JsonObject();
+
+            if (this.Codepage.HasValue)
             {
-                { "codepage", this.Codepage },
-            };
+                jsonObject.Add("codepage", this.Codepage.Value);
+            }
+
+            if (this.SummaryInformationCodepage.HasValue)
+            {
+                jsonObject.Add("summaryCodepage", this.SummaryInformationCodepage.Value);
+            }
 
             jsonObject.AddIsNotNullOrEmpty("culture", this.Culture);
 
@@ -94,7 +108,8 @@ namespace WixToolset.Data
 
         internal static Localization Deserialize(JsonObject jsonObject)
         {
-            var codepage = jsonObject.GetValueOrDefault("codepage", 0);
+            var codepage = jsonObject.GetValueOrDefault("codepage", null);
+            var summaryCodepage = jsonObject.GetValueOrDefault("summaryCodepage", null);
             var culture = jsonObject.GetValueOrDefault<string>("culture");
 
             var variables = new Dictionary<string, BindVariable>();
@@ -116,7 +131,7 @@ namespace WixToolset.Data
                 }
             }
 
-            return new Localization(codepage, culture, variables, controls);
+            return new Localization(codepage, summaryCodepage, culture, variables, controls);
         }
     }
 }

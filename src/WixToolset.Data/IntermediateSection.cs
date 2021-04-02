@@ -18,13 +18,11 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="id">Identifier for section.</param>
         /// <param name="type">Type of section.</param>
-        /// <param name="codepage">Codepage for resulting database.</param>
         /// <param name="compilationId">Optional compilation identifier</param>
-        public IntermediateSection(string id, SectionType type, int codepage, string compilationId = null)
+        public IntermediateSection(string id, SectionType type, string compilationId = null)
         {
             this.Id = id;
             this.Type = type;
-            this.Codepage = codepage;
             this.CompilationId = compilationId;
             this.symbols = new List<IntermediateSymbol>();
         }
@@ -40,12 +38,6 @@ namespace WixToolset.Data
         /// </summary>
         /// <value>Type of section.</value>
         public SectionType Type { get; }
-
-        /// <summary>
-        /// Gets the codepage for the section.
-        /// </summary>
-        /// <value>Codepage for the section.</value>
-        public int Codepage { get; }
 
         /// <summary>
         /// Gets and sets the identifier of the compilation of the source file containing the section.
@@ -98,7 +90,6 @@ namespace WixToolset.Data
         /// </summary>
         internal static IntermediateSection Deserialize(ISymbolDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
-            var codepage = jsonObject.GetValueOrDefault("codepage", 0);
             var id = jsonObject.GetValueOrDefault<string>("id");
             var type = jsonObject.GetEnumOrDefault("type", SectionType.Unknown);
 
@@ -107,7 +98,7 @@ namespace WixToolset.Data
                 throw new ArgumentException("JSON object is not a valid section, unknown section type", nameof(type));
             }
 
-            var section = new IntermediateSection(id, type, codepage);
+            var section = new IntermediateSection(id, type);
 
             var symbolsJson = jsonObject.GetValueOrDefault<JsonArray>("symbols");
 
@@ -124,8 +115,7 @@ namespace WixToolset.Data
         {
             var jsonObject = new JsonObject
             {
-                { "type", this.Type.ToString().ToLowerInvariant() },
-                { "codepage", this.Codepage }
+                { "type", this.Type.ToString().ToLowerInvariant() }
             };
 
             if (!String.IsNullOrEmpty(this.Id))
