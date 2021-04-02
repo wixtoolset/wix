@@ -36,23 +36,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void Execute()
         {
             // write out the table to an IDT file
-            Encoding encoding;
-
-            // If UTF8 encoding, use the UTF8-specific constructor to avoid writing
-            // the byte order mark at the beginning of the file
-            if (this.Codepage == Encoding.UTF8.CodePage)
-            {
-                encoding = new UTF8Encoding(false, true);
-            }
-            else
-            {
-                if (this.Codepage == 0)
-                {
-                    this.Codepage = Encoding.ASCII.CodePage;
-                }
-
-                encoding = Encoding.GetEncoding(this.Codepage, new EncoderExceptionFallback(), new DecoderExceptionFallback());
-            }
+            var encoding = GetCodepageEncoding(this.Codepage);
 
             this.IdtPath = Path.Combine(this.IntermediateFolder, String.Concat(this.Table.Name, ".idt"));
 
@@ -209,6 +193,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                        .Replace('\n', '\x19');
         }
 
+        private static Encoding GetCodepageEncoding(int codepage)
+        {
+            Encoding encoding;
+
+            // If UTF8 encoding, use the UTF8-specific constructor to avoid writing
+            // the byte order mark at the beginning of the file
+            if (codepage == Encoding.UTF8.CodePage)
+            {
+                encoding = new UTF8Encoding(false, true);
+            }
+            else
+            {
+                if (codepage == 0)
+                {
+                    codepage = Encoding.ASCII.CodePage;
+                }
+
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+                encoding = Encoding.GetEncoding(codepage, new EncoderExceptionFallback(), new DecoderExceptionFallback());
+            }
+
+            return encoding;
+        }
 
         /// <summary>
         /// Gets the type of the column in IDT format.

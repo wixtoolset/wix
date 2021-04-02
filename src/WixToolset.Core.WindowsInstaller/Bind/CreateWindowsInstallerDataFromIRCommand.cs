@@ -18,11 +18,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreateWindowsInstallerDataFromIRCommand
     {
-        public CreateWindowsInstallerDataFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
+        public CreateWindowsInstallerDataFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, int codepage, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
             this.Section = section;
             this.TableDefinitions = tableDefinitions;
+            this.Codepage = codepage;
             this.BackendExtensions = backendExtensions;
             this.BackendHelper = backendHelper;
             this.GeneratedShortNames = new Dictionary<string, List<FileSymbol>>();
@@ -36,6 +37,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private TableDefinitionCollection TableDefinitions { get; }
 
+        private int Codepage { get; }
+
         private IntermediateSection Section { get; }
 
         private Dictionary<string, List<FileSymbol>> GeneratedShortNames { get; }
@@ -46,7 +49,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             this.Data = new WindowsInstallerData(this.Section.Symbols.First().SourceLineNumbers)
             {
-                Codepage = this.Section.Codepage,
+                Codepage = this.Codepage,
                 Type = SectionTypeToOutputType(this.Section.Type)
             };
 
@@ -219,6 +222,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddWixEnsureTableSymbol((WixEnsureTableSymbol)symbol);
                         break;
 
+                    case SymbolDefinitionType.WixPackage:
+                        this.AddWixPackageSymbol((WixPackageSymbol)symbol);
+                        break;
+
                     // Symbols used internally and are not added to the output.
                     case SymbolDefinitionType.WixBuildInfo:
                     case SymbolDefinitionType.WixBindUpdatedFiles:
@@ -237,7 +244,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolDefinitionType.WixOrdering:
                     case SymbolDefinitionType.WixPatchBaseline:
                     case SymbolDefinitionType.WixPatchFamilyGroup:
-                    case SymbolDefinitionType.WixPatchId:
+                    case SymbolDefinitionType.WixPatch:
                     case SymbolDefinitionType.WixPatchRef:
                     case SymbolDefinitionType.WixPatchTarget:
                     case SymbolDefinitionType.WixProperty:
@@ -1212,6 +1219,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var tableDefinition = this.TableDefinitions[symbol.Table];
             this.Data.EnsureTable(tableDefinition);
+        }
+
+        private void AddWixPackageSymbol(WixPackageSymbol symbol)
+        {
+            // TODO: Remove the following from the compiler and do it here instead.
+            //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
+            //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductCode"), productCode, false, false, false, true);
+            //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductLanguage"), productLanguage, false, false, false, true);
+            //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductName"), this.activeName, false, false, false, true);
+            //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductVersion"), version, false, false, false, true);
+            //if (null != upgradeCode)
+            //{
+            //    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "UpgradeCode"), upgradeCode, false, false, false, true);
+            //}
+
+            //if (isPerMachine)
+            //{
+            //    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
+            //}
         }
 
         private bool AddSymbolFromExtension(IntermediateSymbol symbol)

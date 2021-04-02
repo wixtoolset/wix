@@ -9,7 +9,6 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
 
     /// <summary>

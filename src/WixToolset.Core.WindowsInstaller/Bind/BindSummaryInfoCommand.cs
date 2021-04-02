@@ -14,14 +14,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class BindSummaryInfoCommand
     {
-        public BindSummaryInfoCommand(IntermediateSection section, IBackendHelper backendHelper, IWixBranding branding)
+        public BindSummaryInfoCommand(IntermediateSection section, int? summaryInformationCodepage, string productLanguage, IBackendHelper backendHelper, IWixBranding branding)
         {
             this.Section = section;
+            this.SummaryInformationCodepage = summaryInformationCodepage;
+            this.ProductLanguage = productLanguage;
             this.BackendHelper = backendHelper;
             this.Branding = branding;
         }
 
         private IntermediateSection Section { get; }
+
+        private int? SummaryInformationCodepage { get; }
+
+        private string ProductLanguage { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -53,6 +59,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.InstallerVersion = 0;
             this.ModularizationSuffix = null;
 
+            SummaryInformationSymbol summaryInformationCodepageSymbol = null;
+            SummaryInformationSymbol platformAndLanguageSymbol = null;
             var foundCreateDateTime = false;
             var foundLastSaveDataTime = false;
             var foundCreatingApplication = false;
@@ -64,20 +72,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 switch (summaryInformationSymbol.PropertyId)
                 {
                     case SummaryInformationType.Codepage: // PID_CODEPAGE
-                        // make sure the code page is an int and not a web name or null
-                        var codepage = summaryInformationSymbol.Value;
-
-                        if (String.IsNullOrEmpty(codepage))
-                        {
-                            codepage = "0";
-                        }
-                        else
-                        {
-                            summaryInformationSymbol.Value = this.BackendHelper.GetValidCodePage(codepage, false, false, summaryInformationSymbol.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
-                        }
+                        summaryInformationCodepageSymbol = summaryInformationSymbol;
                         break;
+
                     case SummaryInformationType.PlatformAndLanguage:
-                        this.Platform = GetPlatformFromSummaryInformation(summaryInformationSymbol.Value);
+                        platformAndLanguageSymbol = summaryInformationSymbol;
                         break;
 
                     case SummaryInformationType.PackageCode: // PID_REVNUMBER
@@ -117,7 +116,31 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            // set the revision number (package/patch code) if it should be automatically generated
+            // Ensure the codepage is set properly.
+            if (summaryInformationCodepageSymbol == null)
+            {
+                summaryInformationCodepageSymbol = this.Section.AddSymbol(new SummaryInformationSymbol(null)
+                {
+                    PropertyId = SummaryInformationType.Codepage
+                });
+            }
+
+            var codepage = summaryInformationCodepageSymbol.Value;
+
+            if (String.IsNullOrEmpty(codepage))
+            {
+                codepage = this.SummaryInformationCodepage?.ToString(CultureInfo.InvariantCulture) ?? "1252";
+            }
+
+            summaryInformationCodepageSymbol.Value = this.BackendHelper.GetValidCodePage(codepage, onlyAnsi: true).ToString(CultureInfo.InvariantCulture);
+
+            // Ensure the language is set properly and figure out what platform we are targeting.
+            if (platformAndLanguageSymbol != null)
+            {
+                this.Platform = EnsureLanguageAndGetPlatformFromSummaryInformation(platformAndLanguageSymbol, this.ProductLanguage);
+            }
+
+            // Set the revision number (package/patch code) if it should be automatically generated.
             if (!foundPackageCode)
             {
                 this.Section.AddSymbol(new SummaryInformationSymbol(null)
@@ -158,10 +181,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private static Platform GetPlatformFromSummaryInformation(string value)
+        private static Platform EnsureLanguageAndGetPlatformFromSummaryInformation(SummaryInformationSymbol symbol, string language)
         {
+            var value = symbol.Value;
             var separatorIndex = value.IndexOf(';');
             var platformValue = separatorIndex > 0 ? value.Substring(0, separatorIndex) : value;
+
+            // If the language was provided and there was language value after the separator
+            // (or the separator was absent) then use the provided language.
+            if (!String.IsNullOrEmpty(language) && (separatorIndex < 0 || separatorIndex + 1 == value.Length))
+            {
+                symbol.Value = platformValue + ';' + language;
+            }
 
             switch (platformValue)
             {

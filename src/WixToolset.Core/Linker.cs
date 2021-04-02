@@ -180,7 +180,7 @@ namespace WixToolset.Core
 
                 // Create a new section to hold the linked content. Start with the entry section's
                 // metadata.
-                var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
+                var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type);
 
                 var sectionCount = 0;
 

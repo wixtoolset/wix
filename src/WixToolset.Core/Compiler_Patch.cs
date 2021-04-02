@@ -24,7 +24,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string patchId = null;
-            var codepage = 0;
+            string codepage = null;
             ////bool versionMismatches = false;
             ////bool productMismatches = false;
             var allowRemoval = false;
@@ -53,7 +53,7 @@ namespace WixToolset.Core
                         patchId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
                         break;
                     case "Codepage":
-                        codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
+                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib);
                         break;
                     case "AllowMajorVersionMismatches":
                         ////versionMismatches = (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
@@ -149,7 +149,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
             }
 
-            this.Core.CreateActiveSection(this.activeName, SectionType.Patch, codepage, this.Context.CompilationId);
+            this.Core.CreateActiveSection(this.activeName, SectionType.Patch, this.Context.CompilationId);
 
             foreach (var child in node.Elements())
             {
@@ -197,8 +197,9 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixPatchIdSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, patchId))
+                this.Core.AddSymbol(new WixPatchSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, patchId))
                 {
+                    Codepage = codepage,
                     ClientPatchId = clientPatchId,
                     OptimizePatchSizeForLargeFiles = optimizePatchSizeForLargeFiles,
                     ApiPatchingSymbolFlags = apiPatchingSymbolFlags,

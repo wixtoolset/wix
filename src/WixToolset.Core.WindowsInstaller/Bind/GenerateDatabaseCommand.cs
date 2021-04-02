@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         private const string IdtsSubFolder = "_idts";
 
-        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, int codepage, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
+        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
@@ -27,13 +27,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.OutputPath = outputPath;
             this.TableDefinitions = tableDefinitions;
             this.IntermediateFolder = intermediateFolder;
-            this.Codepage = codepage;
             this.KeepAddedColumns = keepAddedColumns;
             this.SuppressAddingValidationRows = suppressAddingValidationRows;
             this.UseSubDirectory = useSubdirectory;
         }
-
-        private int Codepage { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -86,12 +83,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (OutputType.Patch == this.Data.Type)
             {
                 type |= OpenDatabase.OpenPatchFile;
-            }
-
-            // Localize the codepage if a value was specified directly.
-            if (-1 != this.Codepage)
-            {
-                this.Data.Codepage = this.Codepage;
             }
 
             try

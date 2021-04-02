@@ -302,7 +302,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private void GenerateDatabase(WindowsInstallerData output, string databaseFile)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, null, null, output, databaseFile, this.TableDefinitions, this.IntermediateFolder, codepage: -1, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
+            var command = new GenerateDatabaseCommand(this.Messaging, null, null, output, databaseFile, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns: true, suppressAddingValidationRows: true, useSubdirectory: false);
             command.Execute();
         }
     }

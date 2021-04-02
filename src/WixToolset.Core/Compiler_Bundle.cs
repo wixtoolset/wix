@@ -259,7 +259,7 @@ namespace WixToolset.Core
             }
 
             this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
-            this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, 0, this.Context.CompilationId);
+            this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, this.Context.CompilationId);
 
             // Now that the active section is initialized, process only extension attributes and the special ProviderKey attribute.
             foreach (var attrib in node.Attributes())

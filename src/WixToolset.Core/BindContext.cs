@@ -26,8 +26,6 @@ namespace WixToolset.Core
 
         public string CabCachePath { get; set; }
 
-        public int Codepage { get; set; }
-
         public CompressionLevel? DefaultCompressionLevel { get; set; }
 
         public IEnumerable<IDelayedField> DelayedFields { get; set; }
@@ -49,6 +47,12 @@ namespace WixToolset.Core
         public PdbType PdbType { get; set; }
 
         public string PdbPath { get; set; }
+
+        public int? ResolvedCodepage { get; set; }
+
+        public int? ResolvedSummaryInformationCodepage { get; set; }
+
+        public int? ResolvedLcid { get; set; }
 
         public IEnumerable<string> SuppressIces { get; set; }
 

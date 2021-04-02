@@ -680,7 +680,7 @@ namespace WixToolset.Core
 
             Debug.Assert(minimum > CompilerConstants.IntegerNotSet && minimum > CompilerConstants.IllegalInteger, "The legal values for this attribute collide with at least one sentinel used during parsing.");
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             if (0 < value.Length)
             {
@@ -692,7 +692,7 @@ namespace WixToolset.Core
                 {
                     try
                     {
-                        int integer = Convert.ToInt32(value, CultureInfo.InvariantCulture.NumberFormat);
+                        var integer = Convert.ToInt32(value, CultureInfo.InvariantCulture.NumberFormat);
 
                         if (CompilerConstants.IntegerNotSet == integer || CompilerConstants.IllegalInteger == integer)
                         {
@@ -1036,12 +1036,11 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="id">Unique identifier for the section.</param>
         /// <param name="type">Type of section to create.</param>
-        /// <param name="codepage">Codepage for the resulting database for this ection.</param>
-        /// <param name="compilationId"></param>
+        /// <param name="compilationId">Unique identifier for the compilation.</param>
         /// <returns>New section.</returns>
-        internal IntermediateSection CreateActiveSection(string id, SectionType type, int codepage, string compilationId)
+        internal IntermediateSection CreateActiveSection(string id, SectionType type, string compilationId)
         {
-            this.ActiveSection = this.CreateSection(id, type, codepage, compilationId);
+            this.ActiveSection = this.CreateSection(id, type, compilationId);
 
             this.activeSectionCachedInlinedDirectoryIds = new Dictionary<string, string>();
             this.activeSectionSimpleReferences = new HashSet<string>();
@@ -1054,12 +1053,11 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="id">Unique identifier for the section.</param>
         /// <param name="type">Type of section to create.</param>
-        /// <param name="codepage">Codepage for the resulting database for this ection.</param>
-        /// <param name="compilationId"></param>
+        /// <param name="compilationId">Unique identifier for the compilation.</param>
         /// <returns>New section.</returns>
-        internal IntermediateSection CreateSection(string id, SectionType type, int codepage, string compilationId)
+        internal IntermediateSection CreateSection(string id, SectionType type, string compilationId)
         {
-            var section = new IntermediateSection(id, type, codepage, compilationId);
+            var section = new IntermediateSection(id, type, compilationId);
 
             this.intermediate.Sections.Add(section);
 

@@ -4,9 +4,16 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Resolves localization and bind variables.
+    /// </summary>
     public interface IResolver
     {
+        /// <summary>
+        /// Resolve localization and bind variables.
+        /// </summary>
+        /// <param name="context">Resolve context.</param>
+        /// <returns>Resolve result.</returns>
         IResolveResult Resolve(IResolveContext context);
     }
 }

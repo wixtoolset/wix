@@ -25,7 +25,7 @@ namespace WixToolsetTest.CoreIntegration
                 { "ProductNameEditionVersion", new BindVariable() { Id = "ProductNameEditionVersion", Value = "!(loc.ProductNameEdition) v1.2.3" } },
             };
 
-            var localization = new Localization(0, "x-none", variables, new Dictionary<string,LocalizedControl>());
+            var localization = new Localization(0, null, "x-none", variables, new Dictionary<string,LocalizedControl>());
 
             variableResolver.AddLocalization(localization);
 

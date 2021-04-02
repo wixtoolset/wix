@@ -15,7 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class CreateDeltaPatchesCommand
     {
-        public CreateDeltaPatchesCommand(List<IFileFacade> fileFacades, string intermediateFolder, WixPatchIdSymbol wixPatchId)
+        public CreateDeltaPatchesCommand(List<IFileFacade> fileFacades, string intermediateFolder, WixPatchSymbol wixPatchId)
         {
             this.FileFacades = fileFacades;
             this.IntermediateFolder = intermediateFolder;
@@ -24,7 +24,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<IFileFacade> FileFacades { get; }
 
-        private WixPatchIdSymbol WixPatchId { get; }
+        private WixPatchSymbol WixPatchId { get; }
 
         private string IntermediateFolder { get; }
 

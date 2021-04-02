@@ -91,15 +91,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var symbols = this.Intermediate.Sections.SelectMany(s => s.Symbols).ToList();
 
             // Get the patch id from the WixPatchId symbol.
-            var patchIdSymbol = symbols.OfType<WixPatchIdSymbol>().FirstOrDefault();
+            var patchSymbol = symbols.OfType<WixPatchSymbol>().FirstOrDefault();
 
-            if (String.IsNullOrEmpty(patchIdSymbol.Id?.Id))
+            if (String.IsNullOrEmpty(patchSymbol.Id?.Id))
             {
                 this.Messaging.Write(ErrorMessages.ExpectedPatchIdInWixMsp());
                 return subStorages;
             }
 
-            if (String.IsNullOrEmpty(patchIdSymbol.ClientPatchId))
+            if (String.IsNullOrEmpty(patchSymbol.ClientPatchId))
             {
                 this.Messaging.Write(ErrorMessages.ExpectedClientPatchIdInWixMsp());
                 return subStorages;
@@ -115,7 +115,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // populate MSP summary information
-            var patchMetadata = this.PopulateSummaryInformation(summaryInfo, symbols, patchIdSymbol, section.Codepage);
+            var patchMetadata = this.PopulateSummaryInformation(summaryInfo, symbols, patchSymbol);
 
             // enumerate transforms
             var productCodes = new SortedSet<string>();
@@ -168,7 +168,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 mainTransform.Transform.Tables.Remove("Media");
                 mainTransform.Transform.Tables.Remove("MsiDigitalSignature");
 
-                var pairedTransform = this.BuildPairedTransform(summaryInfo, patchMetadata, patchIdSymbol, mainTransform.Transform, mediaSymbol, baselineSymbol, out var productCode);
+                var pairedTransform = this.BuildPairedTransform(summaryInfo, patchMetadata, patchSymbol, mainTransform.Transform, mediaSymbol, baselineSymbol, out var productCode);
 
                 productCode = productCode.ToUpperInvariant();
                 productCodes.Add(productCode);
@@ -211,14 +211,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             productCodes = FinalizePatchProductCodes(symbols, productCodes);
 
             // Semicolon delimited list of the product codes that can accept the patch.
-            summaryInfo.Add(SummaryInformationType.PatchProductCodes, new SummaryInformationSymbol(patchIdSymbol.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.PatchProductCodes, new SummaryInformationSymbol(patchSymbol.SourceLineNumbers)
             {
                 PropertyId = SummaryInformationType.PatchProductCodes,
                 Value = String.Join(";", productCodes)
             });
 
             // Semicolon delimited list of transform substorage names in the order they are applied.
-            summaryInfo.Add(SummaryInformationType.TransformNames, new SummaryInformationSymbol(patchIdSymbol.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.TransformNames, new SummaryInformationSymbol(patchSymbol.SourceLineNumbers)
             {
                 PropertyId = SummaryInformationType.TransformNames,
                 Value = String.Join(";", transformNames)
@@ -262,25 +262,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
-        private Dictionary<string, MsiPatchMetadataSymbol> PopulateSummaryInformation(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, List<IntermediateSymbol> symbols, WixPatchIdSymbol patchIdSymbol, int codepage)
+        private Dictionary<string, MsiPatchMetadataSymbol> PopulateSummaryInformation(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, List<IntermediateSymbol> symbols, WixPatchSymbol patchSymbol)
         {
             // PID_CODEPAGE
             if (!summaryInfo.ContainsKey(SummaryInformationType.Codepage))
             {
                 // Set the code page by default to the same code page for the
                 // string pool in the database.
-                AddSummaryInformation(SummaryInformationType.Codepage, codepage.ToString(CultureInfo.InvariantCulture), patchIdSymbol.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Codepage, patchSymbol.Codepage?.ToString(CultureInfo.InvariantCulture) ?? "0", patchSymbol.SourceLineNumbers);
             }
 
             // GUID patch code for the patch.
-            AddSummaryInformation(SummaryInformationType.PatchCode, patchIdSymbol.Id.Id, patchIdSymbol.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchCode, patchSymbol.Id.Id, patchSymbol.SourceLineNumbers);
 
             // Indicates the minimum Windows Installer version that is required to install the patch.
-            AddSummaryInformation(SummaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchIdSymbol.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchSymbol.SourceLineNumbers);
 
             if (!summaryInfo.ContainsKey(SummaryInformationType.Security))
             {
-                AddSummaryInformation(SummaryInformationType.Security, "4", patchIdSymbol.SourceLineNumbers); // Read-only enforced;
+                AddSummaryInformation(SummaryInformationType.Security, "4", patchSymbol.SourceLineNumbers); // Read-only enforced;
             }
 
             // Use authored comments or default to display name.
@@ -1090,7 +1090,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Create the #transform for the given main transform.
         /// </summary>
-        private WindowsInstallerData BuildPairedTransform(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, Dictionary<string, MsiPatchMetadataSymbol> patchMetadata, WixPatchIdSymbol patchIdSymbol, WindowsInstallerData mainTransform, MediaSymbol mediaSymbol, WixPatchBaselineSymbol baselineSymbol, out string productCode)
+        private WindowsInstallerData BuildPairedTransform(Dictionary<SummaryInformationType, SummaryInformationSymbol> summaryInfo, Dictionary<string, MsiPatchMetadataSymbol> patchMetadata, WixPatchSymbol patchIdSymbol, WindowsInstallerData mainTransform, MediaSymbol mediaSymbol, WixPatchBaselineSymbol baselineSymbol, out string productCode)
         {
             productCode = null;
 

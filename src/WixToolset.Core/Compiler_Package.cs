@@ -5,7 +5,6 @@ namespace WixToolset.Core
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Xml.Linq;
@@ -28,10 +27,10 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compressed = YesNoDefaultType.Default;
             var sourceBits = 0;
-            var codepage = 65001;
+            string codepage = null;
             var productCode = "*";
+            string productLanguage = null;
             var isPerMachine = true;
-            string installScope = null;
             string upgradeCode = null;
             string manufacturer = null;
             string version = null;
@@ -53,7 +52,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                     case "Codepage":
-                        codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
+                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib);
                         break;
                     case "Compressed":
                         compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -62,7 +61,7 @@ namespace WixToolset.Core
                         msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                         break;
                     case "Language":
-                        this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                        productLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                         break;
                     case "Manufacturer":
                         manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
@@ -82,7 +81,7 @@ namespace WixToolset.Core
                         productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
                         break;
                     case "Scope":
-                        installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        var installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         switch (installScope)
                         {
                             case "perMachine":
@@ -129,11 +128,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            if (null == this.activeLanguage)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
-            }
-
             if (null == manufacturer)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
@@ -171,11 +165,11 @@ namespace WixToolset.Core
             try
             {
                 this.compilingProduct = true;
-                this.Core.CreateActiveSection(productCode, SectionType.Product, codepage, this.Context.CompilationId);
+                this.Core.CreateActiveSection(productCode, SectionType.Product, this.Context.CompilationId);
 
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductCode"), productCode, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductLanguage"), this.activeLanguage, false, false, false, true);
+                this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductLanguage"), productLanguage, false, false, false, true);
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductName"), this.activeName, false, false, false, true);
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductVersion"), version, false, false, false, true);
                 if (null != upgradeCode)
@@ -188,7 +182,7 @@ namespace WixToolset.Core
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
                 }
 
-                this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform);
+                this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, productLanguage);
 
                 this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
                 {
@@ -198,7 +192,7 @@ namespace WixToolset.Core
 
                 var contextValues = new Dictionary<string, string>
                 {
-                    ["ProductLanguage"] = this.activeLanguage,
+                    ["ProductLanguage"] = productLanguage,
                     ["ProductVersion"] = version,
                     ["UpgradeCode"] = upgradeCode
                 };
@@ -360,14 +354,17 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    if (!isCodepageSet)
+                    this.Core.AddSymbol(new WixPackageSymbol(sourceLineNumbers)
                     {
-                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                        {
-                            PropertyId = SummaryInformationType.Codepage,
-                            Value = "1252"
-                        });
-                    }
+                        PackageId = productCode,
+                        UpgradeCode = upgradeCode,
+                        Name = this.activeName,
+                        Language = productLanguage,
+                        Version = version,
+                        Manufacturer = manufacturer,
+                        Attributes = isPerMachine ? WixPackageAttributes.PerMachine : WixPackageAttributes.None,
+                        Codepage = codepage,
+                    });
 
                     if (!isPackageNameSet)
                     {
@@ -435,7 +432,7 @@ namespace WixToolset.Core
             }
         }
 
-        private void ValidateAndAddCommonSummaryInformationSymbols(SourceLineNumber sourceLineNumbers, int msiVersion, string platform)
+        private void ValidateAndAddCommonSummaryInformationSymbols(SourceLineNumber sourceLineNumbers, int msiVersion, string platform, string language)
         {
             if (String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) && 200 > msiVersion)
             {
@@ -464,7 +461,7 @@ namespace WixToolset.Core
             this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
             {
                 PropertyId = SummaryInformationType.PlatformAndLanguage,
-                Value = String.Format(CultureInfo.InvariantCulture, "{0};{1}", platform, this.activeLanguage)
+                Value = $"{platform};{language}"
             });
 
             this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
@@ -478,7 +475,6 @@ namespace WixToolset.Core
                 PropertyId = SummaryInformationType.Security,
                 Value = "2"
             });
-
         }
 
         /// <summary>

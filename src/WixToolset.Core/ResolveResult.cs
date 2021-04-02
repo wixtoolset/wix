@@ -8,7 +8,11 @@ namespace WixToolset.Core
 
     internal class ResolveResult : IResolveResult
     {
-        public int Codepage { get; set; }
+        public int? Codepage { get; set; }
+
+        public int? SummaryInformationCodepage { get; set; }
+
+        public int? PackageLcid { get; set; }
 
         public IEnumerable<IDelayedField> DelayedFields { get; set; }
 

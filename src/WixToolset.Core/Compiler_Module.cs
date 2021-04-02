@@ -104,7 +104,7 @@ namespace WixToolset.Core
             try
             {
                 this.compilingModule = true; // notice that we are actually building a Merge Module here
-                this.Core.CreateActiveSection(this.activeName, SectionType.Module, codepage, this.Context.CompilationId);
+                this.Core.CreateActiveSection(this.activeName, SectionType.Module, this.Context.CompilationId);
 
                 foreach (var child in node.Elements())
                 {
@@ -232,15 +232,6 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    if (!setCodepage)
-                    {
-                        this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
-                        {
-                            PropertyId = SummaryInformationType.Codepage,
-                            Value = "1252"
-                        });
-                    }
-
                     if (!setPackageName)
                     {
                         this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
@@ -259,13 +250,12 @@ namespace WixToolset.Core
                         });
                     }
 
-                    var symbol = this.Core.AddSymbol(new ModuleSignatureSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, this.activeName, this.activeLanguage))
+                    var symbol = this.Core.AddSymbol(new WixModuleSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, this.activeName, this.activeLanguage))
                     {
-                        ModuleID = this.activeName,
+                        ModuleId = this.activeName,
+                        Language = this.activeLanguage,
                         Version = version
                     });
-
-                    symbol.Set((int)ModuleSignatureSymbolFields.Language, this.activeLanguage);
 
                     this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
                     {
@@ -273,7 +263,7 @@ namespace WixToolset.Core
                         Value = moduleId
                     });
 
-                    this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform);
+                    this.ValidateAndAddCommonSummaryInformationSymbols(sourceLineNumbers, msiVersion, platform, this.activeLanguage);
                 }
             }
             finally

@@ -82,7 +82,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            this.Core.CreateActiveSection(this.activeName, SectionType.PatchCreation, codepage, this.Context.CompilationId);
+            this.Core.CreateActiveSection(this.activeName, SectionType.PatchCreation, this.Context.CompilationId);
 
             foreach (var child in node.Elements())
             {

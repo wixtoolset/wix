@@ -338,7 +338,9 @@ namespace WixToolset.Core.CommandLine
                     var context = this.ServiceProvider.GetService<IBindContext>();
                     //context.CabbingThreadCount = this.CabbingThreadCount;
                     context.CabCachePath = cabCachePath;
-                    context.Codepage = resolveResult.Codepage;
+                    context.ResolvedCodepage = resolveResult.Codepage;
+                    context.ResolvedSummaryInformationCodepage = resolveResult.SummaryInformationCodepage;
+                    context.ResolvedLcid = resolveResult.PackageLcid;
                     context.DefaultCompressionLevel = this.DefaultCompressionLevel;
                     context.DelayedFields = resolveResult.DelayedFields;
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;

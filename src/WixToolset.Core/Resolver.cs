@@ -4,6 +4,7 @@ namespace WixToolset.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
@@ -22,25 +23,11 @@ namespace WixToolset.Core
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
-
-            this.VariableResolver = serviceProvider.GetService<IVariableResolver>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
-
-        private IVariableResolver VariableResolver { get; set; }
-
-        public IEnumerable<IBindPath> BindPaths { get; set; }
-
-        public string IntermediateFolder { get; set; }
-
-        public Intermediate IntermediateRepresentation { get; set; }
-
-        public IEnumerable<Localization> Localizations { get; set; }
-
-        public IEnumerable<string> FilterCultures { get; set; }
 
         public IResolveResult Resolve(IResolveContext context)
         {
@@ -52,11 +39,26 @@ namespace WixToolset.Core
             ResolveResult resolveResult = null;
             try
             {
-                var codepage = this.PopulateVariableResolver(context);
+                var filteredLocalizations = FilterLocalizations(context);
 
-                this.LocalizeUI(context);
+                var variableResolver = this.CreateVariableResolver(context, filteredLocalizations);
 
-                resolveResult = this.DoResolve(context, codepage);
+                this.LocalizeUI(variableResolver, context.IntermediateRepresentation);
+
+                resolveResult = this.DoResolve(context, variableResolver);
+
+                var primaryLocalization = filteredLocalizations.FirstOrDefault();
+
+                if (primaryLocalization != null)
+                {
+                    this.TryGetCultureInfo(primaryLocalization.Culture, out var cultureInfo);
+
+                    resolveResult.Codepage = primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+
+                    resolveResult.SummaryInformationCodepage = primaryLocalization.SummaryInformationCodepage ?? primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+
+                    resolveResult.PackageLcid = cultureInfo?.LCID;
+                }
             }
             finally
             {
@@ -69,7 +71,7 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult DoResolve(IResolveContext context, int? codepage)
+        private ResolveResult DoResolve(IResolveContext context, IVariableResolver variableResolver)
         {
             var buildingPatch = context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
 
@@ -80,7 +82,7 @@ namespace WixToolset.Core
                 var command = new ResolveFieldsCommand();
                 command.Messaging = this.Messaging;
                 command.BuildingPatch = buildingPatch;
-                command.VariableResolver = this.VariableResolver;
+                command.VariableResolver = variableResolver;
                 command.BindPaths = context.BindPaths;
                 command.Extensions = context.Extensions;
                 command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
@@ -118,7 +120,6 @@ namespace WixToolset.Core
 
             return new ResolveResult
             {
-                Codepage = codepage.HasValue ? codepage.Value : -1,
                 ExpectedEmbeddedFiles = expectedEmbeddedFiles,
                 DelayedFields = delayedFields,
                 IntermediateRepresentation = context.IntermediateRepresentation
@@ -128,13 +129,13 @@ namespace WixToolset.Core
         /// <summary>
         /// Localize dialogs and controls.
         /// </summary>
-        private void LocalizeUI(IResolveContext context)
+        private void LocalizeUI(IVariableResolver variableResolver, Intermediate intermediate)
         {
-            foreach (var section in context.IntermediateRepresentation.Sections)
+            foreach (var section in intermediate.Sections)
             {
                 foreach (var symbol in section.Symbols.OfType<DialogSymbol>())
                 {
-                    if (this.VariableResolver.TryGetLocalizedControl(symbol.Id.Id, null, out var localizedControl))
+                    if (variableResolver.TryGetLocalizedControl(symbol.Id.Id, null, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -169,7 +170,7 @@ namespace WixToolset.Core
 
                 foreach (var symbol in section.Symbols.OfType<ControlSymbol>())
                 {
-                    if (this.VariableResolver.TryGetLocalizedControl(symbol.DialogRef, symbol.Control, out var localizedControl))
+                    if (variableResolver.TryGetLocalizedControl(symbol.DialogRef, symbol.Control, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -204,24 +205,42 @@ namespace WixToolset.Core
             }
         }
 
-        private int? PopulateVariableResolver(IResolveContext context)
+        private IVariableResolver CreateVariableResolver(IResolveContext context, IEnumerable<Localization> filteredLocalizations)
         {
-            var localizations = FilterLocalizations(context);
-            var codepage = localizations.FirstOrDefault()?.Codepage;
+            var variableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
-            foreach (var localization in localizations)
+            foreach (var localization in filteredLocalizations)
             {
-                this.VariableResolver.AddLocalization(localization);
+                variableResolver.AddLocalization(localization);
             }
 
             // Gather all the wix variables.
             var wixVariableSymbols = context.IntermediateRepresentation.Sections.SelectMany(s => s.Symbols).OfType<WixVariableSymbol>();
             foreach (var symbol in wixVariableSymbols)
             {
-                this.VariableResolver.AddVariable(symbol.SourceLineNumbers, symbol.Id.Id, symbol.Value, symbol.Overridable);
+                variableResolver.AddVariable(symbol.SourceLineNumbers, symbol.Id.Id, symbol.Value, symbol.Overridable);
             }
 
-            return codepage;
+            return variableResolver;
+        }
+
+        private bool TryGetCultureInfo(string culture, out CultureInfo cultureInfo)
+        {
+            cultureInfo = null;
+
+            if (!String.IsNullOrEmpty(culture))
+            {
+                try
+                {
+                    cultureInfo = new CultureInfo(culture, useUserOverride: false);
+                }
+                catch
+                {
+                    this.Messaging.Write("");
+                }
+            }
+
+            return cultureInfo != null;
         }
 
         private static IEnumerable<Localization> FilterLocalizations(IResolveContext context)

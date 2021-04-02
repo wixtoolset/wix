@@ -384,7 +384,7 @@ namespace WixToolset.Core
                 {
                     var id = String.Concat(this.Core.ActiveSection.Id, ".", propertyId.Id);
 
-                    section = this.Core.CreateSection(id, SectionType.Fragment, this.Core.ActiveSection.Codepage, this.Context.CompilationId);
+                    section = this.Core.CreateSection(id, SectionType.Fragment, this.Context.CompilationId);
 
                     // Reference the property in the active section.
                     this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, propertyId.Id);
@@ -6159,7 +6159,7 @@ namespace WixToolset.Core
 
             // NOTE: Id is not required for Fragments, this is a departure from the normal run of the mill processing.
 
-            this.Core.CreateActiveSection(id?.Id, SectionType.Fragment, 0, this.Context.CompilationId);
+            this.Core.CreateActiveSection(id?.Id, SectionType.Fragment, this.Context.CompilationId);
 
             var featureDisplay = 0;
             foreach (var child in node.Elements())

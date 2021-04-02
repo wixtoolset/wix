@@ -86,7 +86,8 @@ namespace WixToolset.Core
         private static Localization ParseWixLocalizationElement(IMessaging messaging, XElement node)
         {
             var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
-            var codepage = -1;
+            int? codepage = null;
+            int? summaryInformationCodepage = null;
             string culture = null;
 
             foreach (var attrib in node.Attributes())
@@ -97,6 +98,9 @@ namespace WixToolset.Core
                     {
                         case "Codepage":
                             codepage = Common.GetValidCodePage(attrib.Value, true, false, sourceLineNumbers);
+                            break;
+                        case "SummaryInformationCodepage":
+                            summaryInformationCodepage = Common.GetValidCodePage(attrib.Value, true, false, sourceLineNumbers);
                             break;
                         case "Culture":
                             culture = attrib.Value;
@@ -143,7 +147,7 @@ namespace WixToolset.Core
                 }
             }
 
-            return messaging.EncounteredError ? null : new Localization(codepage, culture, variables, localizedControls);
+            return messaging.EncounteredError ? null : new Localization(codepage, summaryInformationCodepage, culture, variables, localizedControls);
         }
 
         /// <summary>
@@ -254,24 +258,12 @@ namespace WixToolset.Core
                             break;
                         case "RightToLeft":
                             rightToLeft = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
-                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            //{
-                            //    attribs |= MsiInterop.MsidbControlAttributesRTLRO;
-                            //}
                             break;
                         case "RightAligned":
                             rightAligned = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
-                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            //{
-                            //    attribs |= MsiInterop.MsidbControlAttributesRightAligned;
-                            //}
                             break;
                         case "LeftScroll":
                             leftScroll = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
-                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            //{
-                            //    attribs |= MsiInterop.MsidbControlAttributesLeftScroll;
-                            //}
                             break;
                         default:
                             Common.UnexpectedAttribute(messaging, sourceLineNumbers, attrib);

@@ -37,7 +37,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.CabbingThreadCount = context.CabbingThreadCount;
             this.CabCachePath = context.CabCachePath;
-            this.Codepage = context.Codepage;
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
@@ -47,6 +46,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.OutputPath = context.OutputPath;
             this.OutputPdbPath = context.PdbPath;
             this.PdbType = context.PdbType;
+            this.ResolvedCodepage = context.ResolvedCodepage;
+            this.ResolvedSummaryInformationCodepage = context.ResolvedSummaryInformationCodepage;
+            this.ResolvedLcid = context.ResolvedLcid;
             this.SuppressLayout = context.SuppressLayout;
 
             this.SubStorages = subStorages;
@@ -66,8 +68,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
         private IPathResolver PathResolver { get; }
-
-        private int Codepage { get; }
 
         private int CabbingThreadCount { get; }
 
@@ -95,6 +95,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string OutputPdbPath { get; }
 
+        private int? ResolvedCodepage { get; }
+
+        private int? ResolvedSummaryInformationCodepage { get; }
+
+        private int? ResolvedLcid { get; }
+
         private bool SuppressAddingValidationRows { get; }
 
         private bool SuppressLayout { get; }
@@ -111,20 +117,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IBindResult Execute()
         {
-            if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) && !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
+            if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) || !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
             {
                 this.Messaging.Write(ErrorMessages.IntermediatesMustBeResolved(this.Intermediate.Id));
             }
 
             var section = this.Intermediate.Sections.Single();
 
+            var packageSymbol = (section.Type == SectionType.Product) ? this.GetSingleSymbol<WixPackageSymbol>(section) : null;
+            var moduleSymbol = (section.Type == SectionType.Module) ? this.GetSingleSymbol<WixModuleSymbol>(section) : null;
+            var patchSymbol = (section.Type == SectionType.Patch) ? this.GetSingleSymbol<WixPatchSymbol>(section) : null;
+
             var fileTransfers = new List<IFileTransfer>();
             var trackedFiles = new List<ITrackedFile>();
 
             var containsMergeModules = false;
-
-            // If there are any fields to resolve later, create the cache to populate during bind.
-            var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
 
             // Load standard tables, authored custom tables, and extension custom tables.
             TableDefinitionCollection tableDefinitions;
@@ -135,7 +142,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 tableDefinitions = command.TableDefinitions;
             }
 
-            // Process the summary information table before the other tables.
+            // Calculate codepage
+            var codepage = this.CalculateCodepage(packageSymbol, moduleSymbol, patchSymbol);
+
+            // Process properties and create the delayed variable cache if needed.
+            Dictionary<string, string> variableCache = null;
+            string productLanguage = null;
+            {
+                var command = new ProcessPropertiesCommand(section, packageSymbol, this.ResolvedLcid ?? 0, this.DelayedFields.Any(), this.WindowsInstallerBackendHelper);
+                command.Execute();
+
+                variableCache = command.DelayedVariablesCache;
+                productLanguage = command.ProductLanguage;
+            }
+
+            // Process the summary information table after properties are processed.
             bool compressed;
             bool longNames;
             int installerVersion;
@@ -144,7 +165,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 var branding = this.ServiceProvider.GetService<IWixBranding>();
 
-                var command = new BindSummaryInfoCommand(section, this.WindowsInstallerBackendHelper, branding);
+                var command = new BindSummaryInfoCommand(section, this.ResolvedSummaryInformationCodepage, productLanguage, this.WindowsInstallerBackendHelper, branding);
                 command.Execute();
 
                 compressed = command.Compressed;
@@ -152,49 +173,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 installerVersion = command.InstallerVersion;
                 platform = command.Platform;
                 modularizationSuffix = command.ModularizationSuffix;
-            }
-
-            // Add binder variables for all properties.
-            if (SectionType.Product == section.Type || variableCache != null)
-            {
-                foreach (var propertyRow in section.Symbols.OfType<PropertySymbol>())
-                {
-                    // Set the ProductCode if it is to be generated.
-                    if ("ProductCode".Equals(propertyRow.Id.Id, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
-                    {
-                        propertyRow.Value = this.WindowsInstallerBackendHelper.CreateGuid();
-
-#if TODO_PATCHING // Is this still necessary?
-
-                        // Update the target ProductCode in any instance transforms.
-                        foreach (SubStorage subStorage in this.Output.SubStorages)
-                        {
-                            Output subStorageOutput = subStorage.Data;
-                            if (OutputType.Transform != subStorageOutput.Type)
-                            {
-                                continue;
-                            }
-
-                            Table instanceSummaryInformationTable = subStorageOutput.Tables["_SummaryInformation"];
-                            foreach (Row row in instanceSummaryInformationTable.Rows)
-                            {
-                                if ((int)SummaryInformation.Transform.ProductCodes == row.FieldAsInteger(0))
-                                {
-                                    row[1] = row.FieldAsString(1).Replace("*", propertyRow.Value);
-                                    break;
-                                }
-                            }
-                        }
-#endif
-                    }
-
-                    // Add the property name and value to the variableCache.
-                    if (variableCache != null)
-                    {
-                        var key = String.Concat("property.", propertyRow.Id.Id);
-                        variableCache[key] = propertyRow.Value;
-                    }
-                }
             }
 
             // Sequence all the actions.
@@ -415,7 +393,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Time to create the WindowsInstallerData object. Try to put as much above here as possible, updating the IR is better.
             WindowsInstallerData data;
             {
-                var command = new CreateWindowsInstallerDataFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions, this.WindowsInstallerBackendHelper);
+                var command = new CreateWindowsInstallerDataFromIRCommand(this.Messaging, section, tableDefinitions, codepage, this.BackendExtensions, this.WindowsInstallerBackendHelper);
                 data = command.Execute();
             }
 
@@ -450,7 +428,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
             {
-                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Symbols.OfType<WixPatchIdSymbol>().FirstOrDefault());
+                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Symbols.OfType<WixPatchSymbol>().FirstOrDefault());
                 command.Execute();
             }
 
@@ -508,7 +486,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var trackMsi = this.WindowsInstallerBackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
                 trackedFiles.Add(trackMsi);
 
-                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
+                var command = new GenerateDatabaseCommand(this.Messaging, this.WindowsInstallerBackendHelper, this.FileSystemManager, data, trackMsi.Path, tableDefinitions, this.IntermediateFolder, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
                 command.Execute();
 
                 trackedFiles.AddRange(command.GeneratedTemporaryFiles);
@@ -532,7 +510,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.Messaging.EncounteredError)
             {
                 return null;
-            } 
+            }
 
             // Validate the output if there are CUBe files and we're not explicitly suppressing validation.
             if (this.CubeFiles != null && !this.SuppressValidation)
@@ -573,6 +551,43 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             result.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, data);
 
             return result;
+        }
+
+        private int CalculateCodepage(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol, WixPatchSymbol patchSymbol)
+        {
+            var codepage = packageSymbol?.Codepage ?? moduleSymbol?.Codepage ?? patchSymbol?.Codepage;
+
+            if (String.IsNullOrEmpty(codepage))
+            {
+                codepage = this.ResolvedCodepage?.ToString() ?? "65001";
+
+                if (packageSymbol != null)
+                {
+                    packageSymbol.Codepage = codepage;
+                }
+                else if (moduleSymbol != null)
+                {
+                    moduleSymbol.Codepage = codepage;
+                }
+                else if (patchSymbol != null)
+                {
+                    patchSymbol.Codepage = codepage;
+                }
+            }
+
+            return this.WindowsInstallerBackendHelper.GetValidCodePage(codepage);
+        }
+
+        private T GetSingleSymbol<T>(IntermediateSection section) where T : IntermediateSymbol
+        {
+            var symbols = section.Symbols.OfType<T>().ToList();
+
+            if (1 != symbols.Count)
+            {
+                throw new WixException(ErrorMessages.MissingBundleInformation(nameof(T)));
+            }
+
+            return symbols[0];
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, WindowsInstallerData data)

@@ -438,7 +438,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void GenerateDatabase(WindowsInstallerData output, string outputPath, bool keepAddedColumns)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, outputPath, this.TableDefinitions, this.IntermediateFolder, codepage: -1, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true);
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, outputPath, this.TableDefinitions, this.IntermediateFolder, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true);
             command.Execute();
         }
     }

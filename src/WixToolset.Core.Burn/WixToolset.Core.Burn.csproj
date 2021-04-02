@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Security.Permissions" Version="4.6.0" />
     <PackageReference Include="WixToolset.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
