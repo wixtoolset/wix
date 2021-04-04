@@ -39,7 +39,7 @@ namespace WixToolset.Converters.Symbolizer
                     var symbol = GenerateSymbolFromRow(row, wixMediaByDiskId, componentsById, fontsById, bindPathsById, selfRegById, wixFileById, wixDirectoryById);
                     if (symbol != null)
                     {
-                        section.Symbols.Add(symbol);
+                        section.AddSymbol(symbol);
                     }
                 }
             }
@@ -733,11 +733,13 @@ namespace WixToolset.Converters.Symbolizer
 
         private static IntermediateSymbol DefaultSymbolFromRow(Type symbolType, Wix3.Row row, bool columnZeroIsId)
         {
-            var symbol = Activator.CreateInstance(symbolType) as IntermediateSymbol;
+            var id = columnZeroIsId ? GetIdentifierForRow(row) : null;
+
+            var createSymbol = symbolType.GetConstructor(new[] { typeof(SourceLineNumber), typeof(Identifier) });
+            var symbol = (IntermediateSymbol)createSymbol.Invoke(new object[] { SourceLineNumber4(row.SourceLineNumbers), id });
 
             SetSymbolFieldsFromRow(row, symbol, columnZeroIsId);
 
-            symbol.SourceLineNumbers = SourceLineNumber4(row.SourceLineNumbers);
             return symbol;
         }
 
@@ -747,7 +749,11 @@ namespace WixToolset.Converters.Symbolizer
             var fieldDefinitions = columnDefinitions.Select(columnDefinition =>
                 new IntermediateFieldDefinition(columnDefinition.Name, ColumnType3ToIntermediateFieldType4(columnDefinition.Type))).ToArray();
             var symbolDefinition = new IntermediateSymbolDefinition(row.Table.Name, fieldDefinitions, null);
-            var symbol = new IntermediateSymbol(symbolDefinition, SourceLineNumber4(row.SourceLineNumbers));
+
+            var id = columnZeroIsId ? GetIdentifierForRow(row) : null;
+
+            var createSymbol = typeof(IntermediateSymbol).GetConstructor(new[] { typeof(IntermediateSymbolDefinition), typeof(SourceLineNumber), typeof(Identifier) });
+            var symbol = (IntermediateSymbol)createSymbol.Invoke(new object[] { symbolDefinition, SourceLineNumber4(row.SourceLineNumbers), id });
 
             SetSymbolFieldsFromRow(row, symbol, columnZeroIsId);
 
@@ -756,10 +762,9 @@ namespace WixToolset.Converters.Symbolizer
 
         private static void SetSymbolFieldsFromRow(Wix3.Row row, IntermediateSymbol symbol, bool columnZeroIsId)
         {
-            int offset = 0;
+            var offset = 0;
             if (columnZeroIsId)
             {
-                symbol.Id = GetIdentifierForRow(row);
                 offset = 1;
             }
 
