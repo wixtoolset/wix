@@ -22,7 +22,7 @@ namespace WixToolset.Converters.Symbolizer
         public static Intermediate ConvertOutput(Wix3.Output output)
 #pragma warning restore 1591
         {
-            var section = new IntermediateSection(String.Empty, OutputType3ToSectionType4(output.Type), output.Codepage);
+            var section = new IntermediateSection(String.Empty, OutputType3ToSectionType4(output.Type));
 
             var wixMediaByDiskId = IndexWixMediaTableByDiskId(output);
             var componentsById = IndexById<Wix3.Row>(output, "Component");
