@@ -8,7 +8,7 @@
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="GroupA" Directory="INSTALLFOLDER:\dupe">
+        <ComponentGroup Id="GroupA" Directory="INSTALLFOLDER" Subdirectory="dupe">
             <Component>
                 <File Name="a.txt" Source="test.txt" />
             </Component>
@@ -16,7 +16,7 @@
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="GroupB" Directory="INSTALLFOLDER:\dupe">
+        <ComponentGroup Id="GroupB" Directory="INSTALLFOLDER" Subdirectory="dupe">
             <Component>
                 <File Name="b.txt" Source="test.txt" />
             </Component>

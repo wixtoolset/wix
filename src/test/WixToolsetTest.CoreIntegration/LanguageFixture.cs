@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class LanguageFixture
@@ -36,6 +37,14 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
+                var directorySymbols = section.Symbols.OfType<DirectorySymbol>();
+                Assert.Equal(new[]
+                {
+                    "INSTALLFOLDER:Example Corporation\\MsiPackage",
+                    "ProgramFilesFolder:PFiles",
+                    "TARGETDIR:SourceDir"
+                }, directorySymbols.OrderBy(s => s.Id.Id).Select(s => s.Id.Id + ":" + s.Name).ToArray());
+
                 var propertySymbol = section.Symbols.OfType<PropertySymbol>().Single(p => p.Id.Id == "ProductLanguage");
                 Assert.Equal("0", propertySymbol.Value);
 
@@ -44,6 +53,16 @@ namespace WixToolsetTest.CoreIntegration
 
                 var summaryCodepage = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.Codepage);
                 Assert.Equal("1252", summaryCodepage.Value);
+
+                var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var directoryRows = data.Tables["Directory"].Rows;
+                Assert.Equal(new[]
+                {
+                    "d4EceYatXTyy8HXPt5B6DT9Rj.wE:u7-b4gch|Example Corporation",
+                    "INSTALLFOLDER:oekcr5lq|MsiPackage",
+                    "ProgramFilesFolder:PFiles",
+                    "TARGETDIR:SourceDir"
+                }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(2)).ToArray());
             }
         }
 

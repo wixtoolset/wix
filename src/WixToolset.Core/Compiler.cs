@@ -5,7 +5,6 @@ namespace WixToolset.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -2107,6 +2106,7 @@ namespace WixToolset.Core
 
             var comPlusBits = CompilerConstants.IntegerNotSet;
             string condition = null;
+            string subdirectory = null;
             var encounteredODBCDataSource = false;
             var files = 0;
             var guid = "*";
@@ -2163,16 +2163,16 @@ namespace WixToolset.Core
                         break;
                     case "DisableRegistryReflection":
                         disableRegistryReflection = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesDisableRegistryReflection;
-                        //}
                         break;
                     case "Condition":
                         condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Directory":
-                        directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "DiskId":
                         diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
@@ -2196,14 +2196,12 @@ namespace WixToolset.Core
                         {
                         case "either":
                             location = ComponentLocation.Either;
-                            //bits |= MsiInterop.MsidbComponentAttributesOptional;
                             break;
                         case "local": // this is the default
                             location = ComponentLocation.LocalOnly;
                             break;
                         case "source":
                             location = ComponentLocation.SourceOnly;
-                            //bits |= MsiInterop.MsidbComponentAttributesSourceOnly;
                             break;
                         case "":
                             break;
@@ -2217,45 +2215,21 @@ namespace WixToolset.Core
                         break;
                     case "NeverOverwrite":
                         neverOverwrite = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesNeverOverwrite;
-                        //}
                         break;
                     case "Permanent":
                         permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesPermanent;
-                        //}
                         break;
                     case "Shared":
                         shared = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesShared;
-                        //}
                         break;
                     case "SharedDllRefCount":
                         sharedDllRefCount = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesSharedDllRefCount;
-                        //}
                         break;
                     case "Transitive":
                         transitive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesTransitive;
-                        //}
                         break;
                     case "UninstallWhenSuperseded":
                         uninstallWhenSuperseded = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbComponentAttributesUninstallOnSupersedence;
-                        //}
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2275,17 +2249,22 @@ namespace WixToolset.Core
                 id = new Identifier(AccessModifier.Section, componentIdPlaceholder);
             }
 
-            if (null == directoryId)
+            if (String.IsNullOrEmpty(directoryId))
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
             }
 
-            if (String.IsNullOrEmpty(guid) && shared /*MsiInterop.MsidbComponentAttributesShared == (bits & MsiInterop.MsidbComponentAttributesShared)*/)
+            if (!String.IsNullOrEmpty(subdirectory))
+            {
+                directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, directoryId, subdirectory);
+            }
+
+            if (String.IsNullOrEmpty(guid) && shared)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Shared", "yes", "Guid", ""));
             }
 
-            if (String.IsNullOrEmpty(guid) && permanent /*MsiInterop.MsidbComponentAttributesPermanent == (bits & MsiInterop.MsidbComponentAttributesPermanent)*/)
+            if (String.IsNullOrEmpty(guid) && permanent)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Permanent", "yes", "Guid", ""));
             }
@@ -2587,6 +2566,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             string directoryId = null;
+            string subdirectory = null;
             string source = null;
 
             foreach (var attrib in node.Attributes())
@@ -2599,9 +2579,11 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Directory":
-                        // If the inline syntax is invalid it returns null. Use a static error identifier so the null
-                        // directory identifier here doesn't trickle down false errors into child elements.
-                        directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null) ?? "ErrorParsingInlineSyntax";
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "Source":
                         source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2622,6 +2604,8 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
+
+            directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
 
             if (!String.IsNullOrEmpty(source) && !source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             {
@@ -2898,18 +2882,24 @@ namespace WixToolset.Core
         private string ParseCreateFolderElement(XElement node, string componentId, string directoryId, bool win64Component)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string subdirectory = null;
+
             foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Directory":
-                        directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Directory":
+                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2918,24 +2908,26 @@ namespace WixToolset.Core
                 }
             }
 
+            directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
+
             foreach (var child in node.Elements())
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Shortcut":
-                        this.ParseShortcutElement(child, componentId, node.Name.LocalName, directoryId, YesNoType.No);
-                        break;
-                    case "Permission":
-                        this.ParsePermissionElement(child, directoryId, "CreateFolder");
-                        break;
-                    case "PermissionEx":
-                        this.ParsePermissionExElement(child, directoryId, "CreateFolder");
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Shortcut":
+                            this.ParseShortcutElement(child, componentId, node.Name.LocalName, directoryId, YesNoType.No);
+                            break;
+                        case "Permission":
+                            this.ParsePermissionElement(child, directoryId, "CreateFolder");
+                            break;
+                        case "PermissionEx":
+                            this.ParsePermissionExElement(child, directoryId, "CreateFolder");
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2969,10 +2961,12 @@ namespace WixToolset.Core
             Identifier id = null;
             var delete = false;
             string destinationDirectory = null;
+            string destinationSubdirectory = null;
             string destinationName = null;
             string destinationShortName = null;
             string destinationProperty = null;
             string sourceDirectory = null;
+            string sourceSubdirectory = null;
             string sourceFolder = null;
             string sourceName = null;
             string sourceProperty = null;
@@ -2990,16 +2984,20 @@ namespace WixToolset.Core
                         delete = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "DestinationDirectory":
-                        destinationDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        destinationDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, destinationDirectory);
+                        break;
+                    case "DestinationSubdirectory":
+                        destinationSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "DestinationName":
-                        destinationName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                        destinationName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib);
                         break;
                     case "DestinationProperty":
                         destinationProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     case "DestinationShortName":
-                        destinationShortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                        destinationShortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib);
                         break;
                     case "FileId":
                         if (null != fileId)
@@ -3010,7 +3008,11 @@ namespace WixToolset.Core
                         this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, fileId);
                         break;
                     case "SourceDirectory":
-                        sourceDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        sourceDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, sourceDirectory);
+                        break;
+                    case "SourceSubdirectory":
+                        sourceSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "SourceName":
                         sourceName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3044,10 +3046,14 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceProperty", "SourceDirectory"));
             }
 
+            sourceDirectory = this.HandleSubdirectory(sourceLineNumbers, node, sourceDirectory, sourceSubdirectory, "SourceDirectory", "SourceSubdirectory");
+
             if (null != destinationDirectory && null != destinationProperty) // DestinationDirectory and DestinationProperty cannot coexist
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationProperty", "DestinationDirectory"));
             }
+
+            destinationDirectory = this.HandleSubdirectory(sourceLineNumbers, node, destinationDirectory, destinationSubdirectory, "DestinationDirectory", "DestinationSubdirectory");
 
             if (null == id)
             {
@@ -3139,6 +3145,7 @@ namespace WixToolset.Core
             var explicitWin64 = false;
 
             string scriptFile = null;
+            string subdirectory = null;
 
             CustomActionSourceType? sourceType = null;
             CustomActionTargetType? targetType = null;
@@ -3194,8 +3201,9 @@ namespace WixToolset.Core
                         {
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileRef", "Property", "Script"));
                         }
-                        source = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         sourceType = CustomActionSourceType.Directory;
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, source);
                         break;
                     case "DllEntry":
                         if (null != target)
@@ -3355,6 +3363,9 @@ namespace WixToolset.Core
                     case "ScriptSourceFile":
                         scriptFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                        break;
                     case "SuppressModularization":
                         suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
@@ -3397,6 +3408,18 @@ namespace WixToolset.Core
             if (!explicitWin64 && this.Context.IsCurrentPlatform64Bit && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType))
             {
                 win64 = true;
+            }
+
+            if (!String.IsNullOrEmpty(subdirectory))
+            {
+                if (sourceType == CustomActionSourceType.Directory)
+                {
+                    source = this.HandleSubdirectory(sourceLineNumbers, node, source, subdirectory, "Directory", "Subdirectory");
+                }
+                else
+                {
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Subdirectory", "Directory"));
+                }
             }
 
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
@@ -4168,7 +4191,6 @@ namespace WixToolset.Core
             var fileSourceAttribSet = false;
             XAttribute nameAttribute = null;
             var name = "."; // default to parent directory.
-            string inlineSyntax = null;
             string shortName = null;
             string sourceName = null;
             string shortSourceName = null;
@@ -4194,7 +4216,7 @@ namespace WixToolset.Core
                         fileSourceAttribSet = true;
                         break;
                     case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         nameAttribute = attrib;
                         break;
                     case "ShortName":
@@ -4268,37 +4290,22 @@ namespace WixToolset.Core
                 }
             }
 
-            // Create the directory rows for the inline.
-            if (nameAttribute != null)
-            {
-                var lastSlash = name.LastIndexOf('\\');
-                if (lastSlash > 0)
-                {
-                    inlineSyntax = name;
-                    name = inlineSyntax.Substring(lastSlash + 1);
-
-                    parentId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, nameAttribute, parentId, inlineSyntax.Substring(0, lastSlash));
-
-                    if (!this.Core.IsValidLongFilename(name, false, false))
-                    {
-                        this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, nameAttribute.Name.LocalName, nameAttribute.Value, name));
-                    }
-                }
-            }
-
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
-
-                if (!String.IsNullOrEmpty(inlineSyntax))
-                {
-                    this.Core.AddInlineDirectoryId(inlineSyntax, id.Id);
-                }
+                id = this.Core.CreateIdentifier("d", parentId, name, shortName, sourceName, shortSourceName);
             }
-            else if ("TARGETDIR".Equals(id.Id, StringComparison.Ordinal) && !("SourceDir".Equals(name, StringComparison.Ordinal) && shortName == null && shortSourceName == null && sourceName == null))
+            else if (WindowsInstallerStandard.IsStandardDirectory(id.Id))
+            {
+                if (String.IsNullOrEmpty(sourceName))
+                {
+                    this.Core.Write(CompilerWarnings.DefiningStandardDirectoryDeprecated(sourceLineNumbers, id.Id));
+                }
+
+                if (id.Id == "TARGETDIR" && name != "SourceDir" && shortName == null && shortSourceName == null && sourceName == null)
                 {
                     this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, name));
                 }
+            }
 
             // Update the file source path appropriately.
             if (fileSourceAttribSet)
@@ -4761,7 +4768,8 @@ namespace WixToolset.Core
                         disallowAdvertise = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
                         break;
                     case "ConfigurableDirectory":
-                        configurableDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        configurableDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, configurableDirectory);
                         break;
                     case "Description":
                         description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -8402,6 +8410,23 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
+        }
+
+        private string HandleSubdirectory(SourceLineNumber sourceLineNumbers, XElement element, string directoryId, string subdirectory, string directoryAttributeName, string subdirectoryAttributename)
+        {
+            if (!String.IsNullOrEmpty(subdirectory))
+            {
+                if (String.IsNullOrEmpty(directoryId))
+                {
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, element.Name.LocalName, subdirectoryAttributename, directoryAttributeName));
+                }
+                else
+                {
+                    directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, directoryId, subdirectory);
+                }
+            }
+
+            return directoryId;
         }
     }
 }

@@ -7,6 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class DirectoryFixture
@@ -40,11 +41,11 @@ namespace WixToolsetTest.CoreIntegration
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
                 Assert.Equal(new[]
                 {
-                    "INSTALLFOLDER",
-                    "ProgramFiles6432Folder",
-                    "ProgramFilesFolder",
-                    "TARGETDIR"
-                }, dirSymbols.Select(d => d.Id.Id).ToArray());
+                    "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
+                    "ProgramFiles6432Folder:ProgramFilesFolder:.",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
             }
         }
 
@@ -78,11 +79,11 @@ namespace WixToolsetTest.CoreIntegration
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
                 Assert.Equal(new[]
                 {
-                    "INSTALLFOLDER",
-                    "ProgramFiles6432Folder",
-                    "ProgramFiles64Folder",
-                    "TARGETDIR"
-                }, dirSymbols.Select(d => d.Id.Id).ToArray());
+                    "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
+                    "ProgramFiles6432Folder:ProgramFiles64Folder:.",
+                    "ProgramFiles64Folder:TARGETDIR:PFiles64",
+                    "TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
             }
         }
 
@@ -116,12 +117,14 @@ namespace WixToolsetTest.CoreIntegration
                 var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
                 Assert.Equal(new[]
                 {
-                    "dirZsSsu81KcG46xXTwc4mTSZO5Zx4",
-                    "INSTALLFOLDER",
-                    "ProgramFiles6432Folder",
-                    "ProgramFiles64Folder",
-                    "TARGETDIR"
-                }, dirSymbols.Select(d => d.Id.Id).ToArray());
+                    "dZsSsu81KcG46xXTwc4mTSZO5Zx4:INSTALLFOLDER:dupe",
+                    "INSTALLFOLDER:ProgramFiles6432Folder:MsiPackage",
+                    "ProgramFiles6432Folder:ProgramFiles64Folder:.",
+                    "ProgramFiles64Folder:TARGETDIR:PFiles64",
+                    "TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
+            }
+        }
             }
         }
     }

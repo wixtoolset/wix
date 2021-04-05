@@ -2146,11 +2146,12 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            string directory = null;
+            string directoryId = null;
+            string subdirectory = null;
             string name = null;
             bool? onInstall = null;
             bool? onUninstall = null;
-            string property = null;
+            string propertyId = null;
             string shortName = null;
 
             foreach (var attrib in node.Attributes())
@@ -2163,7 +2164,11 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, parentDirectory);
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        directoryId = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "Name":
                         name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, true);
@@ -2185,7 +2190,7 @@ namespace WixToolset.Core
                         }
                         break;
                     case "Property":
-                        property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        propertyId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     case "ShortName":
                         shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, true);
@@ -2211,15 +2216,23 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
             }
 
-            if (null != directory && null != property)
+            if (String.IsNullOrEmpty(propertyId))
             {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
+                directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId ?? parentDirectory, subdirectory, "Directory", "Subdirectory");
+            }
+            else if (!String.IsNullOrEmpty(directoryId))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directoryId));
+            }
+            else if (!String.IsNullOrEmpty(subdirectory))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Subdirectory", subdirectory));
             }
 
             if (null == id)
             {
                 var on = (onInstall == true && onUninstall == true) ? 3 : (onUninstall == true) ? 2 : (onInstall == true) ? 1 : 0;
-                id = this.Core.CreateIdentifier("rmf", directory ?? property ?? parentDirectory, LowercaseOrNull(shortName), LowercaseOrNull(name), on.ToString());
+                id = this.Core.CreateIdentifier("rmf", directoryId ?? propertyId ?? parentDirectory, LowercaseOrNull(shortName), LowercaseOrNull(name), on.ToString());
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -2231,7 +2244,7 @@ namespace WixToolset.Core
                     ComponentRef = componentId,
                     FileName = name,
                     ShortFileName = shortName,
-                    DirPropertyRef = directory ?? property ?? parentDirectory,
+                    DirPropertyRef = directoryId ?? propertyId ?? parentDirectory,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall,
                 });
@@ -2248,10 +2261,11 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            string directory = null;
+            string directoryId = null;
+            string subdirectory = null;
             bool? onInstall = null;
             bool? onUninstall = null;
-            string property = null;
+            string propertyId = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -2263,7 +2277,11 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, parentDirectory);
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "On":
                         var onValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2282,7 +2300,7 @@ namespace WixToolset.Core
                         }
                         break;
                     case "Property":
-                        property = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        propertyId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2300,15 +2318,23 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
             }
 
-            if (null != directory && null != property)
+            if (String.IsNullOrEmpty(propertyId))
             {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
+                directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId ?? parentDirectory, subdirectory, "Directory", "Subdirectory");
+            }
+            else if (!String.IsNullOrEmpty(directoryId))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directoryId));
+            }
+            else if (!String.IsNullOrEmpty(subdirectory))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Subdirectory", subdirectory));
             }
 
             if (null == id)
             {
                 var on = (onInstall == true && onUninstall == true) ? 3 : (onUninstall == true) ? 2 : (onInstall == true) ? 1 : 0;
-                id = this.Core.CreateIdentifier("rmf", directory ?? property ?? parentDirectory, on.ToString());
+                id = this.Core.CreateIdentifier("rmf", directoryId ?? propertyId, on.ToString());
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -2318,7 +2344,7 @@ namespace WixToolset.Core
                 this.Core.AddSymbol(new RemoveFileSymbol(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
-                    DirPropertyRef = directory ?? property ?? parentDirectory,
+                    DirPropertyRef = directoryId ?? propertyId,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall
                 });
@@ -2335,6 +2361,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
+            string subdirectory = null;
             var runFromSource = CompilerConstants.IntegerNotSet;
             var runLocal = CompilerConstants.IntegerNotSet;
 
@@ -2348,7 +2375,11 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Directory":
-                        directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "RunFromSource":
                         runFromSource = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
@@ -2366,6 +2397,8 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
+
+            directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
 
             if (null == id)
             {
@@ -4001,7 +4034,8 @@ namespace WixToolset.Core
             string description = null;
             string descriptionResourceDll = null;
             int? descriptionResourceId = null;
-            string directory = null;
+            string directoryId = null;
+            string subdirectory = null;
             string displayResourceDll = null;
             int? displayResourceId = null;
             int? hotkey = null;
@@ -4011,7 +4045,8 @@ namespace WixToolset.Core
             string shortName = null;
             ShortcutShowType? show = null;
             string target = null;
-            string workingDirectory = null;
+            string workingDirectoryId = null;
+            string workingSubdirectory = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -4038,7 +4073,11 @@ namespace WixToolset.Core
                         descriptionResourceId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                         break;
                     case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                        break;
+                    case "Subdirectory":
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "DisplayResourceDll":
                         displayResourceDll = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -4086,7 +4125,11 @@ namespace WixToolset.Core
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "WorkingDirectory":
-                        workingDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        workingDirectoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, workingDirectoryId);
+                        break;
+                    case "WorkingSubdirectory":
+                        workingSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -4104,17 +4147,19 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "Advertise", "yes"));
             }
 
-            if (null == directory)
+            if (null == directoryId)
             {
                 if ("Component" == parentElementLocalName)
                 {
-                    directory = defaultTarget;
+                    directoryId = defaultTarget;
                 }
                 else
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Directory", "Component"));
                 }
             }
+
+            directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
 
             if (null != descriptionResourceDll)
             {
@@ -4151,6 +4196,8 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
+            workingDirectoryId = this.HandleSubdirectory(sourceLineNumbers, node, workingDirectoryId, workingSubdirectory, "WorkingDirectory", "WorkingSubdirectory");
+
             if ("Component" != parentElementLocalName && null != target)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Target", parentElementLocalName));
@@ -4158,7 +4205,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("sct", directory, LowercaseOrNull(name));
+                id = this.Core.CreateIdentifier("sct", directoryId, LowercaseOrNull(name));
             }
 
             foreach (var child in node.Elements())
@@ -4209,7 +4256,7 @@ namespace WixToolset.Core
 
                 this.Core.AddSymbol(new ShortcutSymbol(sourceLineNumbers, id)
                 {
-                    DirectoryRef = directory,
+                    DirectoryRef = directoryId,
                     Name = name,
                     ShortName = shortName,
                     ComponentRef = componentId,
@@ -4220,7 +4267,7 @@ namespace WixToolset.Core
                     IconRef = icon,
                     IconIndex = iconIndex,
                     Show = show,
-                    WorkingDirectory = workingDirectory,
+                    WorkingDirectory = workingDirectoryId,
                     DisplayResourceDll = displayResourceDll,
                     DisplayResourceId = displayResourceId,
                     DescriptionResourceDll = descriptionResourceDll,
@@ -4309,7 +4356,8 @@ namespace WixToolset.Core
             var cost = CompilerConstants.IntegerNotSet;
             string description = null;
             var flags = 0;
-            string helpDirectory = null;
+            string helpDirectoryId = null;
+            string helpSubdirectory = null;
             var language = CompilerConstants.IntegerNotSet;
             var majorVersion = CompilerConstants.IntegerNotSet;
             var minorVersion = CompilerConstants.IntegerNotSet;
@@ -4346,7 +4394,11 @@ namespace WixToolset.Core
                         }
                         break;
                     case "HelpDirectory":
-                        helpDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
+                        helpDirectoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, helpDirectoryId);
+                        break;
+                    case "HelpSubdirectory":
+                        helpSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "Hidden":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
@@ -4393,6 +4445,8 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
                 language = CompilerConstants.IllegalInteger;
             }
+
+            helpDirectoryId = this.HandleSubdirectory(sourceLineNumbers, node, helpDirectoryId, helpSubdirectory, "HelpDirectory", "HelpSubdirectory");
 
             // build up the typelib version string for the registry if the major or minor version was specified
             string registryVersion = null;
@@ -4488,7 +4542,7 @@ namespace WixToolset.Core
                         Language = language,
                         ComponentRef = componentId,
                         Description = description,
-                        DirectoryRef = helpDirectory,
+                        DirectoryRef = helpDirectoryId,
                         FeatureRef = Guid.Empty.ToString("B")
                     });
 
@@ -4534,10 +4588,10 @@ namespace WixToolset.Core
                 // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\FLAGS, (Default) = [TypeLibFlags]
                 this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\FLAGS", id, registryVersion), null, flags.ToString(CultureInfo.InvariantCulture.NumberFormat), componentId);
 
-                if (null != helpDirectory)
+                if (null != helpDirectoryId)
                 {
                     // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\HELPDIR, (Default) = [HelpDirectory]
-                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\HELPDIR", id, registryVersion), null, String.Concat("[", helpDirectory, "]"), componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\HELPDIR", id, registryVersion), null, String.Concat("[", helpDirectoryId, "]"), componentId);
                 }
             }
         }

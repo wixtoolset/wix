@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <ComponentGroup Id="ProductComponents">
-      <Component  Directory="INSTALLFOLDER:\a">
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Subdirectory="a">
         <File Source="a\test.txt" />
       </Component>
-      <Component  Directory="INSTALLFOLDER:\b">
+      <Component Subdirectory="b">
         <File Source="b\test.txt" />
       </Component>
-      <Component  Directory="INSTALLFOLDER:\c">
+      <Component Subdirectory="c">
         <File Source="c\test.txt" />
       </Component>
     </ComponentGroup>

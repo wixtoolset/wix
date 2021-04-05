@@ -18,8 +18,6 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class ParseHelper : IParseHelper
     {
-        private static readonly char[] InlineDirectorySeparators = new char[] { ':', '\\', '/' };
-
         public ParseHelper(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
@@ -56,12 +54,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public Identifier CreateDirectorySymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            // For anonymous directories, create the identifier. If this identifier already exists in the
-            // active section, bail so we don't add duplicate anonymous directory symbols (which are legal
-            // but bloat the intermediate and ultimately make the linker do "busy work").
             if (null == id)
             {
-                id = this.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
+                id = this.CreateIdentifier("d", parentId, name, shortName, sourceName, shortSourceName);
             }
 
             var symbol = section.AddSymbol(new DirectorySymbol(sourceLineNumbers, id)
@@ -78,28 +73,37 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId, string inlineSyntax, IDictionary<string, string> sectionCachedInlinedDirectoryIds)
         {
+            if (String.IsNullOrEmpty(parentId))
+            {
+                throw new ArgumentNullException(nameof(parentId));
+            }
+
             if (String.IsNullOrEmpty(inlineSyntax))
             {
-                inlineSyntax = attribute.Value;
+                inlineSyntax = this.GetAttributeLongFilename(sourceLineNumbers, attribute, false, true);
             }
 
-            // If no separator is found, the string is a simple reference.
-            var separatorFound = inlineSyntax.IndexOfAny(InlineDirectorySeparators);
-            if (separatorFound == -1)
+            if (String.IsNullOrEmpty(inlineSyntax))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, inlineSyntax);
-                return inlineSyntax;
+                return parentId;
             }
 
-            // If a parent id was provided and the inline syntax does not start with a directory reference, prepend the parent id.
-            if (!String.IsNullOrEmpty(parentId) && inlineSyntax[separatorFound] != ':')
+            inlineSyntax = inlineSyntax.Trim('\\', '/');
+
+            var cacheKey = String.Concat(parentId, ":", inlineSyntax);
+
+            if (!sectionCachedInlinedDirectoryIds.TryGetValue(cacheKey, out var id))
             {
-                inlineSyntax = String.Concat(parentId, ":", inlineSyntax);
+                var identifier = this.CreateDirectorySymbol(section, sourceLineNumbers, id: null, parentId, inlineSyntax);
+
+                id = identifier.Id;
+            }
+            else
+            {
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, id);
             }
 
-            inlineSyntax = inlineSyntax.TrimEnd('\\', '/');
-
-            return this.ParseInlineSyntax(section, sourceLineNumbers, attribute, inlineSyntax, sectionCachedInlinedDirectoryIds);
+            return id; //this.ParseInlineSyntax(section, sourceLineNumbers, attribute, inlineSyntax, sectionCachedInlinedDirectoryIds);
         }
 
         public string CreateGuid(Guid namespaceGuid, string value)
@@ -444,7 +448,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
-            if (0 < value.Length)
+            if (!String.IsNullOrEmpty(value))
             {
                 if (!this.IsValidLongFilename(value, allowWildcards, allowRelative) && !this.IsValidLocIdentifier(value))
                 {
@@ -838,90 +842,6 @@ namespace WixToolset.Core.ExtensibilityServices
         private void CreateSymbolDefinitionCreator()
         {
             this.Creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
-        }
-
-        private string ParseInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string inlineSyntax, IDictionary<string, string> sectionCachedInlinedDirectoryIds)
-        {
-            if (!sectionCachedInlinedDirectoryIds.TryGetValue(inlineSyntax, out var id))
-            {
-                string parentId;
-                int nameIndex;
-
-                var separatorIndex = inlineSyntax.LastIndexOfAny(InlineDirectorySeparators);
-                if (separatorIndex == -1)
-                {
-                    nameIndex = 0;
-                    parentId = "TARGETDIR";
-                }
-                else if (inlineSyntax[separatorIndex] == '\\' || inlineSyntax[separatorIndex] == '/')
-                {
-                    nameIndex = separatorIndex + 1;
-
-                    if (separatorIndex == 0)
-                    {
-                        parentId = "TARGETDIR";
-                    }
-                    else if (inlineSyntax[separatorIndex - 1] == ':')
-                    {
-                        parentId = this.ParseParentReference(section, sourceLineNumbers, attribute, inlineSyntax, separatorIndex - 1);
-                    }
-                    else
-                    {
-                        var parentInlineDirectory = inlineSyntax.Substring(0, separatorIndex);
-                        parentId = this.ParseInlineSyntax(section, sourceLineNumbers, attribute, parentInlineDirectory.TrimEnd('\\', '/'), sectionCachedInlinedDirectoryIds);
-                    }
-                }
-                else
-                {
-                    nameIndex = separatorIndex + 1;
-                    parentId = this.ParseParentReference(section, sourceLineNumbers, attribute, inlineSyntax, separatorIndex);
-                }
-
-                if (nameIndex == inlineSyntax.Length)
-                {
-                    id = parentId;
-                }
-                else
-                {
-                    var name = nameIndex != -1 ? inlineSyntax.Substring(nameIndex) : null;
-
-                    if (!this.IsValidLongFilename(name, false, false))
-                    {
-                        this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, attribute.Value, name));
-                        return null;
-                    }
-
-                    var identifier = this.CreateDirectorySymbol(section, sourceLineNumbers, null, parentId, name);
-
-                    id = identifier.Id;
-                }
-
-                sectionCachedInlinedDirectoryIds.Add(inlineSyntax, id);
-            }
-
-            return id;
-        }
-
-        private string ParseParentReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string reference, int colonIndex)
-        {
-            if (colonIndex == 0)
-            {
-                this.Messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, attribute.Value, String.Empty));
-                return null;
-            }
-            else
-            {
-                var parentId = reference.Substring(0, colonIndex);
-
-                if (!Common.IsIdentifier(parentId))
-                {
-                    this.Messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, attribute.Value, parentId));
-                    return null;
-                }
-
-                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, parentId);
-                return parentId;
-            }
         }
 
         private static bool TryFindExtension(IEnumerable<ICompilerExtension> extensions, XNamespace ns, out ICompilerExtension extension)

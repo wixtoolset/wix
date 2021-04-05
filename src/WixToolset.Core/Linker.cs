@@ -587,7 +587,6 @@ namespace WixToolset.Core
             {
                 var removeSymbols = new List<IntermediateSymbol>();
 
-                // Count down because we'll sometimes remove items from the list.
                 foreach (var symbol in section.Symbols)
                 {
                     // Only process the "grouping parents" such as FeatureGroup, ComponentGroup, Feature,

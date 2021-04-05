@@ -40,7 +40,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
 
@@ -240,7 +240,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
@@ -351,7 +351,7 @@ namespace WixToolsetTest.CoreIntegration
                 var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(pdbPath));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\PFiles\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
@@ -527,7 +527,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
@@ -563,7 +563,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\AssemblyMsiPackage\candle.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\AssemblyMsiPackage\candle.exe")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
@@ -721,7 +721,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\Foo.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\MsiPackage\Foo.exe")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();

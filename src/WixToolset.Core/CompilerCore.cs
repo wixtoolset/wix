@@ -386,13 +386,12 @@ namespace WixToolset.Core
         /// Creates directories using the inline directory syntax.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="attribute">Attribute containing the inline syntax.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
         /// <param name="inlineSyntax">Optional inline syntax to override attribute's value.</param>
         /// <returns>Identifier of the leaf directory created.</returns>
-        public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId, string inlineSyntax = null)
+        public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, string parentId, string inlineSyntax = null)
         {
-            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, attribute, parentId, inlineSyntax, this.activeSectionCachedInlinedDirectoryIds);
+            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, attribute: null, parentId, inlineSyntax, this.activeSectionCachedInlinedDirectoryIds);
         }
 
         /// <summary>
@@ -784,7 +783,7 @@ namespace WixToolset.Core
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="allowWildcards">true if wildcards are allowed in the filename.</param>
         /// <returns>The attribute's short filename value.</returns>
-        public string GetAttributeShortFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards)
+        public string GetAttributeShortFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false)
         {
             if (null == attribute)
             {
@@ -1019,16 +1018,6 @@ namespace WixToolset.Core
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Adds inline directory syntax generated identifier.
-        /// </summary>
-        /// <param name="inlineSyntax">Inline directory syntax the identifier was generated.</param>
-        /// <param name="id">Generated identifier for inline syntax.</param>
-        internal void AddInlineDirectoryId(string inlineSyntax, string id)
-        {
-            this.activeSectionCachedInlinedDirectoryIds.Add(inlineSyntax, id);
         }
 
         /// <summary>

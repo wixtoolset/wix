@@ -8,19 +8,19 @@
         <Media Id="2" Cabinet="cab2.cab" />
         
         <Feature Id="ProductFeature" Title="MsiPackageTitle">
-            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="1">
+            <Component Directory="ProgramFilesFolder" Subdirectory="~MultiMedia" DiskId="1">
                 <File Source="a1.txt" />
             </Component>
 
-            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="1">
+            <Component Directory="ProgramFilesFolder" Subdirectory="~MultiMedia" DiskId="1">
                 <File Source="a2.txt" />
             </Component>
 
-            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="2">
+            <Component Directory="ProgramFilesFolder" Subdirectory="~MultiMedia" DiskId="2">
                 <File Source="b2.txt" />
             </Component>
 
-            <Component Directory="ProgramFilesFolder:\~MultiMedia" DiskId="2">
+            <Component Directory="ProgramFilesFolder" Subdirectory="~MultiMedia" DiskId="2">
                 <File Source="b1.txt" />
             </Component>
         </Feature>

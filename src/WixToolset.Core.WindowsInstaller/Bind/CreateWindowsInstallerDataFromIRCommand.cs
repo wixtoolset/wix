@@ -18,6 +18,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreateWindowsInstallerDataFromIRCommand
     {
+        private static readonly char[] PathSeparatorChars = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+
         public CreateWindowsInstallerDataFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, int codepage, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
@@ -488,18 +490,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddDirectorySymbol(DirectorySymbol symbol)
         {
-            if (String.IsNullOrEmpty(symbol.ShortName) && symbol.Name != null && !symbol.Name.Equals(".") && !symbol.Name.Equals("SourceDir") && !this.BackendHelper.IsValidShortFilename(symbol.Name, false))
+            (var name, var parentDir) = this.AddDirectorySubdirectories(symbol);
+
+            var shortName = symbol.ShortName;
+            var sourceShortname = symbol.SourceShortName;
+
+            if (String.IsNullOrEmpty(shortName) && name != null && name != "." && name != "SourceDir" && !this.BackendHelper.IsValidShortFilename(name, false))
             {
-                symbol.ShortName = this.CreateShortName(symbol.Name, false, "Directory", symbol.ParentDirectoryRef);
+                shortName = this.CreateShortName(name, false, "Directory", symbol.ParentDirectoryRef);
             }
 
-            if (String.IsNullOrEmpty(symbol.SourceShortName) && !String.IsNullOrEmpty(symbol.SourceName) && !this.BackendHelper.IsValidShortFilename(symbol.SourceName, false))
+            if (String.IsNullOrEmpty(sourceShortname) && !String.IsNullOrEmpty(symbol.SourceName) && !this.BackendHelper.IsValidShortFilename(symbol.SourceName, false))
             {
-                symbol.SourceShortName = this.CreateShortName(symbol.SourceName, false, "Directory", symbol.ParentDirectoryRef);
+                sourceShortname = this.CreateShortName(symbol.SourceName, false, "Directory", symbol.ParentDirectoryRef);
             }
 
-            var sourceName = CreateMsiFilename(symbol.SourceShortName, symbol.SourceName);
-            var targetName = CreateMsiFilename(symbol.ShortName, symbol.Name);
+            var sourceName = CreateMsiFilename(sourceShortname, symbol.SourceName);
+            var targetName = CreateMsiFilename(shortName, name);
 
             if (String.IsNullOrEmpty(targetName))
             {
@@ -510,7 +517,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var row = this.CreateRow(symbol, "Directory");
             row[0] = symbol.Id.Id;
-            row[1] = symbol.ParentDirectoryRef;
+            row[1] = parentDir;
             row[2] = defaultDir;
 
             if (OutputType.Module == this.Data.Type)
@@ -1265,6 +1272,43 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var row = this.CreateRow(symbol, tableDefinition);
                 row[0] = ignoredTable;
             }
+        }
+
+        private (string, string) AddDirectorySubdirectories(DirectorySymbol symbol)
+        {
+            var directory = symbol.Name.Trim(PathSeparatorChars);
+            var parentDir = symbol.ParentDirectoryRef ?? (symbol.Id.Id == "TARGETDIR" ? null : "TARGETDIR");
+
+            var start = 0;
+            var end = directory.IndexOfAny(PathSeparatorChars);
+            var path = String.Empty;
+
+            while (start <= end)
+            {
+                var subdirectoryName = directory.Substring(start, end - start);
+
+                if (!String.IsNullOrEmpty(subdirectoryName))
+                {
+                    path = Path.Combine(path, subdirectoryName);
+
+                    var id = this.BackendHelper.GenerateIdentifier("d", symbol.ParentDirectoryRef, path);
+                    var shortnameSubdirectory = this.BackendHelper.IsValidShortFilename(subdirectoryName, false) ? null : this.CreateShortName(subdirectoryName, false, "Directory", symbol.ParentDirectoryRef);
+
+                    var subdirectoryRow = this.CreateRow(symbol, "Directory");
+                    subdirectoryRow[0] = id;
+                    subdirectoryRow[1] = parentDir;
+                    subdirectoryRow[2] = CreateMsiFilename(shortnameSubdirectory, subdirectoryName);
+
+                    parentDir = id;
+                }
+
+                start = end + 1;
+                end = symbol.Name.IndexOfAny(PathSeparatorChars, start);
+            }
+
+            var name = (start == 0) ? directory : directory.Substring(start);
+
+            return (name, parentDir);
         }
 
         private void EnsureRequiredTables()
