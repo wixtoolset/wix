@@ -513,7 +513,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 targetName = ".";
             }
 
-            var defaultDir = String.IsNullOrEmpty(sourceName) ? targetName : targetName + ":" + sourceName;
+            var defaultDir = String.IsNullOrEmpty(sourceName) || sourceName == targetName ? targetName : targetName + ":" + sourceName;
 
             var row = this.CreateRow(symbol, "Directory");
             row[0] = symbol.Id.Id;

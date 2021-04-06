@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
@@ -171,6 +172,52 @@ namespace WixToolsetTest.CoreIntegration
                     "ProgramFilesFolder:TARGETDIR:PFiles",
                     "TARGETDIR::SourceDir"
                 }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanGetDuplicateTargetSourceName()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "Directory", "DuplicateTargetSourceName.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                Assert.Equal(new[]
+                {
+                    "BinFolder\tProgramFilesFolder\tbin",
+                    "ProgramFilesFolder\tTARGETDIR\tPFiles",
+                    "TARGETDIR\t\tSourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join('\t', d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+
+                var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var directoryRows = data.Tables["Directory"].Rows;
+                Assert.Equal(new[]
+                {
+                    "BinFolder\tProgramFilesFolder\tbin",
+                    "ProgramFilesFolder\tTARGETDIR\tPFiles",
+                    "TARGETDIR\t\tSourceDir"
+                }, directoryRows.Select(r => String.Join('\t', r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
             }
         }
     }
