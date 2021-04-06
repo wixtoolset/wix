@@ -12,6 +12,7 @@ namespace WixToolset.Converters
     using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -120,6 +121,7 @@ namespace WixToolset.Converters
         private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
         private static readonly XName SoftwareTagElementName = WixNamespace + "SoftwareTag";
         private static readonly XName SoftwareTagRefElementName = WixNamespace + "SoftwareTagRef";
+        private static readonly XName StandardDirectoryElementName = WixNamespace + "StandardDirectory";
         private static readonly XName TagElementName = XNamespace.None + "Tag";
         private static readonly XName TagRefElementName = XNamespace.None + "TagRef";
         private static readonly XName TextElementName = WixNamespace + "Text";
@@ -468,7 +470,18 @@ namespace WixToolset.Converters
                 {
                     this.ConvertElement(element);
 
-                    this.ConvertNodes(element.Nodes(), level + 1);
+                    var before = element.Nodes().ToList();
+
+                    this.ConvertNodes(before, level + 1);
+
+                    // If any nodes were added during the processing of the children,
+                    // ensure those added children get processed as well.
+                    var added = element.Nodes().Except(before).ToList();
+
+                    if (added.Any())
+                    {
+                        this.ConvertNodes(added, level + 1);
+                    }
                 }
             }
         }
@@ -948,6 +961,44 @@ namespace WixToolset.Converters
                         element.Add(new XAttribute("Name", shortName));
                         attribute.Remove();
                     }
+                }
+            }
+
+            var id = element.Attribute("Id")?.Value;
+
+            if (id == "TARGETDIR" &&
+                this.OnError(ConverterTestType.TargetDirDeprecated, element, "The TARGETDIR directory should not longer be explicitly defined. Remove the Directory element with Id attribute 'TARGETDIR'."))
+            {
+                var parentElement = element.Parent;
+
+                element.Remove();
+
+                if (parentElement.FirstNode is XText text && String.IsNullOrWhiteSpace(text.Value))
+                {
+                    parentElement.FirstNode.Remove();
+                }
+
+                foreach (var child in element.Nodes())
+                {
+                    parentElement.Add(child);
+                }
+
+                element.RemoveAll();
+
+                if (parentElement.FirstNode is XText textAgain && String.IsNullOrWhiteSpace(textAgain.Value))
+                {
+                    parentElement.FirstNode.Remove();
+                }
+            }
+            else if (id != null &&
+                     WindowsInstallerStandard.IsStandardDirectory(id) &&
+                     this.OnError(ConverterTestType.DefiningStandardDirectoryDeprecated, element, "Standard directories such as '{0}' should no longer be defined using the Directory element. Use the StandardDirectory element instead.", id))
+            {
+                element.Name = StandardDirectoryElementName;
+
+                foreach (var attrib in element.Attributes().Where(a => a.Name.LocalName != "Id").ToList())
+                {
+                    attrib.Remove();
                 }
             }
         }
@@ -2254,6 +2305,16 @@ namespace WixToolset.Converters
             /// The SoftwareTag element's Type attribute is obsolete.
             /// </summary>
             SoftwareTagTypeObsolete,
+
+            /// <summary>
+            /// TARGETDIR directory should not longer be explicitly defined.
+            /// </summary>
+            TargetDirDeprecated,
+
+            /// <summary>
+            /// Standard directories should no longer be defined using the Directory element.
+            /// </summary>
+            DefiningStandardDirectoryDeprecated,
         }
     }
 }
