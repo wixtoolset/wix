@@ -577,11 +577,6 @@ namespace WixToolset.Data
             return Message(null, Ids.TargetDirCorrectedDefaultDir, "The Directory with Id 'TARGETDIR' must have the value 'SourceDir' in its 'DefaultDir' column. This has been automatically corrected for you in the decompiled output.");
         }
 
-        public static Message DefiningWellKnownDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
-        {
-            return Message(sourceLineNumbers, Ids.DefiningWellKnownDirectoryDeprecated, "It is no longer necessary to define Directory with Id '{0}'. One will be provided automatically. Remove the Directory element.", directoryId);
-        }
-
         public static Message TooManyProgIds(SourceLineNumber sourceLineNumbers, string clsId, string progId, string otherClsId)
         {
             return Message(sourceLineNumbers, Ids.TooManyProgIds, "Class '{0}' tried to use ProgId '{1}' which has already been associated with class '{2}'. This information will be left out of the decompiled output.", clsId, progId, otherClsId);
@@ -813,7 +808,7 @@ namespace WixToolset.Data
             PathCanonicalized = 1152,
             DetectConditionRecommended = 1153,
             ExperimentalBundlePlatform = 1154,
-            DefiningWellKnownDirectoryDeprecated = 1155,
+
             CollidingModularizationTypes = 1156,
             InvalidEnvironmentVariable = 1157,
         }
