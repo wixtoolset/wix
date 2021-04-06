@@ -316,6 +316,9 @@ namespace WixToolset.Core
                         case "SoftwareTag":
                             this.ParsePackageTagElement(child);
                             break;
+                        case "StandardDirectory":
+                            this.ParseStandardDirectoryElement(child);
+                            break;
                         case "SummaryInformation":
                             this.ParseSummaryInformationElement(child, ref isCodepageSet, ref isPackageNameSet, ref isKeywordsSet, ref isPackageAuthorSet);
                             break;

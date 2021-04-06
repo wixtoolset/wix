@@ -4,9 +4,9 @@
     <MajorUpgrade DowngradeErrorMessage="Newer version already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <DirectoryRef Id="ProgramFilesFolder">
+    <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" Name="~Test App" />
-    </DirectoryRef>
+    </StandardDirectory>
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />

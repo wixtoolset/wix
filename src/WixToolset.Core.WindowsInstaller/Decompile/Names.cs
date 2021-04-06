@@ -69,6 +69,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         public static readonly XName LevelElement = WxsNamespace + "Level";
         public static readonly XName DialogElement = WxsNamespace + "Dialog";
+        public static readonly XName StandardDirectoryElement = WxsNamespace + "StandardDirectory";
         public static readonly XName DirectoryElement = WxsNamespace + "Directory";
         public static readonly XName DirectorySearchElement = WxsNamespace + "DirectorySearch";
         public static readonly XName CopyFileElement = WxsNamespace + "CopyFile";

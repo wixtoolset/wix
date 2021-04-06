@@ -4289,51 +4289,55 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             foreach (var row in table.Rows)
             {
                 var id = row.FieldAsString(0);
-                var xDirectory = new XElement(Names.DirectoryElement,
+                var elementName = WindowsInstallerStandard.IsStandardDirectory(id) ? Names.StandardDirectoryElement : Names.DirectoryElement;
+                var xDirectory = new XElement(elementName,
                     new XAttribute("Id", id));
 
-                var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(2));
-
-                if (String.Equals(id, "TARGETDIR", StringComparison.Ordinal) && !String.Equals(names[0], "SourceDir", StringComparison.Ordinal))
+                if (!WindowsInstallerStandard.IsStandardDirectory(id))
                 {
-                    this.Messaging.Write(WarningMessages.TargetDirCorrectedDefaultDir());
-                    xDirectory.SetAttributeValue("Name", "SourceDir");
-                }
-                else
-                {
-                    if (null != names[0] && "." != names[0])
-                    {
-                        if (null != names[1])
-                        {
-                            xDirectory.SetAttributeValue("ShortName", names[0]);
-                        }
-                        else
-                        {
-                            xDirectory.SetAttributeValue("Name", names[0]);
-                        }
-                    }
+                    var names = this.BackendHelper.SplitMsiFileName(row.FieldAsString(2));
 
-                    if (null != names[1])
+                    if (id == "TARGETDIR" && names[0] != "SourceDir")
                     {
-                        xDirectory.SetAttributeValue("Name", names[1]);
-                    }
-                }
-
-                if (null != names[2])
-                {
-                    if (null != names[3])
-                    {
-                        xDirectory.SetAttributeValue("ShortSourceName", names[2]);
+                        this.Messaging.Write(WarningMessages.TargetDirCorrectedDefaultDir());
+                        xDirectory.SetAttributeValue("Name", "SourceDir");
                     }
                     else
                     {
-                        xDirectory.SetAttributeValue("SourceName", names[2]);
-                    }
-                }
+                        if (null != names[0] && "." != names[0])
+                        {
+                            if (null != names[1])
+                            {
+                                xDirectory.SetAttributeValue("ShortName", names[0]);
+                            }
+                            else
+                            {
+                                xDirectory.SetAttributeValue("Name", names[0]);
+                            }
+                        }
 
-                if (null != names[3])
-                {
-                    xDirectory.SetAttributeValue("SourceName", names[3]);
+                        if (null != names[1])
+                        {
+                            xDirectory.SetAttributeValue("Name", names[1]);
+                        }
+                    }
+
+                    if (null != names[2])
+                    {
+                        if (null != names[3])
+                        {
+                            xDirectory.SetAttributeValue("ShortSourceName", names[2]);
+                        }
+                        else
+                        {
+                            xDirectory.SetAttributeValue("SourceName", names[2]);
+                        }
+                    }
+
+                    if (null != names[3])
+                    {
+                        xDirectory.SetAttributeValue("SourceName", names[3]);
+                    }
                 }
 
                 this.IndexElement(row, xDirectory);
@@ -4344,7 +4348,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 var xDirectory = this.GetIndexedElement(row);
 
-                if (row.IsColumnNull(1))
+                var id = row.FieldAsString(0);
+
+                if (id == "TARGETDIR")
+                {
+                    // Skip TARGETDIR.
+                }
+                else if (row.IsColumnNull(1) || WindowsInstallerStandard.IsStandardDirectory(id))
                 {
                     this.RootElement.Add(xDirectory);
                 }

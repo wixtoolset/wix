@@ -9,8 +9,8 @@
   </Package>
 
   <Fragment>
-    <DirectoryRef Id="ProgramFilesFolder">
+    <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
-    </DirectoryRef>
+    </StandardDirectory>
   </Fragment>
 </Wix>

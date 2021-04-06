@@ -12,17 +12,14 @@
         <Data Column="Component_" Value="test.txt" />
       </Row>
     </CustomTable>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder" Name="PFiles">
-        <Directory Id="ProgramFiles6432Folder">
-          <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="1egc1laj">
-            <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always32">
-              <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="SourceDir\PFiles\\MsiPackage\test.txt" />
-            </Component>
-          </Directory>
-        </Directory>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="1egc1laj">
+        <Component Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Bitness="always32">
+          <File Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" Name="test.txt" KeyPath="yes" Source="MsiPackage\test.txt" />
+        </Component>
       </Directory>
-    </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramFilesFolder" />
     <Feature Id="ProductFeature" Level="1" Title="MsiPackageTitle">
       <ComponentRef Id="filcV1yrx0x8wJWj4qMzcH21jwkPko" />
     </Feature>

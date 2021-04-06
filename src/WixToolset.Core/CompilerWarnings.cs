@@ -6,6 +6,16 @@ namespace WixToolset.Core
 
     internal static class CompilerWarnings
     {
+        public static Message DirectoryRefStandardDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
+        {
+            return Message(sourceLineNumbers, Ids.DirectoryRefStandardDirectoryDeprecated, "Using DirectoryRef to reference the standard directory '{0}' is deprecated. Use the StandardDirectory element instead.", directoryId);
+        }
+
+        public static Message DefiningStandardDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
+        {
+            return Message(sourceLineNumbers, Ids.DefiningStandardDirectoryDeprecated, "It is no longer necessary to define the standard directory '{0}'. Use the StandardDirectory element instead.", directoryId);
+        }
+
         public static Message DiscouragedVersionAttribute(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.DiscouragedVersionAttribute, "The Provides/@Version attribute should not be specified in an MSI package. The ProductVersion will be used by default.");
@@ -48,6 +58,8 @@ namespace WixToolset.Core
             PropertyRemoved = 5433,
             DiscouragedVersionAttribute = 5434,
             Win64Component = 5435,
+            DirectoryRefStandardDirectoryDeprecated = 5436,
+            DefiningStandardDirectoryDeprecated = 5437,
         }
     }
 }

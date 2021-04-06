@@ -15,11 +15,9 @@
   </Package>
 
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="~Test A" />
-      </Directory>
-    </Directory>
+      <StandardDirectory Id="ProgramFilesFolder">
+          <Directory Id="INSTALLFOLDER" Name="~Test A" />
+      </StandardDirectory>
   </Fragment>
 
   <Fragment>

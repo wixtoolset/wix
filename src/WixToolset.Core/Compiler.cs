@@ -4427,6 +4427,10 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
+            else if (WindowsInstallerStandard.IsStandardDirectory(id))
+            {
+                this.Core.Write(CompilerWarnings.DirectoryRefStandardDirectoryDeprecated(sourceLineNumbers, id));
+            }
 
             if (!String.IsNullOrEmpty(fileSource) && !fileSource.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             {
@@ -6324,6 +6328,9 @@ namespace WixToolset.Core
                         string parentName = null;
                         this.ParseSFPCatalogElement(child, ref parentName);
                         break;
+                    case "StandardDirectory":
+                        this.ParseStandardDirectoryElement(child);
+                        break;
                     case "UI":
                         this.ParseUIElement(child);
                         break;
@@ -7555,6 +7562,71 @@ namespace WixToolset.Core
                 });
 
                 symbol.Set((int)WixMergeSymbolFields.Language, language);
+            }
+        }
+
+        /// <summary>
+        /// Parses a standard directory element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        private void ParseStandardDirectoryElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(id))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+            else if (!WindowsInstallerStandard.IsStandardDirectory(id))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Id", id, String.Join(", \"", WindowsInstallerStandard.StandardDirectories().Select(d => d.Id.Id))));
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, diskId: CompilerConstants.IntegerNotSet, id, srcPath: String.Empty);
+                            break;
+                        case "Directory":
+                            this.ParseDirectoryElement(child, id, diskId: CompilerConstants.IntegerNotSet, fileSource: String.Empty);
+                            break;
+                        case "Merge":
+                            this.ParseMergeElement(child, id, diskId: CompilerConstants.IntegerNotSet);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
             }
         }
 

@@ -203,6 +203,9 @@ namespace WixToolset.Core
                             string parentName = null;
                             this.ParseSFPCatalogElement(child, ref parentName);
                             break;
+                        case "StandardDirectory":
+                            this.ParseStandardDirectoryElement(child);
+                            break;
                         case "Substitution":
                             this.ParseSubstitutionElement(child);
                             break;

@@ -1,15 +1,13 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="~Test Package" Version="$(var.V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="7d326855-e790-4a94-8611-5351f8321fca" Compressed="yes" Scope="perMachine" ProductCode="7d326855-e790-4a94-8611-5351f8321fca">
     
 
     <MajorUpgrade DowngradeErrorMessage="Newer version already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="~Test App" />
-      </Directory>
-    </Directory>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="~Test A" />
+    </StandardDirectory>
 
     <Feature Id="Main">
       <ComponentGroupRef Id="Components" />

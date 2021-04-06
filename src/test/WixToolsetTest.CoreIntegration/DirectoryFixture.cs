@@ -125,6 +125,52 @@ namespace WixToolsetTest.CoreIntegration
                 }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
             }
         }
+
+        [Fact]
+        public void CanGetWithMultiNestedSubdirectory()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "Directory", "Nested.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                Assert.Equal(new[]
+                {
+                    "BinFolder:ProgramFilesFolder:Example Corporation\\Test Product\\bin",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
+
+                var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var directoryRows = data.Tables["Directory"].Rows;
+                Assert.Equal(new[]
+                {
+                    "d4EceYatXTyy8HXPt5B6DT9Rj.wE:ProgramFilesFolder:u7-b4gch|Example Corporation",
+                    "dSJ1pgiASlW7kJTu0wqsGBklJsS0:d4EceYatXTyy8HXPt5B6DT9Rj.wE:vjj-gxay|Test Product",
+                    "BinFolder:dSJ1pgiASlW7kJTu0wqsGBklJsS0:bin",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).ToArray());
             }
         }
     }
