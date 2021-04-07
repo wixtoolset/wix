@@ -1,27 +1,17 @@
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
     <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
         <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
             <Component Id="Del" Directory="INSTALLFOLDER" Guid="3613414c-11f5-40fa-a1f1-a0ba722a6895">
-                <util:XmlConfig
-                    Id="DelElement"
-                    File="[INSTALLFOLDER]my.xml"
-                    Action="delete"
-                    Node="element"
-                    VerifyPath="xxx"
-                    ElementPath="//root/sub"
-                    On="install"
-                    Sequence="1" />
+                <util:XmlConfig Id="DelElement" File="[INSTALLFOLDER]my.xml" Action="delete" Node="element" VerifyPath="xxx" ElementPath="//root/sub" On="install" Sequence="1" />
             </Component>
         </Feature>
     </Package>
 
     <Fragment>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
+            <StandardDirectory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
-            </Directory>
-        </Directory>
-    </Fragment>
+            </StandardDirectory>
+        </Fragment>
 </Wix>
