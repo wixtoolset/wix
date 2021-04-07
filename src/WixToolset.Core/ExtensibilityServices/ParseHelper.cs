@@ -103,7 +103,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.Directory, id);
             }
 
-            return id; //this.ParseInlineSyntax(section, sourceLineNumbers, attribute, inlineSyntax, sectionCachedInlinedDirectoryIds);
+            return id;
         }
 
         public string CreateGuid(Guid namespaceGuid, string value)

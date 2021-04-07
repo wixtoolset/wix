@@ -2171,7 +2171,7 @@ namespace WixToolset.Core
                         this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
                         break;
                     case "Subdirectory":
-                        directoryId = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
                         break;
                     case "Name":
                         name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, true);
