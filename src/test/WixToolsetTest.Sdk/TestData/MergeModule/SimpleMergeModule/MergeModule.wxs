@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Module Id="SimpleMM" Language="1033" Version="1.0.0.0" Guid="86FB9E91-ACF3-4EDF-B711-72DAF2443692" InstallerVersion="200">
     <SummaryInformation Manufacturer="Example Corporation" />
 
@@ -6,9 +6,7 @@
   </Module>
 
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="MergeRedirectFolder" />
-    </Directory>
+    <Directory Id="MergeRedirectFolder" />
   </Fragment>
 
   <Fragment>
