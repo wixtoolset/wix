@@ -4216,7 +4216,14 @@ namespace WixToolset.Core
                         fileSourceAttribSet = true;
                         break;
                     case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                        if ("." == attrib.Value)
+                        {
+                            name = attrib.Value;
+                        }
+                        else
+                        {
+                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                        }
                         nameAttribute = attrib;
                         break;
                     case "ShortName":

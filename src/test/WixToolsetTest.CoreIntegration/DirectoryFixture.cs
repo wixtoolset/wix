@@ -89,6 +89,53 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanGetDefaultName()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Directory", "DefaultName.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var dirSymbols = section.Symbols.OfType<WixToolset.Data.Symbols.DirectorySymbol>().ToList();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BinFolder\tCompanyFolder\t.",
+                    "CompanyFolder\tProgramFilesFolder\tExample Corporation",
+                    "ProgramFilesFolder\tTARGETDIR\tPFiles",
+                    "TARGETDIR\t\tSourceDir"
+                }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => String.Join('\t', d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
+
+                var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var directoryRows = data.Tables["Directory"].Rows;
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "BinFolder\tCompanyFolder\t.",
+                    "CompanyFolder\tProgramFilesFolder\tu7-b4gch|Example Corporation",
+                    "ProgramFilesFolder\tTARGETDIR\tPFiles",
+                    "TARGETDIR\t\tSourceDir"
+                }, directoryRows.Select(r => String.Join('\t', r.FieldAsString(0), r.FieldAsString(1), r.FieldAsString(2))).ToArray());
+            }
+        }
+
+        [Fact]
         public void CanGetDuplicateDir()
         {
             var folder = TestData.Get(@"TestData");
