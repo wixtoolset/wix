@@ -7,17 +7,12 @@
     <RootNamespace>WixToolset.Sql</RootNamespace>
     <Description>WiX Toolset Sql Extension</Description>
     <Title>WiX Toolset Sql Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\sql.wixlib" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
 </Project>
