@@ -10,10 +10,12 @@
     <IsTool>true</IsTool>
     <ContentTargetFolders>build</ContentTargetFolders>
   </PropertyGroup>
+
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\powershell.wixlib" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>

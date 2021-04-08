@@ -175,7 +175,7 @@ namespace WixToolset.PowerShell
             // for use in Formats and Types files. PowerShell v2 still uses 1.
             var major = (2 == requiredPowerShellVersion.Major) ? 1 : requiredPowerShellVersion.Major;
 
-            var variableId = new Identifier(AccessModifier.Public, String.Format(CultureInfo.InvariantCulture, "{0}_{1}", VarPrefix, id));
+            var variableId = new Identifier(AccessModifier.Global, String.Format(CultureInfo.InvariantCulture, "{0}_{1}", VarPrefix, id));
             section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, variableId)
             {
                 Value = major.ToString(CultureInfo.InvariantCulture),
