@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
@@ -15,13 +14,7 @@
 
     <!-- Indicates the service pack level for the .NET Framework 3.5 (for bundles). -->
     <Fragment>
-        <util:RegistrySearch
-            Id="NETFRAMEWORK35_SP_LEVEL"
-            Variable="NETFRAMEWORK35_SP_LEVEL"
-            Root="HKLM"
-            Key="Software\Microsoft\NET Framework Setup\NDP\v3.5"
-            Value="SP"
-            Result="value" />
+        <util:RegistrySearch Id="NETFRAMEWORK35_SP_LEVEL" Variable="NETFRAMEWORK35_SP_LEVEL" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v3.5" Value="SP" Result="value" />
     </Fragment>
 
     <!-- set to #1 if the .NET Framework 3.5 is installed (not set otherwise) -->

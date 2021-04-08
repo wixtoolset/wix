@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dutil" Version="4.0.64" />
+    <PackageReference Include="WixToolset.Dutil" Version="4.0.65" />
     <PackageReference Include="WixToolset.WcaUtil" Version="4.0.18" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />

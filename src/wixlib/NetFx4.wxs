@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
         .NET Framework installation state properties
@@ -30,23 +28,11 @@
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearch
-        Id="NETFRAMEWORK40"
-        Variable="NETFRAMEWORK40"
-        Root="HKLM"
-        Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
-        Value="Install"
-        Result="value" />
+    <util:RegistrySearch Id="NETFRAMEWORK40" Variable="NETFRAMEWORK40" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Value="Install" Result="value" />
   </Fragment>
 
   <Fragment>
-    <util:RegistrySearch
-        Id="NETFRAMEWORK40CLIENT"
-        Variable="NETFRAMEWORK40CLIENT"
-        Root="HKLM"
-        Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client"
-        Value="Install"
-        Result="value" />
+    <util:RegistrySearch Id="NETFRAMEWORK40CLIENT" Variable="NETFRAMEWORK40CLIENT" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client" Value="Install" Result="value" />
   </Fragment>
 
   <!-- set to #1 if the .NET Framework 4.0 client is installed (not set otherwise) -->

@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
-     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
         .NET Framework installation state properties
@@ -32,25 +29,8 @@
     <WixVariable Id="NetFx472WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx472WebId)">
-      <ExePackage
-          InstallArguments="/q /norestart /log &quot;[NetFx472WebLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx472WebLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx472WebDetectCondition)"
-          InstallCondition="!(wix.NetFx472WebInstallCondition)"
-          Id="$(var.NetFx472WebId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          LogPathVariable="NetFx472WebLog">
-        <ExePackagePayload
-          Name="!(wix.NetFx472WebPackageDirectory)NDP472-KB4054531-Web.exe"
-          DownloadUrl="$(var.NetFx472WebLink)"
-          Description="Microsoft .NET Framework 4.7.2 Setup"
-          Hash="37006954E3AFE07FB02D24894CC34794618B78C27A1B514818985B6CC1FA3E896ED99BA2E4AAC3F6469D263819BD94EE70E7113946C51BA83C93B74826FC8FA8"
-          ProductName="Microsoft .NET Framework 4.7.2"
-          Size="1432848"
-          Version="4.7.3081.0" />
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx472WebLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx472WebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx472WebDetectCondition)" InstallCondition="!(wix.NetFx472WebInstallCondition)" Id="$(var.NetFx472WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx472WebLog">
+        <ExePackagePayload Name="!(wix.NetFx472WebPackageDirectory)NDP472-KB4054531-Web.exe" DownloadUrl="$(var.NetFx472WebLink)" Description="Microsoft .NET Framework 4.7.2 Setup" Hash="37006954E3AFE07FB02D24894CC34794618B78C27A1B514818985B6CC1FA3E896ED99BA2E4AAC3F6469D263819BD94EE70E7113946C51BA83C93B74826FC8FA8" ProductName="Microsoft .NET Framework 4.7.2" Size="1432848" Version="4.7.3081.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
@@ -71,25 +51,8 @@
     <WixVariable Id="NetFx472RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx472RedistId)">
-      <ExePackage
-          InstallArguments="/q /norestart /log &quot;[NetFx472RedistLog].html&quot;"
-          UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx472RedistLog].html&quot;"
-          PerMachine="yes"
-          DetectCondition="!(wix.NetFx472RedistDetectCondition)"
-          InstallCondition="!(wix.NetFx472RedistInstallCondition)"
-          Id="$(var.NetFx472RedistId)"
-          Vital="yes"
-          Permanent="yes"
-          Protocol="netfx4"
-          LogPathVariable="NetFx472RedistLog">
-        <ExePackagePayload
-          Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe"
-          DownloadUrl="$(var.NetFx472RedistLink)"
-          Description="Microsoft .NET Framework 4.7.2 Setup"
-          Hash="36F295ED19A5BD5C5F05803BA26EFD17D419ABC7A791312AD011B63A4402492529AED0FB4D45FF1F74381079A310B33649C9C56C36E815B12E79ECD671897489"
-          ProductName="Microsoft .NET Framework 4.7.2"
-          Size="83943272"
-          Version="4.7.3081.0" />
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx472RedistLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx472RedistLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx472RedistDetectCondition)" InstallCondition="!(wix.NetFx472RedistInstallCondition)" Id="$(var.NetFx472RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx472RedistLog">
+        <ExePackagePayload Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx472RedistLink)" Description="Microsoft .NET Framework 4.7.2 Setup" Hash="36F295ED19A5BD5C5F05803BA26EFD17D419ABC7A791312AD011B63A4402492529AED0FB4D45FF1F74381079A310B33649C9C56C36E815B12E79ECD671897489" ProductName="Microsoft .NET Framework 4.7.2" Size="83943272" Version="4.7.3081.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>

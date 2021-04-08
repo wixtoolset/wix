@@ -1,10 +1,7 @@
-<?xml version="1.0"?>
-<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Include xmlns="http://wixtoolset.org/schemas/v4/wxs"
-         xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
-         xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <?define AspNetCoreId = ASPNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
   <?define AspNetCoreRedistId = AspNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
@@ -29,32 +26,17 @@
 
   <Fragment>
     <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
-    <util:DirectorySearch
-        Id="$(var.AspNetCoreId)"
-        Variable="$(var.AspNetCoreId)"
-        Path="[$(var.DotNetHomeId)]\shared\Microsoft.AspNetCore.App\$(var.NetCoreVersion)"
-        Result="exists"
-        After="$(var.DotNetHomeId)" />
+    <util:DirectorySearch Id="$(var.AspNetCoreId)" Variable="$(var.AspNetCoreId)" Path="[$(var.DotNetHomeId)]\shared\Microsoft.AspNetCore.App\$(var.NetCoreVersion)" Result="exists" After="$(var.DotNetHomeId)" />
   </Fragment>
 
   <Fragment>
     <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
-    <util:DirectorySearch
-        Id="$(var.DesktopNetCoreId)"
-        Variable="$(var.DesktopNetCoreId)"
-        Path="[$(var.DotNetHomeId)]\shared\Microsoft.WindowsDesktop.App\$(var.NetCoreVersion)"
-        Result="exists"
-        After="$(var.DotNetHomeId)" />
+    <util:DirectorySearch Id="$(var.DesktopNetCoreId)" Variable="$(var.DesktopNetCoreId)" Path="[$(var.DotNetHomeId)]\shared\Microsoft.WindowsDesktop.App\$(var.NetCoreVersion)" Result="exists" After="$(var.DotNetHomeId)" />
   </Fragment>
 
   <Fragment>
     <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
-    <util:DirectorySearch
-        Id="$(var.DotNetCoreId)"
-        Variable="$(var.DotNetCoreId)"
-        Path="[$(var.DotNetHomeId)]\shared\Microsoft.NETCore.App\$(var.NetCoreVersion)"
-        Result="exists"
-        After="$(var.DotNetHomeId)" />
+    <util:DirectorySearch Id="$(var.DotNetCoreId)" Variable="$(var.DotNetCoreId)" Path="[$(var.DotNetHomeId)]\shared\Microsoft.NETCore.App\$(var.NetCoreVersion)" Result="exists" After="$(var.DotNetHomeId)" />
   </Fragment>
 
   <Fragment>
