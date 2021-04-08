@@ -7,16 +7,12 @@
     <RootNamespace>WixToolset.UI</RootNamespace>
     <Description>WiX Toolset UI Extension</Description>
     <Title>WiX Toolset UI Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
+
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileName).targets" />
     <EmbeddedResource Include="$(OutputPath)..\ui.wixlib" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>
 </Project>
