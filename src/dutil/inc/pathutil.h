@@ -47,6 +47,14 @@ DAPI_(HRESULT) PathGetDirectory(
     );
 
 /*******************************************************************
+PathGetParentPath - extracts the parent directory from a full path.
+********************************************************************/
+DAPI_(HRESULT) PathGetParentPath(
+    __in_z LPCWSTR wzPath,
+    __out_z LPWSTR *psczDirectory
+    );
+
+/*******************************************************************
  PathExpand - gets the full path to a file resolving environment
               variables along the way.
 ********************************************************************/
