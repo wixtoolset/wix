@@ -20,7 +20,7 @@
     <ProjectGuid>{CAD56A7E-342B-4324-9DCB-BCEB8F3BC80D}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>msmqca</TargetName>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>msmqca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset MSMQ CustomAction</Description>
