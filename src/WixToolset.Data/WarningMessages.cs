@@ -242,9 +242,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForEmbeddedPayloads, "The Payload '{0}' is embedded but included a @DownloadUrl attribute. Embedded Payloads cannot be downloaded so the download URL is being ignored.", payloadId);
         }
 
-        public static Message DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(SourceLineNumber sourceLineNumbers, string componentId, string guid)
+        public static Message DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(SourceLineNumber sourceLineNumbers, string componentId, string guid, string type, string keyPath)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions, "Component/@Id='{0}' has a @Guid value '{1}' that duplicates another component in this package. This is not officially supported by Windows Installer but works as long as all components have mutually-exclusive conditions. It is recommended to give each component its own unique GUID.", componentId, guid);
+            return Message(sourceLineNumbers, Ids.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions, "Component/@Id='{0}' with {2} '{3}' has a @Guid value '{1}' that duplicates another component in this package. This is not officially supported by Windows Installer and cannot be used when creating patches. It otherwise works as long as all components with the same GUID have mutually-exclusive conditions. It is recommended to give each component its own unique GUID.", componentId, guid, type, keyPath);
         }
 
         public static Message DuplicatePrimaryKey(SourceLineNumber sourceLineNumbers, string primaryKey, string tableName)

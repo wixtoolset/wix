@@ -278,9 +278,9 @@ namespace WixToolset.Data
             return Message(null, Ids.DuplicateCommandLineOptionInExtension, "The command line option '{0}' has already been loaded by another Heat extension.", arg);
         }
 
-        public static Message DuplicateComponentGuids(SourceLineNumber sourceLineNumbers, string componentId, string guid)
+        public static Message DuplicateComponentGuids(SourceLineNumber sourceLineNumbers, string componentId, string guid, string type, string keyPath)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateComponentGuids, "Component/@Id='{0}' has a @Guid value '{1}' that duplicates another component in this package. It is recommended to give each component its own unique GUID.", componentId, guid);
+            return Message(sourceLineNumbers, Ids.DuplicateComponentGuids, "Component/@Id='{0}' with {2} '{3}' has a @Guid value '{1}' that duplicates another component in this package. It is recommended to give each component its own unique GUID.", componentId, guid, type, keyPath);
         }
 
         public static Message DuplicateContextValue(SourceLineNumber sourceLineNumbers, string contextValue)
@@ -686,7 +686,7 @@ namespace WixToolset.Data
 
         public static Message FinishCabFailed()
         {
-            return Message(null, Ids.FinishCabFailed, "An error (E_FAIL) was returned while finalizing a CAB file. This most commonly happens when creating a CAB file with more than 65535 files in it. Either reduce the number of files in your installation package or split your installation package's files into more than one CAB file using the Media element.");
+            return Message(null, Ids.FinishCabFailed, "An error (E_FAIL) was returned while finalizing a CAB file. This most commonly happens when creating a CAB file with more than 65535 files in it or a compressed size greater than 2GB. Either reduce the number of files in your installation package or split your installation package's files into more than one CAB file using the Media element.");
         }
 
         public static Message FullTempDirectory(string prefix, string directory)
