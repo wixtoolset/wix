@@ -4,6 +4,7 @@
 
 
 // Exit macros
+#define WiuExitTrace(x, s, ...) ExitTraceSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
 #define WiuExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
 #define WiuExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
 #define WiuExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_WIUTIL, x, s, __VA_ARGS__)
@@ -692,12 +693,23 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
 
         if (fReturnHighestVersionOnly)
         {
-            // get the version
+            // try to get the version but if the product registration is broken
+            // (for whatever reason), skip this product
             hr = WiuGetProductInfo(wzCurrentProductCode, L"VersionString", &sczInstalledVersion);
-            WiuExitOnFailure(hr, "Failed to get version for product code: %ls", wzCurrentProductCode);
+            if (FAILED(hr))
+            {
+                WiuExitTrace(hr, "Could not get product version for product code: %ls, skipping...", wzCurrentProductCode);
+                continue;
+            }
 
+            // try to parse the product version but if it is corrupt (for whatever
+            // reason), skip it
             hr = FileVersionFromStringEx(sczInstalledVersion, 0, &qwCurrentVersion);
-            WiuExitOnFailure(hr, "Failed to convert version: %ls to DWORD64 for product code: %ls", sczInstalledVersion, wzCurrentProductCode);
+            if (FAILED(hr))
+            {
+                WiuExitTrace(hr, "Could not convert version: %ls to DWORD64 for product code: %ls, skipping...", sczInstalledVersion, wzCurrentProductCode);
+                continue;
+            }
 
             // if this is the first product found then it is the highest version (for now)
             if (0 == *pcRelatedProducts)

@@ -283,7 +283,7 @@ LExit:
 
 
 /********************************************************************
- RegKeyEnum - enumerates a registry key.
+ RegKeyEnum - enumerates child registry keys.
 
 *********************************************************************/
 extern "C" HRESULT DAPI RegKeyEnum(
@@ -340,7 +340,7 @@ LExit:
 
 
 /********************************************************************
- RegValueEnum - enumerates a registry value.
+ RegValueEnum - enumerates registry values.
 
 *********************************************************************/
 HRESULT DAPI RegValueEnum(
@@ -939,6 +939,61 @@ LExit:
     return hr;
 }
 
+/********************************************************************
+RegKeyReadNumber - reads a DWORD registry key value as a number from
+a specified subkey.
+
+*********************************************************************/
+extern "C" HRESULT DAPI RegKeyReadNumber(
+    __in HKEY hk,
+    __in_z LPCWSTR wzSubKey,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL f64Bit,
+    __out DWORD* pdwValue
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkKey = NULL;
+
+    hr = RegOpen(hk, wzSubKey, KEY_READ | f64Bit ? KEY_WOW64_64KEY : 0, &hkKey);
+    RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
+
+    hr = RegReadNumber(hkKey, wzName, pdwValue);
+    RegExitOnFailure(hr, "Failed to read value: %ls/@%ls", wzSubKey, wzName);
+
+LExit:
+    ReleaseRegKey(hkKey);
+
+    return hr;
+}
+
+/********************************************************************
+RegValueExists - determines whether a named value exists in a 
+specified subkey.
+
+*********************************************************************/
+extern "C" BOOL DAPI RegValueExists(
+    __in HKEY hk,
+    __in_z LPCWSTR wzSubKey,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL f64Bit
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hkKey = NULL;
+    DWORD dwType = 0;
+
+    hr = RegOpen(hk, wzSubKey, KEY_READ | f64Bit ? KEY_WOW64_64KEY : 0, &hkKey);
+    RegExitOnFailure(hr, "Failed to open key: %ls", wzSubKey);
+
+    hr = RegGetType(hkKey, wzName, &dwType);
+    RegExitOnFailure(hr, "Failed to read value type: %ls/@%ls", wzSubKey, wzName);
+
+LExit:
+    ReleaseRegKey(hkKey);
+
+    return SUCCEEDED(hr);
+}
 
 static HRESULT WriteStringToRegistry(
     __in HKEY hk,

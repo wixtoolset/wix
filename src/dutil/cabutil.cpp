@@ -102,6 +102,29 @@ LExit:
 }
 
 
+static HANDLE OpenFileWithRetry(
+    __in LPCWSTR wzPath,
+    __in DWORD dwDesiredAccess,
+    __in DWORD dwCreationDisposition
+)
+{
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+
+    for (DWORD i = 0; i < 30; ++i)
+    {
+        hFile = ::CreateFileW(wzPath, dwDesiredAccess, FILE_SHARE_READ, NULL, dwCreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (INVALID_HANDLE_VALUE != hFile)
+        {
+            break;
+        }
+
+        ::Sleep(100);
+    }
+
+    return hFile;
+}
+
+
 /********************************************************************
  CabInitialize - initializes internal static variables
 
@@ -340,6 +363,7 @@ static __callback void DIAMONDAPI CabExtractFree(__in LPVOID pvData)
 static __callback INT_PTR FAR DIAMONDAPI CabExtractOpen(__in_z PSTR pszFile, __in int oflag, __in int pmode)
 {
     HRESULT hr = S_OK;
+    HANDLE hFile = INVALID_HANDLE_VALUE;
     INT_PTR pFile = -1;
     LPWSTR sczCabFile = NULL;
 
@@ -353,11 +377,13 @@ static __callback INT_PTR FAR DIAMONDAPI CabExtractOpen(__in_z PSTR pszFile, __i
     hr = StrAllocStringAnsi(&sczCabFile, pszFile, 0, CP_UTF8);
     CabExitOnFailure(hr, "Failed to convert UTF8 cab file name to wide character string");
 
-    pFile = reinterpret_cast<INT_PTR>(::CreateFileW(sczCabFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
-    if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(pFile))
+    hFile = OpenFileWithRetry(sczCabFile, GENERIC_READ, OPEN_EXISTING);
+    if (INVALID_HANDLE_VALUE == hFile)
     {
         CabExitWithLastError(hr, "failed to open file: %ls", sczCabFile);
     }
+
+    pFile = reinterpret_cast<INT_PTR>(hFile);
 
     if (vdw64EmbeddedOffset)
     {
@@ -365,7 +391,10 @@ static __callback INT_PTR FAR DIAMONDAPI CabExtractOpen(__in_z PSTR pszFile, __i
         CabExitOnFailure(hr, "Failed to seek to embedded offset %I64d", vdw64EmbeddedOffset);
     }
 
+    hFile = INVALID_HANDLE_VALUE;
+
 LExit:
+    ReleaseFileHandle(hFile);
     ReleaseStr(sczCabFile);
 
     return FAILED(hr) ? -1 : pFile;
@@ -460,6 +489,7 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
     Assert(pFDINotify->pv);
 
     HRESULT hr = S_OK;
+    HANDLE hFile = INVALID_HANDLE_VALUE;
     INT_PTR ipResult = 0;   // result to return on success
 
     CAB_CALLBACK_STRUCT* pccs = static_cast<CAB_CALLBACK_STRUCT*>(pFDINotify->pv);
@@ -503,7 +533,6 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
                 CabExitWithLastError(hr, "failed to get time for resource: %ls", wz);
             }
             ::LocalFileTimeToFileTime(&ftLocal, &ft);
-            
 
             WCHAR wzPath[MAX_PATH];
             hr = ::StringCchCopyW(wzPath, countof(wzPath), pccs->pwzExtractDir);
@@ -511,21 +540,24 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
             hr = ::StringCchCatW(wzPath, countof(wzPath), wz);
             CabExitOnFailure(hr, "failed to concat onto path: %ls file: %ls", wzPath, wz);
 
-            ipResult = reinterpret_cast<INT_PTR>(::CreateFileW(wzPath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL));
-            if (INVALID_HANDLE_VALUE == reinterpret_cast<HANDLE>(ipResult))
+            hFile = OpenFileWithRetry(wzPath, GENERIC_WRITE, CREATE_ALWAYS);
+            if (INVALID_HANDLE_VALUE == hFile)
             {
                 CabExitWithLastError(hr, "failed to create file: %ls", wzPath);
             }
 
-            ::SetFileTime(reinterpret_cast<HANDLE>(ipResult), &ft, &ft, &ft);   // try to set the file time (who cares if it fails)
+            ::SetFileTime(hFile, &ft, &ft, &ft);   // try to set the file time (who cares if it fails)
 
-            if (::SetFilePointer(reinterpret_cast<HANDLE>(ipResult), pFDINotify->cb, NULL, FILE_BEGIN))   // try to set the end of the file (don't worry if this fails)
+            if (::SetFilePointer(hFile, pFDINotify->cb, NULL, FILE_BEGIN))   // try to set the end of the file (don't worry if this fails)
             {
-                if (::SetEndOfFile(reinterpret_cast<HANDLE>(ipResult)))
+                if (::SetEndOfFile(hFile))
                 {
-                    ::SetFilePointer(reinterpret_cast<HANDLE>(ipResult), 0, NULL, FILE_BEGIN);  // reset the file pointer
+                    ::SetFilePointer(hFile, 0, NULL, FILE_BEGIN);  // reset the file pointer
                 }
             }
+
+            ipResult = reinterpret_cast<INT_PTR>(hFile);
+            hFile = INVALID_HANDLE_VALUE;
         }
         else  // resource wasn't requested, skip it
         {
@@ -579,5 +611,7 @@ static __callback INT_PTR DIAMONDAPI CabExtractCallback(__in FDINOTIFICATIONTYPE
     };
 
 LExit:
+    ReleaseFileHandle(hFile);
+
     return (S_OK == hr) ? ipResult : -1;
 }

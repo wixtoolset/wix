@@ -226,6 +226,19 @@ HRESULT DAPI RegQueryKey(
     __out_opt DWORD* pcSubKeys,
     __out_opt DWORD* pcValues
     );
+HRESULT DAPI RegKeyReadNumber(
+    __in HKEY hk,
+    __in_z LPCWSTR wzSubKey,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL f64Bit,
+    __out DWORD* pdwValue
+    );
+BOOL DAPI RegValueExists(
+    __in HKEY hk,
+    __in_z LPCWSTR wzSubKey,
+    __in_z_opt LPCWSTR wzName,
+    __in BOOL f64Bit
+    );
 
 #ifdef __cplusplus
 }

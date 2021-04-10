@@ -1106,6 +1106,134 @@ LExit:
 
 
 /*******************************************************************
+ FileCopyUsingHandlesWithProgress
+
+*******************************************************************/
+extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
+    __in HANDLE hSource,
+    __in HANDLE hTarget,
+    __in DWORD64 cbCopy,
+    __in_opt LPPROGRESS_ROUTINE lpProgressRoutine,
+    __in_opt LPVOID lpData,
+    __in_opt LPBOOL pbCancel,
+    __out_opt DWORD64* pcbCopied
+)
+{
+    HRESULT hr = S_OK;
+    BOOL fStop = FALSE;
+    BOOL fCanceled = FALSE;
+    DWORD64 cbTotalCopied = 0;
+    BYTE rgbData[64 * 1024];
+    DWORD cbRead = 0;
+
+    LARGE_INTEGER liSourceSize = { };
+    LARGE_INTEGER liTotalCopied = { };
+    LARGE_INTEGER liZero = { };
+    DWORD dwResult = 0;
+
+    hr = FileSizeByHandle(hSource, &liSourceSize.QuadPart);
+    FileExitOnFailure(hr, "Failed to get size of source.");
+
+    if (0 < cbCopy && cbCopy < (DWORD64)liSourceSize.QuadPart)
+    {
+        liSourceSize.QuadPart = cbCopy;
+    }
+
+    dwResult = lpProgressRoutine(liSourceSize, liTotalCopied, liZero, liZero, 0, CALLBACK_STREAM_SWITCH, hSource, hTarget, lpData);
+    switch (dwResult)
+    {
+    case PROGRESS_CONTINUE:
+        break;
+
+    case PROGRESS_CANCEL:
+        fCanceled = TRUE;
+        fStop = TRUE;
+        break;
+
+    case PROGRESS_STOP:
+        fStop = TRUE;
+        break;
+
+    case PROGRESS_QUIET:
+        lpProgressRoutine = NULL;
+        break;
+    }
+
+    // Set size of the target file.
+    ::SetFilePointerEx(hTarget, liSourceSize, NULL, FILE_BEGIN);
+
+    if (!::SetEndOfFile(hTarget))
+    {
+        FileExitWithLastError(hr, "Failed to set end of target file.");
+    }
+
+    if (!::SetFilePointerEx(hTarget, liZero, NULL, FILE_BEGIN))
+    {
+        FileExitWithLastError(hr, "Failed to reset target file pointer.");
+    }
+
+    // Copy with progress.
+    while (!fStop && (0 == cbCopy || cbTotalCopied < cbCopy))
+    {
+        cbRead = static_cast<DWORD>((0 == cbCopy) ? countof(rgbData) : min(countof(rgbData), cbCopy - cbTotalCopied));
+        if (!::ReadFile(hSource, rgbData, cbRead, &cbRead, NULL))
+        {
+            FileExitWithLastError(hr, "Failed to read from source.");
+        }
+
+        if (cbRead)
+        {
+            hr = FileWriteHandle(hTarget, rgbData, cbRead);
+            FileExitOnFailure(hr, "Failed to write to target.");
+
+            cbTotalCopied += cbRead;
+
+            if (lpProgressRoutine)
+            {
+                liTotalCopied.QuadPart = cbTotalCopied;
+                dwResult = lpProgressRoutine(liSourceSize, liTotalCopied, liZero, liZero, 0, CALLBACK_CHUNK_FINISHED, hSource, hTarget, lpData);
+                switch (dwResult)
+                {
+                case PROGRESS_CONTINUE:
+                    break;
+
+                case PROGRESS_CANCEL:
+                    fCanceled = TRUE;
+                    fStop = TRUE;
+                    break;
+
+                case PROGRESS_STOP:
+                    fStop = TRUE;
+                    break;
+
+                case PROGRESS_QUIET:
+                    lpProgressRoutine = NULL;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            fStop = TRUE;
+        }
+    }
+
+LExit:
+    if (pbCancel)
+    {
+        *pbCancel = fCanceled;
+    }
+
+    if (pcbCopied)
+    {
+        *pcbCopied = cbTotalCopied;
+    }
+
+    return hr;
+}
+
+
+/*******************************************************************
  FileEnsureCopy
 
 *******************************************************************/
