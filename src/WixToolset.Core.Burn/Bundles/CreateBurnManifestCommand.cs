@@ -399,6 +399,10 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("InstallArguments", exePackage.InstallCommand);
                         writer.WriteAttributeString("UninstallArguments", exePackage.UninstallCommand);
                         writer.WriteAttributeString("RepairArguments", exePackage.RepairCommand);
+                        if (!String.IsNullOrEmpty(exePackage.RepairCondition))
+                        {
+                            writer.WriteAttributeString("RepairCondition", exePackage.RepairCondition);
+                        }
                         writer.WriteAttributeString("Repairable", exePackage.Repairable ? "yes" : "no");
                         if (!String.IsNullOrEmpty(exePackage.ExeProtocol))
                         {
@@ -410,6 +414,10 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("ProductCode", msiPackage.ProductCode);
                         writer.WriteAttributeString("Language", msiPackage.ProductLanguage.ToString(CultureInfo.InvariantCulture));
                         writer.WriteAttributeString("Version", msiPackage.ProductVersion);
+                        if (!String.IsNullOrEmpty(msiPackage.RepairCondition))
+                        {
+                            writer.WriteAttributeString("RepairCondition", msiPackage.RepairCondition);
+                        }
                         if (!String.IsNullOrEmpty(msiPackage.UpgradeCode))
                         {
                             writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
@@ -419,6 +427,11 @@ namespace WixToolset.Core.Burn.Bundles
                     {
                         writer.WriteAttributeString("PatchCode", mspPackage.PatchCode);
                         writer.WriteAttributeString("PatchXml", mspPackage.PatchXml);
+
+                        if (!String.IsNullOrEmpty(mspPackage.RepairCondition))
+                        {
+                            writer.WriteAttributeString("RepairCondition", mspPackage.RepairCondition);
+                        }
 
                         // If there is still a chance that all of our patches will target a narrow set of
                         // product codes, add the patch list to the overall list.
