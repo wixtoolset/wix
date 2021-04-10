@@ -16,6 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.RepairCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.UninstallCommand), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.ExeProtocol), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleExePackageSymbolFields.RepairCondition), IntermediateFieldType.String),
             },
             typeof(WixBundleExePackageSymbol));
     }
@@ -33,6 +34,7 @@ namespace WixToolset.Data.Symbols
         RepairCommand,
         UninstallCommand,
         ExeProtocol,
+        RepairCondition,
     }
 
     [Flags]
@@ -87,6 +89,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleExePackageSymbolFields.ExeProtocol];
             set => this.Set((int)WixBundleExePackageSymbolFields.ExeProtocol, value);
+        }
+
+        public string RepairCondition
+        {
+            get => (string)this.Fields[(int)WixBundleExePackageSymbolFields.RepairCondition];
+            set => this.Set((int)WixBundleExePackageSymbolFields.RepairCondition, value);
         }
 
         public bool Repairable => !String.IsNullOrEmpty(this.RepairCommand);

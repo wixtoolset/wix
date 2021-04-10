@@ -14,6 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageSymbolFields.PatchCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageSymbolFields.Manufacturer), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageSymbolFields.PatchXml), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMspPackageSymbolFields.RepairCondition), IntermediateFieldType.String),
             },
             typeof(WixBundleMspPackageSymbol));
     }
@@ -29,6 +30,7 @@ namespace WixToolset.Data.Symbols
         PatchCode,
         Manufacturer,
         PatchXml,
+        RepairCondition,
     }
 
     [Flags]
@@ -72,6 +74,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleMspPackageSymbolFields.PatchXml];
             set => this.Set((int)WixBundleMspPackageSymbolFields.PatchXml, value);
+        }
+
+        public string RepairCondition
+        {
+            get => (string)this.Fields[(int)WixBundleMspPackageSymbolFields.RepairCondition];
+            set => this.Set((int)WixBundleMspPackageSymbolFields.RepairCondition, value);
         }
 
         public bool Slipstream => (this.Attributes & WixBundleMspPackageAttributes.Slipstream) == WixBundleMspPackageAttributes.Slipstream;
