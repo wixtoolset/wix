@@ -354,14 +354,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            // Set generated component guids.
+            // Set generated component guids and validate all guids.
             {
-                var command = new CalculateComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
-                command.Execute();
-            }
-
-            {
-                var command = new ValidateComponentGuidsCommand(this.Messaging, section);
+                var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
                 command.Execute();
             }
 
