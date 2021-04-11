@@ -205,6 +205,7 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
+                    "-d", "ProductCode=83f9c623-26fe-42ab-951e-170022117f54",
                     Path.Combine(folder, "CustomTable", "CustomTable.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
