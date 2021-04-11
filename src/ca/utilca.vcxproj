@@ -59,6 +59,7 @@
     <ClCompile Include="OsInfo.cpp" />
     <ClCompile Include="qtexecca.cpp" />
     <ClCompile Include="RemoveFoldersEx.cpp" />
+    <ClCompile Include="RemoveRegistryKeysEx.cpp" />
     <ClCompile Include="RestartManager.cpp" />
     <ClCompile Include="scaexec.cpp" />
     <ClCompile Include="scamanifest.cpp" />

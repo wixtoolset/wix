@@ -45,6 +45,14 @@
     </Fragment>
 
     <Fragment>
+        <CustomAction Id="$(var.Prefix)RemoveRegistryKeysEx$(var.Suffix)" DllEntry="WixRemoveRegistryKeysEx" Execute="immediate" Return="ignore" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)RemoveRegistryKeysEx$(var.Suffix)" Before="RemoveRegistryValues" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment>
         <CustomAction Id="$(var.Prefix)BroadcastSettingChange$(var.Suffix)" DllEntry="WixBroadcastSettingChange" Execute="immediate" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>

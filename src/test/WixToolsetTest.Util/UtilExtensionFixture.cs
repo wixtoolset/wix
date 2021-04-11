@@ -130,6 +130,21 @@ namespace WixToolsetTest.Util
         }
 
         [Fact]
+        public void CanBuildRemoveRegistryKeyExInMergeModule()
+        {
+            var folder = TestData.Get(@"TestData", "RemoveRegistryKeyEx");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder }, "test.msm");
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveRegistry", "Wix4RemoveRegistryKeyEx");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "Binary:Wix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\t[Binary data]",
+                "CustomAction:Wix4RemoveRegistryKeysEx_X64.047730A5_30FE_4A62_A520_DA9381B8226A\t65\tWix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\tWixRemoveRegistryKeysEx\t",
+                "Wix4RemoveRegistryKeyEx:rrxfcDhR4HhE3v3rYiQcNtQjyahQNg.047730A5_30FE_4A62_A520_DA9381B8226A\tfilh4juyUVjoUcWWtcQmd5L07FoON4.047730A5_30FE_4A62_A520_DA9381B8226A\t2\tSOFTWARE\\Example\t1\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
         public void CanBuildRemoveFolderExInMergeModule()
         {
             var folder = TestData.Get(@"TestData\RemoveFolderEx");

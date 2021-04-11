@@ -35,12 +35,6 @@ namespace WixToolset.Util
         internal const int UserDontCreateUser = 0x00000200;
         internal const int UserNonVital = 0x00000400;
 
-        internal enum WixRegistrySearchFormat
-        {
-            Raw,
-            Compatible,
-        }
-
         private static readonly Regex FindPropertyBrackets = new Regex(@"\[(?!\\|\])|(?<!\[\\\]|\[\\|\\\[)\]", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/util";
@@ -134,6 +128,9 @@ namespace WixToolset.Util
                             break;
                         case "RemoveFolderEx":
                             this.ParseRemoveFolderExElement(intermediate, section, element, componentId);
+                            break;
+                        case "RemoveRegistryKey":
+                            this.ParseRemoveRegistryKeyExElement(intermediate, section, element, componentId);
                             break;
                         case "RestartResource":
                             this.ParseRestartResourceElement(intermediate, section, element, componentId);
@@ -2884,6 +2881,100 @@ namespace WixToolset.Util
                 });
 
                 this.ParseHelper.EnsureTable(section, sourceLineNumbers, "RemoveFile");
+            }
+        }
+
+        /// <summary>
+        /// Parses a RemoveRegistryKeyEx element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="componentId">Identifier of parent component.</param>
+        private void ParseRemoveRegistryKeyExElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
+            var mode = WixRemoveRegistryKeyExInstallMode.Uninstall;
+            string condition = null;
+            RegistryRootType? root = null;
+            string key = null;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Id":
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "On":
+                            var actionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (actionValue)
+                            {
+                                case "":
+                                    break;
+                                case "install":
+                                    mode = WixRemoveRegistryKeyExInstallMode.Install;
+                                    break;
+                                case "uninstall":
+                                    mode = WixRemoveRegistryKeyExInstallMode.Uninstall;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "On", actionValue, "install", "uninstall"));
+                                    break;
+                            }
+                            break;
+                        case "Root":
+                            root = this.ParseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Key":
+                            key = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            if (!root.HasValue)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Root"));
+            }
+
+            if (key == null)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Key"));
+            }
+
+            if (id == null)
+            {
+                id = this.ParseHelper.CreateIdentifier("rrx", componentId, condition, root.ToString(), key, mode.ToString());
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                this.ParseHelper.EnsureTable(section, sourceLineNumbers, "Registry");
+                this.ParseHelper.EnsureTable(section, sourceLineNumbers, "RemoveRegistry");
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4RemoveRegistryKeysEx", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+
+                section.AddSymbol(new WixRemoveRegistryKeyExSymbol(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Root = root.Value,
+                    Key = key,
+                    InstallMode = mode,
+                    Condition = condition
+                });
             }
         }
 

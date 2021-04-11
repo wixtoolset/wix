@@ -1,0 +1,13 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Module Language="1033" Version="1.0.0.0" Id="InternetShortcutModule" Guid="047730a5-30fe-4a62-a520-da9381b8226a">
+        <SummaryInformation Manufacturer="Example Corporation" />
+
+        <ComponentGroupRef Id="ModuleComponents" />
+    </Module>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MergeModule" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>

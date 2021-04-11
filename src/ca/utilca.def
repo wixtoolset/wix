@@ -35,6 +35,8 @@ EXPORTS
     WixSilentExec64
 ; RemoveFoldersEx.cpp
     WixRemoveFoldersEx
+; RemoveRegistryKeysEx.cpp
+    WixRemoveRegistryKeysEx
 ;scaexec.cpp
     RegisterPerfCounterData
     UnregisterPerfCounterData

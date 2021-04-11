@@ -23,6 +23,7 @@ namespace WixToolset.Util
         WixFormatFiles,
         WixInternetShortcut,
         WixRemoveFolderEx,
+        WixRemoveRegistryKeyEx,
         WixRestartResource,
         WixTouchFile,
         WixWindowsFeatureSearch,
@@ -93,6 +94,9 @@ namespace WixToolset.Util
                 case UtilSymbolDefinitionType.WixRemoveFolderEx:
                     return UtilSymbolDefinitions.WixRemoveFolderEx;
 
+                case UtilSymbolDefinitionType.WixRemoveRegistryKeyEx:
+                    return UtilSymbolDefinitions.WixRemoveRegistryKeyEx;
+                    
                 case UtilSymbolDefinitionType.WixRestartResource:
                     return UtilSymbolDefinitions.WixRestartResource;
 

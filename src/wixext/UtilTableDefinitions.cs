@@ -38,6 +38,21 @@ namespace WixToolset.Util
             symbolIdIsPrimaryKey: true
         );
 
+        public static readonly TableDefinition Wix4RemoveRegistryKeyEx = new TableDefinition(
+            "Wix4RemoveRegistryKeyEx",
+            UtilSymbolDefinitions.WixRemoveRegistryKeyEx,
+            new[]
+            {
+                new ColumnDefinition("Wix4RemoveRegistryKeyEx", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Identifier for the Wix4RemoveRegistryKeyEx row in the package.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Root", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: -1, maxValue: 3, description: "The predefined root key for the registry value, one of rrkEnum."),
+                new ColumnDefinition("Key", ColumnType.Localized, 255, primaryKey: false, nullable: false, ColumnCategory.RegPath, description: "The key for the registry value.", modularizeType: ColumnModularizeType.Property),
+                new ColumnDefinition("InstallMode", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 3, description: "1 == Remove only when the associated component is being installed (msiInstallStateLocal or msiInstallStateSource), 2 == Remove only when the associated component is being removed (msiInstallStateAbsent), 3 = Remove in either of the above cases."),
+                new ColumnDefinition("Condition", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression to control whether the registry key is removed.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
+            },
+            symbolIdIsPrimaryKey: true
+        );
+
         public static readonly TableDefinition Wix4RestartResource = new TableDefinition(
             "Wix4RestartResource",
             UtilSymbolDefinitions.WixRestartResource,
@@ -281,6 +296,7 @@ namespace WixToolset.Util
         {
             Wix4CloseApplication,
             Wix4RemoveFolderEx,
+            Wix4RemoveRegistryKeyEx,
             Wix4RestartResource,
             Wix4FileShare,
             Wix4FileSharePermissions,
