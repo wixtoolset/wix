@@ -140,7 +140,7 @@ namespace WixToolset.Iis
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
-            int attributes = 0;
+            int attributes = 8; // SCA_CERT_ATTRIBUTE_VITAL
             string binaryRef = null;
             string certificatePath = null;
             string name = null;
@@ -242,6 +242,16 @@ namespace WixToolset.Iis
                                         this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreName", storeNameValue, "ca", "my", "request", "root", "otherPeople", "trustedPeople", "trustedPublisher"));
                                         break;
                                 }
+                            }
+                            break;
+                        case "Vital":
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= 8; // SCA_CERT_ATTRIBUTE_VITAL
+                            }
+                            else
+                            {
+                                attributes &= ~8; // SCA_CERT_ATTRIBUTE_VITAL
                             }
                             break;
                         default:

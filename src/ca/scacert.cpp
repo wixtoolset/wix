@@ -244,7 +244,7 @@ static HRESULT ConfigureCertificates(
         ExitOnFailure(hr, "Failed to pass Certificate.Certificate to deferred CustomAction.");
         hr = WcaWriteStringToCaData(pwzStoreName, &pwzCaData);
         ExitOnFailure(hr, "Failed to pass Certificate.StoreName to deferred CustomAction.");
-        hr = WcaWriteIntegerToCaData(SCA_CERT_ATTRIBUTE_BINARYDATA, &pwzCaData);
+        hr = WcaWriteIntegerToCaData(dwAttributes, &pwzCaData);
         ExitOnFailure(hr, "Failed to pass Certificate.Attributes to deferred CustomAction.");
 
         // Copy the rollback data from the deferred data because it's the same up to this point.
@@ -268,6 +268,9 @@ static HRESULT ConfigureCertificates(
 
                 hr = WcaWriteStringToCaData(pwzPFXPassword, &pwzRollbackCaData);
                 ExitOnFailure(hr, "Failed to pass Certificate.PFXPassword to rollback CustomAction.");
+
+                hr = WcaWriteIntegerToCaData(dwAttributes, &pwzCaData);
+                ExitOnFailure(hr, "Failed to pass Certificate.Attributes to deferred CustomAction.");
             }
 
             // Pick the right action to run based on what store we're uninstalling from.

@@ -23,6 +23,7 @@ static HRESULT InstallCertificatePackage(
     __in LPCWSTR wzName,
     __in_opt BYTE* rgbData,
     __in DWORD cbData,
+    __in BOOL fVital,
     __in_opt LPCWSTR wzPFXPassword
     );
 
@@ -32,6 +33,12 @@ static HRESULT UninstallCertificatePackage(
     __in LPCWSTR wzName
     );
 
+static HRESULT AddCertificate(
+    __in HCERTSTORE hStore,
+    __in PCCERT_CONTEXT pCertContext,
+    __in LPCWSTR wzCertificateUniqueName,
+    __in BOOL fVital
+);
 
 /* ****************************************************************
  AddUserCertificate - CUSTOM ACTION ENTRY POINT for adding per-user
@@ -185,7 +192,7 @@ static HRESULT ExecuteCertificateOperation(
         // CertAddCertificateContextToStore(CERT_STORE_ADD_REPLACE_EXISTING) does not remove the private key if the cert is replaced
         UninstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName);
 
-        hr = InstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName, pbData, cbData, pwzPFXPassword);
+        hr = InstallCertificatePackage(hCertStore, fUserStoreLocation, pwzName, pbData, cbData, iAttributes & SCA_CERT_ATTRIBUTE_VITAL, pwzPFXPassword);
         ExitOnFailure(hr, "Failed to install certificate.");
     }
     else
@@ -226,6 +233,7 @@ static HRESULT InstallCertificatePackage(
     __in LPCWSTR wzName,
     __in_opt BYTE* rgbData,
     __in DWORD cbData,
+    __in BOOL fVital,
     __in_opt LPCWSTR wzPFXPassword
     )
 {
@@ -273,8 +281,7 @@ static HRESULT InstallCertificatePackage(
                  pCertContext;
                  pCertContext = ::CertEnumCertificatesInStore(hPfxCertStore, pCertContext))
             {
-                WcaLog(LOGMSG_STANDARD, "Adding certificate: %ls", pwzUniqueName);
-                hr = CertInstallSingleCertificate(hStore, pCertContext, pwzUniqueName);
+                hr = AddCertificate(hStore, pCertContext, pwzUniqueName, fVital);
                 MessageExitOnFailure(hr, msierrCERTFailedAdd, "Failed to add certificate to the store.");
 
                 hr = StrAllocFormatted(&pwzUniqueName, L"%s_wixCert_%d", wzName, ++iUniqueId);
@@ -289,8 +296,7 @@ static HRESULT InstallCertificatePackage(
     }
     else
     {
-        WcaLog(LOGMSG_STANDARD, "Adding certificate: %ls", pwzUniqueName);
-        hr = CertInstallSingleCertificate(hStore, pCertContext, pwzUniqueName);
+        hr = AddCertificate(hStore, pCertContext, pwzUniqueName, fVital);
         MessageExitOnFailure(hr, msierrCERTFailedAdd, "Failed to add certificate to the store.");
     }
 
@@ -398,6 +404,27 @@ LExit:
     if(pCertContext)
     {
         ::CertFreeCertificateContext(pCertContext);
+    }
+
+    return hr;
+}
+
+static HRESULT AddCertificate(
+    __in HCERTSTORE hStore,
+    __in PCCERT_CONTEXT pCertContext,
+    __in LPCWSTR wzCertificateUniqueName,
+    __in BOOL fVital
+)
+{
+    HRESULT hr = S_OK;
+
+    WcaLog(LOGMSG_STANDARD, "Adding certificate: %ls", wzCertificateUniqueName);
+
+    hr = CertInstallSingleCertificate(hStore, pCertContext, wzCertificateUniqueName);
+    if (FAILED(hr) && !fVital)
+    {
+        WcaLog(LOGMSG_STANDARD, "Could not add non-vital certificate: %ls due to error: 0x%x, continuing...", wzCertificateUniqueName, hr);
+        hr = S_FALSE;
     }
 
     return hr;
