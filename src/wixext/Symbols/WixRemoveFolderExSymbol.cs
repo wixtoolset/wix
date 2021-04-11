@@ -14,6 +14,7 @@ namespace WixToolset.Util
                 new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.Property), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.InstallMode), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixRemoveFolderExSymbolFields.Condition), IntermediateFieldType.String),
             },
             typeof(WixRemoveFolderExSymbol));
     }
@@ -28,6 +29,14 @@ namespace WixToolset.Util.Symbols
         ComponentRef,
         Property,
         InstallMode,
+        Condition,
+    }
+
+    public enum WixRemoveFolderExInstallMode
+    {
+        Install = 1,
+        Uninstall = 2,
+        Both = 3,
     }
 
     public class WixRemoveFolderExSymbol : IntermediateSymbol
@@ -54,10 +63,16 @@ namespace WixToolset.Util.Symbols
             set => this.Set((int)WixRemoveFolderExSymbolFields.Property, value);
         }
 
-        public int InstallMode
+        public WixRemoveFolderExInstallMode InstallMode
         {
-            get => this.Fields[(int)WixRemoveFolderExSymbolFields.InstallMode].AsNumber();
-            set => this.Set((int)WixRemoveFolderExSymbolFields.InstallMode, value);
+            get => (WixRemoveFolderExInstallMode)this.Fields[(int)WixRemoveFolderExSymbolFields.InstallMode].AsNumber();
+            set => this.Set((int)WixRemoveFolderExSymbolFields.InstallMode, (int)value);
+        }
+
+        public string Condition
+        {
+            get => this.Fields[(int)WixRemoveFolderExSymbolFields.Condition].AsString();
+            set => this.Set((int)WixRemoveFolderExSymbolFields.Condition, value);
         }
     }
 }

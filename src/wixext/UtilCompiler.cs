@@ -41,13 +41,6 @@ namespace WixToolset.Util
             Compatible,
         }
 
-        internal enum WixRemoveFolderExOn
-        {
-            Install = 1,
-            Uninstall = 2,
-            Both = 3,
-        }
-
         private static readonly Regex FindPropertyBrackets = new Regex(@"\[(?!\\|\])|(?<!\[\\\]|\[\\|\\\[)\]", RegexOptions.ExplicitCapture | RegexOptions.Compiled);
 
         public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/util";
@@ -2812,8 +2805,9 @@ namespace WixToolset.Util
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
-            var on = (int)WixRemoveFolderExOn.Uninstall;
+            var mode = WixRemoveFolderExInstallMode.Uninstall;
             string property = null;
+            string condition = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -2821,6 +2815,9 @@ namespace WixToolset.Util
                 {
                     switch (attrib.Name.LocalName)
                     {
+                        case "Condition":
+                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
@@ -2828,24 +2825,22 @@ namespace WixToolset.Util
                             var onValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (onValue.Length == 0)
                             {
-                                on = CompilerConstants.IllegalInteger;
                             }
                             else
                             {
                                 switch (onValue)
                                 {
                                     case "install":
-                                        on = (int)WixRemoveFolderExOn.Install;
+                                        mode = WixRemoveFolderExInstallMode.Install;
                                         break;
                                     case "uninstall":
-                                        on = (int)WixRemoveFolderExOn.Uninstall;
+                                        mode = WixRemoveFolderExInstallMode.Uninstall;
                                         break;
                                     case "both":
-                                        on = (int)WixRemoveFolderExOn.Both;
+                                        mode = WixRemoveFolderExInstallMode.Both;
                                         break;
                                     default:
                                         this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "On", onValue, "install", "uninstall", "both"));
-                                        on = CompilerConstants.IllegalInteger;
                                         break;
                                 }
                             }
@@ -2869,9 +2864,9 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Property"));
             }
 
-            if (null == id)
+            if (id == null)
             {
-                id = this.ParseHelper.CreateIdentifier("wrf", componentId, property, on.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                id = this.ParseHelper.CreateIdentifier("wrf", componentId, property, mode.ToString());
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -2884,7 +2879,8 @@ namespace WixToolset.Util
                 {
                     ComponentRef = componentId,
                     Property = property,
-                    InstallMode = on,
+                    InstallMode = mode,
+                    Condition = condition
                 });
 
                 this.ParseHelper.EnsureTable(section, sourceLineNumbers, "RemoveFile");

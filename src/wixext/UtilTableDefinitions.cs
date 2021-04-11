@@ -33,6 +33,7 @@ namespace WixToolset.Util
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, description: "Name of Property that contains the root of the directory tree to remove.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("InstallMode", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 3, description: "1 == Remove only when the associated component is being installed (msiInstallStateLocal or msiInstallStateSource), 2 == Remove only when the associated component is being removed (msiInstallStateAbsent), 3 = Remove in either of the above cases."),
+                new ColumnDefinition("Condition", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "Optional expression which skips the removing of folders.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
             },
             symbolIdIsPrimaryKey: true
         );
