@@ -30,6 +30,14 @@ namespace WixToolset.Util.Symbols
         Attributes,
     }
 
+    public enum WixRestartResourceAttributes
+    {
+        Filename = 1,
+        ProcessName,
+        ServiceName,
+        TypeMask = 0xf,
+    }
+
     public class WixRestartResourceSymbol : IntermediateSymbol
     {
         public WixRestartResourceSymbol() : base(UtilSymbolDefinitions.WixRestartResource, null, null)
@@ -54,10 +62,10 @@ namespace WixToolset.Util.Symbols
             set => this.Set((int)WixRestartResourceSymbolFields.Resource, value);
         }
 
-        public int Attributes
+        public WixRestartResourceAttributes? Attributes
         {
-            get => this.Fields[(int)WixRestartResourceSymbolFields.Attributes].AsNumber();
-            set => this.Set((int)WixRestartResourceSymbolFields.Attributes, value);
+            get => (WixRestartResourceAttributes?)this.Fields[(int)WixRestartResourceSymbolFields.Attributes].AsNullableNumber();
+            set => this.Set((int)WixRestartResourceSymbolFields.Attributes, (int?)value);
         }
     }
 }

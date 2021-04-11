@@ -41,14 +41,6 @@ namespace WixToolset.Util
             Compatible,
         }
 
-        internal enum WixRestartResourceAttributes
-        {
-            Filename = 1,
-            ProcessName,
-            ServiceName,
-            TypeMask = 0xf,
-        }
-
         internal enum WixRemoveFolderExOn
         {
             Install = 1,
@@ -2909,7 +2901,7 @@ namespace WixToolset.Util
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string resource = null;
-            var attributes = CompilerConstants.IntegerNotSet;
+            WixRestartResourceAttributes? attributes = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -2923,17 +2915,17 @@ namespace WixToolset.Util
 
                         case "Path":
                             resource = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            attributes = (int)WixRestartResourceAttributes.Filename;
+                            attributes = WixRestartResourceAttributes.Filename;
                             break;
 
                         case "ProcessName":
                             resource = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            attributes = (int)WixRestartResourceAttributes.ProcessName;
+                            attributes = WixRestartResourceAttributes.ProcessName;
                             break;
 
                         case "ServiceName":
                             resource = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            attributes = (int)WixRestartResourceAttributes.ServiceName;
+                            attributes = WixRestartResourceAttributes.ServiceName;
                             break;
 
                         default:
@@ -2948,14 +2940,14 @@ namespace WixToolset.Util
             }
 
             // Validate the attribute.
-            if (null == id)
+            if (id == null)
             {
                 id = this.ParseHelper.CreateIdentifier("wrr", componentId, resource, attributes.ToString());
             }
 
-            if (String.IsNullOrEmpty(resource) || CompilerConstants.IntegerNotSet == attributes)
+            if (!attributes.HasValue)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "Path", "ServiceName"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "Path", "ProcessName", "ServiceName"));
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
