@@ -475,10 +475,19 @@ HRESULT ScaUserExecute(
     DWORD er = 0;
     PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
 
+    LPWSTR pwzBaseScriptKey = NULL;
+    DWORD cScriptKey = 0;
+
     USER_INFO_0 *pUserInfo = NULL;
+    LPWSTR pwzScriptKey = NULL;
     LPWSTR pwzActionData = NULL;
     LPWSTR pwzRollbackData = NULL;
 
+    // Get the base script key for this CustomAction.
+    hr = WcaCaScriptCreateKey(&pwzBaseScriptKey);
+    ExitOnFailure(hr, "Failed to get encoding key.");
+
+    // Loop through all the users to be configured.
     for (SCA_USER *psu = psuList; psu; psu = psu->psuNext)
     {
         USER_EXISTS ueUserExists = USER_EXISTS_INDETERMINATE;
@@ -555,6 +564,17 @@ HRESULT ScaUserExecute(
             // Rollback only if the user already exists, we couldn't determine if the user exists, or we are going to create the user
             if ((USER_EXISTS_YES == ueUserExists) || (USER_EXISTS_INDETERMINATE == ueUserExists) || !(psu->iAttributes & SCAU_DONT_CREATE_USER))
             {
+                ++cScriptKey;
+                hr = StrAllocFormatted(&pwzScriptKey, L"%ls%u", pwzBaseScriptKey, cScriptKey);
+                ExitOnFailure(hr, "Failed to create encoding key.");
+
+                // Write the script key to CustomActionData for install and rollback so information can be passed to rollback.
+                hr = WcaWriteStringToCaData(pwzScriptKey, &pwzActionData);
+                ExitOnFailure(hr, "Failed to add encoding key to custom action data.");
+
+                hr = WcaWriteStringToCaData(pwzScriptKey, &pwzRollbackData);
+                ExitOnFailure(hr, "Failed to add encoding key to rollback custom action data.");
+
                 INT iRollbackUserAttributes = psu->iAttributes;
 
                 // If the user already exists, ensure this is accounted for in rollback
@@ -566,6 +586,10 @@ HRESULT ScaUserExecute(
                 {
                     iRollbackUserAttributes &= ~SCAU_DONT_CREATE_USER;
                 }
+
+                // The deferred CA determines when to rollback User Rights Assignments so these should never be set.
+                iRollbackUserAttributes &= ~SCAU_ALLOW_LOGON_AS_SERVICE;
+                iRollbackUserAttributes &= ~SCAU_ALLOW_LOGON_AS_BATCH;
 
                 hr = WcaWriteStringToCaData(psu->wzName, &pwzRollbackData);
                 ExitOnFailure(hr, "Failed to add user name to rollback custom action data: %ls", psu->wzName);
@@ -583,6 +607,12 @@ HRESULT ScaUserExecute(
 
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateUserRollback"), pwzRollbackData, COST_USER_DELETE);
                 ExitOnFailure(hr, "failed to schedule CreateUserRollback");
+            }
+            else
+            {
+                // Write empty script key to CustomActionData since there is no rollback.
+                hr = WcaWriteStringToCaData(L"", &pwzActionData);
+                ExitOnFailure(hr, "Failed to add empty encoding key to custom action data.");
             }
 
             //
@@ -614,6 +644,7 @@ HRESULT ScaUserExecute(
             ExitOnFailure(hr, "failed to schedule RemoveUser");
         }
 
+        ReleaseNullStr(pwzScriptKey);
         ReleaseNullStr(pwzActionData);
         ReleaseNullStr(pwzRollbackData);
         if (pUserInfo)
@@ -629,6 +660,8 @@ HRESULT ScaUserExecute(
     }
 
 LExit:
+    ReleaseStr(pwzBaseScriptKey);
+    ReleaseStr(pwzScriptKey);
     ReleaseStr(pwzActionData);
     ReleaseStr(pwzRollbackData);
     if (pUserInfo)

@@ -137,7 +137,7 @@
 
         <CustomAction Id="$(var.Prefix)ConfigureUsers$(var.Suffix)" DllEntry="ConfigureUsers" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
         <CustomAction Id="$(var.Prefix)CreateUser$(var.Suffix)" DllEntry="CreateUser" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)CreateUserRollback$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)CreateUserRollback$(var.Suffix)" DllEntry="CreateUserRollback" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
         <!-- RemoveUser is a type commit action because it is not possible to rollback the removal of a user -->
         <CustomAction Id="$(var.Prefix)RemoveUser$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="commit" Return="ignore" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 

@@ -45,6 +45,7 @@ EXPORTS
     CreateSmb
     DropSmb
     CreateUser
+    CreateUserRollback
     RemoveUser
 ;scasched.cpp
     ConfigurePerfmonInstall
