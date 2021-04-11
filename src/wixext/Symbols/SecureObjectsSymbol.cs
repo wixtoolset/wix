@@ -25,6 +25,7 @@ namespace WixToolset.Util
 
 namespace WixToolset.Util.Symbols
 {
+    using System;
     using WixToolset.Data;
 
     public enum SecureObjectsSymbolFields
@@ -36,6 +37,13 @@ namespace WixToolset.Util.Symbols
         Attributes,
         Permission,
         ComponentRef,
+    }
+
+    [Flags]
+    public enum WixPermissionExAttributes
+    {
+        None = 0x0,
+        Inheritable = 0x01
     }
 
     public class SecureObjectsSymbol : IntermediateSymbol
@@ -74,10 +82,10 @@ namespace WixToolset.Util.Symbols
             set => this.Set((int)SecureObjectsSymbolFields.User, value);
         }
 
-        public int Attributes
+        public WixPermissionExAttributes Attributes
         {
-            get => this.Fields[(int)SecureObjectsSymbolFields.Attributes].AsNumber();
-            set => this.Set((int)SecureObjectsSymbolFields.Attributes, value);
+            get => (WixPermissionExAttributes)this.Fields[(int)SecureObjectsSymbolFields.Attributes].AsNumber();
+            set => this.Set((int)SecureObjectsSymbolFields.Attributes, (int)value);
         }
 
         public int? Permission
