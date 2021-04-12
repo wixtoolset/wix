@@ -16,3 +16,10 @@
 #include "cost.h"
 
 #include "caDecor.h"
+
+enum eHandleExisting
+{
+    heReplace = 0,
+    heIgnore = 1,
+    heFail = 2
+};

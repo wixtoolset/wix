@@ -10,6 +10,25 @@ namespace WixToolsetTest.Http
     public class HttpExtensionFixture
     {
         [Fact]
+        public void CanBuildUsingSniSssl()
+        {
+            var folder = TestData.Get("TestData", "SniSsl");
+            var build = new Builder(folder, typeof(HttpExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(Build, "CustomAction", "WixHttpSniSslCert");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "CustomAction:Wix4ExecHttpSniSslCertsInstall_X86\t3073\tWix4HttpCA_X86\tExecHttpSniSslCerts\t",
+                "CustomAction:Wix4ExecHttpSniSslCertsUninstall_X86\t3073\tWix4HttpCA_X86\tExecHttpSniSslCerts\t",
+                "CustomAction:Wix4RollbackHttpSniSslCertsInstall_X86\t3329\tWix4HttpCA_X86\tExecHttpSniSslCerts\t",
+                "CustomAction:Wix4RollbackHttpSniSslCertsUninstall_X86\t3329\tWix4HttpCA_X86\tExecHttpSniSslCerts\t",
+                "CustomAction:Wix4SchedHttpSniSslCertsInstall_X86\t1\tWix4HttpCA_X86\tSchedHttpSniSslCertsInstall\t",
+                "CustomAction:Wix4SchedHttpSniSslCertsUninstall_X86\t1\tWix4HttpCA_X86\tSchedHttpSniSslCertsUninstall\t",
+                "WixHttpSniSslCert:sslC9YX6_H7UL_WGBx4DoDGI.Sj.D0\texample.com\t8080\t[SOME_THUMBPRINT]\t\t\t2\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+            }, results);
+        }
+
+        [Fact]
         public void CanBuildUsingUrlReservation()
         {
             var folder = TestData.Get(@"TestData\UsingUrlReservation");

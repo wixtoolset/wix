@@ -32,6 +32,33 @@
     </Fragment>
 
     <Fragment>
+        <UIRef Id="WixHttpErrors" />
+        <UI>
+            <ProgressText Action="$(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" Message="!(loc.WixSchedHttpSniSslCertsInstall)" />
+            <ProgressText Action="$(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" Message="!(loc.WixSchedHttpSniSslCertsUninstall)" />
+            <ProgressText Action="$(var.Prefix)RollbackHttpSniSslCertsInstall$(var.Suffix)" Message="!(loc.WixRollbackHttpSniSslCertsInstall)" />
+            <ProgressText Action="$(var.Prefix)ExecHttpSniSslCertsInstall$(var.Suffix)" Message="!(loc.WixExecHttpSniSslCertsInstall)" />
+            <ProgressText Action="$(var.Prefix)RollbackHttpSniSslCertsUninstall$(var.Suffix)" Message="!(loc.WixRollbackHttpSniSslCertsUninstall)" />
+            <ProgressText Action="$(var.Prefix)ExecHttpSniSslCertsUninstall$(var.Suffix)" Message="!(loc.WixExecHttpSniSslCertsUninstall)" />
+        </UI>
+
+        <CustomAction Id="$(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="SchedHttpSniSslCertsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="SchedHttpSniSslCertsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpSniSslCertsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSniSslCerts" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpSniSslCertsInstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSniSslCerts" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackHttpSniSslCertsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSniSslCerts" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecHttpSniSslCertsUninstall$(var.Suffix)" BinaryRef="$(var.Prefix)HttpCA$(var.Suffix)" DllEntry="ExecHttpSniSslCerts" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+
+        <!--
+            We need HTTP.SYS on Windows 8 or later for SNI SSL support.
+        -->
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT >= 602" />
+            <Custom Action="$(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT >= 602" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment>
         <Binary Id="$(var.Prefix)HttpCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))httpca.dll" />
     </Fragment>
 </Include>

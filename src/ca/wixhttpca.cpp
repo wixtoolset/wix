@@ -40,8 +40,6 @@ LPCWSTR vcsHttpUrlAceQuery =
     L"WHERE `WixHttpUrlAce`.`WixHttpUrlReservation_`=?";
 enum eHttpUrlAceQuery { huaqSecurityPrincipal = 1, huaqRights };
 
-enum eHandleExisting { heReplace = 0, heIgnore = 1, heFail = 2 };
-
 /******************************************************************
  SchedHttpUrlReservations - immediate custom action worker to 
    prepare configuring URL reservations.
@@ -348,6 +346,11 @@ extern "C" UINT __stdcall ExecHttpUrlReservations(
     ExitOnFailure(hr, "Failed to get CustomActionData.");
     WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", sczCustomActionData);
 
+    if (!sczCustomActionData || !*sczCustomActionData)
+    {
+        WcaLog(LOGMSG_STANDARD, "No URL reservations to be executed.");
+    }
+
     wz = sczCustomActionData;
     while (wz && *wz)
     {
@@ -388,7 +391,7 @@ extern "C" UINT __stdcall ExecHttpUrlReservations(
             {
                 if (fRollback)
                 {
-                    WcaLogError(hr, "Failed to remove reservation for URL '%ls'", sczUrl);
+                    WcaLogError(hr, "Failed to remove reservation for rollback for URL '%ls'", sczUrl);
                 }
                 else
                 {
@@ -396,6 +399,7 @@ extern "C" UINT __stdcall ExecHttpUrlReservations(
                 }
             }
         }
+
         if (fAdd)
         {
             WcaLog(LOGMSG_STANDARD, "Adding reservation for URL '%ls' with SDDL '%ls'", sczUrl, sczSDDL);
@@ -408,7 +412,7 @@ extern "C" UINT __stdcall ExecHttpUrlReservations(
             {
                 if (fRollback)
                 {
-                    WcaLogError(hr, "Failed to add reservation for URL '%ls' with SDDL '%ls'", sczUrl, sczSDDL);
+                    WcaLogError(hr, "Failed to add reservation for rollback for URL '%ls' with SDDL '%ls'", sczUrl, sczSDDL);
                 }
                 else
                 {

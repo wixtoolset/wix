@@ -7,3 +7,6 @@ EXPORTS
 	SchedHttpUrlReservationsInstall
 	SchedHttpUrlReservationsUninstall
 	ExecHttpUrlReservations
+	SchedHttpSniSslCertsInstall
+	SchedHttpSniSslCertsUninstall
+	ExecHttpSniSslCerts

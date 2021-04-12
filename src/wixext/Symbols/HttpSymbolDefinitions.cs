@@ -7,6 +7,7 @@ namespace WixToolset.Http
 
     public enum HttpSymbolDefinitionType
     {
+        WixHttpSniSslCert,
         WixHttpUrlAce,
         WixHttpUrlReservation,
     }
@@ -29,6 +30,9 @@ namespace WixToolset.Http
         {
             switch (type)
             {
+                case HttpSymbolDefinitionType.WixHttpSniSslCert:
+                    return HttpSymbolDefinitions.WixHttpSniSslCert;
+
                 case HttpSymbolDefinitionType.WixHttpUrlAce:
                     return HttpSymbolDefinitions.WixHttpUrlAce;
 

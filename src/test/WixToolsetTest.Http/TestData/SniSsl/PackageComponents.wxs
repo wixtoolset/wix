@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:http="http://wixtoolset.org/schemas/v4/wxs/http">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <http:SniSslCertificate Host="example.com" Port="8080" Thumbprint="[SOME_THUMBPRINT]" HandleExisting="fail" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

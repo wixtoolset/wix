@@ -3,3 +3,4 @@
 
 
 const UINT COST_HTTP_URL_ACL = 2000;
+const UINT COST_HTTP_SNI_SSL = 2000;
