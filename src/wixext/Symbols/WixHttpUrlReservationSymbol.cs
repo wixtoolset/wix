@@ -44,10 +44,10 @@ namespace WixToolset.Http.Symbols
 
         public IntermediateField this[WixHttpUrlReservationSymbolFields index] => this.Fields[(int)index];
 
-        public int HandleExisting
+        public HandleExisting HandleExisting
         {
-            get => this.Fields[(int)WixHttpUrlReservationSymbolFields.HandleExisting].AsNumber();
-            set => this.Set((int)WixHttpUrlReservationSymbolFields.HandleExisting, value);
+            get => (HandleExisting)this.Fields[(int)WixHttpUrlReservationSymbolFields.HandleExisting].AsNumber();
+            set => this.Set((int)WixHttpUrlReservationSymbolFields.HandleExisting, (int)value);
         }
 
         public string Sddl

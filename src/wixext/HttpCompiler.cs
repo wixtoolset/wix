@@ -72,7 +72,7 @@ namespace WixToolset.Http
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
-            var handleExisting = HttpConstants.heReplace;
+            var handleExisting = HandleExisting.Replace;
             string sddl = null;
             string url = null;
             var foundACE = false;
@@ -91,13 +91,13 @@ namespace WixToolset.Http
                             switch (handleExistingValue)
                             {
                                 case "replace":
-                                    handleExisting = HttpConstants.heReplace;
+                                    handleExisting = HandleExisting.Replace;
                                     break;
                                 case "ignore":
-                                    handleExisting = HttpConstants.heIgnore;
+                                    handleExisting = HandleExisting.Ignore;
                                     break;
                                 case "fail":
-                                    handleExisting = HttpConstants.heFail;
+                                    handleExisting = HandleExisting.Fail;
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "HandleExisting", handleExistingValue, "replace", "ignore", "fail"));

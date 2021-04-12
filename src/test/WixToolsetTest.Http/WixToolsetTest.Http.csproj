@@ -12,10 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\UsingUrlReservation\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingUrlReservation\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingUrlReservation\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingUrlReservation\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,9 +11,5 @@ namespace WixToolset.Http
         public const int GENERIC_EXECUTE = 0x20000000;
         public const int GENERIC_WRITE = 0x40000000;
 
-        // from wixhttpca.cpp
-        public const int heReplace = 0;
-        public const int heIgnore = 1;
-        public const int heFail = 2;
     }
 }
