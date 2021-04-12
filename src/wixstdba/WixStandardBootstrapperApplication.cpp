@@ -1894,6 +1894,7 @@ private: // privates
     LExit:
         // destroy main window
         pThis->DestroyMainWindow();
+        pThis->UninitializeTaskbarButton();
 
         // initiate engine shutdown
         DWORD dwQuit = HRESULT_CODE(hr);
@@ -2555,6 +2556,17 @@ private: // privates
             m_fRegistered = FALSE;
         }
     }
+
+
+    //
+    // UninitializeTaskbarButton - clean up the taskbar registration.
+    //
+    void UninitializeTaskbarButton()
+    {
+        m_fTaskbarButtonOK = FALSE;
+        ReleaseNullObject(m_pTaskbarList);
+    }
+
 
     static LRESULT CallDefaultWndProc(
         __in CWixStandardBootstrapperApplication* pBA,
@@ -3857,6 +3869,7 @@ public:
     ~CWixStandardBootstrapperApplication()
     {
         AssertSz(!::IsWindow(m_hWnd), "Window should have been destroyed before destructor.");
+        AssertSz(!m_pTaskbarList, "Taskbar should have been released before destructor.");
         AssertSz(!m_pTheme, "Theme should have been released before destructor.");
 
         for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
@@ -3865,7 +3878,6 @@ public:
         }
 
         ::DeleteCriticalSection(&m_csShowingInternalUiThisPackage);
-        ReleaseObject(m_pTaskbarList);
         ReleaseDict(m_sdOverridableVariables);
         ReleaseStr(m_sczFailedMessage);
         ReleaseStr(m_sczConfirmCloseMessage);
