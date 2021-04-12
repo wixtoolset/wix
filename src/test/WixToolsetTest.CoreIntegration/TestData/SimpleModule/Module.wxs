@@ -1,13 +1,17 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" Guid="243FB739-4D05-472F-9CFB-EF6B1017B6DE" InstallerVersion="200">
-    <SummaryInformation Manufacturer="!(loc.Manufacturer)" />
+    <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" Guid="243FB739-4D05-472F-9CFB-EF6B1017B6DE" InstallerVersion="200">
+        <SummaryInformation Manufacturer="!(loc.Manufacturer)" />
 
-    <Directory Id="MergeRedirectFolder">
+        <Directory Id="MergeRedirectFolder">
+            <Component Id="ModuleComponent1" Guid="A04E61B2-3ED4-4803-B2EB-4B773576FA45">
+                <File Id="File1" Source="test.txt" />
+            </Component>
+        </Directory>
 
-      <Component Id="ModuleComponent" Guid="A04E61B2-3ED4-4803-B2EB-4B773576FA45">
-        <File Source="test.txt" />
-      </Component> 
-
-    </Directory>
-  </Module>
+        <Directory Id="NotTheMergeRedirectFolder">
+            <Component Id="ModuleComponent2" Guid="EADB3047-BD32-417B-AABF-B8D9CCDC22DA">
+                <File Id="File2" Source="test.txt" />
+            </Component>
+        </Directory>
+    </Module>
 </Wix>

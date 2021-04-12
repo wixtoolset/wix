@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" InstallerVersion="200">
+      <Directory Id="MergeRedirectFolder">
+        <Component Id="ModuleComponent2" Guid="{BB222EE8-229B-4051-9443-49E348F0CC77}" Bitness="always32">
+          <File Id="File2" ShortName="sfmxqeab.wxs" Name="MergeModule.wxs" KeyPath="yes" Source="SourceDir\File\File2.F844F0E3_8CB4_4A0F_973E_31C4F9338382" />
+        </Component>
+      </Directory>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="WixTestDir" ShortName="7bhhvaai" Name="WiX Toolset Test Directory">
+        <Component Id="ModuleComponent1" Guid="{D86EC5A2-9576-4699-BDC3-00586FF72CBE}" Bitness="always32">
+          <File Id="File1" ShortName="gahushls.wxs" Name="MergeModule.wxs" KeyPath="yes" Source="SourceDir\File\File1.F844F0E3_8CB4_4A0F_973E_31C4F9338382" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <SummaryInformation Description="MergeModule1" Manufacturer="WiX Toolset contributors" />
+  </Module>
+</Wix>

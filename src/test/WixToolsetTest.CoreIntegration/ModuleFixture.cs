@@ -46,19 +46,23 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[]
                 {
                     "MergeRedirectFolder\tTARGETDIR\t.",
+                    "NotTheMergeRedirectFolder\tTARGETDIR\t.",
                     "TARGETDIR\t\tSourceDir"
                 }, dirSymbols.Select(d => String.Join("\t", d.Id.Id, d.ParentDirectoryRef, d.Name)).ToArray());
 
-                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
-                Assert.Equal("filyIq8rqcxxf903Hsn5K9L0SWV73g", fileSymbol.Id.Id);
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+                var fileSymbols = section.Symbols.OfType<FileSymbol>().OrderBy(d => d.Id.Id).ToList();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    $"File1\t{Path.Combine(folder, @"data\test.txt")}\ttest.txt",
+                    $"File2\t{Path.Combine(folder, @"data\test.txt")}\ttest.txt",
+                }, fileSymbols.Select(fileSymbol => String.Join("\t", fileSymbol.Id.Id, fileSymbol[FileSymbolFields.Source].AsPath().Path, fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path)).ToArray());
 
                 var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var fileRows = data.Tables["File"].Rows;
                 Assert.Equal(new[]
                 {
-                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                    "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
+                    "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                 }, fileRows.Select(r => r.FieldAsString(0)).ToArray());
 
                 var cabPath = Path.Combine(intermediateFolder, "msm-test.cab");
@@ -66,7 +70,8 @@ namespace WixToolsetTest.CoreIntegration
                 var files = Query.GetCabinetFiles(cabPath);
                 Assert.Equal(new[]
                 {
-                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                    "File1.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
+                    "File2.243FB739_4D05_472F_9CFB_EF6B1017B6DE",
                 }, files.Select(f => Path.Combine(f.Path, f.Name)).ToArray());
             }
         }

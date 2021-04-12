@@ -4352,7 +4352,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                 if (id == "TARGETDIR")
                 {
-                    // Skip TARGETDIR.
+                    // Skip TARGETDIR (but see below!).
                 }
                 else if (row.IsColumnNull(1) || WindowsInstallerStandard.IsStandardDirectory(id))
                 {
@@ -4360,7 +4360,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
                 else
                 {
-                    if (!this.TryGetIndexedElement("Directory", out var xParentDirectory, row.FieldAsString(1)))
+                    var parentDirectoryId = row.FieldAsString(1);
+
+                    if (!this.TryGetIndexedElement("Directory", out var xParentDirectory, parentDirectoryId))
                     {
                         this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Directory_Parent", row.FieldAsString(1), "Directory"));
                     }
@@ -4370,7 +4372,15 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                     else
                     {
-                        xParentDirectory.Add(xDirectory);
+                        // TARGETDIR is omitted but if this directory is a first-generation descendant, add it as a root.
+                        if (parentDirectoryId == "TARGETDIR")
+                        {
+                            this.RootElement.Add(xDirectory);
+                        }
+                        else
+                        {
+                            xParentDirectory.Add(xDirectory);
+                        }
                     }
                 }
             }

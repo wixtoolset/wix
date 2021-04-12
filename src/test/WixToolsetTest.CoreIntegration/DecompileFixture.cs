@@ -3,10 +3,8 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
-    using System.Xml.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Extensibility.Services;
     using Xunit;
 
     public class DecompileFixture
@@ -77,6 +75,12 @@ namespace WixToolsetTest.CoreIntegration
         public void CanDecompileNullComponent()
         {
             DecompileAndCompare(@"TestData\DecompileNullComponent", "example.msi", "Expected.wxs");
+        }
+
+        [Fact]
+        public void CanDecompileMergeModuleWithTargetDirComponent()
+        {
+            DecompileAndCompare(@"TestData\DecompileTargetDirMergeModule", "MergeModule1.msm", "Expected.wxs");
         }
     }
 }
