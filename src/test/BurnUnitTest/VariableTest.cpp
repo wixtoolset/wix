@@ -134,7 +134,7 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             BURN_VARIABLES variables = { };
             LPWSTR scz = NULL;
-            DWORD cch = 0;
+            SIZE_T cch = 0;
             BOOL fContainsHiddenData = FALSE;
             try
             {
@@ -180,12 +180,12 @@ namespace Bootstrapper
                 hr = VariableFormatString(&variables, L"PRE [PROP1] POST", &scz, &cch);
                 TestThrowOnFailure(hr, L"Failed to format string");
 
-                Assert::Equal((DWORD)lstrlenW(scz), cch);
+                Assert::Equal((SIZE_T)lstrlenW(scz), cch);
 
                 hr = VariableFormatString(&variables, L"PRE [PROP1] POST", NULL, &cch);
                 TestThrowOnFailure(hr, L"Failed to format string");
 
-                Assert::Equal((DWORD)lstrlenW(scz), cch);
+                Assert::Equal((SIZE_T)lstrlenW(scz), cch);
             }
             finally
             {

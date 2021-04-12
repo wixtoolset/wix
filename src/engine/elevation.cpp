@@ -156,6 +156,7 @@ static HRESULT OnSessionResume(
 static HRESULT OnSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in DWORD cbData
     );
@@ -1650,7 +1651,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_END:
-        hrResult = OnSessionEnd(pContext->pPackages, pContext->pRegistration, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnSessionEnd(pContext->pPackages, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE:
@@ -1969,6 +1970,7 @@ LExit:
 static HRESULT OnSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in DWORD cbData
     )
@@ -1990,7 +1992,7 @@ static HRESULT OnSessionEnd(
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     // suspend session in per-machine process
-    hr = RegistrationSessionEnd(pRegistration, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction);
+    hr = RegistrationSessionEnd(pRegistration, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction);
     ExitOnFailure(hr, "Failed to suspend registration session.");
 
 LExit:
