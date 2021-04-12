@@ -1120,7 +1120,6 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
 )
 {
     HRESULT hr = S_OK;
-    BOOL fStop = FALSE;
     BOOL fCanceled = FALSE;
     DWORD64 cbTotalCopied = 0;
     BYTE rgbData[64 * 1024];
@@ -1147,12 +1146,10 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
 
     case PROGRESS_CANCEL:
         fCanceled = TRUE;
-        fStop = TRUE;
-        break;
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
     case PROGRESS_STOP:
-        fStop = TRUE;
-        break;
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
     case PROGRESS_QUIET:
         lpProgressRoutine = NULL;
@@ -1173,7 +1170,7 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
     }
 
     // Copy with progress.
-    while (!fStop && (0 == cbCopy || cbTotalCopied < cbCopy))
+    while (0 == cbCopy || cbTotalCopied < cbCopy)
     {
         cbRead = static_cast<DWORD>((0 == cbCopy) ? countof(rgbData) : min(countof(rgbData), cbCopy - cbTotalCopied));
         if (!::ReadFile(hSource, rgbData, cbRead, &cbRead, NULL))
@@ -1199,12 +1196,10 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
 
                 case PROGRESS_CANCEL:
                     fCanceled = TRUE;
-                    fStop = TRUE;
-                    break;
+                    ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
                 case PROGRESS_STOP:
-                    fStop = TRUE;
-                    break;
+                    ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
                 case PROGRESS_QUIET:
                     lpProgressRoutine = NULL;
@@ -1214,7 +1209,7 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
         }
         else
         {
-            fStop = TRUE;
+            break;
         }
     }
 
