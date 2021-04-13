@@ -69,6 +69,7 @@ static void UpdateCacheSuccessProgress(
     __inout DWORD64* pqwSuccessfulCachedProgress
     );
 static HRESULT LayoutBundle(
+    __in HANDLE hSourceEngineFile,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
     __in HANDLE hPipe,
@@ -114,6 +115,7 @@ static HRESULT PromptForSource(
     );
 static HRESULT CopyPayload(
     __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in HANDLE hSourceFile,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath
     );
@@ -510,7 +512,7 @@ extern "C" HRESULT ApplyCache(
                 break;
 
             case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
-                hr = LayoutBundle(pUX, pVariables, hPipe, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczLayoutDirectory, pCacheAction->bundleLayout.sczUnverifiedPath, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal);
+                hr = LayoutBundle(hSourceEngineFile, pUX, pVariables, hPipe, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczLayoutDirectory, pCacheAction->bundleLayout.sczUnverifiedPath, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal);
                 if (SUCCEEDED(hr))
                 {
                     UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
@@ -1053,6 +1055,7 @@ static void UpdateCacheSuccessProgress(
 }
 
 static HRESULT LayoutBundle(
+    __in HANDLE hSourceEngineFile,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
     __in HANDLE hPipe,
@@ -1090,7 +1093,7 @@ static HRESULT LayoutBundle(
     hr = PathCompare(sczBundlePath, sczDestinationPath, &nEquivalentPaths);
     ExitOnFailure(hr, "Failed to determine if layout bundle path was equivalent with current process path.");
 
-    if (CSTR_EQUAL == nEquivalentPaths)
+    if (CSTR_EQUAL == nEquivalentPaths && FileExistsEx(sczDestinationPath, NULL))
     {
         ExitFunction1(hr = S_OK);
     }
@@ -1112,7 +1115,7 @@ static HRESULT LayoutBundle(
             hr = UserExperienceOnCacheAcquireBegin(pUX, NULL, NULL, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczBundlePath);
             ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
-            hr = CopyPayload(&progress, sczBundlePath, wzUnverifiedPath);
+            hr = CopyPayload(&progress, hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
             // Error handling happens after sending complete message to BA.
 
             UserExperienceOnCacheAcquireComplete(pUX, NULL, NULL, hr, &fRetryAcquire);
@@ -1239,7 +1242,7 @@ static HRESULT AcquireContainerOrPayload(
             hr = UserExperienceOnCacheAcquireBegin(pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczSourceFullPath);
             ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
-            hr = CopyPayload(&progress, sczSourceFullPath, wzDestinationPath);
+            hr = CopyPayload(&progress, INVALID_HANDLE_VALUE, sczSourceFullPath, wzDestinationPath);
             // Error handling happens after sending complete message to BA.
 
             // We successfully copied from a source location, set that as the last used source.
@@ -1432,6 +1435,7 @@ LExit:
 
 static HRESULT CopyPayload(
     __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in HANDLE hSourceFile,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath
     )
@@ -1440,6 +1444,8 @@ static HRESULT CopyPayload(
     DWORD dwFileAttributes = 0;
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
     LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
+    HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
+    HANDLE hSourceOpenedFile = INVALID_HANDLE_VALUE;
 
     DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "copy", wzSourcePath);
@@ -1457,7 +1463,30 @@ static HRESULT CopyPayload(
         }
     }
 
-    if (!::CopyFileExW(wzSourcePath, wzDestinationPath, CacheProgressRoutine, pProgress, &pProgress->fCancel, 0))
+    if (INVALID_HANDLE_VALUE == hSourceFile)
+    {
+        hSourceOpenedFile = ::CreateFileW(wzSourcePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+        if (INVALID_HANDLE_VALUE == hSourceOpenedFile)
+        {
+            ExitWithLastError(hr, "Failed to open source file to copy payload from: '%ls' to: %ls.", wzSourcePath, wzDestinationPath);
+        }
+
+        hSourceFile = hSourceOpenedFile;
+    }
+    else
+    {
+        hr = FileSetPointer(hSourceFile, 0, NULL, FILE_BEGIN);
+        ExitOnRootFailure(hr, "Failed to read from start of source file to copy payload from: '%ls' to: %ls.", wzSourcePath, wzDestinationPath);
+    }
+
+    hDestinationFile = ::CreateFileW(wzDestinationPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    if (INVALID_HANDLE_VALUE == hDestinationFile)
+    {
+        ExitWithLastError(hr, "Failed to open destination file to copy payload from: '%ls' to: %ls.", wzSourcePath, wzDestinationPath);
+    }
+
+    hr = FileCopyUsingHandlesWithProgress(hSourceFile, hDestinationFile, 0, CacheProgressRoutine, pProgress);
+    if (FAILED(hr))
     {
         if (pProgress->fCancel)
         {
@@ -1466,11 +1495,14 @@ static HRESULT CopyPayload(
         }
         else
         {
-            ExitWithLastError(hr, "Failed attempt to copy payload from: '%ls' to: %ls.", wzSourcePath, wzDestinationPath);
+            ExitOnRootFailure(hr, "Failed attempt to copy payload from: '%ls' to: %ls.", wzSourcePath, wzDestinationPath);
         }
     }
 
 LExit:
+    ReleaseFileHandle(hDestinationFile);
+    ReleaseFileHandle(hSourceOpenedFile);
+
     return hr;
 }
 
