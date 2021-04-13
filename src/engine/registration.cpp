@@ -97,6 +97,7 @@ static BOOL IsWuRebootPending();
 static BOOL IsBundleRebootPending(
     __in BURN_REGISTRATION* pRegistration
 );
+static BOOL IsRegistryRebootPending();
 
 // function definitions
 
@@ -451,7 +452,7 @@ extern "C" HRESULT RegistrationSetVariables(
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle version built-in variable.");
 
-    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsBundleRebootPending(pRegistration) || IsWuRebootPending(), TRUE);
+    hr = VariableSetNumeric(pVariables, BURN_REBOOT_PENDING, IsBundleRebootPending(pRegistration) || IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:
@@ -505,6 +506,8 @@ extern "C" HRESULT RegistrationDetectResumeType(
 
     if (IsBundleRebootPending(pRegistration))
     {
+        LogId(REPORT_STANDARD, MSG_PENDING_REBOOT_DETECTED, pRegistration->sczRegistrationKey);
+
         *pResumeType = BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING;
         ExitFunction1(hr = S_OK);
     }
@@ -1637,4 +1640,63 @@ LExit:
     ReleaseRegKey(hkRebootRequired);
 
     return fBundleRebootPending;
+}
+
+static BOOL IsRegistryRebootPending()
+{
+    HRESULT hr = S_OK;
+    DWORD dwValue;
+    HKEY hk = NULL;
+    BOOL fRebootPending = FALSE;
+
+    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\ServerManager", L"CurrentRebootAttempts", TRUE, &dwValue);
+    fRebootPending = SUCCEEDED(hr) && 0 < dwValue;
+
+    if (!fRebootPending)
+    {
+        hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Updates", L"UpdateExeVolatile", TRUE, &dwValue);
+        fRebootPending = SUCCEEDED(hr) && 0 < dwValue;
+
+        if (!fRebootPending)
+        {
+            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending", NULL, TRUE);
+
+            if (!fRebootPending)
+            {
+                fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootInProgress", NULL, TRUE);
+
+                if (!fRebootPending)
+                {
+                    hr = RegKeyReadNumber(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update", L"AUState", TRUE, &dwValue);
+                    fRebootPending = SUCCEEDED(hr) && 8 == dwValue;
+
+                    if (!fRebootPending)
+                    {
+                        fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations", TRUE);
+
+                        if (!fRebootPending)
+                        {
+                            fRebootPending = RegValueExists(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", L"PendingFileRenameOperations2", TRUE);
+
+                            if (!fRebootPending)
+                            {
+                                hr = RegOpen(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\FileRenameOperations", KEY_READ | KEY_WOW64_64KEY, &hk);
+                                if (SUCCEEDED(hr))
+                                {
+                                    DWORD cSubKeys = 0;
+                                    DWORD cValues = 0;
+                                    hr = RegQueryKey(hk, &cSubKeys, &cValues);
+                                    fRebootPending = SUCCEEDED(hr) && (0 < cSubKeys || 0 < cValues);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ReleaseRegKey(hk);
+
+    return fRebootPending;
 }
