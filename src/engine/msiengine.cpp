@@ -789,7 +789,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     {
     case BOOTSTRAPPER_PACKAGE_STATE_PRESENT: __fallthrough;
     case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:
-        if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
+        if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
         {
             hr = VerCompareParsedVersions(pVersion, pInstalledVersion, &nCompareResult);
             ExitOnFailure(hr, "Failed to compare '%ls' to '%ls' for planning.", pVersion->sczVersion, pInstalledVersion->sczVersion);
@@ -800,6 +800,10 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
             if (nCompareResult > 0)
             {
                 execute = BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE;
+            }
+            else if (BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested)
+            {
+                execute = BOOTSTRAPPER_ACTION_STATE_MEND;
             }
             else if (BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested)
             {
@@ -829,6 +833,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_REQUEST_STATE_MEND: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
             break;
@@ -844,6 +849,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         switch (pPackage->requested)
         {
         case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+        case BOOTSTRAPPER_REQUEST_STATE_MEND: __fallthrough;
         case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
             execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
             break;
@@ -887,10 +893,12 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-            // If we requested to put the package on the machine then remove the package during rollback
-            // if the package is uninstallable.
-            if ((BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested) &&
-                pPackage->fUninstallable)
+            // If the package is uninstallable and we requested to put the package on the machine then
+            // remove the package during rollback.
+            if (pPackage->fUninstallable &&
+                (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
+                 BOOTSTRAPPER_REQUEST_STATE_MEND == pPackage->requested ||
+                 BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested))
             {
                 rollback = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
             }
@@ -1228,11 +1236,12 @@ extern "C" HRESULT MsiEngineExecutePackage(
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
+    case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
         {
         LPCWSTR wzReinstallAll = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action ||
                                   pExecuteAction->msiPackage.pPackage->Msi.cFeatures) ? L"" : L" REINSTALL=ALL";
-        LPCWSTR wzReinstallMode = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action) ? L"o" : L"e";
+        LPCWSTR wzReinstallMode = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action || BOOTSTRAPPER_ACTION_STATE_MEND == pExecuteAction->msiPackage.action) ? L"o" : L"e";
 
         hr = StrAllocFormattedSecure(&sczProperties, L"%ls%ls REINSTALLMODE=\"cmus%ls\" REBOOT=ReallySuppress", sczProperties ? sczProperties : L"", wzReinstallAll, wzReinstallMode);
         ExitOnFailure(hr, "Failed to add reinstall mode and reboot suppression properties on repair.");

@@ -1025,6 +1025,7 @@ static void CalculateDependencyActionStates(
                 }
                 break;
             case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
+            case BOOTSTRAPPER_REQUEST_STATE_MEND: __fallthrough;
             case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
                 // Register if the package is requested but already installed.
                 switch (pPackage->currentState)
@@ -1048,6 +1049,7 @@ static void CalculateDependencyActionStates(
             break;
         case BOOTSTRAPPER_ACTION_STATE_INSTALL: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
+        case BOOTSTRAPPER_ACTION_STATE_MEND: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_REPAIR: __fallthrough;
         case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE: __fallthrough;
             *pDependencyExecuteAction = BURN_DEPENDENCY_ACTION_REGISTER;
