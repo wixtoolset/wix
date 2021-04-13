@@ -674,8 +674,9 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
     HRESULT hr = S_OK;
     WCHAR wzCurrentProductCode[MAX_GUID_CHARS + 1] = { };
     LPWSTR sczInstalledVersion = NULL;
-    DWORD64 qwCurrentVersion = 0;
-    DWORD64 qwHighestVersion = 0;
+    VERUTIL_VERSION* pCurrentVersion = NULL;
+    VERUTIL_VERSION* pHighestVersion = NULL;
+    int nCompare = 0;
 
     // make sure we start at zero
     *pcRelatedProducts = 0;
@@ -702,30 +703,39 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
                 continue;
             }
 
-            // try to parse the product version but if it is corrupt (for whatever
-            // reason), skip it
-            hr = FileVersionFromStringEx(sczInstalledVersion, 0, &qwCurrentVersion);
-            if (FAILED(hr))
+            hr = VerParseVersion(sczInstalledVersion, 0, FALSE, &pCurrentVersion);
+            WiuExitOnFailure(hr, "Failed to parse version: %ls for product code: %ls", sczInstalledVersion, wzCurrentProductCode);
+
+            if (pCurrentVersion->fInvalid)
             {
-                WiuExitTrace(hr, "Could not convert version: %ls to DWORD64 for product code: %ls, skipping...", sczInstalledVersion, wzCurrentProductCode);
-                continue;
+                WiuExitTrace(E_INVALIDDATA, "Enumerated msi package with invalid version, product code: '%1!ls!', version: '%2!ls!'");
             }
 
             // if this is the first product found then it is the highest version (for now)
-            if (0 == *pcRelatedProducts)
+            if (!pHighestVersion)
             {
-                qwHighestVersion = qwCurrentVersion;
+                pHighestVersion = pCurrentVersion;
+                pCurrentVersion = NULL;
             }
             else
             {
+                hr = VerCompareParsedVersions(pCurrentVersion, pHighestVersion, &nCompare);
+                WiuExitOnFailure(hr, "Failed to compare version '%ls' to highest version: '%ls'", pCurrentVersion->sczVersion, pHighestVersion->sczVersion);
+
                 // if this is the highest version encountered so far then overwrite
                 // the first item in the array (there will never be more than one item)
-                if (qwCurrentVersion > qwHighestVersion)
+                if (nCompare > 0)
                 {
-                    qwHighestVersion = qwCurrentVersion;
+                    ReleaseVerutilVersion(pHighestVersion);
+                    pHighestVersion = pCurrentVersion;
+                    pCurrentVersion = NULL;
 
                     hr = StrAllocString(prgsczProductCodes[0], wzCurrentProductCode, 0);
                     WiuExitOnFailure(hr, "Failed to update array with higher versioned product code.");
+                }
+                else
+                {
+                    ReleaseVerutilVersion(pCurrentVersion);
                 }
 
                 // continue here as we don't want anything else added to the list
@@ -738,6 +748,8 @@ extern "C" HRESULT DAPI WiuEnumRelatedProductCodes(
     }
 
 LExit:
+    ReleaseVerutilVersion(pCurrentVersion);
+    ReleaseVerutilVersion(pHighestVersion);
     ReleaseStr(sczInstalledVersion);
     return hr;
 }
