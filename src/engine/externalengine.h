@@ -165,6 +165,11 @@ HRESULT ExternalEngineLaunchApprovedExe(
     __in const DWORD dwWaitForInputIdleTimeout
     );
 
+HRESULT ExternalEngineSetUpdateSource(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_z LPCWSTR wzUrl
+    );
+
 HRESULT WINAPI ExternalEngineValidateMessageParameter(
     __in_opt const LPVOID pv,
     __in SIZE_T cbSizeOffset,

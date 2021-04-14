@@ -733,6 +733,38 @@ LExit:
     return hr;
 }
 
+HRESULT ExternalEngineSetUpdateSource(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_z LPCWSTR wzUrl
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fLeaveCriticalSection = FALSE;
+
+    ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
+    fLeaveCriticalSection = TRUE;
+    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    ExitOnFailure(hr, "Engine is active, cannot change engine state.");
+
+    if (wzUrl && *wzUrl)
+    {
+        hr = StrAllocString(&pEngineState->update.sczUpdateSource, wzUrl, 0);
+        ExitOnFailure(hr, "Failed to set feed download URL.");
+    }
+    else // no URL provided means clear out the whole download source.
+    {
+        ReleaseNullStr(pEngineState->update.sczUpdateSource);
+    }
+
+LExit:
+    if (fLeaveCriticalSection)
+    {
+        ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
+    }
+
+    return hr;
+}
+
 // TODO: callers need to provide the original size (at the time of first public release) of the struct instead of the current size.
 HRESULT WINAPI ExternalEngineValidateMessageParameter(
     __in_opt const LPVOID pv,

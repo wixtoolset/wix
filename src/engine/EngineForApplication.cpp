@@ -411,6 +411,22 @@ LExit:
     return hr;
 }
 
+static HRESULT BAEngineSetUpdateSource(
+    __in BOOTSTRAPPER_ENGINE_CONTEXT* pContext,
+    __in const LPVOID pvArgs,
+    __inout LPVOID pvResults
+    )
+{
+    HRESULT hr = S_OK;
+    ValidateMessageArgs(hr, pvArgs, BAENGINE_SETUPDATESOURCE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BAENGINE_SETUPDATESOURCE_RESULTS, pResults);
+
+    hr = ExternalEngineSetUpdateSource(pContext->pEngineState, pArgs->wzUrl);
+
+LExit:
+    return hr;
+}
+
 HRESULT WINAPI EngineForApplicationProc(
     __in BOOTSTRAPPER_ENGINE_MESSAGE message,
     __in const LPVOID pvArgs,
@@ -496,6 +512,9 @@ HRESULT WINAPI EngineForApplicationProc(
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_LAUNCHAPPROVEDEXE:
         hr = BAEngineLaunchApprovedExe(pContext, pvArgs, pvResults);
+        break;
+    case BOOTSTRAPPER_ENGINE_MESSAGE_SETUPDATESOURCE:
+        hr = BAEngineSetUpdateSource(pContext, pvArgs, pvResults);
         break;
     case BOOTSTRAPPER_ENGINE_MESSAGE_COMPAREVERSIONS:
         hr = BAEngineCompareVersions(pContext, pvArgs, pvResults);

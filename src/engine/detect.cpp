@@ -258,6 +258,7 @@ extern "C" HRESULT DetectUpdate(
     BOOL fBeginCalled = FALSE;
     BOOL fSkip = TRUE;
     BOOL fIgnoreError = FALSE;
+    LPWSTR sczOriginalSource = NULL;
 
     // If no update source was specified, skip update detection.
     if (!pUpdate->sczUpdateSource || !*pUpdate->sczUpdateSource)
@@ -266,7 +267,11 @@ extern "C" HRESULT DetectUpdate(
     }
 
     fBeginCalled = TRUE;
-    hr = UserExperienceOnDetectUpdateBegin(pUX, pUpdate->sczUpdateSource, &fSkip);
+
+    hr = StrAllocString(&sczOriginalSource, pUpdate->sczUpdateSource, 0);
+    ExitOnFailure(hr, "Failed to duplicate update feed source.");
+
+    hr = UserExperienceOnDetectUpdateBegin(pUX, sczOriginalSource, &fSkip);
     ExitOnRootFailure(hr, "BA aborted detect update begin.");
 
     if (!fSkip)
@@ -276,6 +281,8 @@ extern "C" HRESULT DetectUpdate(
     }
 
 LExit:
+    ReleaseStr(sczOriginalSource);
+
     if (fBeginCalled)
     {
         UserExperienceOnDetectUpdateComplete(pUX, hr, &fIgnoreError);
