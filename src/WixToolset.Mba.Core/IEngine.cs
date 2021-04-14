@@ -145,6 +145,12 @@ namespace WixToolset.Mba.Core
         void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, byte[] hash);
 
         /// <summary>
+        /// Sets the URL to the update feed.
+        /// </summary>
+        /// <param name="url">URL of the update feed.</param>
+        void SetUpdateSource(string url);
+
+        /// <summary>
         /// Set the local source for a package or container.
         /// </summary>
         /// <param name="packageOrContainerId">The id that uniquely identifies the package or container.</param>

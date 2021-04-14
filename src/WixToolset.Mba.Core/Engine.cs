@@ -247,6 +247,12 @@ namespace WixToolset.Mba.Core
         }
 
         /// <inheritdoc/>
+        public void SetUpdateSource(string url)
+        {
+            this.engine.SetUpdateSource(url);
+        }
+
+        /// <inheritdoc/>
         public void SetLocalSource(string packageOrContainerId, string payloadId, string path)
         {
             this.engine.SetLocalSource(packageOrContainerId, payloadId, path);

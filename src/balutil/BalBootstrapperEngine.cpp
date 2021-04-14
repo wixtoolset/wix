@@ -535,6 +535,21 @@ public: // IBootstrapperEngine
         return m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_LAUNCHAPPROVEDEXE, &args, &results, m_pvBAEngineProcContext);
     }
 
+    virtual STDMETHODIMP SetUpdateSource(
+        __in_z LPCWSTR wzUrl
+        )
+    {
+        BAENGINE_SETUPDATESOURCE_ARGS args = { };
+        BAENGINE_SETUPDATESOURCE_RESULTS results = { };
+
+        args.cbSize = sizeof(args);
+        args.wzUrl = wzUrl;
+
+        results.cbSize = sizeof(results);
+
+        return m_pfnBAEngineProc(BOOTSTRAPPER_ENGINE_MESSAGE_SETUPDATESOURCE, &args, &results, m_pvBAEngineProcContext);
+    }
+
     virtual STDMETHODIMP CompareVersions(
         __in_z LPCWSTR wzVersion1,
         __in_z LPCWSTR wzVersion2,

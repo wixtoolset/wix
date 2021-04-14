@@ -278,6 +278,14 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
+        /// Sets the URL to the update feed.
+        /// </summary>
+        /// <param name="url">URL of the update feed.</param>
+        void SetUpdateSource(
+            [MarshalAs(UnmanagedType.LPWStr)] string url
+            );
+
+        /// <summary>
         /// See <see cref="IEngine.CompareVersions(string, string)"/>.
         /// </summary>
         /// <param name="wzVersion1"></param>
