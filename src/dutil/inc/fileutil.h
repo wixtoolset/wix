@@ -153,9 +153,7 @@ HRESULT DAPI FileCopyUsingHandlesWithProgress(
     __in HANDLE hTarget,
     __in DWORD64 cbCopy,
     __in_opt LPPROGRESS_ROUTINE lpProgressRoutine,
-    __in_opt LPVOID lpData,
-    __in_opt LPBOOL pbCancel,
-    __out_opt DWORD64* pcbCopied
+    __in_opt LPVOID lpData
     );
 HRESULT DAPI FileEnsureCopy(
     __in_z LPCWSTR wzSource,

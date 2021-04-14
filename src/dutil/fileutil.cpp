@@ -1114,13 +1114,10 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
     __in HANDLE hTarget,
     __in DWORD64 cbCopy,
     __in_opt LPPROGRESS_ROUTINE lpProgressRoutine,
-    __in_opt LPVOID lpData,
-    __in_opt LPBOOL pbCancel,
-    __out_opt DWORD64* pcbCopied
+    __in_opt LPVOID lpData
 )
 {
     HRESULT hr = S_OK;
-    BOOL fCanceled = FALSE;
     DWORD64 cbTotalCopied = 0;
     BYTE rgbData[64 * 1024];
     DWORD cbRead = 0;
@@ -1145,7 +1142,6 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
         break;
 
     case PROGRESS_CANCEL:
-        fCanceled = TRUE;
         ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
     case PROGRESS_STOP:
@@ -1195,7 +1191,6 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
                     break;
 
                 case PROGRESS_CANCEL:
-                    fCanceled = TRUE;
                     ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
                 case PROGRESS_STOP:
@@ -1214,16 +1209,6 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
     }
 
 LExit:
-    if (pbCancel)
-    {
-        *pbCancel = fCanceled;
-    }
-
-    if (pcbCopied)
-    {
-        *pcbCopied = cbTotalCopied;
-    }
-
     return hr;
 }
 
