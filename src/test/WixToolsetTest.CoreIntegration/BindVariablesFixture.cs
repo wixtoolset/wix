@@ -10,6 +10,34 @@ namespace WixToolsetTest.CoreIntegration
 
     public class BindVariablesFixture
     {
+        [Fact(Skip = "Test demonstrates failure")]
+        public void CanBuildBundleWithPackageBindVariables()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleBindVariables", "CacheIdFromPackageDescription.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(exePath));
+            }
+        }
+
         [Fact]
         public void CanBuildWithDefaultValue()
         {

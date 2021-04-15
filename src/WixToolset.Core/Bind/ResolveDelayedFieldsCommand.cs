@@ -149,6 +149,7 @@ namespace WixToolset.Core.Bind
                     else
                     {
                         this.Messaging.Write(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
+                        break;
                     }
                 }
                 else
