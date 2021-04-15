@@ -7,7 +7,7 @@
     <Compile Include="..\..\Templates\Package.wxs" Link="Package.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.25" />
-    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.82" />
+    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.27" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.91" />
   </ItemGroup>
 </Project>

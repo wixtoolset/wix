@@ -10,6 +10,6 @@
     <ProjectReference Include="..\PackageAv1_0_2\PackageAv1_0_2.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.25" />
+    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.27" />
   </ItemGroup>
 </Project>
