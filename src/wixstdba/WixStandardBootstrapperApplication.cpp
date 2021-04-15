@@ -2095,7 +2095,7 @@ private: // privates
         LPCWSTR wzLocFileName = m_fPrereq ? L"mbapreq.wxl" : L"thm.wxl";
 
         // Find and load .wxl file.
-        hr = LocProbeForFile(wzModulePath, wzLocFileName, wzLanguage, &sczLocPath);
+        hr = LocProbeForFileEx(wzModulePath, wzLocFileName, wzLanguage, &sczLocPath, TRUE);
         BalExitOnFailure(hr, "Failed to probe for loc file: %ls in path: %ls", wzLocFileName, wzModulePath);
 
         hr = LocLoadFromFile(sczLocPath, &m_pWixLoc);
@@ -2142,7 +2142,7 @@ private: // privates
         LPWSTR sczThemePath = NULL;
         LPCWSTR wzThemeFileName = m_fPrereq ? L"mbapreq.thm" : L"thm.xml";
 
-        hr = LocProbeForFile(wzModulePath, wzThemeFileName, wzLanguage, &sczThemePath);
+        hr = LocProbeForFileEx(wzModulePath, wzThemeFileName, wzLanguage, &sczThemePath, TRUE);
         BalExitOnFailure(hr, "Failed to probe for theme file: %ls in path: %ls", wzThemeFileName, wzModulePath);
 
         hr = ThemeLoadFromFile(sczThemePath, &m_pTheme);
@@ -2808,7 +2808,7 @@ private: // privates
                                     hr = StrAllocString(&sczLicenseFilename, PathFile(sczLicenseFormatted), 0);
                                     if (SUCCEEDED(hr))
                                     {
-                                        hr = LocProbeForFile(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath);
+                                        hr = LocProbeForFileEx(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath, TRUE);
                                         if (SUCCEEDED(hr))
                                         {
                                             hr = ThemeLoadRichEditFromFile(m_pTheme, WIXSTDBA_CONTROL_EULA_RICHEDIT, sczLicensePath, m_hModule);
@@ -3325,7 +3325,7 @@ private: // privates
                 hr = PathGetDirectory(sczLicensePath, &sczLicenseDirectory);
                 if (SUCCEEDED(hr))
                 {
-                    hr = LocProbeForFile(sczLicenseDirectory, PathFile(sczLicenseUrl), m_sczLanguage, &sczLicensePath);
+                    hr = LocProbeForFileEx(sczLicenseDirectory, PathFile(sczLicenseUrl), m_sczLanguage, &sczLicensePath, TRUE);
                 }
             }
         }
