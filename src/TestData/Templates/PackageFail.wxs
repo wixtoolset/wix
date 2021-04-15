@@ -23,15 +23,13 @@
   </Package>
 
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="WixDir" Name="~Test WiX">
-          <Directory Id="TestDir" Name="$(var.TestGroupName)">
-            <Directory Id="INSTALLFOLDER" Name="$(var.PackageName)" />
-          </Directory>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="WixDir" Name="~Test WiX">
+        <Directory Id="TestDir" Name="$(var.TestGroupName)">
+          <Directory Id="INSTALLFOLDER" Name="$(var.PackageName)" />
         </Directory>
       </Directory>
-    </Directory>
+    </StandardDirectory>
   </Fragment>
 
   <Fragment>
