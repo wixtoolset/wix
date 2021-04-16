@@ -16,6 +16,7 @@ enum BURN_CACHE_PROGRESS_TYPE
     BURN_CACHE_PROGRESS_TYPE_ACQUIRE,
     BURN_CACHE_PROGRESS_TYPE_VERIFY,
     BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY,
+    BURN_CACHE_PROGRESS_TYPE_EXTRACT,
 };
 
 // structs
@@ -43,6 +44,7 @@ typedef struct _BURN_CACHE_PROGRESS_CONTEXT
     BURN_CONTAINER* pContainer;
     BURN_PACKAGE* pPackage;
     BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem;
+    BURN_PAYLOAD* pPayload;
 
     BOOL fCancel;
     HRESULT hrError;
@@ -875,6 +877,12 @@ static HRESULT ApplyExtractContainer(
         pContainer->qwCommittedCacheProgress = 0;
     }
 
+    if (pContainer->qwCommittedExtractProgress)
+    {
+        pContext->qwSuccessfulCacheProgress -= pContainer->qwCommittedExtractProgress;
+        pContainer->qwCommittedExtractProgress = 0;
+    }
+
     if (!pContainer->fActuallyAttached)
     {
         hr = ApplyAcquireContainerOrPayload(pContext, pContainer, NULL, NULL);
@@ -890,8 +898,18 @@ static HRESULT ApplyExtractContainer(
         CacheSetLastUsedSource(pContext->pVariables, pContext->sczLastUsedFolderCandidate, pContainer->sczFilePath);
     }
 
-    pContext->qwSuccessfulCacheProgress += pContainer->qwExtractSizeTotal;
-    pContainer->qwCommittedCacheProgress += pContainer->qwExtractSizeTotal;
+    if (pContainer->qwExtractSizeTotal < pContainer->qwCommittedExtractProgress)
+    {
+        AssertSz(FALSE, "Container extracted more than planned.");
+        pContext->qwSuccessfulCacheProgress -= pContainer->qwCommittedExtractProgress;
+        pContext->qwSuccessfulCacheProgress += pContainer->qwExtractSizeTotal;
+    }
+    else
+    {
+        pContext->qwSuccessfulCacheProgress += pContainer->qwExtractSizeTotal - pContainer->qwCommittedExtractProgress;
+    }
+
+    pContainer->qwCommittedExtractProgress = pContainer->qwExtractSizeTotal;
 
 LExit:
     ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
@@ -1100,6 +1118,11 @@ static HRESULT ExtractContainer(
     BURN_CONTAINER_CONTEXT context = { };
     HANDLE hContainerHandle = INVALID_HANDLE_VALUE;
     LPWSTR sczExtractPayloadId = NULL;
+    BURN_CACHE_PROGRESS_CONTEXT progress = { };
+
+    progress.pCacheContext = pContext;
+    progress.pContainer = pContainer;
+    progress.type = BURN_CACHE_PROGRESS_TYPE_EXTRACT;
 
     // If the container is actually attached, then it was planned to be acquired through hSourceEngineFile.
     if (pContainer->fActuallyAttached)
@@ -1119,11 +1142,29 @@ static HRESULT ExtractContainer(
             BURN_PAYLOAD* pExtract = pContext->pPayloads->rgPayloads + iExtract;
             if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
             {
+                progress.pPayload = pExtract;
+
                 hr = PreparePayloadDestinationPath(pExtract->sczUnverifiedPath);
                 ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", pExtract->sczUnverifiedPath);
 
+                hr = UserExperienceOnCachePayloadExtractBegin(pContext->pUX, pContainer->sczId, pExtract->sczKey);
+                if (FAILED(hr))
+                {
+                    UserExperienceOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
+                    ExitOnRootFailure(hr, "BA aborted cache payload extract begin.");
+                }
+
                 // TODO: Send progress when extracting stream to file.
                 hr = ContainerStreamToFile(&context, pExtract->sczUnverifiedPath);
+                // Error handling happens after sending complete message to BA.
+
+                // If succeeded, send 100% complete here to make sure progress was sent to the BA.
+                if (SUCCEEDED(hr))
+                {
+                    hr = CompleteCacheProgress(&progress, pExtract->qwFileSize);
+                }
+
+                UserExperienceOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
                 ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", sczExtractPayloadId, pContainer->sczId);
 
                 fExtracted = TRUE;
@@ -1754,7 +1795,12 @@ static HRESULT CompleteCacheProgress(
     if (PROGRESS_CONTINUE == dwResult)
     {
         pContext->pCacheContext->qwSuccessfulCacheProgress += qwFileSize;
-        if (pContext->pContainer)
+
+        if (pContext->pPayload)
+        {
+            pContext->pContainer->qwCommittedExtractProgress += qwFileSize;
+        }
+        else if (pContext->pContainer)
         {
             pContext->pContainer->qwCommittedCacheProgress += qwFileSize;
         }
@@ -1800,7 +1846,7 @@ static DWORD CALLBACK CacheProgressRoutine(
     DWORD dwResult = PROGRESS_CONTINUE;
     BURN_CACHE_PROGRESS_CONTEXT* pProgress = static_cast<BURN_CACHE_PROGRESS_CONTEXT*>(lpData);
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : NULL;
-    LPCWSTR wzPayloadId = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload->sczKey : NULL;
+    LPCWSTR wzPayloadId = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload->sczKey : pProgress->pPayload ? pProgress->pPayload->sczKey : NULL;
     DWORD64 qwCacheProgress = pProgress->pCacheContext->qwSuccessfulCacheProgress + TotalBytesTransferred.QuadPart;
     if (qwCacheProgress > pProgress->pCacheContext->qwTotalCacheSize)
     {
@@ -1822,6 +1868,10 @@ static DWORD CALLBACK CacheProgressRoutine(
     case BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY:
         hr = UserExperienceOnCacheContainerOrPayloadVerifyProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
         ExitOnRootFailure(hr, "BA aborted container or payload verify: %ls", wzPayloadId);
+        break;
+    case BURN_CACHE_PROGRESS_TYPE_EXTRACT:
+        hr = UserExperienceOnCachePayloadExtractProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
+        ExitOnRootFailure(hr, "BA aborted extract container: %ls, payload: %ls", wzPackageOrContainerId, wzPayloadId);
         break;
     }
 

@@ -1831,6 +1831,7 @@ static void ResetPlannedContainerState(
     pContainer->fPlanned = FALSE;
     pContainer->qwExtractSizeTotal = 0;
     pContainer->qwCommittedCacheProgress = 0;
+    pContainer->qwCommittedExtractProgress = 0;
 }
 
 static void ResetPlannedPayloadsState(

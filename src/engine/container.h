@@ -78,6 +78,7 @@ typedef struct _BURN_CONTAINER
     LPWSTR sczUnverifiedPath;
     DWORD64 qwExtractSizeTotal;
     DWORD64 qwCommittedCacheProgress;
+    DWORD64 qwCommittedExtractProgress;
 } BURN_CONTAINER;
 
 typedef struct _BURN_CONTAINERS

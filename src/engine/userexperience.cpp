@@ -758,6 +758,93 @@ LExit:
     return hr;
 }
 
+EXTERN_C BAAPI UserExperienceOnCachePayloadExtractBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCACHEPAYLOADEXTRACTBEGIN_ARGS args = { };
+    BA_ONCACHEPAYLOADEXTRACTBEGIN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzContainerId = wzContainerId;
+    args.wzPayloadId = wzPayloadId;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTBEGIN, &args, &results);
+    ExitOnFailure(hr, "BA OnCachePayloadExtractBegin failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCachePayloadExtractComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS args = { };
+    BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzContainerId = wzContainerId;
+    args.wzPayloadId = wzPayloadId;
+    args.hrStatus = hrStatus;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTCOMPLETE, &args, &results);
+    ExitOnFailure(hr, "BA OnCachePayloadExtractComplete failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCachePayloadExtractProgress(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in DWORD64 dw64Progress,
+    __in DWORD64 dw64Total,
+    __in DWORD dwOverallPercentage
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS args = { };
+    BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzContainerId = wzContainerId;
+    args.wzPayloadId = wzPayloadId;
+    args.dw64Progress = dw64Progress;
+    args.dw64Total = dw64Total;
+    args.dwOverallPercentage = dwOverallPercentage;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS, &args, &results);
+    ExitOnFailure(hr, "BA OnCachePayloadExtractProgress failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
 EXTERN_C BAAPI UserExperienceOnCacheVerifyBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,

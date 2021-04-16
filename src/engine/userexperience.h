@@ -196,6 +196,25 @@ BAAPI UserExperienceOnCachePackageComplete(
     __in HRESULT hrStatus,
     __inout BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION* pAction
     );
+BAAPI UserExperienceOnCachePayloadExtractBegin(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId
+    );
+BAAPI UserExperienceOnCachePayloadExtractComplete(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in HRESULT hrStatus
+    );
+BAAPI UserExperienceOnCachePayloadExtractProgress(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in DWORD64 dw64Progress,
+    __in DWORD64 dw64Total,
+    __in DWORD dwOverallPercentage
+    );
 BAAPI UserExperienceOnCacheVerifyBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,
