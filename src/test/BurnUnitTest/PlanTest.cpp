@@ -71,7 +71,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
             Assert::Equal(107082ull, pPlan->qwEstimatedSize);
-            Assert::Equal(202458ull, pPlan->qwCacheSizeTotal);
+            Assert::Equal(303687ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
             dwIndex = 0;
@@ -308,7 +308,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
             Assert::Equal(35694ull, pPlan->qwEstimatedSize);
-            Assert::Equal(67486ull, pPlan->qwCacheSizeTotal);
+            Assert::Equal(101229ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
             dwIndex = 0;
@@ -388,7 +388,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
             Assert::Equal(33743ull, pPlan->qwEstimatedSize);
-            Assert::Equal(67486ull, pPlan->qwCacheSizeTotal);
+            Assert::Equal(101229ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
             dwIndex = 0;
@@ -458,7 +458,7 @@ namespace Bootstrapper
             Assert::Equal(dwIndex, pPlan->cRollbackCacheActions);
 
             Assert::Equal(35694ull, pPlan->qwEstimatedSize);
-            Assert::Equal(67486ull, pPlan->qwCacheSizeTotal);
+            Assert::Equal(101229ull, pPlan->qwCacheSizeTotal);
 
             fRollback = FALSE;
             dwIndex = 0;

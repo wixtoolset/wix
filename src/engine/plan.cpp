@@ -431,6 +431,7 @@ extern "C" HRESULT PlanLayoutBundle(
     pCacheAction->bundleLayout.qwBundleSize = qwBundleSize;
     pCacheAction->bundleLayout.pPayloadGroup = pLayoutPayloads;
 
+    // Acquire + Verify
     pPlan->qwCacheSizeTotal += 2 * qwBundleSize;
 
     ++pPlan->cOverallProgressTicksTotal;
@@ -1005,6 +1006,7 @@ extern "C" HRESULT PlanLayoutContainer(
             pCacheAction->type = BURN_CACHE_ACTION_TYPE_CONTAINER;
             pCacheAction->container.pContainer = pContainer;
 
+            // Acquire + Verify
             pPlan->qwCacheSizeTotal += 2 * pContainer->qwFileSize;
         }
     }
@@ -1012,11 +1014,9 @@ extern "C" HRESULT PlanLayoutContainer(
     {
         if (!pContainer->fActuallyAttached)
         {
+            // Acquire
             pPlan->qwCacheSizeTotal += pContainer->qwFileSize;
         }
-
-        // TODO: This should be the sum of all uncompressed payloads in the container, ideally restricted to the payloads that were actually planned.
-        pPlan->qwCacheSizeTotal += pContainer->qwFileSize;
     }
 
     if (!pContainer->sczUnverifiedPath)
@@ -1829,6 +1829,8 @@ static void ResetPlannedContainerState(
     )
 {
     pContainer->fPlanned = FALSE;
+    pContainer->qwExtractSizeTotal = 0;
+    pContainer->qwCommittedCacheProgress = 0;
 }
 
 static void ResetPlannedPayloadsState(
@@ -2246,7 +2248,15 @@ static HRESULT ProcessPayloadGroup(
 
         if (!pPlan->sczLayoutDirectory || !pPayload->pContainer)
         {
+            // Acquire + Verify
             pPlan->qwCacheSizeTotal += 2 * pPayload->qwFileSize;
+        }
+
+        if (!pPlan->sczLayoutDirectory && pPayload->pContainer && 1 == pPayload->cRemainingInstances)
+        {
+            // Extract
+            pPlan->qwCacheSizeTotal += pPayload->qwFileSize;
+            pPayload->pContainer->qwExtractSizeTotal += pPayload->qwFileSize;
         }
 
         if (!pPayload->sczUnverifiedPath)

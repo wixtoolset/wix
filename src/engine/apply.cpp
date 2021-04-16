@@ -869,6 +869,12 @@ static HRESULT ApplyExtractContainer(
 {
     HRESULT hr = S_OK;
 
+    if (pContainer->qwCommittedCacheProgress)
+    {
+        pContext->qwSuccessfulCacheProgress -= pContainer->qwCommittedCacheProgress;
+        pContainer->qwCommittedCacheProgress = 0;
+    }
+
     if (!pContainer->fActuallyAttached)
     {
         hr = ApplyAcquireContainerOrPayload(pContext, pContainer, NULL, NULL);
@@ -884,7 +890,8 @@ static HRESULT ApplyExtractContainer(
         CacheSetLastUsedSource(pContext->pVariables, pContext->sczLastUsedFolderCandidate, pContainer->sczFilePath);
     }
 
-    pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
+    pContext->qwSuccessfulCacheProgress += pContainer->qwExtractSizeTotal;
+    pContainer->qwCommittedCacheProgress += pContainer->qwExtractSizeTotal;
 
 LExit:
     ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
@@ -1110,7 +1117,7 @@ static HRESULT ExtractContainer(
         for (DWORD iExtract = 0; iExtract < pContext->pPayloads->cPayloads; ++iExtract)
         {
             BURN_PAYLOAD* pExtract = pContext->pPayloads->rgPayloads + iExtract;
-            if (pExtract->sczUnverifiedPath && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
+            if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
             {
                 hr = PreparePayloadDestinationPath(pExtract->sczUnverifiedPath);
                 ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", pExtract->sczUnverifiedPath);
@@ -1747,7 +1754,11 @@ static HRESULT CompleteCacheProgress(
     if (PROGRESS_CONTINUE == dwResult)
     {
         pContext->pCacheContext->qwSuccessfulCacheProgress += qwFileSize;
-        if (pContext->pPayloadGroupItem)
+        if (pContext->pContainer)
+        {
+            pContext->pContainer->qwCommittedCacheProgress += qwFileSize;
+        }
+        else if (pContext->pPayloadGroupItem)
         {
             pContext->pPayloadGroupItem->qwCommittedCacheProgress += qwFileSize;
         }
