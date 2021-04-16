@@ -188,7 +188,6 @@ HRESULT RegistrationSessionBegin(
     __in_z LPCWSTR wzEngineWorkingPath,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
     __in DWORD64 qwEstimatedSize

@@ -143,7 +143,6 @@ static HRESULT OnApplyUninitialize(
 static HRESULT OnSessionBegin(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BYTE* pbData,
     __in DWORD cbData
     );
@@ -1643,7 +1642,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN:
-        hrResult = OnSessionBegin(pContext->pRegistration, pContext->pVariables, pContext->pUserExperience, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnSessionBegin(pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME:
@@ -1895,7 +1894,6 @@ static HRESULT OnApplyUninitialize(
 static HRESULT OnSessionBegin(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BYTE* pbData,
     __in DWORD cbData
     )
@@ -1930,7 +1928,7 @@ static HRESULT OnSessionBegin(
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Begin session in per-machine process.
-    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pVariables, pUserExperience, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize);
+    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize);
     ExitOnFailure(hr, "Failed to begin registration session.");
 
 LExit:

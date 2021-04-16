@@ -112,7 +112,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to get current process path.");
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE | BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -205,7 +205,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -226,7 +226,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
@@ -316,7 +316,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -427,7 +427,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was created
@@ -460,7 +460,7 @@ namespace Bootstrapper
                 //
 
                 // write registration
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 // verify that registration was updated
@@ -560,7 +560,7 @@ namespace Bootstrapper
                 Assert::Equal((int)BOOTSTRAPPER_RESUME_TYPE_NONE, (int)resumeType);
 
                 // begin session
-                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, &userExperience, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
+                hr = RegistrationSessionBegin(sczCurrentProcess, &registration, &variables, BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_REGISTRATION, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, 0);
                 TestThrowOnFailure(hr, L"Failed to register bundle.");
 
                 hr = RegistrationSaveState(&registration, rgbData, sizeof(rgbData));

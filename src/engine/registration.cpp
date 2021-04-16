@@ -593,7 +593,6 @@ extern "C" HRESULT RegistrationSessionBegin(
     __in_z LPCWSTR wzEngineWorkingPath,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
     __in DWORD64 qwEstimatedSize
@@ -609,7 +608,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     // Cache bundle executable.
     if (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE)
     {
-        hr = CacheCompleteBundle(pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, &pUserExperience->payloads, wzEngineWorkingPath
+        hr = CacheCompleteBundle(pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, wzEngineWorkingPath
 #ifdef DEBUG
                         , pRegistration->sczCacheExecutablePath
 #endif

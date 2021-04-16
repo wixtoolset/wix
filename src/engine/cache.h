@@ -101,7 +101,6 @@ HRESULT CacheCompleteBundle(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzBundleId,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in_z LPCWSTR wzSourceBundlePath
 #ifdef DEBUG
     , __in_z LPCWSTR wzExecutablePath

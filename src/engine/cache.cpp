@@ -776,7 +776,6 @@ extern "C" HRESULT CacheCompleteBundle(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzBundleId,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in_z LPCWSTR wzSourceBundlePath
 #ifdef DEBUG
     , __in_z LPCWSTR wzExecutablePath
@@ -823,21 +822,6 @@ extern "C" HRESULT CacheCompleteBundle(
 
     hr = PathGetDirectory(wzSourceBundlePath, &sczSourceDirectory);
     ExitOnFailure(hr, "Failed to get directory from engine working path: %ls", wzSourceBundlePath);
-
-    // Cache external UX payloads to completed path.
-    for (DWORD i = 0; i < pUxPayloads->cPayloads; ++i)
-    {
-        BURN_PAYLOAD* pPayload = &pUxPayloads->rgPayloads[i];
-
-        if (BURN_PAYLOAD_PACKAGING_EXTERNAL == pPayload->packaging)
-        {
-            hr = PathConcat(sczSourceDirectory, pPayload->sczSourcePath, &sczPayloadSourcePath);
-            ExitOnFailure(hr, "Failed to build payload source path.");
-
-            hr = CacheCompletePayload(fPerMachine, pPayload, wzBundleId, sczPayloadSourcePath, FALSE);
-            ExitOnFailure(hr, "Failed to complete the cache of payload: %ls", pPayload->sczKey);
-        }
-    }
 
 LExit:
     ReleaseStr(sczPayloadSourcePath);
