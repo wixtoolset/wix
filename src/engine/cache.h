@@ -1,6 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#define BURN_CACHE_MAX_SEARCH_PATHS 7
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,12 +53,14 @@ HRESULT CacheGetResumePath(
     __in_z LPCWSTR wzPayloadWorkingPath,
     __deref_out_z LPWSTR* psczResumePath
     );
-HRESULT CacheFindLocalSource(
+HRESULT CacheGetLocalSourcePaths(
+    __in_z LPCWSTR wzRelativePath,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath,
+    __in_z_opt LPCWSTR wzLayoutDirectory,
     __in BURN_VARIABLES* pVariables,
-    __out BOOL* pfFound,
-    __out_z LPWSTR* psczSourceFullPath
+    __inout LPWSTR** prgSearchPaths,
+    __out DWORD* pcSearchPaths
     );
 HRESULT CacheSetLastUsedSource(
     __in BURN_VARIABLES* pVariables,

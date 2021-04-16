@@ -395,28 +395,45 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,
     __in_z_opt LPCWSTR wzPayloadId,
-    __in BOOTSTRAPPER_CACHE_OPERATION operation,
-    __in_z LPCWSTR wzSource
+    __in_z LPWSTR* pwzSource,
+    __in_z LPWSTR* pwzDownloadUrl,
+    __in_z_opt LPCWSTR wzPayloadContainerId,
+    __out BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
     )
 {
     HRESULT hr = S_OK;
     BA_ONCACHEACQUIREBEGIN_ARGS args = { };
     BA_ONCACHEACQUIREBEGIN_RESULTS results = { };
+    *pCacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
 
     args.cbSize = sizeof(args);
     args.wzPackageOrContainerId = wzPackageOrContainerId;
     args.wzPayloadId = wzPayloadId;
-    args.operation = operation;
-    args.wzSource = wzSource;
+    args.wzSource = *pwzSource;
+    args.wzDownloadUrl = *pwzDownloadUrl;
+    args.wzPayloadContainerId = wzPayloadContainerId;
+    args.recommendation = *pCacheOperation;
 
     results.cbSize = sizeof(results);
+    results.action = *pCacheOperation;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREBEGIN, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireBegin failed.");
 
     if (results.fCancel)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    else
+    {
+        // Verify the BA requested an action that is possible.
+        if (BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD == results.action && *pwzDownloadUrl && **pwzDownloadUrl ||
+            BOOTSTRAPPER_CACHE_OPERATION_EXTRACT == results.action && wzPayloadContainerId ||
+            BOOTSTRAPPER_CACHE_OPERATION_COPY == results.action ||
+            BOOTSTRAPPER_CACHE_OPERATION_NONE == results.action)
+        {
+            *pCacheOperation = results.action;
+        }
     }
 
 LExit:
@@ -444,7 +461,7 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireComplete(
     results.cbSize = sizeof(results);
     results.action = args.recommendation;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireComplete failed.");
 
     if (FAILED(hrStatus))
@@ -484,6 +501,64 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireProgress(
     if (results.fCancel)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnCacheAcquireResolving(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzPackageOrContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in_z LPWSTR* rgSearchPaths,
+    __in DWORD cSearchPaths,
+    __in BOOL fFoundLocal,
+    __in DWORD* pdwChosenSearchPath,
+    __in_z_opt LPCWSTR wzDownloadUrl,
+    __in_z_opt LPCWSTR wzPayloadContainerId,
+    __inout BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONCACHEACQUIRERESOLVING_ARGS args = { };
+    BA_ONCACHEACQUIRERESOLVING_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageOrContainerId = wzPackageOrContainerId;
+    args.wzPayloadId = wzPayloadId;
+    args.rgSearchPaths = const_cast<LPCWSTR*>(rgSearchPaths);
+    args.cSearchPaths = cSearchPaths;
+    args.fFoundLocal = fFoundLocal;
+    args.dwRecommendedSearchPath = *pdwChosenSearchPath;
+    args.wzDownloadUrl = wzDownloadUrl;
+    args.recommendation = *pCacheOperation;
+
+    results.cbSize = sizeof(results);
+    results.dwChosenSearchPath = *pdwChosenSearchPath;
+    results.action = *pCacheOperation;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING, &args, &results);
+    ExitOnFailure(hr, "BA OnCacheAcquireResolving failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    else
+    {
+        // Verify the BA requested an action that is possible.
+        if (BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD == results.action && wzDownloadUrl && *wzDownloadUrl ||
+            BOOTSTRAPPER_CACHE_OPERATION_EXTRACT == results.action && wzPayloadContainerId ||
+            BOOTSTRAPPER_CACHE_OPERATION_NONE == results.action)
+        {
+            *pCacheOperation = results.action;
+        }
+        else if (BOOTSTRAPPER_CACHE_OPERATION_COPY == results.action && results.dwChosenSearchPath < cSearchPaths)
+        {
+            *pdwChosenSearchPath = results.dwChosenSearchPath;
+            *pCacheOperation = results.action;
+        }
     }
 
 LExit:
@@ -1856,45 +1931,6 @@ EXTERN_C BAAPI UserExperienceOnRegisterComplete(
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERCOMPLETE, &args, &results);
     ExitOnFailure(hr, "BA OnRegisterComplete failed.");
-
-LExit:
-    return hr;
-}
-
-EXTERN_C BAAPI UserExperienceOnResolveSource(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageOrContainerId,
-    __in_z_opt LPCWSTR wzPayloadId,
-    __in_z LPCWSTR wzLocalSource,
-    __in_z_opt LPCWSTR wzDownloadSource,
-    __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* pAction
-    )
-{
-    HRESULT hr = S_OK;
-    BA_ONRESOLVESOURCE_ARGS args = { };
-    BA_ONRESOLVESOURCE_RESULTS results = { };
-
-    args.cbSize = sizeof(args);
-    args.wzPackageOrContainerId = wzPackageOrContainerId;
-    args.wzPayloadId = wzPayloadId;
-    args.wzLocalSource = wzLocalSource;
-    args.wzDownloadSource = wzDownloadSource;
-    args.recommendation = *pAction;
-
-    results.cbSize = sizeof(results);
-    results.action = *pAction;
-
-    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE, &args, &results);
-    ExitOnFailure(hr, "BA OnResolveSource failed.");
-
-    if (results.fCancel)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
-    }
-    else
-    {
-        *pAction = results.action;
-    }
 
 LExit:
     return hr;

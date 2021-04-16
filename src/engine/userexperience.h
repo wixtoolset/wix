@@ -126,8 +126,10 @@ BAAPI UserExperienceOnCacheAcquireBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z_opt LPCWSTR wzPackageOrContainerId,
     __in_z_opt LPCWSTR wzPayloadId,
-    __in BOOTSTRAPPER_CACHE_OPERATION operation,
-    __in_z LPCWSTR wzSource
+    __in_z LPWSTR* pwzSource,
+    __in_z LPWSTR* pwzDownloadUrl,
+    __in_z_opt LPCWSTR wzPayloadContainerId,
+    __out BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
     );
 BAAPI UserExperienceOnCacheAcquireComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -143,6 +145,18 @@ BAAPI UserExperienceOnCacheAcquireProgress(
     __in DWORD64 dw64Progress,
     __in DWORD64 dw64Total,
     __in DWORD dwOverallPercentage
+    );
+BAAPI UserExperienceOnCacheAcquireResolving(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzPackageOrContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in_z LPWSTR* rgSearchPaths,
+    __in DWORD cSearchPaths,
+    __in BOOL fFoundLocal,
+    __in DWORD* pdwChosenSearchPath,
+    __in_z_opt LPCWSTR wzDownloadUrl,
+    __in_z_opt LPCWSTR wzPayloadContainerId,
+    __inout BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
     );
 BAAPI UserExperienceOnCacheBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience
@@ -425,14 +439,6 @@ BAAPI UserExperienceOnRegisterBegin(
 BAAPI UserExperienceOnRegisterComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in HRESULT hrStatus
-    );
-BAAPI UserExperienceOnResolveSource(
-    __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzPackageOrContainerId,
-    __in_z_opt LPCWSTR wzPayloadId,
-    __in_z LPCWSTR wzLocalSource,
-    __in_z_opt LPCWSTR wzDownloadSource,
-    __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* pAction
     );
 BAAPI UserExperienceOnRollbackMsiTransactionBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,

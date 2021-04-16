@@ -11,7 +11,7 @@ static const DWORD FILE_OPERATION_RETRY_WAIT = 2000;
 
 static BOOL vfInitializedCache = FALSE;
 static BOOL vfRunningFromCache = FALSE;
-static LPWSTR vsczSourceProcessPath = NULL;
+static LPWSTR vsczSourceProcessFolder = NULL;
 static LPWSTR vsczWorkingFolder = NULL;
 static LPWSTR vsczDefaultUserPackageCache = NULL;
 static LPWSTR vsczDefaultMachinePackageCache = NULL;
@@ -140,8 +140,8 @@ extern "C" HRESULT CacheInitialize(
             wzSourceProcessPath = sczCurrentPath;
         }
 
-        hr = StrAllocString(&vsczSourceProcessPath, wzSourceProcessPath, 0);
-        ExitOnFailure(hr, "Failed to initialize cache source path.");
+        hr = PathGetDirectory(wzSourceProcessPath, &vsczSourceProcessFolder);
+        ExitOnFailure(hr, "Failed to initialize cache source folder.");
 
         // If we're not running from the cache, ensure the original source is set.
         if (!vfRunningFromCache)
@@ -393,112 +393,166 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CacheFindLocalSource(
+extern "C" HRESULT CacheGetLocalSourcePaths(
+    __in_z LPCWSTR wzRelativePath,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath,
+    __in_z_opt LPCWSTR wzLayoutDirectory,
     __in BURN_VARIABLES* pVariables,
-    __out BOOL* pfFound,
-    __out_z LPWSTR* psczSourceFullPath
+    __inout LPWSTR** prgSearchPaths,
+    __out DWORD* pcSearchPaths
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczSourceProcessFolder = NULL;
     LPWSTR sczCurrentPath = NULL;
-    LPWSTR sczLastSourcePath = NULL;
     LPWSTR sczLastSourceFolder = NULL;
-    LPWSTR sczLayoutPath = NULL;
-    LPWSTR sczLayoutFolder = NULL;
-    LPCWSTR rgwzSearchPaths[4] = { };
+    LPWSTR* psczPath = NULL;
+    BOOL fPreferSourcePathLocation = FALSE;
+    BOOL fTryLastFolder = FALSE;
+    BOOL fTryRelativePath = FALSE;
+    BOOL fSourceIsAbsolute = FALSE;
     DWORD cSearchPaths = 0;
 
-    // If the source path provided is a full path, obviously that is where we should be looking.
-    if (PathIsAbsolute(wzSourcePath))
+    AssertSz(vfInitializedCache, "Cache wasn't initialized");
+
+    hr = GetLastUsedSourceFolder(pVariables, &sczLastSourceFolder);
+    fPreferSourcePathLocation = !vfRunningFromCache || FAILED(hr);
+    fTryLastFolder = SUCCEEDED(hr) && sczLastSourceFolder && *sczLastSourceFolder && CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, vsczSourceProcessFolder, -1, sczLastSourceFolder, -1);
+    fTryRelativePath = CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzSourcePath, -1, wzRelativePath, -1);
+    fSourceIsAbsolute = PathIsAbsolute(wzSourcePath);
+
+    // If the source path provided is a full path, try that first.
+    if (fSourceIsAbsolute)
     {
-        rgwzSearchPaths[0] = wzSourcePath;
-        cSearchPaths = 1;
+        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+        ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+        psczPath = *prgSearchPaths + cSearchPaths;
+        ++cSearchPaths;
+
+        hr = StrAllocString(psczPath, wzSourcePath, 0);
+        ExitOnFailure(hr, "Failed to copy absolute source path.");
     }
-    else
+
+    // Try the destination path next.
+    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+    ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+    psczPath = *prgSearchPaths + cSearchPaths;
+    ++cSearchPaths;
+
+    hr = StrAllocString(psczPath, wzDestinationPath, 0);
+    ExitOnFailure(hr, "Failed to copy absolute source path.");
+
+    if (!fSourceIsAbsolute)
     {
-        // Use the destination path first.
-        rgwzSearchPaths[0] = wzDestinationPath;
-        cSearchPaths = 1;
+        // Calculate the source path location.
+        // In the case where we are in the bundle's package cache and
+        // couldn't find a last used source that will be the package cache path
+        // which isn't likely to have what we are looking for.
+        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+        ExitOnFailure(hr, "Failed to ensure size for search paths array.");
 
-        // If we're not running from cache or we couldn't get the last source, use
-        // the source path location. In the case where we are in the bundle's
-        // package cache and couldn't find a last used source we unfortunately will
-        // be picking the package cache path which isn't likely to have what we are
-        // looking for.
-        hr = GetLastUsedSourceFolder(pVariables, &sczLastSourceFolder);
-        if (!vfRunningFromCache || FAILED(hr))
+        hr = PathConcat(vsczSourceProcessFolder, wzSourcePath, &sczCurrentPath);
+        ExitOnFailure(hr, "Failed to combine source process folder with source.");
+
+        // If we're not running from cache or we couldn't get the last source,
+        // try the source path location next.
+        if (fPreferSourcePathLocation)
         {
-            hr = PathGetDirectory(vsczSourceProcessPath, &sczSourceProcessFolder);
-            ExitOnFailure(hr, "Failed to get current process directory.");
-
-            hr = PathConcat(sczSourceProcessFolder, wzSourcePath, &sczCurrentPath);
-            ExitOnFailure(hr, "Failed to combine last source with source.");
-
-            rgwzSearchPaths[cSearchPaths] = sczCurrentPath;
+            (*prgSearchPaths)[cSearchPaths] = sczCurrentPath;
             ++cSearchPaths;
+            sczCurrentPath = NULL;
         }
 
-        // If we have a last used source and it does not duplicate the existing search path,
-        // add the last used source to the search path second.
-        if (sczLastSourceFolder && *sczLastSourceFolder)
+        // If we have a last used source and it is not the source path location,
+        // add the last used source to the search path next.
+        if (fTryLastFolder)
         {
-            hr = PathConcat(sczLastSourceFolder, wzSourcePath, &sczLastSourcePath);
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+            ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+            psczPath = *prgSearchPaths + cSearchPaths;
+            ++cSearchPaths;
+
+            hr = PathConcat(sczLastSourceFolder, wzSourcePath, psczPath);
             ExitOnFailure(hr, "Failed to combine last source with source.");
-
-            if (1 == cSearchPaths || CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, rgwzSearchPaths[1], -1, sczLastSourcePath, -1))
-            {
-                rgwzSearchPaths[cSearchPaths] = sczLastSourcePath;
-                ++cSearchPaths;
-            }
         }
 
-        // Also consider the layout directory if set on the command line or by the BA.
-        hr = VariableGetString(pVariables, BURN_BUNDLE_LAYOUT_DIRECTORY, &sczLayoutFolder);
-        if (E_NOTFOUND != hr)
+        if (!fPreferSourcePathLocation)
         {
-            ExitOnFailure(hr, "Failed to get bundle layout directory property.");
+            (*prgSearchPaths)[cSearchPaths] = sczCurrentPath;
+            ++cSearchPaths;
+            sczCurrentPath = NULL;
+        }
 
-            hr = PathConcat(sczLayoutFolder, wzSourcePath, &sczLayoutPath);
+        // Also consider the layout directory if doing Layout.
+        if (wzLayoutDirectory)
+        {
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+            ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+            psczPath = *prgSearchPaths + cSearchPaths;
+            ++cSearchPaths;
+
+            hr = PathConcat(wzLayoutDirectory, wzSourcePath, psczPath);
             ExitOnFailure(hr, "Failed to combine layout source with source.");
-
-            rgwzSearchPaths[cSearchPaths] = sczLayoutPath;
-            ++cSearchPaths;
         }
     }
 
-    *pfFound = FALSE; // assume we won't find the file locally.
-
-    for (DWORD i = 0; i < cSearchPaths; ++i)
+    if (fTryRelativePath)
     {
-        // If the file exists locally, copy its path.
-        if (FileExistsEx(rgwzSearchPaths[i], NULL))
+        hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+        ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+        hr = PathConcat(vsczSourceProcessFolder, wzRelativePath, &sczCurrentPath);
+        ExitOnFailure(hr, "Failed to combine source process folder with relative.");
+
+        if (fPreferSourcePathLocation)
         {
-            hr = StrAllocString(psczSourceFullPath, rgwzSearchPaths[i], 0);
-            ExitOnFailure(hr, "Failed to copy source path.");
-
-            *pfFound = TRUE;
-            break;
+            (*prgSearchPaths)[cSearchPaths] = sczCurrentPath;
+            ++cSearchPaths;
+            sczCurrentPath = NULL;
         }
-    }
 
-    // If nothing was found, return the first thing in our search path as the
-    // best path where we thought we should have found the file.
-    if (!*pfFound)
-    {
-        hr = StrAllocString(psczSourceFullPath, rgwzSearchPaths[0], 0);
-        ExitOnFailure(hr, "Failed to copy source path.");
+        if (fTryLastFolder)
+        {
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+            ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+            psczPath = *prgSearchPaths + cSearchPaths;
+            ++cSearchPaths;
+
+            hr = PathConcat(sczLastSourceFolder, wzRelativePath, psczPath);
+            ExitOnFailure(hr, "Failed to combine last source with relative.");
+        }
+
+        if (!fPreferSourcePathLocation)
+        {
+            (*prgSearchPaths)[cSearchPaths] = sczCurrentPath;
+            ++cSearchPaths;
+            sczCurrentPath = NULL;
+        }
+
+        if (wzLayoutDirectory)
+        {
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+            ExitOnFailure(hr, "Failed to ensure size for search paths array.");
+
+            psczPath = *prgSearchPaths + cSearchPaths;
+            ++cSearchPaths;
+
+            hr = PathConcat(wzLayoutDirectory, wzSourcePath, psczPath);
+            ExitOnFailure(hr, "Failed to combine layout source with relative.");
+        }
     }
 
 LExit:
     ReleaseStr(sczCurrentPath);
-    ReleaseStr(sczSourceProcessFolder);
     ReleaseStr(sczLastSourceFolder);
-    ReleaseStr(sczLastSourcePath);
-    ReleaseStr(sczLayoutFolder);
-    ReleaseStr(sczLayoutPath);
+
+    AssertSz(cSearchPaths <= BURN_CACHE_MAX_SEARCH_PATHS, "Got more than BURN_CACHE_MAX_SEARCH_PATHS search paths");
+    *pcSearchPaths = cSearchPaths;
 
     return hr;
 }
@@ -1079,7 +1133,7 @@ extern "C" void CacheUninitialize()
     ReleaseNullStr(vsczDefaultMachinePackageCache);
     ReleaseNullStr(vsczDefaultUserPackageCache);
     ReleaseNullStr(vsczWorkingFolder);
-    ReleaseNullStr(vsczSourceProcessPath);
+    ReleaseNullStr(vsczSourceProcessFolder);
 
     vfRunningFromCache = FALSE;
     vfInitializedCache = FALSE;
@@ -1224,17 +1278,12 @@ static HRESULT GetLastUsedSourceFolder(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczOriginalSource = NULL;
 
     hr = VariableGetString(pVariables, BURN_BUNDLE_LAST_USED_SOURCE, psczLastSource);
     if (E_NOTFOUND == hr)
     {
         // Try the original source folder.
-        hr = VariableGetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, &sczOriginalSource);
-        if (SUCCEEDED(hr))
-        {
-            hr = PathGetDirectory(sczOriginalSource, psczLastSource);
-        }
+        hr = VariableGetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER, psczLastSource);
     }
 
     return hr;

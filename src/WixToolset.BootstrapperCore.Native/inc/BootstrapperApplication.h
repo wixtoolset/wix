@@ -54,8 +54,13 @@ enum BOOTSTRAPPER_RELATED_OPERATION
 
 enum BOOTSTRAPPER_CACHE_OPERATION
 {
+    // There is no source available.
+    BOOTSTRAPPER_CACHE_OPERATION_NONE,
+    // Copy the payload or container from the chosen local source.
     BOOTSTRAPPER_CACHE_OPERATION_COPY,
+    // Download the payload or container using the download URL.
     BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD,
+    // Extract the payload from the container.
     BOOTSTRAPPER_CACHE_OPERATION_EXTRACT,
 };
 
@@ -112,7 +117,7 @@ enum BOOTSTRAPPER_APPLICATION_MESSAGE
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPACKAGEBEGIN,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREBEGIN,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREPROGRESS,
-    BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE,
+    BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYBEGIN,
     BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYCOMPLETE,
@@ -158,7 +163,7 @@ enum BOOTSTRAPPER_APPLYCOMPLETE_ACTION
 enum BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION
 {
     BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION_NONE,
-    // Instructs the engine to try the acquisition of the package again.
+    // Instructs the engine to try the acquisition of the payload again.
     // Ignored if hrStatus is a success.
     BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION_RETRY,
 };
@@ -200,16 +205,6 @@ enum BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION
     // Instructs the engine to stop processing the chain and
     // suspend the current state.
     BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_SUSPEND,
-};
-
-enum BOOTSTRAPPER_RESOLVESOURCE_ACTION
-{
-    // Instructs the engine that the source can't be found.
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION_NONE,
-    // Instructs the engine to try the local source again.
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION_RETRY,
-    // Instructs the engine to try the download source.
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION_DOWNLOAD,
 };
 
 enum BOOTSTRAPPER_SHUTDOWN_ACTION
@@ -315,14 +310,17 @@ struct BA_ONCACHEACQUIREBEGIN_ARGS
     DWORD cbSize;
     LPCWSTR wzPackageOrContainerId;
     LPCWSTR wzPayloadId;
-    BOOTSTRAPPER_CACHE_OPERATION operation;
     LPCWSTR wzSource;
+    LPCWSTR wzDownloadUrl;
+    LPCWSTR wzPayloadContainerId;
+    BOOTSTRAPPER_CACHE_OPERATION recommendation;
 };
 
 struct BA_ONCACHEACQUIREBEGIN_RESULTS
 {
     DWORD cbSize;
     BOOL fCancel;
+    BOOTSTRAPPER_CACHE_OPERATION action;
 };
 
 struct BA_ONCACHEACQUIRECOMPLETE_ARGS
@@ -353,6 +351,28 @@ struct BA_ONCACHEACQUIREPROGRESS_ARGS
 struct BA_ONCACHEACQUIREPROGRESS_RESULTS
 {
     DWORD cbSize;
+    BOOL fCancel;
+};
+
+struct BA_ONCACHEACQUIRERESOLVING_ARGS
+{
+    DWORD cbSize;
+    LPCWSTR wzPackageOrContainerId;
+    LPCWSTR wzPayloadId;
+    LPCWSTR* rgSearchPaths;
+    DWORD cSearchPaths;
+    BOOL fFoundLocal;
+    DWORD dwRecommendedSearchPath;
+    LPCWSTR wzDownloadUrl;
+    LPCWSTR wzPayloadContainerId;
+    BOOTSTRAPPER_CACHE_OPERATION recommendation;
+};
+
+struct BA_ONCACHEACQUIRERESOLVING_RESULTS
+{
+    DWORD cbSize;
+    DWORD dwChosenSearchPath;
+    BOOTSTRAPPER_CACHE_OPERATION action;
     BOOL fCancel;
 };
 
@@ -1011,23 +1031,6 @@ struct BA_ONREGISTERCOMPLETE_ARGS
 struct BA_ONREGISTERCOMPLETE_RESULTS
 {
     DWORD cbSize;
-};
-
-struct BA_ONRESOLVESOURCE_ARGS
-{
-    DWORD cbSize;
-    LPCWSTR wzPackageOrContainerId;
-    LPCWSTR wzPayloadId;
-    LPCWSTR wzLocalSource;
-    LPCWSTR wzDownloadSource;
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION recommendation;
-};
-
-struct BA_ONRESOLVESOURCE_RESULTS
-{
-    DWORD cbSize;
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION action;
-    BOOL fCancel;
 };
 
 struct BA_ONROLLBACKMSITRANSACTIONBEGIN_ARGS

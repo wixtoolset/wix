@@ -151,9 +151,9 @@ Bundle global condition check didn't succeed - aborting without loading applicat
 
 MessageId=54
 Severity=Error
-SymbolicName=MSG_PAYLOAD_FILE_NOT_PRESENT
+SymbolicName=MSG_RESOLVE_SOURCE_FAILED
 Language=English
-Failed to resolve source for file: %2!ls!, error: %1!ls!.
+Failed to resolve source for payload: %2!ls!, package: %3!ls!, container: %4!ls!, error: %1!ls!.
 .
 
 MessageId=55
@@ -722,34 +722,6 @@ Severity=Success
 SymbolicName=MSG_ACQUIRE_PACKAGE_PAYLOAD
 Language=English
 Acquiring package: %1!ls!, payload: %2!ls!, %3!hs! from: %4!ls!
-.
-
-MessageId=340
-Severity=Warning
-SymbolicName=MSG_PROMPT_BUNDLE_PAYLOAD_SOURCE
-Language=English
-Prompt for source of bundle payload: %2!ls!, path: %3!ls!
-.
-
-MessageId=341
-Severity=Warning
-SymbolicName=MSG_PROMPT_CONTAINER_SOURCE
-Language=English
-Prompt for source of container: %1!ls!, path: %3!ls!
-.
-
-MessageId=342
-Severity=Warning
-SymbolicName=MSG_PROMPT_CONTAINER_PAYLOAD_SOURCE
-Language=English
-Prompt for source of container: %1!ls!, payload: %2!ls!, path: %3!ls!
-.
-
-MessageId=343
-Severity=Warning
-SymbolicName=MSG_PROMPT_PACKAGE_PAYLOAD_SOURCE
-Language=English
-Prompt for source of package: %1!ls!, payload: %2!ls!, path: %3!ls!
 .
 
 MessageId=348

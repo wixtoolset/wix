@@ -269,8 +269,7 @@ HRESULT ExternalEngineSetUpdate(
     )
 {
     HRESULT hr = S_OK;
-    LPCWSTR sczId = NULL;
-    LPWSTR sczLocalSource = NULL;
+    LPWSTR sczFilePath = NULL;
     LPWSTR sczCommandline = NULL;
     UUID guid = { };
     WCHAR wzGuid[39];
@@ -296,38 +295,30 @@ HRESULT ExternalEngineSetUpdate(
     {
         UpdateUninitialize(&pEngineState->update);
 
-        if (!wzLocalSource || !*wzLocalSource)
-        {
-            hr = StrAllocFormatted(&sczLocalSource, L"update\\%ls", pEngineState->registration.sczExecutableName);
-            ExitOnFailure(hr, "Failed to default local update source");
-        }
-
         hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, pEngineState->command.display, pEngineState->command.restart, BOOTSTRAPPER_RELATION_NONE, FALSE, pEngineState->registration.sczActiveParent, pEngineState->registration.sczAncestors, NULL, pEngineState->command.wzCommandLine);
         ExitOnFailure(hr, "Failed to recreate command-line for update bundle.");
 
-        // Per-user bundles would fail to use the downloaded update bundle, as the existing install would already be cached 
-        // at the registration id's location.  Here I am generating a random guid, but in the future it would be nice if the
-        // feed would provide the ID of the update.
-        if (!pEngineState->registration.fPerMachine)
-        {
-            rs = ::UuidCreate(&guid);
-            hr = HRESULT_FROM_RPC(rs);
-            ExitOnFailure(hr, "Failed to create bundle update guid.");
+        // Bundles would fail to use the downloaded update bundle, as the running bundle would be one of the search paths.
+        // Here I am generating a random guid, but in the future it would be nice if the feed would provide the ID of the update.
+        rs = ::UuidCreate(&guid);
+        hr = HRESULT_FROM_RPC(rs);
+        ExitOnFailure(hr, "Failed to create bundle update guid.");
 
-            if (!::StringFromGUID2(guid, wzGuid, countof(wzGuid)))
-            {
-                hr = E_OUTOFMEMORY;
-                ExitOnRootFailure(hr, "Failed to convert bundle update guid into string.");
-            }
-
-            sczId = wzGuid;
-        }
-        else
+        if (!::StringFromGUID2(guid, wzGuid, countof(wzGuid)))
         {
-            sczId = pEngineState->registration.sczId;
+            hr = E_OUTOFMEMORY;
+            ExitOnRootFailure(hr, "Failed to convert bundle update guid into string.");
         }
 
-        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, rpr), &pEngineState->update.package, FALSE, sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, FALSE, pEngineState->registration.sczExecutableName, sczLocalSource ? sczLocalSource : wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
+        hr = StrAllocFormatted(&sczFilePath, L"%ls\\%ls", wzGuid, pEngineState->registration.sczExecutableName);
+        ExitOnFailure(hr, "Failed to build bundle update file path.");
+
+        if (!wzLocalSource || !*wzLocalSource)
+        {
+            wzLocalSource = sczFilePath;
+        }
+
+        hr = PseudoBundleInitialize(FILEMAKEVERSION(rmj, rmm, rup, rpr), &pEngineState->update.package, FALSE, pEngineState->registration.sczId, BOOTSTRAPPER_RELATION_UPDATE, BOOTSTRAPPER_PACKAGE_STATE_ABSENT, FALSE, sczFilePath, wzLocalSource, wzDownloadSource, qwSize, TRUE, sczCommandline, NULL, NULL, NULL, rgbHash, cbHash);
         ExitOnFailure(hr, "Failed to set update bundle.");
 
         pEngineState->update.fUpdateAvailable = TRUE;
@@ -337,7 +328,7 @@ LExit:
     ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
 
     ReleaseStr(sczCommandline);
-    ReleaseStr(sczLocalSource);
+    ReleaseStr(sczFilePath);
 
     return hr;
 }

@@ -23,6 +23,9 @@ typedef struct _BURN_CACHE_CONTEXT
     DWORD64 qwTotalCacheSize;
     DWORD64 qwSuccessfulCacheProgress;
     LPCWSTR wzLayoutDirectory;
+    LPWSTR* rgSearchPaths;
+    DWORD cSearchPaths;
+    DWORD cSearchPathsMax;
 } BURN_CACHE_CONTEXT;
 
 typedef struct _BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT
@@ -112,15 +115,6 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     __in BOOL fMove,
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
-    );
-static HRESULT PromptForSource(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in_z LPCWSTR wzPackageOrContainerId,
-    __in_z_opt LPCWSTR wzPayloadId,
-    __in_z LPCWSTR wzLocalSource,
-    __in_z_opt LPCWSTR wzDownloadSource,
-    __out BOOL* pfRetry,
-    __out BOOL* pfDownload
     );
 static HRESULT CopyPayload(
     __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
@@ -485,6 +479,9 @@ extern "C" HRESULT ApplyCache(
     cacheContext.qwTotalCacheSize = pPlan->qwCacheSizeTotal;
     cacheContext.wzLayoutDirectory = pPlan->sczLayoutDirectory;
 
+    hr = MemAllocArray(reinterpret_cast<LPVOID*>(&cacheContext.rgSearchPaths), sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
+    ExitOnNull(cacheContext.rgSearchPaths, hr, E_OUTOFMEMORY, "Failed to allocate cache search paths array.");
+
     for (DWORD i = 0; i < pPlan->cCacheActions; ++i)
     {
         BURN_CACHE_ACTION* pCacheAction = pPlan->rgCacheActions + i;
@@ -560,6 +557,12 @@ LExit:
     }
 
     CacheCleanup(FALSE, pPlan->wzBundleId);
+
+    for (DWORD i = 0; i < cacheContext.cSearchPathsMax; ++i)
+    {
+        ReleaseNullStr(cacheContext.rgSearchPaths[i]);
+    }
+    ReleaseMem(cacheContext.rgSearchPaths);
 
     UserExperienceOnCacheComplete(pUX, hr);
     return hr;
@@ -949,17 +952,8 @@ static HRESULT ApplyProcessPayload(
     {
         fRetry = FALSE;
 
-        if (pPayload->pContainer)
-        {
-            // TODO: only extract container if payload isn't already extracted
-            hr = ApplyExtractContainer(pContext, pPayload->pContainer);
-            ExitOnFailure(hr, "Failed to extract container for payload: %ls", pPayload->sczKey);
-        }
-        else
-        {
-            hr = AcquireContainerOrPayload(pContext, NULL, pPackage, pPayload);
-            LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_PAYLOAD, "Failed to acquire payload: %ls to working path: %ls", pPayload->sczKey, pPayload->sczUnverifiedPath);
-        }
+        hr = AcquireContainerOrPayload(pContext, NULL, pPackage, pPayload);
+        LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_PAYLOAD, "Failed to acquire payload: %ls to working path: %ls", pPayload->sczKey, pPayload->sczUnverifiedPath);
 
         pContext->qwSuccessfulCacheProgress += pPayload->qwFileSize;
 
@@ -1054,8 +1048,10 @@ static HRESULT LayoutBundle(
 {
     HRESULT hr = S_OK;
     LPWSTR sczBundlePath = NULL;
+    LPWSTR sczBundleDownloadUrl = NULL;
     LPWSTR sczDestinationPath = NULL;
     int nEquivalentPaths = 0;
+    BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
     BOOL fRetryAcquire = FALSE;
@@ -1096,7 +1092,7 @@ static HRESULT LayoutBundle(
             fRetryAcquire = FALSE;
             progress.fCancel = FALSE;
 
-            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, NULL, NULL, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczBundlePath);
+            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, NULL, NULL, &sczBundlePath, &sczBundleDownloadUrl, NULL, &cacheOperation);
             ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
             hr = CopyPayload(&progress, pContext->hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
@@ -1142,6 +1138,7 @@ static HRESULT LayoutBundle(
 
 LExit:
     ReleaseStr(sczDestinationPath);
+    ReleaseStr(sczBundleDownloadUrl);
     ReleaseStr(sczBundlePath);
 
     return hr;
@@ -1160,11 +1157,16 @@ static HRESULT AcquireContainerOrPayload(
     int nEquivalentPaths = 0;
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : NULL;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : NULL;
+    LPCWSTR wzPayloadContainerId = pPayload && pPayload->pContainer ? pPayload->pContainer->sczId : NULL;
     LPCWSTR wzDestinationPath = pContainer ? pContainer->sczUnverifiedPath: pPayload->sczUnverifiedPath;
     LPCWSTR wzRelativePath = pContainer ? pContainer->sczFilePath : pPayload->sczFilePath;
-    LPWSTR sczSourceFullPath = NULL;
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
+    BOOL fBeginCalled = FALSE;
     BOOL fRetry = FALSE;
+    DWORD dwChosenSearchPath = 0;
+    BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
+    LPWSTR* pwzDownloadUrl = pContainer ? &pContainer->downloadSource.sczUrl : &pPayload->downloadSource.sczUrl;
+    LPWSTR* pwzSourcePath = pContainer ? &pContainer->sczSourcePath : &pPayload->sczSourcePath;
 
     progress.pCacheContext = pContext;
     progress.pContainer = pContainer;
@@ -1173,86 +1175,148 @@ static HRESULT AcquireContainerOrPayload(
 
     do
     {
-        LPCWSTR wzDownloadUrl = pContainer ? pContainer->downloadSource.sczUrl : pPayload->downloadSource.sczUrl;
-        LPCWSTR wzSourcePath = pContainer ? pContainer->sczSourcePath : pPayload->sczSourcePath;
-
         BOOL fFoundLocal = FALSE;
-        BOOL fCopy = FALSE;
-        BOOL fDownload = FALSE;
 
+        pContext->cSearchPaths = 0;
+        dwChosenSearchPath = 0;
         fRetry = FALSE;
         progress.fCancel = FALSE;
+        fBeginCalled = TRUE;
 
-        hr = CacheFindLocalSource(wzSourcePath, wzDestinationPath, pContext->pVariables, &fFoundLocal, &sczSourceFullPath);
-        ExitOnFailure(hr, "Failed to search local source.");
-        
-        if (fFoundLocal) // the file exists locally, so copy it.
+        hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId, pwzSourcePath, pwzDownloadUrl, wzPayloadContainerId, &cacheOperation);
+        ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
+
+        // Skip the Resolving event and probing local paths if the BA already knew it wanted to download or extract.
+        if (BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD != cacheOperation &&
+            BOOTSTRAPPER_CACHE_OPERATION_EXTRACT != cacheOperation)
         {
-            // If the source path and destination path are different, do the copy (otherwise there's no point).
-            hr = PathCompare(sczSourceFullPath, wzDestinationPath, &nEquivalentPaths);
-            ExitOnFailure(hr, "Failed to determine if payload source path was equivalent to the destination path.");
+            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths);
+            ExitOnFailure(hr, "Failed to search local source.");
 
-            fCopy = (CSTR_EQUAL != nEquivalentPaths);
-        }
-        else // can't find the file locally, so prompt for source.
-        {
-            DWORD dwLogId = pContainer ? (wzPayloadId ? MSG_PROMPT_CONTAINER_PAYLOAD_SOURCE : MSG_PROMPT_CONTAINER_SOURCE) : pPackage ? MSG_PROMPT_PACKAGE_PAYLOAD_SOURCE : MSG_PROMPT_BUNDLE_PAYLOAD_SOURCE;
-            LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId ? wzPackageOrContainerId : L"", wzPayloadId ? wzPayloadId : L"", sczSourceFullPath);
-
-            hr = PromptForSource(pContext->pUX, wzPackageOrContainerId, wzPayloadId, sczSourceFullPath, wzDownloadUrl, &fRetry, &fDownload);
-
-            // If the BA requested download then ensure a download url is available (it may have been set
-            // during PromptForSource so we need to check again).
-            if (fDownload)
+            for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
             {
-                wzDownloadUrl = pContainer ? pContainer->downloadSource.sczUrl : pPayload->downloadSource.sczUrl;
-                if (!wzDownloadUrl || !*wzDownloadUrl)
+                // If the file exists locally, choose it.
+                if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
                 {
-                    hr = E_INVALIDARG;
+                    dwChosenSearchPath = i;
+
+                    fFoundLocal = TRUE;
+                    break;
                 }
             }
 
-            // Log the error
-            LogExitOnFailure(hr, MSG_PAYLOAD_FILE_NOT_PRESENT, "Failed while prompting for source (original path '%ls').", sczSourceFullPath);
-        }
-
-        if (fCopy)
-        {
-            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczSourceFullPath);
-            ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
-
-            hr = CopyPayload(&progress, INVALID_HANDLE_VALUE, sczSourceFullPath, wzDestinationPath);
-            // Error handling happens after sending complete message to BA.
-
-            // We successfully copied from a source location, set that as the last used source.
-            if (SUCCEEDED(hr))
+            if (BOOTSTRAPPER_CACHE_OPERATION_COPY == cacheOperation)
             {
-                CacheSetLastUsedSource(pContext->pVariables, sczSourceFullPath, wzRelativePath);
+                if (!fFoundLocal)
+                {
+                    cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
+                }
             }
-        }
-        else if (fDownload)
-        {
-            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD, wzDownloadUrl);
-            ExitOnRootFailure(hr, "BA aborted cache download payload begin.");
+            else
+            {
+                if (fFoundLocal) // the file exists locally, so copy it.
+                {
+                    cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_COPY;
+                }
+                else if (wzPayloadContainerId)
+                {
+                    cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_EXTRACT;
+                }
+                else if (*pwzDownloadUrl && **pwzDownloadUrl)
+                {
+                    cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD;
+                }
+            }
 
-            hr = DownloadPayload(&progress, wzDestinationPath);
-            // Error handling happens after sending complete message to BA.
+            // Let the BA have a chance to override the action, but their chance to change the source is during begin or complete.
+            hr = UserExperienceOnCacheAcquireResolving(pContext->pUX, wzPackageOrContainerId, wzPayloadId, pContext->rgSearchPaths, pContext->cSearchPaths, fFoundLocal, &dwChosenSearchPath, *pwzDownloadUrl, wzPayloadContainerId, &cacheOperation);
+            ExitOnRootFailure(hr, "BA aborted cache acquire resolving.");
         }
 
-        if (fCopy || fDownload)
+        switch (cacheOperation)
         {
+        case BOOTSTRAPPER_CACHE_OPERATION_COPY:
+            // If the source path and destination path are different, do the copy (otherwise there's no point).
+            hr = PathCompare(pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath, &nEquivalentPaths);
+            ExitOnFailure(hr, "Failed to determine if payload paths were equivalent, source: %ls, destination: %ls.", pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath);
+
+            if (CSTR_EQUAL != nEquivalentPaths)
+            {
+                hr = CopyPayload(&progress, INVALID_HANDLE_VALUE, pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath);
+                // Error handling happens after sending complete message to BA.
+
+                // TODO: wait for verification?
+                // We successfully copied from a source location, set that as the last used source.
+                if (SUCCEEDED(hr))
+                {
+                    CacheSetLastUsedSource(pContext->pVariables, pContext->rgSearchPaths[dwChosenSearchPath], wzRelativePath);
+                }
+            }
+
+            fBeginCalled = FALSE;
             UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
             if (fRetry)
             {
                 hr = S_OK;
             }
+
+            ExitOnFailure(hr, "Failed to acquire payload from: '%ls' to working path: '%ls'", pContext->rgSearchPaths[dwChosenSearchPath], wzDestinationPath);
+
+            break;
+        case BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD:
+            hr = DownloadPayload(&progress, wzDestinationPath);
+            // Error handling happens after sending complete message to BA.
+
+            fBeginCalled = FALSE;
+            UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
+            if (fRetry)
+            {
+                hr = S_OK;
+            }
+
+            ExitOnFailure(hr, "Failed to acquire payload from: '%ls' to working path: '%ls'", *pwzDownloadUrl, wzDestinationPath);
+
+            break;
+        case BOOTSTRAPPER_CACHE_OPERATION_EXTRACT:
+            Assert(pPayload->pContainer);
+
+            hr = ApplyExtractContainer(pContext, pPayload->pContainer);
+            // Error handling happens after sending complete message to BA.
+
+            fBeginCalled = FALSE;
+            UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
+            if (fRetry)
+            {
+                hr = S_OK;
+            }
+
+            ExitOnFailure(hr, "Failed to extract container for payload: %ls", wzPayloadId);
+
+            break;
+        case BOOTSTRAPPER_CACHE_OPERATION_NONE:
+            hr = E_FILENOTFOUND;
+            LogErrorId(hr, MSG_RESOLVE_SOURCE_FAILED, wzPayloadId, pPackage ? pPackage->sczId : NULL, pContainer ? pContainer->sczId : NULL);
+
+            fBeginCalled = FALSE;
+            UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
+            if (fRetry)
+            {
+                hr = S_OK;
+            }
+
+            ExitOnFailure(hr, "Failed to resolve source, payload: %ls, package: %ls, container: %ls", wzPayloadId, pPackage ? pPackage->sczId : NULL, pContainer ? pContainer->sczId : NULL);
+
+            break;
         }
-        ExitOnFailure(hr, "Failed to acquire payload from: '%ls' to working path: '%ls'", fCopy ? sczSourceFullPath : wzDownloadUrl, wzDestinationPath);
     } while (fRetry);
-    ExitOnFailure(hr, "Failed to find external payload to cache.");
 
 LExit:
-    ReleaseStr(sczSourceFullPath);
+    if (fBeginCalled)
+    {
+        UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
+    }
+
+    pContext->cSearchPathsMax = max(pContext->cSearchPaths, pContext->cSearchPathsMax);
 
     return hr;
 }
@@ -1350,48 +1414,6 @@ static HRESULT LayoutOrCacheContainerOrPayload(
             *pfRetry = TRUE; // go back and retry acquire.
         }
     } while (S_FALSE == hr);
-
-LExit:
-    return hr;
-}
-
-static HRESULT PromptForSource(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in_z LPCWSTR wzPackageOrContainerId,
-    __in_z_opt LPCWSTR wzPayloadId,
-    __in_z LPCWSTR wzLocalSource,
-    __in_z_opt LPCWSTR wzDownloadSource,
-    __inout BOOL* pfRetry,
-    __inout BOOL* pfDownload
-    )
-{
-    HRESULT hr = S_OK;
-    BOOTSTRAPPER_RESOLVESOURCE_ACTION action = BOOTSTRAPPER_RESOLVESOURCE_ACTION_NONE;
-
-    hr = UserExperienceOnResolveSource(pUX, wzPackageOrContainerId, wzPayloadId, wzLocalSource, wzDownloadSource, &action);
-    if (FAILED(hr))
-    {
-        ExitFunction();
-    }
-
-    switch (action)
-    {
-    case BOOTSTRAPPER_RESOLVESOURCE_ACTION_NONE:
-        hr = E_FILENOTFOUND;
-        break;
-
-    case BOOTSTRAPPER_RESOLVESOURCE_ACTION_RETRY:
-        *pfRetry = TRUE;
-        break;
-
-    case BOOTSTRAPPER_RESOLVESOURCE_ACTION_DOWNLOAD:
-        *pfDownload = TRUE;
-        break;
-
-    default:
-        hr = E_INVALIDARG;
-        break;
-    }
 
 LExit:
     return hr;
