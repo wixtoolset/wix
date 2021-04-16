@@ -57,6 +57,10 @@ static HRESULT TransferWorkingPathToUnverifiedPath(
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in BOOL fMove
     );
+static HRESULT VerifyFileAgainstContainer(
+    __in BURN_CONTAINER* pContainer,
+    __in_z LPCWSTR wzVerifyPath
+    );
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzVerifyPath
@@ -837,7 +841,7 @@ LExit:
 extern "C" HRESULT CacheCompletePayload(
     __in BOOL fPerMachine,
     __in BURN_PAYLOAD* pPayload,
-    __in_z_opt LPCWSTR wzCacheId,
+    __in_z LPCWSTR wzCacheId,
     __in_z LPCWSTR wzWorkingPayloadPath,
     __in BOOL fMove
     )
@@ -906,6 +910,44 @@ LExit:
     ReleaseStr(sczUnverifiedPayloadPath);
     ReleaseStr(sczCachedPath);
     ReleaseStr(sczCachedDirectory);
+
+    return hr;
+}
+
+extern "C" HRESULT CacheVerifyContainer(
+    __in BURN_CONTAINER* pContainer,
+    __in_z LPCWSTR wzCachedDirectory
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCachedPath = NULL;
+
+    hr = PathConcat(wzCachedDirectory, pContainer->sczFilePath, &sczCachedPath);
+    ExitOnFailure(hr, "Failed to concat complete cached path.");
+
+    hr = VerifyFileAgainstContainer(pContainer, sczCachedPath);
+
+LExit:
+    ReleaseStr(sczCachedPath);
+
+    return hr;
+}
+
+extern "C" HRESULT CacheVerifyPayload(
+    __in BURN_PAYLOAD* pPayload,
+    __in_z LPCWSTR wzCachedDirectory
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCachedPath = NULL;
+
+    hr = PathConcat(wzCachedDirectory, pPayload->sczFilePath, &sczCachedPath);
+    ExitOnFailure(hr, "Failed to concat complete cached path.");
+
+    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath);
+
+LExit:
+    ReleaseStr(sczCachedPath);
 
     return hr;
 }
@@ -1380,6 +1422,38 @@ static HRESULT TransferWorkingPathToUnverifiedPath(
     }
 
 LExit:
+    return hr;
+}
+
+static HRESULT VerifyFileAgainstContainer(
+    __in BURN_CONTAINER* pContainer,
+    __in_z LPCWSTR wzVerifyPath
+    )
+{
+    HRESULT hr = S_OK;
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+
+    // Get the container on disk actual hash.
+    hFile = ::CreateFileW(wzVerifyPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    if (INVALID_HANDLE_VALUE == hFile)
+    {
+        hr = HRESULT_FROM_WIN32(::GetLastError());
+        if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
+        {
+            ExitFunction(); // do not log error when the file was not found.
+        }
+        ExitOnRootFailure(hr, "Failed to open container at path: %ls", wzVerifyPath);
+    }
+
+    if (pContainer->pbHash) // the container should have a hash we can use to verify it.
+    {
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzVerifyPath, hFile);
+        ExitOnFailure(hr, "Failed to verify hash of container: %ls", pContainer->sczId);
+    }
+
+LExit:
+    ReleaseFileHandle(hFile);
+
     return hr;
 }
 
