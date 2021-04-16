@@ -15,6 +15,7 @@ enum BURN_CACHE_PROGRESS_TYPE
 {
     BURN_CACHE_PROGRESS_TYPE_ACQUIRE,
     BURN_CACHE_PROGRESS_TYPE_VERIFY,
+    BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY,
 };
 
 // structs
@@ -100,6 +101,12 @@ static HRESULT ApplyProcessPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_PACKAGE* pPackage,
     __in BURN_PAYLOAD* pPayload
+    );
+static HRESULT ApplyCacheVerifyContainerOrPayload(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in_opt BURN_CONTAINER* pContainer,
+    __in_opt BURN_PACKAGE* pPackage,
+    __in_opt BURN_PAYLOAD* pPayload
     );
 static HRESULT ExtractContainer(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -910,11 +917,9 @@ static HRESULT ApplyLayoutContainer(
 
     Assert(!pContainer->fAttached);
 
-    hr = CacheVerifyContainer(pContainer, pContext->wzLayoutDirectory);
+    hr = ApplyCacheVerifyContainerOrPayload(pContext, pContainer, NULL, NULL);
     if (SUCCEEDED(hr))
     {
-        // TODO: send Acquire and Verify messages to BA?
-        pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize * 2;
         ExitFunction();
     }
 
@@ -969,11 +974,9 @@ static HRESULT ApplyProcessPayload(
         ExitFunction();
     }
 
-    hr = CacheVerifyPayload(pPayload, pContext->wzLayoutDirectory ? pContext->wzLayoutDirectory : pPackage->sczCacheFolder);
+    hr = ApplyCacheVerifyContainerOrPayload(pContext, NULL, pPackage, pPayload);
     if (SUCCEEDED(hr))
     {
-        // TODO: send Acquire and Verify messages to BA?
-        pContext->qwSuccessfulCacheProgress += pPayload->qwFileSize * 2;
         ExitFunction();
     }
 
@@ -1008,6 +1011,54 @@ static HRESULT ApplyProcessPayload(
 
 LExit:
     ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
+
+    return hr;
+}
+
+static HRESULT ApplyCacheVerifyContainerOrPayload(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in_opt BURN_CONTAINER* pContainer,
+    __in_opt BURN_PACKAGE* pPackage,
+    __in_opt BURN_PAYLOAD* pPayload
+    )
+{
+    AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
+
+    HRESULT hr = S_OK;
+    BURN_CACHE_PROGRESS_CONTEXT progress = { };
+    LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : NULL;
+    LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : NULL;
+
+    progress.pCacheContext = pContext;
+    progress.pContainer = pContainer;
+    progress.pPackage = pPackage;
+    progress.pPayload = pPayload;
+    progress.type = BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY;
+
+    hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
+    ExitOnRootFailure(hr, "BA aborted cache container or payload verify begin.");
+
+    if (pContainer)
+    {
+        hr = CacheVerifyContainer(pContainer, pContext->wzLayoutDirectory);
+    }
+    else
+    {
+        hr = CacheVerifyPayload(pPayload, pContext->wzLayoutDirectory ? pContext->wzLayoutDirectory : pPackage->sczCacheFolder);
+    }
+
+    // This was best effort to avoid acquiring the container or payload.
+    if (FAILED(hr))
+    {
+        ExitFunction();
+    }
+
+    pContext->qwSuccessfulCacheProgress += pContainer ? pContainer->qwFileSize : pPayload->qwFileSize;
+
+    hr = CompleteCacheProgress(&progress, pContainer ? pContainer->qwFileSize : pPayload->qwFileSize);
+
+LExit:
+    UserExperienceOnCacheContainerOrPayloadVerifyComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr);
 
     return hr;
 }
@@ -1112,9 +1163,21 @@ static HRESULT LayoutBundle(
 
     if (CSTR_EQUAL == nEquivalentPaths && FileExistsEx(sczDestinationPath, NULL))
     {
-        // TODO: send Acquire and Verify messages to BA?
-        pContext->qwSuccessfulCacheProgress += 2 * qwBundleSize;
-        ExitFunction1(hr = S_OK);
+        hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, NULL, NULL);
+        if (FAILED(hr))
+        {
+            UserExperienceOnCacheContainerOrPayloadVerifyComplete(pContext->pUX, NULL, NULL, hr);
+            ExitOnRootFailure(hr, "BA aborted cache payload verify begin.");
+        }
+
+        pContext->qwSuccessfulCacheProgress += qwBundleSize;
+
+        progress.type = BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY;
+        hr = CompleteCacheProgress(&progress, qwBundleSize);
+
+        UserExperienceOnCacheContainerOrPayloadVerifyComplete(pContext->pUX, NULL, NULL, hr);
+
+        ExitFunction();
     }
 
     do
@@ -1701,6 +1764,10 @@ static DWORD CALLBACK CacheProgressRoutine(
     case BURN_CACHE_PROGRESS_TYPE_VERIFY:
         hr = UserExperienceOnCacheVerifyProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
         ExitOnRootFailure(hr, "BA aborted verify of %hs: %ls", pProgress->pContainer ? "container" : "payload", pProgress->pContainer ? wzPackageOrContainerId : wzPayloadId);
+        break;
+    case BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY:
+        hr = UserExperienceOnCacheContainerOrPayloadVerifyProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
+        ExitOnRootFailure(hr, "BA aborted container or payload verify: %ls", wzPayloadId);
         break;
     }
 
