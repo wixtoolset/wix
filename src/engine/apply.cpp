@@ -11,6 +11,12 @@
 
 const DWORD BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS = 2;
 
+enum BURN_CACHE_PROGRESS_TYPE
+{
+    BURN_CACHE_PROGRESS_TYPE_ACQUIRE,
+    BURN_CACHE_PROGRESS_TYPE_VERIFY,
+};
+
 // structs
 
 typedef struct _BURN_CACHE_CONTEXT
@@ -29,16 +35,17 @@ typedef struct _BURN_CACHE_CONTEXT
     LPWSTR sczLastUsedFolderCandidate;
 } BURN_CACHE_CONTEXT;
 
-typedef struct _BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT
+typedef struct _BURN_CACHE_PROGRESS_CONTEXT
 {
     BURN_CACHE_CONTEXT* pCacheContext;
+    BURN_CACHE_PROGRESS_TYPE type;
     BURN_CONTAINER* pContainer;
     BURN_PACKAGE* pPackage;
     BURN_PAYLOAD* pPayload;
 
     BOOL fCancel;
     HRESULT hrError;
-} BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT;
+} BURN_CACHE_PROGRESS_CONTEXT;
 
 typedef struct _BURN_EXECUTE_CONTEXT
 {
@@ -111,7 +118,7 @@ static HRESULT ApplyAcquireContainerOrPayload(
     __in_opt BURN_PAYLOAD* pPayload
     );
 static HRESULT AcquireContainerOrPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __out BOOL* pfRetry
     );
 static HRESULT LayoutOrCacheContainerOrPayload(
@@ -127,17 +134,17 @@ static HRESULT PreparePayloadDestinationPath(
     __in_z LPCWSTR wzDestinationPath
     );
 static HRESULT CopyPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __in HANDLE hSourceFile,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath
     );
 static HRESULT DownloadPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __in_z LPCWSTR wzDestinationPath
     );
 static HRESULT CompleteCacheProgress(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pContext,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pContext,
     __in DWORD64 qwFileSize
     );
 static DWORD CALLBACK CacheProgressRoutine(
@@ -921,13 +928,6 @@ static HRESULT ApplyLayoutContainer(
         hr = LayoutOrCacheContainerOrPayload(pContext, pContainer, NULL, NULL, TRUE, cTryAgainAttempts, &fRetry);
         if (SUCCEEDED(hr))
         {
-            if (pContext->sczLastUsedFolderCandidate)
-            {
-                // We successfully copied from a source location, set that as the last used source.
-                CacheSetLastUsedSource(pContext->pVariables, pContext->sczLastUsedFolderCandidate, pContainer->sczFilePath);
-            }
-
-            pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
             break;
         }
         else
@@ -988,13 +988,6 @@ static HRESULT ApplyProcessPayload(
         hr = LayoutOrCacheContainerOrPayload(pContext, NULL, pPackage, pPayload, FALSE, cTryAgainAttempts, &fRetry);
         if (SUCCEEDED(hr))
         {
-            if (pContext->sczLastUsedFolderCandidate)
-            {
-                // We successfully copied from a source location, set that as the last used source.
-                CacheSetLastUsedSource(pContext->pVariables, pContext->sczLastUsedFolderCandidate, pPayload->sczFilePath);
-            }
-
-            pContext->qwSuccessfulCacheProgress += pPayload->qwFileSize;
             break;
         }
         else
@@ -1092,9 +1085,11 @@ static HRESULT LayoutBundle(
     LPWSTR sczDestinationPath = NULL;
     int nEquivalentPaths = 0;
     BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
-    BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
+    BURN_CACHE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
     BOOL fRetryAcquire = FALSE;
+
+    progress.pCacheContext = pContext;
 
     hr = VariableGetString(pContext->pVariables, BURN_BUNDLE_SOURCE_PROCESS_PATH, &sczBundlePath);
     if (FAILED(hr))
@@ -1122,12 +1117,11 @@ static HRESULT LayoutBundle(
         ExitFunction1(hr = S_OK);
     }
 
-    progress.pCacheContext = pContext;
-
     do
     {
         hr = S_OK;
         fRetry = FALSE;
+        progress.type = BURN_CACHE_PROGRESS_TYPE_ACQUIRE;
 
         for (;;)
         {
@@ -1156,6 +1150,8 @@ static HRESULT LayoutBundle(
             break;
         }
 
+        progress.type = BURN_CACHE_PROGRESS_TYPE_VERIFY;
+
         do
         {
             hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, NULL, NULL);
@@ -1168,6 +1164,11 @@ static HRESULT LayoutBundle(
             else
             {
                 hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
+            }
+
+            if (SUCCEEDED(hr))
+            {
+                hr = CompleteCacheProgress(&progress, qwBundleSize);
             }
 
             BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
@@ -1189,8 +1190,6 @@ static HRESULT LayoutBundle(
     } while (fRetry);
     LogExitOnFailure(hr, MSG_FAILED_LAYOUT_BUNDLE, "Failed to layout bundle: %ls to layout directory: %ls", sczBundlePath, pContext->wzLayoutDirectory);
 
-    pContext->qwSuccessfulCacheProgress += qwBundleSize;
-
 LExit:
     ReleaseStr(sczDestinationPath);
     ReleaseStr(sczBundleDownloadUrl);
@@ -1209,10 +1208,11 @@ static HRESULT ApplyAcquireContainerOrPayload(
     AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
 
     HRESULT hr = S_OK;
-    BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
+    BURN_CACHE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
 
     progress.pCacheContext = pContext;
+    progress.type = BURN_CACHE_PROGRESS_TYPE_ACQUIRE;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
     progress.pPayload = pPayload;
@@ -1235,7 +1235,7 @@ LExit:
 }
 
 static HRESULT AcquireContainerOrPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __out BOOL* pfRetry
     )
 {
@@ -1373,6 +1373,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     LPCWSTR wzUnverifiedPath = pContainer ? pContainer->sczUnverifiedPath : pPayload->sczUnverifiedPath;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : L"";
     BOOL fCanAffectRegistration = FALSE;
+    BURN_CACHE_PROGRESS_CONTEXT progress = { };
 
     if (!pContext->wzLayoutDirectory)
     {
@@ -1383,6 +1384,11 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     }
 
     *pfRetry = FALSE;
+    progress.pCacheContext = pContext;
+    progress.type = BURN_CACHE_PROGRESS_TYPE_VERIFY;
+    progress.pContainer = pContainer;
+    progress.pPackage = pPackage;
+    progress.pPayload = pPayload;
 
     do
     {
@@ -1407,6 +1413,11 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         else // complete the payload.
         {
             hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove);
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            hr = CompleteCacheProgress(&progress, pContainer ? pContainer->qwFileSize : pPayload->qwFileSize);
         }
 
         if (SUCCEEDED(hr) && fCanAffectRegistration)
@@ -1460,7 +1471,7 @@ LExit:
 }
 
 static HRESULT CopyPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __in HANDLE hSourceFile,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath
@@ -1522,7 +1533,7 @@ LExit:
 }
 
 static HRESULT DownloadPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __in_z LPCWSTR wzDestinationPath
     )
 {
@@ -1618,7 +1629,7 @@ LExit:
 }
 
 static HRESULT CompleteCacheProgress(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pContext,
+    __in BURN_CACHE_PROGRESS_CONTEXT* pContext,
     __in DWORD64 qwFileSize
     )
 {
@@ -1634,6 +1645,12 @@ static HRESULT CompleteCacheProgress(
     if (PROGRESS_CONTINUE == dwResult)
     {
         pContext->pCacheContext->qwSuccessfulCacheProgress += qwFileSize;
+
+        if (BURN_CACHE_PROGRESS_TYPE_VERIFY == pContext->type && pContext->pCacheContext->sczLastUsedFolderCandidate)
+        {
+            // We successfully copied from a source location, set that as the last used source.
+            CacheSetLastUsedSource(pContext->pCacheContext->pVariables, pContext->pCacheContext->sczLastUsedFolderCandidate, pContext->pContainer ? pContext->pContainer->sczFilePath : pContext->pPayload->sczFilePath);
+        }
     }
     else if (PROGRESS_CANCEL == dwResult)
     {
@@ -1664,7 +1681,7 @@ static DWORD CALLBACK CacheProgressRoutine(
 {
     HRESULT hr = S_OK;
     DWORD dwResult = PROGRESS_CONTINUE;
-    BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress = static_cast<BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT*>(lpData);
+    BURN_CACHE_PROGRESS_CONTEXT* pProgress = static_cast<BURN_CACHE_PROGRESS_CONTEXT*>(lpData);
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : NULL;
     LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : NULL;
     DWORD64 qwCacheProgress = pProgress->pCacheContext->qwSuccessfulCacheProgress + TotalBytesTransferred.QuadPart;
@@ -1675,8 +1692,17 @@ static DWORD CALLBACK CacheProgressRoutine(
     }
     DWORD dwOverallPercentage = pProgress->pCacheContext->qwTotalCacheSize ? static_cast<DWORD>(qwCacheProgress * 100 / pProgress->pCacheContext->qwTotalCacheSize) : 0;
 
-    hr = UserExperienceOnCacheAcquireProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
-    ExitOnRootFailure(hr, "BA aborted acquire of %hs: %ls", pProgress->pContainer ? "container" : "payload", pProgress->pContainer ? wzPackageOrContainerId : wzPayloadId);
+    switch (pProgress->type)
+    {
+    case BURN_CACHE_PROGRESS_TYPE_ACQUIRE:
+        hr = UserExperienceOnCacheAcquireProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
+        ExitOnRootFailure(hr, "BA aborted acquire of %hs: %ls", pProgress->pContainer ? "container" : "payload", pProgress->pContainer ? wzPackageOrContainerId : wzPayloadId);
+        break;
+    case BURN_CACHE_PROGRESS_TYPE_VERIFY:
+        hr = UserExperienceOnCacheVerifyProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
+        ExitOnRootFailure(hr, "BA aborted verify of %hs: %ls", pProgress->pContainer ? "container" : "payload", pProgress->pContainer ? wzPackageOrContainerId : wzPayloadId);
+        break;
+    }
 
 LExit:
     if (HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) == hr)

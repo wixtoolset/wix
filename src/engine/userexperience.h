@@ -189,6 +189,14 @@ BAAPI UserExperienceOnCacheVerifyComplete(
     __in HRESULT hrStatus,
     __inout BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION* pAction
     );
+BAAPI UserExperienceOnCacheVerifyProgress(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z_opt LPCWSTR wzPackageOrContainerId,
+    __in_z_opt LPCWSTR wzPayloadId,
+    __in DWORD64 dw64Progress,
+    __in DWORD64 dw64Total,
+    __in DWORD dwOverallPercentage
+    );
 BAAPI UserExperienceOnCommitMsiTransactionBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzTransactionId
