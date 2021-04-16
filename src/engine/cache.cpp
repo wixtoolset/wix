@@ -59,11 +59,13 @@ static HRESULT TransferWorkingPathToUnverifiedPath(
     );
 static HRESULT VerifyFileAgainstContainer(
     __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzVerifyPath
+    __in_z LPCWSTR wzVerifyPath,
+    __in BOOL fAlreadyCached
     );
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzVerifyPath
+    __in_z LPCWSTR wzVerifyPath,
+    __in BOOL fAlreadyCached
     );
 static HRESULT ResetPathPermissions(
     __in BOOL fPerMachine,
@@ -896,18 +898,10 @@ extern "C" HRESULT CacheCompletePayload(
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     // If the cached file matches what we expected, we're good.
-    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath);
+    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE);
     if (SUCCEEDED(hr))
     {
-        ::DecryptFileW(sczCachedPath, 0);  // Let's try to make sure it's not encrypted.
-        LogId(REPORT_STANDARD, MSG_VERIFIED_EXISTING_PAYLOAD, pPayload->sczKey, sczCachedPath);
         ExitFunction();
-    }
-    else if (E_PATHNOTFOUND != hr && E_FILENOTFOUND != hr)
-    {
-        LogErrorId(hr, MSG_FAILED_VERIFY_PAYLOAD, pPayload->sczKey, sczCachedPath, NULL);
-
-        FileEnsureDelete(sczCachedPath); // if the file existed but did not verify correctly, make it go away.
     }
 
     hr = CreateUnverifiedPath(fPerMachine, pPayload->sczKey, &sczUnverifiedPayloadPath);
@@ -928,14 +922,8 @@ extern "C" HRESULT CacheCompletePayload(
     hr = ResetPathPermissions(fPerMachine, sczUnverifiedPayloadPath);
     ExitOnFailure(hr, "Failed to reset permissions on unverified cached payload: %ls", pPayload->sczKey);
 
-    hr = VerifyFileAgainstPayload(pPayload, sczUnverifiedPayloadPath);
-    if (FAILED(hr))
-    {
-        LogErrorId(hr, MSG_FAILED_VERIFY_PAYLOAD, pPayload->sczKey, sczUnverifiedPayloadPath, NULL);
-
-        FileEnsureDelete(sczUnverifiedPayloadPath); // if the file did not verify correctly, make it go away.
-        ExitFunction();
-    }
+    hr = VerifyFileAgainstPayload(pPayload, sczUnverifiedPayloadPath, FALSE);
+    LogExitOnFailure(hr, MSG_FAILED_VERIFY_PAYLOAD, "Failed to verify payload: %ls at path: %ls", pPayload->sczKey, sczUnverifiedPayloadPath, NULL);
 
     LogId(REPORT_STANDARD, MSG_VERIFIED_ACQUIRED_PAYLOAD, pPayload->sczKey, sczUnverifiedPayloadPath, fMove ? "moving" : "copying", sczCachedPath);
 
@@ -963,7 +951,7 @@ extern "C" HRESULT CacheVerifyContainer(
     hr = PathConcat(wzCachedDirectory, pContainer->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyFileAgainstContainer(pContainer, sczCachedPath);
+    hr = VerifyFileAgainstContainer(pContainer, sczCachedPath, TRUE);
 
 LExit:
     ReleaseStr(sczCachedPath);
@@ -982,7 +970,7 @@ extern "C" HRESULT CacheVerifyPayload(
     hr = PathConcat(wzCachedDirectory, pPayload->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath);
+    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE);
 
 LExit:
     ReleaseStr(sczCachedPath);
@@ -1460,7 +1448,8 @@ LExit:
 
 static HRESULT VerifyFileAgainstContainer(
     __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzVerifyPath
+    __in_z LPCWSTR wzVerifyPath,
+    __in BOOL fAlreadyCached
     )
 {
     HRESULT hr = S_OK;
@@ -1484,15 +1473,32 @@ static HRESULT VerifyFileAgainstContainer(
         ExitOnFailure(hr, "Failed to verify hash of container: %ls", pContainer->sczId);
     }
 
+    if (fAlreadyCached)
+    {
+        LogId(REPORT_STANDARD, MSG_VERIFIED_EXISTING_CONTAINER, pContainer->sczId, wzVerifyPath);
+        ::DecryptFileW(wzVerifyPath, 0);  // Let's try to make sure it's not encrypted.
+    }
+
 LExit:
     ReleaseFileHandle(hFile);
+
+    if (FAILED(hr) && E_PATHNOTFOUND != hr && E_FILENOTFOUND != hr)
+    {
+        if (fAlreadyCached)
+        {
+            LogErrorId(hr, MSG_FAILED_VERIFY_CONTAINER, pContainer->sczId, wzVerifyPath, NULL);
+        }
+
+        FileEnsureDelete(wzVerifyPath); // if the file existed but did not verify correctly, make it go away.
+    }
 
     return hr;
 }
 
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzVerifyPath
+    __in_z LPCWSTR wzVerifyPath,
+    __in BOOL fAlreadyCached
     )
 {
     HRESULT hr = S_OK;
@@ -1516,8 +1522,24 @@ static HRESULT VerifyFileAgainstPayload(
         ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
     }
 
+    if (fAlreadyCached)
+    {
+        LogId(REPORT_STANDARD, MSG_VERIFIED_EXISTING_PAYLOAD, pPayload->sczKey, wzVerifyPath);
+        ::DecryptFileW(wzVerifyPath, 0);  // Let's try to make sure it's not encrypted.
+    }
+
 LExit:
     ReleaseFileHandle(hFile);
+
+    if (FAILED(hr) && E_PATHNOTFOUND != hr && E_FILENOTFOUND != hr)
+    {
+        if (fAlreadyCached)
+        {
+            LogErrorId(hr, MSG_FAILED_VERIFY_PAYLOAD, pPayload->sczKey, wzVerifyPath, NULL);
+        }
+
+        FileEnsureDelete(wzVerifyPath); // if the file existed but did not verify correctly, make it go away.
+    }
 
     return hr;
 }

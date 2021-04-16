@@ -478,6 +478,13 @@ Language=English
 Acquired payload: %1!ls! to working path: %2!ls! from: %4!ls!.
 .
 
+MessageId=303
+Severity=Success
+SymbolicName=MSG_VERIFIED_EXISTING_CONTAINER
+Language=English
+Verified existing container: %1!ls! at path: %2!ls!.
+.
+
 MessageId=304
 Severity=Success
 SymbolicName=MSG_VERIFIED_EXISTING_PAYLOAD
@@ -722,6 +729,13 @@ Severity=Success
 SymbolicName=MSG_ACQUIRE_PACKAGE_PAYLOAD
 Language=English
 Acquiring package: %1!ls!, payload: %2!ls!, %3!hs! from: %4!ls!
+.
+
+MessageId=339
+Severity=Error
+SymbolicName=MSG_FAILED_VERIFY_CONTAINER
+Language=English
+Failed to verify container: %2!ls! at path: %3!ls!, error: %1!ls!. Deleting file.
 .
 
 MessageId=347

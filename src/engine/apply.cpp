@@ -538,6 +538,9 @@ extern "C" HRESULT ApplyCache(
 
             if (!pPackage->fPerMachine && !cacheContext.wzLayoutDirectory)
             {
+                hr = CacheGetCompletedPath(FALSE, pPackage->sczCacheId, &pPackage->sczCacheFolder);
+                ExitOnFailure(hr, "Failed to get cached path for package with cache id: %ls", pPackage->sczCacheId);
+
                 cacheContext.hPipe = INVALID_HANDLE_VALUE;
             }
 
@@ -800,12 +803,6 @@ static HRESULT ApplyCachePackage(
     HRESULT hr = S_OK;
     BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
 
-    if (!pPackage->sczCacheFolder && !pContext->wzLayoutDirectory)
-    {
-        hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &pPackage->sczCacheFolder);
-        ExitOnFailure(hr, "Failed to get cached path for package with cache id: %ls", pPackage->sczCacheId);
-    }
-
     for (;;)
     {
         hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cPayloads, pPackage->payloads.qwTotalSize);
@@ -1038,7 +1035,11 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
     hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
     ExitOnRootFailure(hr, "BA aborted cache container or payload verify begin.");
 
-    if (pContainer)
+    if (INVALID_HANDLE_VALUE != pContext->hPipe)
+    {
+        hr = ElevationCacheVerifyContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayload, pContext->wzLayoutDirectory);
+    }
+    else if (pContainer)
     {
         hr = CacheVerifyContainer(pContainer, pContext->wzLayoutDirectory);
     }

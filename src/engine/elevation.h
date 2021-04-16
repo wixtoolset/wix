@@ -64,6 +64,13 @@ HRESULT ElevationCacheOrLayoutContainerOrPayload(
     __in_z LPCWSTR wzUnverifiedPath,
     __in BOOL fMove
     );
+HRESULT ElevationCacheVerifyContainerOrPayload(
+    __in HANDLE hPipe,
+    __in_opt BURN_CONTAINER* pContainer,
+    __in_opt BURN_PACKAGE* pPackage,
+    __in_opt BURN_PAYLOAD* pPayload,
+    __in_z_opt LPCWSTR wzLayoutDirectory
+    );
 HRESULT ElevationCacheCleanup(
     __in HANDLE hPipe
     );
