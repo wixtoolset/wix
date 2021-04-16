@@ -349,7 +349,7 @@ extern "C" void PackageUninitialize(
         MemFree(pPackage->rgDependencyProviders);
     }
 
-    ReleaseMem(pPackage->payloads.rgpPayloads);
+    ReleaseMem(pPackage->payloads.rgItems);
 
     switch (pPackage->type)
     {
@@ -567,14 +567,16 @@ static HRESULT ParsePayloadRefsFromXml(
     }
 
     // allocate memory for payload pointers
-    pPackage->payloads.rgpPayloads = (BURN_PAYLOAD**)MemAlloc(sizeof(BURN_PAYLOAD*) * cNodes, TRUE);
-    ExitOnNull(pPackage->payloads.rgpPayloads, hr, E_OUTOFMEMORY, "Failed to allocate memory for package payloads.");
+    pPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM) * cNodes, TRUE);
+    ExitOnNull(pPackage->payloads.rgItems, hr, E_OUTOFMEMORY, "Failed to allocate memory for package payloads.");
 
-    pPackage->payloads.cPayloads = cNodes;
+    pPackage->payloads.cItems = cNodes;
 
     // parse package elements
     for (DWORD i = 0; i < cNodes; ++i)
     {
+        BURN_PAYLOAD_GROUP_ITEM* pPackagePayload = pPackage->payloads.rgItems + i;
+
         hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
         ExitOnFailure(hr, "Failed to get next node.");
 
@@ -583,10 +585,10 @@ static HRESULT ParsePayloadRefsFromXml(
         ExitOnFailure(hr, "Failed to get Id attribute.");
 
         // find payload
-        hr = PayloadFindById(pPayloads, sczId, &pPackage->payloads.rgpPayloads[i]);
+        hr = PayloadFindById(pPayloads, sczId, &pPackagePayload->pPayload);
         ExitOnFailure(hr, "Failed to find payload.");
 
-        pPackage->payloads.qwTotalSize += pPackage->payloads.rgpPayloads[i]->qwFileSize;
+        pPackage->payloads.qwTotalSize += pPackagePayload->pPayload->qwFileSize;
 
         // prepare next iteration
         ReleaseNullObject(pixnNode);

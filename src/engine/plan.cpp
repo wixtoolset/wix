@@ -1839,15 +1839,22 @@ static void ResetPlannedPayloadsState(
     {
         BURN_PAYLOAD* pPayload = pPayloads->rgPayloads + i;
 
+        pPayload->cRemainingInstances = 0;
         pPayload->state = BURN_PAYLOAD_STATE_NONE;
         ReleaseNullStr(pPayload->sczLocalFilePath);
     }
 }
 
 static void ResetPlannedPayloadGroupState(
-    __in BURN_PAYLOAD_GROUP* /*pPayloadGroup*/
+    __in BURN_PAYLOAD_GROUP* pPayloadGroup
     )
 {
+    for (DWORD i = 0; i < pPayloadGroup->cItems; ++i)
+    {
+        BURN_PAYLOAD_GROUP_ITEM* pItem = pPayloadGroup->rgItems + i;
+
+        pItem->fCached = FALSE;
+    }
 }
 
 static void ResetPlannedPackageState(
@@ -2223,9 +2230,12 @@ static HRESULT ProcessPayloadGroup(
 {
     HRESULT hr = S_OK;
 
-    for (DWORD i = 0; i < pPayloadGroup->cPayloads; ++i)
+    for (DWORD i = 0; i < pPayloadGroup->cItems; ++i)
     {
-        BURN_PAYLOAD* pPayload = pPayloadGroup->rgpPayloads[i];
+        BURN_PAYLOAD_GROUP_ITEM* pItem = pPayloadGroup->rgItems + i;
+        BURN_PAYLOAD* pPayload = pItem->pPayload;
+
+        pPayload->cRemainingInstances += 1;
 
         if (pPayload->pContainer && !pPayload->pContainer->fPlanned)
         {

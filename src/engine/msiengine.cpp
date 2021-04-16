@@ -1100,7 +1100,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
     LPWSTR sczProperties = NULL;
     LPWSTR sczObfuscatedProperties = NULL;
     BURN_PACKAGE* pPackage = pExecuteAction->msiPackage.pPackage;
-    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
     // During rollback, if the package is already in the rollback state we expect don't
     // touch it again.
@@ -1981,7 +1981,7 @@ static HRESULT ConcatPatchProperty(
         {
             BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + i;
             BURN_PACKAGE* pMspPackage = pSlipstreamMsp->pMspPackage;
-            BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgpPayloads[0];
+            BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgItems[0].pPayload;
             BOOTSTRAPPER_ACTION_STATE patchExecuteAction = fRollback ? pSlipstreamMsp->rollback : pSlipstreamMsp->execute;
 
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < patchExecuteAction)

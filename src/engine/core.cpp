@@ -1679,9 +1679,9 @@ static HRESULT DetectPackagePayloadsCached(
         if (DirExists(sczCachePath, NULL))
         {
             // Check all payloads to see if any exist.
-            for (DWORD i = 0; i < pPackage->payloads.cPayloads; ++i)
+            for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
             {
-                BURN_PAYLOAD* pPayload = pPackage->payloads.rgpPayloads[i];
+                BURN_PAYLOAD* pPayload = pPackage->payloads.rgItems[i].pPayload;
 
                 hr = PathConcat(sczCachePath, pPayload->sczFilePath, &sczPayloadCachePath);
                 ExitOnFailure(hr, "Failed to concat payload cache path.");

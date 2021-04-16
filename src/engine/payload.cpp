@@ -139,11 +139,11 @@ extern "C" HRESULT PayloadsParseFromXml(
 
         if (pPayload->fLayoutOnly && pLayoutPayloads)
         {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pLayoutPayloads->rgpPayloads), pLayoutPayloads->cPayloads + 1, sizeof(BURN_PAYLOAD*), 5);
-            ExitOnNull(pPayloads->rgPayloads, hr, E_OUTOFMEMORY, "Failed to allocate memory for layout payloads.");
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pLayoutPayloads->rgItems), pLayoutPayloads->cItems + 1, sizeof(BURN_PAYLOAD_GROUP_ITEM), 5);
+            ExitOnFailure(hr, "Failed to allocate memory for layout payloads.");
 
-            pLayoutPayloads->rgpPayloads[pLayoutPayloads->cPayloads] = pPayload;
-            ++pLayoutPayloads->cPayloads;
+            pLayoutPayloads->rgItems[pLayoutPayloads->cItems].pPayload = pPayload;
+            ++pLayoutPayloads->cItems;
 
             pLayoutPayloads->qwTotalSize += pPayload->qwFileSize;
         }

@@ -581,7 +581,7 @@ extern "C" HRESULT MspEngineExecutePackage(
     {
         LPCWSTR wzAppend = NULL;
         BURN_PACKAGE* pMspPackage = pExecuteAction->mspTarget.rgOrderedPatches[i].pPackage;
-        BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgpPayloads[0];
+        BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgItems[0].pPayload;
         AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Invalid package type added to ordered patches.");
 
         if (BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->mspTarget.action)

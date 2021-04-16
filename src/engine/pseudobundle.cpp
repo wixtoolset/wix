@@ -35,13 +35,13 @@ extern "C" HRESULT PseudoBundleInitialize(
     }
 
     // Initialize the single payload, and fill out all the necessary fields
-    pPackage->payloads.rgpPayloads = (BURN_PAYLOAD**)MemAlloc(sizeof(BURN_PAYLOAD*), TRUE);
-    ExitOnNull(pPackage->payloads.rgpPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload group inside of related bundle struct");
-    pPackage->payloads.cPayloads = 1;
+    pPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM), TRUE);
+    ExitOnNull(pPackage->payloads.rgItems, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload group inside of related bundle struct");
+    pPackage->payloads.cItems = 1;
 
     pPayload = (BURN_PAYLOAD*)MemAlloc(sizeof(BURN_PAYLOAD), TRUE); 
     ExitOnNull(pPayload, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of related bundle struct");
-    pPackage->payloads.rgpPayloads[0] = pPayload;
+    pPackage->payloads.rgItems[0].pPayload = pPayload;
     pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
     pPayload->qwFileSize = qwSize;
 
@@ -171,13 +171,13 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     LPWSTR sczArguments = NULL;
 
     // Initialize the payloads, and copy the necessary fields.
-    pPassthroughPackage->payloads.rgpPayloads = (BURN_PAYLOAD**)MemAlloc(sizeof(BURN_PAYLOAD*) * pPackage->payloads.cPayloads, TRUE);
-    ExitOnNull(pPassthroughPackage->payloads.rgpPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn package payload inside of passthrough bundle.");
-    pPassthroughPackage->payloads.cPayloads = pPackage->payloads.cPayloads;
+    pPassthroughPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM) * pPackage->payloads.cItems, TRUE);
+    ExitOnNull(pPassthroughPackage->payloads.rgItems, hr, E_OUTOFMEMORY, "Failed to allocate space for burn package payload inside of passthrough bundle.");
+    pPassthroughPackage->payloads.cItems = pPackage->payloads.cItems;
 
-    for (DWORD iPayload = 0; iPayload < pPackage->payloads.cPayloads; ++iPayload)
+    for (DWORD iPayload = 0; iPayload < pPackage->payloads.cItems; ++iPayload)
     {
-        pPassthroughPackage->payloads.rgpPayloads[iPayload] = pPackage->payloads.rgpPayloads[iPayload];
+        pPassthroughPackage->payloads.rgItems[iPayload].pPayload = pPackage->payloads.rgItems[iPayload].pPayload;
     }
 
     pPassthroughPackage->Exe.fPseudoBundle = TRUE;

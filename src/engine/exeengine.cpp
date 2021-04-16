@@ -373,7 +373,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     DWORD dwExitCode = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
     BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
-    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
     // get cached executable path
     hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);

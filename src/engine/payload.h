@@ -47,6 +47,7 @@ typedef struct _BURN_PAYLOAD
     LPWSTR sczLocalFilePath; // location of extracted or downloaded copy
 
     LPWSTR sczUnverifiedPath;
+    DWORD cRemainingInstances;
 } BURN_PAYLOAD;
 
 typedef struct _BURN_PAYLOADS
@@ -55,10 +56,18 @@ typedef struct _BURN_PAYLOADS
     DWORD cPayloads;
 } BURN_PAYLOADS;
 
+typedef struct _BURN_PAYLOAD_GROUP_ITEM
+{
+    BURN_PAYLOAD* pPayload;
+
+    // mutable members
+    BOOL fCached;
+} BURN_PAYLOAD_GROUP_ITEM;
+
 typedef struct _BURN_PAYLOAD_GROUP
 {
-    BURN_PAYLOAD** rgpPayloads;
-    DWORD cPayloads;
+    BURN_PAYLOAD_GROUP_ITEM* rgItems;
+    DWORD cItems;
     DWORD64 qwTotalSize;
 } BURN_PAYLOAD_GROUP;
 

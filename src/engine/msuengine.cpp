@@ -265,7 +265,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
     DWORD dwExitCode = 0;
     BOOL fUseSysNativePath = FALSE;
     BURN_PACKAGE* pPackage = pExecuteAction->msuPackage.pPackage;
-    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
 #if !defined(_WIN64)
     hr = ProcWow64(::GetCurrentProcess(), &fUseSysNativePath);

@@ -82,9 +82,9 @@ extern "C" void RelatedBundlesUninitialize(
         {
             BURN_PACKAGE* pPackage = &pRelatedBundles->rgRelatedBundles[i].package;
 
-            for (DWORD j = 0; j < pPackage->payloads.cPayloads; ++j)
+            for (DWORD j = 0; j < pPackage->payloads.cItems; ++j)
             {
-                PayloadUninitialize(pPackage->payloads.rgpPayloads[j]);
+                PayloadUninitialize(pPackage->payloads.rgItems[j].pPayload);
             }
 
             PackageUninitialize(pPackage);

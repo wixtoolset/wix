@@ -100,7 +100,7 @@ static HRESULT ApplyLayoutContainer(
 static HRESULT ApplyProcessPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD* pPayload
+    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     );
 static HRESULT ApplyCacheVerifyContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -132,8 +132,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in BOOL fMove,
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem,
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
     );
@@ -805,14 +804,14 @@ static HRESULT ApplyCachePackage(
 
     for (;;)
     {
-        hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cPayloads, pPackage->payloads.qwTotalSize);
+        hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cItems, pPackage->payloads.qwTotalSize);
         LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
 
-        for (DWORD i = 0; i < pPackage->payloads.cPayloads; ++i)
+        for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
         {
-            BURN_PAYLOAD* pPayload = pPackage->payloads.rgpPayloads[i];
+            BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPackage->payloads.rgItems + i;
 
-            hr = ApplyProcessPayload(pContext, pPackage, pPayload);
+            hr = ApplyProcessPayload(pContext, pPackage, pPayloadGroupItem);
             if (FAILED(hr))
             {
                 break;
@@ -831,6 +830,16 @@ static HRESULT ApplyCachePackage(
         if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_RETRY == cachePackageCompleteAction)
         {
             // TODO: the progress needs to account for the payloads (potentially) being recached.
+            for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
+            {
+                BURN_PAYLOAD_GROUP_ITEM* pItem = pPackage->payloads.rgItems + i;
+                if (pItem->fCached)
+                {
+                    pItem->pPayload->cRemainingInstances += 1;
+                    pItem->fCached = FALSE;
+                }
+            }
+
             LogErrorId(hr, MSG_APPLY_RETRYING_PACKAGE, pPackage->sczId, NULL, NULL);
 
             continue;
@@ -891,12 +900,12 @@ static HRESULT ApplyLayoutBundle(
     hr = LayoutBundle(pContext, wzExecutableName, wzUnverifiedPath, qwBundleSize);
     ExitOnFailure(hr, "Failed to layout bundle.");
 
-    for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
+    for (DWORD i = 0; i < pPayloads->cItems; ++i)
     {
-        BURN_PAYLOAD* pPayload = pPayloads->rgpPayloads[i];
+        BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPayloads->rgItems + i;
 
-        hr = ApplyProcessPayload(pContext, NULL, pPayload);
-        ExitOnFailure(hr, "Failed to layout bundle payload: %ls", pPayload->sczKey);
+        hr = ApplyProcessPayload(pContext, NULL, pPayloadGroupItem);
+        ExitOnFailure(hr, "Failed to layout bundle payload: %ls", pPayloadGroupItem->pPayload->sczKey);
     }
 
 LExit:
@@ -927,7 +936,7 @@ static HRESULT ApplyLayoutContainer(
         hr = ApplyAcquireContainerOrPayload(pContext, pContainer, NULL, NULL);
         LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_CONTAINER, "Failed to acquire container: %ls to working path: %ls", pContainer->sczId, pContainer->sczUnverifiedPath);
 
-        hr = LayoutOrCacheContainerOrPayload(pContext, pContainer, NULL, NULL, TRUE, cTryAgainAttempts, &fRetry);
+        hr = LayoutOrCacheContainerOrPayload(pContext, pContainer, NULL, NULL, cTryAgainAttempts, &fRetry);
         if (SUCCEEDED(hr))
         {
             break;
@@ -957,12 +966,13 @@ LExit:
 static HRESULT ApplyProcessPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD* pPayload
+    __in BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     )
 {
     HRESULT hr = S_OK;
     DWORD cTryAgainAttempts = 0;
     BOOL fRetry = FALSE;
+    BURN_PAYLOAD* pPayload = pPayloadGroupItem->pPayload;
 
     Assert(pContext->pPayloads && pPackage || pContext->wzLayoutDirectory);
 
@@ -984,8 +994,7 @@ static HRESULT ApplyProcessPayload(
         hr = ApplyAcquireContainerOrPayload(pContext, NULL, pPackage, pPayload);
         LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_PAYLOAD, "Failed to acquire payload: %ls to working path: %ls", pPayload->sczKey, pPayload->sczUnverifiedPath);
 
-        // TODO: set fMove to TRUE appropriately
-        hr = LayoutOrCacheContainerOrPayload(pContext, NULL, pPackage, pPayload, FALSE, cTryAgainAttempts, &fRetry);
+        hr = LayoutOrCacheContainerOrPayload(pContext, NULL, pPackage, pPayloadGroupItem, cTryAgainAttempts, &fRetry);
         if (SUCCEEDED(hr))
         {
             break;
@@ -1426,18 +1435,30 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in BOOL fMove,
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem,
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
     )
 {
     HRESULT hr = S_OK;
+    BURN_PAYLOAD* pPayload = pPayloadGroupItem ? pPayloadGroupItem->pPayload : NULL;
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : L"";
     LPCWSTR wzUnverifiedPath = pContainer ? pContainer->sczUnverifiedPath : pPayload->sczUnverifiedPath;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : L"";
     BOOL fCanAffectRegistration = FALSE;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
+    BOOL fMove = !pPayload || 1 == pPayload->cRemainingInstances;
+
+    if (pContainer)
+    {
+        Assert(!pPayloadGroupItem);
+    }
+    else
+    {
+        Assert(pPayload);
+        AssertSz(0 < pPayload->cRemainingInstances, "Laying out payload more times than planned.");
+        AssertSz(!pPayloadGroupItem->fCached, "Laying out payload group item that was already cached.");
+    }
 
     if (!pContext->wzLayoutDirectory)
     {
@@ -1500,6 +1521,12 @@ static HRESULT LayoutOrCacheContainerOrPayload(
             *pfRetry = TRUE; // go back and retry acquire.
         }
     } while (S_FALSE == hr);
+
+    if (SUCCEEDED(hr) && pPayloadGroupItem)
+    {
+        pPayload->cRemainingInstances -= 1;
+        pPayloadGroupItem->fCached = TRUE;
+    }
 
 LExit:
     return hr;
