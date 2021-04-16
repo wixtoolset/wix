@@ -1010,7 +1010,13 @@ extern "C" HRESULT PlanLayoutContainer(
     }
     else
     {
-        pPlan->qwCacheSizeTotal += 2 * pContainer->qwFileSize;
+        if (!pContainer->fActuallyAttached)
+        {
+            pPlan->qwCacheSizeTotal += pContainer->qwFileSize;
+        }
+
+        // TODO: This should be the sum of all uncompressed payloads in the container, ideally restricted to the payloads that were actually planned.
+        pPlan->qwCacheSizeTotal += pContainer->qwFileSize;
     }
 
     if (!pContainer->sczUnverifiedPath)

@@ -724,6 +724,13 @@ Language=English
 Acquiring package: %1!ls!, payload: %2!ls!, %3!hs! from: %4!ls!
 .
 
+MessageId=347
+Severity=Warning
+SymbolicName=MSG_APPLY_RETRYING_CONTAINER
+Language=English
+Application requested retry of container: %2!ls!, encountered error: %1!ls!. Retrying...
+.
+
 MessageId=348
 Severity=Warning
 SymbolicName=MSG_APPLY_RETRYING_PACKAGE
@@ -778,6 +785,20 @@ Severity=Warning
 SymbolicName=MSG_SOURCELIST_REGISTER
 Language=English
 Unable to register source directory: %1!ls!, product: %2!ls!, reason: 0x%3!x!. Continuing...
+.
+
+MessageId=356
+Severity=Warning
+SymbolicName=MSG_APPLY_RETRYING_ACQUIRE_CONTAINER
+Language=English
+Application requested retry acquire of container: %2!ls!, encountered error: %1!ls!. Retrying...
+.
+
+MessageId=357
+Severity=Warning
+SymbolicName=MSG_APPLY_RETRYING_ACQUIRE_PAYLOAD
+Language=English
+Application requested retry acquire of payload: %2!ls!, encountered error: %1!ls!. Retrying...
 .
 
 MessageId=358
