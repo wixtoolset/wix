@@ -1854,6 +1854,7 @@ static void ResetPlannedPayloadGroupState(
         BURN_PAYLOAD_GROUP_ITEM* pItem = pPayloadGroup->rgItems + i;
 
         pItem->fCached = FALSE;
+        pItem->qwCommittedCacheProgress = 0;
     }
 }
 

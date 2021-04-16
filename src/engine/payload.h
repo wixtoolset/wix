@@ -62,6 +62,7 @@ typedef struct _BURN_PAYLOAD_GROUP_ITEM
 
     // mutable members
     BOOL fCached;
+    DWORD64 qwCommittedCacheProgress;
 } BURN_PAYLOAD_GROUP_ITEM;
 
 typedef struct _BURN_PAYLOAD_GROUP

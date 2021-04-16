@@ -42,7 +42,7 @@ typedef struct _BURN_CACHE_PROGRESS_CONTEXT
     BURN_CACHE_PROGRESS_TYPE type;
     BURN_CONTAINER* pContainer;
     BURN_PACKAGE* pPackage;
-    BURN_PAYLOAD* pPayload;
+    BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem;
 
     BOOL fCancel;
     HRESULT hrError;
@@ -106,7 +106,7 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     );
 static HRESULT ExtractContainer(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -122,7 +122,7 @@ static HRESULT ApplyAcquireContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     );
 static HRESULT AcquireContainerOrPayload(
     __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
@@ -829,7 +829,6 @@ static HRESULT ApplyCachePackage(
 
         if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_RETRY == cachePackageCompleteAction)
         {
-            // TODO: the progress needs to account for the payloads (potentially) being recached.
             for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
             {
                 BURN_PAYLOAD_GROUP_ITEM* pItem = pPackage->payloads.rgItems + i;
@@ -837,6 +836,12 @@ static HRESULT ApplyCachePackage(
                 {
                     pItem->pPayload->cRemainingInstances += 1;
                     pItem->fCached = FALSE;
+                }
+
+                if (pItem->qwCommittedCacheProgress)
+                {
+                    pContext->qwSuccessfulCacheProgress -= pItem->qwCommittedCacheProgress;
+                    pItem->qwCommittedCacheProgress = 0;
                 }
             }
 
@@ -981,7 +986,7 @@ static HRESULT ApplyProcessPayload(
         ExitFunction();
     }
 
-    hr = ApplyCacheVerifyContainerOrPayload(pContext, NULL, pPackage, pPayload);
+    hr = ApplyCacheVerifyContainerOrPayload(pContext, NULL, pPackage, pPayloadGroupItem);
     if (SUCCEEDED(hr))
     {
         ExitFunction();
@@ -991,7 +996,7 @@ static HRESULT ApplyProcessPayload(
     {
         fRetry = FALSE;
 
-        hr = ApplyAcquireContainerOrPayload(pContext, NULL, pPackage, pPayload);
+        hr = ApplyAcquireContainerOrPayload(pContext, NULL, pPackage, pPayloadGroupItem);
         LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_PAYLOAD, "Failed to acquire payload: %ls to working path: %ls", pPayload->sczKey, pPayload->sczUnverifiedPath);
 
         hr = LayoutOrCacheContainerOrPayload(pContext, NULL, pPackage, pPayloadGroupItem, cTryAgainAttempts, &fRetry);
@@ -1009,7 +1014,8 @@ static HRESULT ApplyProcessPayload(
             }
 
             ++cTryAgainAttempts;
-            pContext->qwSuccessfulCacheProgress -= pPayload->qwFileSize;
+            pContext->qwSuccessfulCacheProgress -= pPayloadGroupItem->qwCommittedCacheProgress;
+            pPayloadGroupItem->qwCommittedCacheProgress = 0;
             ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
             LogErrorId(hr, MSG_APPLY_RETRYING_PAYLOAD, pPayload->sczKey, NULL, NULL);
         }
@@ -1025,20 +1031,21 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     )
 {
-    AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
+    AssertSz(pContainer || pPayloadGroupItem, "Must provide a container or a payload.");
 
     HRESULT hr = S_OK;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : NULL;
-    LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : NULL;
+    LPCWSTR wzPayloadId = pPayloadGroupItem ? pPayloadGroupItem->pPayload->sczKey : NULL;
+    DWORD64 qwFileSize = pContainer ? pContainer->qwFileSize : pPayloadGroupItem->pPayload->qwFileSize;
 
     progress.pCacheContext = pContext;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
-    progress.pPayload = pPayload;
+    progress.pPayloadGroupItem = pPayloadGroupItem;
     progress.type = BURN_CACHE_PROGRESS_TYPE_CONTAINER_OR_PAYLOAD_VERIFY;
 
     hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
@@ -1046,7 +1053,7 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
 
     if (INVALID_HANDLE_VALUE != pContext->hPipe)
     {
-        hr = ElevationCacheVerifyContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayload, pContext->wzLayoutDirectory);
+        hr = ElevationCacheVerifyContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayloadGroupItem->pPayload, pContext->wzLayoutDirectory);
     }
     else if (pContainer)
     {
@@ -1054,7 +1061,7 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
     }
     else
     {
-        hr = CacheVerifyPayload(pPayload, pContext->wzLayoutDirectory ? pContext->wzLayoutDirectory : pPackage->sczCacheFolder);
+        hr = CacheVerifyPayload(pPayloadGroupItem->pPayload, pContext->wzLayoutDirectory ? pContext->wzLayoutDirectory : pPackage->sczCacheFolder);
     }
 
     // This was best effort to avoid acquiring the container or payload.
@@ -1063,9 +1070,13 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
         ExitFunction();
     }
 
-    pContext->qwSuccessfulCacheProgress += pContainer ? pContainer->qwFileSize : pPayload->qwFileSize;
+    pContext->qwSuccessfulCacheProgress += qwFileSize;
+    if (pPayloadGroupItem)
+    {
+        pPayloadGroupItem->qwCommittedCacheProgress += qwFileSize;
+    }
 
-    hr = CompleteCacheProgress(&progress, pContainer ? pContainer->qwFileSize : pPayload->qwFileSize);
+    hr = CompleteCacheProgress(&progress, qwFileSize);
 
 LExit:
     UserExperienceOnCacheContainerOrPayloadVerifyComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr);
@@ -1275,10 +1286,10 @@ static HRESULT ApplyAcquireContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload
+    __in_opt BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem
     )
 {
-    AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
+    AssertSz(pContainer || pPayloadGroupItem, "Must provide a container or a payload.");
 
     HRESULT hr = S_OK;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
@@ -1288,7 +1299,7 @@ static HRESULT ApplyAcquireContainerOrPayload(
     progress.type = BURN_CACHE_PROGRESS_TYPE_ACQUIRE;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
-    progress.pPayload = pPayload;
+    progress.pPayloadGroupItem = pPayloadGroupItem;
 
     do
     {
@@ -1297,10 +1308,10 @@ static HRESULT ApplyAcquireContainerOrPayload(
         if (fRetry)
         {
             hr = S_OK;
-            LogErrorId(hr, pContainer ? MSG_APPLY_RETRYING_ACQUIRE_CONTAINER : MSG_APPLY_RETRYING_ACQUIRE_PAYLOAD, pContainer ? pContainer->sczId : pPayload->sczKey, NULL, NULL);
+            LogErrorId(hr, pContainer ? MSG_APPLY_RETRYING_ACQUIRE_CONTAINER : MSG_APPLY_RETRYING_ACQUIRE_PAYLOAD, pContainer ? pContainer->sczId : pPayloadGroupItem->pPayload->sczKey, NULL, NULL);
         }
 
-        ExitOnFailure(hr, "Failed to acquire %hs: %ls", pContainer ? "container" : "payload", pContainer ? pContainer->sczId : pPayload->sczKey);
+        ExitOnFailure(hr, "Failed to acquire %hs: %ls", pContainer ? "container" : "payload", pContainer ? pContainer->sczId : pPayloadGroupItem->pPayload->sczKey);
     } while (fRetry);
 
 LExit:
@@ -1315,7 +1326,7 @@ static HRESULT AcquireContainerOrPayload(
     BURN_CACHE_CONTEXT* pContext = pProgress->pCacheContext;
     BURN_CONTAINER* pContainer = pProgress->pContainer;
     BURN_PACKAGE* pPackage = pProgress->pPackage;
-    BURN_PAYLOAD* pPayload = pProgress->pPayload;
+    BURN_PAYLOAD* pPayload = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload : NULL;
     AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
 
     HRESULT hr = S_OK;
@@ -1473,7 +1484,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     progress.type = BURN_CACHE_PROGRESS_TYPE_VERIFY;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
-    progress.pPayload = pPayload;
+    progress.pPayloadGroupItem = pPayloadGroupItem;
 
     do
     {
@@ -1570,11 +1581,11 @@ static HRESULT CopyPayload(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
-    LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
+    LPCWSTR wzPayloadId = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload->sczKey : L"";
     HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
     HANDLE hSourceOpenedFile = INVALID_HANDLE_VALUE;
 
-    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
+    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayloadGroupItem ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "copy", wzSourcePath);
 
     hr = PreparePayloadDestinationPath(wzDestinationPath);
@@ -1630,14 +1641,14 @@ static HRESULT DownloadPayload(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
-    LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
-    DOWNLOAD_SOURCE* pDownloadSource = pProgress->pContainer ? &pProgress->pContainer->downloadSource : &pProgress->pPayload->downloadSource;
-    DWORD64 qwDownloadSize = pProgress->pContainer ? pProgress->pContainer->qwFileSize : pProgress->pPayload->qwFileSize;
+    LPCWSTR wzPayloadId = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload->sczKey : L"";
+    DOWNLOAD_SOURCE* pDownloadSource = pProgress->pContainer ? &pProgress->pContainer->downloadSource : &pProgress->pPayloadGroupItem->pPayload->downloadSource;
+    DWORD64 qwDownloadSize = pProgress->pContainer ? pProgress->pContainer->qwFileSize : pProgress->pPayloadGroupItem->pPayload->qwFileSize;
     DOWNLOAD_CACHE_CALLBACK cacheCallback = { };
     DOWNLOAD_AUTHENTICATION_CALLBACK authenticationCallback = { };
     APPLY_AUTHENTICATION_REQUIRED_DATA authenticationData = { };
 
-    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
+    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayloadGroupItem ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "download", pDownloadSource->sczUrl);
 
     hr = PreparePayloadDestinationPath(wzDestinationPath);
@@ -1736,11 +1747,15 @@ static HRESULT CompleteCacheProgress(
     if (PROGRESS_CONTINUE == dwResult)
     {
         pContext->pCacheContext->qwSuccessfulCacheProgress += qwFileSize;
+        if (pContext->pPayloadGroupItem)
+        {
+            pContext->pPayloadGroupItem->qwCommittedCacheProgress += qwFileSize;
+        }
 
         if (BURN_CACHE_PROGRESS_TYPE_VERIFY == pContext->type && pContext->pCacheContext->sczLastUsedFolderCandidate)
         {
             // We successfully copied from a source location, set that as the last used source.
-            CacheSetLastUsedSource(pContext->pCacheContext->pVariables, pContext->pCacheContext->sczLastUsedFolderCandidate, pContext->pContainer ? pContext->pContainer->sczFilePath : pContext->pPayload->sczFilePath);
+            CacheSetLastUsedSource(pContext->pCacheContext->pVariables, pContext->pCacheContext->sczLastUsedFolderCandidate, pContext->pContainer ? pContext->pContainer->sczFilePath : pContext->pPayloadGroupItem->pPayload->sczFilePath);
         }
     }
     else if (PROGRESS_CANCEL == dwResult)
@@ -1774,7 +1789,7 @@ static DWORD CALLBACK CacheProgressRoutine(
     DWORD dwResult = PROGRESS_CONTINUE;
     BURN_CACHE_PROGRESS_CONTEXT* pProgress = static_cast<BURN_CACHE_PROGRESS_CONTEXT*>(lpData);
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : NULL;
-    LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : NULL;
+    LPCWSTR wzPayloadId = pProgress->pPayloadGroupItem ? pProgress->pPayloadGroupItem->pPayload->sczKey : NULL;
     DWORD64 qwCacheProgress = pProgress->pCacheContext->qwSuccessfulCacheProgress + TotalBytesTransferred.QuadPart;
     if (qwCacheProgress > pProgress->pCacheContext->qwTotalCacheSize)
     {
