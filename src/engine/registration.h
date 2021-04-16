@@ -92,6 +92,7 @@ typedef struct _BURN_REGISTRATION
     BOOL fPerMachine;
     BOOL fRegisterArp;
     BOOL fDisableResume;
+    BOOL fCached;
     BOOL fInstalled;
     LPWSTR sczId;
     LPWSTR sczTag;
@@ -174,8 +175,7 @@ HRESULT RegistrationSetVariables(
     __in BURN_VARIABLES* pVariables
     );
 HRESULT RegistrationDetectInstalled(
-    __in BURN_REGISTRATION* pRegistration,
-    __out BOOL* pfInstalled
+    __in BURN_REGISTRATION* pRegistration
     );
 HRESULT RegistrationDetectResumeType(
     __in BURN_REGISTRATION* pRegistration,

@@ -186,6 +186,7 @@ BAAPI UserExperienceOnCommitMsiTransactionComplete(
     );
 BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOL fCached,
     __in BOOL fInstalled,
     __in DWORD cPackages
     );

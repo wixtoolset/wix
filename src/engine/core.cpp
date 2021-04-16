@@ -239,7 +239,7 @@ extern "C" HRESULT CoreQueryRegistration(
     SIZE_T iBuffer = 0;
 
     // Detect if bundle is already installed.
-    hr = RegistrationDetectInstalled(&pEngineState->registration, &pEngineState->registration.fInstalled);
+    hr = RegistrationDetectInstalled(&pEngineState->registration);
     ExitOnFailure(hr, "Failed to detect bundle install state.");
 
     // detect resume type
@@ -293,7 +293,7 @@ extern "C" HRESULT CoreDetect(
     // only happens if Apply() changed the state of bundle (installed or
     // uninstalled). In that case, Detect() can be used here to reset
     // the installed state.
-    hr = RegistrationDetectInstalled(&pEngineState->registration, &pEngineState->registration.fInstalled);
+    hr = RegistrationDetectInstalled(&pEngineState->registration);
     ExitOnFailure(hr, "Failed to detect bundle install state.");
 
     if (pEngineState->registration.fInstalled)
@@ -308,7 +308,7 @@ extern "C" HRESULT CoreDetect(
     }
 
     fDetectBegan = TRUE;
-    hr = UserExperienceOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fInstalled, pEngineState->packages.cPackages);
+    hr = UserExperienceOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fCached, pEngineState->registration.fInstalled, pEngineState->packages.cPackages);
     ExitOnRootFailure(hr, "UX aborted detect begin.");
 
     pEngineState->userExperience.hwndDetect = hwndParent;
@@ -426,7 +426,7 @@ LExit:
 
     pEngineState->userExperience.hwndDetect = NULL;
 
-    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr, !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fInstalled), FAILED(hr) ? "(failed)" : LoggingBoolToString(pEngineState->registration.fEligibleForCleanup));
+    LogId(REPORT_STANDARD, MSG_DETECT_COMPLETE, hr, !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fInstalled), !fDetectBegan ? "(failed)" : LoggingBoolToString(pEngineState->registration.fCached), FAILED(hr) ? "(failed)" : LoggingBoolToString(pEngineState->registration.fEligibleForCleanup));
 
     return hr;
 }

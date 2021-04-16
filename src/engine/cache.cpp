@@ -733,6 +733,7 @@ extern "C" HRESULT CacheCompleteBundle(
     hr = PathConcat(sczTargetDirectory, wzExecutableName, &sczTargetPath);
     ExitOnFailure(hr, "Failed to combine completed path with engine file name.");
 
+    // We can't just use wzExecutablePath because we needed to call CreateCompletedPath to ensure that the destination was secured.
     Assert(CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzExecutablePath, -1, sczTargetPath, -1));
 
     // If the bundle is running out of the package cache then we don't need to copy it there

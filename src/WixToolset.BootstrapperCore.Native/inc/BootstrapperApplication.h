@@ -463,6 +463,7 @@ struct BA_ONDETECTBEGIN_ARGS
     DWORD cbSize;
     BOOL fInstalled;
     DWORD cPackages;
+    BOOL fCached;
 };
 
 struct BA_ONDETECTBEGIN_RESULTS

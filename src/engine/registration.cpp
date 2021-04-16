@@ -463,13 +463,14 @@ LExit:
 }
 
 extern "C" HRESULT RegistrationDetectInstalled(
-    __in BURN_REGISTRATION* pRegistration,
-    __out BOOL* pfInstalled
+    __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
     DWORD dwInstalled = 0;
+
+    pRegistration->fCached = FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
 
     // open registration key
     hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
@@ -484,7 +485,7 @@ extern "C" HRESULT RegistrationDetectInstalled(
         hr = S_OK;
     }
 
-    *pfInstalled = (1 == dwInstalled);
+    pRegistration->fInstalled = (1 == dwInstalled);
 
     ReleaseRegKey(hkRegistration);
     return hr;

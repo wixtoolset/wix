@@ -708,6 +708,7 @@ LExit:
 
 EXTERN_C BAAPI UserExperienceOnDetectBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in BOOL fCached,
     __in BOOL fInstalled,
     __in DWORD cPackages
     )
@@ -719,6 +720,7 @@ EXTERN_C BAAPI UserExperienceOnDetectBegin(
     args.cbSize = sizeof(args);
     args.cPackages = cPackages;
     args.fInstalled = fInstalled;
+    args.fCached = fCached;
 
     results.cbSize = sizeof(results);
 

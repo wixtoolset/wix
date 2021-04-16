@@ -300,7 +300,7 @@ MessageId=199
 Severity=Success
 SymbolicName=MSG_DETECT_COMPLETE
 Language=English
-Detect complete, result: 0x%1!x!, installed: %2!hs!, eligible for cleanup: %3!hs!
+Detect complete, result: 0x%1!x!, installed: %2!hs!, cached: %3!hs!, eligible for cleanup: %4!hs!
 .
 
 MessageId=200
