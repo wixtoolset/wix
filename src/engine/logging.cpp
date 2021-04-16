@@ -426,23 +426,6 @@ extern "C" LPCSTR LoggingPackageRegistrationStateToString(
     }
 }
 
-extern "C" LPCSTR LoggingCacheStateToString(
-    __in BURN_CACHE_STATE cacheState
-    )
-{
-    switch (cacheState)
-    {
-    case BURN_CACHE_STATE_NONE:
-        return "None";
-    case BURN_CACHE_STATE_PARTIAL:
-        return "Partial";
-    case BURN_CACHE_STATE_COMPLETE:
-        return "Complete";
-    default:
-        return "Invalid";
-    }
-}
-
 extern "C" LPCSTR LoggingMsiFeatureStateToString(
     __in BOOTSTRAPPER_FEATURE_STATE featureState
     )

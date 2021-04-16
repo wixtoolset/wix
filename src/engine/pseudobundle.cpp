@@ -10,7 +10,7 @@ extern "C" HRESULT PseudoBundleInitialize(
     __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BURN_CACHE_STATE cacheState,
+    __in BOOL fCached,
     __in_z LPCWSTR wzFilePath,
     __in_z LPCWSTR wzLocalSource,
     __in_z_opt LPCWSTR wzDownloadSource,
@@ -67,14 +67,14 @@ extern "C" HRESULT PseudoBundleInitialize(
         memcpy_s(pPackage->rgPayloads->pPayload->pbHash, pPackage->rgPayloads->pPayload->cbHash, pbHash, cbHash);
     }
 
-    pPackage->rgPayloads->fCached = BURN_CACHE_STATE_NONE < cacheState;
+    pPackage->rgPayloads->fCached = fCached;
 
     pPackage->Exe.fPseudoBundle = TRUE;
 
     pPackage->type = BURN_PACKAGE_TYPE_EXE;
     pPackage->fPerMachine = fPerMachine;
     pPackage->currentState = state;
-    pPackage->cache = cacheState;
+    pPackage->fCached = fCached;
     pPackage->qwInstallSize = qwSize;
     pPackage->qwSize = qwSize;
     pPackage->fVital = fVital;
@@ -216,7 +216,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     pPassthroughPackage->fPerMachine = FALSE; // passthrough bundles are always launched per-user.
     pPassthroughPackage->type = pPackage->type;
     pPassthroughPackage->currentState = pPackage->currentState;
-    pPassthroughPackage->cache = pPackage->cache;
+    pPassthroughPackage->fCached = pPackage->fCached;
     pPassthroughPackage->qwInstallSize = pPackage->qwInstallSize;
     pPassthroughPackage->qwSize = pPackage->qwSize;
     pPassthroughPackage->fVital = pPackage->fVital;

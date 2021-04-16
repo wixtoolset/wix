@@ -13,7 +13,7 @@ HRESULT PseudoBundleInitialize(
     __in_z LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BURN_CACHE_STATE cacheState,
+    __in BOOL fCached,
     __in_z LPCWSTR wzFilePath,
     __in_z LPCWSTR wzLocalSource,
     __in_z_opt LPCWSTR wzDownloadSource,

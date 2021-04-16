@@ -41,13 +41,6 @@ enum BURN_PACKAGE_TYPE
     BURN_PACKAGE_TYPE_MSU,
 };
 
-enum BURN_CACHE_STATE
-{
-    BURN_CACHE_STATE_NONE,
-    BURN_CACHE_STATE_PARTIAL,
-    BURN_CACHE_STATE_COMPLETE,
-};
-
 enum BURN_CACHE_TYPE
 {
     BURN_CACHE_TYPE_NO,
@@ -246,12 +239,12 @@ typedef struct _BURN_PACKAGE
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundaryBackward; // used during uninstall.
 
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
-    BURN_CACHE_STATE cache;                     // only valid after Detect.
+    BOOL fCached;                               // only valid after Detect.
     BOOL fPackageProviderExists;                // only valid after Detect.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.
-    BOOL fAcquire;                              // only valid during Plan.
-    BOOL fUncache;                              // only valid during Plan.
+    BOOL fPlannedCache;                         // only valid during Plan.
+    BOOL fPlannedUncache;                       // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE execute;          // only valid during Plan.
     BOOTSTRAPPER_ACTION_STATE rollback;         // only valid during Plan.
     BURN_DEPENDENCY_ACTION providerExecute;     // only valid during Plan.

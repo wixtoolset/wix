@@ -67,7 +67,7 @@ extern "C" void DetectReset(
         pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
         pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
-        pPackage->cache = BURN_CACHE_STATE_NONE;
+        pPackage->fCached = FALSE;
         for (DWORD iPayload = 0; iPayload < pPackage->cPayloads; ++iPayload)
         {
             BURN_PACKAGE_PAYLOAD* pPayload = pPackage->rgPayloads + iPayload;
@@ -149,10 +149,10 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
                         pRegistration->fForwardCompatibleBundleExists = TRUE;
                     }
 
-                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, BURN_CACHE_STATE_COMPLETE != pRelatedBundle->package.cache);
+                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
                     ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
 
-                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingCacheStateToString(pRelatedBundle->package.cache));
+                    LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
                 }
             }
         }
@@ -225,9 +225,9 @@ extern "C" HRESULT DetectReportRelatedBundles(
             break;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingRelatedOperationToString(operation), LoggingCacheStateToString(pRelatedBundle->package.cache));
+        LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->relationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingRelatedOperationToString(operation), LoggingBoolToString(pRelatedBundle->package.fCached));
 
-        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, operation, BURN_CACHE_STATE_COMPLETE != pRelatedBundle->package.cache);
+        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->relationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, operation, !pRelatedBundle->package.fCached);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
 
         // For now, if any related bundles will be executed during uninstall by default then never automatically clean up the bundle.

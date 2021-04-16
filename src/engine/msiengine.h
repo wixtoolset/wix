@@ -50,8 +50,7 @@ HRESULT MsiEnginePlanAddPackage(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in_opt HANDLE hCacheEvent,
-    __in BOOL fPlanPackageCacheRollback
+    __in_opt HANDLE hCacheEvent
     );
 HRESULT MsiEngineBeginTransaction(
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary

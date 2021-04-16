@@ -388,7 +388,7 @@ extern "C" HRESULT CoreDetect(
             pEngineState->registration.fEligibleForCleanup = FALSE;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingCacheStateToString(pPackage->cache), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
+        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {
@@ -439,7 +439,6 @@ extern "C" HRESULT CorePlan(
     HRESULT hr = S_OK;
     BOOL fPlanBegan = FALSE;
     LPWSTR sczLayoutDirectory = NULL;
-    HANDLE hSyncpointEvent = NULL;
     BURN_PACKAGE* pUpgradeBundlePackage = NULL;
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
     BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
@@ -489,7 +488,7 @@ extern "C" HRESULT CorePlan(
         ExitOnFailure(hr, "Failed to plan the layout of the bundle.");
 
         // Plan the packages' layout.
-        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, sczLayoutDirectory, &hSyncpointEvent);
+        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, sczLayoutDirectory);
         ExitOnFailure(hr, "Failed to plan packages.");
     }
     else if (BOOTSTRAPPER_ACTION_UPDATE_REPLACE == action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED == action)
@@ -498,7 +497,7 @@ extern "C" HRESULT CorePlan(
 
         pUpgradeBundlePackage = &pEngineState->update.package;
 
-        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
+        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
         ExitOnFailure(hr, "Failed to plan update.");
     }
     else
@@ -512,7 +511,7 @@ extern "C" HRESULT CorePlan(
 
             pForwardCompatibleBundlePackage = &pEngineState->plan.forwardCompatibleBundle;
 
-            hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
+            hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
             ExitOnFailure(hr, "Failed to plan passthrough.");
         }
         else // doing an action that modifies the machine state.
@@ -533,11 +532,11 @@ extern "C" HRESULT CorePlan(
                 hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
                 ExitOnFailure(hr, "Failed to plan related bundles.");
 
-                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, NULL, &hSyncpointEvent);
+                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, NULL);
                 ExitOnFailure(hr, "Failed to plan packages.");
 
                 // Schedule the update of related bundles last.
-                hr = PlanRelatedBundlesComplete(&pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, &hSyncpointEvent, dwExecuteActionEarlyIndex);
+                hr = PlanRelatedBundlesComplete(&pEngineState->registration, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, dwExecuteActionEarlyIndex);
                 ExitOnFailure(hr, "Failed to schedule related bundles.");
             }
         }
@@ -1669,9 +1668,8 @@ static HRESULT DetectPackagePayloadsCached(
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachePath = NULL;
-    BURN_CACHE_STATE cache = BURN_CACHE_STATE_NONE; // assume the package will not be cached.
+    BOOL fCached = FALSE; // assume the package is not cached.
     LPWSTR sczPayloadCachePath = NULL;
-    LONGLONG llSize = 0;
 
     if (pPackage->sczCacheId && *pPackage->sczCacheId)
     {
@@ -1681,9 +1679,7 @@ static HRESULT DetectPackagePayloadsCached(
         // If the cached directory exists, we have something.
         if (DirExists(sczCachePath, NULL))
         {
-            cache = BURN_CACHE_STATE_COMPLETE; // assume all payloads are cached.
-
-            // Check all payloads to see if any are missing or not the right size.
+            // Check all payloads to see if they exist.
             for (DWORD i = 0; i < pPackage->cPayloads; ++i)
             {
                 BURN_PACKAGE_PAYLOAD* pPackagePayload = pPackage->rgPayloads + i;
@@ -1691,35 +1687,25 @@ static HRESULT DetectPackagePayloadsCached(
                 hr = PathConcat(sczCachePath, pPackagePayload->pPayload->sczFilePath, &sczPayloadCachePath);
                 ExitOnFailure(hr, "Failed to concat payload cache path.");
 
-                hr = FileSize(sczPayloadCachePath, &llSize);
-                if (SUCCEEDED(hr) && static_cast<DWORD64>(llSize) != pPackagePayload->pPayload->qwFileSize)
+                if (FileExistsEx(sczPayloadCachePath, NULL))
                 {
-                    hr = HRESULT_FROM_WIN32(ERROR_FILE_CORRUPT); // size did not match expectations, so cache must have the wrong file.
-                }
-
-                if (SUCCEEDED(hr))
-                {
-                    // TODO: should we do a full on hash verification on the file to ensure
-                    //       the exact right file is cached?
-
+                    // TODO: We shouldn't track whether the payload was cached since all we did was check whether the file exists.
                     pPackagePayload->fCached = TRUE;
+                    fCached = TRUE;
                 }
                 else
                 {
-                    LogId(REPORT_STANDARD, MSG_DETECT_PACKAGE_NOT_FULLY_CACHED, pPackage->sczId, pPackagePayload->pPayload->sczKey, hr);
-
-                    cache = BURN_CACHE_STATE_PARTIAL; // found a payload that was not cached so we are partial.
-                    hr = S_OK;
+                    LogId(REPORT_STANDARD, MSG_DETECT_PACKAGE_NOT_FULLY_CACHED, pPackage->sczId, pPackagePayload->pPayload->sczKey);
                 }
             }
         }
     }
 
-    pPackage->cache = cache;
+    pPackage->fCached = fCached;
 
     if (pPackage->fCanAffectRegistration)
     {
-        pPackage->cacheRegistrationState = BURN_CACHE_STATE_NONE < pPackage->cache ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+        pPackage->cacheRegistrationState = pPackage->fCached ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
 LExit:
@@ -1808,7 +1794,7 @@ static void LogPackages(
             const DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == action) ? pPackages->cPackages - 1 - i : i;
             const BURN_PACKAGE* pPackage = &pPackages->rgPackages[iPackage];
 
-            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingBoolToString(pPackage->fAcquire), LoggingBoolToString(pPackage->fUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
+            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingBoolToString(pPackage->fPlannedCache), LoggingBoolToString(pPackage->fPlannedUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
             
             if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
             {

@@ -242,16 +242,16 @@ Detected forward compatible bundle: %1!ls!, type: %2!hs!, scope: %3!hs!, version
 
 MessageId=108
 Severity=Warning
-SymbolicName=MSG_DETECT_RELATED_BUNDLE_NOT_FULLY_CACHED
+SymbolicName=MSG_DETECT_RELATED_BUNDLE_NOT_CACHED
 Language=English
-Detected partially cached related bundle: %1!ls!, cache path: %2!ls!, reason: 0x%3!x!
+Detected related bundle missing from cache: %1!ls!, cache path: %2!ls!
 .
 
 MessageId=120
 Severity=Warning
 SymbolicName=MSG_DETECT_PACKAGE_NOT_FULLY_CACHED
 Language=English
-Detected partially cached package: %1!ls!, invalid payload: %2!ls!, reason: 0x%3!x!
+Detected partially cached package: %1!ls!, missing payload: %2!ls!
 .
 
 MessageId=121
@@ -363,7 +363,7 @@ MessageId=208
 Severity=Warning
 SymbolicName=MSG_PLAN_DISABLING_ROLLBACK_NO_CACHE
 Language=English
-Plan disabled rollback for package: %1!ls!, due to incomplete cache: %2!hs!, original rollback action: %3!hs!
+Plan disabled rollback due to incomplete cache for package: %1!ls!, original rollback action: %2!hs!
 .
 
 MessageId=209

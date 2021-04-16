@@ -391,14 +391,14 @@ static HRESULT LoadRelatedBundleFromKey(
     __in HKEY hkBundleId,
     __in BOOL fPerMachine,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __inout BURN_RELATED_BUNDLE *pRelatedBundle
+    __inout BURN_RELATED_BUNDLE* pRelatedBundle
     )
 {
     HRESULT hr = S_OK;
     DWORD64 qwEngineVersion = 0;
     LPWSTR sczBundleVersion = NULL;
     LPWSTR sczCachePath = NULL;
-    BURN_CACHE_STATE cacheState = BURN_CACHE_STATE_NONE;
+    BOOL fCached = FALSE;
     DWORD64 qwFileSize = 0;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
 
@@ -423,19 +423,16 @@ static HRESULT LoadRelatedBundleFromKey(
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH, &sczCachePath);
     ExitOnFailure(hr, "Failed to read cache path from registry for bundle: %ls", wzRelatedBundleId);
 
-    hr = FileSize(sczCachePath, reinterpret_cast<LONGLONG *>(&qwFileSize));
-    if (SUCCEEDED(hr))
+    if (FileExistsEx(sczCachePath, NULL))
     {
-        cacheState = BURN_CACHE_STATE_COMPLETE;
+        fCached = TRUE;
     }
-    else if (E_FILENOTFOUND != hr)
+    else
     {
-        cacheState = BURN_CACHE_STATE_PARTIAL;
-        LogId(REPORT_STANDARD, MSG_DETECT_RELATED_BUNDLE_NOT_FULLY_CACHED, wzRelatedBundleId, sczCachePath, hr);
+        LogId(REPORT_STANDARD, MSG_DETECT_RELATED_BUNDLE_NOT_CACHED, wzRelatedBundleId, sczCachePath);
     }
-    hr = S_OK;
 
-    pRelatedBundle->fPlannable = BURN_CACHE_STATE_COMPLETE == cacheState;
+    pRelatedBundle->fPlannable = fCached;
 
     hr = RegReadString(hkBundleId, BURN_REGISTRATION_REGISTRY_BUNDLE_PROVIDER_KEY, &dependencyProvider.sczKey);
     if (E_FILENOTFOUND != hr)
@@ -464,7 +461,7 @@ static HRESULT LoadRelatedBundleFromKey(
     pRelatedBundle->relationType = relationType;
 
     hr = PseudoBundleInitialize(qwEngineVersion, &pRelatedBundle->package, fPerMachine, wzRelatedBundleId, pRelatedBundle->relationType,
-                                BOOTSTRAPPER_PACKAGE_STATE_PRESENT, cacheState, sczCachePath, sczCachePath, NULL, qwFileSize, FALSE,
+                                BOOTSTRAPPER_PACKAGE_STATE_PRESENT, fCached, sczCachePath, sczCachePath, NULL, qwFileSize, FALSE,
                                 L"-quiet", L"-repair -quiet", L"-uninstall -quiet",
                                 (dependencyProvider.sczKey && *dependencyProvider.sczKey) ? &dependencyProvider : NULL,
                                 NULL, 0);

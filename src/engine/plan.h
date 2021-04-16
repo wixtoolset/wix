@@ -411,8 +411,7 @@ HRESULT PlanPackages(
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in_z_opt LPCWSTR wzLayoutDirectory,
-    __inout HANDLE* phSyncpointEvent
+    __in_z_opt LPCWSTR wzLayoutDirectory
     );
 HRESULT PlanRegistration(
     __in BURN_PLAN* pPlan,
@@ -428,8 +427,7 @@ HRESULT PlanPassThroughBundle(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __inout HANDLE* phSyncpointEvent
+    __in BOOTSTRAPPER_RELATION_TYPE relationType
     );
 HRESULT PlanUpdateBundle(
     __in BURN_USER_EXPERIENCE* pUX,
@@ -438,8 +436,7 @@ HRESULT PlanUpdateBundle(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __inout HANDLE* phSyncpointEvent
+    __in BOOTSTRAPPER_RELATION_TYPE relationType
     );
 HRESULT PlanLayoutPackage(
     __in BURN_PLAN* pPlan,
@@ -475,7 +472,6 @@ HRESULT PlanRelatedBundlesComplete(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __inout HANDLE* phSyncpointEvent,
     __in DWORD dwExecuteActionEarlyIndex
     );
 HRESULT PlanFinalizeActions(
@@ -488,8 +484,7 @@ HRESULT PlanCleanPackage(
 HRESULT PlanExecuteCacheSyncAndRollback(
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
-    __in HANDLE hCacheEvent,
-    __in BOOL fPlanPackageCacheRollback
+    __in HANDLE hCacheEvent
     );
 HRESULT PlanExecuteCheckpoint(
     __in BURN_PLAN* pPlan

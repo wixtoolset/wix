@@ -28,8 +28,7 @@ HRESULT MsuEnginePlanAddPackage(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in HANDLE hCacheEvent,
-    __in BOOL fPlanPackageCacheRollback
+    __in HANDLE hCacheEvent
     );
 HRESULT MsuEngineExecutePackage(
     __in BURN_EXECUTE_ACTION* pExecuteAction,

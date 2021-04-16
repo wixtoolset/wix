@@ -127,7 +127,6 @@ namespace Bootstrapper
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCommitMsiTransaction(pPlan, fRollback, dwIndex++, L"rbaOCA08D8ky7uBOK71_6FWz1K3TuQ");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteWaitSyncpoint(pPlan, fRollback, dwIndex++, pPlan->rgCacheActions[23].syncpoint.hEvent);
             ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cExecuteActions);
 
@@ -509,7 +508,6 @@ namespace Bootstrapper
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", BURN_DEPENDENCY_ACTION_REGISTER);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
-            ValidateExecuteWaitSyncpoint(pPlan, fRollback, dwIndex++, pPlan->rgCacheActions[6].syncpoint.hEvent);
             ValidateExecuteExePackage(pPlan, fRollback, dwIndex++, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", BOOTSTRAPPER_ACTION_STATE_UNINSTALL, NULL);
             Assert::Equal(dwIndex, pPlan->cExecuteActions);
 
@@ -593,6 +591,7 @@ namespace Bootstrapper
             Assert::Equal(0ul, pPlan->cOverallProgressTicksTotal);
 
             dwIndex = 0;
+            ValidateCleanAction(pPlan, dwIndex++, L"PackageA");
             Assert::Equal(dwIndex, pPlan->cCleanActions);
 
             UINT uIndex = 0;
@@ -1042,7 +1041,7 @@ namespace Bootstrapper
         void DetectPackageAsPresentAndCached(BURN_PACKAGE* pPackage)
         {
             pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
-            pPackage->cache = BURN_CACHE_STATE_COMPLETE;
+            pPackage->fCached = TRUE;
             if (pPackage->fCanAffectRegistration)
             {
                 pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
@@ -1158,7 +1157,7 @@ namespace Bootstrapper
             pRelatedBundle->fPlannable = TRUE;
             pRelatedBundle->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
-            hr = PseudoBundleInitialize(0, &pRelatedBundle->package, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, BURN_CACHE_STATE_COMPLETE, NULL, NULL, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
+            hr = PseudoBundleInitialize(0, &pRelatedBundle->package, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, NULL, NULL, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
             NativeAssert::Succeeded(hr, "Failed to initialize related bundle to represent bundle: %ls", wzId);
 
             ++pRelatedBundles->cRelatedBundles;

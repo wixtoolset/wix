@@ -94,10 +94,6 @@ LPCSTR LoggingPackageRegistrationStateToString(
     __in BURN_PACKAGE_REGISTRATION_STATE registrationState
     );
 
-LPCSTR LoggingCacheStateToString(
-    __in BURN_CACHE_STATE cacheState
-    );
-
 LPCSTR LoggingMsiFeatureStateToString(
     __in BOOTSTRAPPER_FEATURE_STATE featureState
     );

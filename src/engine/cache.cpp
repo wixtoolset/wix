@@ -91,6 +91,7 @@ static HRESULT RemoveBundleOrPackage(
 static HRESULT VerifyHash(
     __in BYTE* pbHash,
     __in DWORD cbHash,
+    __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile
     );
@@ -1288,7 +1289,7 @@ static HRESULT VerifyThenTransferContainer(
     // Container should have a hash we can use to verify with.
     if (pContainer->pbHash)
     {
-        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, wzUnverifiedContainerPath, hFile);
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzUnverifiedContainerPath, hFile);
         ExitOnFailure(hr, "Failed to verify container hash: %ls", wzCachedPath);
     }
 
@@ -1330,7 +1331,7 @@ static HRESULT VerifyThenTransferPayload(
 
     if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, wzUnverifiedPayloadPath, hFile);
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzUnverifiedPayloadPath, hFile);
         ExitOnFailure(hr, "Failed to verify payload hash: %ls", wzCachedPath);
     }
 
@@ -1398,7 +1399,7 @@ static HRESULT VerifyFileAgainstPayload(
 
     if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, wzVerifyPath, hFile);
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzVerifyPath, hFile);
         ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
     }
 
@@ -1712,7 +1713,7 @@ static HRESULT RemoveBundleOrPackage(
         }
     }
 
-    if (FAILED(hr))
+    if (E_PATHNOTFOUND != hr && FAILED(hr))
     {
         LogId(REPORT_STANDARD, fBundle ? MSG_UNABLE_UNCACHE_BUNDLE : MSG_UNABLE_UNCACHE_PACKAGE, wzBundleOrPackageId, sczDirectory, hr);
         hr = S_OK;
@@ -1743,6 +1744,7 @@ LExit:
 static HRESULT VerifyHash(
     __in BYTE* pbHash,
     __in DWORD cbHash,
+    __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile
     )
@@ -1751,22 +1753,31 @@ static HRESULT VerifyHash(
 
     HRESULT hr = S_OK;
     BYTE rgbActualHash[SHA512_HASH_LEN] = { };
-    DWORD64 qwHashedBytes;
+    DWORD64 qwHashedBytes = 0;
+    LONGLONG llSize = 0;
     LPWSTR pszExpected = NULL;
     LPWSTR pszActual = NULL;
+
+    hr = FileSizeByHandle(hFile, &llSize);
+    ExitOnFailure(hr, "Failed to get file size for path: %ls", wzUnverifiedPayloadPath);
+
+    if (static_cast<DWORD64>(llSize) != qwFileSize)
+    {
+        ExitOnFailure(hr = ERROR_FILE_CORRUPT, "File size mismatch for path: %ls, expected: %llu, actual: %lld", wzUnverifiedPayloadPath, qwFileSize, llSize);
+    }
 
     // TODO: create a cryp hash file that sends progress.
     hr = CrypHashFileHandle(hFile, PROV_RSA_AES, CALG_SHA_512, rgbActualHash, sizeof(rgbActualHash), &qwHashedBytes);
     ExitOnFailure(hr, "Failed to calculate hash for path: %ls", wzUnverifiedPayloadPath);
 
     // Compare hashes.
-    if (cbHash != sizeof(rgbActualHash) || 0 != memcmp(pbHash, rgbActualHash, SHA512_HASH_LEN))
+    if (cbHash != sizeof(rgbActualHash) || 0 != memcmp(pbHash, rgbActualHash, sizeof(rgbActualHash)))
     {
         hr = CRYPT_E_HASH_VALUE;
 
         // Best effort to log the expected and actual hash value strings.
         if (SUCCEEDED(StrAllocHexEncode(pbHash, cbHash, &pszExpected)) &&
-            SUCCEEDED(StrAllocHexEncode(rgbActualHash, (SIZE_T)qwHashedBytes, &pszActual)))
+            SUCCEEDED(StrAllocHexEncode(rgbActualHash, sizeof(rgbActualHash), &pszActual)))
         {
             ExitOnFailure(hr, "Hash mismatch for path: %ls, expected: %ls, actual: %ls", wzUnverifiedPayloadPath, pszExpected, pszActual);
         }

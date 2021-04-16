@@ -1910,6 +1910,8 @@ static HRESULT DoRollbackActions(
                 ExitFunction1(hr = S_OK);
 
             case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
+                // TODO: This used to be skipped if the package was already cached.
+                //       Need to figure out new logic for when (if?) to skip it.
                 hr = CleanPackage(pEngineState->companionConnection.hPipe, pRollbackAction->uncachePackage.pPackage);
                 IgnoreRollbackError(hr, "Failed to uncache package for rollback.");
                 break;
