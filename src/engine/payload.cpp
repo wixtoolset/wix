@@ -18,6 +18,7 @@ static HRESULT FindEmbeddedBySourcePath(
 extern "C" HRESULT PayloadsParseFromXml(
     __in BURN_PAYLOADS* pPayloads,
     __in_opt BURN_CONTAINERS* pContainers,
+    __in_opt BURN_PAYLOAD_GROUP* pLayoutPayloads,
     __in IXMLDOMNode* pixnBundle
     )
 {
@@ -136,6 +137,17 @@ extern "C" HRESULT PayloadsParseFromXml(
         hr = StrAllocHexDecode(scz, &pPayload->pbHash, &pPayload->cbHash);
         ExitOnFailure(hr, "Failed to hex decode the Payload/@Hash.");
 
+        if (pPayload->fLayoutOnly && pLayoutPayloads)
+        {
+            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pLayoutPayloads->rgpPayloads), pLayoutPayloads->cPayloads + 1, sizeof(BURN_PAYLOAD*), 5);
+            ExitOnNull(pPayloads->rgPayloads, hr, E_OUTOFMEMORY, "Failed to allocate memory for layout payloads.");
+
+            pLayoutPayloads->rgpPayloads[pLayoutPayloads->cPayloads] = pPayload;
+            ++pLayoutPayloads->cPayloads;
+
+            pLayoutPayloads->qwTotalSize += pPayload->qwFileSize;
+        }
+
         // prepare next iteration
         ReleaseNullObject(pixnNode);
     }
@@ -150,6 +162,24 @@ LExit:
     return hr;
 }
 
+extern "C" void PayloadUninitialize(
+    __in BURN_PAYLOAD* pPayload
+    )
+{
+    if (pPayload)
+    {
+        ReleaseStr(pPayload->sczKey);
+        ReleaseStr(pPayload->sczFilePath);
+        ReleaseMem(pPayload->pbHash);
+        ReleaseStr(pPayload->sczSourcePath);
+        ReleaseStr(pPayload->sczLocalFilePath);
+        ReleaseStr(pPayload->downloadSource.sczUrl);
+        ReleaseStr(pPayload->downloadSource.sczUser);
+        ReleaseStr(pPayload->downloadSource.sczPassword);
+        ReleaseStr(pPayload->sczUnverifiedPath);
+    }
+}
+
 extern "C" void PayloadsUninitialize(
     __in BURN_PAYLOADS* pPayloads
     )
@@ -158,16 +188,7 @@ extern "C" void PayloadsUninitialize(
     {
         for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
         {
-            BURN_PAYLOAD* pPayload = &pPayloads->rgPayloads[i];
-
-            ReleaseStr(pPayload->sczKey);
-            ReleaseStr(pPayload->sczFilePath);
-            ReleaseMem(pPayload->pbHash);
-            ReleaseStr(pPayload->sczSourcePath);
-            ReleaseStr(pPayload->sczLocalFilePath);
-            ReleaseStr(pPayload->downloadSource.sczUrl);
-            ReleaseStr(pPayload->downloadSource.sczUser);
-            ReleaseStr(pPayload->downloadSource.sczPassword);
+            PayloadUninitialize(pPayloads->rgPayloads + i);
         }
         MemFree(pPayloads->rgPayloads);
     }

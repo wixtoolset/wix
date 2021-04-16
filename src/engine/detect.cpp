@@ -68,11 +68,6 @@ extern "C" void DetectReset(
         pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
 
         pPackage->fCached = FALSE;
-        for (DWORD iPayload = 0; iPayload < pPackage->cPayloads; ++iPayload)
-        {
-            BURN_PACKAGE_PAYLOAD* pPayload = pPackage->rgPayloads + iPayload;
-            pPayload->fCached = FALSE;
-        }
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {

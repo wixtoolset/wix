@@ -65,7 +65,6 @@ typedef struct _BURN_CONTAINER
     DWORD64 qwFileSize;
     LPWSTR sczHash;
     LPWSTR sczFilePath;         // relative path to container.
-    LPWSTR sczSourcePath;
     DOWNLOAD_SOURCE downloadSource;
 
     BYTE* pbHash;
@@ -73,8 +72,10 @@ typedef struct _BURN_CONTAINER
     DWORD64 qwAttachedOffset;
     BOOL fActuallyAttached;     // indicates whether an attached container is attached or missing.
 
-    //LPWSTR* rgsczPayloads;
-    //DWORD cPayloads;
+    // mutable members
+    BOOL fPlanned;
+    LPWSTR sczSourcePath;
+    LPWSTR sczUnverifiedPath;
 } BURN_CONTAINER;
 
 typedef struct _BURN_CONTAINERS

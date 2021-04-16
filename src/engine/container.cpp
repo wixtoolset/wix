@@ -3,17 +3,6 @@
 #include "precomp.h"
 
 
-// internal function declarations
-
-static HRESULT GetAttachedContainerInfo(
-    __in HANDLE hFile,
-    __in DWORD iContainerIndex,
-    __out DWORD* pdwFormat,
-    __out DWORD64* pqwOffset,
-    __out DWORD64* pqwSize
-    );
-
-
 // function definitions
 
 extern "C" HRESULT ContainersParseFromXml(
@@ -186,6 +175,7 @@ extern "C" void ContainersUninitialize(
             ReleaseStr(pContainer->downloadSource.sczUrl);
             ReleaseStr(pContainer->downloadSource.sczUser);
             ReleaseStr(pContainer->downloadSource.sczPassword);
+            ReleaseStr(pContainer->sczUnverifiedPath);
         }
         MemFree(pContainers->rgContainers);
     }

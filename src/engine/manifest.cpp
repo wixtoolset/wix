@@ -145,7 +145,7 @@ static HRESULT ParseFromXml(
     ExitOnFailure(hr, "Failed to parse containers.");
 
     // parse payloads
-    hr = PayloadsParseFromXml(&pEngineState->payloads, &pEngineState->containers, pixeBundle);
+    hr = PayloadsParseFromXml(&pEngineState->payloads, &pEngineState->containers, &pEngineState->layoutPayloads, pixeBundle);
     ExitOnFailure(hr, "Failed to parse payloads.");
 
     // parse packages

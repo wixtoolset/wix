@@ -552,7 +552,7 @@ MessageId=314
 Severity=Error
 SymbolicName=MSG_FAILED_CACHE_PAYLOAD
 Language=English
-Failed to cache payload: %2!ls! from working path: %3!ls!, error: %1!ls!.
+Failed to cache payload: %2!ls! from working path: %4!ls!, error: %1!ls!.
 .
 
 MessageId=315
@@ -574,7 +574,7 @@ MessageId=317
 Severity=Error
 SymbolicName=MSG_FAILED_LAYOUT_PAYLOAD
 Language=English
-Failed to layout payload: %2!ls! to layout directory: %3!ls!, error: %1!ls!.
+Failed to layout payload: %2!ls! from working path: %4!ls! to layout directory: %3!ls!, error: %1!ls!.
 .
 
 MessageId=318

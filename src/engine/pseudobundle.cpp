@@ -26,6 +26,7 @@ extern "C" HRESULT PseudoBundleInitialize(
 {
     HRESULT hr = S_OK;
     LPWSTR sczRelationTypeCommandLineSwitch = NULL;
+    BURN_PAYLOAD* pPayload = NULL;
 
     LPCWSTR wzRelationTypeCommandLine = CoreRelationTypeToCommandLineString(relationType);
     if (wzRelationTypeCommandLine)
@@ -34,40 +35,39 @@ extern "C" HRESULT PseudoBundleInitialize(
     }
 
     // Initialize the single payload, and fill out all the necessary fields
-    pPackage->rgPayloads = (BURN_PACKAGE_PAYLOAD *)MemAlloc(sizeof(BURN_PACKAGE_PAYLOAD), TRUE); 
-    ExitOnNull(pPackage->rgPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn package payload inside of related bundle struct");
-    pPackage->cPayloads = 1;
+    pPackage->payloads.rgpPayloads = (BURN_PAYLOAD**)MemAlloc(sizeof(BURN_PAYLOAD*), TRUE);
+    ExitOnNull(pPackage->payloads.rgpPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload group inside of related bundle struct");
+    pPackage->payloads.cPayloads = 1;
 
-    pPackage->rgPayloads->pPayload = (BURN_PAYLOAD *)MemAlloc(sizeof(BURN_PAYLOAD), TRUE); 
-    ExitOnNull(pPackage->rgPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of related bundle struct");
-    pPackage->rgPayloads->pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
-    pPackage->rgPayloads->pPayload->qwFileSize = qwSize;
+    pPayload = (BURN_PAYLOAD*)MemAlloc(sizeof(BURN_PAYLOAD), TRUE); 
+    ExitOnNull(pPayload, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of related bundle struct");
+    pPackage->payloads.rgpPayloads[0] = pPayload;
+    pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
+    pPayload->qwFileSize = qwSize;
 
-    hr = StrAllocString(&pPackage->rgPayloads->pPayload->sczKey, wzId, 0);
+    hr = StrAllocString(&pPayload->sczKey, wzId, 0);
     ExitOnFailure(hr, "Failed to copy key for pseudo bundle payload.");
 
-    hr = StrAllocString(&pPackage->rgPayloads->pPayload->sczFilePath, wzFilePath, 0);
+    hr = StrAllocString(&pPayload->sczFilePath, wzFilePath, 0);
     ExitOnFailure(hr, "Failed to copy filename for pseudo bundle.");
 
-    hr = StrAllocString(&pPackage->rgPayloads->pPayload->sczSourcePath, wzLocalSource, 0);
+    hr = StrAllocString(&pPayload->sczSourcePath, wzLocalSource, 0);
     ExitOnFailure(hr, "Failed to copy local source path for pseudo bundle.");
 
     if (wzDownloadSource && *wzDownloadSource)
     {
-        hr = StrAllocString(&pPackage->rgPayloads->pPayload->downloadSource.sczUrl, wzDownloadSource, 0);
+        hr = StrAllocString(&pPayload->downloadSource.sczUrl, wzDownloadSource, 0);
         ExitOnFailure(hr, "Failed to copy download source for pseudo bundle.");
     }
 
     if (pbHash)
     {
-        pPackage->rgPayloads->pPayload->pbHash = static_cast<BYTE*>(MemAlloc(cbHash, FALSE));
-        ExitOnNull(pPackage->rgPayloads->pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for pseudo bundle payload hash.");
+        pPayload->pbHash = static_cast<BYTE*>(MemAlloc(cbHash, FALSE));
+        ExitOnNull(pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for pseudo bundle payload hash.");
 
-        pPackage->rgPayloads->pPayload->cbHash = cbHash;
-        memcpy_s(pPackage->rgPayloads->pPayload->pbHash, pPackage->rgPayloads->pPayload->cbHash, pbHash, cbHash);
+        pPayload->cbHash = cbHash;
+        memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
     }
-
-    pPackage->rgPayloads->fCached = fCached;
 
     pPackage->Exe.fPseudoBundle = TRUE;
 
@@ -171,44 +171,13 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     LPWSTR sczArguments = NULL;
 
     // Initialize the payloads, and copy the necessary fields.
-    pPassthroughPackage->rgPayloads = (BURN_PACKAGE_PAYLOAD *)MemAlloc(sizeof(BURN_PACKAGE_PAYLOAD) * pPackage->cPayloads, TRUE);
-    ExitOnNull(pPassthroughPackage->rgPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn package payload inside of passthrough bundle.");
-    pPassthroughPackage->cPayloads = pPackage->cPayloads;
+    pPassthroughPackage->payloads.rgpPayloads = (BURN_PAYLOAD**)MemAlloc(sizeof(BURN_PAYLOAD*) * pPackage->payloads.cPayloads, TRUE);
+    ExitOnNull(pPassthroughPackage->payloads.rgpPayloads, hr, E_OUTOFMEMORY, "Failed to allocate space for burn package payload inside of passthrough bundle.");
+    pPassthroughPackage->payloads.cPayloads = pPackage->payloads.cPayloads;
 
-    for (DWORD iPayload = 0; iPayload < pPackage->cPayloads; ++iPayload)
+    for (DWORD iPayload = 0; iPayload < pPackage->payloads.cPayloads; ++iPayload)
     {
-        BURN_PACKAGE_PAYLOAD* pPayload = pPackage->rgPayloads + iPayload;
-
-        pPassthroughPackage->rgPayloads[iPayload].pPayload = (BURN_PAYLOAD *)MemAlloc(sizeof(BURN_PAYLOAD), TRUE); 
-        ExitOnNull(pPassthroughPackage->rgPayloads[iPayload].pPayload, hr, E_OUTOFMEMORY, "Failed to allocate space for burn payload inside of related bundle struct");
-        pPassthroughPackage->rgPayloads[iPayload].pPayload->packaging = pPayload->pPayload->packaging;
-        pPassthroughPackage->rgPayloads[iPayload].pPayload->qwFileSize = pPayload->pPayload->qwFileSize;
-
-        hr = StrAllocString(&pPassthroughPackage->rgPayloads[iPayload].pPayload->sczKey, pPayload->pPayload->sczKey, 0);
-        ExitOnFailure(hr, "Failed to copy key for passthrough pseudo bundle payload.");
-
-        hr = StrAllocString(&pPassthroughPackage->rgPayloads[iPayload].pPayload->sczFilePath, pPayload->pPayload->sczFilePath, 0);
-        ExitOnFailure(hr, "Failed to copy filename for passthrough pseudo bundle.");
-
-        hr = StrAllocString(&pPassthroughPackage->rgPayloads[iPayload].pPayload->sczSourcePath, pPayload->pPayload->sczSourcePath, 0);
-        ExitOnFailure(hr, "Failed to copy local source path for passthrough pseudo bundle.");
-
-        if (pPayload->pPayload->downloadSource.sczUrl)
-        {
-            hr = StrAllocString(&pPassthroughPackage->rgPayloads[iPayload].pPayload->downloadSource.sczUrl, pPayload->pPayload->downloadSource.sczUrl, 0);
-            ExitOnFailure(hr, "Failed to copy download source for passthrough pseudo bundle.");
-        }
-
-        if (pPayload->pPayload->pbHash)
-        {
-            pPassthroughPackage->rgPayloads[iPayload].pPayload->pbHash = static_cast<BYTE*>(MemAlloc(pPayload->pPayload->cbHash, FALSE));
-            ExitOnNull(pPassthroughPackage->rgPayloads[iPayload].pPayload->pbHash, hr, E_OUTOFMEMORY, "Failed to allocate memory for pseudo bundle payload hash.");
-
-            pPassthroughPackage->rgPayloads[iPayload].pPayload->cbHash = pPayload->pPayload->cbHash;
-            memcpy_s(pPassthroughPackage->rgPayloads[iPayload].pPayload->pbHash, pPassthroughPackage->rgPayloads[iPayload].pPayload->cbHash, pPayload->pPayload->pbHash, pPayload->pPayload->cbHash);
-        }
-
-        pPassthroughPackage->rgPayloads[iPayload].fCached = pPayload->fCached;
+        pPassthroughPackage->payloads.rgpPayloads[iPayload] = pPackage->payloads.rgpPayloads[iPayload];
     }
 
     pPassthroughPackage->Exe.fPseudoBundle = TRUE;

@@ -581,6 +581,7 @@ extern "C" HRESULT MspEngineExecutePackage(
     {
         LPCWSTR wzAppend = NULL;
         BURN_PACKAGE* pMspPackage = pExecuteAction->mspTarget.rgOrderedPatches[i].pPackage;
+        BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgpPayloads[0];
         AssertSz(BURN_PACKAGE_TYPE_MSP == pMspPackage->type, "Invalid package type added to ordered patches.");
 
         if (BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->mspTarget.action)
@@ -592,7 +593,7 @@ extern "C" HRESULT MspEngineExecutePackage(
             // Best effort to set the execute package cache folder variable.
             VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-            hr = PathConcat(sczCachedDirectory, pMspPackage->rgPayloads[0].pPayload->sczFilePath, &sczMspPath);
+            hr = PathConcat(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
             ExitOnFailure(hr, "Failed to build MSP path.");
 
             wzAppend = sczMspPath;

@@ -38,17 +38,10 @@ enum BURN_CACHE_ACTION_TYPE
     BURN_CACHE_ACTION_TYPE_NONE,
     BURN_CACHE_ACTION_TYPE_CHECKPOINT,
     BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE,
-    BURN_CACHE_ACTION_TYPE_PACKAGE_START,
-    BURN_CACHE_ACTION_TYPE_PACKAGE_STOP,
+    BURN_CACHE_ACTION_TYPE_PACKAGE,
     BURN_CACHE_ACTION_TYPE_ROLLBACK_PACKAGE,
     BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT,
-    BURN_CACHE_ACTION_TYPE_ACQUIRE_CONTAINER,
-    BURN_CACHE_ACTION_TYPE_EXTRACT_CONTAINER,
-    BURN_CACHE_ACTION_TYPE_LAYOUT_CONTAINER,
-    BURN_CACHE_ACTION_TYPE_ACQUIRE_PAYLOAD,
-    BURN_CACHE_ACTION_TYPE_CACHE_PAYLOAD,
-    BURN_CACHE_ACTION_TYPE_LAYOUT_PAYLOAD,
-    BURN_CACHE_ACTION_TYPE_TRANSACTION_BOUNDARY,
+    BURN_CACHE_ACTION_TYPE_CONTAINER,
 };
 
 enum BURN_EXECUTE_ACTION_TYPE
@@ -78,13 +71,6 @@ enum BURN_CLEAN_ACTION_TYPE
 
 // structs
 
-typedef struct _BURN_EXTRACT_PAYLOAD
-{
-    BURN_PACKAGE* pPackage;
-    BURN_PAYLOAD* pPayload;
-    LPWSTR sczUnverifiedPath;
-} BURN_EXTRACT_PAYLOAD;
-
 typedef struct _BURN_DEPENDENT_REGISTRATION_ACTION
 {
     BURN_DEPENDENT_REGISTRATION_ACTION_TYPE type;
@@ -111,7 +97,6 @@ typedef struct _BURN_CACHE_PAYLOAD_PROGRESS
 typedef struct _BURN_CACHE_ACTION
 {
     BURN_CACHE_ACTION_TYPE type;
-    BOOL fSkipUntilRetried;
     union
     {
         struct
@@ -121,21 +106,14 @@ typedef struct _BURN_CACHE_ACTION
         struct
         {
             LPWSTR sczExecutableName;
-            LPWSTR sczLayoutDirectory;
             LPWSTR sczUnverifiedPath;
             DWORD64 qwBundleSize;
+            BURN_PAYLOAD_GROUP* pPayloadGroup;
         } bundleLayout;
         struct
         {
             BURN_PACKAGE* pPackage;
-            DWORD cCachePayloads;
-            DWORD64 qwCachePayloadSizeTotal;
-            DWORD iPackageCompleteAction;
-        } packageStart;
-        struct
-        {
-            BURN_PACKAGE* pPackage;
-        } packageStop;
+        } package;
         struct
         {
             BURN_PACKAGE* pPackage;
@@ -147,62 +125,7 @@ typedef struct _BURN_CACHE_ACTION
         struct
         {
             BURN_CONTAINER* pContainer;
-            DWORD iProgress;
-            LPWSTR sczUnverifiedPath;
-        } resolveContainer;
-        struct
-        {
-            BURN_CONTAINER* pContainer;
-            DWORD iSkipUntilAcquiredByAction;
-            LPWSTR sczContainerUnverifiedPath;
-
-            BURN_EXTRACT_PAYLOAD* rgPayloads;
-            DWORD cPayloads;
-        } extractContainer;
-        struct
-        {
-            BURN_PACKAGE* pPackage;
-            BURN_CONTAINER* pContainer;
-            DWORD iProgress;
-            DWORD iTryAgainAction;
-            DWORD cTryAgainAttempts;
-            LPWSTR sczLayoutDirectory;
-            LPWSTR sczUnverifiedPath;
-            BOOL fMove;
-        } layoutContainer;
-        struct
-        {
-            BURN_PACKAGE* pPackage;
-            BURN_PAYLOAD* pPayload;
-            DWORD iProgress;
-            LPWSTR sczUnverifiedPath;
-        } resolvePayload;
-        struct
-        {
-            BURN_PACKAGE* pPackage;
-            BURN_PAYLOAD* pPayload;
-            DWORD iProgress;
-            DWORD iTryAgainAction;
-            DWORD cTryAgainAttempts;
-            LPWSTR sczUnverifiedPath;
-            BOOL fMove;
-        } cachePayload;
-        struct
-        {
-            BURN_PACKAGE* pPackage;
-            BURN_PAYLOAD* pPayload;
-            DWORD iProgress;
-            DWORD iTryAgainAction;
-            DWORD cTryAgainAttempts;
-            LPWSTR sczLayoutDirectory;
-            LPWSTR sczUnverifiedPath;
-            BOOL fMove;
-        } layoutPayload;
-        struct
-        {
-            BURN_ROLLBACK_BOUNDARY* pRollbackBoundary;
-            HANDLE hEvent;
-        } rollbackBoundary;
+        } container;
     };
 } BURN_CACHE_ACTION;
 
@@ -306,6 +229,7 @@ typedef struct _BURN_CLEAN_ACTION
 typedef struct _BURN_PLAN
 {
     BOOTSTRAPPER_ACTION action;
+    BURN_PAYLOADS* pPayloads;   // points directly into parent the ENGINE_STATE.
     LPWSTR wzBundleId;          // points directly into parent the ENGINE_STATE.
     LPWSTR wzBundleProviderKey; // points directly into parent the ENGINE_STATE.
     BOOL fPerMachine;
@@ -315,6 +239,7 @@ typedef struct _BURN_PLAN
     BOOL fDisableRollback;
     BOOL fAffectedMachineState;
     BOOL fIgnoreAllDependents;
+    LPWSTR sczLayoutDirectory;
 
     DWORD64 qwCacheSizeTotal;
 
@@ -369,7 +294,9 @@ typedef struct _BURN_PLAN
 
 void PlanReset(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGES* pPackages
+    __in BURN_CONTAINERS* pContainers,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_PAYLOAD_GROUP* pLayoutPayloads
     );
 void PlanUninitializeExecuteAction(
     __in BURN_EXECUTE_ACTION* pExecuteAction
@@ -393,8 +320,7 @@ HRESULT PlanLayoutBundle(
     __in_z LPCWSTR wzExecutableName,
     __in DWORD64 qwBundleSize,
     __in BURN_VARIABLES* pVariables,
-    __in BURN_PAYLOADS* pPayloads,
-    __out_z LPWSTR* psczLayoutDirectory
+    __in BURN_PAYLOAD_GROUP* pLayoutPayloads
     );
 HRESULT PlanForwardCompatibleBundles(
     __in BURN_USER_EXPERIENCE* pUX,
@@ -410,8 +336,7 @@ HRESULT PlanPackages(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in_z_opt LPCWSTR wzLayoutDirectory
+    __in BOOTSTRAPPER_RELATION_TYPE relationType
     );
 HRESULT PlanRegistration(
     __in BURN_PLAN* pPlan,
@@ -438,10 +363,13 @@ HRESULT PlanUpdateBundle(
     __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType
     );
+HRESULT PlanLayoutContainer(
+    __in BURN_PLAN* pPlan,
+    __in BURN_CONTAINER* pContainer
+    );
 HRESULT PlanLayoutPackage(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage,
-    __in_z_opt LPCWSTR wzLayoutDirectory
+    __in BURN_PACKAGE* pPackage
     );
 HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,

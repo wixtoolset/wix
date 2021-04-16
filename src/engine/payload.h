@@ -45,6 +45,8 @@ typedef struct _BURN_PAYLOAD
     // mutable members
     BURN_PAYLOAD_STATE state;
     LPWSTR sczLocalFilePath; // location of extracted or downloaded copy
+
+    LPWSTR sczUnverifiedPath;
 } BURN_PAYLOAD;
 
 typedef struct _BURN_PAYLOADS
@@ -53,13 +55,23 @@ typedef struct _BURN_PAYLOADS
     DWORD cPayloads;
 } BURN_PAYLOADS;
 
+typedef struct _BURN_PAYLOAD_GROUP
+{
+    BURN_PAYLOAD** rgpPayloads;
+    DWORD cPayloads;
+    DWORD64 qwTotalSize;
+} BURN_PAYLOAD_GROUP;
 
 // functions
 
 HRESULT PayloadsParseFromXml(
     __in BURN_PAYLOADS* pPayloads,
     __in_opt BURN_CONTAINERS* pContainers,
+    __in_opt BURN_PAYLOAD_GROUP* pLayoutPayloads,
     __in IXMLDOMNode* pixnBundle
+    );
+void PayloadUninitialize(
+    __in BURN_PAYLOAD* pPayload
     );
 void PayloadsUninitialize(
     __in BURN_PAYLOADS* pPayloads

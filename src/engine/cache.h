@@ -54,6 +54,7 @@ HRESULT CacheGetResumePath(
     );
 HRESULT CacheFindLocalSource(
     __in_z LPCWSTR wzSourcePath,
+    __in_z LPCWSTR wzDestinationPath,
     __in BURN_VARIABLES* pVariables,
     __out BOOL* pfFound,
     __out_z LPWSTR* psczSourceFullPath

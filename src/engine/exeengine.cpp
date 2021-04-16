@@ -372,31 +372,33 @@ extern "C" HRESULT ExeEngineExecutePackage(
     PROCESS_INFORMATION pi = { };
     DWORD dwExitCode = 0;
     GENERIC_EXECUTE_MESSAGE message = { };
+    BURN_PACKAGE* pPackage = pExecuteAction->exePackage.pPackage;
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
 
     // get cached executable path
-    hr = CacheGetCompletedPath(pExecuteAction->exePackage.pPackage->fPerMachine, pExecuteAction->exePackage.pPackage->sczCacheId, &sczCachedDirectory);
-    ExitOnFailure(hr, "Failed to get cached path for package: %ls", pExecuteAction->exePackage.pPackage->sczId);
+    hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+    ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
     // Best effort to set the execute package cache folder and action variables.
     VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, pExecuteAction->exePackage.action, TRUE);
 
-    hr = PathConcat(sczCachedDirectory, pExecuteAction->exePackage.pPackage->rgPayloads[0].pPayload->sczFilePath, &sczExecutablePath);
+    hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczExecutablePath);
     ExitOnFailure(hr, "Failed to build executable path.");
 
     // pick arguments
     switch (pExecuteAction->exePackage.action)
     {
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
-        wzArguments = pExecuteAction->exePackage.pPackage->Exe.sczInstallArguments;
+        wzArguments = pPackage->Exe.sczInstallArguments;
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
-        wzArguments = pExecuteAction->exePackage.pPackage->Exe.sczUninstallArguments;
+        wzArguments = pPackage->Exe.sczUninstallArguments;
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
-        wzArguments = pExecuteAction->exePackage.pPackage->Exe.sczRepairArguments;
+        wzArguments = pPackage->Exe.sczRepairArguments;
         break;
 
     default:
@@ -408,9 +410,9 @@ extern "C" HRESULT ExeEngineExecutePackage(
     hr = StrAllocString(&sczArguments, wzArguments && *wzArguments ? wzArguments : L"", 0);
     ExitOnFailure(hr, "Failed to copy package arguments.");
 
-    for (DWORD i = 0; i < pExecuteAction->exePackage.pPackage->Exe.cCommandLineArguments; ++i)
+    for (DWORD i = 0; i < pPackage->Exe.cCommandLineArguments; ++i)
     {
-        BURN_EXE_COMMAND_LINE_ARGUMENT* commandLineArgument = &pExecuteAction->exePackage.pPackage->Exe.rgCommandLineArguments[i];
+        BURN_EXE_COMMAND_LINE_ARGUMENT* commandLineArgument = &pPackage->Exe.rgCommandLineArguments[i];
         BOOL fCondition = FALSE;
 
         hr = ConditionEvaluate(pVariables, commandLineArgument->sczCondition, &fCondition);
@@ -468,10 +470,10 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
     ExitOnFailure(hr, "Failed to create obfuscated executable command.");
 
-    if (pExecuteAction->exePackage.pPackage->Exe.fSupportsAncestors)
+    if (pPackage->Exe.fSupportsAncestors)
     {
         // Add the list of dependencies to ignore, if any, to the burn command line.
-        if (pExecuteAction->exePackage.sczIgnoreDependencies && BURN_EXE_PROTOCOL_TYPE_BURN == pExecuteAction->exePackage.pPackage->Exe.protocol)
+        if (pExecuteAction->exePackage.sczIgnoreDependencies && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
         {
             hr = StrAllocFormattedSecure(&sczCommand, L"%ls -%ls=%ls", sczCommand, BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pExecuteAction->exePackage.sczIgnoreDependencies);
             ExitOnFailure(hr, "Failed to append the list of dependencies to ignore to the command line.");
@@ -491,21 +493,21 @@ extern "C" HRESULT ExeEngineExecutePackage(
         }
     }
 
-    if (BURN_EXE_PROTOCOL_TYPE_BURN == pExecuteAction->exePackage.pPackage->Exe.protocol)
+    if (BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
     {
         hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, &sczCommandObfuscated);
         ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
     }
 
     // Log before we add the secret pipe name and client token for embedded processes.
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pExecuteAction->exePackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated);
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->exePackage.action), sczExecutablePath, sczCommandObfuscated);
 
-    if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_BURN == pExecuteAction->exePackage.pPackage->Exe.protocol)
+    if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
     {
         hr = EmbeddedRunBundle(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run bundle as embedded from path: %ls", sczExecutablePath);
     }
-    else if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_NETFX4 == pExecuteAction->exePackage.pPackage->Exe.protocol)
+    else if (!pExecuteAction->exePackage.fFireAndForget && BURN_EXE_PROTOCOL_TYPE_NETFX4 == pPackage->Exe.protocol)
     {
         hr = NetFxRunChainer(sczExecutablePath, sczCommand, pfnGenericMessageHandler, pvContext, &dwExitCode);
         ExitOnFailure(hr, "Failed to run netfx chainer: %ls", sczExecutablePath);
@@ -543,7 +545,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
         } while (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr);
     }
 
-    hr = HandleExitCode(pExecuteAction->exePackage.pPackage, dwExitCode, pRestart);
+    hr = HandleExitCode(pPackage, dwExitCode, pRestart);
     ExitOnRootFailure(hr, "Process returned error: 0x%x", dwExitCode);
 
 LExit:

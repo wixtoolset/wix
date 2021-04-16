@@ -80,7 +80,14 @@ extern "C" void RelatedBundlesUninitialize(
     {
         for (DWORD i = 0; i < pRelatedBundles->cRelatedBundles; ++i)
         {
-            PackageUninitialize(&pRelatedBundles->rgRelatedBundles[i].package);
+            BURN_PACKAGE* pPackage = &pRelatedBundles->rgRelatedBundles[i].package;
+
+            for (DWORD j = 0; j < pPackage->payloads.cPayloads; ++j)
+            {
+                PayloadUninitialize(pPackage->payloads.rgpPayloads[j]);
+            }
+
+            PackageUninitialize(pPackage);
             ReleaseStr(pRelatedBundles->rgRelatedBundles[i].sczTag);
         }
 

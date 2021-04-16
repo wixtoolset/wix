@@ -287,7 +287,7 @@ extern "C" HRESULT CoreDetect(
     pEngineState->fDetected = FALSE;
     pEngineState->fPlanned = FALSE;
     DetectReset(&pEngineState->registration, &pEngineState->packages);
-    PlanReset(&pEngineState->plan, &pEngineState->packages);
+    PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
     // Detect if bundle installed state has changed since start up. This
     // only happens if Apply() changed the state of bundle (installed or
@@ -438,7 +438,6 @@ extern "C" HRESULT CorePlan(
 {
     HRESULT hr = S_OK;
     BOOL fPlanBegan = FALSE;
-    LPWSTR sczLayoutDirectory = NULL;
     BURN_PACKAGE* pUpgradeBundlePackage = NULL;
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
     BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
@@ -460,11 +459,12 @@ extern "C" HRESULT CorePlan(
 
     // Always reset the plan.
     pEngineState->fPlanned = FALSE;
-    PlanReset(&pEngineState->plan, &pEngineState->packages);
+    PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
     // Remember the overall action state in the plan since it shapes the changes
     // we make everywhere.
     pEngineState->plan.action = action;
+    pEngineState->plan.pPayloads = &pEngineState->payloads;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback;
@@ -484,11 +484,11 @@ extern "C" HRESULT CorePlan(
         Assert(!pEngineState->plan.fPerMachine);
 
         // Plan the bundle's layout.
-        hr = PlanLayoutBundle(&pEngineState->plan, pEngineState->registration.sczExecutableName, pEngineState->section.qwBundleSize, &pEngineState->variables, &pEngineState->payloads, &sczLayoutDirectory);
+        hr = PlanLayoutBundle(&pEngineState->plan, pEngineState->registration.sczExecutableName, pEngineState->section.qwBundleSize, &pEngineState->variables, &pEngineState->layoutPayloads);
         ExitOnFailure(hr, "Failed to plan the layout of the bundle.");
 
         // Plan the packages' layout.
-        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, sczLayoutDirectory);
+        hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
         ExitOnFailure(hr, "Failed to plan packages.");
     }
     else if (BOOTSTRAPPER_ACTION_UPDATE_REPLACE == action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED == action)
@@ -532,7 +532,7 @@ extern "C" HRESULT CorePlan(
                 hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
                 ExitOnFailure(hr, "Failed to plan related bundles.");
 
-                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, NULL);
+                hr = PlanPackages(&pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType);
                 ExitOnFailure(hr, "Failed to plan packages.");
 
                 // Schedule the update of related bundles last.
@@ -562,7 +562,6 @@ LExit:
     }
 
     LogId(REPORT_STANDARD, MSG_PLAN_COMPLETE, hr);
-    ReleaseStr(sczLayoutDirectory);
 
     return hr;
 }
@@ -1679,23 +1678,22 @@ static HRESULT DetectPackagePayloadsCached(
         // If the cached directory exists, we have something.
         if (DirExists(sczCachePath, NULL))
         {
-            // Check all payloads to see if they exist.
-            for (DWORD i = 0; i < pPackage->cPayloads; ++i)
+            // Check all payloads to see if any exist.
+            for (DWORD i = 0; i < pPackage->payloads.cPayloads; ++i)
             {
-                BURN_PACKAGE_PAYLOAD* pPackagePayload = pPackage->rgPayloads + i;
+                BURN_PAYLOAD* pPayload = pPackage->payloads.rgpPayloads[i];
 
-                hr = PathConcat(sczCachePath, pPackagePayload->pPayload->sczFilePath, &sczPayloadCachePath);
+                hr = PathConcat(sczCachePath, pPayload->sczFilePath, &sczPayloadCachePath);
                 ExitOnFailure(hr, "Failed to concat payload cache path.");
 
                 if (FileExistsEx(sczPayloadCachePath, NULL))
                 {
-                    // TODO: We shouldn't track whether the payload was cached since all we did was check whether the file exists.
-                    pPackagePayload->fCached = TRUE;
                     fCached = TRUE;
+                    break;
                 }
                 else
                 {
-                    LogId(REPORT_STANDARD, MSG_DETECT_PACKAGE_NOT_FULLY_CACHED, pPackage->sczId, pPackagePayload->pPayload->sczKey);
+                    LogId(REPORT_STANDARD, MSG_DETECT_PACKAGE_NOT_FULLY_CACHED, pPackage->sczId, pPayload->sczKey);
                 }
             }
         }

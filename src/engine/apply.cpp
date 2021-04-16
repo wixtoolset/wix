@@ -13,18 +13,28 @@ const DWORD BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS = 2;
 
 // structs
 
-struct BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT
+typedef struct _BURN_CACHE_CONTEXT
 {
     BURN_USER_EXPERIENCE* pUX;
+    BURN_VARIABLES* pVariables;
+    BURN_PAYLOADS* pPayloads;
+    HANDLE hPipe;
+    HANDLE hSourceEngineFile;
+    DWORD64 qwTotalCacheSize;
+    DWORD64 qwSuccessfulCacheProgress;
+    LPCWSTR wzLayoutDirectory;
+} BURN_CACHE_CONTEXT;
+
+typedef struct _BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT
+{
+    BURN_CACHE_CONTEXT* pCacheContext;
     BURN_CONTAINER* pContainer;
     BURN_PACKAGE* pPackage;
     BURN_PAYLOAD* pPayload;
-    DWORD64 qwCacheProgress;
-    DWORD64 qwTotalCacheSize;
 
     BOOL fCancel;
     BOOL fError;
-};
+} BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT;
 
 typedef struct _BURN_EXECUTE_CONTEXT
 {
@@ -56,50 +66,49 @@ static HRESULT ExecuteDependentRegistrationActions(
     __in_ecount(cActions) const BURN_DEPENDENT_REGISTRATION_ACTION* rgActions,
     __in DWORD cActions
     );
-static HRESULT ExtractContainer(
-    __in HANDLE hSourceEngineFile,
-    __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzContainerPath,
-    __in_ecount(cExtractPayloads) BURN_EXTRACT_PAYLOAD* rgExtractPayloads,
-    __in DWORD cExtractPayloads
+static HRESULT ApplyCachePackage(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PACKAGE* pPackage
     );
-static void UpdateCacheSuccessProgress(
-    __in BURN_PLAN* pPlan,
-    __in BURN_CACHE_ACTION* pCacheAction,
-    __inout DWORD64* pqwSuccessfulCachedProgress
+static HRESULT ApplyExtractContainer(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
+    );
+static HRESULT ApplyLayoutBundle(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PAYLOAD_GROUP* pPayloads,
+    __in_z LPCWSTR wzExecutableName,
+    __in_z LPCWSTR wzUnverifiedPath
+    );
+static HRESULT ApplyLayoutContainer(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
+    );
+static HRESULT ApplyProcessPayload(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in_opt BURN_PACKAGE* pPackage,
+    __in BURN_PAYLOAD* pPayload
+    );
+static HRESULT ExtractContainer(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
     );
 static HRESULT LayoutBundle(
-    __in HANDLE hSourceEngineFile,
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
-    __in HANDLE hPipe,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzUnverifiedPath,
-    __in DWORD64 qwSuccessfulCacheProgress,
-    __in DWORD64 qwTotalCacheSize
+    __in_z LPCWSTR wzUnverifiedPath
     );
 static HRESULT AcquireContainerOrPayload(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in LPCWSTR wzDestinationPath,
-    __in DWORD64 qwSuccessfulCacheProgress,
-    __in DWORD64 qwTotalCacheSize
+    __in_opt BURN_PAYLOAD* pPayload
     );
 static HRESULT LayoutOrCacheContainerOrPayload(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in HANDLE hPipe,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
     __in_opt BURN_PAYLOAD* pPayload,
-    __in BOOL fAlreadyProvidedProgress,
-    __in DWORD64 qwSuccessfullyCacheProgress,
-    __in DWORD64 qwTotalCacheSize,
-    __in_z_opt LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzUnverifiedPath,
     __in BOOL fMove,
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
@@ -461,268 +470,83 @@ extern "C" HRESULT ApplyCache(
 {
     HRESULT hr = S_OK;
     DWORD dwCheckpoint = 0;
-    BOOL fRetry = FALSE;
-    DWORD iRetryAction = BURN_PLAN_INVALID_ACTION_INDEX;
-    BURN_PACKAGE* pStartedPackage = NULL;
-    DWORD64 qwSuccessfulCachedProgress = 0;
-
-    // Allow us to retry and skip packages.
-    DWORD iPackageStartAction = BURN_PLAN_INVALID_ACTION_INDEX;
-    DWORD iPackageCompleteAction = BURN_PLAN_INVALID_ACTION_INDEX;
+    BURN_CACHE_CONTEXT cacheContext = { };
+    BURN_PACKAGE* pPackage = NULL;
 
     *pfRollback = FALSE;
 
     hr = UserExperienceOnCacheBegin(pUX);
     ExitOnRootFailure(hr, "BA aborted cache.");
 
-    do
+    cacheContext.hSourceEngineFile = hSourceEngineFile;
+    cacheContext.pPayloads = pPlan->pPayloads;
+    cacheContext.pUX = pUX;
+    cacheContext.pVariables = pVariables;
+    cacheContext.qwTotalCacheSize = pPlan->qwCacheSizeTotal;
+    cacheContext.wzLayoutDirectory = pPlan->sczLayoutDirectory;
+
+    for (DWORD i = 0; i < pPlan->cCacheActions; ++i)
     {
-        hr = S_OK;
-        fRetry = FALSE;
+        BURN_CACHE_ACTION* pCacheAction = pPlan->rgCacheActions + i;
+        cacheContext.hPipe = hPipe;
+        pPackage = NULL;
 
-        // Allow us to retry just a container or payload.
-        LPCWSTR wzRetryId = NULL;
-        DWORD iRetryContainerOrPayloadAction = BURN_PLAN_INVALID_ACTION_INDEX;
-        BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
-
-        // cache actions
-        for (DWORD i = (BURN_PLAN_INVALID_ACTION_INDEX == iRetryAction) ? 0 : iRetryAction; SUCCEEDED(hr) && i < pPlan->cCacheActions; ++i)
+        switch (pCacheAction->type)
         {
-            BURN_CACHE_ACTION* pCacheAction = pPlan->rgCacheActions + i;
-            BOOL fRetryContainerOrPayload = FALSE;
-            cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
+        case BURN_CACHE_ACTION_TYPE_CHECKPOINT:
+            dwCheckpoint = pCacheAction->checkpoint.dwId;
+            break;
 
-            if (pCacheAction->fSkipUntilRetried)
+        case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
+            hr = ApplyLayoutBundle(&cacheContext, pCacheAction->bundleLayout.pPayloadGroup, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczUnverifiedPath);
+            ExitOnFailure(hr, "Failed cache action: %ls", L"layout bundle");
+
+            ++(*pcOverallProgressTicks);
+
+            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks);
+            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"layout bundle");
+
+            break;
+
+        case BURN_CACHE_ACTION_TYPE_PACKAGE:
+            pPackage = pCacheAction->package.pPackage;
+
+            if (!pPackage->fPerMachine && !cacheContext.wzLayoutDirectory)
             {
-                // If this action was retried, let's make sure it will not be skipped any longer.
-                if (iRetryAction == i)
-                {
-                    pCacheAction->fSkipUntilRetried = FALSE;
-                }
-                else // skip the action.
-                {
-                    continue;
-                }
+                cacheContext.hPipe = INVALID_HANDLE_VALUE;
             }
 
-            switch (pCacheAction->type)
+            hr = ApplyCachePackage(&cacheContext, pPackage);
+            ExitOnFailure(hr, "Failed cache action: %ls", L"cache package");
+
+            ++(*pcOverallProgressTicks);
+
+            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks);
+            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"cache package");
+
+            break;
+
+        case BURN_CACHE_ACTION_TYPE_CONTAINER:
+            Assert(pPlan->sczLayoutDirectory);
+            hr = ApplyLayoutContainer(&cacheContext, pCacheAction->container.pContainer);
+            ExitOnFailure(hr, "Failed cache action: %ls", L"layout container");
+            
+            break;
+
+        case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
+            if (!::SetEvent(pCacheAction->syncpoint.hEvent))
             {
-            case BURN_CACHE_ACTION_TYPE_CHECKPOINT:
-                dwCheckpoint = pCacheAction->checkpoint.dwId;
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
-                hr = LayoutBundle(hSourceEngineFile, pUX, pVariables, hPipe, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczLayoutDirectory, pCacheAction->bundleLayout.sczUnverifiedPath, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                    ++(*pcOverallProgressTicks);
-
-                    hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks);
-                    if (FAILED(hr))
-                    {
-                        LogErrorId(hr, MSG_USER_CANCELED, L"layout bundle", NULL, NULL);
-                    }
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_PACKAGE_START:
-                iPackageStartAction = i; // if we retry this package, we'll start here in the plan.
-                iPackageCompleteAction = pCacheAction->packageStart.iPackageCompleteAction; // if we ignore this package, we'll start after the complete action in the plan.
-                pStartedPackage = pCacheAction->packageStart.pPackage;
-
-                hr = UserExperienceOnCachePackageBegin(pUX, pStartedPackage->sczId, pCacheAction->packageStart.cCachePayloads, pCacheAction->packageStart.qwCachePayloadSizeTotal);
-                if (FAILED(hr))
-                {
-                    LogErrorId(hr, MSG_USER_CANCELED, L"begin cache package", pStartedPackage->sczId, NULL);
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_ACQUIRE_CONTAINER:
-                hr = AcquireContainerOrPayload(pUX, pVariables, pCacheAction->resolveContainer.pContainer, NULL, NULL, pCacheAction->resolveContainer.sczUnverifiedPath, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                }
-                else
-                {
-                    LogErrorId(hr, MSG_FAILED_ACQUIRE_CONTAINER, pCacheAction->resolveContainer.pContainer->sczId, pCacheAction->resolveContainer.sczUnverifiedPath, NULL);
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_EXTRACT_CONTAINER:
-                // If this action is to be skipped until the acquire action is not skipped and the other
-                // action is still being skipped then skip this action.
-                if (BURN_PLAN_INVALID_ACTION_INDEX != pCacheAction->extractContainer.iSkipUntilAcquiredByAction && pPlan->rgCacheActions[pCacheAction->extractContainer.iSkipUntilAcquiredByAction].fSkipUntilRetried)
-                {
-                    break;
-                }
-
-                hr = ExtractContainer(hSourceEngineFile, pCacheAction->extractContainer.pContainer, pCacheAction->extractContainer.sczContainerUnverifiedPath, pCacheAction->extractContainer.rgPayloads, pCacheAction->extractContainer.cPayloads);
-                if (FAILED(hr))
-                {
-                    LogErrorId(hr, MSG_FAILED_EXTRACT_CONTAINER, pCacheAction->extractContainer.pContainer->sczId, pCacheAction->extractContainer.sczContainerUnverifiedPath, NULL);
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_LAYOUT_CONTAINER:
-                hr = LayoutOrCacheContainerOrPayload(pUX, hPipe, pCacheAction->layoutContainer.pContainer, pCacheAction->layoutContainer.pPackage, NULL, pPlan->rgContainerProgress[pCacheAction->layoutContainer.iProgress].fCachedDuringApply, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal, pCacheAction->layoutContainer.sczLayoutDirectory, pCacheAction->layoutContainer.sczUnverifiedPath, pCacheAction->layoutContainer.fMove, pCacheAction->layoutContainer.cTryAgainAttempts, &fRetryContainerOrPayload);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                }
-                else
-                {
-                    LogErrorId(hr, MSG_FAILED_LAYOUT_CONTAINER, pCacheAction->layoutContainer.pContainer->sczId, pCacheAction->layoutContainer.sczLayoutDirectory, pCacheAction->layoutContainer.sczUnverifiedPath);
-
-                    if (fRetryContainerOrPayload)
-                    {
-                        wzRetryId = pCacheAction->layoutContainer.pContainer->sczId;
-                        iRetryContainerOrPayloadAction = pCacheAction->layoutContainer.iTryAgainAction;
-
-                        ++pCacheAction->layoutContainer.cTryAgainAttempts;
-                    }
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_ACQUIRE_PAYLOAD:
-                hr = AcquireContainerOrPayload(pUX, pVariables, NULL, pCacheAction->resolvePayload.pPackage, pCacheAction->resolvePayload.pPayload, pCacheAction->resolvePayload.sczUnverifiedPath, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                }
-                else
-                {
-                    LogErrorId(hr, MSG_FAILED_ACQUIRE_PAYLOAD, pCacheAction->resolvePayload.pPayload->sczKey, pCacheAction->resolvePayload.sczUnverifiedPath, NULL);
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_CACHE_PAYLOAD:
-                hr = LayoutOrCacheContainerOrPayload(pUX, pCacheAction->cachePayload.pPackage->fPerMachine ? hPipe : INVALID_HANDLE_VALUE, NULL, pCacheAction->cachePayload.pPackage, pCacheAction->cachePayload.pPayload, pPlan->rgPayloadProgress[pCacheAction->cachePayload.iProgress].fCachedDuringApply, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal, NULL, pCacheAction->cachePayload.sczUnverifiedPath, pCacheAction->cachePayload.fMove, pCacheAction->cachePayload.cTryAgainAttempts, &fRetryContainerOrPayload);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                }
-                else
-                {
-                    LogErrorId(hr, MSG_FAILED_CACHE_PAYLOAD, pCacheAction->cachePayload.pPayload->sczKey, pCacheAction->cachePayload.sczUnverifiedPath, NULL);
-
-                    if (fRetryContainerOrPayload)
-                    {
-                        wzRetryId = pCacheAction->cachePayload.pPayload->sczKey;
-                        iRetryContainerOrPayloadAction = pCacheAction->cachePayload.iTryAgainAction;
-
-                        ++pCacheAction->cachePayload.cTryAgainAttempts;
-                    }
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_LAYOUT_PAYLOAD:
-                hr = LayoutOrCacheContainerOrPayload(pUX, hPipe, NULL, pCacheAction->layoutPayload.pPackage, pCacheAction->layoutPayload.pPayload, pPlan->rgPayloadProgress[pCacheAction->layoutPayload.iProgress].fCachedDuringApply, qwSuccessfulCachedProgress, pPlan->qwCacheSizeTotal, pCacheAction->layoutPayload.sczLayoutDirectory, pCacheAction->layoutPayload.sczUnverifiedPath, pCacheAction->layoutPayload.fMove, pCacheAction->layoutPayload.cTryAgainAttempts, &fRetryContainerOrPayload);
-                if (SUCCEEDED(hr))
-                {
-                    UpdateCacheSuccessProgress(pPlan, pCacheAction, &qwSuccessfulCachedProgress);
-                }
-                else
-                {
-                    LogErrorId(hr, MSG_FAILED_LAYOUT_PAYLOAD, pCacheAction->layoutPayload.pPayload->sczKey, pCacheAction->layoutPayload.sczLayoutDirectory, pCacheAction->layoutPayload.sczUnverifiedPath);
-
-                    if (fRetryContainerOrPayload)
-                    {
-                        wzRetryId = pCacheAction->layoutPayload.pPayload->sczKey;
-                        iRetryContainerOrPayloadAction = pCacheAction->layoutPayload.iTryAgainAction;
-
-                        ++pCacheAction->layoutPayload.cTryAgainAttempts;
-                    }
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_PACKAGE_STOP:
-                AssertSz(pStartedPackage == pCacheAction->packageStop.pPackage, "Expected package started cached to be the same as the package checkpointed.");
-
-                hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks + 1);
-                if (FAILED(hr))
-                {
-                    LogErrorId(hr, MSG_USER_CANCELED, L"end cache package", NULL, NULL);
-                }
-                else
-                {
-                    ++(*pcOverallProgressTicks);
-
-                    UserExperienceOnCachePackageComplete(pUX, pStartedPackage->sczId, hr, &cachePackageCompleteAction);
-
-                    pStartedPackage->hrCacheResult = hr;
-
-                    iPackageStartAction = BURN_PLAN_INVALID_ACTION_INDEX;
-                    iPackageCompleteAction = BURN_PLAN_INVALID_ACTION_INDEX;
-                    pStartedPackage = NULL;
-                }
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_SIGNAL_SYNCPOINT:
-                if (!::SetEvent(pCacheAction->syncpoint.hEvent))
-                {
-                    ExitWithLastError(hr, "Failed to set syncpoint event.");
-                }
-                break;
-
-            default:
-                AssertSz(FALSE, "Unknown cache action.");
-                break;
+                ExitWithLastError(hr, "Failed to set syncpoint event.");
             }
+            break;
+
+        default:
+            AssertSz(FALSE, "Unknown cache action.");
+            break;
         }
-
-        if (BURN_PLAN_INVALID_ACTION_INDEX != iRetryContainerOrPayloadAction)
-        {
-            Assert(wzRetryId);
-
-            LogErrorId(hr, MSG_APPLY_RETRYING_PAYLOAD, wzRetryId, NULL, NULL);
-
-            iRetryAction = iRetryContainerOrPayloadAction;
-            fRetry = TRUE;
-        }
-        else if (pStartedPackage)
-        {
-            Assert(BURN_PLAN_INVALID_ACTION_INDEX != iPackageStartAction);
-            Assert(BURN_PLAN_INVALID_ACTION_INDEX != iPackageCompleteAction);
-
-            cachePackageCompleteAction = SUCCEEDED(hr) || pStartedPackage->fVital ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
-            UserExperienceOnCachePackageComplete(pUX, pStartedPackage->sczId, hr, &cachePackageCompleteAction);
-            if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_RETRY == cachePackageCompleteAction)
-            {
-                LogErrorId(hr, MSG_APPLY_RETRYING_PACKAGE, pStartedPackage->sczId, NULL, NULL);
-
-                iRetryAction = iPackageStartAction;
-                fRetry = TRUE;
-            }
-            else if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE == cachePackageCompleteAction && !pStartedPackage->fVital) // ignore non-vital download failures.
-            {
-                LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, pStartedPackage->sczId, hr);
-
-                ++(*pcOverallProgressTicks); // add progress even though we didn't fully cache the package.
-
-                iRetryAction = iPackageCompleteAction + 1;
-                fRetry = TRUE;
-            }
-
-            pStartedPackage->hrCacheResult = hr;
-
-            iPackageStartAction = BURN_PLAN_INVALID_ACTION_INDEX;
-            iPackageCompleteAction = BURN_PLAN_INVALID_ACTION_INDEX;
-            pStartedPackage = NULL;
-        }
-        else
-        {
-            Assert(BURN_PLAN_INVALID_ACTION_INDEX == iPackageStartAction);
-            Assert(BURN_PLAN_INVALID_ACTION_INDEX == iPackageCompleteAction);
-        }
-    } while (fRetry);
+    }
 
 LExit:
-    Assert(NULL == pStartedPackage);
-    Assert(BURN_PLAN_INVALID_ACTION_INDEX == iPackageStartAction);
-    Assert(BURN_PLAN_INVALID_ACTION_INDEX == iPackageCompleteAction);
-
     if (FAILED(hr))
     {
         DoRollbackCache(pUX, pPlan, hPipe, dwCheckpoint);
@@ -936,12 +760,216 @@ LExit:
     return hr;
 }
 
+static HRESULT ApplyCachePackage(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
+
+    for (;;)
+    {
+        hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cPayloads, pPackage->payloads.qwTotalSize);
+        LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
+
+        for (DWORD i = 0; i < pPackage->payloads.cPayloads; ++i)
+        {
+            BURN_PAYLOAD* pPayload = pPackage->payloads.rgpPayloads[i];
+
+            hr = ApplyProcessPayload(pContext, pPackage, pPayload);
+            if (FAILED(hr))
+            {
+                break;
+            }
+        }
+
+        pPackage->hrCacheResult = hr;
+        cachePackageCompleteAction = SUCCEEDED(hr) || pPackage->fVital ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
+        UserExperienceOnCachePackageComplete(pContext->pUX, pPackage->sczId, hr, &cachePackageCompleteAction);
+
+        if (SUCCEEDED(hr))
+        {
+            break;
+        }
+
+        if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_RETRY == cachePackageCompleteAction)
+        {
+            // TODO: the progress needs to account for the payloads (potentially) being recached.
+            LogErrorId(hr, MSG_APPLY_RETRYING_PACKAGE, pPackage->sczId, NULL, NULL);
+
+            continue;
+        }
+        else if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE == cachePackageCompleteAction && !pPackage->fVital) // ignore non-vital download failures.
+        {
+            LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hr);
+            hr = S_OK;
+        }
+
+        break;
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT ApplyExtractContainer(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!pContainer->fActuallyAttached)
+    {
+        hr = AcquireContainerOrPayload(pContext, pContainer, NULL, NULL);
+        LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_CONTAINER, "Failed to acquire container: %ls to working path: %ls", pContainer->sczId, pContainer->sczUnverifiedPath);
+    }
+
+    pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
+
+    hr = ExtractContainer(pContext, pContainer);
+    LogExitOnFailure(hr, MSG_FAILED_EXTRACT_CONTAINER, "Failed to extract payloads from container: %ls to working path: %ls", pContainer->sczId, pContainer->sczUnverifiedPath);
+
+    pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
+
+LExit:
+    return hr;
+}
+
+static HRESULT ApplyLayoutBundle(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_PAYLOAD_GROUP* pPayloads,
+    __in_z LPCWSTR wzExecutableName,
+    __in_z LPCWSTR wzUnverifiedPath
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = LayoutBundle(pContext, wzExecutableName, wzUnverifiedPath);
+    ExitOnFailure(hr, "Failed to layout bundle.");
+
+    for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
+    {
+        BURN_PAYLOAD* pPayload = pPayloads->rgpPayloads[i];
+
+        hr = ApplyProcessPayload(pContext, NULL, pPayload);
+        ExitOnFailure(hr, "Failed to layout bundle payload: %ls", pPayload->sczKey);
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT ApplyLayoutContainer(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cTryAgainAttempts = 0;
+    BOOL fRetry = FALSE;
+
+    Assert(!pContainer->fAttached);
+
+    for (;;)
+    {
+        fRetry = FALSE;
+
+        hr = AcquireContainerOrPayload(pContext, pContainer, NULL, NULL);
+        LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_CONTAINER, "Failed to acquire container: %ls to working path: %ls", pContainer->sczId, pContainer->sczUnverifiedPath);
+
+        pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
+
+        hr = LayoutOrCacheContainerOrPayload(pContext, pContainer, NULL, NULL, TRUE, cTryAgainAttempts, &fRetry);
+        if (SUCCEEDED(hr))
+        {
+            pContext->qwSuccessfulCacheProgress += pContainer->qwFileSize;
+            break;
+        }
+        else
+        {
+            LogErrorId(hr, MSG_FAILED_LAYOUT_CONTAINER, pContainer->sczId, pContext->wzLayoutDirectory, pContainer->sczUnverifiedPath);
+
+            if (!fRetry)
+            {
+                ExitFunction();
+            }
+
+            ++cTryAgainAttempts;
+            pContext->qwSuccessfulCacheProgress -= pContainer->qwFileSize;
+            LogErrorId(hr, MSG_APPLY_RETRYING_PAYLOAD, pContainer->sczId, NULL, NULL);
+        }
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT ApplyProcessPayload(
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in_opt BURN_PACKAGE* pPackage,
+    __in BURN_PAYLOAD* pPayload
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cTryAgainAttempts = 0;
+    BOOL fRetry = FALSE;
+
+    Assert(pContext->pPayloads || pContext->wzLayoutDirectory);
+
+    for (;;)
+    {
+        fRetry = FALSE;
+
+        if (pPayload->pContainer)
+        {
+            if (pContext->wzLayoutDirectory)
+            {
+                ExitFunction();
+            }
+
+            // TODO: only extract container if payload isn't already cached and isn't already extracted
+            hr = ApplyExtractContainer(pContext, pPayload->pContainer);
+            ExitOnFailure(hr, "Failed to extract container for payload: %ls", pPayload->sczKey);
+        }
+        else
+        {
+            hr = AcquireContainerOrPayload(pContext, NULL, pPackage, pPayload);
+            LogExitOnFailure(hr, MSG_FAILED_ACQUIRE_PAYLOAD, "Failed to acquire payload: %ls to working path: %ls", pPayload->sczKey, pPayload->sczUnverifiedPath);
+        }
+
+        pContext->qwSuccessfulCacheProgress += pPayload->qwFileSize;
+
+        // TODO: set fMove to TRUE appropriately
+        hr = LayoutOrCacheContainerOrPayload(pContext, NULL, pPackage, pPayload, FALSE, cTryAgainAttempts, &fRetry);
+        if (SUCCEEDED(hr))
+        {
+            pContext->qwSuccessfulCacheProgress += pPayload->qwFileSize;
+            break;
+        }
+        else
+        {
+            LogErrorId(hr, pContext->wzLayoutDirectory ? MSG_FAILED_LAYOUT_PAYLOAD : MSG_FAILED_CACHE_PAYLOAD, pPayload->sczKey, pContext->wzLayoutDirectory, pPayload->sczUnverifiedPath);
+
+            if (!fRetry)
+            {
+                ExitFunction();
+            }
+
+            ++cTryAgainAttempts;
+            pContext->qwSuccessfulCacheProgress -= pPayload->qwFileSize;
+            LogErrorId(hr, MSG_APPLY_RETRYING_PAYLOAD, pPayload->sczKey, NULL, NULL);
+        }
+    }
+
+LExit:
+    return hr;
+}
+
 static HRESULT ExtractContainer(
-    __in HANDLE hSourceEngineFile,
-    __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzContainerPath,
-    __in_ecount(cExtractPayloads) BURN_EXTRACT_PAYLOAD* rgExtractPayloads,
-    __in DWORD cExtractPayloads
+    __in BURN_CACHE_CONTEXT* pContext,
+    __in BURN_CONTAINER* pContainer
     )
 {
     HRESULT hr = S_OK;
@@ -952,20 +980,20 @@ static HRESULT ExtractContainer(
     // If the container is actually attached, then it was planned to be acquired through hSourceEngineFile.
     if (pContainer->fActuallyAttached)
     {
-        hContainerHandle = hSourceEngineFile;
+        hContainerHandle = pContext->hSourceEngineFile;
     }
 
-    hr = ContainerOpen(&context, pContainer, hContainerHandle, wzContainerPath);
+    hr = ContainerOpen(&context, pContainer, hContainerHandle, pContainer->sczUnverifiedPath);
     ExitOnFailure(hr, "Failed to open container: %ls.", pContainer->sczId);
 
     while (S_OK == (hr = ContainerNextStream(&context, &sczExtractPayloadId)))
     {
         BOOL fExtracted = FALSE;
 
-        for (DWORD iExtract = 0; iExtract < cExtractPayloads; ++iExtract)
+        for (DWORD iExtract = 0; iExtract < pContext->pPayloads->cPayloads; ++iExtract)
         {
-            BURN_EXTRACT_PAYLOAD* pExtract = rgExtractPayloads + iExtract;
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->pPayload->sczSourcePath, -1))
+            BURN_PAYLOAD* pExtract = pContext->pPayloads->rgPayloads + iExtract;
+            if (pExtract->sczUnverifiedPath && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
             {
                 // TODO: Send progress when extracting stream to file.
                 hr = ContainerStreamToFile(&context, pExtract->sczUnverifiedPath);
@@ -996,74 +1024,10 @@ LExit:
     return hr;
 }
 
-static void UpdateCacheSuccessProgress(
-    __in BURN_PLAN* pPlan,
-    __in BURN_CACHE_ACTION* pCacheAction,
-    __inout DWORD64* pqwSuccessfulCachedProgress
-    )
-{
-    switch (pCacheAction->type)
-    {
-    case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
-        *pqwSuccessfulCachedProgress += pCacheAction->bundleLayout.qwBundleSize;
-        break;
-
-    case BURN_CACHE_ACTION_TYPE_ACQUIRE_CONTAINER:
-        if (!pPlan->rgContainerProgress[pCacheAction->resolveContainer.iProgress].fCachedDuringApply)
-        {
-            pPlan->rgContainerProgress[pCacheAction->resolveContainer.iProgress].fCachedDuringApply = TRUE;
-            *pqwSuccessfulCachedProgress += pCacheAction->resolveContainer.pContainer->qwFileSize;
-        }
-        break;
-
-    case BURN_CACHE_ACTION_TYPE_LAYOUT_CONTAINER:
-        if (!pPlan->rgContainerProgress[pCacheAction->layoutContainer.iProgress].fCachedDuringApply)
-        {
-            pPlan->rgContainerProgress[pCacheAction->layoutContainer.iProgress].fCachedDuringApply = TRUE;
-            *pqwSuccessfulCachedProgress += pCacheAction->layoutContainer.pContainer->qwFileSize;
-        }
-        break;
-
-    case BURN_CACHE_ACTION_TYPE_ACQUIRE_PAYLOAD:
-        if (!pPlan->rgPayloadProgress[pCacheAction->resolvePayload.iProgress].fCachedDuringApply)
-        {
-            pPlan->rgPayloadProgress[pCacheAction->resolvePayload.iProgress].fCachedDuringApply = TRUE;
-            *pqwSuccessfulCachedProgress += pCacheAction->resolvePayload.pPayload->qwFileSize;
-        }
-        break;
-
-    case BURN_CACHE_ACTION_TYPE_CACHE_PAYLOAD:
-        if (!pPlan->rgPayloadProgress[pCacheAction->cachePayload.iProgress].fCachedDuringApply)
-        {
-            pPlan->rgPayloadProgress[pCacheAction->cachePayload.iProgress].fCachedDuringApply = TRUE;
-            *pqwSuccessfulCachedProgress += pCacheAction->cachePayload.pPayload->qwFileSize;
-        }
-        break;
-
-    case BURN_CACHE_ACTION_TYPE_LAYOUT_PAYLOAD:
-        if (!pPlan->rgPayloadProgress[pCacheAction->layoutPayload.iProgress].fCachedDuringApply)
-        {
-            pPlan->rgPayloadProgress[pCacheAction->layoutPayload.iProgress].fCachedDuringApply = TRUE;
-            *pqwSuccessfulCachedProgress += pCacheAction->layoutPayload.pPayload->qwFileSize;
-        }
-        break;
-
-    default:
-        AssertSz(FALSE, "Unexpected cache action type.");
-        break;
-    }
-}
-
 static HRESULT LayoutBundle(
-    __in HANDLE hSourceEngineFile,
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
-    __in HANDLE hPipe,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzUnverifiedPath,
-    __in DWORD64 qwSuccessfulCacheProgress,
-    __in DWORD64 qwTotalCacheSize
+    __in_z LPCWSTR wzUnverifiedPath
     )
 {
     HRESULT hr = S_OK;
@@ -1074,7 +1038,7 @@ static HRESULT LayoutBundle(
     BOOL fRetry = FALSE;
     BOOL fRetryAcquire = FALSE;
 
-    hr = VariableGetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_PATH, &sczBundlePath);
+    hr = VariableGetString(pContext->pVariables, BURN_BUNDLE_SOURCE_PROCESS_PATH, &sczBundlePath);
     if (FAILED(hr))
     {
         if  (E_NOTFOUND != hr)
@@ -1086,7 +1050,7 @@ static HRESULT LayoutBundle(
         ExitOnFailure(hr, "Failed to get path to bundle to layout.");
     }
 
-    hr = PathConcat(wzLayoutDirectory, wzExecutableName, &sczDestinationPath);
+    hr = PathConcat(pContext->wzLayoutDirectory, wzExecutableName, &sczDestinationPath);
     ExitOnFailure(hr, "Failed to concat layout path for bundle.");
 
     // If the destination path is the currently running bundle, bail.
@@ -1098,9 +1062,7 @@ static HRESULT LayoutBundle(
         ExitFunction1(hr = S_OK);
     }
 
-    progress.pUX = pUX;
-    progress.qwCacheProgress = qwSuccessfulCacheProgress;
-    progress.qwTotalCacheSize = qwTotalCacheSize;
+    progress.pCacheContext = pContext;
 
     do
     {
@@ -1112,13 +1074,13 @@ static HRESULT LayoutBundle(
             fRetryAcquire = FALSE;
             progress.fCancel = FALSE;
 
-            hr = UserExperienceOnCacheAcquireBegin(pUX, NULL, NULL, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczBundlePath);
+            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, NULL, NULL, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczBundlePath);
             ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
-            hr = CopyPayload(&progress, hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
+            hr = CopyPayload(&progress, pContext->hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
             // Error handling happens after sending complete message to BA.
 
-            UserExperienceOnCacheAcquireComplete(pUX, NULL, NULL, hr, &fRetryAcquire);
+            UserExperienceOnCacheAcquireComplete(pContext->pUX, NULL, NULL, hr, &fRetryAcquire);
             if (fRetryAcquire)
             {
                 continue;
@@ -1130,20 +1092,20 @@ static HRESULT LayoutBundle(
 
         do
         {
-            hr = UserExperienceOnCacheVerifyBegin(pUX, NULL, NULL);
+            hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, NULL, NULL);
             ExitOnRootFailure(hr, "BA aborted cache verify begin.");
 
-            if (INVALID_HANDLE_VALUE != hPipe)
+            if (INVALID_HANDLE_VALUE != pContext->hPipe)
             {
-                hr = ElevationLayoutBundle(hPipe, wzLayoutDirectory, wzUnverifiedPath);
+                hr = ElevationLayoutBundle(pContext->hPipe, pContext->wzLayoutDirectory, wzUnverifiedPath);
             }
             else
             {
-                hr = CacheLayoutBundle(wzExecutableName, wzLayoutDirectory, wzUnverifiedPath);
+                hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
             }
 
             BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
-            UserExperienceOnCacheVerifyComplete(pUX, NULL, NULL, hr, &action);
+            UserExperienceOnCacheVerifyComplete(pContext->pUX, NULL, NULL, hr, &action);
             if (BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYVERIFICATION == action)
             {
                 hr = S_FALSE; // retry verify.
@@ -1154,7 +1116,7 @@ static HRESULT LayoutBundle(
             }
         } while (S_FALSE == hr);
     } while (fRetry);
-    LogExitOnFailure(hr, MSG_FAILED_LAYOUT_BUNDLE, "Failed to layout bundle: %ls to layout directory: %ls", sczBundlePath, wzLayoutDirectory);
+    LogExitOnFailure(hr, MSG_FAILED_LAYOUT_BUNDLE, "Failed to layout bundle: %ls to layout directory: %ls", sczBundlePath, pContext->wzLayoutDirectory);
 
 LExit:
     ReleaseStr(sczDestinationPath);
@@ -1164,14 +1126,10 @@ LExit:
 }
 
 static HRESULT AcquireContainerOrPayload(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_VARIABLES* pVariables,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in LPCWSTR wzDestinationPath,
-    __in DWORD64 qwSuccessfulCacheProgress,
-    __in DWORD64 qwTotalCacheSize
+    __in_opt BURN_PAYLOAD* pPayload
     )
 {
     AssertSz(pContainer || pPayload, "Must provide a container or a payload.");
@@ -1180,17 +1138,16 @@ static HRESULT AcquireContainerOrPayload(
     int nEquivalentPaths = 0;
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : NULL;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : NULL;
+    LPCWSTR wzDestinationPath = pContainer ? pContainer->sczUnverifiedPath: pPayload->sczUnverifiedPath;
     LPCWSTR wzRelativePath = pContainer ? pContainer->sczFilePath : pPayload->sczFilePath;
     LPWSTR sczSourceFullPath = NULL;
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
 
+    progress.pCacheContext = pContext;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
     progress.pPayload = pPayload;
-    progress.pUX = pUX;
-    progress.qwCacheProgress = qwSuccessfulCacheProgress;
-    progress.qwTotalCacheSize = qwTotalCacheSize;
 
     do
     {
@@ -1204,7 +1161,7 @@ static HRESULT AcquireContainerOrPayload(
         fRetry = FALSE;
         progress.fCancel = FALSE;
 
-        hr = CacheFindLocalSource(wzSourcePath, pVariables, &fFoundLocal, &sczSourceFullPath);
+        hr = CacheFindLocalSource(wzSourcePath, wzDestinationPath, pContext->pVariables, &fFoundLocal, &sczSourceFullPath);
         ExitOnFailure(hr, "Failed to search local source.");
         
         if (fFoundLocal) // the file exists locally, so copy it.
@@ -1220,7 +1177,7 @@ static HRESULT AcquireContainerOrPayload(
             DWORD dwLogId = pContainer ? (wzPayloadId ? MSG_PROMPT_CONTAINER_PAYLOAD_SOURCE : MSG_PROMPT_CONTAINER_SOURCE) : pPackage ? MSG_PROMPT_PACKAGE_PAYLOAD_SOURCE : MSG_PROMPT_BUNDLE_PAYLOAD_SOURCE;
             LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId ? wzPackageOrContainerId : L"", wzPayloadId ? wzPayloadId : L"", sczSourceFullPath);
 
-            hr = PromptForSource(pUX, wzPackageOrContainerId, wzPayloadId, sczSourceFullPath, wzDownloadUrl, &fRetry, &fDownload);
+            hr = PromptForSource(pContext->pUX, wzPackageOrContainerId, wzPayloadId, sczSourceFullPath, wzDownloadUrl, &fRetry, &fDownload);
 
             // If the BA requested download then ensure a download url is available (it may have been set
             // during PromptForSource so we need to check again).
@@ -1239,7 +1196,7 @@ static HRESULT AcquireContainerOrPayload(
 
         if (fCopy)
         {
-            hr = UserExperienceOnCacheAcquireBegin(pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczSourceFullPath);
+            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_COPY, sczSourceFullPath);
             ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
             hr = CopyPayload(&progress, INVALID_HANDLE_VALUE, sczSourceFullPath, wzDestinationPath);
@@ -1248,12 +1205,12 @@ static HRESULT AcquireContainerOrPayload(
             // We successfully copied from a source location, set that as the last used source.
             if (SUCCEEDED(hr))
             {
-                CacheSetLastUsedSource(pVariables, sczSourceFullPath, wzRelativePath);
+                CacheSetLastUsedSource(pContext->pVariables, sczSourceFullPath, wzRelativePath);
             }
         }
         else if (fDownload)
         {
-            hr = UserExperienceOnCacheAcquireBegin(pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD, wzDownloadUrl);
+            hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId, BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD, wzDownloadUrl);
             ExitOnRootFailure(hr, "BA aborted cache download payload begin.");
 
             hr = DownloadPayload(&progress, wzDestinationPath);
@@ -1262,7 +1219,7 @@ static HRESULT AcquireContainerOrPayload(
 
         if (fCopy || fDownload)
         {
-            UserExperienceOnCacheAcquireComplete(pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
+            UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &fRetry);
             if (fRetry)
             {
                 hr = S_OK;
@@ -1279,16 +1236,10 @@ LExit:
 }
 
 static HRESULT LayoutOrCacheContainerOrPayload(
-    __in BURN_USER_EXPERIENCE* pUX,
-    __in HANDLE hPipe,
+    __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
     __in_opt BURN_PACKAGE* pPackage,
     __in_opt BURN_PAYLOAD* pPayload,
-    __in BOOL fAlreadyProvidedProgress,
-    __in DWORD64 qwSuccessfulCachedProgress,
-    __in DWORD64 qwTotalCacheSize,
-    __in_z_opt LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzUnverifiedPath,
     __in BOOL fMove,
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
@@ -1296,13 +1247,14 @@ static HRESULT LayoutOrCacheContainerOrPayload(
 {
     HRESULT hr = S_OK;
     LPCWSTR wzPackageOrContainerId = pContainer ? pContainer->sczId : pPackage ? pPackage->sczId : L"";
+    LPCWSTR wzUnverifiedPath = pContainer ? pContainer->sczUnverifiedPath : pPayload->sczUnverifiedPath;
     LPCWSTR wzPayloadId = pPayload ? pPayload->sczKey : L"";
     LARGE_INTEGER liContainerOrPayloadSize = { };
     LARGE_INTEGER liZero = { };
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT progress = { };
     BOOL fCanAffectRegistration = FALSE;
 
-    if (!wzLayoutDirectory)
+    if (!pContext->wzLayoutDirectory)
     {
         Assert(!pContainer);
         Assert(pPackage);
@@ -1312,41 +1264,31 @@ static HRESULT LayoutOrCacheContainerOrPayload(
 
     liContainerOrPayloadSize.QuadPart = pContainer ? pContainer->qwFileSize : pPayload->qwFileSize;
 
+    progress.pCacheContext = pContext;
     progress.pContainer = pContainer;
     progress.pPackage = pPackage;
     progress.pPayload = pPayload;
-    progress.pUX = pUX;
-    progress.qwTotalCacheSize = qwTotalCacheSize;
-    if (fAlreadyProvidedProgress)
-    {
-        Assert(qwSuccessfulCachedProgress >= static_cast<DWORD64>(liContainerOrPayloadSize.QuadPart));
-        progress.qwCacheProgress = qwSuccessfulCachedProgress - liContainerOrPayloadSize.QuadPart; // remove the payload size, since it was marked successful thus included in the successful size already.
-    }
-    else
-    {
-        progress.qwCacheProgress = qwSuccessfulCachedProgress;
-    }
 
     *pfRetry = FALSE;
 
     do
     {
-        hr = UserExperienceOnCacheVerifyBegin(pUX, wzPackageOrContainerId, wzPayloadId);
+        hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
         ExitOnRootFailure(hr, "BA aborted cache verify begin.");
 
-        if (INVALID_HANDLE_VALUE != hPipe) // pass the decision off to the elevated process.
+        if (INVALID_HANDLE_VALUE != pContext->hPipe) // pass the decision off to the elevated process.
         {
-            hr = ElevationCacheOrLayoutContainerOrPayload(hPipe, pContainer, pPackage, pPayload, wzLayoutDirectory, wzUnverifiedPath, fMove);
+            hr = ElevationCacheOrLayoutContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
         }
-        else if (wzLayoutDirectory) // layout the container or payload.
+        else if (pContext->wzLayoutDirectory) // layout the container or payload.
         {
             if (pContainer)
             {
-                hr = CacheLayoutContainer(pContainer, wzLayoutDirectory, wzUnverifiedPath, fMove);
+                hr = CacheLayoutContainer(pContainer, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
             }
             else
             {
-                hr = CacheLayoutPayload(pPayload, wzLayoutDirectory, wzUnverifiedPath, fMove);
+                hr = CacheLayoutPayload(pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
             }
         }
         else // complete the payload.
@@ -1376,7 +1318,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         }
 
         BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = FAILED(hr) && cTryAgainAttempts < BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS ? BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYACQUISITION : BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
-        UserExperienceOnCacheVerifyComplete(pUX, wzPackageOrContainerId, wzPayloadId, hr, &action);
+        UserExperienceOnCacheVerifyComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &action);
         if (BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYVERIFICATION == action)
         {
             hr = S_FALSE; // retry verify.
@@ -1541,7 +1483,7 @@ static HRESULT DownloadPayload(
     cacheCallback.pfnCancel = NULL; // TODO: set this
     cacheCallback.pv = pProgress;
    
-    authenticationData.pUX = pProgress->pUX;
+    authenticationData.pUX = pProgress->pCacheContext->pUX;
     authenticationData.wzPackageOrContainerId = wzPackageOrContainerId;
     authenticationData.wzPayloadId = wzPayloadId;
     authenticationCallback.pv =  static_cast<LPVOID>(&authenticationData);
@@ -1630,15 +1572,15 @@ static DWORD CALLBACK CacheProgressRoutine(
     BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress = static_cast<BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT*>(lpData);
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : NULL;
     LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : NULL;
-    DWORD64 qwCacheProgress = pProgress->qwCacheProgress + TotalBytesTransferred.QuadPart;
-    if (qwCacheProgress > pProgress->qwTotalCacheSize)
+    DWORD64 qwCacheProgress = pProgress->pCacheContext->qwSuccessfulCacheProgress + TotalBytesTransferred.QuadPart;
+    if (qwCacheProgress > pProgress->pCacheContext->qwTotalCacheSize)
     {
-        AssertSz(FALSE, "Apply has cached more than Plan envisioned.");
-        qwCacheProgress = pProgress->qwTotalCacheSize;
+        //AssertSz(FALSE, "Apply has cached more than Plan envisioned.");
+        qwCacheProgress = pProgress->pCacheContext->qwTotalCacheSize;
     }
-    DWORD dwOverallPercentage = pProgress->qwTotalCacheSize ? static_cast<DWORD>(qwCacheProgress * 100 / pProgress->qwTotalCacheSize) : 0;
+    DWORD dwOverallPercentage = pProgress->pCacheContext->qwTotalCacheSize ? static_cast<DWORD>(qwCacheProgress * 100 / pProgress->pCacheContext->qwTotalCacheSize) : 0;
 
-    hr = UserExperienceOnCacheAcquireProgress(pProgress->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
+    hr = UserExperienceOnCacheAcquireProgress(pProgress->pCacheContext->pUX, wzPackageOrContainerId, wzPayloadId, TotalBytesTransferred.QuadPart, TotalFileSize.QuadPart, dwOverallPercentage);
     if (HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) == hr)
     {
         dwResult = PROGRESS_CANCEL;

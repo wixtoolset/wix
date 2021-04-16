@@ -1099,6 +1099,8 @@ extern "C" HRESULT MsiEngineExecutePackage(
     LPWSTR sczMsiPath = NULL;
     LPWSTR sczProperties = NULL;
     LPWSTR sczObfuscatedProperties = NULL;
+    BURN_PACKAGE* pPackage = pExecuteAction->msiPackage.pPackage;
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
 
     // During rollback, if the package is already in the rollback state we expect don't
     // touch it again.
@@ -1106,10 +1108,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     {
         if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->msiPackage.action)
         {
-            hr = WiuGetProductInfoEx(pExecuteAction->msiPackage.pPackage->Msi.sczProductCode, NULL, pExecuteAction->msiPackage.pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+            hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
             if (FAILED(hr))  // package not present.
             {
-                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pExecuteAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), LoggingPackageStateToString(BOOTSTRAPPER_PACKAGE_STATE_ABSENT));
+                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), LoggingPackageStateToString(BOOTSTRAPPER_PACKAGE_STATE_ABSENT));
 
                 hr = S_OK;
                 ExitFunction();
@@ -1117,10 +1119,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
         }
         else if (BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->msiPackage.action)
         {
-            hr = WiuGetProductInfoEx(pExecuteAction->msiPackage.pPackage->Msi.sczProductCode, NULL, pExecuteAction->msiPackage.pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+            hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
             if (SUCCEEDED(hr))  // package present.
             {
-                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pExecuteAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), LoggingPackageStateToString(BOOTSTRAPPER_PACKAGE_STATE_PRESENT));
+                LogId(REPORT_STANDARD, MSG_ROLLBACK_PACKAGE_SKIPPED, pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), LoggingPackageStateToString(BOOTSTRAPPER_PACKAGE_STATE_PRESENT));
 
                 hr = S_OK;
                 ExitFunction();
@@ -1141,13 +1143,13 @@ extern "C" HRESULT MsiEngineExecutePackage(
     if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL != pExecuteAction->msiPackage.action)
     {
         // get cached MSI path
-        hr = CacheGetCompletedPath(pExecuteAction->msiPackage.pPackage->fPerMachine, pExecuteAction->msiPackage.pPackage->sczCacheId, &sczCachedDirectory);
-        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pExecuteAction->msiPackage.pPackage->sczId);
+        hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
         // Best effort to set the execute package cache folder variable.
         VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-        hr = PathConcat(sczCachedDirectory, pExecuteAction->msiPackage.pPackage->rgPayloads[0].pPayload->sczFilePath, &sczMsiPath);
+        hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsiPath);
         ExitOnFailure(hr, "Failed to build MSI path.");
     }
 
@@ -1169,28 +1171,28 @@ extern "C" HRESULT MsiEngineExecutePackage(
     if (pExecuteAction->msiPackage.sczLogPath && *pExecuteAction->msiPackage.sczLogPath)
     {
         hr = WiuEnableLog(dwLogMode, pExecuteAction->msiPackage.sczLogPath, 0);
-        ExitOnFailure(hr, "Failed to enable logging for package: %ls to: %ls", pExecuteAction->msiPackage.pPackage->sczId, pExecuteAction->msiPackage.sczLogPath);
+        ExitOnFailure(hr, "Failed to enable logging for package: %ls to: %ls", pPackage->sczId, pExecuteAction->msiPackage.sczLogPath);
     }
 
     // set up properties
-    hr = MsiEngineConcatProperties(pExecuteAction->msiPackage.pPackage->Msi.rgProperties, pExecuteAction->msiPackage.pPackage->Msi.cProperties, pVariables, fRollback, &sczProperties, FALSE);
+    hr = MsiEngineConcatProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczProperties, FALSE);
     ExitOnFailure(hr, "Failed to add properties to argument string.");
 
-    hr = MsiEngineConcatProperties(pExecuteAction->msiPackage.pPackage->Msi.rgProperties, pExecuteAction->msiPackage.pPackage->Msi.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
+    hr = MsiEngineConcatProperties(pPackage->Msi.rgProperties, pPackage->Msi.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
     ExitOnFailure(hr, "Failed to add obfuscated properties to argument string.");
 
     // add feature action properties
-    hr = ConcatFeatureActionProperties(pExecuteAction->msiPackage.pPackage, pExecuteAction->msiPackage.rgFeatures, &sczProperties);
+    hr = ConcatFeatureActionProperties(pPackage, pExecuteAction->msiPackage.rgFeatures, &sczProperties);
     ExitOnFailure(hr, "Failed to add feature action properties to argument string.");
 
-    hr = ConcatFeatureActionProperties(pExecuteAction->msiPackage.pPackage, pExecuteAction->msiPackage.rgFeatures, &sczObfuscatedProperties);
+    hr = ConcatFeatureActionProperties(pPackage, pExecuteAction->msiPackage.rgFeatures, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add feature action properties to obfuscated argument string.");
 
     // add slipstream patch properties
-    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, fRollback, &sczProperties);
+    hr = ConcatPatchProperty(pPackage, fRollback, &sczProperties);
     ExitOnFailure(hr, "Failed to add patch properties to argument string.");
 
-    hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, fRollback, &sczObfuscatedProperties);
+    hr = ConcatPatchProperty(pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
     hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczProperties);
@@ -1199,7 +1201,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
     hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pExecuteAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
 
     //
     // Do the actual action.
@@ -1213,13 +1215,13 @@ extern "C" HRESULT MsiEngineExecutePackage(
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to install MSI package.");
 
-        RegisterSourceDirectory(pExecuteAction->msiPackage.pPackage, sczMsiPath);
+        RegisterSourceDirectory(pPackage, sczMsiPath);
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_MINOR_UPGRADE:
         // If feature selection is not enabled, then reinstall the existing features to ensure they get
         // updated.
-        if (0 == pExecuteAction->msiPackage.pPackage->Msi.cFeatures)
+        if (0 == pPackage->Msi.cFeatures)
         {
             hr = StrAllocConcatSecure(&sczProperties, L" REINSTALL=ALL", 0);
             ExitOnFailure(hr, "Failed to add reinstall all property on minor upgrade.");
@@ -1231,7 +1233,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
         hr = WiuInstallProduct(sczMsiPath, sczProperties, &restart);
         ExitOnFailure(hr, "Failed to perform minor upgrade of MSI package.");
 
-        RegisterSourceDirectory(pExecuteAction->msiPackage.pPackage, sczMsiPath);
+        RegisterSourceDirectory(pPackage, sczMsiPath);
         break;
 
     case BOOTSTRAPPER_ACTION_STATE_MODIFY: __fallthrough;
@@ -1239,7 +1241,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
     case BOOTSTRAPPER_ACTION_STATE_REPAIR:
         {
         LPCWSTR wzReinstallAll = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action ||
-                                  pExecuteAction->msiPackage.pPackage->Msi.cFeatures) ? L"" : L" REINSTALL=ALL";
+                                  pPackage->Msi.cFeatures) ? L"" : L" REINSTALL=ALL";
         LPCWSTR wzReinstallMode = (BOOTSTRAPPER_ACTION_STATE_MODIFY == pExecuteAction->msiPackage.action || BOOTSTRAPPER_ACTION_STATE_MEND == pExecuteAction->msiPackage.action) ? L"o" : L"e";
 
         hr = StrAllocFormattedSecure(&sczProperties, L"%ls%ls REINSTALLMODE=\"cmus%ls\" REBOOT=ReallySuppress", sczProperties ? sczProperties : L"", wzReinstallAll, wzReinstallMode);
@@ -1262,10 +1264,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
         hr = StrAllocFormattedSecure(&sczProperties, L"%ls %ls=ALL", sczProperties, DEPENDENCY_IGNOREDEPENDENCIES);
         ExitOnFailure(hr, "Failed to add the list of dependencies to ignore to the properties.");
 
-        hr = WiuConfigureProductEx(pExecuteAction->msiPackage.pPackage->Msi.sczProductCode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT, sczProperties, &restart);
+        hr = WiuConfigureProductEx(pPackage->Msi.sczProductCode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT, sczProperties, &restart);
         if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr)
         {
-            LogId(REPORT_STANDARD, MSG_ATTEMPTED_UNINSTALL_ABSENT_PACKAGE, pExecuteAction->msiPackage.pPackage->sczId);
+            LogId(REPORT_STANDARD, MSG_ATTEMPTED_UNINSTALL_ABSENT_PACKAGE, pPackage->sczId);
             hr = S_OK;
         }
         ExitOnFailure(hr, "Failed to uninstall MSI package.");
@@ -1979,6 +1981,7 @@ static HRESULT ConcatPatchProperty(
         {
             BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pPackage->Msi.rgSlipstreamMsps + i;
             BURN_PACKAGE* pMspPackage = pSlipstreamMsp->pMspPackage;
+            BURN_PAYLOAD* pMspPackagePayload = pMspPackage->payloads.rgpPayloads[0];
             BOOTSTRAPPER_ACTION_STATE patchExecuteAction = fRollback ? pSlipstreamMsp->rollback : pSlipstreamMsp->execute;
 
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < patchExecuteAction)
@@ -1986,7 +1989,7 @@ static HRESULT ConcatPatchProperty(
                 hr = CacheGetCompletedPath(pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
                 ExitOnFailure(hr, "Failed to get cached path for MSP package: %ls", pMspPackage->sczId);
 
-                hr = PathConcat(sczCachedDirectory, pMspPackage->rgPayloads[0].pPayload->sczFilePath, &sczMspPath);
+                hr = PathConcat(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);
                 ExitOnFailure(hr, "Failed to build MSP path.");
 
                 if (!sczPatches)

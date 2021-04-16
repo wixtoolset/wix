@@ -264,6 +264,8 @@ extern "C" HRESULT MsuEngineExecutePackage(
     GENERIC_EXECUTE_MESSAGE message = { };
     DWORD dwExitCode = 0;
     BOOL fUseSysNativePath = FALSE;
+    BURN_PACKAGE* pPackage = pExecuteAction->msuPackage.pPackage;
+    BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgpPayloads[0];
 
 #if !defined(_WIN64)
     hr = ProcWow64(::GetCurrentProcess(), &fUseSysNativePath);
@@ -295,13 +297,13 @@ extern "C" HRESULT MsuEngineExecutePackage(
     {
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
         // get cached MSU path
-        hr = CacheGetCompletedPath(TRUE, pExecuteAction->msuPackage.pPackage->sczCacheId, &sczCachedDirectory);
-        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pExecuteAction->msuPackage.pPackage->sczId);
+        hr = CacheGetCompletedPath(TRUE, pPackage->sczCacheId, &sczCachedDirectory);
+        ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
         // Best effort to set the execute package cache folder variable.
         VariableSetString(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_CACHE_FOLDER, sczCachedDirectory, TRUE, FALSE);
 
-        hr = PathConcat(sczCachedDirectory, pExecuteAction->msuPackage.pPackage->rgPayloads[0].pPayload->sczFilePath, &sczMsuPath);
+        hr = PathConcat(sczCachedDirectory, pPackagePayload->sczFilePath, &sczMsuPath);
         ExitOnFailure(hr, "Failed to build MSU path.");
 
         // format command
@@ -311,7 +313,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
 
     case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
         // format command
-        hr = StrAllocFormatted(&sczCommand, L"\"%ls\" /uninstall /kb:%ls /quiet /norestart", sczWusaPath, pExecuteAction->msuPackage.pPackage->Msu.sczKB);
+        hr = StrAllocFormatted(&sczCommand, L"\"%ls\" /uninstall /kb:%ls /quiet /norestart", sczWusaPath, pPackage->Msu.sczKB);
         ExitOnFailure(hr, "Failed to format MSU uninstall command.");
         break;
 
@@ -329,7 +331,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
         ExitOnFailure(hr, "Failed to append log path to MSU command-line.");
     }
 
-    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pExecuteAction->msuPackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->msuPackage.action), sczMsuPath ? sczMsuPath : pExecuteAction->msuPackage.pPackage->Msu.sczKB, sczCommand);
+    LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msuPackage.action), sczMsuPath ? sczMsuPath : pPackage->Msu.sczKB, sczCommand);
 
     hr = EnsureWUServiceEnabled(fStopWusaService, &schWu, &fWuWasDisabled);
     ExitOnFailure(hr, "Failed to ensure WU service was enabled to install MSU package.");

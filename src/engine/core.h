@@ -112,6 +112,8 @@ typedef struct _BURN_ENGINE_STATE
 
     BURN_LOGGING log;
 
+    BURN_PAYLOAD_GROUP layoutPayloads;
+
     BURN_PLAN plan;
 
     BURN_MODE mode;

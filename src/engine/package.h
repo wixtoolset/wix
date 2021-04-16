@@ -184,12 +184,6 @@ typedef struct _BURN_SLIPSTREAM_MSP
     BOOTSTRAPPER_ACTION_STATE rollback;   // only valid during Plan.
 } BURN_SLIPSTREAM_MSP;
 
-typedef struct _BURN_PACKAGE_PAYLOAD
-{
-    BURN_PAYLOAD* pPayload;
-    BOOL fCached;
-} BURN_PACKAGE_PAYLOAD;
-
 typedef struct _BURN_DEPENDENCY_PROVIDER
 {
     LPWSTR sczKey;
@@ -260,8 +254,7 @@ typedef struct _BURN_PACKAGE
     BURN_PACKAGE_REGISTRATION_STATE expectedInstallRegistrationState;// only valid after Plan.
     BURN_PACKAGE_REGISTRATION_STATE transactionRegistrationState;    // only valid during Apply inside an MSI transaction.
 
-    BURN_PACKAGE_PAYLOAD* rgPayloads;
-    DWORD cPayloads;
+    BURN_PAYLOAD_GROUP payloads;
 
     BURN_DEPENDENCY_PROVIDER* rgDependencyProviders;
     DWORD cDependencyProviders;
