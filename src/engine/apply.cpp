@@ -802,26 +802,34 @@ static HRESULT ApplyCachePackage(
     )
 {
     HRESULT hr = S_OK;
+    BOOL fCanceledBegin = FALSE;
     BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION cachePackageCompleteAction = BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE;
 
     for (;;)
     {
+        fCanceledBegin = FALSE;
+
         hr = UserExperienceOnCachePackageBegin(pContext->pUX, pPackage->sczId, pPackage->payloads.cItems, pPackage->payloads.qwTotalSize);
-        LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
-
-        for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
+        if (FAILED(hr))
         {
-            BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPackage->payloads.rgItems + i;
-
-            hr = ApplyProcessPayload(pContext, pPackage, pPayloadGroupItem);
-            if (FAILED(hr))
+            fCanceledBegin = TRUE;
+        }
+        else
+        {
+            for (DWORD i = 0; i < pPackage->payloads.cItems; ++i)
             {
-                break;
+                BURN_PAYLOAD_GROUP_ITEM* pPayloadGroupItem = pPackage->payloads.rgItems + i;
+
+                hr = ApplyProcessPayload(pContext, pPackage, pPayloadGroupItem);
+                if (FAILED(hr))
+                {
+                    break;
+                }
             }
         }
 
         pPackage->hrCacheResult = hr;
-        cachePackageCompleteAction = SUCCEEDED(hr) || pPackage->fVital ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
+        cachePackageCompleteAction = SUCCEEDED(hr) || pPackage->fVital || fCanceledBegin ? BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_NONE : BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE;
         UserExperienceOnCachePackageComplete(pContext->pUX, pPackage->sczId, hr, &cachePackageCompleteAction);
 
         if (SUCCEEDED(hr))
@@ -855,6 +863,10 @@ static HRESULT ApplyCachePackage(
         {
             LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hr);
             hr = S_OK;
+        }
+        else if (fCanceledBegin)
+        {
+            LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls: %ls", L"begin cache package", pPackage->sczId);
         }
 
         break;
@@ -1208,6 +1220,7 @@ static HRESULT LayoutBundle(
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
     BOOL fRetry = FALSE;
     BOOL fRetryAcquire = FALSE;
+    BOOL fCanceledBegin = FALSE;
 
     progress.pCacheContext = pContext;
 
@@ -1259,23 +1272,34 @@ static HRESULT LayoutBundle(
         {
             fRetryAcquire = FALSE;
             progress.fCancel = FALSE;
+            fCanceledBegin = FALSE;
 
             hr = UserExperienceOnCacheAcquireBegin(pContext->pUX, NULL, NULL, &sczBundlePath, &sczBundleDownloadUrl, NULL, &cacheOperation);
-            ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
 
-            hr = CopyPayload(&progress, pContext->hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
-            // Error handling happens after sending complete message to BA.
-
-            // If succeeded, send 100% complete here to make sure progress was sent to the BA.
-            if (SUCCEEDED(hr))
+            if (FAILED(hr))
             {
-                hr = CompleteCacheProgress(&progress, qwBundleSize);
+                fCanceledBegin = TRUE;
+            }
+            else
+            {
+                hr = CopyPayload(&progress, pContext->hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
+                // Error handling happens after sending complete message to BA.
+
+                // If succeeded, send 100% complete here to make sure progress was sent to the BA.
+                if (SUCCEEDED(hr))
+                {
+                    hr = CompleteCacheProgress(&progress, qwBundleSize);
+                }
             }
 
             UserExperienceOnCacheAcquireComplete(pContext->pUX, NULL, NULL, hr, &fRetryAcquire);
             if (fRetryAcquire)
             {
                 continue;
+            }
+            else if (fCanceledBegin)
+            {
+                ExitOnRootFailure(hr, "BA aborted cache acquire begin.");
             }
 
             ExitOnFailure(hr, "Failed to copy bundle from: '%ls' to: '%ls'", sczBundlePath, wzUnverifiedPath);
@@ -1286,14 +1310,22 @@ static HRESULT LayoutBundle(
 
         do
         {
+            fCanceledBegin = FALSE;
+
             hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, NULL, NULL);
-            ExitOnRootFailure(hr, "BA aborted cache verify begin.");
 
-            hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
-
-            if (SUCCEEDED(hr))
+            if (FAILED(hr))
             {
-                hr = CompleteCacheProgress(&progress, qwBundleSize);
+                fCanceledBegin = TRUE;
+            }
+            else
+            {
+                hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
+
+                if (SUCCEEDED(hr))
+                {
+                    hr = CompleteCacheProgress(&progress, qwBundleSize);
+                }
             }
 
             BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
@@ -1305,6 +1337,10 @@ static HRESULT LayoutBundle(
             else if (BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYACQUISITION == action)
             {
                 fRetry = TRUE; // go back and retry acquire.
+            }
+            else if (fCanceledBegin)
+            {
+                ExitOnRootFailure(hr, "BA aborted cache verify begin.");
             }
         } while (S_FALSE == hr);
 
@@ -1500,6 +1536,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     BOOL fCanAffectRegistration = FALSE;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
     BOOL fMove = !pPayload || 1 == pPayload->cRemainingInstances;
+    BOOL fCanceledBegin = FALSE;
 
     if (pContainer)
     {
@@ -1529,27 +1566,35 @@ static HRESULT LayoutOrCacheContainerOrPayload(
 
     do
     {
-        hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
-        ExitOnRootFailure(hr, "BA aborted cache verify begin.");
+        fCanceledBegin = FALSE;
 
-        if (pContext->wzLayoutDirectory) // layout the container or payload.
+        hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
+
+        if (FAILED(hr))
         {
-            if (pContainer)
-            {
-                hr = CacheLayoutContainer(pContainer, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
-            }
-            else
-            {
-                hr = CacheLayoutPayload(pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
-            }
+            fCanceledBegin = TRUE;
         }
-        else if (INVALID_HANDLE_VALUE != pContext->hPipe) // pass the decision off to the elevated process.
+        else
         {
-            hr = ElevationCacheCompletePayload(pContext->hPipe, pPackage, pPayload, wzUnverifiedPath, fMove);
-        }
-        else // complete the payload.
-        {
-            hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove);
+            if (pContext->wzLayoutDirectory) // layout the container or payload.
+            {
+                if (pContainer)
+                {
+                    hr = CacheLayoutContainer(pContainer, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
+                }
+                else
+                {
+                    hr = CacheLayoutPayload(pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
+                }
+            }
+            else if (INVALID_HANDLE_VALUE != pContext->hPipe) // pass the decision off to the elevated process.
+            {
+                hr = ElevationCacheCompletePayload(pContext->hPipe, pPackage, pPayload, wzUnverifiedPath, fMove);
+            }
+            else // complete the payload.
+            {
+                hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove);
+            }
         }
 
         if (SUCCEEDED(hr))
@@ -1562,7 +1607,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
             pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_PRESENT;
         }
 
-        BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = FAILED(hr) && cTryAgainAttempts < BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS ? BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYACQUISITION : BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
+        BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action = FAILED(hr) && !fCanceledBegin && cTryAgainAttempts < BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS ? BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYACQUISITION : BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_NONE;
         UserExperienceOnCacheVerifyComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, &action);
         if (BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYVERIFICATION == action)
         {
@@ -1571,6 +1616,10 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         else if (BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION_RETRYACQUISITION == action)
         {
             *pfRetry = TRUE; // go back and retry acquire.
+        }
+        else if (fCanceledBegin)
+        {
+            ExitOnRootFailure(hr, "BA aborted cache verify begin.");
         }
     } while (S_FALSE == hr);
 
