@@ -82,7 +82,8 @@ static HRESULT ApplyLayoutBundle(
     __in BURN_CACHE_CONTEXT* pContext,
     __in BURN_PAYLOAD_GROUP* pPayloads,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzUnverifiedPath
+    __in_z LPCWSTR wzUnverifiedPath,
+    __in DWORD64 qwBundleSize
     );
 static HRESULT ApplyLayoutContainer(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -100,7 +101,8 @@ static HRESULT ExtractContainer(
 static HRESULT LayoutBundle(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzUnverifiedPath
+    __in_z LPCWSTR wzUnverifiedPath,
+    __in DWORD64 qwBundleSize
     );
 static HRESULT ApplyAcquireContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
@@ -504,7 +506,7 @@ extern "C" HRESULT ApplyCache(
             break;
 
         case BURN_CACHE_ACTION_TYPE_LAYOUT_BUNDLE:
-            hr = ApplyLayoutBundle(&cacheContext, pCacheAction->bundleLayout.pPayloadGroup, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczUnverifiedPath);
+            hr = ApplyLayoutBundle(&cacheContext, pCacheAction->bundleLayout.pPayloadGroup, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczUnverifiedPath, pCacheAction->bundleLayout.qwBundleSize);
             ExitOnFailure(hr, "Failed cache action: %ls", L"layout bundle");
 
             ++(*pcOverallProgressTicks);
@@ -866,12 +868,13 @@ static HRESULT ApplyLayoutBundle(
     __in BURN_CACHE_CONTEXT* pContext,
     __in BURN_PAYLOAD_GROUP* pPayloads,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzUnverifiedPath
+    __in_z LPCWSTR wzUnverifiedPath,
+    __in DWORD64 qwBundleSize
     )
 {
     HRESULT hr = S_OK;
 
-    hr = LayoutBundle(pContext, wzExecutableName, wzUnverifiedPath);
+    hr = LayoutBundle(pContext, wzExecutableName, wzUnverifiedPath, qwBundleSize);
     ExitOnFailure(hr, "Failed to layout bundle.");
 
     for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
@@ -1073,7 +1076,8 @@ LExit:
 static HRESULT LayoutBundle(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzUnverifiedPath
+    __in_z LPCWSTR wzUnverifiedPath,
+    __in DWORD64 qwBundleSize
     )
 {
     HRESULT hr = S_OK;
@@ -1107,6 +1111,8 @@ static HRESULT LayoutBundle(
 
     if (CSTR_EQUAL == nEquivalentPaths && FileExistsEx(sczDestinationPath, NULL))
     {
+        // TODO: send Acquire and Verify messages to BA?
+        pContext->qwSuccessfulCacheProgress += 2 * qwBundleSize;
         ExitFunction1(hr = S_OK);
     }
 
@@ -1127,6 +1133,12 @@ static HRESULT LayoutBundle(
 
             hr = CopyPayload(&progress, pContext->hSourceEngineFile, sczBundlePath, wzUnverifiedPath);
             // Error handling happens after sending complete message to BA.
+
+            // If succeeded, send 100% complete here to make sure progress was sent to the BA.
+            if (SUCCEEDED(hr))
+            {
+                hr = CompleteCacheProgress(&progress, qwBundleSize);
+            }
 
             UserExperienceOnCacheAcquireComplete(pContext->pUX, NULL, NULL, hr, &fRetryAcquire);
             if (fRetryAcquire)
@@ -1163,8 +1175,15 @@ static HRESULT LayoutBundle(
                 fRetry = TRUE; // go back and retry acquire.
             }
         } while (S_FALSE == hr);
+
+        if (fRetry)
+        {
+            pContext->qwSuccessfulCacheProgress -= qwBundleSize;
+        }
     } while (fRetry);
     LogExitOnFailure(hr, MSG_FAILED_LAYOUT_BUNDLE, "Failed to layout bundle: %ls to layout directory: %ls", sczBundlePath, pContext->wzLayoutDirectory);
+
+    pContext->qwSuccessfulCacheProgress += qwBundleSize;
 
 LExit:
     ReleaseStr(sczDestinationPath);
