@@ -1076,13 +1076,13 @@ static HRESULT ApplyCacheVerifyContainerOrPayload(
     hr = UserExperienceOnCacheContainerOrPayloadVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
     ExitOnRootFailure(hr, "BA aborted cache container or payload verify begin.");
 
-    if (INVALID_HANDLE_VALUE != pContext->hPipe)
-    {
-        hr = ElevationCacheVerifyContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayloadGroupItem->pPayload, pContext->wzLayoutDirectory);
-    }
-    else if (pContainer)
+    if (pContainer)
     {
         hr = CacheVerifyContainer(pContainer, pContext->wzLayoutDirectory);
+    }
+    else if (!pContext->wzLayoutDirectory && INVALID_HANDLE_VALUE != pContext->hPipe)
+    {
+        hr = ElevationCacheVerifyPayload(pContext->hPipe, pPackage, pPayloadGroupItem->pPayload);
     }
     else
     {
@@ -1289,14 +1289,7 @@ static HRESULT LayoutBundle(
             hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, NULL, NULL);
             ExitOnRootFailure(hr, "BA aborted cache verify begin.");
 
-            if (INVALID_HANDLE_VALUE != pContext->hPipe)
-            {
-                hr = ElevationLayoutBundle(pContext->hPipe, pContext->wzLayoutDirectory, wzUnverifiedPath);
-            }
-            else
-            {
-                hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
-            }
+            hr = CacheLayoutBundle(wzExecutableName, pContext->wzLayoutDirectory, wzUnverifiedPath);
 
             if (SUCCEEDED(hr))
             {
@@ -1539,11 +1532,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
         hr = UserExperienceOnCacheVerifyBegin(pContext->pUX, wzPackageOrContainerId, wzPayloadId);
         ExitOnRootFailure(hr, "BA aborted cache verify begin.");
 
-        if (INVALID_HANDLE_VALUE != pContext->hPipe) // pass the decision off to the elevated process.
-        {
-            hr = ElevationCacheOrLayoutContainerOrPayload(pContext->hPipe, pContainer, pPackage, pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
-        }
-        else if (pContext->wzLayoutDirectory) // layout the container or payload.
+        if (pContext->wzLayoutDirectory) // layout the container or payload.
         {
             if (pContainer)
             {
@@ -1553,6 +1542,10 @@ static HRESULT LayoutOrCacheContainerOrPayload(
             {
                 hr = CacheLayoutPayload(pPayload, pContext->wzLayoutDirectory, wzUnverifiedPath, fMove);
             }
+        }
+        else if (INVALID_HANDLE_VALUE != pContext->hPipe) // pass the decision off to the elevated process.
+        {
+            hr = ElevationCacheCompletePayload(pContext->hPipe, pPackage, pPayload, wzUnverifiedPath, fMove);
         }
         else // complete the payload.
         {

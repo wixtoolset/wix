@@ -50,26 +50,17 @@ HRESULT ElevationSaveState(
     __in_bcount(cbBuffer) BYTE* pbBuffer,
     __in SIZE_T cbBuffer
     );
-HRESULT ElevationLayoutBundle(
+HRESULT ElevationCacheCompletePayload(
     __in HANDLE hPipe,
-    __in_z LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzUnverifiedPath
-    );
-HRESULT ElevationCacheOrLayoutContainerOrPayload(
-    __in HANDLE hPipe,
-    __in_opt BURN_CONTAINER* pContainer,
-    __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in_z_opt LPCWSTR wzLayoutDirectory,
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzUnverifiedPath,
     __in BOOL fMove
     );
-HRESULT ElevationCacheVerifyContainerOrPayload(
+HRESULT ElevationCacheVerifyPayload(
     __in HANDLE hPipe,
-    __in_opt BURN_CONTAINER* pContainer,
-    __in_opt BURN_PACKAGE* pPackage,
-    __in_opt BURN_PAYLOAD* pPayload,
-    __in_z_opt LPCWSTR wzLayoutDirectory
+    __in BURN_PACKAGE* pPackage,
+    __in BURN_PAYLOAD* pPayload
     );
 HRESULT ElevationCacheCleanup(
     __in HANDLE hPipe
