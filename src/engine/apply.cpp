@@ -123,6 +123,9 @@ static HRESULT LayoutOrCacheContainerOrPayload(
     __in DWORD cTryAgainAttempts,
     __out BOOL* pfRetry
     );
+static HRESULT PreparePayloadDestinationPath(
+    __in_z LPCWSTR wzDestinationPath
+    );
 static HRESULT CopyPayload(
     __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
     __in HANDLE hSourceFile,
@@ -1044,6 +1047,9 @@ static HRESULT ExtractContainer(
             BURN_PAYLOAD* pExtract = pContext->pPayloads->rgPayloads + iExtract;
             if (pExtract->sczUnverifiedPath && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
             {
+                hr = PreparePayloadDestinationPath(pExtract->sczUnverifiedPath);
+                ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", pExtract->sczUnverifiedPath);
+
                 // TODO: Send progress when extracting stream to file.
                 hr = ContainerStreamToFile(&context, pExtract->sczUnverifiedPath);
                 ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", sczExtractPayloadId, pContainer->sczId);
@@ -1424,22 +1430,12 @@ LExit:
     return hr;
 }
 
-static HRESULT CopyPayload(
-    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
-    __in HANDLE hSourceFile,
-    __in_z LPCWSTR wzSourcePath,
+static HRESULT PreparePayloadDestinationPath(
     __in_z LPCWSTR wzDestinationPath
     )
 {
     HRESULT hr = S_OK;
     DWORD dwFileAttributes = 0;
-    LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
-    LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
-    HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
-    HANDLE hSourceOpenedFile = INVALID_HANDLE_VALUE;
-
-    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
-    LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "copy", wzSourcePath);
 
     // If the destination file already exists, clear the readonly bit to avoid E_ACCESSDENIED.
     if (FileExistsEx(wzDestinationPath, &dwFileAttributes))
@@ -1453,6 +1449,34 @@ static HRESULT CopyPayload(
             }
         }
     }
+
+LExit:
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        hr = S_OK;
+    }
+
+    return hr;
+}
+
+static HRESULT CopyPayload(
+    __in BURN_CACHE_ACQUIRE_PROGRESS_CONTEXT* pProgress,
+    __in HANDLE hSourceFile,
+    __in_z LPCWSTR wzSourcePath,
+    __in_z LPCWSTR wzDestinationPath
+    )
+{
+    HRESULT hr = S_OK;
+    LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
+    LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
+    HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
+    HANDLE hSourceOpenedFile = INVALID_HANDLE_VALUE;
+
+    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
+    LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "copy", wzSourcePath);
+
+    hr = PreparePayloadDestinationPath(wzDestinationPath);
+    ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", wzDestinationPath);
 
     if (INVALID_HANDLE_VALUE == hSourceFile)
     {
@@ -1503,7 +1527,6 @@ static HRESULT DownloadPayload(
     )
 {
     HRESULT hr = S_OK;
-    DWORD dwFileAttributes = 0;
     LPCWSTR wzPackageOrContainerId = pProgress->pContainer ? pProgress->pContainer->sczId : pProgress->pPackage ? pProgress->pPackage->sczId : L"";
     LPCWSTR wzPayloadId = pProgress->pPayload ? pProgress->pPayload->sczKey : L"";
     DOWNLOAD_SOURCE* pDownloadSource = pProgress->pContainer ? &pProgress->pContainer->downloadSource : &pProgress->pPayload->downloadSource;
@@ -1515,18 +1538,8 @@ static HRESULT DownloadPayload(
     DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayload ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "download", pDownloadSource->sczUrl);
 
-    // If the destination file already exists, clear the readonly bit to avoid E_ACCESSDENIED.
-    if (FileExistsEx(wzDestinationPath, &dwFileAttributes))
-    {
-        if (FILE_ATTRIBUTE_READONLY & dwFileAttributes)
-        {
-            dwFileAttributes &= ~FILE_ATTRIBUTE_READONLY;
-            if (!::SetFileAttributes(wzDestinationPath, dwFileAttributes))
-            {
-                ExitWithLastError(hr, "Failed to clear readonly bit on payload destination path: %ls", wzDestinationPath);
-            }
-        }
-    }
+    hr = PreparePayloadDestinationPath(wzDestinationPath);
+    ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", wzDestinationPath);
 
     cacheCallback.pfnProgress = CacheProgressRoutine;
     cacheCallback.pfnCancel = NULL; // TODO: set this
