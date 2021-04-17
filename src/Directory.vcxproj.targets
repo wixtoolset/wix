@@ -1,0 +1,45 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!--
+  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.csproj.targets
+  then update all of the repos.
+-->
+<Project>
+  <PropertyGroup>
+    <PrepareForBuildDependsOn>
+      $(PrepareForBuildDependsOn);
+      __SetVersionResource
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <Target Name="__SetVersionResource" DependsOnTargets="__SetPropertiesFromGit">
+    <PropertyGroup>
+      <_ResourceFileType Condition=" '$(ConfigurationType)'=='Application' ">VFT_APP</_ResourceFileType>
+      <_ResourceFileType Condition=" '$(ConfigurationType)'=='DynamicLibrary' ">VFT_DLL</_ResourceFileType>
+      <Description Condition=" '$(Description)'=='' ">$(TargetName)</Description>
+      <Title Condition=" '$(Title)'=='' ">$(Description)</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ResourceCompile Include="$(MSBuildThisFileDirectory)ver.rc">
+        <PreprocessorDefinitions>
+          %(PreprocessorDefinitions);
+          GITVER_FILEVER=$(FileVersion.Replace('.', ','));
+          GITVER_PRODUCTVER=$(AssemblyVersion.Replace('.', ','));
+          GITVER_FILE_VERSION=$(FileVersion);
+          GITVER_PRODUCT_VERSION=$(AssemblyVersion);
+          GITVER_FILE_TYPE=$(_ResourceFileType);
+          GITVER_CODEPAGE=0;
+          GITVER_LCID=$([System.Convert]::ToInt32('%(Culture)', 16));
+          GITVER_VERSION_BLOCK=$([System.Convert]::ToString($([MSBuild]::Multiply($([System.Convert]::ToUint64('%(Culture)', 16)), 65536)), 16).PadLeft(8, '0'));
+          GITVER_COMPANY=$(Company);
+          GITVER_COPYRIGHT=$(Copyright);
+          GITVER_TITLE=$(Title);
+          GITVER_PRODUCT=$(Product);
+          GITVER_INFORMATIONAL_VERSION=$(InformationalVersion);
+          GITVER_INTERNAL_NAME=$(TargetName);
+          GITVER_FILE_NAME=$(TargetFileName);
+        </PreprocessorDefinitions>
+      </ResourceCompile>
+    </ItemGroup>
+  </Target>
+</Project>

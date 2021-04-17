@@ -8,7 +8,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <EnableSourceLink Condition=" '$(NCrunch)' == '1' ">false</EnableSourceLink>
-    <MSBuildWarningsAsMessages>MSB3246</MSBuildWarningsAsMessages>
 
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
     <BaseOutputPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</BaseOutputPath>
@@ -20,6 +19,10 @@
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
     <PackageLicenseExpression>MS-RL</PackageLicenseExpression>
     <Product>WiX Toolset</Product>
+
+    <GitThisAssembly>false</GitThisAssembly>
+    <GitVersionFile>version.txt</GitVersionFile>
+    <GitBaseVersionRegex Condition="'$(GitBaseVersionRegex)' == ''">v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+)\-v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})$</GitBaseVersionRegex>
   </PropertyGroup>
 
   <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />

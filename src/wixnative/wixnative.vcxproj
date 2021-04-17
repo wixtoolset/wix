@@ -69,7 +69,7 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Dutil" Version="4.0.72" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+    <PackageReference Include="GitInfo" Version="2.1.2" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

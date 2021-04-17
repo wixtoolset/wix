@@ -9,18 +9,5 @@
     <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
-  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion"
-          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
-    <PropertyGroup>
-      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(PrivateRepositoryUrl)'!='' ">$(PrivateRepositoryUrl.Replace('.git',''))</ProjectUrl>
-
-      <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
-      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(OutputPath)..\</NuspecBasePath>
-      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Version=$(PackageVersion);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildProjectDirectory)\;ProjectUrl=$(ProjectUrl)</NuspecProperties>
-      <PublishRepositoryUrl>true</PublishRepositoryUrl>
-      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    </PropertyGroup>
-  </Target>
-
+  <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
 </Project>
