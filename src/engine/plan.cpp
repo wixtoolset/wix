@@ -431,8 +431,8 @@ extern "C" HRESULT PlanLayoutBundle(
     pCacheAction->bundleLayout.qwBundleSize = qwBundleSize;
     pCacheAction->bundleLayout.pPayloadGroup = pLayoutPayloads;
 
-    // Acquire + Verify
-    pPlan->qwCacheSizeTotal += 2 * qwBundleSize;
+    // Acquire + Verify + Finalize
+    pPlan->qwCacheSizeTotal += 3 * qwBundleSize;
 
     ++pPlan->cOverallProgressTicksTotal;
 
@@ -1006,8 +1006,8 @@ extern "C" HRESULT PlanLayoutContainer(
             pCacheAction->type = BURN_CACHE_ACTION_TYPE_CONTAINER;
             pCacheAction->container.pContainer = pContainer;
 
-            // Acquire + Verify
-            pPlan->qwCacheSizeTotal += 2 * pContainer->qwFileSize;
+            // Acquire + Verify + Finalize
+            pPlan->qwCacheSizeTotal += 3 * pContainer->qwFileSize;
         }
     }
     else
@@ -2249,8 +2249,14 @@ static HRESULT ProcessPayloadGroup(
 
         if (!pPlan->sczLayoutDirectory || !pPayload->pContainer)
         {
-            // Acquire + Verify
-            pPlan->qwCacheSizeTotal += 2 * pPayload->qwFileSize;
+            // Acquire + Verify + Finalize
+            pPlan->qwCacheSizeTotal += 3 * pPayload->qwFileSize;
+
+            if (!pPlan->sczLayoutDirectory)
+            {
+                // Staging
+                pPlan->qwCacheSizeTotal += pPayload->qwFileSize;
+            }
         }
 
         if (!pPlan->sczLayoutDirectory && pPayload->pContainer && 1 == pPayload->cRemainingInstances)

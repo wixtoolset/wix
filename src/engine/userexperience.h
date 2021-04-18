@@ -233,7 +233,8 @@ BAAPI UserExperienceOnCacheVerifyProgress(
     __in_z_opt LPCWSTR wzPayloadId,
     __in DWORD64 dw64Progress,
     __in DWORD64 dw64Total,
-    __in DWORD dwOverallPercentage
+    __in DWORD dwOverallPercentage,
+    __in BOOTSTRAPPER_CACHE_VERIFY_STEP verifyStep
     );
 BAAPI UserExperienceOnCommitMsiTransactionBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,

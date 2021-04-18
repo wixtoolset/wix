@@ -44,28 +44,47 @@ static HRESULT VerifyThenTransferContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzCachedPath,
     __in_z LPCWSTR wzUnverifiedContainerPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 static HRESULT VerifyThenTransferPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCachedPath,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
-static HRESULT TransferWorkingPathToUnverifiedPath(
-    __in_z LPCWSTR wzWorkingPath,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+static HRESULT CacheTransferFileWithRetry(
+    __in_z LPCWSTR wzSourcePath,
+    __in_z LPCWSTR wzDestinationPath,
+    __in BOOL fMove,
+    __in BURN_CACHE_STEP cacheStep,
+    __in DWORD64 qwFileSize,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 static HRESULT VerifyFileAgainstContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzVerifyPath,
-    __in BOOL fAlreadyCached
+    __in BOOL fAlreadyCached,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzVerifyPath,
-    __in BOOL fAlreadyCached
+    __in BOOL fAlreadyCached,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 static HRESULT ResetPathPermissions(
     __in BOOL fPerMachine,
@@ -99,7 +118,26 @@ static HRESULT VerifyHash(
     __in DWORD cbHash,
     __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
+    __in HANDLE hFile,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
+    );
+static HRESULT SendCacheBeginMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in BURN_CACHE_STEP cacheStep
+    );
+static HRESULT SendCacheSuccessMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in DWORD64 qwFileSize
+    );
+static HRESULT SendCacheCompleteMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in HRESULT hrStatus
     );
 
 
@@ -754,7 +792,11 @@ LExit:
 extern "C" HRESULT CacheLayoutBundle(
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzSourceBundlePath
+    __in_z LPCWSTR wzSourceBundlePath,
+    __in DWORD64 qwBundleSize,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -765,7 +807,7 @@ extern "C" HRESULT CacheLayoutBundle(
 
     LogStringLine(REPORT_STANDARD, "Layout bundle from: '%ls' to: '%ls'", wzSourceBundlePath, sczTargetPath);
 
-    hr = FileEnsureMoveWithRetry(wzSourceBundlePath, sczTargetPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+    hr = CacheTransferFileWithRetry(wzSourceBundlePath, sczTargetPath, TRUE, BURN_CACHE_STEP_FINALIZE, qwBundleSize, pfnCacheMessageHandler, pfnProgress, pContext);
     ExitOnFailure(hr, "Failed to layout bundle from: '%ls' to '%ls'", wzSourceBundlePath, sczTargetPath);
 
 LExit:
@@ -838,7 +880,10 @@ extern "C" HRESULT CacheLayoutContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in_z LPCWSTR wzUnverifiedContainerPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -847,7 +892,7 @@ extern "C" HRESULT CacheLayoutContainer(
     hr = PathConcat(wzLayoutDirectory, pContainer->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyThenTransferContainer(pContainer, sczCachedPath, wzUnverifiedContainerPath, fMove);
+    hr = VerifyThenTransferContainer(pContainer, sczCachedPath, wzUnverifiedContainerPath, fMove, pfnCacheMessageHandler, pfnProgress, pContext);
     ExitOnFailure(hr, "Failed to layout container from cached path: %ls", sczCachedPath);
 
 LExit:
@@ -860,7 +905,10 @@ extern "C" HRESULT CacheLayoutPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -869,7 +917,7 @@ extern "C" HRESULT CacheLayoutPayload(
     hr = PathConcat(wzLayoutDirectory, pPayload->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyThenTransferPayload(pPayload, sczCachedPath, wzUnverifiedPayloadPath, fMove);
+    hr = VerifyThenTransferPayload(pPayload, sczCachedPath, wzUnverifiedPayloadPath, fMove, pfnCacheMessageHandler, pfnProgress, pContext);
     ExitOnFailure(hr, "Failed to layout payload from cached payload: %ls", sczCachedPath);
 
 LExit:
@@ -883,7 +931,10 @@ extern "C" HRESULT CacheCompletePayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCacheId,
     __in_z LPCWSTR wzWorkingPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -898,7 +949,7 @@ extern "C" HRESULT CacheCompletePayload(
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
     // If the cached file matches what we expected, we're good.
-    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE);
+    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE, BURN_CACHE_STEP_HASH_TO_SKIP_VERIFY, pfnCacheMessageHandler, pfnProgress, pContext);
     if (SUCCEEDED(hr))
     {
         ExitFunction();
@@ -910,10 +961,21 @@ extern "C" HRESULT CacheCompletePayload(
     // If the working path exists, let's get it into the unverified path so we can reset the ACLs and verify the file.
     if (FileExistsEx(wzWorkingPayloadPath, NULL))
     {
-        hr = TransferWorkingPathToUnverifiedPath(wzWorkingPayloadPath, sczUnverifiedPayloadPath, fMove);
+        hr = CacheTransferFileWithRetry(wzWorkingPayloadPath, sczUnverifiedPayloadPath, fMove, BURN_CACHE_STEP_STAGE, pPayload->qwFileSize, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to transfer working path to unverified path for payload: %ls.", pPayload->sczKey);
     }
-    else if (!FileExistsEx(sczUnverifiedPayloadPath, NULL)) // if the working path and unverified path do not exist, nothing we can do.
+    else if (FileExistsEx(sczUnverifiedPayloadPath, NULL))
+    {
+        // Make sure the staging progress is sent even though there was nothing to do.
+        hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, BURN_CACHE_STEP_STAGE);
+        if (SUCCEEDED(hr))
+        {
+            hr = SendCacheSuccessMessage(pfnCacheMessageHandler, pContext, pPayload->qwFileSize);
+        }
+        SendCacheCompleteMessage(pfnCacheMessageHandler, pContext, hr);
+        ExitOnFailure(hr, "Aborted transferring working path to unverified path for payload: %ls.", pPayload->sczKey);
+    }
+    else // if the working path and unverified path do not exist, nothing we can do.
     {
         hr = E_FILENOTFOUND;
         ExitOnFailure(hr, "Failed to find payload: %ls in working path: %ls and unverified path: %ls", pPayload->sczKey, wzWorkingPayloadPath, sczUnverifiedPayloadPath);
@@ -922,12 +984,12 @@ extern "C" HRESULT CacheCompletePayload(
     hr = ResetPathPermissions(fPerMachine, sczUnverifiedPayloadPath);
     ExitOnFailure(hr, "Failed to reset permissions on unverified cached payload: %ls", pPayload->sczKey);
 
-    hr = VerifyFileAgainstPayload(pPayload, sczUnverifiedPayloadPath, FALSE);
+    hr = VerifyFileAgainstPayload(pPayload, sczUnverifiedPayloadPath, FALSE, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
     LogExitOnFailure(hr, MSG_FAILED_VERIFY_PAYLOAD, "Failed to verify payload: %ls at path: %ls", pPayload->sczKey, sczUnverifiedPayloadPath, NULL);
 
     LogId(REPORT_STANDARD, MSG_VERIFIED_ACQUIRED_PAYLOAD, pPayload->sczKey, sczUnverifiedPayloadPath, fMove ? "moving" : "copying", sczCachedPath);
 
-    hr = FileEnsureMoveWithRetry(sczUnverifiedPayloadPath, sczCachedPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+    hr = CacheTransferFileWithRetry(sczUnverifiedPayloadPath, sczCachedPath, TRUE, BURN_CACHE_STEP_FINALIZE, pPayload->qwFileSize, pfnCacheMessageHandler, pfnProgress, pContext);
     ExitOnFailure(hr, "Failed to move verified file to complete payload path: %ls", sczCachedPath);
 
     ::DecryptFileW(sczCachedPath, 0);  // Let's try to make sure it's not encrypted.
@@ -942,7 +1004,10 @@ LExit:
 
 extern "C" HRESULT CacheVerifyContainer(
     __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzCachedDirectory
+    __in_z LPCWSTR wzCachedDirectory,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -951,7 +1016,7 @@ extern "C" HRESULT CacheVerifyContainer(
     hr = PathConcat(wzCachedDirectory, pContainer->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyFileAgainstContainer(pContainer, sczCachedPath, TRUE);
+    hr = VerifyFileAgainstContainer(pContainer, sczCachedPath, TRUE, BURN_CACHE_STEP_HASH_TO_SKIP_ACQUIRE, pfnCacheMessageHandler, pfnProgress, pContext);
 
 LExit:
     ReleaseStr(sczCachedPath);
@@ -961,7 +1026,10 @@ LExit:
 
 extern "C" HRESULT CacheVerifyPayload(
     __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzCachedDirectory
+    __in_z LPCWSTR wzCachedDirectory,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -970,7 +1038,7 @@ extern "C" HRESULT CacheVerifyPayload(
     hr = PathConcat(wzCachedDirectory, pPayload->sczFilePath, &sczCachedPath);
     ExitOnFailure(hr, "Failed to concat complete cached path.");
 
-    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE);
+    hr = VerifyFileAgainstPayload(pPayload, sczCachedPath, TRUE, BURN_CACHE_STEP_HASH_TO_SKIP_ACQUIRE, pfnCacheMessageHandler, pfnProgress, pContext);
 
 LExit:
     ReleaseStr(sczCachedPath);
@@ -1342,7 +1410,10 @@ static HRESULT VerifyThenTransferContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzCachedPath,
     __in_z LPCWSTR wzUnverifiedContainerPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -1358,22 +1429,13 @@ static HRESULT VerifyThenTransferContainer(
     // Container should have a hash we can use to verify with.
     if (pContainer->pbHash)
     {
-        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzUnverifiedContainerPath, hFile);
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzUnverifiedContainerPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify container hash: %ls", wzCachedPath);
     }
 
     LogStringLine(REPORT_STANDARD, "%ls container from working path '%ls' to path '%ls'", fMove ? L"Moving" : L"Copying", wzUnverifiedContainerPath, wzCachedPath);
 
-    if (fMove)
-    {
-        hr = FileEnsureMoveWithRetry(wzUnverifiedContainerPath, wzCachedPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to move %ls to %ls", wzUnverifiedContainerPath, wzCachedPath);
-    }
-    else
-    {
-        hr = FileEnsureCopyWithRetry(wzUnverifiedContainerPath, wzCachedPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to copy %ls to %ls", wzUnverifiedContainerPath, wzCachedPath);
-    }
+    hr = CacheTransferFileWithRetry(wzUnverifiedContainerPath, wzCachedPath, fMove, BURN_CACHE_STEP_FINALIZE, pContainer->qwFileSize, pfnCacheMessageHandler, pfnProgress, pContext);
 
 LExit:
     ReleaseFileHandle(hFile);
@@ -1385,7 +1447,10 @@ static HRESULT VerifyThenTransferPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCachedPath,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -1400,22 +1465,13 @@ static HRESULT VerifyThenTransferPayload(
 
     if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzUnverifiedPayloadPath, hFile);
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzUnverifiedPayloadPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify payload hash: %ls", wzCachedPath);
     }
 
     LogStringLine(REPORT_STANDARD, "%ls payload from working path '%ls' to path '%ls'", fMove ? L"Moving" : L"Copying", wzUnverifiedPayloadPath, wzCachedPath);
 
-    if (fMove)
-    {
-        hr = FileEnsureMoveWithRetry(wzUnverifiedPayloadPath, wzCachedPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to move %ls to %ls", wzUnverifiedPayloadPath, wzCachedPath);
-    }
-    else
-    {
-        hr = FileEnsureCopyWithRetry(wzUnverifiedPayloadPath, wzCachedPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to copy %ls to %ls", wzUnverifiedPayloadPath, wzCachedPath);
-    }
+    hr = CacheTransferFileWithRetry(wzUnverifiedPayloadPath, wzCachedPath, fMove, BURN_CACHE_STEP_FINALIZE, pPayload->qwFileSize, pfnCacheMessageHandler, pfnProgress, pContext);
 
 LExit:
     ReleaseFileHandle(hFile);
@@ -1423,33 +1479,50 @@ LExit:
     return hr;
 }
 
-static HRESULT TransferWorkingPathToUnverifiedPath(
-    __in_z LPCWSTR wzWorkingPath,
-    __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+static HRESULT CacheTransferFileWithRetry(
+    __in_z LPCWSTR wzSourcePath,
+    __in_z LPCWSTR wzDestinationPath,
+    __in BOOL fMove,
+    __in BURN_CACHE_STEP cacheStep,
+    __in DWORD64 qwFileSize,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE /*pfnProgress*/,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
 
+    hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, cacheStep);
+    ExitOnFailure(hr, "Aborted cache file transfer begin.");
+
+    // TODO: send progress during the file transfer.
     if (fMove)
     {
-        hr = FileEnsureMoveWithRetry(wzWorkingPath, wzUnverifiedPayloadPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to move %ls to %ls", wzWorkingPath, wzUnverifiedPayloadPath);
+        hr = FileEnsureMoveWithRetry(wzSourcePath, wzDestinationPath, TRUE, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+        ExitOnFailure(hr, "Failed to move %ls to %ls", wzSourcePath, wzDestinationPath);
     }
     else
     {
-        hr = FileEnsureCopyWithRetry(wzWorkingPath, wzUnverifiedPayloadPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-        ExitOnFailure(hr, "Failed to copy %ls to %ls", wzWorkingPath, wzUnverifiedPayloadPath);
+        hr = FileEnsureCopyWithRetry(wzSourcePath, wzDestinationPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+        ExitOnFailure(hr, "Failed to copy %ls to %ls", wzSourcePath, wzDestinationPath);
     }
 
+    hr = SendCacheSuccessMessage(pfnCacheMessageHandler, pContext, qwFileSize);
+
 LExit:
+    SendCacheCompleteMessage(pfnCacheMessageHandler, pContext, hr);
+
     return hr;
 }
 
 static HRESULT VerifyFileAgainstContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzVerifyPath,
-    __in BOOL fAlreadyCached
+    __in BOOL fAlreadyCached,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -1469,7 +1542,7 @@ static HRESULT VerifyFileAgainstContainer(
 
     if (pContainer->pbHash) // the container should have a hash we can use to verify it.
     {
-        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzVerifyPath, hFile);
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify hash of container: %ls", pContainer->sczId);
     }
 
@@ -1498,7 +1571,11 @@ LExit:
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzVerifyPath,
-    __in BOOL fAlreadyCached
+    __in BOOL fAlreadyCached,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
@@ -1518,7 +1595,7 @@ static HRESULT VerifyFileAgainstPayload(
 
     if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzVerifyPath, hFile);
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
     }
 
@@ -1881,7 +1958,11 @@ static HRESULT VerifyHash(
     __in DWORD cbHash,
     __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in HANDLE hFile
+    __in HANDLE hFile,
+    __in BURN_CACHE_STEP cacheStep,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE /*pfnProgress*/,
+    __in LPVOID pContext
     )
 {
     UNREFERENCED_PARAMETER(wzUnverifiedPayloadPath);
@@ -1892,6 +1973,9 @@ static HRESULT VerifyHash(
     LONGLONG llSize = 0;
     LPWSTR pszExpected = NULL;
     LPWSTR pszActual = NULL;
+
+    hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, cacheStep);
+    ExitOnFailure(hr, "Aborted cache verify hash begin.");
 
     hr = FileSizeByHandle(hFile, &llSize);
     ExitOnFailure(hr, "Failed to get file size for path: %ls", wzUnverifiedPayloadPath);
@@ -1922,9 +2006,64 @@ static HRESULT VerifyHash(
         }
     }
 
+    hr = SendCacheSuccessMessage(pfnCacheMessageHandler, pContext, qwFileSize);
+
 LExit:
+    SendCacheCompleteMessage(pfnCacheMessageHandler, pContext, hr);
+
     ReleaseStr(pszActual);
     ReleaseStr(pszExpected);
+
+    return hr;
+}
+
+static HRESULT SendCacheBeginMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in BURN_CACHE_STEP cacheStep
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_CACHE_MESSAGE message = { };
+
+    message.type = BURN_CACHE_MESSAGE_BEGIN;
+    message.begin.cacheStep = cacheStep;
+
+    hr = pfnCacheMessageHandler(&message, pContext);
+
+    return hr;
+}
+
+static HRESULT SendCacheSuccessMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in DWORD64 qwFileSize
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_CACHE_MESSAGE message = { };
+
+    message.type = BURN_CACHE_MESSAGE_SUCCESS;
+    message.success.qwFileSize = qwFileSize;
+
+    hr = pfnCacheMessageHandler(&message, pContext);
+
+    return hr;
+}
+
+static HRESULT SendCacheCompleteMessage(
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPVOID pContext,
+    __in HRESULT hrStatus
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_CACHE_MESSAGE message = { };
+
+    message.type = BURN_CACHE_MESSAGE_COMPLETE;
+    message.complete.hrStatus = hrStatus;
+
+    hr = pfnCacheMessageHandler(&message, pContext);
 
     return hr;
 }

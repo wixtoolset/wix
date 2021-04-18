@@ -55,12 +55,18 @@ HRESULT ElevationCacheCompletePayload(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzUnverifiedPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT ElevationCacheVerifyPayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD* pPayload
+    __in BURN_PAYLOAD* pPayload,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT ElevationCacheCleanup(
     __in HANDLE hPipe

@@ -35,11 +35,15 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE,
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN,
     BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE,
+    BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN,
+    BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_COMPLETE,
+    BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PROGRESS,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ERROR,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_MESSAGE,
     BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_FILES_IN_USE,
     BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID,
+    BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE,
 } BURN_ELEVATION_MESSAGE_TYPE;
 
 
@@ -51,6 +55,13 @@ typedef struct _BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT
     BOOL fPauseCompleteNeeded;
     BOOL fSrpCompleteNeeded;
 } BURN_ELEVATION_APPLY_INITIALIZE_MESSAGE_CONTEXT;
+
+typedef struct _BURN_ELEVATION_CACHE_MESSAGE_CONTEXT
+{
+    PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler;
+    LPPROGRESS_ROUTINE pfnProgress;
+    LPVOID pvContext;
+} BURN_ELEVATION_CACHE_MESSAGE_CONTEXT;
 
 typedef struct _BURN_ELEVATION_GENERIC_MESSAGE_CONTEXT
 {
@@ -99,6 +110,11 @@ static HRESULT ProcessApplyInitializeMessages(
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
     );
+static HRESULT ProcessBurnCacheMessages(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in LPVOID pvContext,
+    __out DWORD* pdwResult
+    );
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
@@ -112,6 +128,12 @@ static HRESULT ProcessMsiPackageMessages(
 static HRESULT ProcessLaunchApprovedExeMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
+    __out DWORD* pdwResult
+    );
+static HRESULT ProcessProgressRoutineMessage(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pvContext,
     __out DWORD* pdwResult
     );
 static HRESULT ProcessElevatedChildMessage(
@@ -165,12 +187,14 @@ static HRESULT OnSaveState(
     __in DWORD cbData
     );
 static HRESULT OnCacheCompletePayload(
+    __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
     __in DWORD cbData
     );
 static HRESULT OnCacheVerifyPayload(
+    __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
@@ -224,6 +248,21 @@ static HRESULT OnExecutePackageDependencyAction(
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BYTE* pbData,
     __in DWORD cbData
+    );
+static HRESULT CALLBACK BurnCacheMessageHandler(
+    __in BURN_CACHE_MESSAGE* pMessage,
+    __in LPVOID pvContext
+    );
+static DWORD CALLBACK ElevatedProgressRoutine(
+    __in LARGE_INTEGER TotalFileSize,
+    __in LARGE_INTEGER TotalBytesTransferred,
+    __in LARGE_INTEGER StreamSize,
+    __in LARGE_INTEGER StreamBytesTransferred,
+    __in DWORD dwStreamNumber,
+    __in DWORD dwCallbackReason,
+    __in HANDLE hSourceFile,
+    __in HANDLE hDestinationFile,
+    __in_opt LPVOID lpData
     );
 static int GenericExecuteMessageHandler(
     __in GENERIC_EXECUTE_MESSAGE* pMessage,
@@ -582,13 +621,21 @@ extern "C" HRESULT ElevationCacheCompletePayload(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzUnverifiedPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
+    BURN_ELEVATION_CACHE_MESSAGE_CONTEXT context = { };
+
+    context.pfnCacheMessageHandler = pfnCacheMessageHandler;
+    context.pfnProgress = pfnProgress;
+    context.pvContext = pContext;
 
     // serialize message data
     hr = BuffWriteString(&pbData, &cbData, pPackage->sczId);
@@ -604,7 +651,7 @@ extern "C" HRESULT ElevationCacheCompletePayload(
     ExitOnFailure(hr, "Failed to write move flag to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD, pbData, cbData, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -618,13 +665,21 @@ LExit:
 extern "C" HRESULT ElevationCacheVerifyPayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_PAYLOAD* pPayload
+    __in BURN_PAYLOAD* pPayload,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     )
 {
     HRESULT hr = S_OK;
     BYTE* pbData = NULL;
     SIZE_T cbData = 0;
     DWORD dwResult = 0;
+    BURN_ELEVATION_CACHE_MESSAGE_CONTEXT context = { };
+
+    context.pfnCacheMessageHandler = pfnCacheMessageHandler;
+    context.pfnProgress = pfnProgress;
+    context.pvContext = pContext;
 
     // serialize message data
     hr = BuffWriteString(&pbData, &cbData, pPackage->sczId);
@@ -634,7 +689,7 @@ extern "C" HRESULT ElevationCacheVerifyPayload(
     ExitOnFailure(hr, "Failed to write payload id to message buffer.");
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD, pbData, cbData, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD, pbData, cbData, ProcessBurnCacheMessages, &context, &dwResult);
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -1377,6 +1432,69 @@ LExit:
     return hr;
 }
 
+static HRESULT ProcessBurnCacheMessages(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in LPVOID pvContext,
+    __out DWORD* pdwResult
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    BURN_ELEVATION_CACHE_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_CACHE_MESSAGE_CONTEXT*>(pvContext);
+    BURN_CACHE_MESSAGE message = { };
+    BOOL fProgressRoutine = FALSE;
+
+    // Process the message.
+    switch (pMsg->dwMessage)
+    {
+    case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN:
+        // read message parameters
+        hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, reinterpret_cast<DWORD*>(&message.begin.cacheStep));
+        ExitOnFailure(hr, "Failed to read begin cache step.");
+
+        message.type = BURN_CACHE_MESSAGE_BEGIN;
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_COMPLETE:
+        // read message parameters
+        hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, reinterpret_cast<DWORD*>(&message.complete.hrStatus));
+        ExitOnFailure(hr, "Failed to read complete hresult.");
+
+        message.type = BURN_CACHE_MESSAGE_COMPLETE;
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS:
+        // read message parameters
+        hr = BuffReadNumber64((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.success.qwFileSize);
+        ExitOnFailure(hr, "Failed to read begin cache step.");
+
+        message.type = BURN_CACHE_MESSAGE_SUCCESS;
+        break;
+
+    case BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE:
+        fProgressRoutine = TRUE;
+        break;
+
+    default:
+        hr = E_INVALIDARG;
+        ExitOnRootFailure(hr, "Invalid burn cache message.");
+        break;
+    }
+
+    if (fProgressRoutine)
+    {
+        hr = ProcessProgressRoutineMessage(pMsg, pContext->pfnProgress, pContext->pvContext, pdwResult);
+    }
+    else
+    {
+        hr = pContext->pfnCacheMessageHandler(&message, pContext->pvContext);
+        *pdwResult = static_cast<DWORD>(hr);
+    }
+
+LExit:
+    return hr;
+}
+
 static HRESULT ProcessGenericExecuteMessages(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in LPVOID pvContext,
@@ -1596,11 +1714,41 @@ LExit:
     return hr;
 }
 
+static HRESULT ProcessProgressRoutineMessage(
+    __in BURN_PIPE_MESSAGE* pMsg,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pvContext,
+    __out DWORD* pdwResult
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LARGE_INTEGER liTotalFileSize = { };
+    LARGE_INTEGER liTotalBytesTransferred = { };
+    LARGE_INTEGER liStreamSize = { };
+    LARGE_INTEGER liStreamBytesTransferred = { };
+    DWORD dwStreamNumber = 0;
+    DWORD dwCallbackReason = CALLBACK_CHUNK_FINISHED;
+    HANDLE hSourceFile = INVALID_HANDLE_VALUE;
+    HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
+
+    hr = BuffReadNumber64((BYTE*)pMsg->pvData, pMsg->cbData, &iData, reinterpret_cast<DWORD64*>(&liTotalFileSize.QuadPart));
+    ExitOnFailure(hr, "Failed to read total file size for progress.");
+
+    hr = BuffReadNumber64((BYTE*)pMsg->pvData, pMsg->cbData, &iData, reinterpret_cast<DWORD64*>(&liTotalBytesTransferred.QuadPart));
+    ExitOnFailure(hr, "Failed to read total bytes transferred for progress.");
+
+    *pdwResult = pfnProgress(liTotalFileSize, liTotalBytesTransferred, liStreamSize, liStreamBytesTransferred, dwStreamNumber, dwCallbackReason, hSourceFile, hDestinationFile, pvContext);
+
+LExit:
+    return hr;
+}
+
 static HRESULT ProcessElevatedChildMessage(
     __in BURN_PIPE_MESSAGE* pMsg,
     __in_opt LPVOID pvContext,
     __out DWORD* pdwResult
-)
+    )
 {
     HRESULT hr = S_OK;
     BURN_ELEVATION_CHILD_MESSAGE_CONTEXT* pContext = static_cast<BURN_ELEVATION_CHILD_MESSAGE_CONTEXT*>(pvContext);
@@ -1705,11 +1853,11 @@ static HRESULT ProcessElevatedChildCacheMessage(
     switch (pMsg->dwMessage)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD:
-        hrResult = OnCacheCompletePayload(pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCacheCompletePayload(pContext->hPipe, pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD:
-        hrResult = OnCacheVerifyPayload(pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCacheVerifyPayload(pContext->hPipe, pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP:
@@ -2002,6 +2150,7 @@ LExit:
 }
 
 static HRESULT OnCacheCompletePayload(
+    __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
@@ -2043,7 +2192,7 @@ static HRESULT OnCacheCompletePayload(
 
     if (pPackage && pPayload) // complete payload.
     {
-        hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove);
+        hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
         ExitOnFailure(hr, "Failed to cache payload: %ls", pPayload->sczKey);
     }
     else
@@ -2060,6 +2209,7 @@ LExit:
 }
 
 static HRESULT OnCacheVerifyPayload(
+    __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
@@ -2097,7 +2247,7 @@ static HRESULT OnCacheVerifyPayload(
         hr = CacheGetCompletedPath(TRUE, pPackage->sczCacheId, &sczCacheDirectory);
         ExitOnFailure(hr, "Failed to get cached path for package with cache id: %ls", pPackage->sczCacheId);
 
-        hr = CacheVerifyPayload(pPayload, sczCacheDirectory);
+        hr = CacheVerifyPayload(pPayload, sczCacheDirectory, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
     }
     else
     {
@@ -2571,6 +2721,91 @@ LExit:
     PlanUninitializeExecuteAction(&executeAction);
 
     return hr;
+}
+
+static HRESULT CALLBACK BurnCacheMessageHandler(
+    __in BURN_CACHE_MESSAGE* pMessage,
+    __in LPVOID pvContext
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+    HANDLE hPipe = (HANDLE)pvContext;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    DWORD dwMessage = 0;
+
+    switch (pMessage->type)
+    {
+    case BURN_CACHE_MESSAGE_BEGIN:
+        // serialize message data
+        hr = BuffWriteNumber(&pbData, &cbData, pMessage->begin.cacheStep);
+        ExitOnFailure(hr, "Failed to write progress percentage to message buffer.");
+
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_BEGIN;
+        break;
+
+    case BURN_CACHE_MESSAGE_COMPLETE:
+        // serialize message data
+        hr = BuffWriteNumber(&pbData, &cbData, pMessage->complete.hrStatus);
+        ExitOnFailure(hr, "Failed to write error code to message buffer.");
+
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_COMPLETE;
+        break;
+
+    case BURN_CACHE_MESSAGE_SUCCESS:
+        hr = BuffWriteNumber64(&pbData, &cbData, pMessage->success.qwFileSize);
+        ExitOnFailure(hr, "Failed to count of files in use to message buffer.");
+
+        dwMessage = BURN_ELEVATION_MESSAGE_TYPE_BURN_CACHE_SUCCESS;
+        break;
+    }
+
+    // send message
+    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send burn cache message to per-user process.");
+
+    hr = dwResult;
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return hr;
+}
+
+static DWORD CALLBACK ElevatedProgressRoutine(
+    __in LARGE_INTEGER TotalFileSize,
+    __in LARGE_INTEGER TotalBytesTransferred,
+    __in LARGE_INTEGER /*StreamSize*/,
+    __in LARGE_INTEGER /*StreamBytesTransferred*/,
+    __in DWORD /*dwStreamNumber*/,
+    __in DWORD /*dwCallbackReason*/,
+    __in HANDLE /*hSourceFile*/,
+    __in HANDLE /*hDestinationFile*/,
+    __in_opt LPVOID lpData
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwResult = 0;
+    HANDLE hPipe = (HANDLE)lpData;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    DWORD dwMessage = BURN_ELEVATION_MESSAGE_TYPE_PROGRESS_ROUTINE;
+
+    hr = BuffWriteNumber64(&pbData, &cbData, TotalFileSize.QuadPart);
+    ExitOnFailure(hr, "Failed to write total file size progress to message buffer.");
+
+    hr = BuffWriteNumber64(&pbData, &cbData, TotalBytesTransferred.QuadPart);
+    ExitOnFailure(hr, "Failed to write total bytes transferred progress to message buffer.");
+
+    // send message
+    hr = PipeSendMessage(hPipe, dwMessage, pbData, cbData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send progress routine message to per-user process.");
+
+LExit:
+    ReleaseBuffer(pbData);
+
+    return dwResult;
 }
 
 static int GenericExecuteMessageHandler(

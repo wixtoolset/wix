@@ -912,7 +912,8 @@ EXTERN_C BAAPI UserExperienceOnCacheVerifyProgress(
     __in_z_opt LPCWSTR wzPayloadId,
     __in DWORD64 dw64Progress,
     __in DWORD64 dw64Total,
-    __in DWORD dwOverallPercentage
+    __in DWORD dwOverallPercentage,
+    __in BOOTSTRAPPER_CACHE_VERIFY_STEP verifyStep
     )
 {
     HRESULT hr = S_OK;
@@ -925,6 +926,7 @@ EXTERN_C BAAPI UserExperienceOnCacheVerifyProgress(
     args.dw64Progress = dw64Progress;
     args.dw64Total = dw64Total;
     args.dwOverallPercentage = dwOverallPercentage;
+    args.verifyStep = verifyStep;
 
     results.cbSize = sizeof(results);
 

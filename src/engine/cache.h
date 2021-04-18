@@ -7,7 +7,48 @@
 extern "C" {
 #endif
 
-// structs
+
+enum BURN_CACHE_MESSAGE_TYPE
+{
+    BURN_CACHE_MESSAGE_BEGIN,
+    BURN_CACHE_MESSAGE_SUCCESS,
+    BURN_CACHE_MESSAGE_COMPLETE,
+};
+
+enum BURN_CACHE_STEP
+{
+    BURN_CACHE_STEP_HASH_TO_SKIP_ACQUIRE,
+    BURN_CACHE_STEP_HASH_TO_SKIP_VERIFY,
+    BURN_CACHE_STEP_STAGE,
+    BURN_CACHE_STEP_HASH,
+    BURN_CACHE_STEP_FINALIZE,
+};
+
+typedef struct _BURN_CACHE_MESSAGE
+{
+    BURN_CACHE_MESSAGE_TYPE type;
+
+    union
+    {
+        struct
+        {
+            BURN_CACHE_STEP cacheStep;
+        } begin;
+        struct
+        {
+            DWORD64 qwFileSize;
+        } success;
+        struct
+        {
+            HRESULT hrStatus;
+        } complete;
+    };
+} BURN_CACHE_MESSAGE;
+
+typedef HRESULT(CALLBACK* PFN_BURNCACHEMESSAGEHANDLER)(
+    __in BURN_CACHE_MESSAGE* pMessage,
+    __in LPVOID pvContext
+    );
 
 // functions
 
@@ -95,7 +136,11 @@ HRESULT CacheBundleToWorkingDirectory(
 HRESULT CacheLayoutBundle(
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzLayoutDirectory,
-    __in_z LPCWSTR wzSourceBundlePath
+    __in_z LPCWSTR wzSourceBundlePath,
+    __in DWORD64 qwBundleSize,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheCompleteBundle(
     __in BOOL fPerMachine,
@@ -110,28 +155,43 @@ HRESULT CacheLayoutContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in_z LPCWSTR wzUnverifiedContainerPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheLayoutPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheCompletePayload(
     __in BOOL fPerMachine,
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCacheId,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
-    __in BOOL fMove
+    __in BOOL fMove,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheVerifyContainer(
     __in BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzCachedDirectory
+    __in_z LPCWSTR wzCachedDirectory,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheVerifyPayload(
     __in BURN_PAYLOAD* pPayload,
-    __in_z LPCWSTR wzCachedDirectory
+    __in_z LPCWSTR wzCachedDirectory,
+    __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
+    __in LPPROGRESS_ROUTINE pfnProgress,
+    __in LPVOID pContext
     );
 HRESULT CacheRemoveWorkingFolder(
     __in_z_opt LPCWSTR wzBundleId

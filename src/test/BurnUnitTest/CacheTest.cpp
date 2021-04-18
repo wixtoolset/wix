@@ -2,6 +2,26 @@
 
 #include "precomp.h"
 
+static HRESULT CALLBACK CacheTestEventRoutine(
+    __in BURN_CACHE_MESSAGE* pMessage,
+    __in LPVOID pvContext
+    );
+
+static DWORD CALLBACK CacheTestProgressRoutine(
+    __in LARGE_INTEGER TotalFileSize,
+    __in LARGE_INTEGER TotalBytesTransferred,
+    __in LARGE_INTEGER StreamSize,
+    __in LARGE_INTEGER StreamBytesTransferred,
+    __in DWORD dwStreamNumber,
+    __in DWORD dwCallbackReason,
+    __in HANDLE hSourceFile,
+    __in HANDLE hDestinationFile,
+    __in_opt LPVOID lpData
+    );
+
+typedef struct _CACHE_TEST_CONTEXT
+{
+} CACHE_TEST_CONTEXT;
 
 namespace Microsoft
 {
@@ -33,6 +53,7 @@ namespace Bootstrapper
             LPWSTR sczPayloadPath = NULL;
             BYTE* pb = NULL;
             DWORD cb = NULL;
+            CACHE_TEST_CONTEXT context = { };
 
             try
             {
@@ -51,7 +72,7 @@ namespace Bootstrapper
                 payload.pbHash = pb;
                 payload.cbHash = cb;
 
-                hr = CacheCompletePayload(package.fPerMachine, &payload, package.sczCacheId, sczPayloadPath, FALSE);
+                hr = CacheCompletePayload(package.fPerMachine, &payload, package.sczCacheId, sczPayloadPath, FALSE, CacheTestEventRoutine, CacheTestProgressRoutine, &context);
                 Assert::Equal(S_OK, hr);
             }
             finally
@@ -72,4 +93,27 @@ namespace Bootstrapper
 }
 }
 }
+}
+
+static HRESULT CALLBACK CacheTestEventRoutine(
+    __in BURN_CACHE_MESSAGE* /*pMessage*/,
+    __in LPVOID /*pvContext*/
+    )
+{
+    return S_OK;
+}
+
+static DWORD CALLBACK CacheTestProgressRoutine(
+    __in LARGE_INTEGER /*TotalFileSize*/,
+    __in LARGE_INTEGER /*TotalBytesTransferred*/,
+    __in LARGE_INTEGER /*StreamSize*/,
+    __in LARGE_INTEGER /*StreamBytesTransferred*/,
+    __in DWORD /*dwStreamNumber*/,
+    __in DWORD /*dwCallbackReason*/,
+    __in HANDLE /*hSourceFile*/,
+    __in HANDLE /*hDestinationFile*/,
+    __in_opt LPVOID /*lpData*/
+    )
+{
+    return PROGRESS_QUIET;
 }
