@@ -717,13 +717,6 @@ Language=English
 Acquiring container: %1!ls!, %3!hs! from: %4!ls!
 .
 
-MessageId=337
-Severity=Success
-SymbolicName=MSG_ACQUIRE_CONTAINER_PAYLOAD
-Language=English
-Acquiring container: %1!ls!, payload: %2!ls!, %3!hs! from: %4!ls!
-.
-
 MessageId=338
 Severity=Success
 SymbolicName=MSG_ACQUIRE_PACKAGE_PAYLOAD
@@ -738,25 +731,39 @@ Language=English
 Failed to verify container: %2!ls! at path: %3!ls!, error: %1!ls!. Deleting file.
 .
 
+MessageId=340
+Severity=Warning
+SymbolicName=MSG_CACHE_CONTINUING_NONVITAL_PACKAGE
+Language=English
+Cached non-vital package: %1!ls!, encountered error: 0x%2!x!. Continuing...
+.
+
+MessageId=346
+Severity=Warning
+SymbolicName=MSG_CACHE_RETRYING_PACKAGE
+Language=English
+Application requested retry of caching package: %1!ls!, encountered error: 0x%2!x!. Retrying...
+.
+
 MessageId=347
 Severity=Warning
-SymbolicName=MSG_APPLY_RETRYING_CONTAINER
+SymbolicName=MSG_CACHE_RETRYING_CONTAINER
 Language=English
-Application requested retry of container: %2!ls!, encountered error: %1!ls!. Retrying...
+Application requested retry of caching container: %2!ls!, encountered error: %1!ls!. Retrying...
 .
 
 MessageId=348
 Severity=Warning
 SymbolicName=MSG_APPLY_RETRYING_PACKAGE
 Language=English
-Application requested retry of package: %1!ls!, encountered error: 0x%2!x!. Retrying...
+Application requested retry of executing package: %1!ls!, encountered error: 0x%2!x!. Retrying...
 .
 
 MessageId=349
 Severity=Warning
-SymbolicName=MSG_APPLY_RETRYING_PAYLOAD
+SymbolicName=MSG_CACHE_RETRYING_PAYLOAD
 Language=English
-Application requested retry of payload: %2!ls!, encountered error: %1!ls!. Retrying...
+Application requested retry of caching payload: %2!ls!, encountered error: %1!ls!. Retrying...
 .
 
 MessageId=350

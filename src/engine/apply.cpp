@@ -862,13 +862,13 @@ static HRESULT ApplyCachePackage(
                 }
             }
 
-            LogErrorId(hr, MSG_APPLY_RETRYING_PACKAGE, pPackage->sczId, NULL, NULL);
+            LogErrorId(hr, MSG_CACHE_RETRYING_PACKAGE, pPackage->sczId, NULL, NULL);
 
             continue;
         }
         else if (BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION_IGNORE == cachePackageCompleteAction && !pPackage->fVital) // ignore non-vital download failures.
         {
-            LogId(REPORT_STANDARD, MSG_APPLY_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hr);
+            LogId(REPORT_STANDARD, MSG_CACHE_CONTINUING_NONVITAL_PACKAGE, pPackage->sczId, hr);
             hr = S_OK;
         }
         else if (fCanceledBegin)
@@ -1003,7 +1003,7 @@ static HRESULT ApplyLayoutContainer(
             pContext->qwSuccessfulCacheProgress -= pContainer->qwCommittedCacheProgress;
             pContainer->qwCommittedCacheProgress = 0;
             ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
-            LogErrorId(hr, MSG_APPLY_RETRYING_CONTAINER, pContainer->sczId, NULL, NULL);
+            LogErrorId(hr, MSG_CACHE_RETRYING_CONTAINER, pContainer->sczId, NULL, NULL);
         }
     }
 
@@ -1062,7 +1062,7 @@ static HRESULT ApplyProcessPayload(
             pContext->qwSuccessfulCacheProgress -= pPayloadGroupItem->qwCommittedCacheProgress;
             pPayloadGroupItem->qwCommittedCacheProgress = 0;
             ReleaseNullStr(pContext->sczLastUsedFolderCandidate);
-            LogErrorId(hr, MSG_APPLY_RETRYING_PAYLOAD, pPayload->sczKey, NULL, NULL);
+            LogErrorId(hr, MSG_CACHE_RETRYING_PAYLOAD, pPayload->sczKey, NULL, NULL);
         }
     }
 
@@ -1644,7 +1644,7 @@ static HRESULT CopyPayload(
     HANDLE hDestinationFile = INVALID_HANDLE_VALUE;
     HANDLE hSourceOpenedFile = INVALID_HANDLE_VALUE;
 
-    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayloadGroupItem ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
+    DWORD dwLogId = pProgress->pContainer ? MSG_ACQUIRE_CONTAINER : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "copy", wzSourcePath);
 
     hr = PreparePayloadDestinationPath(wzDestinationPath);
@@ -1707,7 +1707,7 @@ static HRESULT DownloadPayload(
     DOWNLOAD_AUTHENTICATION_CALLBACK authenticationCallback = { };
     APPLY_AUTHENTICATION_REQUIRED_DATA authenticationData = { };
 
-    DWORD dwLogId = pProgress->pContainer ? (pProgress->pPayloadGroupItem ? MSG_ACQUIRE_CONTAINER_PAYLOAD : MSG_ACQUIRE_CONTAINER) : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
+    DWORD dwLogId = pProgress->pContainer ? MSG_ACQUIRE_CONTAINER : pProgress->pPackage ? MSG_ACQUIRE_PACKAGE_PAYLOAD : MSG_ACQUIRE_BUNDLE_PAYLOAD;
     LogId(REPORT_STANDARD, dwLogId, wzPackageOrContainerId, wzPayloadId, "download", pDownloadSource->sczUrl);
 
     hr = PreparePayloadDestinationPath(wzDestinationPath);
