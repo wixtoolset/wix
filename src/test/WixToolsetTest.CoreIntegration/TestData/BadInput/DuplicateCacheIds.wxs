@@ -2,8 +2,11 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage Id="Manual1" SourceFile="burn.exe" Name="manual1\burn.exe" CacheId="Manual" />
-            <ExePackage Id="Manual2" SourceFile="burn.exe" Name="manual2\burn.exe" CacheId="Manual" />
+            <ExePackage Id="Manual1" SourceFile="burn.exe" Name="manual1\burn.exe" DetectCondition="test" CacheId="!(wix.WixVariable1)" />
+            <ExePackage Id="Manual2" SourceFile="burn.exe" Name="manual2\burn.exe" DetectCondition="test" CacheId="!(wix.WixVariable2)" />
         </PackageGroup>
+
+        <WixVariable Id="WixVariable1" Value="CollidingCacheId" />
+        <WixVariable Id="WixVariable2" Value="CollidingCacheId" />
     </Fragment>
 </Wix>

@@ -280,7 +280,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/4628")]
+        [Fact]
         public void CantBuildWithDuplicateCacheIds()
         {
             var folder = TestData.Get(@"TestData");
@@ -302,7 +302,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                Assert.Equal(8001, result.ExitCode);
             }
         }
 

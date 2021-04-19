@@ -359,7 +359,6 @@ namespace WixToolset.Core.Burn
                 this.BackendHelper.ResolveDelayedFields(this.DelayedFields, variableCache);
             }
 
-            Dictionary<string, WixDependencyProviderSymbol> dependencySymbolsByKey;
             {
                 var command = new ProcessDependencyProvidersCommand(this.Messaging, section, facades);
                 command.Execute();
@@ -368,7 +367,6 @@ namespace WixToolset.Core.Burn
                 {
                     bundleSymbol.ProviderKey = command.BundleProviderKey; // set the overridable bundle provider key.
                 }
-                dependencySymbolsByKey = command.DependencySymbolsByKey;
             }
 
             // Update the bundle per-machine/per-user scope based on the chained packages.
@@ -379,6 +377,13 @@ namespace WixToolset.Core.Burn
             {
                 var command = new ProcessBundleSoftwareTagsCommand(section, softwareTags);
                 command.Execute();
+            }
+
+            this.DetectDuplicateCacheIds(facades);
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
             }
 
             // Give the extension one last hook before generating the output files.
@@ -577,6 +582,24 @@ namespace WixToolset.Core.Burn
                     dependencySymbolsById.ContainsKey(facade.PackageId))
                 {
                     this.Messaging.Write(WarningMessages.NoPerMachineDependencies(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
+                }
+            }
+        }
+
+        private void DetectDuplicateCacheIds(IDictionary<string, PackageFacade> facades)
+        {
+            var duplicateCacheIdDetector = new Dictionary<string, WixBundlePackageSymbol>();
+
+            foreach (var facade in facades.Values)
+            {
+                if (duplicateCacheIdDetector.TryGetValue(facade.PackageSymbol.CacheId, out var collisionPackage))
+                {
+                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds(collisionPackage.SourceLineNumbers, facade.PackageSymbol.CacheId));
+                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds2(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.CacheId));
+                }
+                else
+                {
+                    duplicateCacheIdDetector.Add(facade.PackageSymbol.CacheId, facade.PackageSymbol);
                 }
             }
         }

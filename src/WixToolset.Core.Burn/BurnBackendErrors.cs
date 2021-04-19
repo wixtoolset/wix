@@ -6,10 +6,15 @@ namespace WixToolset.Core.Burn
 
     internal static class BurnBackendErrors
     {
-        //public static Message ReplaceThisWithTheFirstError(SourceLineNumber sourceLineNumbers)
-        //{
-        //    return Message(sourceLineNumbers, Ids.ReplaceThisWithTheFirstError, "format string", arg1, arg2);
-        //}
+        public static Message DuplicateCacheIds(SourceLineNumber originalLineNumber, string cacheId)
+        {
+            return Message(originalLineNumber, Ids.DuplicateCacheIds, "The cache id '{0}' has been duplicated as indicated in the following message.", cacheId);
+        }
+
+        public static Message DuplicateCacheIds2(SourceLineNumber duplicateLineNumber, string cacheId)
+        {
+            return Message(duplicateLineNumber, Ids.DuplicateCacheIds2, "Each cache id must be unique. '{0}' has been used before as indicated in the previous message.", cacheId);
+        }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
@@ -18,7 +23,8 @@ namespace WixToolset.Core.Burn
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstError = 8000,
+            DuplicateCacheIds = 8000,
+            DuplicateCacheIds2 = 8001,
         }
     }
 }
