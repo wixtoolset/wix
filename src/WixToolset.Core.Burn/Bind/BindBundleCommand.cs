@@ -459,12 +459,18 @@ namespace WixToolset.Core.Burn
                 containers = command.Containers;
             }
 
+            // Resolve the download URLs now that we have all of the containers and payloads calculated.
+            {
+                var command = new ResolveDownloadUrlsCommand(this.Messaging, this.BackendExtensions, containers, payloadSymbols);
+                command.Execute();
+            }
+
             // Create the bundle manifest.
             string manifestPath;
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(this.Messaging, this.BackendExtensions, executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;

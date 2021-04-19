@@ -143,7 +143,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void ReplacesDownloadUrlPlaceholders()
         {
             var folder = TestData.Get(@"TestData");

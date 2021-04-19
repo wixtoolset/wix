@@ -18,10 +18,8 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendBinderExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
+        public CreateBurnManifestCommand(string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
-            this.Messaging = messaging;
-            this.BackendExtensions = backendExtensions;
             this.ExecutableName = executableName;
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
@@ -37,10 +35,6 @@ namespace WixToolset.Core.Burn.Bundles
         }
 
         public string OutputPath { get; private set; }
-
-        private IMessaging Messaging { get; }
-
-        private IEnumerable<IBurnBackendBinderExtension> BackendExtensions { get; }
 
         private string ExecutableName { get; }
 
@@ -657,12 +651,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (ContainerType.Detached == container.Type)
             {
-                string resolvedUrl = this.ResolveUrl(container.DownloadUrl, null, null, container.Id.Id, container.Name);
-                if (!String.IsNullOrEmpty(resolvedUrl))
-                {
-                    writer.WriteAttributeString("DownloadUrl", resolvedUrl);
-                }
-                else if (!String.IsNullOrEmpty(container.DownloadUrl))
+                if (!String.IsNullOrEmpty(container.DownloadUrl))
                 {
                     writer.WriteAttributeString("DownloadUrl", container.DownloadUrl);
                 }
@@ -671,11 +660,6 @@ namespace WixToolset.Core.Burn.Bundles
             }
             else if (ContainerType.Attached == container.Type)
             {
-                if (!String.IsNullOrEmpty(container.DownloadUrl))
-                {
-                    this.Messaging.Write(WarningMessages.DownloadUrlNotSupportedForAttachedContainers(container.SourceLineNumbers, container.Id.Id));
-                }
-
                 writer.WriteAttributeString("FilePath", executableName); // attached containers use the name of the bundle since they are attached to the executable.
                 writer.WriteAttributeString("AttachedIndex", container.AttachedContainerIndex.Value.ToString(CultureInfo.InvariantCulture));
                 writer.WriteAttributeString("Attached", "yes");
@@ -700,11 +684,6 @@ namespace WixToolset.Core.Burn.Bundles
             switch (payload.Packaging)
             {
                 case PackagingType.Embedded: // this means it's in a container.
-                    if (!String.IsNullOrEmpty(payload.DownloadUrl))
-                    {
-                        this.Messaging.Write(WarningMessages.DownloadUrlNotSupportedForEmbeddedPayloads(payload.SourceLineNumbers, payload.Id.Id));
-                    }
-
                     writer.WriteAttributeString("Packaging", "embedded");
                     writer.WriteAttributeString("SourcePath", payload.EmbeddedId);
 
@@ -715,14 +694,7 @@ namespace WixToolset.Core.Burn.Bundles
                     break;
 
                 case PackagingType.External:
-                    var packageId = payload.ParentPackagePayloadRef;
-                    var parentUrl = payload.ParentPackagePayloadRef == null ? null : allPayloads[payload.ParentPackagePayloadRef].DownloadUrl;
-                    var resolvedUrl = this.ResolveUrl(payload.DownloadUrl, parentUrl, packageId, payload.Id.Id, payload.Name);
-                    if (!String.IsNullOrEmpty(resolvedUrl))
-                    {
-                        writer.WriteAttributeString("DownloadUrl", resolvedUrl);
-                    }
-                    else if (!String.IsNullOrEmpty(payload.DownloadUrl))
+                    if (!String.IsNullOrEmpty(payload.DownloadUrl))
                     {
                         writer.WriteAttributeString("DownloadUrl", payload.DownloadUrl);
                     }
@@ -731,21 +703,6 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("SourcePath", payload.Name);
                     break;
             }
-        }
-
-        private string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName)
-        {
-            string resolved = null;
-            foreach (var extension in this.BackendExtensions)
-            {
-                resolved = extension.ResolveUrl(url, fallbackUrl, packageId, payloadId, fileName);
-                if (!String.IsNullOrEmpty(resolved))
-                {
-                    break;
-                }
-            }
-
-            return resolved;
         }
     }
 }
