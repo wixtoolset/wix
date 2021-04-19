@@ -7,11 +7,11 @@ namespace WixToolset.Firewall
     public static class FirewallTableDefinitions
     {
         public static readonly TableDefinition WixFirewallException = new TableDefinition(
-            "WixFirewallException",
+            "Wix4FirewallException",
             FirewallSymbolDefinitions.WixFirewallException,
             new[]
             {
-                new ColumnDefinition("WixFirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Wix4FirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.Localized, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Localizable display name.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("RemoteAddresses", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Remote address to accept incoming connections from.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Port", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, minValue: 1, description: "Port number.", modularizeType: ColumnModularizeType.Property),

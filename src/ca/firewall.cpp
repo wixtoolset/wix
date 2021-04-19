@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 LPCWSTR vcsFirewallExceptionQuery =
-    L"SELECT `Name`, `RemoteAddresses`, `Port`, `Protocol`, `Program`, `Attributes`, `Profile`, `Component_`, `Description`, `Direction` FROM `WixFirewallException`";
+    L"SELECT `Name`, `RemoteAddresses`, `Port`, `Protocol`, `Program`, `Attributes`, `Profile`, `Component_`, `Description`, `Direction` FROM `Wix4FirewallException`";
 enum eFirewallExceptionQuery { feqName = 1, feqRemoteAddresses, feqPort, feqProtocol, feqProgram, feqAttributes, feqProfile, feqComponent, feqDescription };
 enum eFirewallExceptionTarget { fetPort = 1, fetApplication, fetUnknown };
 enum eFirewallExceptionAttributes { feaIgnoreFailures = 1 };
@@ -43,15 +43,15 @@ static UINT SchedFirewallExceptions(
     ExitOnFailure(hr, "failed to initialize");
 
     // anything to do?
-    if (S_OK != WcaTableExists(L"WixFirewallException"))
+    if (S_OK != WcaTableExists(L"Wix4FirewallException"))
     {
-        WcaLog(LOGMSG_STANDARD, "WixFirewallException table doesn't exist, so there are no firewall exceptions to configure.");
+        WcaLog(LOGMSG_STANDARD, "Wix4FirewallException table doesn't exist, so there are no firewall exceptions to configure.");
         ExitFunction();
     }
 
     // query and loop through all the firewall exceptions
     hr = WcaOpenExecuteView(vcsFirewallExceptionQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on WixFirewallException table");
+    ExitOnFailure(hr, "failed to open view on Wix4FirewallException table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -141,7 +141,7 @@ static UINT SchedFirewallExceptions(
     {
         hr = S_OK;
     } 
-    ExitOnFailure(hr, "failure occured while processing WixFirewallException table");
+    ExitOnFailure(hr, "failure occured while processing Wix4FirewallException table");
 
     // schedule ExecFirewallExceptions if there's anything to do
     if (pwzCustomActionData && *pwzCustomActionData)
