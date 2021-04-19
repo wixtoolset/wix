@@ -85,8 +85,8 @@ static void SetSniSslCertSetKey(
 
 
 LPCWSTR vcsWixHttpSniSslCertQuery =
-L"SELECT `WixHttpSniSslCert`.`WixHttpSniSslCert`, `WixHttpSniSslCert`.`Host`, `WixHttpSniSslCert`.`Port`, `WixHttpSniSslCert`.`Thumbprint`, `WixHttpSniSslCert`.`AppId`, `WixHttpSniSslCert`.`Store`, `WixHttpSniSslCert`.`HandleExisting`, `WixHttpSniSslCert`.`Component_` "
-L"FROM `WixHttpSniSslCert`";
+L"SELECT `Wix4HttpSniSslCert`.`Wix4HttpSniSslCert`, `Wix4HttpSniSslCert`.`Host`, `Wix4HttpSniSslCert`.`Port`, `Wix4HttpSniSslCert`.`Thumbprint`, `Wix4HttpSniSslCert`.`AppId`, `Wix4HttpSniSslCert`.`Store`, `Wix4HttpSniSslCert`.`HandleExisting`, `Wix4HttpSniSslCert`.`Component_` "
+L"FROM `Wix4HttpSniSslCert`";
 enum eWixHttpSniSslCertQuery { hurqId = 1, hurqHost, hurqPort, hurqCertificateThumbprint, hurqAppId, hurqCertificateStore, hurqHandleExisting, hurqComponent };
 
 /******************************************************************
@@ -320,17 +320,17 @@ static UINT SchedHttpSniSslCerts(
     HTTP_SERVICE_CONFIG_SSL_SNI_SET* pExistingSniSslSet = NULL;
 
     // Anything to do?
-    hr = WcaTableExists(L"WixHttpSniSslCert");
-    ExitOnFailure(hr, "Failed to check if the WixHttpSniSslCert table exists");
+    hr = WcaTableExists(L"Wix4HttpSniSslCert");
+    ExitOnFailure(hr, "Failed to check if the Wix4HttpSniSslCert table exists");
     if (S_FALSE == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "WixHttpSniSslCert table doesn't exist, so there are no URL reservations to configure");
+        WcaLog(LOGMSG_STANDARD, "Wix4HttpSniSslCert table doesn't exist, so there are no URL reservations to configure");
         ExitFunction();
     }
 
     // Query and loop through all the SNI SSL certificates.
     hr = WcaOpenExecuteView(vcsWixHttpSniSslCertQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on the WixHttpSniSslCert table");
+    ExitOnFailure(hr, "Failed to open view on the Wix4HttpSniSslCert table");
 
     hr = HRESULT_FROM_WIN32(::HttpInitialize(HTTPAPI_VERSION_1, HTTP_INITIALIZE_CONFIG, NULL));
     ExitOnFailure(hr, "Failed to initialize HTTP Server configuration");
@@ -340,66 +340,66 @@ static UINT SchedHttpSniSslCerts(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, hurqId, &sczId);
-        ExitOnFailure(hr, "Failed to get WixHttpSniSslCert.WixHttpSniSslCert");
+        ExitOnFailure(hr, "Failed to get Wix4HttpSniSslCert.Wix4HttpSniSslCert");
 
         hr = WcaGetRecordString(hRec, hurqComponent, &sczComponent);
-        ExitOnFailure(hr, "Failed to get WixHttpSniSslCert.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4HttpSniSslCert.Component_");
 
         // Figure out what we're doing for this reservation, treating reinstall the same as install.
         todoComponent = WcaGetComponentToDo(sczComponent);
         if ((WCA_TODO_REINSTALL == todoComponent ? WCA_TODO_INSTALL : todoComponent) != todoSched)
         {
-            WcaLog(LOGMSG_STANDARD, "Component '%ls' action state (%d) doesn't match request (%d) for WixHttpSniSslCert '%ls'", sczComponent, todoComponent, todoSched, sczId);
+            WcaLog(LOGMSG_STANDARD, "Component '%ls' action state (%d) doesn't match request (%d) for Wix4HttpSniSslCert '%ls'", sczComponent, todoComponent, todoSched, sczId);
             continue;
         }
 
         hr = WcaGetRecordFormattedString(hRec, hurqHost, &sczHost);
-        ExitOnFailure(hr, "Failed to get WixHttpSniSslCert.Host");
+        ExitOnFailure(hr, "Failed to get Wix4HttpSniSslCert.Host");
 
         hr = WcaGetRecordFormattedInteger(hRec, hurqPort, &iPort);
-        ExitOnFailure(hr, "Failed to get WixHttpSniSslCert.Port");
+        ExitOnFailure(hr, "Failed to get Wix4HttpSniSslCert.Port");
 
         hr = WcaGetRecordFormattedString(hRec, hurqCertificateThumbprint, &sczCertificateThumbprint);
-        ExitOnFailure(hr, "Failed to get WixHttpSniSslCert.CertificateThumbprint");
+        ExitOnFailure(hr, "Failed to get Wix4HttpSniSslCert.CertificateThumbprint");
 
         if (!sczHost || !*sczHost)
         {
             hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Require a Host value for WixHttpSniSslCert '%ls'", sczId);
+            ExitOnFailure(hr, "Require a Host value for Wix4HttpSniSslCert '%ls'", sczId);
         }
 
         if (!iPort)
         {
             hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Require a Port value for WixHttpSniSslCert '%ls'", sczId);
+            ExitOnFailure(hr, "Require a Port value for Wix4HttpSniSslCert '%ls'", sczId);
         }
 
         if (!sczCertificateThumbprint || !*sczCertificateThumbprint)
         {
             hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Require a CertificateThumbprint value for WixHttpSniSslCert '%ls'", sczId);
+            ExitOnFailure(hr, "Require a CertificateThumbprint value for Wix4HttpSniSslCert '%ls'", sczId);
         }
 
         hr = WcaGetRecordFormattedString(hRec, hurqAppId, &sczAppId);
-        ExitOnFailure(hr, "Failed to get AppId for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to get AppId for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = WcaGetRecordFormattedString(hRec, hurqCertificateStore, &sczCertificateStore);
-        ExitOnFailure(hr, "Failed to get CertificateStore for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to get CertificateStore for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = WcaGetRecordInteger(hRec, hurqHandleExisting, &iHandleExisting);
-        ExitOnFailure(hr, "Failed to get HandleExisting for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to get HandleExisting for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = GetSniSslCert(sczHost, iPort, &pExistingSniSslSet);
-        ExitOnFailure(hr, "Failed to get the existing SNI SSL certificate for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to get the existing SNI SSL certificate for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = EnsureAppId(&sczAppId, pExistingSniSslSet);
-        ExitOnFailure(hr, "Failed to ensure AppId for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to ensure AppId for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = WriteExistingSniSslCert(todoComponent, sczId, sczHost, iPort, iHandleExisting, pExistingSniSslSet, &sczRollbackCustomActionData);
-        ExitOnFailure(hr, "Failed to write rollback custom action data for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to write rollback custom action data for Wix4HttpSniSslCert '%ls'", sczId);
 
         hr = WriteSniSslCert(todoComponent, sczId, sczHost, iPort, iHandleExisting, sczCertificateThumbprint, sczAppId, sczCertificateStore, &sczCustomActionData);
-        ExitOnFailure(hr, "Failed to write custom action data for WixHttpSniSslCert '%ls'", sczId);
+        ExitOnFailure(hr, "Failed to write custom action data for Wix4HttpSniSslCert '%ls'", sczId);
         ++cCertificates;
 
         ReleaseNullMem(pExistingSniSslSet);
@@ -410,7 +410,7 @@ static UINT SchedHttpSniSslCerts(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occurred while processing WixHttpSniSslCert table");
+    ExitOnFailure(hr, "Failure occurred while processing Wix4HttpSniSslCert table");
 
     // Schedule ExecHttpSniSslCerts if there's anything to do.
     if (cCertificates)
@@ -475,16 +475,16 @@ static HRESULT WriteExistingSniSslCert(
     if (pSniSslSet)
     {
         hr = StrAllocHexEncode(reinterpret_cast<BYTE*>(pSniSslSet->ParamDesc.pSslHash), pSniSslSet->ParamDesc.SslHashLength, &sczCertificateThumbprint);
-        ExitOnFailure(hr, "Failed to convert existing certificate thumbprint to hex for WixHttpSniSslCert '%ls'", wzId);
+        ExitOnFailure(hr, "Failed to convert existing certificate thumbprint to hex for Wix4HttpSniSslCert '%ls'", wzId);
 
         hr = StringFromGuid(pSniSslSet->ParamDesc.AppId, &sczAppId);
-        ExitOnFailure(hr, "Failed to copy existing AppId for WixHttpSniSslCert '%ls'", wzId);
+        ExitOnFailure(hr, "Failed to copy existing AppId for Wix4HttpSniSslCert '%ls'", wzId);
 
         wzCertificateStore = pSniSslSet->ParamDesc.pSslCertStoreName;
     }
 
     hr = WriteSniSslCert(action, wzId, wzHost, iPort, iHandleExisting, sczCertificateThumbprint ? sczCertificateThumbprint : L"", sczAppId ? sczAppId : L"", wzCertificateStore ? wzCertificateStore : L"", psczCustomActionData);
-    ExitOnFailure(hr, "Failed to write custom action data for WixHttpSniSslCert '%ls'", wzId);
+    ExitOnFailure(hr, "Failed to write custom action data for Wix4HttpSniSslCert '%ls'", wzId);
 
 LExit:
     ReleaseStr(sczAppId);

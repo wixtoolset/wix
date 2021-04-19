@@ -30,14 +30,14 @@ HTTPAPI_VERSION vcHttpVersion = HTTPAPI_VERSION_1;
 ULONG vcHttpFlags = HTTP_INITIALIZE_CONFIG;
 
 LPCWSTR vcsHttpUrlReservationQuery =
-    L"SELECT `WixHttpUrlReservation`.`WixHttpUrlReservation`, `WixHttpUrlReservation`.`HandleExisting`, `WixHttpUrlReservation`.`Sddl`, `WixHttpUrlReservation`.`Url`, `WixHttpUrlReservation`.`Component_` "
-    L"FROM `WixHttpUrlReservation`";
+    L"SELECT `Wix4HttpUrlReservation`.`Wix4HttpUrlReservation`, `Wix4HttpUrlReservation`.`HandleExisting`, `Wix4HttpUrlReservation`.`Sddl`, `Wix4HttpUrlReservation`.`Url`, `Wix4HttpUrlReservation`.`Component_` "
+    L"FROM `Wix4HttpUrlReservation`";
 enum eHttpUrlReservationQuery { hurqId = 1, hurqHandleExisting, hurqSDDL, hurqUrl, hurqComponent };
 
 LPCWSTR vcsHttpUrlAceQuery =
-    L"SELECT `WixHttpUrlAce`.`SecurityPrincipal`, `WixHttpUrlAce`.`Rights` "
-    L"FROM `WixHttpUrlAce` "
-    L"WHERE `WixHttpUrlAce`.`WixHttpUrlReservation_`=?";
+    L"SELECT `Wix4HttpUrlAce`.`SecurityPrincipal`, `Wix4HttpUrlAce`.`Rights` "
+    L"FROM `Wix4HttpUrlAce` "
+    L"WHERE `Wix4HttpUrlAce`.`Wix4HttpUrlReservation_`=?";
 enum eHttpUrlAceQuery { huaqSecurityPrincipal = 1, huaqRights };
 
 /******************************************************************
@@ -80,21 +80,21 @@ static UINT SchedHttpUrlReservations(
     ExitOnFailure(hr, "Failed to initialize.");
 
     // Anything to do?
-    hr = WcaTableExists(L"WixHttpUrlReservation");
-    ExitOnFailure(hr, "Failed to check if the WixHttpUrlReservation table exists.");
+    hr = WcaTableExists(L"Wix4HttpUrlReservation");
+    ExitOnFailure(hr, "Failed to check if the Wix4HttpUrlReservation table exists.");
     if (S_FALSE == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "WixHttpUrlReservation table doesn't exist, so there are no URL reservations to configure.");
+        WcaLog(LOGMSG_STANDARD, "Wix4HttpUrlReservation table doesn't exist, so there are no URL reservations to configure.");
         ExitFunction();
     }
 
-    hr = WcaTableExists(L"WixHttpUrlAce");
-    ExitOnFailure(hr, "Failed to check if the WixHttpUrlAce table exists.");
+    hr = WcaTableExists(L"Wix4HttpUrlAce");
+    ExitOnFailure(hr, "Failed to check if the Wix4HttpUrlAce table exists.");
     fAceTableExists = S_OK == hr;
 
     // Query and loop through all the URL reservations.
     hr = WcaOpenExecuteView(vcsHttpUrlReservationQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on the WixHttpUrlReservation table.");
+    ExitOnFailure(hr, "Failed to open view on the Wix4HttpUrlReservation table.");
 
     hr = HRESULT_FROM_WIN32(::HttpInitialize(vcHttpVersion, vcHttpFlags, NULL));
     ExitOnFailure(hr, "Failed to initialize HTTP Server configuration.");
@@ -104,10 +104,10 @@ static UINT SchedHttpUrlReservations(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, hurqId, &sczId);
-        ExitOnFailure(hr, "Failed to get WixHttpUrlReservation.WixHttpUrlReservation");
+        ExitOnFailure(hr, "Failed to get Wix4HttpUrlReservation.Wix4HttpUrlReservation");
 
         hr = WcaGetRecordString(hRec, hurqComponent, &sczComponent);
-        ExitOnFailure(hr, "Failed to get WixHttpUrlReservation.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4HttpUrlReservation.Component_");
 
         // Figure out what we're doing for this reservation, treating reinstall the same as install.
         todoComponent = WcaGetComponentToDo(sczComponent);
@@ -118,10 +118,10 @@ static UINT SchedHttpUrlReservations(
         }
 
         hr = WcaGetRecordFormattedString(hRec, hurqUrl, &sczUrl);
-        ExitOnFailure(hr, "Failed to get WixHttpUrlReservation.Url");
+        ExitOnFailure(hr, "Failed to get Wix4HttpUrlReservation.Url");
 
         hr = WcaGetRecordInteger(hRec, hurqHandleExisting, &iHandleExisting);
-        ExitOnFailure(hr, "Failed to get WixHttpUrlReservation.HandleExisting");
+        ExitOnFailure(hr, "Failed to get Wix4HttpUrlReservation.HandleExisting");
 
         if (::MsiRecordIsNull(hRec, hurqSDDL))
         {
@@ -133,20 +133,20 @@ static UINT SchedHttpUrlReservations(
             {
                 hQueryReq = ::MsiCreateRecord(1);
                 hr = WcaSetRecordString(hQueryReq, 1, sczId);
-                ExitOnFailure(hr, "Failed to create record for querying WixHttpUrlAce table for reservation %ls", sczId);
+                ExitOnFailure(hr, "Failed to create record for querying Wix4HttpUrlAce table for reservation %ls", sczId);
 
                 hr = WcaOpenView(vcsHttpUrlAceQuery, &hAceView);
-                ExitOnFailure(hr, "Failed to open view on WixHttpUrlAce table for reservation %ls", sczId);
+                ExitOnFailure(hr, "Failed to open view on Wix4HttpUrlAce table for reservation %ls", sczId);
                 hr = WcaExecuteView(hAceView, hQueryReq);
-                ExitOnFailure(hr, "Failed to execute view on WixHttpUrlAce table for reservation %ls", sczId);
+                ExitOnFailure(hr, "Failed to execute view on Wix4HttpUrlAce table for reservation %ls", sczId);
 
                 while (S_OK == (hr = WcaFetchRecord(hAceView, &hRec)))
                 {
                     hr = WcaGetRecordFormattedString(hRec, huaqSecurityPrincipal, &sczSecurityPrincipal);
-                    ExitOnFailure(hr, "Failed to get WixHttpUrlAce.SecurityPrincipal");
+                    ExitOnFailure(hr, "Failed to get Wix4HttpUrlAce.SecurityPrincipal");
 
                     hr = WcaGetRecordInteger(hRec, huaqRights, &iRights);
-                    ExitOnFailure(hr, "Failed to get WixHttpUrlAce.Rights");
+                    ExitOnFailure(hr, "Failed to get Wix4HttpUrlAce.Rights");
 
                     hr = AppendUrlAce(sczSecurityPrincipal, iRights, &sczSDDL);
                     ExitOnFailure(hr, "Failed to append URL ACE.");
@@ -156,13 +156,13 @@ static UINT SchedHttpUrlReservations(
                 {
                     hr = S_OK;
                 }
-                ExitOnFailure(hr, "Failed to enumerate selected rows from WixHttpUrlAce table.");
+                ExitOnFailure(hr, "Failed to enumerate selected rows from Wix4HttpUrlAce table.");
             }
         }
         else
         {
             hr = WcaGetRecordFormattedString(hRec, hurqSDDL, &sczSDDL);
-            ExitOnFailure(hr, "Failed to get WixHttpUrlReservation.SDDL");
+            ExitOnFailure(hr, "Failed to get Wix4HttpUrlReservation.SDDL");
         }
 
         hr = GetUrlReservation(sczUrl, &sczExistingSDDL);
@@ -181,7 +181,7 @@ static UINT SchedHttpUrlReservations(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occurred while processing WixHttpUrlReservation table.");
+    ExitOnFailure(hr, "Failure occurred while processing Wix4HttpUrlReservation table.");
 
     // Schedule ExecHttpUrlReservations if there's anything to do.
     if (cUrlReservations)
