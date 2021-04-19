@@ -342,7 +342,7 @@ extern "C" UINT __stdcall ExecuteSqlStrings(MSIHANDLE hInstall)
         hr = WcaReadStringFromCaData(&pwz, &pwzSql);
         ExitOnFailure(hr, "failed to read SQL string for key: %ls", pwzSqlKey);
 
-        // If the SqlString row is set to continue on error and the DB connection failed, skip attempting to execute
+        // If the Wix4SqlString row is set to continue on error and the DB connection failed, skip attempting to execute
         if ((iAttributesSQL & SCASQL_CONTINUE_ON_ERROR) && FAILED(hrDB))
         {
             WcaLog(LOGMSG_STANDARD, "Error 0x%x: continuing after failure to connect to database: %ls", hrDB, pwzDatabase);

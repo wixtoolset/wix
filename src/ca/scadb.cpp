@@ -5,12 +5,12 @@
 // sql queries
 LPCWSTR vcsSqlDatabaseQuery = L"SELECT `SqlDb`, `Server`, `Instance`, `Database`, "
                               L"`Component_`, `User_`, `FileSpec_`, `FileSpec_Log`, `Attributes` "
-                              L"FROM `SqlDatabase`";
+                              L"FROM `Wix4SqlDatabase`";
 enum eSqlDatabaseQuery { sdqSqlDb = 1, sdqServer, sdqInstance, sdqDatabase, 
                          sdqComponent, sdqUser, sdqDbFileSpec, sdqLogFileSpec, sdqAttributes };
 
 LPCWSTR vcsSqlFileSpecQuery = L"SELECT `FileSpec`, `Name`, `Filename`, `Size`, "
-                              L"`MaxSize`, `GrowthSize` FROM `SqlFileSpec` WHERE `FileSpec`=?";
+                              L"`MaxSize`, `GrowthSize` FROM `Wix4SqlFileSpec` WHERE `FileSpec`=?";
 enum eSqlFileSpecQuery { sfsqFileSpec = 1, sfsqName, sfsqFilename, sfsqSize, 
                          sfsqMaxSize, sfsqGrowth };
 
@@ -63,21 +63,21 @@ HRESULT ScaDbsRead(
 
     SCA_DB* psd = NULL;
 
-    if (S_OK != WcaTableExists(L"SqlDatabase"))
+    if (S_OK != WcaTableExists(L"Wix4SqlDatabase"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ScaCreateDatabase() - SqlDatabase table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ScaCreateDatabase() - Wix4SqlDatabase table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
-    if (S_OK == WcaTableExists(L"SqlFileSpec"))
+    if (S_OK == WcaTableExists(L"Wix4SqlFileSpec"))
     {
         hr = WcaOpenView(vcsSqlFileSpecQuery, &hViewFileSpec);
-        ExitOnFailure(hr, "failed to open view on SqlFileSpec table");
+        ExitOnFailure(hr, "failed to open view on Wix4SqlFileSpec table");
     }
 
     // loop through all the sql databases
     hr = WcaOpenExecuteView(vcsSqlDatabaseQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on SqlDatabase table");
+    ExitOnFailure(hr, "Failed to open view on Wix4SqlDatabase table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         BOOL fHasComponent = FALSE;
@@ -85,7 +85,7 @@ HRESULT ScaDbsRead(
         INSTALLSTATE isAction = INSTALLSTATE_UNKNOWN;
 
         hr = WcaGetRecordString(hRec, sdqSqlDb, &pwzId);
-        ExitOnFailure(hr, "Failed to get SqlDatabase.SqlDb");
+        ExitOnFailure(hr, "Failed to get Wix4SqlDatabase.SqlDb");
 
         hr = WcaGetRecordString(hRec, sdqComponent, &pwzComponent);
         ExitOnFailure(hr, "Failed to get Component for database: '%ls'", psd->wzKey);
@@ -110,10 +110,10 @@ HRESULT ScaDbsRead(
         ExitOnFailure(hr, "Failed to allocate memory for new database: %D", pwzId);
 
         hr = ::StringCchCopyW(psd->wzKey, countof(psd->wzKey), pwzId);
-        ExitOnFailure(hr, "Failed to copy SqlDatabase.SqlDbL: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlDatabase.SqlDbL: %ls", pwzId);
 
         hr = ::StringCchCopyW(psd->wzComponent, countof(psd->wzComponent), pwzComponent);
-        ExitOnFailure(hr, "Failed to copy SqlDatabase.Component_: %ls", pwzComponent);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlDatabase.Component_: %ls", pwzComponent);
 
         psd->fHasComponent = fHasComponent;
         psd->isInstalled = isInstalled;
@@ -135,7 +135,7 @@ HRESULT ScaDbsRead(
         ExitOnFailure(hr, "Failed to copy database string to database object:%ls", pwzData);
 
         hr = WcaGetRecordInteger(hRec, sdqAttributes, &psd->iAttributes);
-        ExitOnFailure(hr, "Failed to get SqlDatabase.Attributes");
+        ExitOnFailure(hr, "Failed to get Wix4SqlDatabase.Attributes");
 
         hr = WcaGetRecordFormattedString(hRec, sdqUser, &pwzData);
         ExitOnFailure(hr, "Failed to get User record for database: '%ls'", psd->wzKey);
@@ -189,7 +189,7 @@ HRESULT ScaDbsRead(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing SqlDatabase table");
+    ExitOnFailure(hr, "Failure occured while processing Wix4SqlDatabase table");
 
 LExit:
     if (psd)
@@ -521,18 +521,18 @@ HRESULT GetFileSpec(
 
     // get the FileSpec record
     hr = WcaExecuteView(hViewFileSpec, hRecFileSpec);
-    ExitOnFailure(hr, "failed to execute view on SqlFileSpec table for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "failed to execute view on Wix4SqlFileSpec table for filespec: %ls", wzKey);
     hr = WcaFetchSingleRecord(hViewFileSpec, &hRec);
     ExitOnFailure(hr, "failed to get record for filespec: %ls", wzKey);
 
     // read the data out of the filespec record
     hr = WcaGetRecordFormattedString(hRec, sfsqName, &pwzData);
-    ExitOnFailure(hr, "Failed to get SqlFileSpec.Name for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "Failed to get Wix4SqlFileSpec.Name for filespec: %ls", wzKey);
     hr = ::StringCchCopyW(psf->wzName, countof(psf->wzName), pwzData);
-    ExitOnFailure(hr, "Failed to copy SqlFileSpec.Name string: %ls", pwzData);
+    ExitOnFailure(hr, "Failed to copy Wix4SqlFileSpec.Name string: %ls", pwzData);
 
     hr = WcaGetRecordFormattedString(hRec, sfsqFilename, &pwzData);
-    ExitOnFailure(hr, "Failed to get SqlFileSpec.Filename for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "Failed to get Wix4SqlFileSpec.Filename for filespec: %ls", wzKey);
     if (*pwzData)
     {
         hr = ::StringCchCopyW(psf->wzFilename, countof(psf->wzFilename), pwzData);
@@ -545,7 +545,7 @@ HRESULT GetFileSpec(
     }
 
     hr = WcaGetRecordFormattedString(hRec, sfsqSize, &pwzData);
-    ExitOnFailure(hr, "Failed to get SqlFileSpec.Size for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "Failed to get Wix4SqlFileSpec.Size for filespec: %ls", wzKey);
     if (*pwzData)
     {
         hr = ::StringCchCopyW(psf->wzSize, countof(psf->wzSize), pwzData);
@@ -557,7 +557,7 @@ HRESULT GetFileSpec(
     }
 
     hr = WcaGetRecordFormattedString(hRec, sfsqMaxSize, &pwzData);
-    ExitOnFailure(hr, "Failed to get SqlFileSpec.MaxSize for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "Failed to get Wix4SqlFileSpec.MaxSize for filespec: %ls", wzKey);
     if (*pwzData)
     {
         hr = ::StringCchCopyW(psf->wzMaxSize, countof(psf->wzMaxSize), pwzData);
@@ -569,7 +569,7 @@ HRESULT GetFileSpec(
     }
 
     hr = WcaGetRecordFormattedString(hRec, sfsqGrowth, &pwzData);
-    ExitOnFailure(hr, "Failed to get SqlFileSpec.GrowthSize for filespec: %ls", wzKey);
+    ExitOnFailure(hr, "Failed to get Wix4SqlFileSpec.GrowthSize for filespec: %ls", wzKey);
     if (*pwzData)
     {
         hr = ::StringCchCopyW(psf->wzGrow, countof(psf->wzGrow), pwzData);
@@ -581,6 +581,7 @@ HRESULT GetFileSpec(
     }
 
     hr = S_OK;
+
 LExit:
     ReleaseStr(pwzData);
     return hr;

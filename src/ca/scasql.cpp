@@ -67,21 +67,21 @@ static HRESULT ConfigureSqlData(
     SCA_SQLSTR* psssList = NULL;
 
     // check for the prerequsite tables
-    if (S_OK != WcaTableExists(L"SqlDatabase"))
+    if (S_OK != WcaTableExists(L"Wix4SqlDatabase"))
     {
-        WcaLog(LOGMSG_VERBOSE, "skipping SQL CustomAction, no SqlDatabase table");
+        WcaLog(LOGMSG_VERBOSE, "skipping SQL CustomAction, no Wix4SqlDatabase table");
         ExitFunction1(hr = S_FALSE);
     }
 
     // read tables
     hr = ScaDbsRead(&psdList, saAction);
-    ExitOnFailure(hr, "failed to read SqlDatabase table");
+    ExitOnFailure(hr, "failed to read Wix4SqlDatabase table");
 
     hr = ScaSqlStrsRead(&psssList, saAction);
-    ExitOnFailure(hr, "failed to read SqlStrings table");
+    ExitOnFailure(hr, "failed to read Wix4SqlString table");
 
     hr = ScaSqlStrsReadScripts(&psssList, saAction);
-    ExitOnFailure(hr, "failed to read SqlScripts table");
+    ExitOnFailure(hr, "failed to read Wix4SqlScript table");
 
     if (SCA_ACTION_UNINSTALL == saAction)
     {

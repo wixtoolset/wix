@@ -11,15 +11,19 @@ namespace WixToolsetTest.Sql
     public class SqlExtensionFixture
     {
         [Fact]
-        public void CanBuildUsingSqlString()
+        public void CanBuildUsingSqlStuff()
         {
             var folder = TestData.Get(@"TestData\UsingSql");
             var build = new Builder(folder, typeof(SqlExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "SqlString");
-            Assert.Equal(new[]
+            var results = build.BuildAndQuery(Build, "Wix4SqlDatabase", "Wix4SqlFileSpec", "Wix4SqlScript", "Wix4SqlString");
+            WixAssert.CompareLineByLine(new[]
             {
-                "SqlString:TestString\tTestDB\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tCREATE TABLE TestTable1(name varchar(20), value varchar(20))\t\t1\t",
+                "Wix4SqlDatabase:TestDB\tMySQLHostName\tMyInstanceName\tMyDB\tDatabaseComponent\t\tTestFileSpecId\tTestLogFileSpecId\t35",
+                "Wix4SqlFileSpec:TestFileSpecId\tTestFileSpecLogicalName\tTestFileSpec\t10MB\t100MB\t10%",
+                "Wix4SqlFileSpec:TestLogFileSpecId\tTestLogFileSpecLogicalName\tTestLogFileSpec\t1MB\t10MB\t1%",
+                "Wix4SqlScript:TestScript\tTestDB\tDatabaseComponent\tScriptBinary\t\t1\t",
+                "Wix4SqlString:TestString\tTestDB\tDatabaseComponent\tCREATE TABLE TestTable1(name varchar(20), value varchar(20))\t\t1\t",
             }, results.ToArray());
         }
 

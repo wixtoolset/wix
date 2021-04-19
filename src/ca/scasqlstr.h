@@ -18,7 +18,7 @@ struct SCA_SQLSTR
 
     LPWSTR pwzSql;
     int iAttributes;
-    int iSequence; //used to sequence SqlString and SqlScript tables together
+    int iSequence; //used to sequence Wix4SqlString and Wix4SqlScript tables together
 
     SCA_SQLSTR* psssNext;
 };

@@ -7,7 +7,7 @@ namespace WixToolset.Sql
     public static class SqlTableDefinitions
     {
         public static readonly TableDefinition SqlDatabase = new TableDefinition(
-            "SqlDatabase",
+            "Wix4SqlDatabase",
             SqlSymbolDefinitions.SqlDatabase,
             new[]
             {
@@ -17,15 +17,15 @@ namespace WixToolset.Sql
                 new ColumnDefinition("Database", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Primary key, name of database in a SQL Server"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state ", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "User", keyColumn: 1, description: "Foreign key, User used to log into database", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("FileSpec_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "SqlFileSpec", keyColumn: 1, description: "Foreign key referencing SqlFileSpec.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("FileSpec_Log", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "SqlFileSpec", keyColumn: 1, description: "Foreign key referencing SqlFileSpec.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("FileSpec_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4SqlFileSpec", keyColumn: 1, description: "Foreign key referencing SqlFileSpec.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("FileSpec_Log", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Wix4SqlFileSpec", keyColumn: 1, description: "Foreign key referencing SqlFileSpec.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Attributes", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 255, description: "1 == create on install, 2 == drop on uninstall, 4 == continue on error, 8 == drop on install, 16 == create on uninstall, 32 == confirm update existing table, 64 == create on reinstall, 128 == drop on reinstall"),
             },
             symbolIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition SqlFileSpec = new TableDefinition(
-            "SqlFileSpec",
+            "Wix4SqlFileSpec",
             SqlSymbolDefinitions.SqlFileSpec,
             new[]
             {
@@ -40,12 +40,12 @@ namespace WixToolset.Sql
         );
 
         public static readonly TableDefinition SqlScript = new TableDefinition(
-            "SqlScript",
+            "Wix4SqlScript",
             SqlSymbolDefinitions.SqlScript,
             new[]
             {
                 new ColumnDefinition("Script", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary key, non-localized token"),
-                new ColumnDefinition("SqlDb_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "SqlDatabase", keyColumn: 1, description: "Foreign key, SQL Server key", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("SqlDb_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4SqlDatabase", keyColumn: 1, description: "Foreign key, SQL Server key", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ScriptBinary_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Binary", keyColumn: 1, description: "Foreign key, Binary stream that contains SQL Script to execute", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "User", keyColumn: 1, description: "Foreign key, User used to log into database", modularizeType: ColumnModularizeType.Column),
@@ -56,12 +56,12 @@ namespace WixToolset.Sql
         );
 
         public static readonly TableDefinition SqlString = new TableDefinition(
-            "SqlString",
+            "Wix4SqlString",
             SqlSymbolDefinitions.SqlString,
             new[]
             {
-                new ColumnDefinition("String", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Id for the SqlString", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("SqlDb_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "SqlDatabase", keyColumn: 1, description: "Foreign key, SQL Server key", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("String", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Id for the Wix4SqlString", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("SqlDb_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4SqlDatabase", keyColumn: 1, description: "Foreign key, SQL Server key", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("SQL", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "SQL query to execute"),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "User", keyColumn: 1, description: "Foreign key, User used to log into database", modularizeType: ColumnModularizeType.Column),

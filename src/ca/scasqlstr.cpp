@@ -4,11 +4,11 @@
 
 // sql queries
 LPCWSTR vcsSqlStringQuery = L"SELECT `String`, `SqlDb_`, `Component_`,`SQL`,`User_`,`Attributes`,`Sequence` "
-L"FROM `SqlString` ORDER BY `SqlDb_`,`Sequence`";
+L"FROM `Wix4SqlString` ORDER BY `SqlDb_`,`Sequence`";
 enum eSqlStringQuery { ssqSqlString = 1, ssqSqlDb, ssqComponent, ssqSQL, ssqUser, ssqAttributes, ssqSequence };
 
 LPCWSTR vcsSqlScriptQuery = L"SELECT `ScriptBinary_`,`Script`, `SqlDb_`, `Component_`,`User_`,`Attributes`,`Sequence` "
-L"FROM `SqlScript` ORDER BY `SqlDb_`,`Sequence`";
+L"FROM `Wix4SqlScript` ORDER BY `SqlDb_`,`Sequence`";
 enum eSqlScriptQuery { sscrqScriptBinary=1, sscrqSqlScript, sscrqSqlDb, sscrqComponent, sscrqUser, sscrqAttributes, sscrqSequence };
 
 LPCWSTR vcsSqlBinaryScriptQuery = L"SELECT `Data` FROM `Binary` WHERE `Name`=?";
@@ -44,15 +44,15 @@ HRESULT ScaSqlStrsRead(
 
     SCA_SQLSTR* psss = NULL;
 
-    if (S_OK != WcaTableExists(L"SqlString") || S_OK != WcaTableExists(L"SqlDatabase"))
+    if (S_OK != WcaTableExists(L"Wix4SqlString") || S_OK != WcaTableExists(L"Wix4SqlDatabase"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSqlStrsRead() - SqlString and/or SqlDatabase table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSqlStrsRead() - Wix4SqlString and/or Wix4SqlDatabase table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
     // loop through all the sql strings
     hr = WcaOpenExecuteView(vcsSqlStringQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on SqlString table");
+    ExitOnFailure(hr, "Failed to open view on Wix4SqlString table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         INSTALLSTATE isInstalled = INSTALLSTATE_UNKNOWN;
@@ -80,30 +80,30 @@ HRESULT ScaSqlStrsRead(
         psss->isAction = isAction;
 
         hr = WcaGetRecordString(hRec, ssqSqlString, &pwzData);
-        ExitOnFailure(hr, "Failed to get SqlString.String");
+        ExitOnFailure(hr, "Failed to get Wix4SqlString.String");
         hr = ::StringCchCopyW(psss->wzKey, countof(psss->wzKey), pwzData);
-        ExitOnFailure(hr, "Failed to copy SqlString.String: %ls", pwzData);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlString.String: %ls", pwzData);
 
         // find the database information for this string
         hr = WcaGetRecordString(hRec, ssqSqlDb, &pwzData);
-        ExitOnFailure(hr, "Failed to get SqlString.SqlDb_ for SqlString '%ls'", psss->wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlString.SqlDb_ for SqlString '%ls'", psss->wzKey);
         hr = ::StringCchCopyW(psss->wzSqlDb, countof(psss->wzSqlDb), pwzData);
-        ExitOnFailure(hr, "Failed to copy SqlString.SqlDb_: %ls", pwzData);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlString.SqlDb_: %ls", pwzData);
 
         hr = WcaGetRecordInteger(hRec, ssqAttributes, &psss->iAttributes);
-        ExitOnFailure(hr, "Failed to get SqlString.Attributes for SqlString '%ls'", psss->wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlString.Attributes for SqlString '%ls'", psss->wzKey);
 
         //get the sequence number for the string (note that this will be sequenced with scripts too)
         hr = WcaGetRecordInteger(hRec, ssqSequence, &psss->iSequence);
-        ExitOnFailure(hr, "Failed to get SqlString.Sequence for SqlString '%ls'", psss->wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlString.Sequence for SqlString '%ls'", psss->wzKey);
 
         // execute SQL
         hr = WcaGetRecordFormattedString(hRec, ssqSQL, &pwzData);
-        ExitOnFailure(hr, "Failed to get SqlString.SQL for SqlString '%ls'", psss->wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlString.SQL for SQL string '%ls'", psss->wzKey);
 
         Assert(!psss->pwzSql);
         hr = StrAllocString(&psss->pwzSql, pwzData, 0);
-        ExitOnFailure(hr, "Failed to alloc string for SqlString '%ls'", psss->wzKey);
+        ExitOnFailure(hr, "Failed to alloc string for SQL string '%ls'", psss->wzKey);
 
         *ppsssList = AddSqlStrToList(*ppsssList, psss);
         psss = NULL; // set the sss to NULL so it doesn't get freed below
@@ -113,7 +113,7 @@ HRESULT ScaSqlStrsRead(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while reading SqlString table");
+    ExitOnFailure(hr, "Failure occured while reading Wix4SqlString table");
 
 LExit:
     // if anything was left over after an error clean it all up
@@ -157,19 +157,19 @@ HRESULT ScaSqlStrsReadScripts(
     SCA_SQLSTR sss;
     SCA_SQLSTR* psss = NULL;
 
-    if (S_OK != WcaTableExists(L"SqlScript") || S_OK != WcaTableExists(L"SqlDatabase") || S_OK != WcaTableExists(L"Binary"))
+    if (S_OK != WcaTableExists(L"Wix4SqlScript") || S_OK != WcaTableExists(L"Wix4SqlDatabase") || S_OK != WcaTableExists(L"Binary"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSqlStrsReadScripts() - SqlScripts and/or SqlDatabase table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSqlStrsReadScripts() - Wix4SqlScript and/or Wix4SqlDatabase table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
     // open a view on the binary table
     hr = WcaOpenView(vcsSqlBinaryScriptQuery, &hViewBinary);
-    ExitOnFailure(hr, "Failed to open view on Binary table for SqlScripts");
+    ExitOnFailure(hr, "Failed to open view on Binary table for SQL scripts");
 
     // loop through all the sql scripts
     hr = WcaOpenExecuteView(vcsSqlScriptQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on SqlScript table");
+    ExitOnFailure(hr, "Failed to open view on Wix4SqlScript table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         INSTALLSTATE isInstalled = INSTALLSTATE_UNKNOWN;
@@ -196,33 +196,33 @@ HRESULT ScaSqlStrsReadScripts(
         sss.isAction = isAction;
 
         hr = WcaGetRecordString(hRec, sscrqSqlScript, &pwzData);
-        ExitOnFailure(hr, "Failed to get SqlScript.Script");
+        ExitOnFailure(hr, "Failed to get Wix4SqlScript.Script");
         hr = ::StringCchCopyW(sss.wzKey, countof(sss.wzKey), pwzData);
-        ExitOnFailure(hr, "Failed to copy SqlScript.Script: %ls", pwzData);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlScript.Script: %ls", pwzData);
 
         // find the database information for this string
         hr = WcaGetRecordString(hRec, sscrqSqlDb, &pwzData);
-        ExitOnFailure(hr, "Failed to get SqlScript.SqlDb_ for SqlScript '%ls'", sss.wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlScript.SqlDb_ for SqlScript '%ls'", sss.wzKey);
         hr = ::StringCchCopyW(sss.wzSqlDb, countof(sss.wzSqlDb), pwzData);
-        ExitOnFailure(hr, "Failed to copy SqlScritp.SqlDbb: %ls", pwzData);
+        ExitOnFailure(hr, "Failed to copy Wix4SqlScript.SqlDbb: %ls", pwzData);
 
         hr = WcaGetRecordInteger(hRec, sscrqAttributes, &sss.iAttributes);
-        ExitOnFailure(hr, "Failed to get SqlScript.Attributes for SqlScript '%ls'", sss.wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlScript.Attributes for SqlScript '%ls'", sss.wzKey);
 
         hr = WcaGetRecordInteger(hRec, sscrqSequence, &sss.iSequence);
-        ExitOnFailure(hr, "Failed to get SqlScript.Sequence for SqlScript '%ls'", sss.wzKey);
+        ExitOnFailure(hr, "Failed to get Wix4SqlScript.Sequence for SqlScript '%ls'", sss.wzKey);
 
         // get the sql script out of the binary stream
         hr = WcaExecuteView(hViewBinary, hRec);
-        ExitOnFailure(hr, "Failed to open SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
+        ExitOnFailure(hr, "Failed to open Wix4SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
         hr = WcaFetchSingleRecord(hViewBinary, &hRecBinary);
-        ExitOnFailure(hr, "Failed to fetch SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
+        ExitOnFailure(hr, "Failed to fetch Wix4SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
 
         // Note: We need to allocate an extra character on the stream to NULL terminate the SQL script.
         //       The WcaGetRecordStream() function won't let us add extra space on the end of the stream
         //       so we'll read the stream "the old fashioned way".
         //hr = WcaGetRecordStream(hRecBinary, ssbsqData, (BYTE**)&pbScript, &cbScript);
-        //ExitOnFailure(hr, "Failed to read SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
+        //ExitOnFailure(hr, "Failed to read Wix4SqlScript.BinaryScript_ for SqlScript '%ls'", sss.wzKey);
         er = ::MsiRecordReadStream(hRecBinary, ssbsqData, NULL, &cbRead);
         hr = HRESULT_FROM_WIN32(er);
         ExitOnFailure(hr, "failed to get size of stream");
@@ -472,7 +472,7 @@ HRESULT ScaSqlStrsReadScripts(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while reading SqlString table");
+    ExitOnFailure(hr, "Failure occured while reading Wix4SqlScript table");
 
 LExit:
     // if anything was left over after an error clean it all up
