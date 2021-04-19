@@ -146,7 +146,7 @@ namespace WixToolset.Mba.Core
         public event EventHandler<CacheAcquireProgressEventArgs> CacheAcquireProgress;
 
         /// <inheritdoc/>
-        public event EventHandler<ResolveSourceEventArgs> ResolveSource;
+        public event EventHandler<CacheAcquireResolvingEventArgs> CacheAcquireResolving;
 
         /// <inheritdoc/>
         public event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
@@ -736,12 +736,12 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Called by the engine, raises the <see cref="ResolveSource"/> event.
+        /// Called by the engine, raises the <see cref="CacheAcquireResolving"/> event.
         /// </summary>
         /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnResolveSource(ResolveSourceEventArgs args)
+        protected virtual void OnCacheAcquireResolving(CacheAcquireResolvingEventArgs args)
         {
-            EventHandler<ResolveSourceEventArgs> handler = this.ResolveSource;
+            EventHandler<CacheAcquireResolvingEventArgs> handler = this.CacheAcquireResolving;
             if (null != handler)
             {
                 handler(this, args);
@@ -1126,9 +1126,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectBegin(bool fInstalled, int cPackages, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectBegin(bool fCached, bool fInstalled, int cPackages, ref bool fCancel)
         {
-            DetectBeginEventArgs args = new DetectBeginEventArgs(fInstalled, cPackages, fCancel);
+            DetectBeginEventArgs args = new DetectBeginEventArgs(fCached, fInstalled, cPackages, fCancel);
             this.OnDetectBegin(args);
 
             fCancel = args.Cancel;
@@ -1400,11 +1400,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnCacheAcquireBegin(string wzPackageOrContainerId, string wzPayloadId, CacheOperation operation, string wzSource, ref bool fCancel)
+        int IBootstrapperApplication.OnCacheAcquireBegin(string wzPackageOrContainerId, string wzPayloadId, string wzSource, string wzDownloadUrl, string wzPayloadContainerId, CacheOperation recommendation, ref CacheOperation action, ref bool fCancel)
         {
-            CacheAcquireBeginEventArgs args = new CacheAcquireBeginEventArgs(wzPackageOrContainerId, wzPayloadId, operation, wzSource, fCancel);
+            CacheAcquireBeginEventArgs args = new CacheAcquireBeginEventArgs(wzPackageOrContainerId, wzPayloadId, wzSource, wzDownloadUrl, wzPayloadContainerId, recommendation, action, fCancel);
             this.OnCacheAcquireBegin(args);
 
+            action = args.Action;
             fCancel = args.Cancel;
             return args.HResult;
         }
@@ -1418,11 +1419,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnResolveSource(string wzPackageOrContainerId, string wzPayloadId, string wzLocalSource, string wzDownloadSource, BOOTSTRAPPER_RESOLVESOURCE_ACTION recommendation, ref BOOTSTRAPPER_RESOLVESOURCE_ACTION action, ref bool fCancel)
+        int IBootstrapperApplication.OnCacheAcquireResolving(string wzPackageOrContainerId, string wzPayloadId, string[] searchPaths, int cSearchPaths, bool fFoundLocal, int dwRecommendedSearchPath, string wzDownloadUrl, string wzPayloadContainerId, CacheResolveOperation recommendation, ref int dwChosenSearchPath, ref CacheResolveOperation action, ref bool fCancel)
         {
-            ResolveSourceEventArgs args = new ResolveSourceEventArgs(wzPackageOrContainerId, wzPayloadId, wzLocalSource, wzDownloadSource, action, recommendation, fCancel);
-            this.OnResolveSource(args);
+            CacheAcquireResolvingEventArgs args = new CacheAcquireResolvingEventArgs(wzPackageOrContainerId, wzPayloadId, searchPaths, fFoundLocal, dwRecommendedSearchPath, wzDownloadUrl, wzPayloadContainerId, recommendation, dwChosenSearchPath, action, fCancel);
+            this.OnCacheAcquireResolving(args);
 
+            dwChosenSearchPath = args.ChosenSearchPath;
             action = args.Action;
             fCancel = args.Cancel;
             return args.HResult;

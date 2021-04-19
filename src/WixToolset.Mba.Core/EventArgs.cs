@@ -123,6 +123,31 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Base class for cancellable action BA <see cref="EventArgs"/> classes.
+    /// </summary>
+    [Serializable]
+    public abstract class CancellableActionEventArgs<T> : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public CancellableActionEventArgs(bool cancelRecommendation, T recommendation, T action)
+            : base(cancelRecommendation)
+        {
+            this.Recommendation = recommendation;
+            this.Action = action;
+        }
+
+        /// <summary>
+        /// Gets the recommended action from the engine.
+        /// </summary>
+        public T Recommendation { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the action to be performed. This is passed back to the engine.
+        /// </summary>
+        public T Action { get; set; }
+    }
+
+    /// <summary>
     /// Additional arguments used when startup has begun.
     /// </summary>
     [Serializable]
@@ -196,23 +221,24 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the overall detection phase has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectBegin"/>
     /// </summary>
     [Serializable]
     public class DetectBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="installed">Specifies whether the bundle is installed.</param>
-        /// <param name="packageCount">The number of packages to detect.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public DetectBeginEventArgs(bool installed, int packageCount, bool cancelRecommendation)
+        /// <summary />
+        public DetectBeginEventArgs(bool cached, bool installed, int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
+            this.Cached = cached;
             this.Installed = installed;
             this.PackageCount = packageCount;
         }
+
+        /// <summary>
+        /// Gets whether the bundle is cached.
+        /// </summary>
+        public bool Cached { get; private set; }
 
         /// <summary>
         /// Gets whether the bundle is installed.
@@ -290,6 +316,7 @@ namespace WixToolset.Mba.Core
             : base(cancelRecommendation)
         {
             this.UpdateLocation = updateLocation;
+            this.Skip = skipRecommendation;
         }
 
         /// <summary>
@@ -1242,6 +1269,8 @@ namespace WixToolset.Mba.Core
         /// <param name="forceKeepRegistration"></param>
         public UnregisterBeginEventArgs(bool keepRegistration, bool forceKeepRegistration)
         {
+            this.KeepRegistration = keepRegistration;
+            this.ForceKeepRegistration = forceKeepRegistration;
         }
 
         /// <summary>
@@ -1288,21 +1317,20 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine begins to acquire containers or payloads.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireBegin"/>.
     /// </summary>
     [Serializable]
-    public class CacheAcquireBeginEventArgs : CancellableHResultEventArgs
+    public class CacheAcquireBeginEventArgs : CancellableActionEventArgs<CacheOperation>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheAcquireBeginEventArgs"/> class.
-        /// </summary>
-        public CacheAcquireBeginEventArgs(string packageOrContainerId, string payloadId, CacheOperation operation, string source, bool cancelRecommendation)
-            : base(cancelRecommendation)
+        /// <summary />
+        public CacheAcquireBeginEventArgs(string packageOrContainerId, string payloadId, string source, string downloadUrl, string payloadContainerId, CacheOperation recommendation, CacheOperation action, bool cancelRecommendation)
+            : base(cancelRecommendation, recommendation, action)
         {
             this.PackageOrContainerId = packageOrContainerId;
             this.PayloadId = payloadId;
-            this.Operation = operation;
             this.Source = source;
+            this.DownloadUrl = downloadUrl;
+            this.PayloadContainerId = payloadContainerId;
         }
 
         /// <summary>
@@ -1316,25 +1344,28 @@ namespace WixToolset.Mba.Core
         public string PayloadId { get; private set; }
 
         /// <summary>
-        /// Gets the cache acquire operation.
-        /// </summary>
-        public CacheOperation Operation { get; private set; }
-
-        /// <summary>
         /// Gets the source of the container or payload.
         /// </summary>
         public string Source { get; private set; }
+
+        /// <summary>
+        /// Gets the optional URL to download container or payload.
+        /// </summary>
+        public string DownloadUrl { get; private set; }
+
+        /// <summary>
+        /// Gets the optional identity of the container that contains the payload being acquired.
+        /// </summary>
+        public string PayloadContainerId { get; private set; }
     }
 
     /// <summary>
-    /// Additional arguments used when the engine acquires some part of a container or payload.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireProgress"/>.
     /// </summary>
     [Serializable]
     public class CacheAcquireProgressEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheAcquireBeginEventArgs"/> class.
-        /// </summary>
+        /// <summary />
         public CacheAcquireProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1372,14 +1403,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine completes the acquisition of a container or payload.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireComplete"/>.
     /// </summary>
     [Serializable]
     public class CacheAcquireCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheAcquireCompleteEventArgs"/> class.
-        /// </summary>
+        /// <summary />
         public CacheAcquireCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus, BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1729,62 +1758,64 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used by the engine to allow the BA to change the source
-    /// using <see cref="Engine.SetLocalSource"/> or <see cref="Engine.SetDownloadSource"/>.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireResolving"/>.
     /// </summary>
     [Serializable]
-    public class ResolveSourceEventArgs : CancellableHResultEventArgs
+    public class CacheAcquireResolvingEventArgs : CancellableActionEventArgs<CacheResolveOperation>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ResolveSourceEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageOrContainerId">The identity of the package or container that requires source.</param>
-        /// <param name="payloadId">The identity of the payload that requires source.</param>
-        /// <param name="localSource">The current path used for source resolution.</param>
-        /// <param name="downloadSource">Optional URL to download container or payload.</param>
-        /// <param name="recommendation">The recommended action from the engine.</param>
-        /// <param name="action">The action to perform.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public ResolveSourceEventArgs(string packageOrContainerId, string payloadId, string localSource, string downloadSource, BOOTSTRAPPER_RESOLVESOURCE_ACTION recommendation, BOOTSTRAPPER_RESOLVESOURCE_ACTION action, bool cancelRecommendation)
-            : base(cancelRecommendation)
+        /// <summary />
+        public CacheAcquireResolvingEventArgs(string packageOrContainerId, string payloadId, string[] searchPaths, bool foundLocal, int recommendedSearchPath, string downloadUrl, string payloadContainerId, CacheResolveOperation recommendation, int chosenSearchPath, CacheResolveOperation action, bool cancel)
+            : base(cancel, recommendation, action)
         {
             this.PackageOrContainerId = packageOrContainerId;
             this.PayloadId = payloadId;
-            this.LocalSource = localSource;
-            this.DownloadSource = downloadSource;
-            this.Recommendation = recommendation;
-            this.Action = action;
+            this.SearchPaths = searchPaths;
+            this.FoundLocal = foundLocal;
+            this.RecommendedSearchPath = recommendedSearchPath;
+            this.DownloadUrl = downloadUrl;
+            this.PayloadContainerId = payloadContainerId;
+            this.ChosenSearchPath = chosenSearchPath;
         }
 
         /// <summary>
-        /// Gets the identity of the package or container that requires source.
+        /// Gets the identity of the package or container that is being acquired.
         /// </summary>
         public string PackageOrContainerId { get; private set; }
 
         /// <summary>
-        /// Gets the identity of the payload that requires source.
+        /// Gets the identity of the payload that is being acquired.
         /// </summary>
         public string PayloadId { get; private set; }
 
         /// <summary>
-        /// Gets the current path used for source resolution.
+        /// Gets the search paths used for source resolution.
         /// </summary>
-        public string LocalSource { get; private set; }
+        public string[] SearchPaths { get; private set; }
+
+        /// <summary>
+        /// Gets whether <see cref="RecommendedSearchPath"/> indicates that a file was found at that search path.
+        /// </summary>
+        public bool FoundLocal { get; private set; }
+
+        /// <summary>
+        /// When <see cref="FoundLocal"/> is true, the index to <see cref="SearchPaths"/> for the recommended local file.
+        /// </summary>
+        public int RecommendedSearchPath { get; private set; }
 
         /// <summary>
         /// Gets the optional URL to download container or payload.
         /// </summary>
-        public string DownloadSource { get; private set; }
+        public string DownloadUrl { get; private set; }
 
         /// <summary>
-        /// Gets the recommended action from the engine.
+        /// Gets the optional identity of the container that contains the payload being acquired.
         /// </summary>
-        public BOOTSTRAPPER_RESOLVESOURCE_ACTION Recommendation { get; private set; }
+        public string PayloadContainerId { get; private set; }
 
         /// <summary>
-        /// Gets or sets the action to perform.
+        /// Gets or sets the index to <see cref="SearchPaths"/> to use when <see cref="CancellableActionEventArgs{T}.Action"/> is set to <see cref="CacheOperation.Copy"/>.
         /// </summary>
-        public BOOTSTRAPPER_RESOLVESOURCE_ACTION Action { get; set; }
+        public int ChosenSearchPath { get; set; }
     }
 
     /// <summary>

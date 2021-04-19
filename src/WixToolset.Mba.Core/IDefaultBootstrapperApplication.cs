@@ -30,12 +30,16 @@ namespace WixToolset.Mba.Core
         event EventHandler<BeginMsiTransactionCompleteEventArgs> BeginMsiTransactionComplete;
 
         /// <summary>
-        /// Fired when the engine has begun acquiring the installation sources.
+        /// Fired when the engine has begun acquiring the payload or container.
+        /// The BA can change the source using <see cref="IEngine.SetLocalSource(string, string, string)"/>
+        /// or <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
         /// </summary>
         event EventHandler<CacheAcquireBeginEventArgs> CacheAcquireBegin;
 
         /// <summary>
-        /// Fired when the engine has completed the acquisition of the installation sources.
+        /// Fired when the engine has completed the acquisition of the payload or container.
+        /// The BA can change the source using <see cref="IEngine.SetLocalSource(string, string, string)"/>
+        /// or <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
         /// </summary>
         event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
 
@@ -43,6 +47,11 @@ namespace WixToolset.Mba.Core
         /// Fired when the engine has progress acquiring the installation sources.
         /// </summary>
         event EventHandler<CacheAcquireProgressEventArgs> CacheAcquireProgress;
+
+        /// <summary>
+        /// Fired by the engine to allow the BA to override the acquisition action.
+        /// </summary>
+        event EventHandler<CacheAcquireResolvingEventArgs> CacheAcquireResolving;
 
         /// <summary>
         /// Fired when the engine has begun caching the installation sources.
@@ -283,12 +292,6 @@ namespace WixToolset.Mba.Core
         /// Fired when the engine has completed registering the location and visibility of the bundle.
         /// </summary>
         event EventHandler<RegisterCompleteEventArgs> RegisterComplete;
-
-        /// <summary>
-        /// Fired by the engine to allow the BA to change the source
-        /// using <see cref="IEngine.SetLocalSource(string, string, string)"/> or <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
-        /// </summary>
-        event EventHandler<ResolveSourceEventArgs> ResolveSource;
 
         /// <summary>
         /// Fired when the engine is about to rollback an MSI transaction.

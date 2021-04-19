@@ -15,7 +15,7 @@ static HRESULT BalBaseBAProcOnDetectBegin(
     __inout BA_ONDETECTBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnDetectBegin(pArgs->fInstalled, pArgs->cPackages, &pResults->fCancel);
+    return pBA->OnDetectBegin(pArgs->fCached, pArgs->fInstalled, pArgs->cPackages, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnDetectComplete(
@@ -303,7 +303,7 @@ static HRESULT BalBaseBAProcOnCacheAcquireBegin(
     __inout BA_ONCACHEACQUIREBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnCacheAcquireBegin(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->operation, pArgs->wzSource, &pResults->fCancel);
+    return pBA->OnCacheAcquireBegin(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->wzSource, pArgs->wzDownloadUrl, pArgs->wzPayloadContainerId, pArgs->recommendation, &pResults->action, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnCacheAcquireProgress(
@@ -315,13 +315,13 @@ static HRESULT BalBaseBAProcOnCacheAcquireProgress(
     return pBA->OnCacheAcquireProgress(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->dw64Progress, pArgs->dw64Total, pArgs->dwOverallPercentage, &pResults->fCancel);
 }
 
-static HRESULT BalBaseBAProcOnResolveSource(
+static HRESULT BalBaseBAProcOnCacheAcquireResolving(
     __in IBootstrapperApplication* pBA,
-    __in BA_ONRESOLVESOURCE_ARGS* pArgs,
-    __inout BA_ONRESOLVESOURCE_RESULTS* pResults
+    __in BA_ONCACHEACQUIRERESOLVING_ARGS* pArgs,
+    __inout BA_ONCACHEACQUIRERESOLVING_RESULTS* pResults
     )
 {
-    return pBA->OnResolveSource(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->wzLocalSource, pArgs->wzDownloadSource, pArgs->recommendation, &pResults->action, &pResults->fCancel);
+    return pBA->OnCacheAcquireResolving(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->rgSearchPaths, pArgs->cSearchPaths, pArgs->fFoundLocal, pArgs->dwRecommendedSearchPath, pArgs->wzDownloadUrl, pArgs->wzPayloadContainerId, pArgs->recommendation, &pResults->dwChosenSearchPath, &pResults->action, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnCacheAcquireComplete(
@@ -713,8 +713,8 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREPROGRESS:
             hr = BalBaseBAProcOnCacheAcquireProgress(pBA, reinterpret_cast<BA_ONCACHEACQUIREPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIREPROGRESS_RESULTS*>(pvResults));
             break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE:
-            hr = BalBaseBAProcOnResolveSource(pBA, reinterpret_cast<BA_ONRESOLVESOURCE_ARGS*>(pvArgs), reinterpret_cast<BA_ONRESOLVESOURCE_RESULTS*>(pvResults));
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING:
+            hr = BalBaseBAProcOnCacheAcquireResolving(pBA, reinterpret_cast<BA_ONCACHEACQUIRERESOLVING_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIRERESOLVING_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE:
             hr = BalBaseBAProcOnCacheAcquireComplete(pBA, reinterpret_cast<BA_ONCACHEACQUIRECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIRECOMPLETE_RESULTS*>(pvResults));

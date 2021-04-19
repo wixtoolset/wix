@@ -87,6 +87,7 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnDetectBegin(
+        __in BOOL /*fCached*/,
         __in BOOL /*fInstalled*/,
         __in DWORD /*cPackages*/,
         __inout BOOL* pfCancel
@@ -442,14 +443,17 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnCacheAcquireBegin(
-        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
-        __in BOOTSTRAPPER_CACHE_OPERATION /*operation*/,
         __in_z LPCWSTR /*wzSource*/,
+        __in_z_opt LPCWSTR /*wzDownloadUrl*/,
+        __in_z_opt LPCWSTR /*wzPayloadContainerId*/,
+        __in BOOTSTRAPPER_CACHE_OPERATION /*recommendation*/,
+        __inout BOOTSTRAPPER_CACHE_OPERATION* /*pAction*/,
         __inout BOOL* pfCancel
         )
     {
-        BalRetryStartPackage(BALRETRY_TYPE_CACHE, wzPackageOrContainerId, wzPayloadId);
+        BalRetryStartContainerOrPayload(wzPackageOrContainerId, wzPayloadId);
         *pfCancel |= CheckCanceled();
         return S_OK;
     }
@@ -488,13 +492,18 @@ public: // IBootstrapperApplication
         return hr;
     }
 
-    virtual STDMETHODIMP OnResolveSource(
-        __in_z LPCWSTR /*wzPackageOrContainerId*/,
+    virtual STDMETHODIMP OnCacheAcquireResolving(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
         __in_z_opt LPCWSTR /*wzPayloadId*/,
-        __in_z LPCWSTR /*wzLocalSource*/,
-        __in_z_opt LPCWSTR /*wzDownloadSource*/,
-        __in BOOTSTRAPPER_RESOLVESOURCE_ACTION /*recommendation*/,
-        __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* /*pAction*/,
+        __in_z LPCWSTR* /*rgSearchPaths*/,
+        __in DWORD /*cSearchPaths*/,
+        __in BOOL /*fFoundLocal*/,
+        __in DWORD /*dwRecommendedSearchPath*/,
+        __in_z_opt LPCWSTR /*wzDownloadUrl*/,
+        __in_z_opt LPCWSTR /*wzPayloadContainerId*/,
+        __in BOOTSTRAPPER_CACHE_RESOLVE_OPERATION /*recommendation*/,
+        __inout DWORD* /*pdwChosenSearchPath*/,
+        __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* /*pAction*/,
         __inout BOOL* pfCancel
         )
     {
@@ -518,7 +527,7 @@ public: // IBootstrapperApplication
             ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT));
         }
 
-        hr = BalRetryEndPackage(BALRETRY_TYPE_CACHE, wzPackageOrContainerId, wzPayloadId, hrStatus, &fRetry);
+        hr = BalRetryEndContainerOrPayload(wzPackageOrContainerId, wzPayloadId, hrStatus, &fRetry);
         ExitOnFailure(hr, "BalRetryEndPackage for cache failed");
 
         if (fRetry)
@@ -599,7 +608,7 @@ public: // IBootstrapperApplication
         // Only track retry on execution (not rollback).
         if (fExecute)
         {
-            BalRetryStartPackage(BALRETRY_TYPE_EXECUTE, wzPackageId, NULL);
+            BalRetryStartPackage(wzPackageId);
         }
 
         m_fRollingBack = !fExecute;
@@ -700,7 +709,7 @@ public: // IBootstrapperApplication
             ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT));
         }
 
-        hr = BalRetryEndPackage(BALRETRY_TYPE_EXECUTE, wzPackageId, NULL, hrStatus, &fRetry);
+        hr = BalRetryEndPackage(wzPackageId, hrStatus, &fRetry);
         ExitOnFailure(hr, "BalRetryEndPackage for execute failed");
 
         if (fRetry)
@@ -950,6 +959,9 @@ protected:
         m_fCanceled = FALSE;
         m_fApplying = FALSE;
         m_fRollingBack = FALSE;
+
+        m_dwProgressPercentage = 0;
+        m_dwOverallProgressPercentage = 0;
 
         BalRetryInitialize(dwRetryCount, dwRetryTimeout);
     }

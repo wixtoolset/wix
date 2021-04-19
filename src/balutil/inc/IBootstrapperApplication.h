@@ -21,6 +21,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnDetectBegin - called when the engine begins detection.
     STDMETHOD(OnDetectBegin)(
+        __in BOOL fCached,
         __in BOOL fInstalled,
         __in DWORD cPackages,
         __inout BOOL* pfCancel
@@ -279,14 +280,20 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         )  = 0;
 
-    // OnCacheAcquireBegin - called when the engine begins copying or
-    //                       downloading a payload to the working folder.
+    // OnCacheAcquireBegin - called when the engine begins acquiring a payload or container.
+    //
+    // Notes:
+    //  It is expected the BA may call IBootstrapperEngine::SetLocalSource() or IBootstrapperEngine::SetDownloadSource()
+    //  to update the source location before returning.
     //
     STDMETHOD(OnCacheAcquireBegin)(
         __in_z_opt LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
-        __in BOOTSTRAPPER_CACHE_OPERATION operation,
         __in_z LPCWSTR wzSource,
+        __in_z_opt LPCWSTR wzDownloadUrl,
+        __in_z_opt LPCWSTR wzPayloadContainerId,
+        __in BOOTSTRAPPER_CACHE_OPERATION recommendation,
+        __inout BOOTSTRAPPER_CACHE_OPERATION* pAction,
         __inout BOOL* pfCancel
         ) = 0;
 
@@ -302,27 +309,38 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnResolveSource - called when a payload or container cannot be found locally.
+    // OnCacheAcquireResolving - called to allow the BA to override the acquisition action for the payload or container.
     //
     // Parameters:
+    //  wzPackageOrContainerId will be NULL when resolving a layout-only payload.
     //  wzPayloadId will be NULL when resolving a container.
-    //  wzDownloadSource will be NULL if the container or payload does not provide a DownloadURL.
+    //  wzDownloadUrl will be NULL if the container or payload does not provide a DownloadURL.
+    //  wzPayloadContainerId will not be NULL if acquiring a payload that is in a container.
     //
-    // Notes:
-    //  It is expected the BA may call IBootstrapperEngine::SetLocalSource() or IBootstrapperEngine::SetDownloadSource()
-    //  to update the source location before returning BOOTSTRAPPER_RESOLVESOURCE_ACTION_RETRY or BOOTSTRAPPER_RESOLVESOURCE_ACTION_DOWNLOAD.
-    STDMETHOD(OnResolveSource)(
-        __in_z LPCWSTR wzPackageOrContainerId,
+    //  rgSearchPaths are the search paths used for source resolution.
+    //  fFoundLocal is TRUE when dwRecommendedSearchPath indicates that the file was found.
+    //  dwRecommendedSearchPath is the index into rgSearchPaths for the recommended local file.
+    //
+    STDMETHOD(OnCacheAcquireResolving)(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
-        __in_z LPCWSTR wzLocalSource,
-        __in_z_opt LPCWSTR wzDownloadSource,
-        __in BOOTSTRAPPER_RESOLVESOURCE_ACTION recommendation,
-        __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* pAction,
+        __in_z LPCWSTR* rgSearchPaths,
+        __in DWORD cSearchPaths,
+        __in BOOL fFoundLocal,
+        __in DWORD dwRecommendedSearchPath,
+        __in_z_opt LPCWSTR wzDownloadUrl,
+        __in_z_opt LPCWSTR wzPayloadContainerId,
+        __in BOOTSTRAPPER_CACHE_RESOLVE_OPERATION recommendation,
+        __inout DWORD* pdwChosenSearchPath,
+        __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* pAction,
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnCacheAcquireComplete - called after the engine copied or downloaded
-    //                          a payload to the working folder.
+    // OnCacheAcquireComplete - called after the engine acquired the payload or container.
+    //
+    // Notes:
+    //  It is expected the BA may call IBootstrapperEngine::SetLocalSource() or IBootstrapperEngine::SetDownloadSource()
+    //  to update the source location before returning BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION_RETRY.
     //
     STDMETHOD(OnCacheAcquireComplete)(
         __in_z_opt LPCWSTR wzPackageOrContainerId,

@@ -6,12 +6,6 @@
 extern "C" {
 #endif
 
-typedef enum BALRETRY_TYPE
-{
-    BALRETRY_TYPE_CACHE,
-    BALRETRY_TYPE_EXECUTE,
-} BALRETRY_TYPE;
-
 /*******************************************************************
  BalRetryInitialize - initialize the retry count and timeout between
                       retries (in milliseconds).
@@ -33,9 +27,7 @@ DAPI_(void) BalRetryUninitialize();
                         wait the specified timeout.
 ********************************************************************/
 DAPI_(void) BalRetryStartPackage(
-    __in BALRETRY_TYPE type,
-    __in_z_opt LPCWSTR wzPackageId,
-    __in_z_opt LPCWSTR wzPayloadId
+    __in_z LPCWSTR wzPackageId
     );
 
 /*******************************************************************
@@ -43,17 +35,34 @@ DAPI_(void) BalRetryStartPackage(
                         to consider.
 ********************************************************************/
 DAPI_(void) BalRetryErrorOccurred(
-    __in_z_opt LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzPackageId,
     __in DWORD dwError
     );
 
 /*******************************************************************
- BalRetryEndPackage - returns IDRETRY is a retry is recommended or 
-                      IDNOACTION if a retry is not recommended.
+ BalRetryEndPackage - returns TRUE if a retry is recommended.
 ********************************************************************/
 DAPI_(HRESULT) BalRetryEndPackage(
-    __in BALRETRY_TYPE type,
-    __in_z_opt LPCWSTR wzPackageId,
+    __in_z LPCWSTR wzPackageId,
+    __in HRESULT hrError,
+    __inout BOOL* pfRetry
+    );
+
+/*******************************************************************
+ BalRetryStartContainerOrPayload - call when a container or payload
+        begins to be acquired. If the target is being retried,
+        the function will wait the specified timeout.
+********************************************************************/
+DAPI_(void) BalRetryStartContainerOrPayload(
+    __in_z_opt LPCWSTR wzContainerOrPackageId,
+    __in_z_opt LPCWSTR wzPayloadId
+    );
+
+/*******************************************************************
+ BalRetryEndContainerOrPayload - returns TRUE if a retry is recommended.
+********************************************************************/
+DAPI_(HRESULT) BalRetryEndContainerOrPayload(
+    __in_z_opt LPCWSTR wzContainerOrPackageId,
     __in_z_opt LPCWSTR wzPayloadId,
     __in HRESULT hrError,
     __inout BOOL* pfRetry

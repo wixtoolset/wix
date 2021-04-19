@@ -44,13 +44,10 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectBegin"/>.
         /// </summary>
-        /// <param name="fInstalled"></param>
-        /// <param name="cPackages"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectBegin(
+            [MarshalAs(UnmanagedType.Bool)] bool fCached,
             [MarshalAs(UnmanagedType.Bool)] bool fInstalled,
             [MarshalAs(UnmanagedType.U4)] int cPackages,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
@@ -540,32 +537,22 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheAcquireBegin"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="operation"></param>
-        /// <param name="wzSource"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheAcquireBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
-            [MarshalAs(UnmanagedType.U4)] CacheOperation operation,
             [MarshalAs(UnmanagedType.LPWStr)] string wzSource,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadUrl,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadContainerId,
+            [MarshalAs(UnmanagedType.U4)] CacheOperation recommendation,
+            [MarshalAs(UnmanagedType.I4)] ref CacheOperation action,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheAcquireProgress"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="dw64Progress"></param>
-        /// <param name="dw64Total"></param>
-        /// <param name="dwOverallPercentage"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheAcquireProgress(
@@ -578,37 +565,28 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.ResolveSource"/>.
+        /// See <see cref="IDefaultBootstrapperApplication.CacheAcquireResolving"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="wzLocalSource"></param>
-        /// <param name="wzDownloadSource"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="action"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
-        int OnResolveSource(
+        int OnCacheAcquireResolving(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzLocalSource,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadSource,
-            BOOTSTRAPPER_RESOLVESOURCE_ACTION recommendation,
-            ref BOOTSTRAPPER_RESOLVESOURCE_ACTION action,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3, ArraySubType = UnmanagedType.LPWStr), In] string[] searchPaths,
+            [MarshalAs(UnmanagedType.U4)] int cSearchPaths,
+            [MarshalAs(UnmanagedType.Bool)] bool fFoundLocal,
+            [MarshalAs(UnmanagedType.U4)] int dwRecommendedSearchPath,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadUrl,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadContainerId,
+            [MarshalAs(UnmanagedType.I4)] CacheResolveOperation recommendation,
+            [MarshalAs(UnmanagedType.U4)] ref int dwChosenSearchPath,
+            [MarshalAs(UnmanagedType.I4)] ref CacheResolveOperation action,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheAcquireComplete"/>.
         /// </summary>
-        /// <param name="wzPackageOrContainerId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="pAction"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheAcquireComplete(
@@ -1419,19 +1397,55 @@ namespace WixToolset.Mba.Core
     public enum CacheOperation
     {
         /// <summary>
-        /// Container or payload is being copied.
+        /// There is no source available.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Copy the payload or container from the chosen local source.
         /// </summary>
         Copy,
 
         /// <summary>
-        /// Container or payload is being downloaded.
+        /// Download the payload or container using the download URL.
         /// </summary>
         Download,
 
         /// <summary>
-        /// Container or payload is being extracted.
+        /// Extract the payload from the container.
         /// </summary>
-        Extract
+        Extract,
+    }
+
+    /// <summary>
+    /// The source to be used to acquire a container or payload.
+    /// </summary>
+    public enum CacheResolveOperation
+    {
+        /// <summary>
+        /// There is no source available.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Copy the payload or container from the chosen local source.
+        /// </summary>
+        Local,
+
+        /// <summary>
+        /// Download the payload or container from the download URL.
+        /// </summary>
+        Download,
+
+        /// <summary>
+        /// Extract the payload from the container.
+        /// </summary>
+        Container,
+
+        /// <summary>
+        /// Look again for the payload or container locally.
+        /// </summary>
+        Retry,
     }
 
     /// <summary>
@@ -1637,7 +1651,7 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// The available actions for <see cref="IDefaultBootstrapperApplication.ResolveSource"/>.
+    /// The available actions for <see cref="IDefaultBootstrapperApplication.CacheAcquireResolving"/>.
     /// </summary>
     public enum BOOTSTRAPPER_RESOLVESOURCE_ACTION
     {

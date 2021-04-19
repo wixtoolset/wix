@@ -2,23 +2,33 @@
 
 #include "precomp.h"
 
+typedef enum BALRETRY_TYPE
+{
+    BALRETRY_TYPE_CACHE_CONTAINER,
+    BALRETRY_TYPE_CACHE_PAYLOAD,
+    BALRETRY_TYPE_EXECUTE,
+} BALRETRY_TYPE;
+
 struct BALRETRY_INFO
 {
-    LPWSTR sczId;           // package or container id.
-    LPWSTR sczPayloadId;    // optional payload id.
+    LPWSTR sczId;
     DWORD cRetries;
     DWORD dwLastError;
 };
 
 static DWORD vdwMaxRetries = 0;
 static DWORD vdwTimeout = 0;
-static BALRETRY_INFO vrgRetryInfo[2];
+static BALRETRY_INFO vrgRetryInfo[3];
 
 // prototypes
 static BOOL IsActiveRetryEntry(
     __in BALRETRY_TYPE type,
-    __in_z LPCWSTR wzPackageId,
-    __in_z_opt LPCWSTR wzPayloadId
+    __in_z LPCWSTR sczId
+    );
+
+static HRESULT StartActiveRetryEntry(
+    __in BALRETRY_TYPE type,
+    __in_z LPCWSTR sczId
     );
 
 
@@ -39,7 +49,6 @@ DAPI_(void) BalRetryUninitialize()
     for (DWORD i = 0; i < countof(vrgRetryInfo); ++i)
     {
         ReleaseStr(vrgRetryInfo[i].sczId);
-        ReleaseStr(vrgRetryInfo[i].sczPayloadId);
         memset(vrgRetryInfo + i, 0, sizeof(BALRETRY_INFO));
     }
 
@@ -48,34 +57,32 @@ DAPI_(void) BalRetryUninitialize()
 }
 
 
-DAPI_(void) BalRetryStartPackage(
-    __in BALRETRY_TYPE type,
-    __in_z_opt LPCWSTR wzPackageId,
+DAPI_(void) BalRetryStartContainerOrPayload(
+    __in_z_opt LPCWSTR wzContainerOrPackageId,
     __in_z_opt LPCWSTR wzPayloadId
     )
 {
-    if (!wzPackageId || !*wzPackageId)
+    if (!wzContainerOrPackageId && !wzPayloadId)
     {
-        ReleaseNullStr(vrgRetryInfo[type].sczId);
-        ReleaseNullStr(vrgRetryInfo[type].sczPayloadId);
+        ReleaseNullStr(vrgRetryInfo[BALRETRY_TYPE_CACHE_CONTAINER].sczId);
+        ReleaseNullStr(vrgRetryInfo[BALRETRY_TYPE_CACHE_PAYLOAD].sczId);
     }
-    else if (IsActiveRetryEntry(type, wzPackageId, wzPayloadId))
+    else if (wzPayloadId)
     {
-        ++vrgRetryInfo[type].cRetries;
-        ::Sleep(vdwTimeout);
+        StartActiveRetryEntry(BALRETRY_TYPE_CACHE_PAYLOAD, wzPayloadId);
     }
     else
     {
-        StrAllocString(&vrgRetryInfo[type].sczId, wzPackageId, 0);
-        if (wzPayloadId)
-        {
-            StrAllocString(&vrgRetryInfo[type].sczPayloadId, wzPayloadId, 0);
-        }
-
-        vrgRetryInfo[type].cRetries = 0;
+        StartActiveRetryEntry(BALRETRY_TYPE_CACHE_CONTAINER, wzContainerOrPackageId);
     }
+}
 
-    vrgRetryInfo[type].dwLastError = ERROR_SUCCESS;
+
+DAPI_(void) BalRetryStartPackage(
+    __in_z LPCWSTR wzPackageId
+    )
+{
+    StartActiveRetryEntry(BALRETRY_TYPE_EXECUTE, wzPackageId);
 }
 
 
@@ -84,86 +91,111 @@ DAPI_(void) BalRetryErrorOccurred(
     __in DWORD dwError
     )
 {
-    if (IsActiveRetryEntry(BALRETRY_TYPE_CACHE, wzPackageId, NULL))
-    {
-        vrgRetryInfo[BALRETRY_TYPE_CACHE].dwLastError = dwError;
-    }
-    else if (IsActiveRetryEntry(BALRETRY_TYPE_EXECUTE, wzPackageId, NULL))
+    if (IsActiveRetryEntry(BALRETRY_TYPE_EXECUTE, wzPackageId))
     {
         vrgRetryInfo[BALRETRY_TYPE_EXECUTE].dwLastError = dwError;
     }
 }
 
 
-DAPI_(HRESULT) BalRetryEndPackage(
-    __in BALRETRY_TYPE type,
-    __in_z_opt LPCWSTR wzPackageId,
+DAPI_(HRESULT) BalRetryEndContainerOrPayload(
+    __in_z_opt LPCWSTR wzContainerOrPackageId,
     __in_z_opt LPCWSTR wzPayloadId,
     __in HRESULT hrError,
     __inout BOOL* pfRetry
     )
 {
     HRESULT hr = S_OK;
+    BALRETRY_TYPE type = BALRETRY_TYPE_CACHE_PAYLOAD;
+    LPCWSTR wzId = NULL;
+
+    if (!wzContainerOrPackageId && !wzPayloadId)
+    {
+        ReleaseNullStr(vrgRetryInfo[BALRETRY_TYPE_CACHE_CONTAINER].sczId);
+        ReleaseNullStr(vrgRetryInfo[BALRETRY_TYPE_CACHE_PAYLOAD].sczId);
+        ExitFunction();
+    }
+    else if (wzPayloadId)
+    {
+        type = BALRETRY_TYPE_CACHE_PAYLOAD;
+        wzId = wzPayloadId;
+    }
+    else
+    {
+        type = BALRETRY_TYPE_CACHE_CONTAINER;
+        wzId = wzContainerOrPackageId;
+    }
+
+    if (FAILED(hrError) && vrgRetryInfo[type].cRetries < vdwMaxRetries && IsActiveRetryEntry(type, wzId))
+    {
+        // Retry on all errors except the following.
+        if (HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) != hrError &&
+            BG_E_NETWORK_DISCONNECTED != hrError &&
+            HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) != hrError &&
+            HRESULT_FROM_WIN32(ERROR_INTERNET_NAME_NOT_RESOLVED) != hrError)
+        {
+            *pfRetry = TRUE;
+        }
+    }
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalRetryEndPackage(
+    __in_z LPCWSTR wzPackageId,
+    __in HRESULT hrError,
+    __inout BOOL* pfRetry
+    )
+{
+    HRESULT hr = S_OK;
+    BALRETRY_TYPE type = BALRETRY_TYPE_EXECUTE;
 
     if (!wzPackageId || !*wzPackageId)
     {
         ReleaseNullStr(vrgRetryInfo[type].sczId);
-        ReleaseNullStr(vrgRetryInfo[type].sczPayloadId);
     }
-    else if (FAILED(hrError) && vrgRetryInfo[type].cRetries < vdwMaxRetries && IsActiveRetryEntry(type, wzPackageId, wzPayloadId))
+    else if (FAILED(hrError) && vrgRetryInfo[type].cRetries < vdwMaxRetries && IsActiveRetryEntry(type, wzPackageId))
     {
-        if (BALRETRY_TYPE_CACHE == type)
+        // If the service is out of whack, just try again.
+        if (HRESULT_FROM_WIN32(ERROR_INSTALL_SERVICE_FAILURE) == hrError)
         {
-            // Retry on all errors except the following.
-            if (HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT) != hrError &&
-                BG_E_NETWORK_DISCONNECTED != hrError &&
-                HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) != hrError &&
-                HRESULT_FROM_WIN32(ERROR_INTERNET_NAME_NOT_RESOLVED) != hrError)
+            *pfRetry = TRUE;
+        }
+        else if (HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE) == hrError)
+        {
+            DWORD dwError = vrgRetryInfo[type].dwLastError;
+
+            // If we failed with one of these specific error codes, then retry since
+            // we've seen these have a high success of succeeding on retry.
+            if (1303 == dwError ||
+                1304 == dwError ||
+                1306 == dwError ||
+                1307 == dwError ||
+                1309 == dwError ||
+                1310 == dwError ||
+                1311 == dwError ||
+                1312 == dwError ||
+                1316 == dwError ||
+                1317 == dwError ||
+                1321 == dwError ||
+                1335 == dwError ||
+                1402 == dwError ||
+                1406 == dwError ||
+                1606 == dwError ||
+                1706 == dwError ||
+                1719 == dwError ||
+                1723 == dwError ||
+                1923 == dwError ||
+                1931 == dwError)
             {
                 *pfRetry = TRUE;
             }
         }
-        else if (BALRETRY_TYPE_EXECUTE == type)
+        else if (HRESULT_FROM_WIN32(ERROR_INSTALL_ALREADY_RUNNING) == hrError)
         {
-            // If the service is out of whack, just try again.
-            if (HRESULT_FROM_WIN32(ERROR_INSTALL_SERVICE_FAILURE) == hrError)
-            {
-                *pfRetry = TRUE;
-            }
-            else if (HRESULT_FROM_WIN32(ERROR_INSTALL_FAILURE) == hrError)
-            {
-                DWORD dwError = vrgRetryInfo[type].dwLastError;
-
-                // If we failed with one of these specific error codes, then retry since
-                // we've seen these have a high success of succeeding on retry.
-                if (1303 == dwError ||
-                    1304 == dwError ||
-                    1306 == dwError ||
-                    1307 == dwError ||
-                    1309 == dwError ||
-                    1310 == dwError ||
-                    1311 == dwError ||
-                    1312 == dwError ||
-                    1316 == dwError ||
-                    1317 == dwError ||
-                    1321 == dwError ||
-                    1335 == dwError ||
-                    1402 == dwError ||
-                    1406 == dwError ||
-                    1606 == dwError ||
-                    1706 == dwError ||
-                    1719 == dwError ||
-                    1723 == dwError ||
-                    1923 == dwError ||
-                    1931 == dwError)
-                {
-                    *pfRetry = TRUE;
-                }
-            }
-            else if (HRESULT_FROM_WIN32(ERROR_INSTALL_ALREADY_RUNNING) == hrError)
-            {
-                *pfRetry = TRUE;
-            }
+            *pfRetry = TRUE;
         }
     }
 
@@ -175,17 +207,40 @@ DAPI_(HRESULT) BalRetryEndPackage(
 
 static BOOL IsActiveRetryEntry(
     __in BALRETRY_TYPE type,
-    __in_z LPCWSTR wzPackageId,
-    __in_z_opt LPCWSTR wzPayloadId
+    __in_z LPCWSTR sczId
     )
 {
     BOOL fActive = FALSE;
 
-    fActive = vrgRetryInfo[type].sczId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzPackageId, -1, vrgRetryInfo[type].sczId, -1);
-    if (fActive && wzPayloadId) // if a payload id was provided ensure it matches.
-    {
-        fActive = vrgRetryInfo[type].sczPayloadId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzPayloadId, -1, vrgRetryInfo[type].sczPayloadId, -1);
-    }
+    fActive = vrgRetryInfo[type].sczId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, sczId, -1, vrgRetryInfo[type].sczId, -1);
 
     return fActive;
+}
+
+static HRESULT StartActiveRetryEntry(
+    __in BALRETRY_TYPE type,
+    __in_z LPCWSTR sczId
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!sczId || !*sczId)
+    {
+        ReleaseNullStr(vrgRetryInfo[type].sczId);
+    }
+    else if (IsActiveRetryEntry(type, sczId))
+    {
+        ++vrgRetryInfo[type].cRetries;
+        ::Sleep(vdwTimeout);
+    }
+    else
+    {
+        hr = StrAllocString(&vrgRetryInfo[type].sczId, sczId, 0);
+
+        vrgRetryInfo[type].cRetries = 0;
+    }
+
+    vrgRetryInfo[type].dwLastError = ERROR_SUCCESS;
+
+    return hr;
 }

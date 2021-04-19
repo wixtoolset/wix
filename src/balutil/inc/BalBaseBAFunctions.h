@@ -90,6 +90,7 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnDetectBegin(
+        __in BOOL /*fCached*/,
         __in BOOL /*fInstalled*/,
         __in DWORD /*cPackages*/,
         __inout BOOL* /*pfCancel*/
@@ -385,8 +386,11 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnCacheAcquireBegin(
         __in_z LPCWSTR /*wzPackageOrContainerId*/,
         __in_z_opt LPCWSTR /*wzPayloadId*/,
-        __in BOOTSTRAPPER_CACHE_OPERATION /*operation*/,
         __in_z LPCWSTR /*wzSource*/,
+        __in_z_opt LPCWSTR /*wzDownloadUrl*/,
+        __in_z_opt LPCWSTR /*wzPayloadContainerId*/,
+        __in BOOTSTRAPPER_CACHE_OPERATION /*recommendation*/,
+        __inout BOOTSTRAPPER_CACHE_OPERATION* /*pAction*/,
         __inout BOOL* /*pfCancel*/
         )
     {
@@ -405,13 +409,18 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnResolveSource(
-        __in_z LPCWSTR /*wzPackageOrContainerId*/,
+    virtual STDMETHODIMP OnCacheAcquireResolving(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
         __in_z_opt LPCWSTR /*wzPayloadId*/,
-        __in_z LPCWSTR /*wzLocalSource*/,
-        __in_z_opt LPCWSTR /*wzDownloadSource*/,
-        __in BOOTSTRAPPER_RESOLVESOURCE_ACTION /*recommendation*/,
-        __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* /*pAction*/,
+        __in_z LPCWSTR* /*rgSearchPaths*/,
+        __in DWORD /*cSearchPaths*/,
+        __in BOOL /*fFoundLocal*/,
+        __in DWORD /*dwRecommendedSearchPath*/,
+        __in_z_opt LPCWSTR /*wzDownloadUrl*/,
+        __in_z_opt LPCWSTR /*wzPayloadContainerId*/,
+        __in BOOTSTRAPPER_CACHE_RESOLVE_OPERATION /*recommendation*/,
+        __inout DWORD* /*pdwChosenSearchPath*/,
+        __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* /*pAction*/,
         __inout BOOL* /*pfCancel*/
         )
     {
