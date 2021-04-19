@@ -342,6 +342,15 @@ static HRESULT BalBaseBAProcOnCacheVerifyBegin(
     return pBA->OnCacheVerifyBegin(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnCacheVerifyProgress(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHEVERIFYPROGRESS_ARGS* pArgs,
+    __inout BA_ONCACHEVERIFYPROGRESS_RESULTS* pResults
+    )
+{
+    return pBA->OnCacheVerifyProgress(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->dw64Progress, pArgs->dw64Total, pArgs->dwOverallPercentage, pArgs->verifyStep, &pResults->fCancel);
+}
+
 static HRESULT BalBaseBAProcOnCacheVerifyComplete(
     __in IBootstrapperApplication* pBA,
     __in BA_ONCACHEVERIFYCOMPLETE_ARGS* pArgs,
@@ -594,6 +603,60 @@ static HRESULT BalBaseBAProcOnPlanForwardCompatibleBundle(
     return pBA->OnPlanForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fRecommendedIgnoreBundle, &pResults->fCancel, &pResults->fIgnoreBundle);
 }
 
+static HRESULT BalBaseBAProcOnCacheContainerOrPayloadVerifyBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_ARGS* pArgs,
+    __inout BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_RESULTS* pResults
+    )
+{
+    return pBA->OnCacheContainerOrPayloadVerifyBegin(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnCacheContainerOrPayloadVerifyProgress(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_ARGS* pArgs,
+    __inout BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_RESULTS* pResults
+    )
+{
+    return pBA->OnCacheContainerOrPayloadVerifyProgress(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->dw64Progress, pArgs->dw64Total, pArgs->dwOverallPercentage, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnCacheContainerOrPayloadVerifyComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_ARGS* pArgs,
+    __inout BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnCacheContainerOrPayloadVerifyComplete(pArgs->wzPackageOrContainerId, pArgs->wzPayloadId, pArgs->hrStatus);
+}
+
+static HRESULT BalBaseBAProcOnCachePayloadExtractBegin(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHEPAYLOADEXTRACTBEGIN_ARGS* pArgs,
+    __inout BA_ONCACHEPAYLOADEXTRACTBEGIN_RESULTS* pResults
+    )
+{
+    return pBA->OnCachePayloadExtractBegin(pArgs->wzContainerId, pArgs->wzPayloadId, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnCachePayloadExtractProgress(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS* pArgs,
+    __inout BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS* pResults
+    )
+{
+    return pBA->OnCachePayloadExtractProgress(pArgs->wzContainerId, pArgs->wzPayloadId, pArgs->dw64Progress, pArgs->dw64Total, pArgs->dwOverallPercentage, &pResults->fCancel);
+}
+
+static HRESULT BalBaseBAProcOnCachePayloadExtractComplete(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS* pArgs,
+    __inout BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS* /*pResults*/
+    )
+{
+    return pBA->OnCachePayloadExtractComplete(pArgs->wzContainerId, pArgs->wzPayloadId, pArgs->hrStatus);
+}
+
 /*******************************************************************
 BalBaseBootstrapperApplicationProc - requires pvContext to be of type IBootstrapperApplication.
                                      Provides a default mapping between the new message based BA interface and
@@ -722,6 +785,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYBEGIN:
             hr = BalBaseBAProcOnCacheVerifyBegin(pBA, reinterpret_cast<BA_ONCACHEVERIFYBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEVERIFYBEGIN_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYPROGRESS:
+            hr = BalBaseBAProcOnCacheVerifyProgress(pBA, reinterpret_cast<BA_ONCACHEVERIFYPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEVERIFYPROGRESS_RESULTS*>(pvResults));
+            break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYCOMPLETE:
             hr = BalBaseBAProcOnCacheVerifyComplete(pBA, reinterpret_cast<BA_ONCACHEVERIFYCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEVERIFYCOMPLETE_RESULTS*>(pvResults));
             break;
@@ -807,6 +873,24 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE:
             hr = BalBaseBAProcOnPlanForwardCompatibleBundle(pBA, reinterpret_cast<BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYBEGIN:
+            hr = BalBaseBAProcOnCacheContainerOrPayloadVerifyBegin(pBA, reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS:
+            hr = BalBaseBAProcOnCacheContainerOrPayloadVerifyProgress(pBA, reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE:
+            hr = BalBaseBAProcOnCacheContainerOrPayloadVerifyComplete(pBA, reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTBEGIN:
+            hr = BalBaseBAProcOnCachePayloadExtractBegin(pBA, reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS:
+            hr = BalBaseBAProcOnCachePayloadExtractProgress(pBA, reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTCOMPLETE:
+            hr = BalBaseBAProcOnCachePayloadExtractComplete(pBA, reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS*>(pvResults));
             break;
         }
     }

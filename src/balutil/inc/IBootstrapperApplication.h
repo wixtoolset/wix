@@ -4,6 +4,26 @@
 
 DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-AB06-099D717C67FE")
 {
+    // BAProc - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method to give the BA raw access to the callback from the engine.
+    //          This might be used to help the BA support more than one version of the engine.
+    STDMETHOD(BAProc)(
+        __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+        __in const LPVOID pvArgs,
+        __inout LPVOID pvResults,
+        __in_opt LPVOID pvContext
+        ) = 0;
+
+    // BAProcFallback - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method
+    //                  to give the BA the ability to use default behavior
+    //                  and then forward the message to extensions.
+    STDMETHOD_(void, BAProcFallback)(
+        __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
+        __in const LPVOID pvArgs,
+        __inout LPVOID pvResults,
+        __inout HRESULT* phr,
+        __in_opt LPVOID pvContext
+        ) = 0;
+
     // OnStartup - called when the engine is ready for the bootstrapper application to start.
     //
     STDMETHOD(OnStartup)() = 0;
@@ -297,8 +317,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
-    // OnCacheAcquireProgress - called when the engine makes progresss copying
-    //                          or downloading a payload to the working folder.
+    // OnCacheAcquireProgress - called when the engine makes progress acquiring the payload or container.
     //
     STDMETHOD(OnCacheAcquireProgress)(
         __in_z_opt LPCWSTR wzPackageOrContainerId,
@@ -356,6 +375,16 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(OnCacheVerifyBegin)(
         __in_z_opt LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnCacheVerifyProgress)(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __in BOOTSTRAPPER_CACHE_VERIFY_STEP verifyStep,
         __inout BOOL* pfCancel
         ) = 0;
 
@@ -570,23 +599,45 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfIgnoreBundle
         ) = 0;
 
-    // BAProc - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method to give the BA raw access to the callback from the engine.
-    //          This might be used to help the BA support more than one version of the engine.
-    STDMETHOD(BAProc)(
-        __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
-        __in const LPVOID pvArgs,
-        __inout LPVOID pvResults,
-        __in_opt LPVOID pvContext
+    STDMETHOD(OnCacheContainerOrPayloadVerifyBegin)(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __inout BOOL* pfCancel
         ) = 0;
 
-    // BAProcFallback - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method
-    //                  to give the BA the ability to use default behavior
-    //                  and then forward the message to extensions.
-    STDMETHOD_(void, BAProcFallback)(
-        __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
-        __in const LPVOID pvArgs,
-        __inout LPVOID pvResults,
-        __inout HRESULT* phr,
-        __in_opt LPVOID pvContext
+    STDMETHOD(OnCacheContainerOrPayloadVerifyProgress)(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnCacheContainerOrPayloadVerifyComplete)(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in HRESULT hrStatus
+        ) = 0;
+
+    STDMETHOD(OnCachePayloadExtractBegin)(
+        __in_z_opt LPCWSTR wzContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnCachePayloadExtractProgress)(
+        __in_z_opt LPCWSTR wzContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __inout BOOL* pfCancel
+        ) = 0;
+
+    STDMETHOD(OnCachePayloadExtractComplete)(
+        __in_z_opt LPCWSTR wzContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in HRESULT hrStatus
         ) = 0;
 };

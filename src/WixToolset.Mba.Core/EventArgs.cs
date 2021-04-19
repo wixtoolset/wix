@@ -51,11 +51,7 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public abstract class ResultEventArgs : HResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ResultEventArgs"/> class.
-        /// </summary>
-        /// <param name="recommendation">Recommended result from engine.</param>
-        /// <param name="result">The result to return to the engine.</param>
+        /// <summary />
         public ResultEventArgs(Result recommendation, Result result)
         {
             this.Recommendation = recommendation;
@@ -99,11 +95,7 @@ namespace WixToolset.Mba.Core
     /// </summary>
     public abstract class ActionEventArgs<T> : StatusEventArgs
     {
-        /// <summary>
-        /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="recommendation">Recommended action from engine.</param>
-        /// <param name="action">The action to perform.</param>
+        /// <summary />
         public ActionEventArgs(int hrStatus, T recommendation, T action)
             : base(hrStatus)
         {
@@ -148,6 +140,49 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Base class for cache progress events.
+    /// </summary>
+    [Serializable]
+    public abstract class CacheProgressBaseEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public CacheProgressBaseEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.PackageOrContainerId = packageOrContainerId;
+            this.PayloadId = payloadId;
+            this.Progress = progress;
+            this.Total = total;
+            this.OverallPercentage = overallPercentage;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the container or package.
+        /// </summary>
+        public string PackageOrContainerId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the payload.
+        /// </summary>
+        public string PayloadId { get; private set; }
+
+        /// <summary>
+        /// Gets the number of bytes cached thus far.
+        /// </summary>
+        public long Progress { get; private set; }
+
+        /// <summary>
+        /// Gets the total bytes to cache.
+        /// </summary>
+        public long Total { get; private set; }
+
+        /// <summary>
+        /// Gets the overall percentage of progress of caching.
+        /// </summary>
+        public int OverallPercentage { get; private set; }
+    }
+
+    /// <summary>
     /// Additional arguments used when startup has begun.
     /// </summary>
     [Serializable]
@@ -182,25 +217,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the system is shutting down or the user is logging off.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SystemShutdown"/>
     /// </summary>
-    /// <remarks>
-    /// <para>To prevent shutting down or logging off, set <see cref="CancellableHResultEventArgs.Cancel"/> to
-    /// true; otherwise, set it to false.</para>
-    /// <para>By default setup will prevent shutting down or logging off between
-    /// <see cref="IDefaultBootstrapperApplication.ApplyBegin"/> and <see cref="IDefaultBootstrapperApplication.ApplyComplete"/>.</para>
-    /// <para>If <see cref="SystemShutdownEventArgs.Reasons"/> contains <see cref="EndSessionReasons.Critical"/>
-    /// the bootstrapper cannot prevent the shutdown and only has a few seconds to save state or perform any other
-    /// critical operations before being closed by the operating system.</para>
-    /// </remarks>
     [Serializable]
     public class SystemShutdownEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="SystemShutdownEventArgs"/> class.
-        /// </summary>
-        /// <param name="reasons">The reason the application is requested to close or being closed.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public SystemShutdownEventArgs(EndSessionReasons reasons, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -301,17 +323,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection for an update has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectUpdateBegin"/>
     /// </summary>
     [Serializable]
     public class DetectUpdateBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectUpdateBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="updateLocation">The location to check for an updated bundle.</param>
-        /// <param name="cancelRecommendation">The cancel recommendation from the engine.</param>
-        /// <param name="skipRecommendation">The skip recommendation from the engine.</param>
+        /// <summary />
         public DetectUpdateBeginEventArgs(string updateLocation, bool cancelRecommendation, bool skipRecommendation)
             : base(cancelRecommendation)
         {
@@ -331,23 +348,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection for an update has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectUpdate"/>
     /// </summary>
     [Serializable]
     public class DetectUpdateEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectUpdateBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="updateLocation">The location to check for an updated bundle.</param>
-        /// <param name="size">The expected size of the updated bundle.</param>
-        /// <param name="version">The expected version of the updated bundle.</param>
-        /// <param name="title">The title of the updated bundle.</param>
-        /// <param name="summary">The summary of the updated bundle.</param>
-        /// <param name="contentType">The content type of the content of the updated bundle.</param>
-        /// <param name="content">The content of the updated bundle.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        /// <param name="stopRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public DetectUpdateEventArgs(string updateLocation, long size, string version, string title, string summary, string contentType, string content, bool cancelRecommendation, bool stopRecommendation)
             : base(cancelRecommendation)
         {
@@ -403,16 +409,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection for an update has completed.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectUpdateComplete"/>
     /// </summary>
     [Serializable]
     public class DetectUpdateCompleteEventArgs : StatusEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectUpdateCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="ignoreRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public DetectUpdateCompleteEventArgs(int hrStatus, bool ignoreRecommendation)
             : base(hrStatus)
         {
@@ -481,16 +483,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection for a specific package has begun.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectPackageBegin"/>
     /// </summary>
     [Serializable]
     public class DetectPackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectPackageBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package to detect.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public DetectPackageBeginEventArgs(string packageId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -504,21 +502,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when a related MSI package has been detected for a package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectRelatedMsiPackage"/>
     /// </summary>
     [Serializable]
     public class DetectRelatedMsiPackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectRelatedMsiPackageEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package detecting.</param>
-        /// <param name="upgradeCode">The upgrade code of the related package detected.</param>
-        /// <param name="productCode">The identity of the related package detected.</param>
-        /// <param name="perMachine">Whether the detected package is per machine.</param>
-        /// <param name="version">The version of the related package detected.</param>
-        /// <param name="operation">The operation that will be taken on the detected package.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public DetectRelatedMsiPackageEventArgs(string packageId, string upgradeCode, string productCode, bool perMachine, string version, RelatedOperation operation, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -598,17 +587,11 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when a feature in an MSI package has been detected.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.DetectMsiFeature"/>
     /// </summary>
     public class DetectMsiFeatureEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectMsiFeatureEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">Detected package identifier.</param>
-        /// <param name="featureId">Detected feature identifier.</param>
-        /// <param name="state">Feature state detected.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public DetectMsiFeatureEventArgs(string packageId, string featureId, FeatureState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -687,16 +670,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun planning the installation.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanBegin"/>
     /// </summary>
     [Serializable]
     public class PlanBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageCount">The number of packages to plan for.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public PlanBeginEventArgs(int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -710,18 +689,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun planning for a related bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanRelatedBundle"/>
     /// </summary>
     [Serializable]
     public class PlanRelatedBundleEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanRelatedBundleEventArgs"/> class.
-        /// </summary>
-        /// <param name="bundleId">The identity of the bundle to plan for.</param>
-        /// <param name="recommendedState">The recommended requested state for the bundle.</param>
-        /// <param name="state">The requested state for the bundle.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public PlanRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -842,19 +815,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when engine is about to plan a feature in an MSI package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanMsiFeature"/>
     /// </summary>
     [Serializable]
     public class PlanMsiFeatureEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanMsiFeatureEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">Package identifier being planned.</param>
-        /// <param name="featureId">Feature identifier being planned.</param>
-        /// <param name="recommendedState">Recommended feature state being planned.</param>
-        /// <param name="state">Feature state being planned.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public PlanMsiFeatureEventArgs(string packageId, string featureId, FeatureState recommendedState, FeatureState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -886,21 +852,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine is planning an MSI or MSP package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanMsiPackage"/>
     /// </summary>
     [Serializable]
     public class PlanMsiPackageEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="PlanMsiPackageEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package planned for.</param>
-        /// <param name="shouldExecute">Whether the package is planned to execute or roll back.</param>
-        /// <param name="action">The action planned for the package.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        /// <param name="actionMsiProperty">The requested MSI property to add.</param>
-        /// <param name="uiLevel">The requested internal UI level.</param>
-        /// <param name="disableExternalUiHandler">Whether Burn is requested to set up an external UI handler.</param>
+        /// <summary />
         public PlanMsiPackageEventArgs(string packageId, bool shouldExecute, ActionState action, bool cancelRecommendation, BURN_MSI_PROPERTY actionMsiProperty, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler)
             : base(cancelRecommendation)
         {
@@ -1080,16 +1037,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun installing the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ApplyBegin"/>
     /// </summary>
     [Serializable]
     public class ApplyBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ApplyBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="phaseCount">The number of phases during apply.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ApplyBeginEventArgs(int phaseCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1104,15 +1057,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine is about to start the elevated process.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ElevateBegin"/>
     /// </summary>
     [Serializable]
     public class ElevateBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ElevateBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ElevateBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1136,17 +1086,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has changed progress for the bundle installation.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Progress"/>
     /// </summary>
     [Serializable]
     public class ProgressEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates an new instance of the <see cref="ProgressEventArgs"/> class.
-        /// </summary>
-        /// <param name="progressPercentage">The percentage from 0 to 100 completed for a package.</param>
-        /// <param name="overallPercentage">The percentage from 0 to 100 completed for the bundle.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ProgressEventArgs(int progressPercentage, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1166,22 +1111,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has encountered an error.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Error"/>
     /// </summary>
     [Serializable]
     public class ErrorEventArgs : ResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ErrorEventArgs"/> class.
-        /// </summary>
-        /// <param name="errorType">The error type.</param>
-        /// <param name="packageId">The identity of the package that yielded the error.</param>
-        /// <param name="errorCode">The error code.</param>
-        /// <param name="errorMessage">The error message.</param>
-        /// <param name="dwUIHint">Recommended display flags for an error dialog.</param>
-        /// <param name="data">The exteded data for the error.</param>
-        /// <param name="recommendation">Recommended result from engine.</param>
-        /// <param name="result">The result to return to the engine.</param>
+        /// <summary />
         public ErrorEventArgs(ErrorType errorType, string packageId, int errorCode, string errorMessage, int dwUIHint, string[] data, Result recommendation, Result result)
             : base(recommendation, result)
         {
@@ -1225,15 +1160,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun registering the location and visibility of the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.RegisterBegin"/>
     /// </summary>
     [Serializable]
     public class RegisterBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="RegisterBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public RegisterBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1301,15 +1233,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun caching the installation sources.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CacheBegin"/>
     /// </summary>
     [Serializable]
     public class CacheBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public CacheBeginEventArgs(bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1363,43 +1292,13 @@ namespace WixToolset.Mba.Core
     /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheAcquireProgress"/>.
     /// </summary>
     [Serializable]
-    public class CacheAcquireProgressEventArgs : CancellableHResultEventArgs
+    public class CacheAcquireProgressEventArgs : CacheProgressBaseEventArgs
     {
         /// <summary />
         public CacheAcquireProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
-            : base(cancelRecommendation)
+            : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
         {
-            this.PackageOrContainerId = packageOrContainerId;
-            this.PayloadId = payloadId;
-            this.Progress = progress;
-            this.Total = total;
-            this.OverallPercentage = overallPercentage;
         }
-
-        /// <summary>
-        /// Gets the identifier of the container or package.
-        /// </summary>
-        public string PackageOrContainerId { get; private set; }
-
-        /// <summary>
-        /// Gets the identifier of the payload (if acquiring a payload).
-        /// </summary>
-        public string PayloadId { get; private set; }
-
-        /// <summary>
-        /// Gets the number of bytes cached thus far.
-        /// </summary>
-        public long Progress { get; private set; }
-
-        /// <summary>
-        /// Gets the total bytes to cache.
-        /// </summary>
-        public long Total { get; private set; }
-
-        /// <summary>
-        /// Gets the overall percentage of progress of caching.
-        /// </summary>
-        public int OverallPercentage { get; private set; }
     }
 
     /// <summary>
@@ -1428,25 +1327,23 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine starts the verification of a payload.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheVerifyBegin"/>.
     /// </summary>
     [Serializable]
     public class CacheVerifyBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheVerifyBeginEventArgs"/> class.
-        /// </summary>
-        public CacheVerifyBeginEventArgs(string packageId, string payloadId, bool cancelRecommendation)
+        /// <summary />
+        public CacheVerifyBeginEventArgs(string packageOrContainerId, string payloadId, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.PackageId = packageId;
+            this.PackageOrContainerId = packageOrContainerId;
             this.PayloadId = payloadId;
         }
 
         /// <summary>
-        /// Gets the identifier of the package.
+        /// Gets the identifier of the container or package.
         /// </summary>
-        public string PackageId { get; private set; }
+        public string PackageOrContainerId { get; private set; }
 
         /// <summary>
         /// Gets the identifier of the payload.
@@ -1455,25 +1352,42 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine completes the verification of a payload.
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheVerifyProgress"/>.
+    /// </summary>
+    [Serializable]
+    public class CacheVerifyProgressEventArgs : CacheProgressBaseEventArgs
+    {
+        /// <summary />
+        public CacheVerifyProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, CacheVerifyStep verifyStep, bool cancelRecommendation)
+            : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
+        {
+            this.Step = verifyStep;
+        }
+
+        /// <summary>
+        /// Gets the current verification step.
+        /// </summary>
+        public CacheVerifyStep Step { get; private set; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CacheVerifyComplete"/>
     /// </summary>
     [Serializable]
     public class CacheVerifyCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CacheVerifyCompleteEventArgs"/> class.
-        /// </summary>
-        public CacheVerifyCompleteEventArgs(string packageId, string payloadId, int hrStatus, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action)
+        /// <summary />
+        public CacheVerifyCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
-            this.PackageId = packageId;
+            this.PackageOrContainerId = packageOrContainerId;
             this.PayloadId = payloadId;
         }
 
         /// <summary>
-        /// Gets the identifier of the package.
+        /// Gets the identifier of the container or package.
         /// </summary>
-        public string PackageId { get; private set; }
+        public string PackageOrContainerId { get; private set; }
 
         /// <summary>
         /// Gets the identifier of the payload.
@@ -1498,16 +1412,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun installing packages.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteBegin"/>
     /// </summary>
     [Serializable]
     public class ExecuteBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecuteBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageCount">The number of packages to act on.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ExecuteBeginEventArgs(int packageCount, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1521,20 +1431,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has begun installing a specific package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecutePackageBegin"/>
     /// </summary>
     [Serializable]
     public class ExecutePackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecutePackageBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package to act on.</param>
-        /// <param name="shouldExecute">Whether the package is being executed or rolled back.</param>
-        /// <param name="action">The action about to be executed.</param>
-        /// <param name="uiLevel">The internal UI level (if this is an MSI or MSP package).</param>
-        /// <param name="disableExternalUiHandler">Whether Burn will set up an external UI handler (if this is an MSI or MSP package).</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, ActionState action, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1572,17 +1474,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine executes one or more patches targeting a product.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecutePatchTarget"/>
     /// </summary>
     [Serializable]
     public class ExecutePatchTargetEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecutePatchTargetEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package to act on.</param>
-        /// <param name="targetProductCode">The product code of the target of the patch.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ExecutePatchTargetEventArgs(string packageId, string targetProductCode, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1602,21 +1499,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when Windows Installer sends an installation message.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteMsiMessage"/>
     /// </summary>
     [Serializable]
     public class ExecuteMsiMessageEventArgs : ResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecuteMsiMessageEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that yielded this message.</param>
-        /// <param name="messageType">The type of this message.</param>
-        /// <param name="dwUIHint">Recommended display flags for this message.</param>
-        /// <param name="message">The message.</param>
-        /// <param name="data">The extended data for the message.</param>
-        /// <param name="recommendation">Recommended result from engine.</param>
-        /// <param name="result">The result to return to the engine.</param>
+        /// <summary />
         public ExecuteMsiMessageEventArgs(string packageId, InstallMessage messageType, int dwUIHint, string message, string[] data, Result recommendation, Result result)
             : base(recommendation, result)
         {
@@ -1654,18 +1542,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arugments used for file in use installation messages.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteFilesInUse"/>
     /// </summary>
     [Serializable]
     public class ExecuteFilesInUseEventArgs : ResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecuteFilesInUseEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that yielded the files in use message.</param>
-        /// <param name="files">The list of files in use.</param>
-        /// <param name="recommendation">Recommended result from engine.</param>
-        /// <param name="result">The result to return to the engine.</param>
+        /// <summary />
         public ExecuteFilesInUseEventArgs(string packageId, string[] files, Result recommendation, Result result)
             : base(recommendation, result)
         {
@@ -1685,19 +1567,13 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecutePackageComplete"/>
     /// Additional arguments used when the engine has completed installing a specific package.
     /// </summary>
     [Serializable]
     public class ExecutePackageCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecutePackageCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that was acted on.</param>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="restart">Whether a restart is required.</param>
-        /// <param name="recommendation">Recommended action from engine.</param>
-        /// <param name="action">The action to perform.</param>
+        /// <summary />
         public ExecutePackageCompleteEventArgs(string packageId, int hrStatus, ApplyRestart restart, BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION recommendation, BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1733,18 +1609,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed installing the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ApplyComplete"/>
     /// </summary>
     [Serializable]
     public class ApplyCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_APPLYCOMPLETE_ACTION>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ApplyCompleteEventArgs"/> clas.
-        /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="restart">Whether a restart is required.</param>
-        /// <param name="recommendation">Recommended action from engine.</param>
-        /// <param name="action">The action to perform.</param>
+        /// <summary />
         public ApplyCompleteEventArgs(int hrStatus, ApplyRestart restart, BOOTSTRAPPER_APPLYCOMPLETE_ACTION recommendation, BOOTSTRAPPER_APPLYCOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1819,18 +1689,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used by the engine when it has begun caching a specific package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CachePackageBegin"/>
     /// </summary>
     [Serializable]
     public class CachePackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CachePackageBeginEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that is being cached.</param>
-        /// <param name="cachePayloads">Number of payloads to be cached.</param>
-        /// <param name="packageCacheSize">The size on disk required by the specific package.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public CachePackageBeginEventArgs(string packageId, int cachePayloads, long packageCacheSize, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -1856,18 +1720,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine when it has completed caching a specific package.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CachePackageComplete"/>
     /// </summary>
     [Serializable]
     public class CachePackageCompleteEventArgs : ActionEventArgs<BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="CachePackageCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package that was cached.</param>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="recommendation">Recommended action from engine.</param>
-        /// <param name="action">The action to perform.</param>
+        /// <summary />
         public CachePackageCompleteEventArgs(string packageId, int hrStatus, BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION recommendation, BOOTSTRAPPER_CACHEPACKAGECOMPLETE_ACTION action)
             : base(hrStatus, recommendation, action)
         {
@@ -1881,18 +1739,12 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments passed by the engine while executing on payload.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.ExecuteProgress"/>
     /// </summary>
     [Serializable]
     public class ExecuteProgressEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ExecuteProgressEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identifier of the package being executed.</param>
-        /// <param name="progressPercentage">The percentage from 0 to 100 of the execution progress for a single payload.</param>
-        /// <param name="overallPercentage">The percentage from 0 to 100 of the execution progress for all payload.</param>
-        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <summary />
         public ExecuteProgressEventArgs(string packageId, int progressPercentage, int overallPercentage, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
@@ -2186,5 +2038,131 @@ namespace WixToolset.Mba.Core
             : base(hrStatus)
         {
         }
+    }
+
+    /// <summary>
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyBegin"/>.
+    /// </summary>
+    [Serializable]
+    public class CacheContainerOrPayloadVerifyBeginEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public CacheContainerOrPayloadVerifyBeginEventArgs(string packageOrContainerId, string payloadId, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.PackageOrContainerId = packageOrContainerId;
+            this.PayloadId = payloadId;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the container or package.
+        /// </summary>
+        public string PackageOrContainerId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the payload.
+        /// </summary>
+        public string PayloadId { get; private set; }
+    }
+
+    /// <summary>
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyProgress"/>.
+    /// </summary>
+    [Serializable]
+    public class CacheContainerOrPayloadVerifyProgressEventArgs : CacheProgressBaseEventArgs
+    {
+        /// <summary />
+        public CacheContainerOrPayloadVerifyProgressEventArgs(string packageOrContainerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
+            : base(packageOrContainerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyComplete"/>
+    /// </summary>
+    [Serializable]
+    public class CacheContainerOrPayloadVerifyCompleteEventArgs : StatusEventArgs
+    {
+        /// <summary />
+        public CacheContainerOrPayloadVerifyCompleteEventArgs(string packageOrContainerId, string payloadId, int hrStatus)
+            : base(hrStatus)
+        {
+            this.PackageOrContainerId = packageOrContainerId;
+            this.PayloadId = payloadId;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the container or package.
+        /// </summary>
+        public string PackageOrContainerId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the payload.
+        /// </summary>
+        public string PayloadId { get; private set; }
+    }
+
+    /// <summary>
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CachePayloadExtractBegin"/>.
+    /// </summary>
+    [Serializable]
+    public class CachePayloadExtractBeginEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public CachePayloadExtractBeginEventArgs(string containerId, string payloadId, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.ContainerId = containerId;
+            this.PayloadId = payloadId;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the container.
+        /// </summary>
+        public string ContainerId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the payload.
+        /// </summary>
+        public string PayloadId { get; private set; }
+    }
+
+    /// <summary>
+    /// EventArgs for <see cref="IDefaultBootstrapperApplication.CachePayloadExtractProgress"/>.
+    /// </summary>
+    [Serializable]
+    public class CachePayloadExtractProgressEventArgs : CacheProgressBaseEventArgs
+    {
+        /// <summary />
+        public CachePayloadExtractProgressEventArgs(string containerId, string payloadId, long progress, long total, int overallPercentage, bool cancelRecommendation)
+            : base(containerId, payloadId, progress, total, overallPercentage, cancelRecommendation)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.CachePayloadExtractComplete"/>
+    /// </summary>
+    [Serializable]
+    public class CachePayloadExtractCompleteEventArgs : StatusEventArgs
+    {
+        /// <summary />
+        public CachePayloadExtractCompleteEventArgs(string containerId, string payloadId, int hrStatus)
+            : base(hrStatus)
+        {
+            this.ContainerId = containerId;
+            this.PayloadId = payloadId;
+        }
+
+        /// <summary>
+        /// Gets the identifier of the container.
+        /// </summary>
+        public string ContainerId { get; private set; }
+
+        /// <summary>
+        /// Gets the identifier of the payload.
+        /// </summary>
+        public string PayloadId { get; private set; }
     }
 }

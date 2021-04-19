@@ -155,6 +155,9 @@ namespace WixToolset.Mba.Core
         public event EventHandler<CacheVerifyBeginEventArgs> CacheVerifyBegin;
 
         /// <inheritdoc/>
+        public event EventHandler<CacheVerifyProgressEventArgs> CacheVerifyProgress;
+
+        /// <inheritdoc/>
         public event EventHandler<CacheVerifyCompleteEventArgs> CacheVerifyComplete;
 
         /// <inheritdoc/>
@@ -228,6 +231,24 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public event EventHandler<PlanForwardCompatibleBundleEventArgs> PlanForwardCompatibleBundle;
+
+        /// <inheritdoc/>
+        public event EventHandler<CacheContainerOrPayloadVerifyBeginEventArgs> CacheContainerOrPayloadVerifyBegin;
+
+        /// <inheritdoc/>
+        public event EventHandler<CacheContainerOrPayloadVerifyProgressEventArgs> CacheContainerOrPayloadVerifyProgress;
+
+        /// <inheritdoc/>
+        public event EventHandler<CacheContainerOrPayloadVerifyCompleteEventArgs> CacheContainerOrPayloadVerifyComplete;
+
+        /// <inheritdoc/>
+        public event EventHandler<CachePayloadExtractBeginEventArgs> CachePayloadExtractBegin;
+
+        /// <inheritdoc/>
+        public event EventHandler<CachePayloadExtractProgressEventArgs> CachePayloadExtractProgress;
+
+        /// <inheritdoc/>
+        public event EventHandler<CachePayloadExtractCompleteEventArgs> CachePayloadExtractComplete;
 
         /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
@@ -775,6 +796,19 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
+        /// Called by the engine, raises the <see cref="CacheVerifyProgress"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCacheVerifyProgress(CacheVerifyProgressEventArgs args)
+        {
+            EventHandler<CacheVerifyProgressEventArgs> handler = this.CacheVerifyProgress;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
         /// Called by the engine, raises the <see cref="CacheVerifyComplete"/> event.
         /// </summary>
         /// <param name="args"></param>
@@ -1098,7 +1132,98 @@ namespace WixToolset.Mba.Core
             }
         }
 
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyBegin"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCacheContainerOrPayloadVerifyBegin(CacheContainerOrPayloadVerifyBeginEventArgs args)
+        {
+            EventHandler<CacheContainerOrPayloadVerifyBeginEventArgs> handler = this.CacheContainerOrPayloadVerifyBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyProgress"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCacheContainerOrPayloadVerifyProgress(CacheContainerOrPayloadVerifyProgressEventArgs args)
+        {
+            EventHandler<CacheContainerOrPayloadVerifyProgressEventArgs> handler = this.CacheContainerOrPayloadVerifyProgress;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CacheContainerOrPayloadVerifyComplete"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCacheContainerOrPayloadVerifyComplete(CacheContainerOrPayloadVerifyCompleteEventArgs args)
+        {
+            EventHandler<CacheContainerOrPayloadVerifyCompleteEventArgs> handler = this.CacheContainerOrPayloadVerifyComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CachePayloadExtractBegin"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCachePayloadExtractBegin(CachePayloadExtractBeginEventArgs args)
+        {
+            EventHandler<CachePayloadExtractBeginEventArgs> handler = this.CachePayloadExtractBegin;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CachePayloadExtractProgress"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCachePayloadExtractProgress(CachePayloadExtractProgressEventArgs args)
+        {
+            EventHandler<CachePayloadExtractProgressEventArgs> handler = this.CachePayloadExtractProgress;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="CachePayloadExtractComplete"/> event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnCachePayloadExtractComplete(CachePayloadExtractCompleteEventArgs args)
+        {
+            EventHandler<CachePayloadExtractCompleteEventArgs> handler = this.CachePayloadExtractComplete;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
         #region IBootstrapperApplication Members
+
+        int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
+        {
+            switch (message)
+            {
+                default:
+                    return NativeMethods.E_NOTIMPL;
+            }
+        }
+
+        void IBootstrapperApplication.BAProcFallback(int message, IntPtr pvArgs, IntPtr pvResults, ref int phr, IntPtr pvContext)
+        {
+        }
 
         int IBootstrapperApplication.OnStartup()
         {
@@ -1439,18 +1564,27 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnCacheVerifyBegin(string wzPackageId, string wzPayloadId, ref bool fCancel)
+        int IBootstrapperApplication.OnCacheVerifyBegin(string wzPackageOrContainerId, string wzPayloadId, ref bool fCancel)
         {
-            CacheVerifyBeginEventArgs args = new CacheVerifyBeginEventArgs(wzPackageId, wzPayloadId, fCancel);
+            CacheVerifyBeginEventArgs args = new CacheVerifyBeginEventArgs(wzPackageOrContainerId, wzPayloadId, fCancel);
             this.OnCacheVerifyBegin(args);
 
             fCancel = args.Cancel;
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnCacheVerifyComplete(string wzPackageId, string wzPayloadId, int hrStatus, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation, ref BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action)
+        int IBootstrapperApplication.OnCacheVerifyProgress(string wzPackageOrContainerId, string wzPayloadId, long dw64Progress, long dw64Total, int dwOverallPercentage, CacheVerifyStep verifyStep, ref bool fCancel)
         {
-            CacheVerifyCompleteEventArgs args = new CacheVerifyCompleteEventArgs(wzPackageId, wzPayloadId, hrStatus, recommendation, action);
+            CacheVerifyProgressEventArgs args = new CacheVerifyProgressEventArgs(wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, verifyStep, fCancel);
+            this.OnCacheVerifyProgress(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCacheVerifyComplete(string wzPackageOrContainerId, string wzPayloadId, int hrStatus, BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation, ref BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION action)
+        {
+            CacheVerifyCompleteEventArgs args = new CacheVerifyCompleteEventArgs(wzPackageOrContainerId, wzPayloadId, hrStatus, recommendation, action);
             this.OnCacheVerifyComplete(args);
 
             action = args.Action;
@@ -1682,17 +1816,56 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
+        int IBootstrapperApplication.OnCacheContainerOrPayloadVerifyBegin(string wzPackageOrContainerId, string wzPayloadId, ref bool fCancel)
         {
-            switch (message)
-            {
-                default:
-                    return NativeMethods.E_NOTIMPL;
-            }
+            CacheContainerOrPayloadVerifyBeginEventArgs args = new CacheContainerOrPayloadVerifyBeginEventArgs(wzPackageOrContainerId, wzPayloadId, fCancel);
+            this.OnCacheContainerOrPayloadVerifyBegin(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
         }
 
-        void IBootstrapperApplication.BAProcFallback(int message, IntPtr pvArgs, IntPtr pvResults, ref int phr, IntPtr pvContext)
+        int IBootstrapperApplication.OnCacheContainerOrPayloadVerifyProgress(string wzPackageOrContainerId, string wzPayloadId, long dw64Progress, long dw64Total, int dwOverallPercentage, ref bool fCancel)
         {
+            CacheContainerOrPayloadVerifyProgressEventArgs args = new CacheContainerOrPayloadVerifyProgressEventArgs(wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, fCancel);
+            this.OnCacheContainerOrPayloadVerifyProgress(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCacheContainerOrPayloadVerifyComplete(string wzPackageOrContainerId, string wzPayloadId, int hrStatus)
+        {
+            CacheContainerOrPayloadVerifyCompleteEventArgs args = new CacheContainerOrPayloadVerifyCompleteEventArgs(wzPackageOrContainerId, wzPayloadId, hrStatus);
+            this.OnCacheContainerOrPayloadVerifyComplete(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCachePayloadExtractBegin(string wzContainerId, string wzPayloadId, ref bool fCancel)
+        {
+            CachePayloadExtractBeginEventArgs args = new CachePayloadExtractBeginEventArgs(wzContainerId, wzPayloadId, fCancel);
+            this.OnCachePayloadExtractBegin(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCachePayloadExtractProgress(string wzContainerId, string wzPayloadId, long dw64Progress, long dw64Total, int dwOverallPercentage, ref bool fCancel)
+        {
+            CachePayloadExtractProgressEventArgs args = new CachePayloadExtractProgressEventArgs(wzContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, fCancel);
+            this.OnCachePayloadExtractProgress(args);
+
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnCachePayloadExtractComplete(string wzContainerId, string wzPayloadId, int hrStatus)
+        {
+            CachePayloadExtractCompleteEventArgs args = new CachePayloadExtractCompleteEventArgs(wzContainerId, wzPayloadId, hrStatus);
+            this.OnCachePayloadExtractComplete(args);
+
+            return args.HResult;
         }
 
         #endregion

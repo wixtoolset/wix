@@ -44,7 +44,7 @@ namespace WixToolset.Mba.Core
         event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
 
         /// <summary>
-        /// Fired when the engine has progress acquiring the installation sources.
+        /// Fired when the engine has progress acquiring the payload or container.
         /// </summary>
         event EventHandler<CacheAcquireProgressEventArgs> CacheAcquireProgress;
 
@@ -64,6 +64,21 @@ namespace WixToolset.Mba.Core
         event EventHandler<CacheCompleteEventArgs> CacheComplete;
 
         /// <summary>
+        /// Fired when the engine begins the verification of the payload or container that was already in the package cache.
+        /// </summary>
+        event EventHandler<CacheContainerOrPayloadVerifyBeginEventArgs> CacheContainerOrPayloadVerifyBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed the verification of the payload or container that was already in the package cache.
+        /// </summary>
+        event EventHandler<CacheContainerOrPayloadVerifyCompleteEventArgs> CacheContainerOrPayloadVerifyComplete;
+
+        /// <summary>
+        /// Fired when the engine has progress verifying the payload or container that was already in the package cache.
+        /// </summary>
+        event EventHandler<CacheContainerOrPayloadVerifyProgressEventArgs> CacheContainerOrPayloadVerifyProgress;
+
+        /// <summary>
         /// Fired when the engine has begun caching a specific package.
         /// </summary>
         event EventHandler<CachePackageBeginEventArgs> CachePackageBegin;
@@ -74,14 +89,34 @@ namespace WixToolset.Mba.Core
         event EventHandler<CachePackageCompleteEventArgs> CachePackageComplete;
 
         /// <summary>
-        /// Fired when the engine begins the verification of the acquired installation sources.
+        /// Fired when the engine begins the extraction of the payload from the container.
+        /// </summary>
+        event EventHandler<CachePayloadExtractBeginEventArgs> CachePayloadExtractBegin;
+
+        /// <summary>
+        /// Fired when the engine has completed the extraction of the payload from the container.
+        /// </summary>
+        event EventHandler<CachePayloadExtractCompleteEventArgs> CachePayloadExtractComplete;
+
+        /// <summary>
+        /// Fired when the engine has progress extracting the payload from the container.
+        /// </summary>
+        event EventHandler<CachePayloadExtractProgressEventArgs> CachePayloadExtractProgress;
+
+        /// <summary>
+        /// Fired when the engine begins the verification of the acquired payload or container.
         /// </summary>
         event EventHandler<CacheVerifyBeginEventArgs> CacheVerifyBegin;
 
         /// <summary>
-        /// Fired when the engine complete the verification of the acquired installation sources.
+        /// Fired when the engine has completed the verification of the acquired payload or container.
         /// </summary>
         event EventHandler<CacheVerifyCompleteEventArgs> CacheVerifyComplete;
+
+        /// <summary>
+        /// Fired when the engine has progress verifying the payload or container.
+        /// </summary>
+        event EventHandler<CacheVerifyProgressEventArgs> CacheVerifyProgress;
 
         /// <summary>
         /// Fired when the engine is about to commit an MSI transaction.
@@ -179,7 +214,7 @@ namespace WixToolset.Mba.Core
         event EventHandler<ExecuteCompleteEventArgs> ExecuteComplete;
 
         /// <summary>
-        /// Fired when Windows Installer sends a files in use installation message.
+        /// Fired when a package sends a files in use installation message.
         /// </summary>
         event EventHandler<ExecuteFilesInUseEventArgs> ExecuteFilesInUse;
 
@@ -204,7 +239,7 @@ namespace WixToolset.Mba.Core
         event EventHandler<ExecutePatchTargetEventArgs> ExecutePatchTarget;
 
         /// <summary>
-        /// Fired by the engine while executing on payload.
+        /// Fired by the engine while executing a package.
         /// </summary>
         event EventHandler<ExecuteProgressEventArgs> ExecuteProgress;
 

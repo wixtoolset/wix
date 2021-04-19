@@ -3,7 +3,6 @@
 namespace WixToolset.Mba.Core
 {
     using System;
-    using System.CodeDom.Compiler;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -14,6 +13,29 @@ namespace WixToolset.Mba.Core
     [Guid("53C31D56-49C0-426B-AB06-099D717C67FE")]
     public interface IBootstrapperApplication
     {
+        /// <summary>
+        /// Low level method that is called directly from the engine.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int BAProc(
+            int message,
+            IntPtr pvArgs,
+            IntPtr pvResults,
+            IntPtr pvContext
+            );
+
+        /// <summary>
+        /// Low level method that is called directly from the engine.
+        /// </summary>
+        void BAProcFallback(
+            int message,
+            IntPtr pvArgs,
+            IntPtr pvResults,
+            ref int phr,
+            IntPtr pvContext
+            );
+
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.Startup"/>.
         /// </summary>
@@ -600,31 +622,36 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheVerifyBegin"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheVerifyBegin(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CacheVerifyProgress"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCacheVerifyProgress(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.U8)] long dw64Progress,
+            [MarshalAs(UnmanagedType.U8)] long dw64Total,
+            [MarshalAs(UnmanagedType.U4)] int dwOverallPercentage,
+            [MarshalAs(UnmanagedType.I4)] CacheVerifyStep verifyStep,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.CacheVerifyComplete"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="wzPayloadId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="recommendation"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnCacheVerifyComplete(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
             int hrStatus,
             BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION recommendation,
@@ -1006,36 +1033,75 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// Low level method that is called directly from the engine.
+        /// See <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyBegin"/>.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="pvArgs"></param>
-        /// <param name="pvResults"></param>
-        /// <param name="pvContext"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
-        int BAProc(
-            int message,
-            IntPtr pvArgs,
-            IntPtr pvResults,
-            IntPtr pvContext
+        int OnCacheContainerOrPayloadVerifyBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
         /// <summary>
-        /// Low level method that is called directly from the engine.
+        /// See <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyProgress"/>.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="pvArgs"></param>
-        /// <param name="pvResults"></param>
-        /// <param name="phr"></param>
-        /// <param name="pvContext"></param>
-        void BAProcFallback(
-            int message,
-            IntPtr pvArgs,
-            IntPtr pvResults,
-            ref int phr,
-            IntPtr pvContext
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCacheContainerOrPayloadVerifyProgress(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.U8)] long dw64Progress,
+            [MarshalAs(UnmanagedType.U8)] long dw64Total,
+            [MarshalAs(UnmanagedType.U4)] int dwOverallPercentage,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CacheContainerOrPayloadVerifyComplete"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCacheContainerOrPayloadVerifyComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            int hrStatus
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CachePayloadExtractBegin"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCachePayloadExtractBegin(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CachePayloadExtractProgress"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCachePayloadExtractProgress(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            [MarshalAs(UnmanagedType.U8)] long dw64Progress,
+            [MarshalAs(UnmanagedType.U8)] long dw64Total,
+            [MarshalAs(UnmanagedType.U4)] int dwOverallPercentage,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.CachePayloadExtractComplete"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCachePayloadExtractComplete(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
+            int hrStatus
             );
     }
 
@@ -1449,6 +1515,26 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// The current step when verifying a container or payload.
+    /// </summary>
+    public enum CacheVerifyStep
+    {
+        /// <summary>
+        /// Copying or moving the file from the working path to the unverified path.
+        /// Not used during Layout.
+        /// </summary>
+        Stage,
+        /// <summary>
+        /// Hashing the file.
+        /// </summary>
+        Hash,
+        /// <summary>
+        /// Copying or moving the file to the final location.
+        /// </summary>
+        Finalize,
+    }
+
+    /// <summary>
     /// The restart state after a package or all packages were applied.
     /// </summary>
     public enum ApplyRestart
@@ -1566,7 +1652,7 @@ namespace WixToolset.Mba.Core
         None,
 
         /// <summary>
-        /// Instructs the engine to try the acquisition of the package again.
+        /// Instructs the engine to try the acquisition of the payload again.
         /// Ignored if hrStatus is a success.
         /// </summary>
         Retry,

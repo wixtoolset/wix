@@ -69,6 +69,26 @@ public: // IUnknown
     }
 
 public: // IBootstrapperApplication
+    virtual STDMETHODIMP_(HRESULT) BAProc(
+        __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
+        __in const LPVOID /*pvArgs*/,
+        __inout LPVOID /*pvResults*/,
+        __in_opt LPVOID /*pvContext*/
+        )
+    {
+        return E_NOTIMPL;
+    }
+
+    virtual STDMETHODIMP_(void) BAProcFallback(
+        __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
+        __in const LPVOID /*pvArgs*/,
+        __inout LPVOID /*pvResults*/,
+        __inout HRESULT* /*phr*/,
+        __in_opt LPVOID /*pvContext*/
+        )
+    {
+    }
+
     virtual STDMETHODIMP OnStartup()
     {
         return S_OK;
@@ -439,7 +459,7 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnCacheVerifyBegin(
-        __in_z LPCWSTR /*wzPackageId*/,
+        __in_z LPCWSTR /*wzPackageOrContainerId*/,
         __in_z LPCWSTR /*wzPayloadId*/,
         __inout BOOL* /*pfCancel*/
         )
@@ -447,8 +467,21 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnCacheVerifyProgress(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __in DWORD64 /*dw64Progress*/,
+        __in DWORD64 /*dw64Total*/,
+        __in DWORD /*dwOverallPercentage*/,
+        __in BOOTSTRAPPER_CACHE_VERIFY_STEP /*verifyStep*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
     virtual STDMETHODIMP OnCacheVerifyComplete(
-        __in_z LPCWSTR /*wzPackageId*/,
+        __in_z LPCWSTR /*wzPackageOrContainerId*/,
         __in_z LPCWSTR /*wzPayloadId*/,
         __in HRESULT /*hrStatus*/,
         __in BOOTSTRAPPER_CACHEVERIFYCOMPLETE_ACTION /*recommendation*/,
@@ -684,24 +717,64 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP_(HRESULT) BAProc(
-        __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
-        __in const LPVOID /*pvArgs*/,
-        __inout LPVOID /*pvResults*/,
-        __in_opt LPVOID /*pvContext*/
+    virtual STDMETHODIMP OnCacheContainerOrPayloadVerifyBegin(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __inout BOOL* /*pfCancel*/
         )
     {
-        return E_NOTIMPL;
+        return S_OK;
     }
 
-    virtual STDMETHODIMP_(void) BAProcFallback(
-        __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
-        __in const LPVOID /*pvArgs*/,
-        __inout LPVOID /*pvResults*/,
-        __inout HRESULT* /*phr*/,
-        __in_opt LPVOID /*pvContext*/
+    virtual STDMETHODIMP OnCacheContainerOrPayloadVerifyProgress(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __in DWORD64 /*dw64Progress*/,
+        __in DWORD64 /*dw64Total*/,
+        __in DWORD /*dwOverallPercentage*/,
+        __inout BOOL* /*pfCancel*/
         )
     {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCacheContainerOrPayloadVerifyComplete(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCachePayloadExtractBegin(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCachePayloadExtractProgress(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __in DWORD64 /*dw64Progress*/,
+        __in DWORD64 /*dw64Total*/,
+        __in DWORD /*dwOverallPercentage*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnCachePayloadExtractComplete(
+        __in_z_opt LPCWSTR /*wzPackageOrContainerId*/,
+        __in_z_opt LPCWSTR /*wzPayloadId*/,
+        __in HRESULT /*hrStatus*/
+        )
+    {
+        return S_OK;
     }
 
 public: // IBAFunctions
