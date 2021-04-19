@@ -26,7 +26,7 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Set of extensions provided to the compiler.
         /// </summary>
-        IEnumerable<ICompilerExtension> Extensions { get; set; }
+        IReadOnlyCollection<ICompilerExtension> Extensions { get; set; }
 
         /// <summary>
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.

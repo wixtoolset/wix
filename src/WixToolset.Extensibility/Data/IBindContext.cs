@@ -35,27 +35,27 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Delayed fields that need to be resolved again.
         /// </summary>
-        IEnumerable<IDelayedField> DelayedFields { get; set; }
+        IReadOnlyCollection<IDelayedField> DelayedFields { get; set; }
 
         /// <summary>
         /// Embedded files to extract.
         /// </summary>
-        IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
+        IReadOnlyCollection<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
         /// <summary>
         /// Binder extensions.
         /// </summary>
-        IEnumerable<IBinderExtension> Extensions { get; set; }
+        IReadOnlyCollection<IBinderExtension> Extensions { get; set; }
 
         /// <summary>
         /// File system extensions.
         /// </summary>
-        IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
+        IReadOnlyCollection<IFileSystemExtension> FileSystemExtensions { get; set; }
 
         /// <summary>
         /// Set of ICEs to execute.
         /// </summary>
-        IEnumerable<string> Ices { get; set; }
+        IReadOnlyCollection<string> Ices { get; set; }
 
         /// <summary>
         /// Intermedaite folder.
@@ -100,7 +100,7 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Set of ICEs to skip.
         /// </summary>
-        IEnumerable<string> SuppressIces { get; set; }
+        IReadOnlyCollection<string> SuppressIces { get; set; }
 
         /// <summary>
         /// Skip all ICEs.

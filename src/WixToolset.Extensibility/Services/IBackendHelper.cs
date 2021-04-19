@@ -72,7 +72,7 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="embeddedFiles">Embedded files to extract.</param>
         /// <returns><c>ITrackedFile</c> for each embedded file extracted.</returns>
-        IEnumerable<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles);
+        IReadOnlyList<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles);
 
         /// <summary>
         /// Generate an identifier by hashing data from the row.

@@ -59,7 +59,7 @@ namespace WixToolset.Extensibility
         /// <param name="path">Optional resolved path to file.</param>
         /// <param name="checkedPaths">Optional collection of paths checked for the file.</param>
         /// <returns>Resolved file result.</returns>
-        protected IResolveFileResult CreateResolveFileResult(string path = null, IEnumerable<string> checkedPaths = null)
+        protected IResolveFileResult CreateResolveFileResult(string path = null, IReadOnlyCollection<string> checkedPaths = null)
         {
             var result = this.Context.ServiceProvider.GetService<IResolveFileResult>();
             result.Path = path;

@@ -7,23 +7,49 @@ namespace WixToolset.Extensibility.Data
     using System.Threading;
     using WixToolset.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Context provided during library creation operations.
+    /// </summary>
     public interface ILibraryContext
     {
+        /// <summary>
+        /// Service provider.
+        /// </summary>
         IServiceProvider ServiceProvider { get; }
 
+        /// <summary>
+        /// Indicates whether files should be bound into the library.
+        /// </summary>
         bool BindFiles { get; set; }
 
-        IEnumerable<IBindPath> BindPaths { get; set; }
+        /// <summary>
+        /// Collection of bindpaths used to bind files.
+        /// </summary>
+        IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
-        IEnumerable<ILibrarianExtension> Extensions { get; set; }
+        /// <summary>
+        /// Collection of extensions used during creation of library.
+        /// </summary>
+        IReadOnlyCollection<ILibrarianExtension> Extensions { get; set; }
 
+        /// <summary>
+        /// Identifier of the library.
+        /// </summary>
         string LibraryId { get; set; }
 
-        IEnumerable<Localization> Localizations { get; set; }
+        /// <summary>
+        /// Collection of localization files to use in the library.
+        /// </summary>
+        IReadOnlyCollection<Localization> Localizations { get; set; }
 
-        IEnumerable<Intermediate> Intermediates { get; set; }
+        /// <summary>
+        /// Collection of intermediates to include in the library.
+        /// </summary>
+        IReadOnlyCollection<Intermediate> Intermediates { get; set; }
 
+        /// <summary>
+        /// Cancellation token.
+        /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
 }

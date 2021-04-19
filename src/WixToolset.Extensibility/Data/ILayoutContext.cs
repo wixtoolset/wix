@@ -19,17 +19,17 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Extensions for use during layout.
         /// </summary>
-        IEnumerable<ILayoutExtension> Extensions { get; set; }
+        IReadOnlyCollection<ILayoutExtension> Extensions { get; set; }
 
         /// <summary>
         /// Set of tracked of files created during processing to be cleaned up.
         /// </summary>
-        IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+        IReadOnlyCollection<ITrackedFile> TrackedFiles { get; set; }
 
         /// <summary>
         /// Set of files to transfer.
         /// </summary>
-        IEnumerable<IFileTransfer> FileTransfers { get; set; }
+        IReadOnlyCollection<IFileTransfer> FileTransfers { get; set; }
 
         /// <summary>
         /// File to capture list of content files.

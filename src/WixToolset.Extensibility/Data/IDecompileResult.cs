@@ -11,7 +11,7 @@ namespace WixToolset.Extensibility.Data
     {
         XDocument Document { get; set; }
 
-        IEnumerable<string> ExtractedFilePaths { get; set; }
+        IReadOnlyCollection<string> ExtractedFilePaths { get; set; }
 
         Platform? Platform { get; set; }
     }

@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
@@ -33,7 +34,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Optional table definitions.
         /// </summary>
-        public virtual IEnumerable<TableDefinition> TableDefinitions => Enumerable.Empty<TableDefinition>();
+        public virtual IReadOnlyCollection<TableDefinition> TableDefinitions => Array.Empty<TableDefinition>();
 
         /// <summary>
         /// Creates a resolved cabinet result.

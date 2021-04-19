@@ -6,13 +6,24 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using WixToolset.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Result of bind operation.
+    /// </summary>
     public interface IBindResult : IDisposable
     {
-        IEnumerable<IFileTransfer> FileTransfers { get; set; }
+        /// <summary>
+        /// Collection of file transfers to complete.
+        /// </summary>
+        IReadOnlyCollection<IFileTransfer> FileTransfers { get; set; }
 
-        IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+        /// <summary>
+        /// Collection of files tracked during binding.
+        /// </summary>
+        IReadOnlyCollection<ITrackedFile> TrackedFiles { get; set; }
 
+        /// <summary>
+        /// Ouput of binding.
+        /// </summary>
         WixOutput Wixout { get; set; }
     }
 }

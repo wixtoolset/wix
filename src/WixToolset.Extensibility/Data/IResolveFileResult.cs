@@ -4,11 +4,19 @@ namespace WixToolset.Extensibility.Data
 {
     using System.Collections.Generic;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Result of resolving a file.
+    /// </summary>
     public interface IResolveFileResult
     {
-        IEnumerable<string> CheckedPaths { get; set; }
+        /// <summary>
+        /// Collection of paths checked to find file.
+        /// </summary>
+        IReadOnlyCollection<string> CheckedPaths { get; set; }
 
+        /// <summary>
+        /// Path to found file, if found.
+        /// </summary>
         string Path { get; set; }
     }
 }

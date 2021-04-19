@@ -33,7 +33,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Optional symbol definitions.
         /// </summary>
-        protected virtual IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => Enumerable.Empty<IntermediateSymbolDefinition>();
+        protected virtual IReadOnlyCollection<IntermediateSymbolDefinition> SymbolDefinitions => Array.Empty<IntermediateSymbolDefinition>();
 
         /// <summary>
         /// See <see cref="IBurnBackendBinderExtension.PreBackendBind(IBindContext)"/>

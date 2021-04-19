@@ -15,7 +15,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// The extension types of the WiX extension.
         /// </summary>
-        protected abstract IEnumerable<Type> ExtensionTypes { get; }
+        protected abstract IReadOnlyCollection<Type> ExtensionTypes { get; }
 
         /// <summary>
         /// See <see cref="IExtensionFactory.TryCreateExtension(Type, out object)"/>

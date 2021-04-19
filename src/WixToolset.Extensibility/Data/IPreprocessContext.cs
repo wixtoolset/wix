@@ -7,14 +7,25 @@ namespace WixToolset.Extensibility.Data
     using System.Threading;
     using WixToolset.Data;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Preprocessor context.
+    /// </summary>
     public interface IPreprocessContext
     {
+        /// <summary>
+        /// Service provider.
+        /// </summary>
         IServiceProvider ServiceProvider { get; }
 
-        IEnumerable<IPreprocessorExtension> Extensions { get; set; }
+        /// <summary>
+        /// Collection of extensions to use during preprocessing.
+        /// </summary>
+        IReadOnlyCollection<IPreprocessorExtension> Extensions { get; set; }
 
-        IEnumerable<string> IncludeSearchPaths { get; set; }
+        /// <summary>
+        /// Collection of search paths to find include files.
+        /// </summary>
+        IReadOnlyCollection<string> IncludeSearchPaths { get; set; }
 
         /// <summary>
         /// Gets the platform which the compiler will use when defaulting 64-bit attributes and elements.
@@ -22,12 +33,24 @@ namespace WixToolset.Extensibility.Data
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
         Platform Platform { get; set; }
 
+        /// <summary>
+        /// Path to the source file being preprocessed.
+        /// </summary>
         string SourcePath { get; set; }
 
+        /// <summary>
+        /// Collection of name/value pairs used as preprocessor variables.
+        /// </summary>
         IDictionary<string, string> Variables { get; set; }
 
+        /// <summary>
+        /// Current source line number of the preprocessor.
+        /// </summary>
         SourceLineNumber CurrentSourceLineNumber { get; set; }
 
+        /// <summary>
+        /// Cancellation token.
+        /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Table definitions provided by the extension.
         /// </summary>
-        IEnumerable<TableDefinition> TableDefinitions { get; }
+        IReadOnlyCollection<TableDefinition> TableDefinitions { get; }
 
         /// <summary>
         /// Called before binding occurs.

@@ -16,7 +16,7 @@ namespace WixToolset.Extensibility.Data
 
         OutputType DecompileType { get; set; }
 
-        IEnumerable<IDecompilerExtension> Extensions { get; set; }
+        IReadOnlyCollection<IDecompilerExtension> Extensions { get; set; }
 
         string ExtractFolder { get; set; }
 

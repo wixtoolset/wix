@@ -37,6 +37,6 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <typeparam name="T">Type of extension to get.</typeparam>
         /// <returns>Extensions of the specified type.</returns>
-        IEnumerable<T> GetServices<T>() where T : class;
+        IReadOnlyCollection<T> GetServices<T>() where T : class;
     }
 }

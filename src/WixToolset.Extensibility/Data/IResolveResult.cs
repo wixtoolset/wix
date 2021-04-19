@@ -28,12 +28,12 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Fields still requiring resolution.
         /// </summary>
-        IEnumerable<IDelayedField> DelayedFields { get; set; }
+        IReadOnlyCollection<IDelayedField> DelayedFields { get; set; }
 
         /// <summary>
         /// Files to extract from embedded .wixlibs.
         /// </summary>
-        IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
+        IReadOnlyCollection<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
         /// <summary>
         /// Resolved intermediate.

@@ -15,7 +15,7 @@ namespace WixToolset.Extensibility
         /// Gets the supported command line types for this extension.
         /// </summary>
         /// <value>The supported command line types for this extension.</value>
-        IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches { get; }
+        IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches { get; }
 
         /// <summary>
         /// Called before the command-line is parsed.

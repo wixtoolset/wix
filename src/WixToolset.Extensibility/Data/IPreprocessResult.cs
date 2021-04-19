@@ -5,11 +5,19 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using System.Xml.Linq;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Result of preprocessing.
+    /// </summary>
     public interface IPreprocessResult
     {
+        /// <summary>
+        /// Document result of preprocessor.
+        /// </summary>
         XDocument Document { get; set; }
 
-        IEnumerable<IIncludedFile> IncludedFiles { get; set; }
+        /// <summary>
+        /// Collection of files included during preprocessing.
+        /// </summary>
+        IReadOnlyCollection<IIncludedFile> IncludedFiles { get; set; }
     }
 }

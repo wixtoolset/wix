@@ -20,22 +20,22 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Bind paths used during resolution.
         /// </summary>
-        IEnumerable<IBindPath> BindPaths { get; set; }
+        IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
         /// <summary>
         /// Resolve extensions.
         /// </summary>
-        IEnumerable<IResolverExtension> Extensions { get; set; }
+        IReadOnlyCollection<IResolverExtension> Extensions { get; set; }
 
         /// <summary>
         /// Extension data.
         /// </summary>
-        IEnumerable<IExtensionData> ExtensionData { get; set; }
+        IReadOnlyCollection<IExtensionData> ExtensionData { get; set; }
 
         /// <summary>
         /// List of cultures to filter the localizations.
         /// </summary>
-        IEnumerable<string> FilterCultures { get; set; }
+        IReadOnlyCollection<string> FilterCultures { get; set; }
 
         /// <summary>
         /// Intermediate folder.
@@ -50,7 +50,7 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Localizations used to resolve.
         /// </summary>
-        IEnumerable<Localization> Localizations { get; set; }
+        IReadOnlyCollection<Localization> Localizations { get; set; }
 
         /// <summary>
         /// Indicates whether to allow localization and bind variables to remain unresolved.
