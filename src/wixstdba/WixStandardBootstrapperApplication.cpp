@@ -945,55 +945,48 @@ public: // IBootstrapperApplication
     }
 
 
-    virtual STDMETHODIMP OnResolveSource(
-        __in_z LPCWSTR wzPackageOrContainerId,
+    virtual STDMETHODIMP OnCacheAcquireResolving(
+        __in_z_opt LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
-        __in_z LPCWSTR wzLocalSource,
-        __in_z_opt LPCWSTR wzDownloadSource,
-        __in BOOTSTRAPPER_RESOLVESOURCE_ACTION /*recommendation*/,
-        __inout BOOTSTRAPPER_RESOLVESOURCE_ACTION* pAction,
+        __in_z LPCWSTR* rgSearchPaths,
+        __in DWORD /*cSearchPaths*/,
+        __in BOOL /*fFoundLocal*/,
+        __in DWORD dwRecommendedSearchPath,
+        __in_z_opt LPCWSTR /*wzDownloadUrl*/,
+        __in_z_opt LPCWSTR /*wzPayloadContainerId*/,
+        __in BOOTSTRAPPER_CACHE_RESOLVE_OPERATION /*recommendation*/,
+        __inout DWORD* /*pdwChosenSearchPath*/,
+        __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* pAction,
         __inout BOOL* pfCancel
         )
     {
         HRESULT hr = S_OK;
 
-        if (BOOTSTRAPPER_DISPLAY_FULL == m_command.display)
+        if (BOOTSTRAPPER_CACHE_RESOLVE_NONE == *pAction && BOOTSTRAPPER_DISPLAY_FULL == m_command.display) // prompt to change the source location.
         {
-            if (wzDownloadSource)
+            OPENFILENAMEW ofn = { };
+            WCHAR wzFile[MAX_PATH] = { };
+
+            ::StringCchCopyW(wzFile, countof(wzFile), rgSearchPaths[dwRecommendedSearchPath]);
+
+            ofn.lStructSize = sizeof(ofn);
+            ofn.hwndOwner = m_hWnd;
+            ofn.lpstrFile = wzFile;
+            ofn.nMaxFile = countof(wzFile);
+            ofn.lpstrFilter = L"All Files\0*.*\0";
+            ofn.nFilterIndex = 1;
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+            ofn.lpstrTitle = m_pTheme->sczCaption;
+
+            if (::GetOpenFileNameW(&ofn))
             {
-                *pAction = BOOTSTRAPPER_RESOLVESOURCE_ACTION_DOWNLOAD;
+                hr = m_pEngine->SetLocalSource(wzPackageOrContainerId, wzPayloadId, ofn.lpstrFile);
+                *pAction = BOOTSTRAPPER_CACHE_RESOLVE_RETRY;
             }
-            else // prompt to change the source location.
+            else
             {
-                OPENFILENAMEW ofn = { };
-                WCHAR wzFile[MAX_PATH] = { };
-
-                ::StringCchCopyW(wzFile, countof(wzFile), wzLocalSource);
-
-                ofn.lStructSize = sizeof(ofn);
-                ofn.hwndOwner = m_hWnd;
-                ofn.lpstrFile = wzFile;
-                ofn.nMaxFile = countof(wzFile);
-                ofn.lpstrFilter = L"All Files\0*.*\0";
-                ofn.nFilterIndex = 1;
-                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-                ofn.lpstrTitle = m_pTheme->sczCaption;
-
-                if (::GetOpenFileNameW(&ofn))
-                {
-                    hr = m_pEngine->SetLocalSource(wzPackageOrContainerId, wzPayloadId, ofn.lpstrFile);
-                    *pAction = BOOTSTRAPPER_RESOLVESOURCE_ACTION_RETRY;
-                }
-                else
-                {
-                    *pfCancel = TRUE;
-                }
+                *pfCancel = TRUE;
             }
-        }
-        else if (wzDownloadSource)
-        {
-            // If doing a non-interactive install and download source is available, let's try downloading the package silently
-            *pAction = BOOTSTRAPPER_RESOLVESOURCE_ACTION_DOWNLOAD;
         }
         // else there's nothing more we can do in non-interactive mode
 
@@ -1196,8 +1189,8 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIREPROGRESS:
             OnCacheAcquireProgressFallback(reinterpret_cast<BA_ONCACHEACQUIREPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIREPROGRESS_RESULTS*>(pvResults));
             break;
-        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONRESOLVESOURCE:
-            OnResolveSourceFallback(reinterpret_cast<BA_ONRESOLVESOURCE_ARGS*>(pvArgs), reinterpret_cast<BA_ONRESOLVESOURCE_RESULTS*>(pvResults));
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING:
+            OnCacheAcquireResolvingFallback(reinterpret_cast<BA_ONCACHEACQUIRERESOLVING_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIRERESOLVING_RESULTS*>(pvResults));
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRECOMPLETE:
             OnCacheAcquireCompleteFallback(reinterpret_cast<BA_ONCACHEACQUIRECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEACQUIRECOMPLETE_RESULTS*>(pvResults));
@@ -1570,12 +1563,12 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEACQUIREPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
-    void OnResolveSourceFallback(
-        __in BA_ONRESOLVESOURCE_ARGS* pArgs,
-        __inout BA_ONRESOLVESOURCE_RESULTS* pResults
+    void OnCacheAcquireResolvingFallback(
+        __in BA_ONCACHEACQUIRERESOLVING_ARGS* pArgs,
+        __inout BA_ONCACHEACQUIRERESOLVING_RESULTS* pResults
         )
     {
-        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONRESOLVESOURCE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEACQUIRERESOLVING, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     void OnCacheAcquireCompleteFallback(
