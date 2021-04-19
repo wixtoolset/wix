@@ -14,9 +14,9 @@ namespace WixToolset.Core
 
         public int? PackageLcid { get; set; }
 
-        public IEnumerable<IDelayedField> DelayedFields { get; set; }
+        public IReadOnlyCollection<IDelayedField> DelayedFields { get; set; }
 
-        public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
+        public IReadOnlyCollection<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
     }

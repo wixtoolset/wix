@@ -19,19 +19,19 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IEnumerable<IBindPath> BindPaths { get; set; }
+        public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
-        public IEnumerable<IResolverExtension> Extensions { get; set; }
+        public IReadOnlyCollection<IResolverExtension> Extensions { get; set; }
 
-        public IEnumerable<IExtensionData> ExtensionData { get; set; }
+        public IReadOnlyCollection<IExtensionData> ExtensionData { get; set; }
 
-        public IEnumerable<string> FilterCultures { get; set; }
+        public IReadOnlyCollection<string> FilterCultures { get; set; }
 
         public string IntermediateFolder { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
 
-        public IEnumerable<Localization> Localizations { get; set; }
+        public IReadOnlyCollection<Localization> Localizations { get; set; }
 
         public IVariableResolver VariableResolver { get; set; }
 

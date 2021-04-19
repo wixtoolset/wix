@@ -11,9 +11,9 @@ namespace WixToolset.Core
     {
         private bool disposed;
 
-        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
+        public IReadOnlyCollection<IFileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+        public IReadOnlyCollection<ITrackedFile> TrackedFiles { get; set; }
 
         public WixOutput Wixout { get; set; }
 

@@ -17,7 +17,7 @@ namespace WixToolset.Core.Bind
             this.FilesWithEmbeddedFiles = embeddedFiles;
         }
 
-        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+        public IReadOnlyList<ITrackedFile> TrackedFiles { get; private set; }
 
         private IBackendHelper BackendHelper { get; }
 

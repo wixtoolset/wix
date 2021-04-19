@@ -11,7 +11,7 @@ namespace WixToolset.Core
     {
         public XDocument Document { get; set; }
 
-        public IEnumerable<string> ExtractedFilePaths { get; set; }
+        public IReadOnlyCollection<string> ExtractedFilePaths { get; set; }
 
         public Platform? Platform { get; set; }
     }

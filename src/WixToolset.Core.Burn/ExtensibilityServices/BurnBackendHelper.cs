@@ -46,7 +46,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name) => this.backendHelper.CreateResolvedDirectory(directoryParent, name);
 
-        public IEnumerable<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles) => this.backendHelper.ExtractEmbeddedFiles(embeddedFiles);
+        public IReadOnlyList<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles) => this.backendHelper.ExtractEmbeddedFiles(embeddedFiles);
 
         public string GenerateIdentifier(string prefix, params string[] args) => this.backendHelper.GenerateIdentifier(prefix, args);
 

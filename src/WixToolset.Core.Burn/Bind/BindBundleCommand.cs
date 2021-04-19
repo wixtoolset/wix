@@ -73,9 +73,9 @@ namespace WixToolset.Core.Burn
 
         private IVariableResolver VariableResolver { get; }
 
-        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
+        public IReadOnlyCollection<IFileTransfer> FileTransfers { get; private set; }
 
-        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+        public IReadOnlyCollection<ITrackedFile> TrackedFiles { get; private set; }
 
         public WixOutput Wixout { get; private set; }
 

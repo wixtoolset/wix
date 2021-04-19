@@ -17,13 +17,13 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IEnumerable<ILayoutExtension> Extensions { get; set; }
+        public IReadOnlyCollection<ILayoutExtension> Extensions { get; set; }
 
-        public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
+        public IReadOnlyCollection<IFileSystemExtension> FileSystemExtensions { get; set; }
 
-        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
+        public IReadOnlyCollection<IFileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+        public IReadOnlyCollection<ITrackedFile> TrackedFiles { get; set; }
 
         public string IntermediateFolder { get; set; }
 

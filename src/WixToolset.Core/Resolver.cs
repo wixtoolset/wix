@@ -77,7 +77,7 @@ namespace WixToolset.Core
 
             var filesWithEmbeddedFiles = new ExtractEmbeddedFiles();
 
-            IEnumerable<DelayedField> delayedFields;
+            IReadOnlyCollection<DelayedField> delayedFields;
             {
                 var command = new ResolveFieldsCommand();
                 command.Messaging = this.Messaging;

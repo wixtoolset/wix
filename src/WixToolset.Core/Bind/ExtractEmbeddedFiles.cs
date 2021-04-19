@@ -50,7 +50,7 @@ namespace WixToolset.Core.Bind
             return extractPath;
         }
 
-        public IEnumerable<ExpectedExtractFile> GetExpectedEmbeddedFiles()
+        public IReadOnlyList<ExpectedExtractFile> GetExpectedEmbeddedFiles()
         {
             var files = new List<ExpectedExtractFile>();
 

@@ -21,7 +21,7 @@ namespace WixToolset.Core
 
         public string CompilationId { get; set; }
 
-        public IEnumerable<ICompilerExtension> Extensions { get; set; }
+        public IReadOnlyCollection<ICompilerExtension> Extensions { get; set; }
 
         public Platform Platform { get; set; }
 

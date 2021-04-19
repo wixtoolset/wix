@@ -18,7 +18,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IEnumerable<BindPath> BindPaths { get; set; }
+        public IReadOnlyCollection<BindPath> BindPaths { get; set; }
 
         public string BurnStubPath { get; set; }
 
@@ -28,15 +28,15 @@ namespace WixToolset.Core
 
         public CompressionLevel? DefaultCompressionLevel { get; set; }
 
-        public IEnumerable<IDelayedField> DelayedFields { get; set; }
+        public IReadOnlyCollection<IDelayedField> DelayedFields { get; set; }
 
-        public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
+        public IReadOnlyCollection<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
-        public IEnumerable<IBinderExtension> Extensions { get; set; }
+        public IReadOnlyCollection<IBinderExtension> Extensions { get; set; }
 
-        public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
+        public IReadOnlyCollection<IFileSystemExtension> FileSystemExtensions { get; set; }
 
-        public IEnumerable<string> Ices { get; set; }
+        public IReadOnlyCollection<string> Ices { get; set; }
 
         public string IntermediateFolder { get; set; }
 
@@ -54,7 +54,7 @@ namespace WixToolset.Core
 
         public int? ResolvedLcid { get; set; }
 
-        public IEnumerable<string> SuppressIces { get; set; }
+        public IReadOnlyCollection<string> SuppressIces { get; set; }
 
         public bool SuppressValidation { get; set; }
 

@@ -216,7 +216,7 @@ namespace WixToolset.Core.CommandLine
             }
         }
 
-        private IEnumerable<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<SourceFile> sourceFiles, CancellationToken cancellationToken)
+        private IReadOnlyList<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<SourceFile> sourceFiles, CancellationToken cancellationToken)
         {
             var intermediates = new List<Intermediate>();
 
@@ -257,7 +257,7 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations, bool bindFiles, IEnumerable<IBindPath> bindPaths, CancellationToken cancellationToken)
+        private Intermediate LibraryPhase(IReadOnlyCollection<Intermediate> intermediates, IReadOnlyCollection<Localization> localizations, bool bindFiles, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
@@ -302,7 +302,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, IReadOnlyCollection<IBindPath> bindPaths, CancellationToken cancellationToken)
         {
             var intermediateFolder = this.IntermediateFolder;
             if (String.IsNullOrEmpty(intermediateFolder))
@@ -405,7 +405,7 @@ namespace WixToolset.Core.CommandLine
             return Array.Empty<Intermediate>();
         }
 
-        private IEnumerable<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables, CancellationToken cancellationToken)
+        private IReadOnlyList<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables, CancellationToken cancellationToken)
         {
             var localizations = new List<Localization>();
             var parser = this.ServiceProvider.GetService<ILocalizationParser>();
@@ -787,7 +787,7 @@ namespace WixToolset.Core.CommandLine
                 return Data.OutputType.Unknown;
             }
 
-            public IEnumerable<string> CalculateFilterCultures()
+            public IReadOnlyList<string> CalculateFilterCultures()
             {
                 var result = new List<string>();
 

@@ -9,7 +9,7 @@ namespace Example.Extension
 
     internal class ExampleWindowsInstallerBackendExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => ExampleTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => ExampleTableDefinitions.All;
 
         public override bool TryProcessSymbol(IntermediateSection section, IntermediateSymbol symbol, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {

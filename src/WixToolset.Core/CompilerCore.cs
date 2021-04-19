@@ -1048,7 +1048,7 @@ namespace WixToolset.Core
         {
             var section = new IntermediateSection(id, type, compilationId);
 
-            this.intermediate.Sections.Add(section);
+            this.intermediate.AddSection(section);
 
             return section;
         }

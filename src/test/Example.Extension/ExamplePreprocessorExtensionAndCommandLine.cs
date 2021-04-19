@@ -12,7 +12,7 @@ namespace Example.Extension
     {
         private string exampleValueFromCommandLine;
 
-        public IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => throw new NotImplementedException();
+        public IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => throw new NotImplementedException();
 
         public ExamplePreprocessorExtensionAndCommandLine()
         {

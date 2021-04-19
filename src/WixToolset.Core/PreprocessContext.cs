@@ -18,11 +18,11 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IEnumerable<IPreprocessorExtension> Extensions { get; set; }
+        public IReadOnlyCollection<IPreprocessorExtension> Extensions { get; set; }
 
         public Platform Platform { get; set; }
 
-        public IEnumerable<string> IncludeSearchPaths { get; set; }
+        public IReadOnlyCollection<string> IncludeSearchPaths { get; set; }
 
         public string SourcePath { get; set; }
 

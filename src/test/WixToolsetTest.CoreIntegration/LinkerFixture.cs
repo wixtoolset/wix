@@ -3,6 +3,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
@@ -29,8 +30,8 @@ namespace WixToolsetTest.CoreIntegration
 
             var creator = serviceProvider.GetService<ISymbolDefinitionCreator>();
             var context = serviceProvider.GetService<ILinkContext>();
-            context.Extensions = Enumerable.Empty<WixToolset.Extensibility.ILinkerExtension>();
-            context.ExtensionData = Enumerable.Empty<WixToolset.Extensibility.IExtensionData>();
+            context.Extensions = Array.Empty<WixToolset.Extensibility.ILinkerExtension>();
+            context.ExtensionData = Array.Empty<WixToolset.Extensibility.IExtensionData>();
             context.Intermediates = new[] { intermediate1, intermediate2 };
             context.SymbolDefinitionCreator = creator;
 

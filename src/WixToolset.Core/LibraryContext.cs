@@ -23,15 +23,15 @@ namespace WixToolset.Core
 
         public bool BindFiles { get; set; }
 
-        public IEnumerable<IBindPath> BindPaths { get; set; }
+        public IReadOnlyCollection<IBindPath> BindPaths { get; set; }
 
-        public IEnumerable<ILibrarianExtension> Extensions { get; set; }
+        public IReadOnlyCollection<ILibrarianExtension> Extensions { get; set; }
 
         public string LibraryId { get; set; }
 
-        public IEnumerable<Localization> Localizations { get; set; }
+        public IReadOnlyCollection<Localization> Localizations { get; set; }
 
-        public IEnumerable<Intermediate> Intermediates { get; set; }
+        public IReadOnlyCollection<Intermediate> Intermediates { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
     }

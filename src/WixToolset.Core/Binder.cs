@@ -58,7 +58,7 @@ namespace WixToolset.Core
 
             var backendFactories = extensionManager.GetServices<IBackendFactory>();
 
-            var entrySection = context.IntermediateRepresentation.Sections[0];
+            var entrySection = context.IntermediateRepresentation.Sections.First();
 
             foreach (var factory in backendFactories)
             {

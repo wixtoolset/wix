@@ -42,7 +42,7 @@ namespace WixToolset.Core.CommandLine
 
         private Platform Platform { get; }
 
-        public IEnumerable<string> IncludeSearchPaths { get; }
+        public IReadOnlyCollection<string> IncludeSearchPaths { get; }
 
         public bool ShowLogo => throw new NotImplementedException();
 

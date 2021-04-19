@@ -22,7 +22,7 @@ namespace WixToolset.Core
 
         public OutputType DecompileType { get; set; }
 
-        public IEnumerable<IDecompilerExtension> Extensions { get; set; }
+        public IReadOnlyCollection<IDecompilerExtension> Extensions { get; set; }
 
         public string ExtractFolder { get; set; }
 

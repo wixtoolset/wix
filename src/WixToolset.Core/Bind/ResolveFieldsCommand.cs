@@ -36,7 +36,7 @@ namespace WixToolset.Core.Bind
 
         public bool AllowUnresolvedVariables { private get; set; }
 
-        public IEnumerable<DelayedField> DelayedFields { get; private set; }
+        public IReadOnlyCollection<DelayedField> DelayedFields { get; private set; }
 
         public void Execute()
         {

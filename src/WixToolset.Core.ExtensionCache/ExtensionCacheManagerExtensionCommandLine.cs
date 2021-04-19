@@ -21,7 +21,7 @@ namespace WixToolset.Core.ExtensionCache
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
         {
             new ExtensionCommandLineSwitch { Switch = "extension", Description = "Manage extension cache." },
         };

@@ -73,7 +73,7 @@ namespace WixToolset.Core.ExtensibilityServices
             };
         }
 
-        public IEnumerable<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles)
+        public IReadOnlyList<ITrackedFile> ExtractEmbeddedFiles(IEnumerable<IExpectedExtractFile> embeddedFiles)
         {
             var command = new ExtractEmbeddedFilesCommand(this, embeddedFiles);
             command.Execute();

@@ -10,6 +10,6 @@ namespace WixToolset.Core
     {
         public XDocument Document { get; set; }
 
-        public IEnumerable<IIncludedFile> IncludedFiles { get; set; }
+        public IReadOnlyCollection<IIncludedFile> IncludedFiles { get; set; }
     }
 }

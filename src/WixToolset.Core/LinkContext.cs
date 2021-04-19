@@ -8,7 +8,6 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
     internal class LinkContext : ILinkContext
     {
@@ -19,13 +18,13 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public IEnumerable<ILinkerExtension> Extensions { get; set; }
+        public IReadOnlyCollection<ILinkerExtension> Extensions { get; set; }
 
-        public IEnumerable<IExtensionData> ExtensionData { get; set; }
+        public IReadOnlyCollection<IExtensionData> ExtensionData { get; set; }
 
         public OutputType ExpectedOutputType { get; set; }
 
-        public IEnumerable<Intermediate> Intermediates { get; set; }
+        public IReadOnlyCollection<Intermediate> Intermediates { get; set; }
 
         public ISymbolDefinitionCreator SymbolDefinitionCreator { get; set; }
 

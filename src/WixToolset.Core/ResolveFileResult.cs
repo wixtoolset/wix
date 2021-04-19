@@ -9,6 +9,6 @@ namespace WixToolset.Core
     {
         public string Path { get; set; }
 
-        public IEnumerable<string> CheckedPaths { get; set; }
+        public IReadOnlyCollection<string> CheckedPaths { get; set; }
     }
 }
