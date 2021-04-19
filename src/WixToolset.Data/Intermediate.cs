@@ -18,6 +18,7 @@ namespace WixToolset.Data
         private const string WixOutputStreamName = "wix-ir.json";
 
         private readonly Dictionary<string, Localization> localizationsByCulture;
+        private readonly List<IntermediateSection> sections;
 
         /// <summary>
         /// Instantiate a new Intermediate.
@@ -26,7 +27,7 @@ namespace WixToolset.Data
         {
             this.Id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
             this.localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
-            this.Sections = new List<IntermediateSection>();
+            this.sections = new List<IntermediateSection>();
         }
 
         public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture) : this(id, level: null, sections, localizationsByCulture)
@@ -38,7 +39,7 @@ namespace WixToolset.Data
             this.Id = id;
             this.Level = level;
             this.localizationsByCulture = (localizationsByCulture != null) ? new Dictionary<string, Localization>(localizationsByCulture, StringComparer.OrdinalIgnoreCase) : new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
-            this.Sections = (sections != null) ? new List<IntermediateSection>(sections) : new List<IntermediateSection>();
+            this.sections = (sections != null) ? new List<IntermediateSection>(sections) : new List<IntermediateSection>();
         }
 
         /// <summary>
@@ -54,12 +55,12 @@ namespace WixToolset.Data
         /// <summary>
         /// Get the localizations contained in this intermediate.
         /// </summary>
-        public IEnumerable<Localization> Localizations => this.localizationsByCulture.Values;
+        public IReadOnlyCollection<Localization> Localizations => this.localizationsByCulture.Values;
 
         /// <summary>
         /// Get the sections contained in this intermediate.
         /// </summary>
-        public IList<IntermediateSection> Sections { get; }
+        public IReadOnlyCollection<IntermediateSection> Sections => this.sections;
 
         /// <summary>
         /// Loads an intermediate from a path on disk.
@@ -146,7 +147,7 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
         /// <returns>Returns the loaded intermediates</returns>
-        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles)
+        public static IReadOnlyList<Intermediate> Load(IEnumerable<string> intermediateFiles)
         {
             var creator = new SimpleSymbolDefinitionCreator();
             return Intermediate.Load(intermediateFiles, creator);
@@ -159,7 +160,7 @@ namespace WixToolset.Data
         /// <param name="creator">ISymbolDefinitionCreator to use when reconstituting the intermediates.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediates</returns>
-        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
+        public static IReadOnlyList<Intermediate> Load(IEnumerable<string> intermediateFiles, ISymbolDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             var jsons = new Queue<JsonWithPath>();
             var intermediates = new List<Intermediate>();
@@ -187,6 +188,27 @@ namespace WixToolset.Data
             }
 
             return intermediates;
+        }
+
+        /// <summary>
+        /// Adds a section to the intermedaite.
+        /// </summary>
+        /// <param name="section">Section to add to the intermediate.</param>
+        /// <returns>Section added to the intermediate.</returns>
+        public IntermediateSection AddSection(IntermediateSection section)
+        {
+            this.sections.Add(section);
+            return section;
+        }
+
+        /// <summary>
+        /// Removes a section from the intermediate.
+        /// </summary>
+        /// <param name="section">Section to remove.</param>
+        /// <returns>True if the section was removed; otherwise false.</returns>
+        public bool Removesection(IntermediateSection section)
+        {
+            return this.sections.Remove(section);
         }
 
         /// <summary>

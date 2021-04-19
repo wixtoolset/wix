@@ -414,12 +414,12 @@ namespace WixToolset.Data.WindowsInstaller
         /// <summary>
         /// Standard actions.
         /// </summary>
-        public static IEnumerable<WixActionSymbol> StandardActions() => standardActionsById.Values;
+        public static IReadOnlyCollection<WixActionSymbol> StandardActions() => standardActionsById.Values;
 
         /// <summary>
         /// Standard directories.
         /// </summary>
-        public static IEnumerable<DirectorySymbol> StandardDirectories() => standardDirectoriesById.Values;
+        public static IReadOnlyCollection<DirectorySymbol> StandardDirectories() => standardDirectoriesById.Values;
 
         /// <summary>
         /// Gets the platform specific directory id for a directory. Most directories are not platform
