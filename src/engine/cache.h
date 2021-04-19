@@ -101,7 +101,8 @@ HRESULT CacheGetLocalSourcePaths(
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in BURN_VARIABLES* pVariables,
     __inout LPWSTR** prgSearchPaths,
-    __out DWORD* pcSearchPaths
+    __out DWORD* pcSearchPaths,
+    __out DWORD* pdwLikelySearchPath
     );
 HRESULT CacheSetLastUsedSource(
     __in BURN_VARIABLES* pVariables,

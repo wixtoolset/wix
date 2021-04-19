@@ -1390,6 +1390,7 @@ static HRESULT AcquireContainerOrPayload(
     LPCWSTR wzRelativePath = pContainer ? pContainer->sczFilePath : pPayload->sczFilePath;
     DWORD dwChosenSearchPath = 0;
     BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
+    BOOTSTRAPPER_CACHE_RESOLVE_OPERATION resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_NONE;
     LPWSTR* pwzDownloadUrl = pContainer ? &pContainer->downloadSource.sczUrl : &pPayload->downloadSource.sczUrl;
     LPWSTR* pwzSourcePath = pContainer ? &pContainer->sczSourcePath : &pPayload->sczSourcePath;
     BOOL fFoundLocal = FALSE;
@@ -1405,47 +1406,70 @@ static HRESULT AcquireContainerOrPayload(
     if (BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD != cacheOperation &&
         BOOTSTRAPPER_CACHE_OPERATION_EXTRACT != cacheOperation)
     {
-        hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths);
-        ExitOnFailure(hr, "Failed to search local source.");
-
-        for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
+        do
         {
-            // If the file exists locally, choose it.
-            if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
-            {
-                dwChosenSearchPath = i;
+            fFoundLocal = FALSE;
+            resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_NONE;
+            dwChosenSearchPath = 0;
 
-                fFoundLocal = TRUE;
+            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath);
+            ExitOnFailure(hr, "Failed to search local source.");
+
+            for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
+            {
+                // If the file exists locally, choose it.
+                if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
+                {
+                    dwChosenSearchPath = i;
+
+                    fFoundLocal = TRUE;
+                    break;
+                }
+            }
+
+            if (BOOTSTRAPPER_CACHE_OPERATION_COPY == cacheOperation)
+            {
+                if (fFoundLocal)
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_LOCAL;
+                }
+            }
+            else
+            {
+                if (fFoundLocal) // the file exists locally, so copy it.
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_LOCAL;
+                }
+                else if (wzPayloadContainerId)
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER;
+                }
+                else if (*pwzDownloadUrl && **pwzDownloadUrl)
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_DOWNLOAD;
+                }
+            }
+
+            // Let the BA have a chance to override the source.
+            hr = UserExperienceOnCacheAcquireResolving(pContext->pUX, wzPackageOrContainerId, wzPayloadId, pContext->rgSearchPaths, pContext->cSearchPaths, fFoundLocal, &dwChosenSearchPath, pwzDownloadUrl, wzPayloadContainerId, &resolveOperation);
+            ExitOnRootFailure(hr, "BA aborted cache acquire resolving.");
+
+            switch (resolveOperation)
+            {
+            case BOOTSTRAPPER_CACHE_RESOLVE_LOCAL:
+                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_COPY;
+                break;
+            case BOOTSTRAPPER_CACHE_RESOLVE_DOWNLOAD:
+                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD;
+                break;
+            case BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER:
+                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_EXTRACT;
+                break;
+            case BOOTSTRAPPER_CACHE_RESOLVE_RETRY:
+                pContext->cSearchPathsMax = max(pContext->cSearchPaths, pContext->cSearchPathsMax);
                 break;
             }
-        }
-
-        if (BOOTSTRAPPER_CACHE_OPERATION_COPY == cacheOperation)
-        {
-            if (!fFoundLocal)
-            {
-                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
-            }
-        }
-        else
-        {
-            if (fFoundLocal) // the file exists locally, so copy it.
-            {
-                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_COPY;
-            }
-            else if (wzPayloadContainerId)
-            {
-                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_EXTRACT;
-            }
-            else if (*pwzDownloadUrl && **pwzDownloadUrl)
-            {
-                cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD;
-            }
-        }
-
-        // Let the BA have a chance to override the action, but their chance to change the source is during begin or complete.
-        hr = UserExperienceOnCacheAcquireResolving(pContext->pUX, wzPackageOrContainerId, wzPayloadId, pContext->rgSearchPaths, pContext->cSearchPaths, fFoundLocal, &dwChosenSearchPath, *pwzDownloadUrl, wzPayloadContainerId, &cacheOperation);
-        ExitOnRootFailure(hr, "BA aborted cache acquire resolving.");
+        } while (BOOTSTRAPPER_CACHE_RESOLVE_RETRY == resolveOperation);
     }
 
     switch (cacheOperation)

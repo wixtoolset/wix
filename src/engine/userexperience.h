@@ -154,9 +154,9 @@ BAAPI UserExperienceOnCacheAcquireResolving(
     __in DWORD cSearchPaths,
     __in BOOL fFoundLocal,
     __in DWORD* pdwChosenSearchPath,
-    __in_z_opt LPCWSTR wzDownloadUrl,
+    __in_z_opt LPWSTR* pwzDownloadUrl,
     __in_z_opt LPCWSTR wzPayloadContainerId,
-    __inout BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
+    __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* pCacheOperation
     );
 BAAPI UserExperienceOnCacheBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience

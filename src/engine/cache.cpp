@@ -440,7 +440,8 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __in BURN_VARIABLES* pVariables,
     __inout LPWSTR** prgSearchPaths,
-    __out DWORD* pcSearchPaths
+    __out DWORD* pcSearchPaths,
+    __out DWORD* pdwLikelySearchPath
     )
 {
     HRESULT hr = S_OK;
@@ -452,6 +453,7 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     BOOL fTryRelativePath = FALSE;
     BOOL fSourceIsAbsolute = FALSE;
     DWORD cSearchPaths = 0;
+    DWORD dwLikelySearchPath = 0;
 
     AssertSz(vfInitializedCache, "Cache wasn't initialized");
 
@@ -472,6 +474,12 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
 
         hr = StrAllocString(psczPath, wzSourcePath, 0);
         ExitOnFailure(hr, "Failed to copy absolute source path.");
+    }
+    else
+    {
+        // If none of the paths exist, then most BAs will want to prompt the user with a possible path.
+        // The destination path is a temporary location and so not really a possible path.
+        dwLikelySearchPath = 1;
     }
 
     // Try the destination path next.
@@ -593,6 +601,7 @@ LExit:
 
     AssertSz(cSearchPaths <= BURN_CACHE_MAX_SEARCH_PATHS, "Got more than BURN_CACHE_MAX_SEARCH_PATHS search paths");
     *pcSearchPaths = cSearchPaths;
+    *pdwLikelySearchPath = dwLikelySearchPath;
 
     return hr;
 }

@@ -515,9 +515,9 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireResolving(
     __in DWORD cSearchPaths,
     __in BOOL fFoundLocal,
     __in DWORD* pdwChosenSearchPath,
-    __in_z_opt LPCWSTR wzDownloadUrl,
+    __in_z_opt LPWSTR* pwzDownloadUrl,
     __in_z_opt LPCWSTR wzPayloadContainerId,
-    __inout BOOTSTRAPPER_CACHE_OPERATION* pCacheOperation
+    __inout BOOTSTRAPPER_CACHE_RESOLVE_OPERATION* pCacheOperation
     )
 {
     HRESULT hr = S_OK;
@@ -531,14 +531,14 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireResolving(
     args.cSearchPaths = cSearchPaths;
     args.fFoundLocal = fFoundLocal;
     args.dwRecommendedSearchPath = *pdwChosenSearchPath;
-    args.wzDownloadUrl = wzDownloadUrl;
+    args.wzDownloadUrl = *pwzDownloadUrl;
     args.recommendation = *pCacheOperation;
 
     results.cbSize = sizeof(results);
     results.dwChosenSearchPath = *pdwChosenSearchPath;
     results.action = *pCacheOperation;
 
-    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING, &args, &results);
+    hr = SendBAMessageFromInactiveEngine(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEACQUIRERESOLVING, &args, &results);
     ExitOnFailure(hr, "BA OnCacheAcquireResolving failed.");
 
     if (results.fCancel)
@@ -548,13 +548,14 @@ EXTERN_C BAAPI UserExperienceOnCacheAcquireResolving(
     else
     {
         // Verify the BA requested an action that is possible.
-        if (BOOTSTRAPPER_CACHE_OPERATION_DOWNLOAD == results.action && wzDownloadUrl && *wzDownloadUrl ||
-            BOOTSTRAPPER_CACHE_OPERATION_EXTRACT == results.action && wzPayloadContainerId ||
-            BOOTSTRAPPER_CACHE_OPERATION_NONE == results.action)
+        if (BOOTSTRAPPER_CACHE_RESOLVE_DOWNLOAD == results.action && *pwzDownloadUrl && **pwzDownloadUrl ||
+            BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER == results.action && wzPayloadContainerId ||
+            BOOTSTRAPPER_CACHE_RESOLVE_RETRY == results.action ||
+            BOOTSTRAPPER_CACHE_RESOLVE_NONE == results.action)
         {
             *pCacheOperation = results.action;
         }
-        else if (BOOTSTRAPPER_CACHE_OPERATION_COPY == results.action && results.dwChosenSearchPath < cSearchPaths)
+        else if (BOOTSTRAPPER_CACHE_RESOLVE_LOCAL == results.action && results.dwChosenSearchPath < cSearchPaths)
         {
             *pdwChosenSearchPath = results.dwChosenSearchPath;
             *pCacheOperation = results.action;

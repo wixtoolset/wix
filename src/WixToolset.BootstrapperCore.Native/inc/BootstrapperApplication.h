@@ -64,6 +64,20 @@ enum BOOTSTRAPPER_CACHE_OPERATION
     BOOTSTRAPPER_CACHE_OPERATION_EXTRACT,
 };
 
+enum BOOTSTRAPPER_CACHE_RESOLVE_OPERATION
+{
+    // There is no source available.
+    BOOTSTRAPPER_CACHE_RESOLVE_NONE,
+    // Copy the payload or container from the chosen local source.
+    BOOTSTRAPPER_CACHE_RESOLVE_LOCAL,
+    // Download the payload or container from the download URL.
+    BOOTSTRAPPER_CACHE_RESOLVE_DOWNLOAD,
+    // Extract the payload from the container.
+    BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER,
+    // Look again for the payload or container locally.
+    BOOTSTRAPPER_CACHE_RESOLVE_RETRY,
+};
+
 enum BOOTSTRAPPER_CACHE_VERIFY_STEP
 {
     BOOTSTRAPPER_CACHE_VERIFY_STEP_STAGE,
@@ -379,14 +393,14 @@ struct BA_ONCACHEACQUIRERESOLVING_ARGS
     DWORD dwRecommendedSearchPath;
     LPCWSTR wzDownloadUrl;
     LPCWSTR wzPayloadContainerId;
-    BOOTSTRAPPER_CACHE_OPERATION recommendation;
+    BOOTSTRAPPER_CACHE_RESOLVE_OPERATION recommendation;
 };
 
 struct BA_ONCACHEACQUIRERESOLVING_RESULTS
 {
     DWORD cbSize;
     DWORD dwChosenSearchPath;
-    BOOTSTRAPPER_CACHE_OPERATION action;
+    BOOTSTRAPPER_CACHE_RESOLVE_OPERATION action;
     BOOL fCancel;
 };
 
