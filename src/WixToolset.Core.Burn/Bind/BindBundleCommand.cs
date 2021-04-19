@@ -208,17 +208,6 @@ namespace WixToolset.Core.Burn
                 {
                     var command = new ProcessMsiPackageCommand(this.ServiceProvider, this.BackendExtensions, section, facade, packagesPayloads[facade.PackageId]);
                     command.Execute();
-
-                    if (null != variableCache)
-                    {
-                        var msiPackage = (WixBundleMsiPackageSymbol)facade.SpecificPackageSymbol;
-                        variableCache.Add(String.Concat("packageLanguage.", facade.PackageId), msiPackage.ProductLanguage.ToString());
-
-                        if (null != msiPackage.Manufacturer)
-                        {
-                            variableCache.Add(String.Concat("packageManufacturer.", facade.PackageId), msiPackage.Manufacturer);
-                        }
-                    }
                 }
                 break;
 
@@ -239,7 +228,7 @@ namespace WixToolset.Core.Burn
 
                 if (null != variableCache)
                 {
-                    BindBundleCommand.PopulatePackageVariableCache(facade.PackageSymbol, variableCache);
+                    BindBundleCommand.PopulatePackageVariableCache(facade, variableCache);
                 }
             }
 
@@ -534,17 +523,27 @@ namespace WixToolset.Core.Burn
         /// <summary>
         /// Populates the variable cache with specific package properties.
         /// </summary>
-        /// <param name="package">The package with properties to cache.</param>
+        /// <param name="facade">The package facade with properties to cache.</param>
         /// <param name="variableCache">The property cache.</param>
-        private static void PopulatePackageVariableCache(WixBundlePackageSymbol package, IDictionary<string, string> variableCache)
+        private static void PopulatePackageVariableCache(PackageFacade facade, IDictionary<string, string> variableCache)
         {
+            var package = facade.PackageSymbol;
             var id = package.Id.Id;
 
-            variableCache.Add(String.Concat("packageDescription.", id), package.Description);
-            //variableCache.Add(String.Concat("packageLanguage.", id), package.Language);
-            //variableCache.Add(String.Concat("packageManufacturer.", id), package.Manufacturer);
-            variableCache.Add(String.Concat("packageName.", id), package.DisplayName);
+            variableCache.Add(String.Concat("packageDescription.", id), package.Description ?? String.Empty);
+            variableCache.Add(String.Concat("packageName.", id), package.DisplayName ?? String.Empty);
             variableCache.Add(String.Concat("packageVersion.", id), package.Version);
+
+            if (facade.SpecificPackageSymbol is WixBundleMsiPackageSymbol msiPackage)
+            { 
+                variableCache.Add(String.Concat("packageLanguage.", id), msiPackage.ProductLanguage.ToString());
+                variableCache.Add(String.Concat("packageManufacturer.", id), msiPackage.Manufacturer ?? String.Empty);
+            }
+            else
+            {
+                variableCache.Add(String.Concat("packageLanguage.", id), String.Empty);
+                variableCache.Add(String.Concat("packageManufacturer.", id), String.Empty);
+            }
         }
 
         private void ResolveBundleInstallScope(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> facades)

@@ -10,7 +10,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class BindVariablesFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildBundleWithPackageBindVariables()
         {
             var folder = TestData.Get(@"TestData");
