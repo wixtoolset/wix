@@ -8,6 +8,6 @@ namespace WixToolset.ComPlus
 
     public class ComPlusWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => ComPlusTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => ComPlusTableDefinitions.All;
     }
 }

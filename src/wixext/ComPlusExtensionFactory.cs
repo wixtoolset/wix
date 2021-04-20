@@ -8,7 +8,7 @@ namespace WixToolset.ComPlus
 
     public class ComPlusExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(ComPlusCompiler),
             typeof(ComPlusExtensionData),
