@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Netfx
 {
@@ -8,7 +8,7 @@ namespace WixToolset.Netfx
 
     public class NetfxExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(NetfxCompiler),
             typeof(NetfxExtensionData),

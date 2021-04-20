@@ -8,6 +8,6 @@ namespace WixToolset.Netfx
 
     public class NetfxWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => NetfxTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => NetfxTableDefinitions.All;
     }
 }
