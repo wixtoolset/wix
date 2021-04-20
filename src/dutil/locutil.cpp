@@ -51,7 +51,7 @@ static HRESULT ParseWxlControl(
 #ifndef MUI_MERGE_SYSTEM_FALLBACK
 #define MUI_MERGE_SYSTEM_FALLBACK           0x10     // GetThreadPreferredUILanguages merges in parent and base languages
 #endif
-typedef WINBASEAPI BOOL (WINAPI *PFN_GET_THREAD_PREFERRED_UI_LANGUAGES) (
+typedef WINBASEAPI BOOL (WINAPI *GET_THREAD_PREFERRED_UI_LANGUAGES) (
     __in DWORD dwFlags,
     __out PULONG pulNumLanguages,
     __out_ecount_opt(*pcchLanguagesBuffer) PZZWSTR pwszLanguagesBuffer,
@@ -65,25 +65,14 @@ extern "C" HRESULT DAPI LocProbeForFile(
     __inout LPWSTR* psczPath
     )
 {
-    return LocProbeForFileEx(wzBasePath, wzLocFileName, wzLanguage, psczPath, FALSE);
-}
-
-extern "C" HRESULT DAPI LocProbeForFileEx(
-    __in_z LPCWSTR wzBasePath,
-    __in_z LPCWSTR wzLocFileName,
-    __in_z_opt LPCWSTR wzLanguage,
-    __inout LPWSTR* psczPath,
-    __in BOOL fUseUILanguage
-    )
-{
     HRESULT hr = S_OK;
     LPWSTR sczProbePath = NULL;
     LANGID langid = 0;
     LPWSTR sczLangIdFile = NULL;
     LPWSTR sczLangsBuff = NULL;
-    PFN_GET_THREAD_PREFERRED_UI_LANGUAGES pfnGetThreadPreferredUILanguages  =
-        reinterpret_cast<PFN_GET_THREAD_PREFERRED_UI_LANGUAGES>(
-            ::GetProcAddress(::GetModuleHandle("Kernel32.dll"), "GetThreadPreferredUILanguages"));
+    GET_THREAD_PREFERRED_UI_LANGUAGES pvfnGetThreadPreferredUILanguages =
+        reinterpret_cast<GET_THREAD_PREFERRED_UI_LANGUAGES>(
+            GetProcAddress(GetModuleHandle("Kernel32.dll"), "GetThreadPreferredUILanguages"));
 
     // If a language was specified, look for a loc file in that as a directory.
     if (wzLanguage && *wzLanguage)
@@ -100,12 +89,12 @@ extern "C" HRESULT DAPI LocProbeForFileEx(
         }
     }
 
-    if (fUseUILanguage && pfnGetThreadPreferredUILanguages)
+    if (pvfnGetThreadPreferredUILanguages)
     {
-        ULONG nLangs = 0;
+        ULONG nLangs;
         ULONG cchLangs = 0;
         DWORD dwFlags = MUI_LANGUAGE_ID | MUI_MERGE_USER_FALLBACK | MUI_MERGE_SYSTEM_FALLBACK;
-        if (!(*pfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, NULL, &cchLangs))
+        if (!(*pvfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, NULL, &cchLangs))
         {
             LocExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return buffer size.");
         }
@@ -114,7 +103,7 @@ extern "C" HRESULT DAPI LocProbeForFileEx(
         LocExitOnFailure(hr, "Failed to allocate buffer for languages");
 
         nLangs = 0;
-        if (!(*pfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, sczLangsBuff, &cchLangs))
+        if (!(*pvfnGetThreadPreferredUILanguages)(dwFlags, &nLangs, sczLangsBuff, &cchLangs))
         {
             LocExitWithLastError(hr, "GetThreadPreferredUILanguages failed to return language list.");
         }
@@ -140,7 +129,7 @@ extern "C" HRESULT DAPI LocProbeForFileEx(
         }
     }
 
-    langid = fUseUILanguage ? ::GetUserDefaultUILanguage() : ::GetUserDefaultLangID();
+    langid = ::GetUserDefaultUILanguage();
 
     hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
     LocExitOnFailure(hr, "Failed to format user langid.");
