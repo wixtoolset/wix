@@ -8,7 +8,7 @@ namespace WixToolset.PowerShell
 
     public class PowerShellExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(PSCompiler),
             typeof(PSExtensionData),
