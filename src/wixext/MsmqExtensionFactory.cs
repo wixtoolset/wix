@@ -8,7 +8,7 @@ namespace WixToolset.Msmq
 
     public class MsmqExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(MsmqCompiler),
             typeof(MsmqExtensionData),

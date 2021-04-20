@@ -8,6 +8,6 @@ namespace WixToolset.Msmq
 
     public class MsmqWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => MsmqTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => MsmqTableDefinitions.All;
     }
 }
