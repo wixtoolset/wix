@@ -22,7 +22,7 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<ITrackedFile> TrackedFiles { get; set; }
 
         /// <summary>
-        /// Ouput of binding.
+        /// Output of binding.
         /// </summary>
         WixOutput Wixout { get; set; }
     }
