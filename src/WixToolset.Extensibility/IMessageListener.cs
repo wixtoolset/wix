@@ -5,13 +5,30 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
-#pragma warning disable 1591 // TODO: add documentation
+    /// <summary>
+    /// Message listener.
+    /// </summary>
     public interface IMessageListener
     {
+        /// <summary>
+        /// Calculate a new level for a message.
+        /// </summary>
+        /// <param name="messaging">Messaging object.</param>
+        /// <param name="message">Message to evaluate.</param>
+        /// <param name="defaultMessageLevel">Current message level.</param>
+        /// <returns></returns>
         MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel);
 
+        /// <summary>
+        /// Writes a message.
+        /// </summary>
+        /// <param name="message">Message to write.</param>
         void Write(Message message);
 
+        /// <summary>
+        /// Writes a string message.
+        /// </summary>
+        /// <param name="message">String message to write.</param>
         void Write(string message);
     }
 }
