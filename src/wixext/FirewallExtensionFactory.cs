@@ -8,7 +8,7 @@ namespace WixToolset.Firewall
 
     public class FirewallExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(FirewallCompiler),
             typeof(FirewallExtensionData),

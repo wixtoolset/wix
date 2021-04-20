@@ -8,6 +8,6 @@ namespace WixToolset.Firewall
 
     public class FirewallWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => FirewallTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => FirewallTableDefinitions.All;
     }
 }
