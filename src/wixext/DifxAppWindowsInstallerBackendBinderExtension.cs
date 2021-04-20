@@ -8,6 +8,6 @@ namespace WixToolset.DifxApp
 
     public class DifxAppWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => DifxAppTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => DifxAppTableDefinitions.All;
     }
 }

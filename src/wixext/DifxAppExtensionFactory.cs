@@ -8,7 +8,7 @@ namespace WixToolset.DifxApp
 
     public class DifxAppExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(DifxAppCompiler),
             typeof(DifxAppExtensionData),
