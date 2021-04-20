@@ -628,6 +628,64 @@ public: // IBootstrapperApplication
     }
 
 
+    virtual STDMETHODIMP OnCacheContainerOrPayloadVerifyProgress(
+        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __inout BOOL* pfCancel
+        )
+    {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCacheContainerOrPayloadVerifyProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage);
+#endif
+
+        UpdateCacheProgress(dwOverallPercentage);
+
+        return __super::OnCacheContainerOrPayloadVerifyProgress(wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, pfCancel);
+    }
+
+
+    virtual STDMETHODIMP OnCachePayloadExtractProgress(
+        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __inout BOOL* pfCancel
+        )
+    {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCachePayloadExtractProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage);
+#endif
+
+        UpdateCacheProgress(dwOverallPercentage);
+
+        return __super::OnCachePayloadExtractProgress(wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, pfCancel);
+    }
+
+
+    virtual STDMETHODIMP OnCacheVerifyProgress(
+        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in DWORD64 dw64Progress,
+        __in DWORD64 dw64Total,
+        __in DWORD dwOverallPercentage,
+        __in BOOTSTRAPPER_CACHE_VERIFY_STEP verifyStep,
+        __inout BOOL* pfCancel
+        )
+    {
+#ifdef DEBUG
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: OnCacheVerifyProgress() - container/package: %ls, payload: %ls, progress: %I64u, total: %I64u, overall progress: %u%%, step: %u", wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, verifyStep);
+#endif
+
+        UpdateCacheProgress(dwOverallPercentage);
+
+        return __super::OnCacheVerifyProgress(wzPackageOrContainerId, wzPayloadId, dw64Progress, dw64Total, dwOverallPercentage, verifyStep, pfCancel);
+    }
+
+
     virtual STDMETHODIMP OnCacheAcquireComplete(
         __in_z LPCWSTR wzPackageOrContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
@@ -638,6 +696,28 @@ public: // IBootstrapperApplication
     {
         SetProgressState(hrStatus);
         return __super::OnCacheAcquireComplete(wzPackageOrContainerId, wzPayloadId, hrStatus, recommendation, pAction);
+    }
+
+
+    virtual STDMETHODIMP OnCacheContainerOrPayloadVerifyComplete(
+        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in HRESULT hrStatus
+        )
+    {
+        SetProgressState(hrStatus);
+        return __super::OnCacheContainerOrPayloadVerifyComplete(wzPackageOrContainerId, wzPayloadId, hrStatus);
+    }
+
+
+    virtual STDMETHODIMP OnCachePayloadExtractComplete(
+        __in_z LPCWSTR wzPackageOrContainerId,
+        __in_z_opt LPCWSTR wzPayloadId,
+        __in HRESULT hrStatus
+        )
+    {
+        SetProgressState(hrStatus);
+        return __super::OnCachePayloadExtractComplete(wzPackageOrContainerId, wzPayloadId, hrStatus);
     }
 
 
@@ -1282,8 +1362,31 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANNEDPACKAGE:
             OnPlannedPackageFallback(reinterpret_cast<BA_ONPLANNEDPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANNEDPACKAGE_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEVERIFYPROGRESS:
+            OnCacheVerifyProgressFallback(reinterpret_cast<BA_ONCACHEVERIFYPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEVERIFYPROGRESS_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYBEGIN:
+            OnCacheContainerOrPayloadVerifyBeginFallback(reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE:
+            OnCacheContainerOrPayloadVerifyCompleteFallback(reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS:
+            OnCacheContainerOrPayloadVerifyProgressFallback(reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTBEGIN:
+            OnCachePayloadExtractBeginFallback(reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTBEGIN_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTBEGIN_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTCOMPLETE:
+            OnCachePayloadExtractCompleteFallback(reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS:
+            OnCachePayloadExtractProgressFallback(reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS*>(pvResults));
+            break;
         default:
+#ifdef DEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
+#endif
             m_pfnBAFunctionsProc((BA_FUNCTIONS_MESSAGE)message, pvArgs, pvResults, m_pvBAFunctionsProcContext);
             break;
         }
@@ -1815,6 +1918,62 @@ private: // privates
         BOOL fIgnoreBundle = pResults->fIgnoreBundle;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
         BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_FORWARD_COMPATIBLE_BUNDLE, m_hModule, pArgs->wzBundleId, fIgnoreBundle ? "ignore" : "enable", pResults->fIgnoreBundle ? "ignore" : "enable");
+    }
+
+    void OnCacheVerifyProgressFallback(
+        __in BA_ONCACHEVERIFYPROGRESS_ARGS* pArgs,
+        __inout BA_ONCACHEVERIFYPROGRESS_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEVERIFYPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCacheContainerOrPayloadVerifyBeginFallback(
+        __in BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_ARGS* pArgs,
+        __inout BA_ONCACHECONTAINERORPAYLOADVERIFYBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCacheContainerOrPayloadVerifyCompleteFallback(
+        __in BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_ARGS* pArgs,
+        __inout BA_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCacheContainerOrPayloadVerifyProgressFallback(
+        __in BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_ARGS* pArgs,
+        __inout BA_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHECONTAINERORPAYLOADVERIFYPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCachePayloadExtractBeginFallback(
+        __in BA_ONCACHEPAYLOADEXTRACTBEGIN_ARGS* pArgs,
+        __inout BA_ONCACHEPAYLOADEXTRACTBEGIN_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTBEGIN, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCachePayloadExtractCompleteFallback(
+        __in BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS* pArgs,
+        __inout BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTCOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnCachePayloadExtractProgressFallback(
+        __in BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS* pArgs,
+        __inout BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS* pResults
+        )
+    {
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
     //
