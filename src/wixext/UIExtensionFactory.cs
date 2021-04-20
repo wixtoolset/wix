@@ -8,7 +8,7 @@ namespace WixToolset.UI
 
     public class UIExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(UIExtensionData),
         };
