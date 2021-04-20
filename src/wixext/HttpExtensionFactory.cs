@@ -8,7 +8,7 @@ namespace WixToolset.Http
 
     public class HttpExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(HttpCompiler),
             typeof(HttpExtensionData),

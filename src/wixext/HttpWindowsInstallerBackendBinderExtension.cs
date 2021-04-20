@@ -8,6 +8,6 @@ namespace WixToolset.Http
 
     public class HttpWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => HttpTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => HttpTableDefinitions.All;
     }
 }
