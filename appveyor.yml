@@ -20,6 +20,7 @@ build_script:
 
 test: off
 
+skip_branch_with_pr: true
 skip_tags: true
 
 on_finish:
