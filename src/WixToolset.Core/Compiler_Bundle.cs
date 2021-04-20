@@ -1974,7 +1974,6 @@ namespace WixToolset.Core
             var perMachine = YesNoDefaultType.NotSet;
             string detectCondition = null;
             string protocol = null;
-            string repairCondition = null;
             var installSize = CompilerConstants.IntegerNotSet;
             string msuKB = null;
             var enableFeatureSelection = YesNoType.NotSet;
@@ -2093,10 +2092,6 @@ namespace WixToolset.Core
                     case "Protocol":
                         protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "RepairCondition":
-                        repairCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
                         break;
                     case "InstallSize":
                         installSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
@@ -2345,7 +2340,6 @@ namespace WixToolset.Core
                         InstallCommand = installArguments,
                         RepairCommand = repairArguments,
                         UninstallCommand = uninstallArguments,
-                        RepairCondition = repairCondition,
                         ExeProtocol = protocol
                     });
                     break;
@@ -2357,7 +2351,6 @@ namespace WixToolset.Core
 
                     this.Core.AddSymbol(new WixBundleMsiPackageSymbol(sourceLineNumbers, id)
                     {
-                        RepairCondition = repairCondition,
                         Attributes = msiAttributes
                     });
                     break;
@@ -2368,7 +2361,6 @@ namespace WixToolset.Core
 
                     this.Core.AddSymbol(new WixBundleMspPackageSymbol(sourceLineNumbers, id)
                     {
-                        RepairCondition = repairCondition,
                         Attributes = mspAttributes
                     });
                     break;
