@@ -331,6 +331,21 @@ namespace WixToolset.Test.BA
             }
         }
 
+        protected override void OnCacheContainerOrPayloadVerifyProgress(CacheContainerOrPayloadVerifyProgressEventArgs args)
+        {
+            this.Log("OnCacheContainerOrPayloadVerifyProgress() - container/package: {0}, payload: {1}, progress: {2}, total: {3}, overall progress: {4}%", args.PackageOrContainerId, args.PayloadId, args.Progress, args.Total, args.OverallPercentage);
+        }
+
+        protected override void OnCachePayloadExtractProgress(CachePayloadExtractProgressEventArgs args)
+        {
+            this.Log("OnCachePayloadExtractProgress() - container/package: {0}, payload: {1}, progress: {2}, total: {3}, overall progress: {4}%", args.PackageOrContainerId, args.PayloadId, args.Progress, args.Total, args.OverallPercentage);
+        }
+
+        protected override void OnCacheVerifyProgress(CacheVerifyProgressEventArgs args)
+        {
+            this.Log("OnCacheVerifyProgress() - container/package: {0}, payload: {1}, progress: {2}, total: {3}, overall progress: {4}%, step: {5}", args.PackageOrContainerId, args.PayloadId, args.Progress, args.Total, args.OverallPercentage, args.Step);
+        }
+
         protected override void OnExecutePackageBegin(ExecutePackageBeginEventArgs args)
         {
             this.Log("OnExecutePackageBegin() - package: {0}, rollback: {1}", args.PackageId, !args.ShouldExecute);
@@ -442,14 +457,6 @@ namespace WixToolset.Test.BA
             {
                 args.Cancel = true;
                 this.Log("OnProgress(cancel)");
-            }
-        }
-
-        protected override void OnResolveSource(ResolveSourceEventArgs args)
-        {
-            if (!String.IsNullOrEmpty(args.DownloadSource))
-            {
-                args.Action = BOOTSTRAPPER_RESOLVESOURCE_ACTION.Download;
             }
         }
 

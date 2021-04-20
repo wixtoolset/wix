@@ -8,6 +8,6 @@
     <Compile Include="..\PackageAv1\ProductComponents.wxs" Link="ProductComponents.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.27" />
+    <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.28" />
   </ItemGroup>
 </Project>

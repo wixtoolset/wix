@@ -9,8 +9,8 @@
     <Feeds Include="*.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.95" />
-    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.69" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.98" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.70" />
   </ItemGroup>
   <Target Name="CopyFeeds" AfterTargets="AfterBuild">
     <Copy SourceFiles="@(Feeds)" DestinationFolder="$(OutputPath)" />
