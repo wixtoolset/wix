@@ -206,7 +206,7 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="section">Section to remove.</param>
         /// <returns>True if the section was removed; otherwise false.</returns>
-        public bool Removesection(IntermediateSection section)
+        public bool RemoveSection(IntermediateSection section)
         {
             return this.sections.Remove(section);
         }
