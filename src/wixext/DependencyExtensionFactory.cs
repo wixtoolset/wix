@@ -8,7 +8,7 @@ namespace WixToolset.Dependency
 
     public class DependencyExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(DependencyCompiler),
             typeof(DependencyExtensionData),
