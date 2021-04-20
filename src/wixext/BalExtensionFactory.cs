@@ -8,7 +8,7 @@ namespace WixToolset.Bal
 
     public class BalExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(BalCompiler),
             typeof(BalExtensionData),

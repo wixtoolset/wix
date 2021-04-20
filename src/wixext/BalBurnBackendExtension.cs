@@ -25,7 +25,7 @@ namespace WixToolset.Bal
             BalSymbolDefinitions.WixStdbaOverridableVariable,
         };
 
-        protected override IEnumerable<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;
+        protected override IReadOnlyCollection<IntermediateSymbolDefinition> SymbolDefinitions => BurnSymbolDefinitions;
 
         public override void SymbolsFinalized(IntermediateSection section)
         {
