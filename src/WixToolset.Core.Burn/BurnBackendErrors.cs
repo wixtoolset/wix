@@ -6,14 +6,14 @@ namespace WixToolset.Core.Burn
 
     internal static class BurnBackendErrors
     {
-        public static Message DuplicateCacheIds(SourceLineNumber originalLineNumber, string cacheId)
+        public static Message DuplicateCacheIds(SourceLineNumber originalLineNumber, string cacheId, string packageId)
         {
-            return Message(originalLineNumber, Ids.DuplicateCacheIds, "The cache id '{0}' has been duplicated as indicated in the following message.", cacheId);
+            return Message(originalLineNumber, Ids.DuplicateCacheIds, "The CacheId '{0}' for package '{1}' is duplicated. Each package must have a unique CacheId.", cacheId, packageId);
         }
 
-        public static Message DuplicateCacheIds2(SourceLineNumber duplicateLineNumber, string cacheId)
+        public static Message DuplicateCacheIds2(SourceLineNumber duplicateLineNumber)
         {
-            return Message(duplicateLineNumber, Ids.DuplicateCacheIds2, "Each cache id must be unique. '{0}' has been used before as indicated in the previous message.", cacheId);
+            return Message(duplicateLineNumber, Ids.DuplicateCacheIds2, "The location of the package related to the previous error.");
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)

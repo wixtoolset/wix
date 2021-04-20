@@ -594,8 +594,8 @@ namespace WixToolset.Core.Burn
             {
                 if (duplicateCacheIdDetector.TryGetValue(facade.PackageSymbol.CacheId, out var collisionPackage))
                 {
-                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds(collisionPackage.SourceLineNumbers, facade.PackageSymbol.CacheId));
-                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds2(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.CacheId));
+                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds(facade.PackageSymbol.SourceLineNumbers, facade.PackageSymbol.CacheId, facade.PackageId));
+                    this.Messaging.Write(BurnBackendErrors.DuplicateCacheIds2(collisionPackage.SourceLineNumbers));
                 }
                 else
                 {
