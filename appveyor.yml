@@ -21,6 +21,8 @@ environment:
 build_script:
   - appveyor.cmd
 
+test: off
+
 pull_requests:
   do_not_increment_build_number: true
 
@@ -29,8 +31,6 @@ nuget:
 
 skip_branch_with_pr: true
 skip_tags: true
-
-test: off
 
 artifacts:
 - path: build\Release\**\*.msi
