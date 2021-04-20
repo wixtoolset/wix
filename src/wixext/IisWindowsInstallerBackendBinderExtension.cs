@@ -8,6 +8,6 @@ namespace WixToolset.Iis
 
     public class IisWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => IisTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => IisTableDefinitions.All;
     }
 }

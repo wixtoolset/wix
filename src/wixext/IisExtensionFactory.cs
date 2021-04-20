@@ -8,7 +8,7 @@ namespace WixToolset.Iis
 
     public class IisExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(IIsCompiler),
             typeof(IIsExtensionData),
