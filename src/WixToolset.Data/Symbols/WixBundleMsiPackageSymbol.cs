@@ -17,7 +17,6 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductLanguage), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.ProductName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.Manufacturer), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageSymbolFields.RepairCondition), IntermediateFieldType.String),
             },
             typeof(WixBundleMsiPackageSymbol));
     }
@@ -36,7 +35,6 @@ namespace WixToolset.Data.Symbols
         ProductLanguage,
         ProductName,
         Manufacturer,
-        RepairCondition,
     }
 
     [Flags]
@@ -98,12 +96,6 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.Manufacturer];
             set => this.Set((int)WixBundleMsiPackageSymbolFields.Manufacturer, value);
-        }
-
-        public string RepairCondition
-        {
-            get => (string)this.Fields[(int)WixBundleMsiPackageSymbolFields.RepairCondition];
-            set => this.Set((int)WixBundleMsiPackageSymbolFields.RepairCondition, value);
         }
 
         public bool EnableFeatureSelection => (this.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection;
