@@ -8,7 +8,7 @@ namespace WixToolset.DirectX
 
     public class DirectXExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(DirectXExtensionData),
         };
