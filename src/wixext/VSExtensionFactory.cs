@@ -8,7 +8,7 @@ namespace WixToolset.VisualStudio
 
     public class VSExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(VSCompiler),
             typeof(VSExtensionData),

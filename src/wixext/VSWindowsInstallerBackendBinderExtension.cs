@@ -8,6 +8,6 @@ namespace WixToolset.VisualStudio
 
     public class VSWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => VSTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => VSTableDefinitions.All;
     }
 }
