@@ -21,7 +21,7 @@ namespace WixToolset.Converters
 
         private IServiceProvider ServiceProvider { get; }
 
-        public override IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
+        public override IReadOnlyCollection<ExtensionCommandLineSwitch> CommandLineSwitches => new ExtensionCommandLineSwitch[]
         {
             new ExtensionCommandLineSwitch { Switch = "convert", Description = "Convert v3 source code to v4 source code." },
             new ExtensionCommandLineSwitch { Switch = "format", Description = "Ensures consistent formatting of source code." },
