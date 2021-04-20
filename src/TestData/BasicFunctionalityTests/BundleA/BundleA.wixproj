@@ -12,6 +12,6 @@
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.98" />
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.99" />
   </ItemGroup>
 </Project>
