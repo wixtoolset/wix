@@ -8,6 +8,6 @@ namespace WixToolset.Sql
 
     public class SqlWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override IEnumerable<TableDefinition> TableDefinitions => SqlTableDefinitions.All;
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => SqlTableDefinitions.All;
     }
 }

@@ -8,7 +8,7 @@ namespace WixToolset.Sql
 
     public class SqlExtensionFactory : BaseExtensionFactory
     {
-        protected override IEnumerable<Type> ExtensionTypes => new[]
+        protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(SqlCompiler),
             typeof(SqlExtensionData),
