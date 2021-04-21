@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" />
+  <Import Project="..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" />
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" />
+
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -28,6 +31,7 @@
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8119537D-E1D9-6591-D51A-49768A2F9C37}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -36,12 +40,19 @@
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
   </PropertyGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalIncludeDirectories Condition=" '$(DirectReference)'=='true' ">$(ProjectDir)..\..\..\balutil\src\WixToolset.BootstrapperCore.Native\inc;$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
+  </PropertyGroup>
+
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
+
   <ItemGroup>
     <ClCompile Include="apply.cpp" />
     <ClCompile Include="approvedexe.cpp" />
@@ -136,6 +147,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+
   <ItemGroup>
     <CustomBuild Include="engine.mc">
       <Message>Compiling message file...</Message>
@@ -144,6 +156,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <Outputs>$(IntDir)engine.messages.h;$(IntDir)engine.messages.rc;$(OutDir)engine.res</Outputs>
     </CustomBuild>
   </ItemGroup>
+
   <Target Name="SetWixVersion" DependsOnTargets="GetBuildVersion" BeforeTargets="ClCompile">
     <PropertyGroup>
       <rmj>$(MajorMinorVersion.Split(`.`)[0])</rmj>
@@ -153,6 +166,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
       <wixver>rmj=$(rmj);rmm=$(rmm);rup=$(rup);rpr=$(rpr);szVerMajorMinorBuild="$(szVerMajorMinorBuild)"</wixver>
     </PropertyGroup>
+
     <ItemGroup>
       <ClCompile>
         <PreprocessorDefinitions>$(wixver);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -166,6 +180,7 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props'))" />
   </Target>
 </Project>

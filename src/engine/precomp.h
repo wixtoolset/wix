@@ -55,10 +55,10 @@
 #include <apuputil.h>
 #include <dpiutil.h>
 
-#include "..\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h"
-#include "..\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h"
-#include "..\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h"
-#include "..\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h"
+#include "BootstrapperEngine.h"
+#include "BootstrapperApplication.h"
+#include "BundleExtensionEngine.h"
+#include "BundleExtension.h"
 
 #include "platform.h"
 #include "variant.h"
