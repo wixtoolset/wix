@@ -436,13 +436,23 @@ namespace WixToolset.Core.Burn
                 trackedFiles.Add(this.BackendHelper.TrackFile(bextManifestPath, TrackedFileType.Temporary));
             }
 
+            var containers = section.Symbols.OfType<WixBundleContainerSymbol>().ToDictionary(t => t.Id.Id);
+            {
+                var command = new DetectPayloadCollisionsCommand(this.Messaging, containers, facades.Values, payloadSymbols, packagesPayloads);
+                command.Execute();
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
             // Create all the containers except the UX container first so the manifest (that goes in the UX container)
             // can contain all size and hash information about the non-UX containers.
             WixBundleContainerSymbol uxContainer;
             IEnumerable<WixBundlePayloadSymbol> uxPayloads;
-            IEnumerable<WixBundleContainerSymbol> containers;
             {
-                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationDllSymbol, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
+                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationDllSymbol, containers.Values, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -450,12 +460,11 @@ namespace WixToolset.Core.Burn
 
                 uxContainer = command.UXContainer;
                 uxPayloads = command.UXContainerPayloads;
-                containers = command.Containers;
             }
 
             // Resolve the download URLs now that we have all of the containers and payloads calculated.
             {
-                var command = new ResolveDownloadUrlsCommand(this.Messaging, this.BackendExtensions, containers, payloadSymbols);
+                var command = new ResolveDownloadUrlsCommand(this.Messaging, this.BackendExtensions, containers.Values, payloadSymbols);
                 command.Execute();
             }
 
@@ -464,7 +473,7 @@ namespace WixToolset.Core.Burn
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers.Values, chainSymbol, orderedFacades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;
@@ -483,7 +492,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers);
+                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers.Values);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);

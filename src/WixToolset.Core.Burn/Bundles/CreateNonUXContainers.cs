@@ -14,11 +14,12 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateNonUXContainers
     {
-        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
+        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, IEnumerable<WixBundleContainerSymbol> containerSymbols, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
         {
             this.BackendHelper = backendHelper;
             this.Section = section;
             this.BootstrapperApplicationDllSymbol = bootstrapperApplicationDllSymbol;
+            this.Containers = containerSymbols;
             this.PayloadSymbols = payloadSymbols;
             this.IntermediateFolder = intermediateFolder;
             this.LayoutFolder = layoutFolder;
@@ -33,7 +34,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public IEnumerable<WixBundlePayloadSymbol> UXContainerPayloads { get; private set; }
 
-        public IEnumerable<WixBundleContainerSymbol> Containers { get; private set; }
+        private IEnumerable<WixBundleContainerSymbol> Containers { get; }
 
         private IBackendHelper BackendHelper { get; }
 
@@ -57,11 +58,9 @@ namespace WixToolset.Core.Burn.Bundles
 
             var attachedContainerIndex = 1; // count starts at one because UX container is "0".
 
-            var containerSymbols = this.Section.Symbols.OfType<WixBundleContainerSymbol>().ToList();
-
             var payloadsByContainer = this.PayloadSymbols.Values.ToLookup(p => p.ContainerRef);
 
-            foreach (var container in containerSymbols)
+            foreach (var container in this.Containers)
             {
                 var containerId = container.Id.Id;
 
@@ -120,7 +119,6 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
-            this.Containers = containerSymbols;
             this.UXContainerPayloads = uxPayloadSymbols;
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;

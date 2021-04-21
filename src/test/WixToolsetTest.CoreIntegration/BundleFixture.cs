@@ -10,6 +10,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Xml;
     using Example.Extension;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
@@ -306,7 +307,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/4574")]
+        [Fact]
         public void CantBuildWithDuplicatePayloadNames()
         {
             var folder = TestData.Get(@"TestData");
@@ -328,7 +329,42 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                var attachedContainerWarnings = result.Messages.Where(m => m.Id == (int)BurnBackendWarnings.Ids.AttachedContainerPayloadCollision)
+                                                               .Select(m => m.ToString())
+                                                               .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with dark.exe, the file will get overwritten.",
+                }, attachedContainerWarnings);
+
+                var baContainerErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.BAContainerPayloadCollision)
+                                                       .Select(m => m.ToString())
+                                                       .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The Payload 'DuplicatePayloadNames.wxs' has a duplicate Name 'fakeba.dll' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "The Payload 'uxTxMXPVMXwQrPTMIGa5WGt93w0Ns' has a duplicate Name 'BootstrapperApplicationData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "The Payload 'uxYRbgitOs0K878jn5L_z7LdJ21KI' has a duplicate Name 'BundleExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                }, baContainerErrors);
+
+                var externalErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.ExternalPayloadCollision)
+                                                    .Select(m => m.ToString())
+                                                    .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The external Payload 'HiddenPersistedBundleVariable.wxs' has a duplicate Name 'PayloadCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
+                    "The external Container 'MsiPackagesContainer' has a duplicate Name 'ContainerCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
+                }, externalErrors);
+
+                var packageCacheErrors = result.Messages.Where(m => m.Id == (int)BurnBackendErrors.Ids.PackageCachePayloadCollision)
+                                                        .Select(m => m.ToString())
+                                                        .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The Payload 'test.msi' has a duplicate Name 'test.msi' in package 'test.msi'. When caching the package, the file will get overwritten.",
+                }, packageCacheErrors);
+
+                Assert.Equal(14, result.Messages.Length);
             }
         }
 

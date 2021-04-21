@@ -2,11 +2,11 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <MsiPackage SourceFile="FirstX86.msi" />
+            <MsiPackage SourceFile="FirstX86\" Name="FirstX86\FirstX86.msi" />
             <RollbackBoundary Transaction="yes" />
-            <MsiPackage SourceFile="FirstX64.msi" />
-            <MsiPackage SourceFile="SecondX64.msi" />
-            <MsiPackage SourceFile="SecondX86.msi" />
+            <MsiPackage SourceFile="FirstX64\" Name="FirstX64\FirstX64.msi" />
+            <MsiPackage SourceFile="SecondX64\" Name="SecondX64\SecondX64.msi" />
+            <MsiPackage SourceFile="SecondX86\" Name="SecondX86\SecondX86.msi" />
         </PackageGroup>
     </Fragment>
 </Wix>

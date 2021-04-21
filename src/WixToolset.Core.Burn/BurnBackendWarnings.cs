@@ -6,10 +6,15 @@ namespace WixToolset.Core.Burn
 
     internal static class BurnBackendWarnings
     {
-        //public static Message ReplaceThisWithTheFirstWarning(SourceLineNumber sourceLineNumbers)
-        //{
-        //    return Message(sourceLineNumbers, Ids.ReplaceThisWithTheFirstWarning, "format string", arg1, arg2);
-        //}
+        public static Message AttachedContainerPayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName)
+        {
+            return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision, "The Payload '{0}' has a duplicate Name '{1}' in the attached container. When extracting the bundle with dark.exe, the file will get overwritten.", payloadId, payloadName);
+        }
+
+        public static Message AttachedContainerPayloadCollision2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision2, "The location of the payload related to the previous error.");
+        }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
@@ -18,7 +23,8 @@ namespace WixToolset.Core.Burn
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstWarning = 8500,
+            AttachedContainerPayloadCollision = 8500,
+            AttachedContainerPayloadCollision2 = 8501,
         }
     }
 }

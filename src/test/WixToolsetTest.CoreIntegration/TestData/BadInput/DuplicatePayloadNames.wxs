@@ -2,8 +2,30 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" />
-            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" />
+            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" />
+            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" />
+            <ExePackage Id="DuplicateCacheIds.wxs" SourceFile="$(sys.SOURCEFILEDIR)DuplicateCacheIds.wxs" Compressed="no" DetectCondition="none" Name="PayloadCollision">
+                <Payload SourceFile="$(sys.SOURCEFILEDIR)BundleVariable.wxs" Compressed="no" Name="ContainerCollision" />
+            </ExePackage>
+            <ExePackage Id="HiddenPersistedBundleVariable.wxs" SourceFile="$(sys.SOURCEFILEDIR)HiddenPersistedBundleVariable.wxs" Compressed="no" DetectCondition="none" Name="PayloadCollision" />
+            <PackageGroupRef Id="MsiPackages" />
         </PackageGroup>
+
+        <PackageGroup Id="MsiPackages">
+            <MsiPackage SourceFile="test.msi">
+                <Payload SourceFile="$(sys.SOURCEFILEDIR)InvalidIds.wxs" Name="MsiPackage\test.txt" />
+                <Payload SourceFile="$(sys.SOURCEFILEDIR)RegistryKey.wxs" Name="test.msi" />
+            </MsiPackage>
+        </PackageGroup>
+
+        <Container Id="MsiPackagesContainer" Type="detached" Name="ContainerCollision">
+            <PackageGroupRef Id="MsiPackages" />
+        </Container>
+
+        <BootstrapperApplication>
+            <Payload Id="DuplicatePayloadNames.wxs" SourceFile="$(sys.SOURCEFILEPATH)" Name="fakeba.dll" />
+            <Payload Id="UnscheduledPackage.wxs" SourceFile="$(sys.SOURCEFILEDIR)UnscheduledPackage.wxs" Name="BootstrapperApplicationData.xml" />
+            <Payload Id="UnscheduledRollbackBoundary.wxs" SourceFile="$(sys.SOURCEFILEDIR)UnscheduledRollbackBoundary.wxs" Name="BundleExtensionData.xml" />
+        </BootstrapperApplication>
     </Fragment>
 </Wix>

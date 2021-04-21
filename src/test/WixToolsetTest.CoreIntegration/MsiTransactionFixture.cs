@@ -81,7 +81,7 @@ namespace WixToolsetTest.CoreIntegration
                 Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
-                "-o", Path.Combine(binFolder, "FirstX86.msi"),
+                "-o", Path.Combine(binFolder, "FirstX86", "FirstX86.msi"),
             });
 
             result.AssertSuccess();
@@ -94,7 +94,7 @@ namespace WixToolsetTest.CoreIntegration
                 Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
-                "-o", Path.Combine(binFolder, "SecondX86.msi"),
+                "-o", Path.Combine(binFolder, "SecondX86", "SecondX86.msi"),
             });
 
             result.AssertSuccess();
@@ -108,7 +108,7 @@ namespace WixToolsetTest.CoreIntegration
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
                 "-arch", "x64",
-                "-o", Path.Combine(binFolder, "FirstX64.msi"),
+                "-o", Path.Combine(binFolder, "FirstX64", "FirstX64.msi"),
             });
 
             result.AssertSuccess();
@@ -122,7 +122,7 @@ namespace WixToolsetTest.CoreIntegration
                 "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                 "-intermediateFolder", intermediateFolder,
                 "-arch", "x64",
-                "-o", Path.Combine(binFolder, "SecondX64.msi"),
+                "-o", Path.Combine(binFolder, "SecondX64", "SecondX64.msi"),
             });
 
             result.AssertSuccess();
