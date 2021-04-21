@@ -39,6 +39,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Bootstrapper Application Layer native utility library</Description>
+    <PackageId>WixToolset.BalUtil</PackageId>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,11 +88,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
-  <Target Name="Pack"
-          DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack balutil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.BalUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
-  </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -6,6 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
