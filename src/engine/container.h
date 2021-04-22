@@ -161,7 +161,7 @@ HRESULT ContainerOpen(
     __in_z LPCWSTR wzFilePath
     );
 HRESULT ContainerNextStream(
-    __inout BURN_CONTAINER_CONTEXT* pContext,
+    __in BURN_CONTAINER_CONTEXT* pContext,
     __inout_z LPWSTR* psczStreamName
     );
 HRESULT ContainerStreamToFile(

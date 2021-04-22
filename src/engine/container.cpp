@@ -318,6 +318,10 @@ extern "C" HRESULT ContainerStreamToBuffer(
     case BURN_CONTAINER_TYPE_CABINET:
         hr = CabExtractStreamToBuffer(pContext, ppbBuffer, pcbBuffer);
         break;
+
+    default:
+        *ppbBuffer = NULL;
+        *pcbBuffer = 0;
     }
 
 //LExit:

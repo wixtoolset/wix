@@ -1,0 +1,20 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="WixBuildTools.TestSupport" Version="4.0.47" />
+    <PackageVersion Include="WixBuildTools.TestSupport.Native" Version="4.0.47" />
+    <PackageVersion Include="WixToolset.DUtil" Version="4.0.70" targetFramework="native" />
+    <PackageVersion Include="WixToolset.BootstrapperCore.Native" Version="4.0.57" targetFramework="native" />
+    <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
+    <PackageVersion Include="xunit.assert" Version="2.4.1" />
+    <PackageVersion Include="xunit.core" Version="2.4.1" />
+    <PackageVersion Include="xunit.extensibility.core" Version="2.4.1" />
+    <PackageVersion Include="xunit.extensibility.execution" Version="2.4.1" />
+    <PackageVersion Include="xunit.runner.msbuild" Version="2.4.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.1" />
+
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.3.37" />
+    <PackageVersion Include="WixToolset.Dutil" Version="4.0.70" />
+    <PackageVersion Include="WixToolset.BootstrapperCore.Native" Version="4.0.57" />
+  </ItemGroup>
+</Project>
