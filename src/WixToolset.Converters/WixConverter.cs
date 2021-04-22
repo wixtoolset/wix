@@ -1848,8 +1848,8 @@ namespace WixToolset.Converters
         {
             // Ignore the error if explicitly ignored or outside the range of the current operation.
             if (this.IgnoreErrors.Contains(converterTestType) ||
-                (this.Operation == ConvertOperation.Convert && converterTestType < ConverterTestType.DeclarationPresent) ||
-                (this.Operation == ConvertOperation.Format && converterTestType > ConverterTestType.DeclarationPresent))
+                (this.Operation == ConvertOperation.Convert && converterTestType < ConverterTestType.EndIgnoreInConvert) ||
+                (this.Operation == ConvertOperation.Format && converterTestType > ConverterTestType.BeginIgnoreInFormat))
             {
                 return false;
             }
@@ -2033,11 +2033,6 @@ namespace WixToolset.Converters
             XmlException,
 
             /// <summary>
-            /// Displayed when a file cannot be accessed; typically when trying to save back a fixed file.
-            /// </summary>
-            UnauthorizedAccessException,
-
-            /// <summary>
             /// Displayed when the whitespace preceding a node is wrong.
             /// </summary>
             WhitespacePrecedingNodeWrong,
@@ -2047,14 +2042,21 @@ namespace WixToolset.Converters
             /// </summary>
             WhitespacePrecedingEndElementWrong,
 
-            // Before this point, ignore errors on convert operation
+            /// Before this point, ignore errors on convert operation
+            EndIgnoreInConvert,
 
             /// <summary>
             /// Displayed when the XML declaration is present in the source file.
             /// </summary>
             DeclarationPresent,
 
-            // After this point, ignore errors on format operation
+            /// <summary>
+            /// Displayed when a file cannot be accessed; typically when trying to save back a fixed file.
+            /// </summary>
+            UnauthorizedAccessException,
+
+            /// After this point, ignore errors on format operation
+            BeginIgnoreInFormat,
 
             /// <summary>
             /// Displayed when the xmlns attribute is missing from the document element.

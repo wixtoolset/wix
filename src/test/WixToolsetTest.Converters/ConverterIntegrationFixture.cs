@@ -8,6 +8,7 @@ namespace WixToolsetTest.Converters
     using WixBuildTools.TestSupport;
     using WixToolset.Converters;
     using WixToolset.Core;
+    using WixToolset.Core.ExtensibilityServices;
     using WixToolset.Core.TestPackage;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
@@ -65,6 +66,29 @@ namespace WixToolsetTest.Converters
                 Assert.Equal(expected, actual);
 
                 EnsureFixed(targetFile);
+            }
+        }
+
+        [Fact]
+        public void CanDetectReadOnlyOutputFile()
+        {
+            const string beforeFileName = "SingleFile.wxs";
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder(true);
+                var targetFile = Path.Combine(baseFolder, beforeFileName);
+                File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
+
+                var info = new FileInfo(targetFile);
+                info.IsReadOnly = true;
+
+                var messaging = new MockMessaging();
+                var converter = new WixConverter(messaging, 4);
+                var errors = converter.ConvertFile(targetFile, true);
+
+                Assert.Equal(10, errors);
             }
         }
 
