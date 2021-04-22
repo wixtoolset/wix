@@ -452,7 +452,7 @@ namespace WixToolset.Core.Burn
             WixBundleContainerSymbol uxContainer;
             IEnumerable<WixBundlePayloadSymbol> uxPayloads;
             {
-                var command = new CreateNonUXContainers(this.BackendHelper, section, bundleApplicationDllSymbol, containers.Values, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
+                var command = new CreateNonUXContainers(this.BackendHelper, this.Messaging, bundleApplicationDllSymbol, containers.Values, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -460,6 +460,11 @@ namespace WixToolset.Core.Burn
 
                 uxContainer = command.UXContainer;
                 uxPayloads = command.UXContainerPayloads;
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
             }
 
             // Resolve the download URLs now that we have all of the containers and payloads calculated.

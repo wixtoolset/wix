@@ -16,6 +16,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.AttachedContainerPayloadCollision2, "The location of the payload related to the previous error.");
         }
 
+        public static Message EmptyContainer(SourceLineNumber sourceLineNumbers, string containerId)
+        {
+            return Message(sourceLineNumbers, Ids.EmptyContainer, "The Container '{0}' is being ignored because it doesn't have any payloads.", containerId);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -25,6 +30,7 @@ namespace WixToolset.Core.Burn
         {
             AttachedContainerPayloadCollision = 8500,
             AttachedContainerPayloadCollision2 = 8501,
+            EmptyContainer = 8502,
         }
     }
 }

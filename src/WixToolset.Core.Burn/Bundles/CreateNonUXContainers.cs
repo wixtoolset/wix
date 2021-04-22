@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Burn.Bundles
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -14,10 +15,10 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateNonUXContainers
     {
-        public CreateNonUXContainers(IBackendHelper backendHelper, IntermediateSection section, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, IEnumerable<WixBundleContainerSymbol> containerSymbols, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
+        public CreateNonUXContainers(IBackendHelper backendHelper, IMessaging messaging, WixBootstrapperApplicationDllSymbol bootstrapperApplicationDllSymbol, IEnumerable<WixBundleContainerSymbol> containerSymbols, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, string intermediateFolder, string layoutFolder, CompressionLevel? defaultCompressionLevel)
         {
             this.BackendHelper = backendHelper;
-            this.Section = section;
+            this.Messaging = messaging;
             this.BootstrapperApplicationDllSymbol = bootstrapperApplicationDllSymbol;
             this.Containers = containerSymbols;
             this.PayloadSymbols = payloadSymbols;
@@ -38,7 +39,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IBackendHelper BackendHelper { get; }
 
-        private IntermediateSection Section { get; }
+        private IMessaging Messaging { get; }
 
         private WixBootstrapperApplicationDllSymbol BootstrapperApplicationDllSymbol { get; }
 
@@ -70,7 +71,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     if (containerId != BurnConstants.BurnDefaultAttachedContainerName)
                     {
-                        // TODO: display warning that we're ignoring container that ended up with no paylods in it.
+                        this.Messaging.Write(BurnBackendWarnings.EmptyContainer(container.SourceLineNumbers, containerId));
                     }
                 }
                 else if (BurnConstants.BurnUXContainerName == containerId)
@@ -113,8 +114,22 @@ namespace WixToolset.Core.Burn.Bundles
                         container.AttachedContainerIndex = attachedContainerIndex;
                         ++attachedContainerIndex;
                     }
+                }
+            }
 
-                    this.CreateContainer(container, containerPayloads);
+            foreach (var container in this.Containers.Where(c => !String.IsNullOrEmpty(c.WorkingPath) && c.Id.Id != BurnConstants.BurnUXContainerName))
+            {
+                if (container.Type == ContainerType.Attached && attachedContainerIndex > 2 && container.Id.Id != BurnConstants.BurnDefaultAttachedContainerName)
+                {
+                    this.Messaging.Write(BurnBackendErrors.MultipleAttachedContainersUnsupported(container.SourceLineNumbers, container.Id.Id));
+                }
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                foreach (var container in this.Containers.Where(c => !String.IsNullOrEmpty(c.WorkingPath) && c.Id.Id != BurnConstants.BurnUXContainerName))
+                {
+                    this.CreateContainer(container, payloadsByContainer[container.Id.Id]);
                     trackedFiles.Add(this.BackendHelper.TrackFile(container.WorkingPath, TrackedFileType.Temporary, container.SourceLineNumbers));
                 }
             }

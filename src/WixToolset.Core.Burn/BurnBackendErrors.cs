@@ -36,6 +36,11 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.ExternalPayloadCollision2, "The location of the symbol related to the previous error.");
         }
 
+        public static Message MultipleAttachedContainersUnsupported(SourceLineNumber sourceLineNumbers, string containerId)
+        {
+            return Message(sourceLineNumbers, Ids.MultipleAttachedContainersUnsupported, "Bundles don't currently support having more than one attached container. Either remove all authored attached containers to use the default attached container, or make sure all compressed payloads are included in this Container '{0}'.", containerId);
+        }
+
         public static Message PackageCachePayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName, string packageId)
         {
             return Message(sourceLineNumbers, Ids.PackageCachePayloadCollision, "The Payload '{0}' has a duplicate Name '{1}' in package '{2}'. When caching the package, the file will get overwritten.", payloadId, payloadName, packageId);
@@ -61,6 +66,7 @@ namespace WixToolset.Core.Burn
             ExternalPayloadCollision2 = 8005,
             PackageCachePayloadCollision = 8006,
             PackageCachePayloadCollision2 = 8007,
+            MultipleAttachedContainersUnsupported = 8008,
         }
     }
 }

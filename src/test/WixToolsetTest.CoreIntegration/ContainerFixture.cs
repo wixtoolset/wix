@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using System.Xml;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -155,7 +156,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6144")]
+        [Fact]
         public void MultipleAttachedContainersAreNotCurrentlySupported()
         {
             var folder = TestData.Get(@"TestData");
@@ -206,7 +207,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                Assert.Equal((int)BurnBackendErrors.Ids.MultipleAttachedContainersUnsupported, result.ExitCode);
             }
         }
     }
