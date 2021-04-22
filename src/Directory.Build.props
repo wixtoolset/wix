@@ -21,6 +21,6 @@
     <Product>WiX Toolset</Product>
   </PropertyGroup>
 
-  <Import Project="Cpp.Build.props" Condition=" '$(MSBuildProjectExtension)'=='.vcxproj' " />
+  <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />
   <Import Project="Custom.Build.props" Condition=" Exists('Custom.Build.props') " />
 </Project>

@@ -4,45 +4,70 @@
   Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.targets
   then update all of the repos.
 -->
-<!--
-  Replace PackageReferences with ProjectReferences when the projects can be found in .sln.
-  See the original here: https://github.com/dotnet/sdk/issues/1151#issuecomment-385133284
--->
 <Project>
   <PropertyGroup>
-    <ReplacePackageReferences>true</ReplacePackageReferences>
-    <TheSolutionPath Condition=" '$(NCrunch)'=='' ">$(SolutionPath)</TheSolutionPath>
-    <TheSolutionPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalSolutionPath)</TheSolutionPath>
+    <SigningToolFolder>$(BaseOutputPath)obj\.tools</SigningToolFolder>
+    <SigningToolExe>$(SigningToolFolder)\SignClient.exe</SigningToolExe>
+    <SigningFilelist>$(SigningToolFolder)\empty-filelist.txt</SigningFilelist>
+    <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
   </PropertyGroup>
 
-  <Choose>
-    <When Condition="$(ReplacePackageReferences) AND '$(TheSolutionPath)' != '' AND '$(TheSolutionPath)' != '*undefined*' AND Exists('$(TheSolutionPath)')">
+  <PropertyGroup>
+    <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
+    <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
 
-      <PropertyGroup>
-        <SolutionFileContent>$([System.IO.File]::ReadAllText($(TheSolutionPath)))</SolutionFileContent>
-        <SmartSolutionDir>$([System.IO.Path]::GetDirectoryName( $(TheSolutionPath) ))</SmartSolutionDir>
-        <RegexPattern>(?&lt;="[PackageName]", ")(.*)(?=", ")</RegexPattern>
-      </PropertyGroup>
+  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+    <PropertyGroup>
+      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(PrivateRepositoryUrl)'!='' ">$(PrivateRepositoryUrl.Replace('.git',''))</ProjectUrl>
 
-      <ItemGroup>
-        <!-- Keep the identity of the PackageReference -->
-        <SmartPackageReference Include="@(PackageReference)">
-          <PackageName>%(Identity)</PackageName>
-          <InSolution>$(SolutionFileContent.Contains('\%(Identity).csproj'))</InSolution>
-        </SmartPackageReference>
+      <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(MSBuildProjectDirectory)</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Authors="$(Authors)";Configuration=$(Configuration);Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Version=$(NPMPackageVersion);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildProjectDirectory)\;ProjectUrl=$(ProjectUrl)</NuspecProperties>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+  </Target>
 
-        <!-- Filter them by mapping them to another ItemGroup using the WithMetadataValue item function -->
-        <PackageInSolution Include="@(SmartPackageReference->WithMetadataValue('InSolution', True))">
-          <Pattern>$(RegexPattern.Replace('[PackageName]','%(PackageName)') )</Pattern>
-          <SmartPath>$([System.Text.RegularExpressions.Regex]::Match('$(SolutionFileContent)', '%(Pattern)'))</SmartPath>
-        </PackageInSolution>
+  <Target Name="PackNative" DependsOnTargets="GetBuildVersion;SetNuspecProperties"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
 
-        <ProjectReference  Include="@(PackageInSolution->'$(SmartSolutionDir)\%(SmartPath)' )"/>
+    <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(BaseOutputPath)$(Configuration)" -BasePath "$(NuspecBasePath)" -Properties $(NuspecProperties)' 
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
 
-        <!-- Remove the package references that are now referenced as projects -->
-        <PackageReference Remove="@(PackageInSolution->'%(PackageName)' )"/>
-      </ItemGroup>
+    <ItemGroup>
+      <NuGetPackOutput Include="$(BaseOutputPath)$(Configuration)\**\$(PackageId)*.nupkg" />
+    </ItemGroup>
+  </Target>
 
-    </When>
-  </Choose>
+  <Target Name="_GetSignClient"
+          Condition=" !Exists('$(SigningToolExe)') ">
+
+    <WriteLinesToFile File='$(SigningFilelist)' Lines='do-not-sign-files-in-nupkg' Overwrite='true' />
+
+    <Exec Command='dotnet.exe tool install --tool-path "$(SigningToolFolder)" SignClient' />
+  </Target>
+
+  <Target Name="SignOutput" DependsOnTargets="_GetSignClient" AfterTargets="AfterBuild"
+          Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' and 
+                      ('$(MSBuildProjectExtension)'=='.csproj' or ('$(MSBuildProjectExtension)'=='.vcxproj' and '$(ConfigurationType)'!='StaticLibrary'))">
+
+    <Exec Command='"$(SigningToolExe)" sign -i $(TargetPath) -c "$(SigningConfiguration)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Target Name="SignNupkg" DependsOnTargets="_GetSignClient" AfterTargets="Pack;PackNative"
+          Condition=" '$(SigningUser)'!='' and '@(NuGetPackOutput)'!='' and '$(SignNupkg)'!='false' ">
+    <ItemGroup>
+      <SigningNupkgs Include="@(NuGetPackOutput)" Condition=" '%(Extension)'=='.nupkg' " />
+    </ItemGroup>
+
+    <Exec Command='"$(SigningToolExe)" sign -i "@(SigningNupkgs->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
+  <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
 </Project>
