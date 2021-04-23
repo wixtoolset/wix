@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <MsiPackage Id="FirstX86">
+                <PayloadGroupRef Id="FirstX86Payloads" />
+            </MsiPackage>
+            <MsiPackage Id="FirstX64" Name="FirstX64\FirstX64.msi" SourceFile="FirstX64\" DownloadUrl="http://example.com/{0}/{1}/{2}" />
+        </PackageGroup>
+        <Container Id="BundlePackages" Type="attached">
+            <PackageGroupRef Id="BundlePackages" />
+        </Container>
+        <PayloadGroup Id="FirstX86Payloads">
+            <MsiPackagePayload Name="FirstX86\FirstX86.msi" SourceFile="FirstX86\" DownloadUrl="http://example.com/{0}/{1}/{2}" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>
