@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ExePackagePayload Description="WiX Toolset Bootstrapper" Hash="F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964E246A1E8AE72E2CF23E0138AFC281BAFDE45969204405E114EB20C8195DA7E5E" ProductName="Windows Installer XML Toolset" Size="463360" Version="3.14.1703.0" />
+    </Fragment>
+</Wix>
