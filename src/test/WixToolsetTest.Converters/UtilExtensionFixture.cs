@@ -111,5 +111,80 @@ namespace WixToolsetTest.Converters
             var actualLines = UnformattedDocumentLines(document);
             WixAssert.CompareLineByLine(expected, actualLines);
         }
+
+
+        [Fact]
+        public void FixXmlConfigValueCData()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>",
+                "  <Fragment>",
+                "    <util:XmlConfig Id='Change' ElementPath='book'>",
+                "      <![CDATA[a<>b]]>",
+                "    </util:XmlConfig>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
+                "  <Fragment>",
+                "    <util:XmlConfig Id=\"Change\" ElementPath=\"book\" Value=\"a&lt;&gt;b\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
+
+        [Fact]
+        public void FixQueryOsPropertyRefs()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>",
+                "  <Fragment>",
+                "    <PropertyRef Id=\"WIX_SUITE_ENTERPRISE\" />",
+                "    <PropertyRef Id=\"WIX_DIR_COMMON_DOCUMENTS\" />",
+                "    <CustomActionRef Id=\"WixFailWhenDeferred\" />",
+                "    <UI>",
+                "      <PropertyRef Id=\"WIX_ACCOUNT_LOCALSERVICE\" />",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
+                "  <Fragment>",
+                "    <util:QueryWindowsSuiteInfo />",
+                "    <util:QueryWindowsDirectories />",
+                "    <util:FailWhenDeferred />",
+                "    <UI>",
+                "      <util:QueryWindowsWellKnownSIDs />",
+                "    </UI>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(6, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+        }
     }
 }

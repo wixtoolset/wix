@@ -8,7 +8,6 @@ namespace WixToolsetTest.Converters
     using WixBuildTools.TestSupport;
     using WixToolset.Converters;
     using WixToolset.Core;
-    using WixToolset.Core.ExtensibilityServices;
     using WixToolset.Core.TestPackage;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
@@ -88,7 +87,7 @@ namespace WixToolsetTest.Converters
                 var converter = new WixConverter(messaging, 4);
                 var errors = converter.ConvertFile(targetFile, true);
 
-                Assert.Equal(10, errors);
+                Assert.Single(messaging.Messages.Where(m => m.Id == 5/*WixConverter.ConverterTestType.UnauthorizedAccessException*/));
             }
         }
 
