@@ -169,6 +169,12 @@ namespace WixToolset.Core.Link
 
                     if (String.IsNullOrEmpty(payloadSymbol.ContainerRef))
                     {
+                        if (payloadSymbol.Compressed == false)
+                        {
+                            this.Messaging.Write(LinkerWarnings.UncompressedPayloadInContainer(payloadSymbol.SourceLineNumbers, groupSymbol.ChildId, containerId));
+                        }
+
+                        payloadSymbol.Compressed = true;
                         payloadSymbol.ContainerRef = containerId;
                     }
                     else

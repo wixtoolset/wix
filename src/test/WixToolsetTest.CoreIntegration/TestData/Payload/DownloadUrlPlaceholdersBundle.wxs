@@ -14,7 +14,7 @@
     </Bundle>
     <Fragment>
         <PackageGroup Id="ContainerPackages">
-            <ExePackage SourceFile="burn.exe" DetectCondition="none" />
+            <ExePackage SourceFile="burn.exe" DetectCondition="none" Compressed="no" />
         </PackageGroup>
     </Fragment>
     <Fragment>

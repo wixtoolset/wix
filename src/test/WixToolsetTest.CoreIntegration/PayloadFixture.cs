@@ -157,7 +157,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                var result = WixRunner.Execute(new[]
+                var result = WixRunner.Execute(false, new[]
                 {
                     "build",
                     Path.Combine(folder, "Payload", "DownloadUrlPlaceholdersBundle.wxs"),
@@ -169,6 +169,11 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
+
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The Payload 'burn.exe' is being added to Container 'PackagesContainer', overriding its Compressed value of 'no'.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
 
                 Assert.True(File.Exists(bundlePath));
 

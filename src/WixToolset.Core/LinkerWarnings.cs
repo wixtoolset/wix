@@ -16,6 +16,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.PayloadInMultipleContainers, "The Payload '{0}' can't be added to Container '{1}' because it was already added to Container '{2}'.", payloadId, containerId1, containerId2);
         }
 
+        public static Message UncompressedPayloadInContainer(SourceLineNumber sourceLineNumbers, string payloadId, string containerId)
+        {
+            return Message(sourceLineNumbers, Ids.UncompressedPayloadInContainer, "The Payload '{0}' is being added to Container '{1}', overriding its Compressed value of 'no'.", payloadId, containerId);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -25,6 +30,7 @@ namespace WixToolset.Core
         {
             LayoutPayloadInContainer = 6900,
             PayloadInMultipleContainers = 6901,
+            UncompressedPayloadInContainer = 6902,
         } // last available is 6999. 7000 is LinkerErrors.
     }
 }
