@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using System.Xml;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -117,7 +118,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/5273")]
+        [Fact]
         public void RejectsPayloadSharedBetweenPackageAndBA()
         {
             var folder = TestData.Get(@"TestData");
@@ -139,7 +140,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, int.MaxValue);
+                Assert.Equal((int)LinkerErrors.Ids.PayloadSharedWithBA, result.ExitCode);
             }
         }
 

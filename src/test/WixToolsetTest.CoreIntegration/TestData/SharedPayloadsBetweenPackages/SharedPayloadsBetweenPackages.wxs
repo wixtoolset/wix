@@ -2,10 +2,10 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage SourceFile="C:\Windows\system32\credwiz.exe" Permanent="yes">
+            <ExePackage SourceFile="C:\Windows\system32\credwiz.exe" Permanent="yes" DetectCondition="none">
                 <PayloadGroupRef Id="SharedPayloads" />
             </ExePackage>
-            <ExePackage SourceFile="C:\Windows\system32\cscript.exe" Permanent="yes">
+            <ExePackage SourceFile="C:\Windows\system32\cscript.exe" Permanent="yes" DetectCondition="none">
                 <PayloadGroupRef Id="SharedPayloads" />
             </ExePackage>
         </PackageGroup>

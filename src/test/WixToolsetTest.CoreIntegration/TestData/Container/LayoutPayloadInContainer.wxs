@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="BurnBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{B5B23622-239B-4E3B-BDAB-67648CB975BF}">
+        <BootstrapperApplication>
+            <BootstrapperApplicationDll SourceFile="fakeba.dll" />
+        </BootstrapperApplication>
+        <Chain>
+            <PackageGroupRef Id="BundlePackages" />
+        </Chain>
+        <PayloadGroupRef Id="Shared" />
+    </Bundle>
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="FirstX64" />
+        </PackageGroup>
+        <PackageGroup Id="FirstX64">
+            <MsiPackage SourceFile="FirstX64.msi">
+                <PayloadGroupRef Id="Shared" />
+            </MsiPackage>
+        </PackageGroup>
+        <Container Id="FirstX64" Name="FirstX64" Type="detached">
+            <PackageGroupRef Id="FirstX64" />
+        </Container>
+        <PayloadGroup Id="Shared">
+            <Payload Id="SharedPayload" SourceFile="$(sys.SOURCEFILEPATH)" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

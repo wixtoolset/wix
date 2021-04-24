@@ -62,7 +62,7 @@ namespace WixToolset.Core.Link
         /// <param name="parentType">The group type for the parent group to flatten.</param>
         /// <param name="parentId">The identifier of the parent group to flatten.</param>
         /// <param name="removeUsedRows">Whether to remove used group rows before returning.</param>
-        public void FlattenAndRewriteRows(ComplexReferenceChildType parentType, string parentId, bool removeUsedRows)
+        public void FlattenAndRewriteRows(ComplexReferenceParentType parentType, string parentId, bool removeUsedRows)
         {
             var parentTypeString = parentType.ToString();
             Debug.Assert(this.groupTypes.Contains(parentTypeString));
@@ -648,14 +648,11 @@ namespace WixToolset.Core.Link
             // We *don't* propagate ordering information from Packages or
             // Containers to their children, because ordering doesn't matter
             // for them, and a Payload in two Packages (or Containers) can
-            // cause a circular reference to occur.  We do, however, need to
-            // track the ordering in the UX Container, because we need the
-            // first payload to be the entrypoint.
+            // cause a circular reference to occur.
             private bool ShouldItemPropagateChildOrdering()
             {
-                if (String.Equals(nameof(ComplexReferenceChildType.Package), this.Type, StringComparison.Ordinal) ||
-                    (String.Equals(nameof(ComplexReferenceParentType.Container), this.Type, StringComparison.Ordinal) &&
-                    !String.Equals(BurnConstants.BurnUXContainerName, this.Id, StringComparison.Ordinal)))
+                if (String.Equals(nameof(ComplexReferenceParentType.Package), this.Type, StringComparison.Ordinal) ||
+                    String.Equals(nameof(ComplexReferenceParentType.Container), this.Type, StringComparison.Ordinal))
                 {
                     return false;
                 }

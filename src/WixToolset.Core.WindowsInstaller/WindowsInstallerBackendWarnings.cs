@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstWarning = 7500,
-        }
+            // ReplaceThisWithTheFirstWarning = 7100,
+        } // last available is 7499. 7500 is WindowsInstallerBackendErrors.
     }
 }

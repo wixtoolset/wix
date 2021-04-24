@@ -2375,6 +2375,7 @@ namespace WixToolset.Core
                 }
 
                 this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, after);
+                this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.ContainerPackage, id.Id, ComplexReferenceChildType.Unknown, null);
             }
 
             return id.Id;

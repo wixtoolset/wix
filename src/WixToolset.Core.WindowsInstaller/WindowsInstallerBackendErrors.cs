@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller
 
         public enum Ids
         {
-            // ReplaceThisWithTheFirstError = 7000,
-        }
+            // ReplaceThisWithTheFirstError = 7500,
+        } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

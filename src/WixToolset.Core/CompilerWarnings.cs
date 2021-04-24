@@ -60,6 +60,6 @@ namespace WixToolset.Core
             Win64Component = 5435,
             DirectoryRefStandardDirectoryDeprecated = 5436,
             DefiningStandardDirectoryDeprecated = 5437,
-        }
+        } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

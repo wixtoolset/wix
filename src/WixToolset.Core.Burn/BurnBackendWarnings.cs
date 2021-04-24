@@ -31,6 +31,6 @@ namespace WixToolset.Core.Burn
             AttachedContainerPayloadCollision = 8500,
             AttachedContainerPayloadCollision2 = 8501,
             EmptyContainer = 8502,
-        }
+        } // last available is 8999. 9000 is VerboseMessages.
     }
 }

@@ -10,6 +10,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Xml;
     using Example.Extension;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core;
     using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
@@ -368,7 +369,61 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6291")]
+        [Fact]
+        public void CantBuildWithOrphanPayload()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadInput", "OrphanPayload.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                Assert.Equal((int)LinkerErrors.Ids.OrphanedPayload, result.ExitCode);
+            }
+        }
+
+        [Fact]
+        public void CantBuildWithPackageInMultipleContainers()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadInput", "PackageInMultipleContainers.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                });
+
+                Assert.Equal((int)LinkerErrors.Ids.PackageInMultipleContainers, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void CantBuildWithUnscheduledPackage()
         {
             var folder = TestData.Get(@"TestData");
@@ -390,11 +445,11 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                Assert.Equal((int)LinkerErrors.Ids.UnscheduledChainPackage, result.ExitCode);
             }
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/6291")]
+        [Fact]
         public void CantBuildWithUnscheduledRollbackBoundary()
         {
             var folder = TestData.Get(@"TestData");
@@ -416,7 +471,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                Assert.Equal((int)LinkerErrors.Ids.UnscheduledRollbackBoundary, result.ExitCode);
             }
         }
     }

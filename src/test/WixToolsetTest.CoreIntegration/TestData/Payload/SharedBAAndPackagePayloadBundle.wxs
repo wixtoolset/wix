@@ -2,7 +2,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage SourceFile="burn.exe">
+            <ExePackage SourceFile="burn.exe" DetectCondition="none">
                 <PayloadGroupRef Id="Shared" />
             </ExePackage>
         </PackageGroup>

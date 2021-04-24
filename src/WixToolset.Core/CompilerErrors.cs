@@ -38,6 +38,6 @@ namespace WixToolset.Core
 
             IllegalName = 6601,
             ExampleRegid = 6602,
-        }
+        } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

@@ -2,15 +2,15 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PackageGroup Id="BundlePackages">
-            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" />
-            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" />
+            <ExePackage Id="Auto1" SourceFile="burn.exe" CacheId="Auto1" DetectCondition="none" />
+            <ExePackage Id="Auto2" SourceFile="burn.exe" CacheId="Auto2" DetectCondition="none" />
         </PackageGroup>
         <SetVariableRef Id="Dummy" />
     </Fragment>
     <Fragment>
         <SetVariable Id="Dummy" Variable="Dummy" />
         <PackageGroup Id="Unscheduled">
-            <ExePackage Id="Unscheduled1" SourceFile="burn.exe" CacheId="Unscheduled1" />
+            <ExePackage Id="Unscheduled1" SourceFile="burn.exe" CacheId="Unscheduled1" DetectCondition="none" />
         </PackageGroup>
     </Fragment>
 </Wix>

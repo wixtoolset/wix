@@ -8,10 +8,9 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using System.Xml;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core;
     using WixToolset.Core.Burn;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
-    using WixToolset.Data.Symbols;
     using Xunit;
 
     public class ContainerFixture
@@ -30,33 +29,9 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
                 var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX86.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX86.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX64.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX64.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Container", "HarvestIntoDetachedContainer.wxs"),
@@ -98,33 +73,9 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
                 var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX86.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX86.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX64.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX64.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Container", "HarvestIntoDetachedContainer.wxs"),
@@ -174,6 +125,55 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void LayoutPayloadIsPutInContainer()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Container", "LayoutPayloadInContainer.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", binFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The layout-only Payload 'SharedPayload' is being added to Container 'FirstX64'. It will not be extracted during layout.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml(ignoreAttributes))
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Payload Id='SharedPayload' FilePath='LayoutPayloadInContainer.wxs' FileSize='*' Hash='*' LayoutOnly='yes' Packaging='embedded' SourcePath='a1' Container='FirstX64' />",
+                }, payloads);
+            }
+        }
+
+        [Fact]
         public void MultipleAttachedContainersAreNotCurrentlySupported()
         {
             var folder = TestData.Get(@"TestData");
@@ -187,33 +187,9 @@ namespace WixToolsetTest.CoreIntegration
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
 
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
                 var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX86.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX86.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "MsiTransaction", "FirstX64.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
-                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
-                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(binFolder, "FirstX64.msi"),
-                });
-
-                result.AssertSuccess();
-
-                result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Container", "MultipleAttachedContainers.wxs"),
@@ -226,6 +202,85 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal((int)BurnBackendErrors.Ids.MultipleAttachedContainersUnsupported, result.ExitCode);
             }
+        }
+
+        [Fact]
+        public void PayloadIsNotPutInMultipleContainers()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Container", "PayloadInMultipleContainers.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", binFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The Payload 'SharedPayload' can't be added to Container 'FirstX64' because it was already added to Container 'FirstX86'.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml(ignoreAttributes))
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<Payload Id='SharedPayload' FilePath='PayloadInMultipleContainers.wxs' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='FirstX86' />",
+                }, payloads);
+            }
+        }
+
+        private void BuildMsis(string folder, string intermediateFolder, string binFolder)
+        {
+            var result = WixRunner.Execute(new[]
+            {
+                "build",
+                Path.Combine(folder, "MsiTransaction", "FirstX86.wxs"),
+                Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                "-intermediateFolder", intermediateFolder,
+                "-o", Path.Combine(binFolder, "FirstX86.msi"),
+            });
+
+            result.AssertSuccess();
+
+            result = WixRunner.Execute(new[]
+            {
+                "build",
+                Path.Combine(folder, "MsiTransaction", "FirstX64.wxs"),
+                Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                "-intermediateFolder", intermediateFolder,
+                "-o", Path.Combine(binFolder, "FirstX64.msi"),
+            });
+
+            result.AssertSuccess();
         }
     }
 }

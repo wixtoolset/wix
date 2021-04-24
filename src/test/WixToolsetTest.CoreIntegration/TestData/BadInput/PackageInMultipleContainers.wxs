@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="MinimalPackageGroup" />
+        </PackageGroup>
+        <Container Id="First">
+            <PackageGroupRef Id="BundlePackages" />
+        </Container>
+        <Container Id="Second">
+            <PackageGroupRef Id="BundlePackages" />
+        </Container>
+    </Fragment>
+</Wix>

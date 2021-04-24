@@ -67,6 +67,6 @@ namespace WixToolset.Core.Burn
             PackageCachePayloadCollision = 8006,
             PackageCachePayloadCollision2 = 8007,
             MultipleAttachedContainersUnsupported = 8008,
-        }
+        } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }
