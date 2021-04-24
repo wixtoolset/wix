@@ -312,7 +312,11 @@ namespace WixToolset.Core
                 }
 
                 // Bundles have groups of data that must be flattened in a way different from other types.
-                this.FlattenBundleTables(resolvedSection);
+                if (resolvedSection.Type == SectionType.Bundle)
+                {
+                    var command = new FlattenAndProcessBundleTablesCommand(resolvedSection, this.Messaging);
+                    command.Execute();
+                }
 
                 if (this.Messaging.EncounteredError)
                 {
@@ -852,37 +856,6 @@ namespace WixToolset.Core
                     }
                 }
         */
-
-        /// <summary>
-        /// Flattens the tables used in a Bundle.
-        /// </summary>
-        /// <param name="entrySection">Output containing the tables to process.</param>
-        private void FlattenBundleTables(IntermediateSection entrySection)
-        {
-            if (SectionType.Bundle != entrySection.Type)
-            {
-                return;
-            }
-
-            // We need to flatten the nested PayloadGroups and PackageGroups under
-            // UX, Chain, and any Containers. When we're done, the WixGroups table
-            // will hold Payloads under UX, ChainPackages (references?) under Chain,
-            // and ChainPackages/Payloads under the attached and any detatched
-            // Containers.
-            var groups = new WixGroupingOrdering(entrySection, this.Messaging);
-
-            // Create UX payloads and Package payloads
-            groups.UseTypes(new[] { ComplexReferenceParentType.Container, ComplexReferenceParentType.Layout, ComplexReferenceParentType.PackageGroup, ComplexReferenceParentType.PayloadGroup, ComplexReferenceParentType.Package }, new[] { ComplexReferenceChildType.PackageGroup, ComplexReferenceChildType.Package, ComplexReferenceChildType.PackagePayload, ComplexReferenceChildType.PayloadGroup, ComplexReferenceChildType.Payload });
-            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Package, false);
-            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Container, false);
-            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Layout, false);
-
-            // Create Chain packages...
-            groups.UseTypes(new[] { ComplexReferenceParentType.PackageGroup }, new[] { ComplexReferenceChildType.Package, ComplexReferenceChildType.PackageGroup });
-            groups.FlattenAndRewriteRows(ComplexReferenceChildType.PackageGroup, "WixChain", false);
-
-            groups.RemoveUsedGroupRows();
-        }
 
         /// <summary>
         /// Resolves the features connected to other features in the active output.

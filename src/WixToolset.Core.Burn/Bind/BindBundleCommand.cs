@@ -143,27 +143,6 @@ namespace WixToolset.Core.Burn
             var payloadSymbols = section.Symbols.OfType<WixBundlePayloadSymbol>().ToDictionary(t => t.Id.Id);
             var packagesPayloads = RecalculatePackagesPayloads(payloadSymbols, wixGroupSymbols);
 
-            // Update explicitly authored payloads with their parent container
-            // to make it easier to gather the payloads later.
-            foreach (var groupSymbol in wixGroupSymbols)
-            {
-                if (ComplexReferenceChildType.Payload == groupSymbol.ChildType)
-                {
-                    var payloadSymbol = payloadSymbols[groupSymbol.ChildId];
-
-                    if (ComplexReferenceParentType.Container == groupSymbol.ParentType)
-                    {
-                        // TODO: v3 didn't warn if we overwrote the payload's container.
-                        // Should we warn now?
-                        payloadSymbol.ContainerRef = groupSymbol.ParentId;
-                    }
-                    else if (ComplexReferenceParentType.Layout == groupSymbol.ParentType)
-                    {
-                        payloadSymbol.LayoutOnly = true;
-                    }
-                }
-            }
-
             var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
 
             // Process the explicitly authored payloads.
