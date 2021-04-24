@@ -131,10 +131,10 @@ namespace WixToolsetTest.CoreIntegration
                     { "WixPayloadProperties", new List<string> { "Size" } },
                 };
                 Assert.Equal(4, payloadElements.Count);
-                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' LayoutOnly='no' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' LayoutOnly='no' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
-                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' LayoutOnly='no' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />", payloadElements[0].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='credwiz.exe' Payload='credwiz.exe' Container='WixAttachedContainer' Name='credwiz.exe' Size='*' />", payloadElements[1].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='SourceFilePayload' Container='WixAttachedContainer' Name='SharedPayloadsBetweenPackages.wxs' Size='*' />", payloadElements[2].GetTestXml(ignoreAttributesByElementName));
+                Assert.Equal("<WixPayloadProperties Package='cscript.exe' Payload='cscript.exe' Container='WixAttachedContainer' Name='cscript.exe' Size='*' />", payloadElements[3].GetTestXml(ignoreAttributesByElementName));
             }
         }
 

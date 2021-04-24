@@ -254,6 +254,61 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void PopulatesBAManifestWithLayoutOnlyPayloads()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var bundlePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                this.BuildMsis(folder, intermediateFolder, binFolder);
+
+                var result = WixRunner.Execute(false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Container", "LayoutPayloadInContainer.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", binFolder,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "The layout-only Payload 'SharedPayload' is being added to Container 'FirstX64'. It will not be extracted during layout.",
+                }, result.Messages.Select(m => m.ToString()).ToArray());
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "WixPayloadProperties", new List<string> { "Size" } },
+                };
+                var payloads = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPayloadProperties")
+                                            .Cast<XmlElement>()
+                                            .Select(e => e.GetTestXml(ignoreAttributesByElementName))
+                                            .ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixPayloadProperties Package='FirstX64.msi' Payload='FirstX64.msi' Container='FirstX64' Name='FirstX64.msi' Size='*' />",
+                    "<WixPayloadProperties Package='FirstX64.msi' Payload='SharedPayload' Container='FirstX64' Name='LayoutPayloadInContainer.wxs' Size='*' />",
+                    "<WixPayloadProperties Package='FirstX64.msi' Payload='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' Container='FirstX64' Name='PFiles\\MsiPackage\\test.txt' Size='*' />",
+                    "<WixPayloadProperties Payload='SharedPayload' Container='FirstX64' Name='LayoutPayloadInContainer.wxs' Size='*' />",
+                }, payloads);
+            }
+        }
+
         private void BuildMsis(string folder, string intermediateFolder, string binFolder)
         {
             var result = WixRunner.Execute(new[]

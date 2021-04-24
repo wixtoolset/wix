@@ -390,7 +390,7 @@ namespace WixToolset.Core.Burn
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
-                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, orderedFacades, uxPayloadIndex, packagesPayloads, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleSymbol, orderedFacades, uxPayloadIndex, payloadSymbols, packagesPayloads, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;

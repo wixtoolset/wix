@@ -15,12 +15,13 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadSymbol> payloadSymbols, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
             this.ChainPackages = chainPackages;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
+            this.Payloads = payloadSymbols;
             this.PackagesPayloads = packagesPayloads;
             this.IntermediateFolder = intermediateFolder;
             this.InternalBurnBackendHelper = internalBurnBackendHelper;
@@ -35,6 +36,8 @@ namespace WixToolset.Core.Burn.Bundles
         private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
         private int LastUXPayloadIndex { get; }
+
+        private Dictionary<string, WixBundlePayloadSymbol> Payloads { get; }
 
         private Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> PackagesPayloads { get; }
 
@@ -216,7 +219,6 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void WritePayloadInfo(XmlTextWriter writer)
         {
-            // TODO: check v3 - should this be only include package payloads or include all non-UX container payloads?
             foreach (var kvp in this.PackagesPayloads.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
             {
                 var packageId = kvp.Key;
@@ -224,30 +226,41 @@ namespace WixToolset.Core.Burn.Bundles
 
                 foreach (var payloadSymbol in payloadsById.Values.OrderBy(p => p.Id.Id, StringComparer.Ordinal))
                 {
-                    writer.WriteStartElement("WixPayloadProperties");
-
-                    writer.WriteAttributeString("Package", packageId);
-
-                    writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
-
-                    if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
-                    {
-                        writer.WriteAttributeString("Container", payloadSymbol.ContainerRef);
-                    }
-
-                    writer.WriteAttributeString("Name", payloadSymbol.Name);
-                    writer.WriteAttributeString("Size", payloadSymbol.FileSize.Value.ToString(CultureInfo.InvariantCulture));
-
-                    if (!String.IsNullOrEmpty(payloadSymbol.DownloadUrl))
-                    {
-                        writer.WriteAttributeString("DownloadUrl", payloadSymbol.DownloadUrl);
-                    }
-
-                    writer.WriteAttributeString("LayoutOnly", payloadSymbol.LayoutOnly ? "yes" : "no");
-
-                    writer.WriteEndElement();
+                    this.WritePayloadInfo(writer, payloadSymbol, packageId);
                 }
             }
+
+            foreach (var payloadSymbol in this.Payloads.Values.Where(p => p.LayoutOnly).OrderBy(p => p.Id.Id, StringComparer.Ordinal))
+            {
+                this.WritePayloadInfo(writer, payloadSymbol, null);
+            }
+        }
+
+        private void WritePayloadInfo(XmlTextWriter writer, WixBundlePayloadSymbol payloadSymbol, string packageId)
+        {
+            writer.WriteStartElement("WixPayloadProperties");
+
+            if (!String.IsNullOrEmpty(packageId))
+            {
+                writer.WriteAttributeString("Package", packageId);
+            }
+
+            writer.WriteAttributeString("Payload", payloadSymbol.Id.Id);
+
+            if (!String.IsNullOrEmpty(payloadSymbol.ContainerRef))
+            {
+                writer.WriteAttributeString("Container", payloadSymbol.ContainerRef);
+            }
+
+            writer.WriteAttributeString("Name", payloadSymbol.Name);
+            writer.WriteAttributeString("Size", payloadSymbol.FileSize.Value.ToString(CultureInfo.InvariantCulture));
+
+            if (!String.IsNullOrEmpty(payloadSymbol.DownloadUrl))
+            {
+                writer.WriteAttributeString("DownloadUrl", payloadSymbol.DownloadUrl);
+            }
+
+            writer.WriteEndElement();
         }
 
         private WixBundlePayloadSymbol CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
