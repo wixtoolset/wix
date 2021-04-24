@@ -54,7 +54,7 @@ namespace WixToolset.Core.Link
 
             // Create Chain packages...
             groups.UseTypes(new[] { ComplexReferenceParentType.PackageGroup }, new[] { ComplexReferenceChildType.Package, ComplexReferenceChildType.PackageGroup });
-            groups.FlattenAndRewriteRows(ComplexReferenceParentType.PackageGroup, "WixChain", false);
+            groups.FlattenAndRewriteRows(ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, false);
 
             groups.RemoveUsedGroupRows();
         }
@@ -93,7 +93,7 @@ namespace WixToolset.Core.Link
                         switch (groupSymbol.ParentType)
                         {
                             case ComplexReferenceParentType.PackageGroup:
-                                if (groupSymbol.ParentId == "WixChain")
+                                if (groupSymbol.ParentId == BurnConstants.BundleChainPackageGroupId)
                                 {
                                     referencedPackages.Add(groupSymbol.ChildId);
                                 }

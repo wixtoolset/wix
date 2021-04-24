@@ -6,13 +6,12 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class OrderPackagesAndRollbackBoundariesCommand
     {
-        private const string DefaultBoundaryId = "WixDefaultBoundary";
-
         public OrderPackagesAndRollbackBoundariesCommand(IMessaging messaging, IntermediateSection section, IDictionary<string, PackageFacade> packageFacades)
         {
             this.Messaging = messaging;
@@ -47,14 +46,14 @@ namespace WixToolset.Core.Burn.Bundles
             // We handle uninstall (aka: backwards) rollback boundaries after
             // we get these install/repair (aka: forward) rollback boundaries
             // defined.
-            var pendingRollbackBoundary = new WixBundleRollbackBoundarySymbol(null, new Identifier(AccessModifier.Section, DefaultBoundaryId)) { Vital = true };
+            var pendingRollbackBoundary = new WixBundleRollbackBoundarySymbol(null, new Identifier(AccessModifier.Section, BurnConstants.BundleDefaultBoundaryId)) { Vital = true };
             var lastRollbackBoundary = pendingRollbackBoundary;
             var boundaryHadX86Package = false;
             var warnedMsiTransaction = false;
 
             foreach (var groupSymbol in groupSymbols)
             {
-                if (ComplexReferenceChildType.Package == groupSymbol.ChildType && ComplexReferenceParentType.PackageGroup == groupSymbol.ParentType && "WixChain" == groupSymbol.ParentId)
+                if (ComplexReferenceChildType.Package == groupSymbol.ChildType && ComplexReferenceParentType.PackageGroup == groupSymbol.ParentType && BurnConstants.BundleChainPackageGroupId == groupSymbol.ParentId)
                 {
                     if (this.PackageFacades.TryGetValue(groupSymbol.ChildId, out var facade))
                     {
@@ -63,7 +62,7 @@ namespace WixToolset.Core.Burn.Bundles
                         if (null != pendingRollbackBoundary)
                         {
                             // If we used the default boundary, ensure the symbol is added to the section.
-                            if (pendingRollbackBoundary.Id.Id == DefaultBoundaryId)
+                            if (pendingRollbackBoundary.Id.Id == BurnConstants.BundleDefaultBoundaryId)
                             {
                                 this.Section.AddSymbol(pendingRollbackBoundary);
                             }
@@ -97,7 +96,7 @@ namespace WixToolset.Core.Burn.Bundles
                         var nextRollbackBoundary = boundariesById[groupSymbol.ChildId];
                         if (null != pendingRollbackBoundary)
                         {
-                            if (pendingRollbackBoundary.Id.Id != DefaultBoundaryId)
+                            if (pendingRollbackBoundary.Id.Id != BurnConstants.BundleDefaultBoundaryId)
                             {
                                 this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
                             }

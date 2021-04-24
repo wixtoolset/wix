@@ -535,6 +535,10 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        if (id?.Id == BurnConstants.BurnUXContainerName || id?.Id == BurnConstants.BurnDefaultAttachedContainerName)
+                        {
+                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                        }
                         break;
                     case "DownloadUrl":
                         downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1736,27 +1740,27 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "MsiPackage":
-                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.Package;
                         break;
                     case "MspPackage":
-                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.Package;
                         break;
                     case "MsuPackage":
-                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.Package;
                         break;
                     case "ExePackage":
-                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.Package;
                         break;
                     case "RollbackBoundary":
-                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.Package;
                         break;
                     case "PackageGroupRef":
-                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, BurnConstants.BundleChainPackageGroupId, previousType, previousId);
                         previousType = ComplexReferenceChildType.PackageGroup;
                         break;
                     default:
@@ -1873,6 +1877,10 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        if (id?.Id == BurnConstants.BundleDefaultBoundaryId)
+                        {
+                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                        }
                         break;
                     case "Vital":
                         vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2150,6 +2158,11 @@ namespace WixToolset.Core
 
             compilerPayload.FinishCompilingPackage();
             var id = compilerPayload.Id;
+
+            if (id.Id == BurnConstants.BundleDefaultBoundaryId)
+            {
+                this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+            }
 
             if (null == logPathVariable)
             {
@@ -2588,6 +2601,10 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        if (id?.Id == BurnConstants.BundleChainPackageGroupId)
+                        {
+                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                        }
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2694,7 +2711,14 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackageGroup, id);
+                        if (id == BurnConstants.BundleChainPackageGroupId)
+                        {
+                            this.Messaging.Write(CompilerErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Id", id));
+                        }
+                        else
+                        {
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundlePackageGroup, id);
+                        }
                         break;
                     case "After":
                         after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
