@@ -15,8 +15,6 @@ namespace WixToolset.Core
 
         public string Description { get; set; }
 
-        public string DisplayName { get; set; }
-
         public string DownloadUrl { get; set; }
 
         public string Hash { get; set; }
@@ -158,7 +156,7 @@ namespace WixToolset.Core
 
                 if (!String.IsNullOrEmpty(this.DownloadUrl))
                 {
-                    this.Core.Write(WarningMessages.DownloadUrlNotSupportedForEmbeddedPayloads(this.SourceLineNumbers, this.Id.Id));
+                    this.Core.Write(WarningMessages.DownloadUrlNotSupportedForBAPayloads(this.SourceLineNumbers, this.Id.Id));
                 }
 
                 this.Compressed = YesNoDefaultType.Yes;
@@ -174,7 +172,7 @@ namespace WixToolset.Core
                     DownloadUrl = this.DownloadUrl,
                     Compressed = (this.Compressed == YesNoDefaultType.Yes) ? true : (this.Compressed == YesNoDefaultType.No) ? (bool?)false : null,
                     UnresolvedSourceFile = this.SourceFile, // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
-                    DisplayName = this.DisplayName ?? this.ProductName,
+                    DisplayName = this.ProductName,
                     Description = this.Description,
                     Hash = this.Hash,
                     FileSize = this.Size,
@@ -243,11 +241,6 @@ namespace WixToolset.Core
         public void ParseDescription(XAttribute attrib)
         {
             this.Description = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
-        }
-
-        public void ParseDisplayName(XAttribute attrib)
-        {
-            this.DisplayName = this.Core.GetAttributeValue(this.SourceLineNumbers, attrib);
         }
 
         public void ParseDownloadUrl(XAttribute attrib)

@@ -44,13 +44,6 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void Execute()
         {
-            var payloadCount = this.Payloads.Count(); // The number of embedded payloads
-
-            if (!String.IsNullOrEmpty(this.ManifestFile))
-            {
-                ++payloadCount;
-            }
-
             var cabinetPath = Path.GetFullPath(this.OutputPath);
 
             var files = new List<CabinetCompressFile>();

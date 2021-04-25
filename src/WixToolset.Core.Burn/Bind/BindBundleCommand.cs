@@ -300,7 +300,7 @@ namespace WixToolset.Core.Burn
 
                     if (PackagingType.Embedded == payload.Packaging && String.IsNullOrEmpty(payload.EmbeddedId))
                     {
-                        payload.EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnAttachedContainerEmbeddedIdFormat, payloadIndex);
+                        payload.EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnAuthoredContainerEmbeddedIdFormat, payloadIndex);
                         ++payloadIndex;
                     }
                 }

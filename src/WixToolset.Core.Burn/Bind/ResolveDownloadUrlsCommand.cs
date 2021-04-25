@@ -5,6 +5,7 @@ namespace WixToolset.Core.Burn.Bind
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
@@ -60,7 +61,14 @@ namespace WixToolset.Core.Burn.Bind
         {
             foreach (var payload in this.PayloadsById.Values)
             {
-                if (payload.Packaging == PackagingType.External)
+                if (payload.Packaging == PackagingType.Embedded && payload.ContainerRef == BurnConstants.BurnUXContainerName)
+                {
+                    if (!String.IsNullOrEmpty(payload.DownloadUrl))
+                    {
+                        this.Messaging.Write(WarningMessages.DownloadUrlNotSupportedForBAPayloads(payload.SourceLineNumbers, payload.Id.Id));
+                    }
+                }
+                else
                 {
                     var packageId = payload.ParentPackagePayloadRef;
                     var parentUrl = payload.ParentPackagePayloadRef == null ? null : this.PayloadsById[payload.ParentPackagePayloadRef].DownloadUrl;
@@ -68,13 +76,6 @@ namespace WixToolset.Core.Burn.Bind
                     if (!String.IsNullOrEmpty(resolvedUrl))
                     {
                         payload.DownloadUrl = resolvedUrl;
-                    }
-                }
-                else if (payload.Packaging == PackagingType.Embedded)
-                {
-                    if (!String.IsNullOrEmpty(payload.DownloadUrl))
-                    {
-                        this.Messaging.Write(WarningMessages.DownloadUrlNotSupportedForEmbeddedPayloads(payload.SourceLineNumbers, payload.Id.Id));
                     }
                 }
             }

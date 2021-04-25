@@ -19,8 +19,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         public const string BurnNamespace = "http://wixtoolset.org/schemas/v4/2008/Burn";
         public const string BurnUXContainerEmbeddedIdFormat = "u{0}";
-        public const string BurnUXContainerPayloadIdFormat = "p{0}";
-        public const string BurnAttachedContainerEmbeddedIdFormat = "a{0}";
+        public const string BurnAuthoredContainerEmbeddedIdFormat = "a{0}";
 
         public const string BADataFileName = "BootstrapperApplicationData.xml";
         public const string BADataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";

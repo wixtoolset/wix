@@ -166,9 +166,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // write the UX allPayloads...
                 foreach (var payload in this.UXContainerPayloads)
                 {
-                    writer.WriteStartElement("Payload");
-                    this.WriteBurnManifestPayloadAttributes(writer, payload, true, this.Payloads);
-                    writer.WriteEndElement();
+                    this.WriteBurnManifestUXPayload(writer, payload);
                 }
 
                 writer.WriteEndElement(); // </UX>
@@ -183,20 +181,9 @@ namespace WixToolset.Core.Burn.Bundles
                     }
                 }
 
-                foreach (var payload in this.Payloads.Values)
+                foreach (var payload in this.Payloads.Values.Where(p => p.ContainerRef != BurnConstants.BurnUXContainerName))
                 {
-                    if (PackagingType.Embedded == payload.Packaging && BurnConstants.BurnUXContainerName != payload.ContainerRef)
-                    {
-                        writer.WriteStartElement("Payload");
-                        this.WriteBurnManifestPayloadAttributes(writer, payload, true, this.Payloads);
-                        writer.WriteEndElement();
-                    }
-                    else if (PackagingType.External == payload.Packaging)
-                    {
-                        writer.WriteStartElement("Payload");
-                        this.WriteBurnManifestPayloadAttributes(writer, payload, false, this.Payloads);
-                        writer.WriteEndElement();
-                    }
+                    this.WriteBurnManifestPayload(writer, payload);
                 }
 
                 foreach (var rollbackBoundary in this.RollbackBoundaries)
@@ -654,9 +641,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void WriteBurnManifestPayloadAttributes(XmlTextWriter writer, WixBundlePayloadSymbol payload, bool embeddedOnly, Dictionary<string, WixBundlePayloadSymbol> allPayloads)
+        private void WriteBurnManifestPayload(XmlTextWriter writer, WixBundlePayloadSymbol payload)
         {
-            Debug.Assert(!embeddedOnly || PackagingType.Embedded == payload.Packaging);
+            writer.WriteStartElement("Payload");
 
             writer.WriteAttributeString("Id", payload.Id.Id);
             writer.WriteAttributeString("FilePath", payload.Name);
@@ -668,28 +655,46 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("LayoutOnly", "yes");
             }
 
+            if (!String.IsNullOrEmpty(payload.DownloadUrl))
+            {
+                writer.WriteAttributeString("DownloadUrl", payload.DownloadUrl);
+            }
+
             switch (payload.Packaging)
             {
                 case PackagingType.Embedded: // this means it's in a container.
+                    Debug.Assert(BurnConstants.BurnUXContainerName != payload.ContainerRef);
+
                     writer.WriteAttributeString("Packaging", "embedded");
                     writer.WriteAttributeString("SourcePath", payload.EmbeddedId);
-
-                    if (BurnConstants.BurnUXContainerName != payload.ContainerRef)
-                    {
-                        writer.WriteAttributeString("Container", payload.ContainerRef);
-                    }
+                    writer.WriteAttributeString("Container", payload.ContainerRef);
                     break;
 
                 case PackagingType.External:
-                    if (!String.IsNullOrEmpty(payload.DownloadUrl))
-                    {
-                        writer.WriteAttributeString("DownloadUrl", payload.DownloadUrl);
-                    }
-
                     writer.WriteAttributeString("Packaging", "external");
                     writer.WriteAttributeString("SourcePath", payload.Name);
                     break;
             }
+
+            writer.WriteEndElement();
+        }
+
+        private void WriteBurnManifestUXPayload(XmlTextWriter writer, WixBundlePayloadSymbol payload)
+        {
+            Debug.Assert(PackagingType.Embedded == payload.Packaging);
+            Debug.Assert(BurnConstants.BurnUXContainerName == payload.ContainerRef);
+
+            writer.WriteStartElement("Payload");
+
+            // TODO: The engine should be updated to not require FileSize, Hash, or Packaging for UX payloads since the values are never used.
+            writer.WriteAttributeString("Id", payload.Id.Id);
+            writer.WriteAttributeString("FilePath", payload.Name);
+            writer.WriteAttributeString("FileSize", payload.FileSize.Value.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("Hash", payload.Hash);
+            writer.WriteAttributeString("Packaging", "embedded");
+            writer.WriteAttributeString("SourcePath", payload.EmbeddedId);
+
+            writer.WriteEndElement();
         }
     }
 }
