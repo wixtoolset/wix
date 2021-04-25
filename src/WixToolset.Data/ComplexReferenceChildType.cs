@@ -45,5 +45,8 @@ namespace WixToolset.Data
 
         /// <summary>PatchFamilyGroup child of complex reference.</summary>
         PatchFamilyGroup,
+
+        /// <summary>ContainerPackage child of complex reference.</summary>
+        ContainerPackage,
     }
 }

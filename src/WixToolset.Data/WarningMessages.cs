@@ -237,9 +237,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForAttachedContainers, "The Container '{0}' is attached but included a @DownloadUrl attribute. Attached Containers cannot be downloaded so the download URL is being ignored.", containerId);
         }
 
-        public static Message DownloadUrlNotSupportedForEmbeddedPayloads(SourceLineNumber sourceLineNumbers, string payloadId)
+        public static Message DownloadUrlNotSupportedForBAPayloads(SourceLineNumber sourceLineNumbers, string payloadId)
         {
-            return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForEmbeddedPayloads, "The Payload '{0}' is embedded but included a @DownloadUrl attribute. Embedded Payloads cannot be downloaded so the download URL is being ignored.", payloadId);
+            return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForBAPayloads, "The BootstrapperApplication Payload '{0}' included a @DownloadUrl attribute. BootstrapperApplication Payloads cannot be downloaded so the download URL is being ignored.", payloadId);
         }
 
         public static Message DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(SourceLineNumber sourceLineNumbers, string componentId, string guid, string type, string keyPath)
@@ -785,7 +785,7 @@ namespace WixToolset.Data
             DiscardedRollbackBoundary = 1129,
             DeprecatedElement = 1130,
             CannotUpdateCabCache = 1131,
-            DownloadUrlNotSupportedForEmbeddedPayloads = 1132,
+            DownloadUrlNotSupportedForBAPayloads = 1132,
             DiscouragedAllUsersValue = 1133,
             ImplicitlyPerUser = 1134,
             PerUserButForcingPerMachine = 1135,

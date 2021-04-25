@@ -6,6 +6,8 @@ namespace WixToolset.Data.Burn
     {
         public const string BurnUXContainerName = "WixUXContainer";
         public const string BurnDefaultAttachedContainerName = "WixAttachedContainer";
+        public const string BundleChainPackageGroupId = "WixChain";
+        public const string BundleDefaultBoundaryId = "WixDefaultBoundary";
         public const string BundleLayoutOnlyPayloadsName = "BundleLayoutOnlyPayloads";
 
         public const string BurnManifestWixOutputStreamName = "wix-burndata.xml";
