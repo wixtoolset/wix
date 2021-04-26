@@ -133,6 +133,11 @@ static HRESULT AcquireContainerOrPayload(
     __in BURN_CACHE_PROGRESS_CONTEXT* pProgress,
     __out BOOL* pfRetry
     );
+static BOOL IsValidLocalFile(
+    __in_z LPCWSTR wzFilePath,
+    __in DWORD64 qwFileSize,
+    __in BOOL fMinimumFileSize
+    );
 static HRESULT LayoutOrCacheContainerOrPayload(
     __in BURN_CACHE_CONTEXT* pContext,
     __in_opt BURN_CONTAINER* pContainer,
@@ -1399,6 +1404,25 @@ static HRESULT AcquireContainerOrPayload(
     LPWSTR* pwzSourcePath = pContainer ? &pContainer->sczSourcePath : &pPayload->sczSourcePath;
     BOOL fFoundLocal = FALSE;
     BOOL fPreferExtract = FALSE;
+    DWORD64 qwFileSize = 0;
+    BOOL fMinimumFileSize = FALSE;
+
+    if (pContainer)
+    {
+        if (pContainer->fAttached)
+        {
+            fMinimumFileSize = TRUE;
+            qwFileSize = pContainer->qwAttachedOffset + pContainer->qwFileSize;
+        }
+        else if (pContainer->pbHash && pContext->wzLayoutDirectory)
+        {
+            qwFileSize = pContainer->qwFileSize;
+        }
+    }
+    else if (pPayload->pbHash)
+    {
+        qwFileSize = pPayload->qwFileSize;
+    }
 
     pContext->cSearchPaths = 0;
     *pfRetry = FALSE;
@@ -1427,7 +1451,7 @@ static HRESULT AcquireContainerOrPayload(
                 // When a payload comes from a container, the container has the highest chance of being correct.
                 // But we want to avoid extracting the container multiple times.
                 // So only consider the destination path, which means the container was already extracted.
-                if (FileExistsEx(pContext->rgSearchPaths[dwDestinationSearchPath], NULL))
+                if (IsValidLocalFile(pContext->rgSearchPaths[dwDestinationSearchPath], qwFileSize, fMinimumFileSize))
                 {
                     fFoundLocal = TRUE;
                     dwChosenSearchPath = dwDestinationSearchPath;
@@ -1442,8 +1466,8 @@ static HRESULT AcquireContainerOrPayload(
             {
                 for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
                 {
-                    // If the file exists locally, choose it.
-                    if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
+                    // If the file exists locally with the correct size, choose it.
+                    if (IsValidLocalFile(pContext->rgSearchPaths[i], qwFileSize, fMinimumFileSize))
                     {
                         dwChosenSearchPath = i;
 
@@ -1555,6 +1579,26 @@ LExit:
     pContext->cSearchPathsMax = max(pContext->cSearchPaths, pContext->cSearchPathsMax);
 
     return hr;
+}
+
+static BOOL IsValidLocalFile(
+    __in_z LPCWSTR wzFilePath,
+    __in DWORD64 qwFileSize,
+    __in BOOL fMinimumFileSize
+    )
+{
+    LONGLONG llFileSize = 0;
+
+    if (!qwFileSize)
+    {
+        return FileExistsEx(wzFilePath, NULL);
+    }
+    else
+    {
+        return SUCCEEDED(FileSize(wzFilePath, &llFileSize)) &&
+               (static_cast<DWORD64>(llFileSize) == qwFileSize ||
+                fMinimumFileSize && static_cast<DWORD64>(llFileSize) > qwFileSize);
+    }
 }
 
 static HRESULT LayoutOrCacheContainerOrPayload(

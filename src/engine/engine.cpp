@@ -523,7 +523,8 @@ static HRESULT RunNormal(
     )
 {
     HRESULT hr = S_OK;
-    HANDLE hPipesCreatedEvent = NULL;
+    LPWSTR sczOriginalSource = NULL;
+    LPWSTR sczCopiedOriginalSource = NULL;
     BOOL fContinueExecution = TRUE;
     BOOL fReloadApp = FALSE;
     BOOL fSkipCleanup = FALSE;
@@ -557,6 +558,27 @@ static HRESULT RunNormal(
     // Query registration state.
     hr = CoreQueryRegistration(pEngineState);
     ExitOnFailure(hr, "Failed to query registration.");
+
+    // Best effort to set the source of attached containers to BURN_BUNDLE_ORIGINAL_SOURCE.
+    hr = VariableGetString(&pEngineState->variables, BURN_BUNDLE_ORIGINAL_SOURCE, &sczOriginalSource);
+    if (SUCCEEDED(hr))
+    {
+        for (DWORD i = 0; i < pEngineState->containers.cContainers; ++i)
+        {
+            BURN_CONTAINER* pContainer = pEngineState->containers.rgContainers + i;
+            if (pContainer->fAttached)
+            {
+                hr = StrAllocString(&sczCopiedOriginalSource, sczOriginalSource, 0);
+                if (SUCCEEDED(hr))
+                {
+                    ReleaseNullStr(pContainer->sczSourcePath);
+                    pContainer->sczSourcePath = sczCopiedOriginalSource;
+                    sczCopiedOriginalSource = NULL;
+                }
+            }
+        }
+    }
+    hr = S_OK;
 
     // Set some built-in variables before loading the BA.
     hr = PlanSetVariables(pEngineState->command.action, &pEngineState->variables);
@@ -613,7 +635,8 @@ LExit:
         ::PostMessageW(pEngineState->command.hwndSplashScreen, WM_CLOSE, 0, 0);
     }
 
-    ReleaseHandle(hPipesCreatedEvent);
+    ReleaseStr(sczOriginalSource);
+    ReleaseStr(sczCopiedOriginalSource);
 
     return hr;
 }
