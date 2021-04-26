@@ -102,7 +102,8 @@ HRESULT CacheGetLocalSourcePaths(
     __in BURN_VARIABLES* pVariables,
     __inout LPWSTR** prgSearchPaths,
     __out DWORD* pcSearchPaths,
-    __out DWORD* pdwLikelySearchPath
+    __out DWORD* pdwLikelySearchPath,
+    __out DWORD* pdwDestinationSearchPath
     );
 HRESULT CacheSetLastUsedSource(
     __in BURN_VARIABLES* pVariables,

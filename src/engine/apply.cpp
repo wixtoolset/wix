@@ -1359,8 +1359,8 @@ static HRESULT ApplyAcquireContainerOrPayload(
 
         if (fRetry)
         {
-            hr = S_OK;
             LogErrorId(hr, pContainer ? MSG_APPLY_RETRYING_ACQUIRE_CONTAINER : MSG_APPLY_RETRYING_ACQUIRE_PAYLOAD, pContainer ? pContainer->sczId : pPayloadGroupItem->pPayload->sczKey, NULL, NULL);
+            hr = S_OK;
         }
 
         ExitOnFailure(hr, "Failed to acquire %hs: %ls", pContainer ? "container" : "payload", pContainer ? pContainer->sczId : pPayloadGroupItem->pPayload->sczKey);
@@ -1389,11 +1389,13 @@ static HRESULT AcquireContainerOrPayload(
     LPCWSTR wzDestinationPath = pContainer ? pContainer->sczUnverifiedPath: pPayload->sczUnverifiedPath;
     LPCWSTR wzRelativePath = pContainer ? pContainer->sczFilePath : pPayload->sczFilePath;
     DWORD dwChosenSearchPath = 0;
+    DWORD dwDestinationSearchPath = 0;
     BOOTSTRAPPER_CACHE_OPERATION cacheOperation = BOOTSTRAPPER_CACHE_OPERATION_NONE;
     BOOTSTRAPPER_CACHE_RESOLVE_OPERATION resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_NONE;
     LPWSTR* pwzDownloadUrl = pContainer ? &pContainer->downloadSource.sczUrl : &pPayload->downloadSource.sczUrl;
     LPWSTR* pwzSourcePath = pContainer ? &pContainer->sczSourcePath : &pPayload->sczSourcePath;
     BOOL fFoundLocal = FALSE;
+    BOOL fPreferExtract = FALSE;
 
     pContext->cSearchPaths = 0;
     *pfRetry = FALSE;
@@ -1409,21 +1411,42 @@ static HRESULT AcquireContainerOrPayload(
         do
         {
             fFoundLocal = FALSE;
+            fPreferExtract = FALSE;
             resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_NONE;
             dwChosenSearchPath = 0;
+            dwDestinationSearchPath = 0;
 
-            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath);
+            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath, &dwDestinationSearchPath);
             ExitOnFailure(hr, "Failed to search local source.");
 
-            for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
+            // When a payload comes from a container, the container has the highest chance of being correct.
+            // But we want to avoid extracting the container multiple times.
+            // So only consider the destination path, which means the container was already extracted.
+            if (wzPayloadContainerId)
             {
-                // If the file exists locally, choose it.
-                if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
+                if (FileExistsEx(pContext->rgSearchPaths[dwDestinationSearchPath], NULL))
                 {
-                    dwChosenSearchPath = i;
-
                     fFoundLocal = TRUE;
-                    break;
+                    dwChosenSearchPath = dwDestinationSearchPath;
+                }
+                else
+                {
+                    fPreferExtract = TRUE;
+                }
+            }
+
+            if (!fFoundLocal)
+            {
+                for (DWORD i = 0; i < pContext->cSearchPaths; ++i)
+                {
+                    // If the file exists locally, choose it.
+                    if (FileExistsEx(pContext->rgSearchPaths[i], NULL))
+                    {
+                        dwChosenSearchPath = i;
+
+                        fFoundLocal = TRUE;
+                        break;
+                    }
                 }
             }
 
@@ -1436,7 +1459,11 @@ static HRESULT AcquireContainerOrPayload(
             }
             else
             {
-                if (fFoundLocal) // the file exists locally, so copy it.
+                if (fPreferExtract) // the file comes from a container which hasn't been extracted yet, so extract it.
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER;
+                }
+                else if (fFoundLocal) // the file exists locally, so copy it.
                 {
                     resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_LOCAL;
                 }

@@ -441,7 +441,8 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     __in BURN_VARIABLES* pVariables,
     __inout LPWSTR** prgSearchPaths,
     __out DWORD* pcSearchPaths,
-    __out DWORD* pdwLikelySearchPath
+    __out DWORD* pdwLikelySearchPath,
+    __out DWORD* pdwDestinationSearchPath
     )
 {
     HRESULT hr = S_OK;
@@ -454,6 +455,7 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     BOOL fSourceIsAbsolute = FALSE;
     DWORD cSearchPaths = 0;
     DWORD dwLikelySearchPath = 0;
+    DWORD dwDestinationSearchPath = 0;
 
     AssertSz(vfInitializedCache, "Cache wasn't initialized");
 
@@ -486,6 +488,7 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(prgSearchPaths), cSearchPaths + 1, sizeof(LPWSTR), BURN_CACHE_MAX_SEARCH_PATHS);
     ExitOnFailure(hr, "Failed to ensure size for search paths array.");
 
+    dwDestinationSearchPath = cSearchPaths;
     psczPath = *prgSearchPaths + cSearchPaths;
     ++cSearchPaths;
 
@@ -602,6 +605,7 @@ LExit:
     AssertSz(cSearchPaths <= BURN_CACHE_MAX_SEARCH_PATHS, "Got more than BURN_CACHE_MAX_SEARCH_PATHS search paths");
     *pcSearchPaths = cSearchPaths;
     *pdwLikelySearchPath = dwLikelySearchPath;
+    *pdwDestinationSearchPath = dwDestinationSearchPath;
 
     return hr;
 }
