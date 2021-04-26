@@ -155,7 +155,7 @@ extern "C" HRESULT CoreInitialize(
         hr = UserExperienceEnsureWorkingFolder(pEngineState->registration.sczId, &pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to get unique temporary folder for bootstrapper application.");
 
-        hr = PayloadExtractFromContainer(&pEngineState->userExperience.payloads, NULL, &containerContext, pEngineState->userExperience.sczTempDirectory);
+        hr = PayloadExtractUXContainer(&pEngineState->userExperience.payloads, &containerContext, pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to extract bootstrapper application payloads.");
 
         hr = PathConcat(pEngineState->userExperience.sczTempDirectory, L"BootstrapperApplicationData.xml", &pEngineState->command.wzBootstrapperApplicationDataPath);

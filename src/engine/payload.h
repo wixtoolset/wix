@@ -85,9 +85,8 @@ void PayloadUninitialize(
 void PayloadsUninitialize(
     __in BURN_PAYLOADS* pPayloads
     );
-HRESULT PayloadExtractFromContainer(
+HRESULT PayloadExtractUXContainer(
     __in BURN_PAYLOADS* pPayloads,
-    __in_opt BURN_CONTAINER* pContainer,
     __in BURN_CONTAINER_CONTEXT* pContainerContext,
     __in_z LPCWSTR wzTargetDir
     );

@@ -1113,7 +1113,8 @@ static HRESULT ExtractContainer(
     HRESULT hr = S_OK;
     BURN_CONTAINER_CONTEXT context = { };
     HANDLE hContainerHandle = INVALID_HANDLE_VALUE;
-    LPWSTR sczExtractPayloadId = NULL;
+    LPWSTR sczStreamName = NULL;
+    BURN_PAYLOAD* pExtract = NULL;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
 
     progress.pCacheContext = pContext;
@@ -1129,14 +1130,17 @@ static HRESULT ExtractContainer(
     hr = ContainerOpen(&context, pContainer, hContainerHandle, pContainer->sczUnverifiedPath);
     ExitOnFailure(hr, "Failed to open container: %ls.", pContainer->sczId);
 
-    while (S_OK == (hr = ContainerNextStream(&context, &sczExtractPayloadId)))
+    while (S_OK == (hr = ContainerNextStream(&context, &sczStreamName)))
     {
         BOOL fExtracted = FALSE;
 
-        for (DWORD iExtract = 0; iExtract < pContext->pPayloads->cPayloads; ++iExtract)
+        hr = PayloadFindEmbeddedBySourcePath(pContext->pPayloads, sczStreamName, &pExtract);
+        if (E_NOTFOUND != hr)
         {
-            BURN_PAYLOAD* pExtract = pContext->pPayloads->rgPayloads + iExtract;
-            if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczExtractPayloadId, -1, pExtract->sczSourcePath, -1))
+            ExitOnFailure(hr, "Failed to find embedded payload by source path: %ls container: %ls", sczStreamName, pContainer->sczId);
+
+            // Skip payloads that weren't planned or have already been cached.
+            if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances)
             {
                 progress.pPayload = pExtract;
 
@@ -1161,17 +1165,16 @@ static HRESULT ExtractContainer(
                 }
 
                 UserExperienceOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
-                ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", sczExtractPayloadId, pContainer->sczId);
+                ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", sczStreamName, pContainer->sczId);
 
                 fExtracted = TRUE;
-                break;
             }
         }
 
         if (!fExtracted)
         {
             hr = ContainerSkipStream(&context);
-            ExitOnFailure(hr, "Failed to skip the extraction of payload: %ls from container: %ls", sczExtractPayloadId, pContainer->sczId);
+            ExitOnFailure(hr, "Failed to skip the extraction of payload: %ls from container: %ls", sczStreamName, pContainer->sczId);
         }
     }
 
@@ -1182,7 +1185,7 @@ static HRESULT ExtractContainer(
     ExitOnFailure(hr, "Failed to extract all payloads from container: %ls", pContainer->sczId);
 
 LExit:
-    ReleaseStr(sczExtractPayloadId);
+    ReleaseStr(sczStreamName);
     ContainerClose(&context);
 
     return hr;

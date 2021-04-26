@@ -190,9 +190,8 @@ extern "C" void PayloadsUninitialize(
     memset(pPayloads, 0, sizeof(BURN_PAYLOADS));
 }
 
-extern "C" HRESULT PayloadExtractFromContainer(
+extern "C" HRESULT PayloadExtractUXContainer(
     __in BURN_PAYLOADS* pPayloads,
-    __in_opt BURN_CONTAINER* pContainer,
     __in BURN_CONTAINER_CONTEXT* pContainerContext,
     __in_z LPCWSTR wzTargetDir
     )
@@ -215,7 +214,7 @@ extern "C" HRESULT PayloadExtractFromContainer(
         ExitOnFailure(hr, "Failed to get next stream.");
 
         // find payload by stream name
-        hr = FindEmbeddedBySourcePath(pPayloads, pContainer, sczStreamName, &pPayload);
+        hr = PayloadFindEmbeddedBySourcePath(pPayloads, sczStreamName, &pPayload);
         ExitOnFailure(hr, "Failed to find embedded payload: %ls", sczStreamName);
 
         // make file path
@@ -241,15 +240,11 @@ extern "C" HRESULT PayloadExtractFromContainer(
     {
         pPayload = &pPayloads->rgPayloads[i];
 
-        // if the payload is part of the container
-        if (!pContainer || pPayload->pContainer == pContainer)
+        // if the payload has not been acquired
+        if (BURN_PAYLOAD_STATE_ACQUIRED > pPayload->state)
         {
-            // if the payload has not been acquired
-            if (BURN_PAYLOAD_STATE_ACQUIRED > pPayload->state)
-            {
-                hr = E_INVALIDDATA;
-                ExitOnRootFailure(hr, "Payload was not found in container: %ls", pPayload->sczKey);
-            }
+            hr = E_INVALIDDATA;
+            ExitOnRootFailure(hr, "Payload was not found in container: %ls", pPayload->sczKey);
         }
     }
 
@@ -317,32 +312,3 @@ LExit:
 
 
 // internal function definitions
-
-static HRESULT FindEmbeddedBySourcePath(
-    __in BURN_PAYLOADS* pPayloads,
-    __in_opt BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzStreamName,
-    __out BURN_PAYLOAD** ppPayload
-    )
-{
-    HRESULT hr = S_OK;
-
-    for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
-    {
-        BURN_PAYLOAD* pPayload = &pPayloads->rgPayloads[i];
-
-        if (BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging && (!pContainer || pPayload->pContainer == pContainer))
-        {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPayload->sczSourcePath, -1, wzStreamName, -1))
-            {
-                *ppPayload = pPayload;
-                ExitFunction1(hr = S_OK);
-            }
-        }
-    }
-
-    hr = E_NOTFOUND;
-
-LExit:
-    return hr;
-}
