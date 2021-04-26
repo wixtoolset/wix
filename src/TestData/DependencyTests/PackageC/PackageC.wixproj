@@ -8,6 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Dependency.wixext" Version="4.0.29" />
-    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.94" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.95" />
   </ItemGroup>
 </Project>
