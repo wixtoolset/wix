@@ -97,7 +97,6 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzWorkingFolderName,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
     );
@@ -743,7 +742,6 @@ extern "C" BOOL CacheBundleRunningFromCache()
 }
 
 extern "C" HRESULT CacheBundleToCleanRoom(
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
     )
@@ -757,7 +755,7 @@ extern "C" HRESULT CacheBundleToCleanRoom(
 
     wzExecutableName = PathFile(sczSourcePath);
 
-    hr = CopyEngineToWorkingFolder(sczSourcePath, BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME, wzExecutableName, pUxPayloads, pSection, psczCleanRoomBundlePath);
+    hr = CopyEngineToWorkingFolder(sczSourcePath, BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczCleanRoomBundlePath);
     ExitOnFailure(hr, "Failed to cache bundle to clean room.");
 
 LExit:
@@ -769,7 +767,6 @@ LExit:
 extern "C" HRESULT CacheBundleToWorkingDirectory(
     __in_z LPCWSTR /*wzBundleId*/,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
     )
@@ -792,7 +789,7 @@ extern "C" HRESULT CacheBundleToWorkingDirectory(
     }
     else // otherwise, carry on putting the bundle in the working folder.
     {
-        hr = CopyEngineToWorkingFolder(sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pUxPayloads, pSection, psczEngineWorkingPath);
+        hr = CopyEngineToWorkingFolder(sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczEngineWorkingPath);
         ExitOnFailure(hr, "Failed to copy engine to working folder.");
     }
 
@@ -1767,7 +1764,6 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzWorkingFolderName,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
     )
@@ -1795,30 +1791,6 @@ static HRESULT CopyEngineToWorkingFolder(
     // Copy the engine without any attached containers to the working path.
     hr = CopyEngineWithSignatureFixup(pSection->hEngineFile, wzSourcePath, sczTargetPath, pSection);
     ExitOnFailure(hr, "Failed to copy engine: '%ls' to working path: %ls", wzSourcePath, sczTargetPath);
-
-    // Copy external UX payloads to working path.
-    for (DWORD i = 0; i < pUxPayloads->cPayloads; ++i)
-    {
-        BURN_PAYLOAD* pPayload = &pUxPayloads->rgPayloads[i];
-
-        if (BURN_PAYLOAD_PACKAGING_EXTERNAL == pPayload->packaging)
-        {
-            if (!sczSourceDirectory)
-            {
-                hr = PathGetDirectory(wzSourcePath, &sczSourceDirectory);
-                ExitOnFailure(hr, "Failed to get directory from engine path: %ls", wzSourcePath);
-            }
-
-            hr = PathConcat(sczSourceDirectory, pPayload->sczSourcePath, &sczPayloadSourcePath);
-            ExitOnFailure(hr, "Failed to build payload source path for working copy.");
-
-            hr = PathConcat(sczTargetDirectory, pPayload->sczFilePath, &sczPayloadTargetPath);
-            ExitOnFailure(hr, "Failed to build payload target path for working copy.");
-
-            hr = FileEnsureCopyWithRetry(sczPayloadSourcePath, sczPayloadTargetPath, TRUE, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
-            ExitOnFailure(hr, "Failed to copy UX payload from: '%ls' to: '%ls'", sczPayloadSourcePath, sczPayloadTargetPath);
-        }
-    }
 
     if (psczEngineWorkingPath)
     {

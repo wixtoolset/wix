@@ -124,14 +124,12 @@ void CacheSendErrorCallback(
     );
 BOOL CacheBundleRunningFromCache();
 HRESULT CacheBundleToCleanRoom(
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
     );
 HRESULT CacheBundleToWorkingDirectory(
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_PAYLOADS* pUxPayloads,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
     );

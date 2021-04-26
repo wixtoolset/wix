@@ -579,7 +579,7 @@ extern "C" HRESULT CoreElevate(
         // If the elevated companion pipe isn't created yet, let's make that happen.
         if (!pEngineState->sczBundleEngineWorkingPath)
         {
-            hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->userExperience.payloads, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+            hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
             ExitOnFailure(hr, "Failed to cache engine to working directory.");
         }
 
@@ -678,7 +678,7 @@ extern "C" HRESULT CoreApply(
     // Ensure the engine is cached to the working path.
     if (!pEngineState->sczBundleEngineWorkingPath)
     {
-        hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->userExperience.payloads, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+        hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
         ExitOnFailure(hr, "Failed to cache engine to working directory.");
     }
 
