@@ -1,0 +1,9 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <UpgradeCode>{5D0BD93A-D1D8-4F59-8417-1390B18A6611}</UpgradeCode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Package.wxs" Link="Package.wxs" />
+  </ItemGroup>
+</Project>
