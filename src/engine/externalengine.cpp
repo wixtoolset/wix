@@ -357,12 +357,6 @@ HRESULT ExternalEngineSetLocalSource(
         hr = PayloadFindById(&pEngineState->payloads, wzPayloadId, &pPayload);
         ExitOnFailure(hr, "BA requested unknown payload with id: %ls", wzPayloadId);
 
-        if (BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_OPERATION);
-            ExitOnFailure(hr, "BA denied while trying to set source on embedded payload: %ls", wzPayloadId);
-        }
-
         hr = StrAllocString(&pPayload->sczSourcePath, wzPath, 0);
         ExitOnFailure(hr, "Failed to set source path for payload.");
     }
@@ -407,12 +401,6 @@ HRESULT ExternalEngineSetDownloadSource(
     {
         hr = PayloadFindById(&pEngineState->payloads, wzPayloadId, &pPayload);
         ExitOnFailure(hr, "BA requested unknown payload with id: %ls", wzPayloadId);
-
-        if (BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_OPERATION);
-            ExitOnFailure(hr, "BA denied while trying to set download URL on embedded payload: %ls", wzPayloadId);
-        }
 
         pDownloadSource = &pPayload->downloadSource;
     }

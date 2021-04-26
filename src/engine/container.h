@@ -79,6 +79,7 @@ typedef struct _BURN_CONTAINER
     DWORD64 qwExtractSizeTotal;
     DWORD64 qwCommittedCacheProgress;
     DWORD64 qwCommittedExtractProgress;
+    HRESULT hrExtract;
 } BURN_CONTAINER;
 
 typedef struct _BURN_CONTAINERS

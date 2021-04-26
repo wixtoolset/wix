@@ -1422,19 +1422,19 @@ static HRESULT AcquireContainerOrPayload(
             hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath, &dwDestinationSearchPath);
             ExitOnFailure(hr, "Failed to search local source.");
 
-            // When a payload comes from a container, the container has the highest chance of being correct.
-            // But we want to avoid extracting the container multiple times.
-            // So only consider the destination path, which means the container was already extracted.
             if (wzPayloadContainerId)
             {
+                // When a payload comes from a container, the container has the highest chance of being correct.
+                // But we want to avoid extracting the container multiple times.
+                // So only consider the destination path, which means the container was already extracted.
                 if (FileExistsEx(pContext->rgSearchPaths[dwDestinationSearchPath], NULL))
                 {
                     fFoundLocal = TRUE;
                     dwChosenSearchPath = dwDestinationSearchPath;
                 }
-                else
+                else // don't prefer the container if extracting it already failed.
                 {
-                    fPreferExtract = TRUE;
+                    fPreferExtract = SUCCEEDED(pPayload->pContainer->hrExtract);
                 }
             }
 
@@ -1470,13 +1470,13 @@ static HRESULT AcquireContainerOrPayload(
                 {
                     resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_LOCAL;
                 }
-                else if (wzPayloadContainerId)
-                {
-                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER;
-                }
                 else if (*pwzDownloadUrl && **pwzDownloadUrl)
                 {
                     resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_DOWNLOAD;
+                }
+                else if (wzPayloadContainerId)
+                {
+                    resolveOperation = BOOTSTRAPPER_CACHE_RESOLVE_CONTAINER;
                 }
             }
 
@@ -1526,7 +1526,7 @@ static HRESULT AcquireContainerOrPayload(
 
         break;
     case BOOTSTRAPPER_CACHE_OPERATION_EXTRACT:
-        Assert(pPayload->pContainer);
+        Assert(pPayload && pPayload->pContainer);
 
         hr = ApplyExtractContainer(pContext, pPayload->pContainer);
         ExitOnFailure(hr, "Failed to extract container for payload: %ls", wzPayloadId);
@@ -1541,6 +1541,15 @@ static HRESULT AcquireContainerOrPayload(
     hr = CompleteCacheProgress(pProgress, pContainer ? pContainer->qwFileSize : pPayload->qwFileSize);
 
 LExit:
+    if (BOOTSTRAPPER_CACHE_OPERATION_EXTRACT == cacheOperation)
+    {
+        if (FAILED(hr) && SUCCEEDED(pPayload->pContainer->hrExtract) &&
+            (fFoundLocal || pPayload->downloadSource.sczUrl && *pPayload->downloadSource.sczUrl))
+        {
+            *pfRetry = TRUE;
+        }
+        pPayload->pContainer->hrExtract = hr;
+    }
     UserExperienceOnCacheAcquireComplete(pContext->pUX, wzPackageOrContainerId, wzPayloadId, hr, pfRetry);
 
     pContext->cSearchPathsMax = max(pContext->cSearchPaths, pContext->cSearchPathsMax);

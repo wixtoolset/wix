@@ -1832,6 +1832,7 @@ static void ResetPlannedContainerState(
     pContainer->qwExtractSizeTotal = 0;
     pContainer->qwCommittedCacheProgress = 0;
     pContainer->qwCommittedExtractProgress = 0;
+    pContainer->hrExtract = S_OK;
 }
 
 static void ResetPlannedPayloadsState(
