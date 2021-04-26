@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "directxca", "src\ca\directxca.vcxproj", "{76542B28-0FFD-47D3-AD6A-D0F20FA875AC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "directxca", "ca\directxca.vcxproj", "{76542B28-0FFD-47D3-AD6A-D0F20FA875AC}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "directx", "src\wixlib\directx.wixproj", "{4D8DDEC7-AAAC-4A32-87D0-5992FE382ED9}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "directx", "wixlib\directx.wixproj", "{4D8DDEC7-AAAC-4A32-87D0-5992FE382ED9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.DirectX.wixext", "src\wixext\WixToolset.DirectX.wixext.csproj", "{6182DBCA-146A-4F37-8406-3139BBE04636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.DirectX.wixext", "wixext\WixToolset.DirectX.wixext.csproj", "{6182DBCA-146A-4F37-8406-3139BBE04636}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.DirectX", "src\test\WixToolsetTest.DirectX\WixToolsetTest.DirectX.csproj", "{508A3DD0-FE58-4150-A1F6-A803A377012A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.DirectX", "test\WixToolsetTest.DirectX\WixToolsetTest.DirectX.csproj", "{508A3DD0-FE58-4150-A1F6-A803A377012A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

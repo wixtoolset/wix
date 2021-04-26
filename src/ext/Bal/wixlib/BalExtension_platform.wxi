@@ -16,20 +16,6 @@
         </BootstrapperApplication>
         <BootstrapperApplicationRef Id="WixDotNetCoreBootstrapperApplicationHost$(var.Suffix)" />
     </Fragment>
-    
-    <Fragment>
-        <BootstrapperApplication Id="WixManagedBootstrapperApplicationHost$(var.Suffix)">
-            <BootstrapperApplicationDll Id="WixManagedBootstrapperApplicationHost" SourceFile="!(bindpath.$(var.platform))\mbahost.dll" />
-            <Payload SourceFile="!(bindpath.$(var.platform))\wixstdba.dll" Name="mbapreq.dll" />
-            <PayloadGroupRef Id="WixManagedBootstrapperApplicationHostManagedPayloads" />
-        </BootstrapperApplication>
-    </Fragment>
-    <Fragment>
-        <BootstrapperApplication Id="WixManagedBootstrapperApplicationHost.Standard$(var.Suffix)">
-            <PayloadGroupRef Id="MbaPreqStandardPayloads" />
-        </BootstrapperApplication>
-        <BootstrapperApplicationRef Id="WixManagedBootstrapperApplicationHost$(var.Suffix)" />
-    </Fragment>
 
     <Fragment>
         <BootstrapperApplication Id="WixStandardBootstrapperApplication$(var.Suffix)">

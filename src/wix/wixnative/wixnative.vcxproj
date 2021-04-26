@@ -63,13 +63,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ContentWithTargetPath Include="$(Platform)\mergemod.dll" CopyToOutputDirectory="PreserveNewest" TargetPath="mergemod.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Dutil" Version="4.0.72" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageReference Include="GitInfo" Version="2.1.2" />
+    <PackageReference Include="WixToolset.Dutil" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    <PackageReference Include="GitInfo" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

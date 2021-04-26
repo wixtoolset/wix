@@ -4,10 +4,13 @@
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
   </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\ca\directxca.vcxproj" />
+    <ProjectReference Include="..\ca\directxca.vcxproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 </Project>

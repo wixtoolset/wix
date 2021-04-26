@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dutil", "src\dutil\dutil.vcxproj", "{1244E671-F108-4334-BA52-8A7517F26ECD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dutil", "WixToolset.DUtil\dutil.vcxproj", "{1244E671-F108-4334-BA52-8A7517F26ECD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUtilUnitTest", "src\test\DUtilUnitTest\DUtilUnitTest.vcxproj", "{AB7EE608-E5FB-42A5-831F-0DEEEA141223}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DUtilUnitTest", "test\DUtilUnitTest\DUtilUnitTest.vcxproj", "{AB7EE608-E5FB-42A5-831F-0DEEEA141223}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

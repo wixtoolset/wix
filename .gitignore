@@ -386,3 +386,16 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+
+# WiX Specific Ignores
+
+# Ignore global.json and Directory.Package.props since they are generated
+src/global.json
+src/Directory.Packages.props
+
+# Ignore downloaded tools
+build/.tools/
+
+# Ignore generated test data
+src/test/burn/TestData/CacheTests/BundleC/fivegb.file

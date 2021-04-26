@@ -5,7 +5,6 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#define MAXUINT USHRT_MAX
 #include <Setup.Configuration.h>
 
 #include "wcautil.h"

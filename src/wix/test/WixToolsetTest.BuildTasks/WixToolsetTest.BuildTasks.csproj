@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,18 +19,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netcoreapp3.1' " />
-    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" />
+    <ProjectReference Include="..\..\..\internal\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 </Project>

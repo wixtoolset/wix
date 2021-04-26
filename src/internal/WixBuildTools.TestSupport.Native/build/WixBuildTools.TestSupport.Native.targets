@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
 
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets" Condition="Exists('$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets')" />
+  <!-- Include these references only when not referenced by the WixBuildTools.TestSupport.Native.vcxproj -->
+  <ItemGroup Condition="'$(MSBuildProjectName)'!='$(MSBuildThisFileName)'">
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>$(RootBuildFolder)internal\$(Configuration)\x86\WixBuildTools.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport.Native">
+      <HintPath>$(RootBuildFolder)internal\$(Configuration)\x86\WixBuildTools.TestSupport.Native.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="xunit.abstractions">
+      <HintPath>$(RootPackagesFolder)xunit.abstractions.2.0.3\lib\netstandard2.0\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert">
+      <HintPath>$(RootPackagesFolder)xunit.assert.2.4.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.core">
+      <HintPath>$(RootPackagesFolder)xunit.extensibility.core.2.4.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.execution.desktop">
+      <HintPath>$(RootPackagesFolder)xunit.extensibility.execution.2.4.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Import Project="$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.targets" Condition="Exists('$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.props'))" />
-    <Error Condition="!Exists('$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(RepoRootDir)\packages\xunit.core.2.4.1\build\xunit.core.targets'))" />
-    <Error Condition="!Exists('$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RepoRootDir)\packages\xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.props'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.4.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.runner.visualstudio.2.4.1\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
-  <UsingTask AssemblyFile="$(RepoRootDir)\packages\xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
+
+  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.4.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
   <Target Name="Test" DependsOnTargets="Build">
     <xunit Assemblies="$(TargetPath)" />
   </Target>

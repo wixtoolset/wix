@@ -15,16 +15,12 @@
     <EmbeddedResource Include="$(OutputPath)..\ui.wixlib" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\wixlib\ui.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\ui.wixproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Data" />
+    <PackageReference Include="WixToolset.Extensibility" />
   </ItemGroup>
 </Project>

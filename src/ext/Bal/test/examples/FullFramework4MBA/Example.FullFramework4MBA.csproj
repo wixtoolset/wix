@@ -9,11 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" PrivateAssets="All" />
+    <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>
 </Project>

@@ -4,4 +4,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?define platform=x64 ?>
     <?include BalExtension_platform.wxi ?>
+    <?include Mbahost_platform.wxi ?>
 </Wix>

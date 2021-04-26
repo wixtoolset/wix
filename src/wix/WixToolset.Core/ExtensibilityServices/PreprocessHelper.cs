@@ -246,10 +246,10 @@ namespace WixToolset.Core.ExtensibilityServices
                             }
 
                         case "WIXMAJORVERSION":
-                            return ThisAssembly.AssemblyFileVersion.Split('.')[0];
+                            return ThisAssembly.Git.BaseVersion.Major;
 
                         case "WIXVERSION":
-                            return ThisAssembly.AssemblyFileVersion;
+                            return $"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}";
 
                         default:
                             return null;

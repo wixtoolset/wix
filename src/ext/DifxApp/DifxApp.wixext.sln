@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "difxapp", "src\wixlib\difxapp.wixproj", "{5066EB93-D8F7-4FAE-B687-024D7A81BD95}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "difxapp", "wixlib\difxapp.wixproj", "{5066EB93-D8F7-4FAE-B687-024D7A81BD95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.DifxApp.wixext", "src\wixext\WixToolset.DifxApp.wixext.csproj", "{2256EFD7-E678-4485-818D-986D590068BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.DifxApp.wixext", "wixext\WixToolset.DifxApp.wixext.csproj", "{2256EFD7-E678-4485-818D-986D590068BE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.DifxApp", "src\test\WixToolsetTest.DifxApp\WixToolsetTest.DifxApp.csproj", "{883D7BA3-1ADC-47AC-95B0-221BB0B7788D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.DifxApp", "test\WixToolsetTest.DifxApp\WixToolsetTest.DifxApp.csproj", "{883D7BA3-1ADC-47AC-95B0-221BB0B7788D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

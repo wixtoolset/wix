@@ -552,8 +552,12 @@ static HRESULT ReadCertificateFile(
         // If we have a PFX blob, get the first certificate out of the PFX and use that instead of the PFX.
         if (dwContentType & CERT_QUERY_CONTENT_PFX)
         {
-            hr = FileRead(&pbData, &cbData, wzPath);
+            SIZE_T size = 0;
+
+            hr = FileRead(&pbData, &size, wzPath);
             ExitOnFailure(hr, "Failed to read PFX file: %ls", wzPath);
+
+            cbData = (DWORD)size;
         }
         else
         {

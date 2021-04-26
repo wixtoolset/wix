@@ -9,8 +9,9 @@
     <Title>WiX Toolset Core</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <NBGV_EmitThisAssemblyClass>true</NBGV_EmitThisAssemblyClass>
     <CreateDocumentationFile>true</CreateDocumentationFile>
+
+    <GitThisAssembly>true</GitThisAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,9 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
+    <ProjectReference Include="..\WixToolset.Core.Native\WixToolset.Core.Native.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Data" />
+    <PackageReference Include="WixToolset.Extensibility" />
   </ItemGroup>
 
   <!--
@@ -36,12 +40,7 @@
     you update these here, be sure to update them there.
   -->
   <ItemGroup>
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
-    <PackageReference Include="NuGet.Versioning" Version="5.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Encoding.CodePages" />
+    <PackageReference Include="NuGet.Versioning" />
   </ItemGroup>
 </Project>

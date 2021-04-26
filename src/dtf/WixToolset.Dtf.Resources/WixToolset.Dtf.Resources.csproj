@@ -9,9 +9,4 @@
     <Description>Classes for reading and writing resource data in executable files</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

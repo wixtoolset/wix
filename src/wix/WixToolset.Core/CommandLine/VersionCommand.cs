@@ -16,7 +16,12 @@ namespace WixToolset.Core.CommandLine
 
         public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine(ThisAssembly.AssemblyInformationalVersion);
+            // $(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(Commit)
+            Console.WriteLine("{0}.{1}.{2}{3}+{4}", ThisAssembly.Git.BaseVersion.Major
+                                                  , ThisAssembly.Git.BaseVersion.Minor
+                                                  , ThisAssembly.Git.BaseVersion.Patch
+                                                  , ThisAssembly.Git.SemVer.DashLabel
+                                                  , ThisAssembly.Git.Commit);
 
             return Task.FromResult(0);
         }
