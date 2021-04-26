@@ -67,11 +67,7 @@ extern "C" HRESULT PayloadsParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"Packaging", &scz);
         ExitOnFailure(hr, "Failed to get @Packaging.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"download", -1))
-        {
-            pPayload->packaging = BURN_PAYLOAD_PACKAGING_DOWNLOAD;
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
         {
             pPayload->packaging = BURN_PAYLOAD_PACKAGING_EMBEDDED;
         }
@@ -108,14 +104,11 @@ extern "C" HRESULT PayloadsParseFromXml(
 
         // @SourcePath
         hr = XmlGetAttributeEx(pixnNode, L"SourcePath", &pPayload->sczSourcePath);
-        if (E_NOTFOUND != hr || BURN_PAYLOAD_PACKAGING_DOWNLOAD != pPayload->packaging)
-        {
-            ExitOnFailure(hr, "Failed to get @SourcePath.");
-        }
+        ExitOnFailure(hr, "Failed to get @SourcePath.");
 
         // @DownloadUrl
         hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pPayload->downloadSource.sczUrl);
-        if (E_NOTFOUND != hr || BURN_PAYLOAD_PACKAGING_DOWNLOAD == pPayload->packaging)
+        if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to get @DownloadUrl.");
         }
