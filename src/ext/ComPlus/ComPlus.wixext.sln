@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complusca", "src\ca\complusca.vcxproj", "{BDEF51ED-E242-4FA2-801A-01B127DF851A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complusca", "ca\complusca.vcxproj", "{BDEF51ED-E242-4FA2-801A-01B127DF851A}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "complus", "src\wixlib\complus.wixproj", "{E191E61E-E098-4F71-888F-51A79F952022}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "complus", "wixlib\complus.wixproj", "{E191E61E-E098-4F71-888F-51A79F952022}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BDEF51ED-E242-4FA2-801A-01B127DF851A} = {BDEF51ED-E242-4FA2-801A-01B127DF851A}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.ComPlus.wixext", "src\wixext\WixToolset.ComPlus.wixext.csproj", "{1497B777-330B-4CFE-927A-22850CD24D64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.ComPlus.wixext", "wixext\WixToolset.ComPlus.wixext.csproj", "{1497B777-330B-4CFE-927A-22850CD24D64}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.ComPlus", "src\test\WixToolsetTest.ComPlus\WixToolsetTest.ComPlus.csproj", "{2FC5F039-EACF-428B-BA87-8CDE1D25E121}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.ComPlus", "test\WixToolsetTest.ComPlus\WixToolsetTest.ComPlus.csproj", "{2FC5F039-EACF-428B-BA87-8CDE1D25E121}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

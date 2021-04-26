@@ -11,8 +11,6 @@
 
 #include <strsafe.h>
 
-#define MAXUINT USHRT_MAX
-
 #include "wcautil.h"
 #include "fileutil.h"
 #include "memutil.h"

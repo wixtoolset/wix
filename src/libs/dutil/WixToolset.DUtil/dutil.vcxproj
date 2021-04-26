@@ -43,7 +43,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
-  <Import Project="..\NativeMultiTargeting.Build.props" />
+  <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
 
   <ItemGroup>
     <ClCompile Include="acl2util.cpp" />
@@ -170,13 +170,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="xsd\thmutil.xsd" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

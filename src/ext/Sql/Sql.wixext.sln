@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlca", "src\ca\sqlca.vcxproj", "{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlca", "ca\sqlca.vcxproj", "{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "sql", "src\wixlib\sql.wixproj", "{9ACF1A20-D801-45CC-A463-F9D13E506AA3}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "sql", "wixlib\sql.wixproj", "{9ACF1A20-D801-45CC-A463-F9D13E506AA3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Sql.wixext", "src\wixext\WixToolset.Sql.wixext.csproj", "{0E05519A-0045-4AEC-BD0C-D9205FF1468F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Sql.wixext", "wixext\WixToolset.Sql.wixext.csproj", "{0E05519A-0045-4AEC-BD0C-D9205FF1468F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Sql", "src\test\WixToolsetTest.Sql\WixToolsetTest.Sql.csproj", "{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Sql", "test\WixToolsetTest.Sql\WixToolsetTest.Sql.csproj", "{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

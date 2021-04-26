@@ -14,13 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\iisca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    <PackageReference Include="GitInfo" />
   </ItemGroup>
-
 </Project>

@@ -1,0 +1,26 @@
+# Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+
+image: Visual Studio 2019
+
+environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  NUGET_XMLDOC_MODE: skip
+  RuntimeTestsEnabled: true
+
+install:
+  - reg add HKLM\Software\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
+  - reg add HKLM\Software\WOW6432Node\Policies\Microsoft\Windows\Installer /t REG_SZ /v Logging /d voicewarmupx /f
+
+build_script:
+  - run_test.cmd
+
+test: off
+
+skip_branch_with_pr: true
+skip_tags: true
+
+on_finish:
+  - ps: 7z a ('logs_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') $env:TEMP\*.log $env:TEMP\..\*.log
+  - ps: Push-AppveyorArtifact logs_*.zip

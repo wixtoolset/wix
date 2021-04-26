@@ -3,7 +3,6 @@
         <BootstrapperApplication>
             <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\Example.EarliestCoreMBA.deps.json" Name="Example.EarliestCoreMBA.deps.json" />
             <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\Example.EarliestCoreMBA.dll" Name="Example.EarliestCoreMBA.dll" bal:BAFactoryAssembly="yes" />
-            <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\Example.EarliestCoreMBA.pdb" Name="Example.EarliestCoreMBA.pdb" />
             <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\Example.EarliestCoreMBA.runtimeconfig.json" Name="Example.EarliestCoreMBA.runtimeconfig.json" />
             <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\mbanative.dll" Name="mbanative.dll" />
             <Payload SourceFile="publish\Example.EarliestCoreMBA\fdd\WixToolset.Mba.Core.dll" Name="WixToolset.Mba.Core.dll" />

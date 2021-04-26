@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" Toolsxmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
@@ -69,11 +69,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.BextUtil" Version="4.0.58" />
-    <PackageReference Include="WixToolset.BootstrapperCore.Native" Version="4.0.141" />
-    <PackageReference Include="WixToolset.DUtil" Version="4.0.72" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+    <PackageReference Include="WixToolset.DUtil" />
+    <PackageReference Include="WixToolset.BextUtil" />
+    <PackageReference Include="WixToolset.BootstrapperCore.Native" />
+
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -413,7 +413,7 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
+        [Theory(Skip = "Depends on creating broken publish which is not supported at this time")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]

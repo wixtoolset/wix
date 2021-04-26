@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "powershell", "src\wixlib\powershell.wixproj", "{9D4CCDFC-840C-4D4E-A9B0-3D6015480645}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "powershell", "wixlib\powershell.wixproj", "{9D4CCDFC-840C-4D4E-A9B0-3D6015480645}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.PowerShell.wixext", "src\wixext\WixToolset.PowerShell.wixext.csproj", "{6F1482DF-1598-4D88-BDAA-B9D0E0242139}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.PowerShell.wixext", "wixext\WixToolset.PowerShell.wixext.csproj", "{6F1482DF-1598-4D88-BDAA-B9D0E0242139}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.PowerShell", "src\test\WixToolsetTest.PowerShell\WixToolsetTest.PowerShell.csproj", "{BFD10109-F4F3-4530-BE3B-802342D411F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.PowerShell", "test\WixToolsetTest.PowerShell\WixToolsetTest.PowerShell.csproj", "{BFD10109-F4F3-4530-BE3B-802342D411F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

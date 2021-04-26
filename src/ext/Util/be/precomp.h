@@ -15,7 +15,7 @@
 
 #include <msxml2.h>
 
-#define MAXUINT USHRT_MAX
+// #define MAXUINT USHRT_MAX
 
 #include <dutil.h>
 #include <memutil.h>

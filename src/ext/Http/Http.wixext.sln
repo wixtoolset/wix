@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpca", "src\ca\httpca.vcxproj", "{90743805-C043-47C7-B5FF-8F5EE5C8A2DE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpca", "ca\httpca.vcxproj", "{90743805-C043-47C7-B5FF-8F5EE5C8A2DE}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "http", "src\wixlib\http.wixproj", "{055C1517-4CED-4199-BCDE-A383E5C4EF78}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "http", "wixlib\http.wixproj", "{055C1517-4CED-4199-BCDE-A383E5C4EF78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Http.wixext", "src\wixext\WixToolset.Http.wixext.csproj", "{AAFC3C7F-D818-4B1D-AF3F-A331EA917F3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Http.wixext", "wixext\WixToolset.Http.wixext.csproj", "{AAFC3C7F-D818-4B1D-AF3F-A331EA917F3F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Http", "src\test\WixToolsetTest.Http\WixToolsetTest.Http.csproj", "{6379EBAA-B5FE-4468-89A3-EF0B5D30B87E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Http", "test\WixToolsetTest.Http\WixToolsetTest.Http.csproj", "{6379EBAA-B5FE-4468-89A3-EF0B5D30B87E}"
 EndProject
-Global
+Global`
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86

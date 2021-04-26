@@ -10,4 +10,9 @@
   </PropertyGroup>
 
   <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

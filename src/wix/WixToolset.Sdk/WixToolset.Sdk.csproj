@@ -20,19 +20,4 @@
     <Content Include="Sdk\Sdk.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Sdk\Sdk.targets" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);SetNuspecVersion</GenerateNuspecDependsOn>
-  </PropertyGroup>
-  <Target Name="SetNuspecVersion">
-    <Error Text="Cannot pack $(MSBuildThisFileName) until all projects are published to: '$(NuspecBasePath)'. Run appveyor.cmd to publish projects properly." Condition=" !Exists('$(NuspecBasePath)') " />
-
-    <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);Version=$(Version);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 </Project>

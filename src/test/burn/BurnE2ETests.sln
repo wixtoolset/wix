@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBA", "src\TestBA\TestBA.csproj", "{04022D35-6D75-49D0-91D2-4208E09DBA6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBA", "TestBA\TestBA.csproj", "{04022D35-6D75-49D0-91D2-4208E09DBA6D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestExe", "src\TestExe\TestExe.csproj", "{B038B342-BE42-4951-82A9-7789412CF37F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestExe", "TestExe\TestExe.csproj", "{B038B342-BE42-4951-82A9-7789412CF37F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixTestTools", "src\WixTestTools\WixTestTools.csproj", "{3D3B02F3-79B6-4BD5-AD49-2889DA3849A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixTestTools", "WixTestTools\WixTestTools.csproj", "{3D3B02F3-79B6-4BD5-AD49-2889DA3849A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BurnE2E", "src\WixToolsetTest.BurnE2E\WixToolsetTest.BurnE2E.csproj", "{FED9D707-E5C3-4867-87B0-FABDB5EB0823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BurnE2E", "WixToolsetTest.BurnE2E\WixToolsetTest.BurnE2E.csproj", "{FED9D707-E5C3-4867-87B0-FABDB5EB0823}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

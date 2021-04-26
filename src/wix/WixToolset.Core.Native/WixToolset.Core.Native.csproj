@@ -20,30 +20,26 @@
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=Win32" />
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=x86" />
     <ProjectReference Include="..\wixnative\wixnative.vcxproj" ReferenceOutputAssembly="false" PrivateAssets="All" Properties="Platform=x64" />
   </ItemGroup>
 
+  <!-- Copy the x86 binaries for unittests (especially CI) but use x64 binaries when in NCrunch -->
   <ItemGroup Condition=" '$(NCrunch)'=='' ">
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\wixnative\Win32\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(BaseOutputPath)$(Configuration)\x86\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition=" '$(NCrunch)'=='1' ">
-    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="$(NCrunchOriginalProjectDir)..\..\build\$(Configuration)\x64\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\..\build\$(SegmentName)\$(Configuration)\x86\wixnative.exe" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NCrunchOriginalProjectDir)..\..\..\build\$(SegmentName)\$(Configuration)\x86\wixnative.pdb" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Data" />
 
     <!-- Warning: The version for System.IO.FileSystem.AccessControl must be kept in sync with WixToolset.Core.nuspec -->
-    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="GitInfo" Version="2.1.2" PrivateAssets="all" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" />
   </ItemGroup>
 </Project>

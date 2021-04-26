@@ -13,6 +13,6 @@
     <ProjectReference Include="..\PackageA_x64\PackageA_x64.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.101" />
+    <PackageReference Include="WixToolset.Bal.wixext" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{4F55F9B8-D8B6-41EB-8796-221B4CD98324}</ProjectGuid>
@@ -9,6 +8,7 @@
     <AssemblyName>WixToolsetTests.Dtf.Linq</AssemblyName>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <CreateDocumentation>false</CreateDocumentation>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,9 +22,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj" />
-    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller.Linq\WixToolset.Dtf.WindowsInstaller.Linq.csproj" />
-    <ProjectReference Include="..\WixToolsetTests.Dtf.WindowsInstaller\WixToolsetTests.Dtf.WindowsInstaller.csproj" />
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj">
+      <Project>{85225597-5121-4361-8332-4E3246D5BBF5}</Project>
+      <Name>WixToolset.Dtf.WindowsInstaller</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller.Linq\WixToolset.Dtf.WindowsInstaller.Linq.csproj">
+      <Project>{7E66313B-C6D4-4729-8422-4D1474E0E6F7}</Project>
+      <Name>WixToolset.Dtf.WindowsInstaller.Linq</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WixToolsetTests.Dtf.WindowsInstaller\WixToolsetTests.Dtf.WindowsInstaller.csproj">
+      <Project>{16F5202F-9276-4166-975C-C9654BAF8012}</Project>
+      <Name>WixToolsetTests.Dtf.WindowsInstaller</Name>
+    </ProjectReference>
   </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

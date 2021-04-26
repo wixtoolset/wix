@@ -17,8 +17,6 @@
 #include <ComAdmin.h>
 #include <ahadmin.h>    // IIS 7 config
 
-#define MAXUINT USHRT_MAX
-
 #include "wcautil.h"
 #include "wcawow64.h"
 #include "wcawrapquery.h"

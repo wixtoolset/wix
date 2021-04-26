@@ -6,6 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Extensibility" />
   </ItemGroup>
-
 </Project>

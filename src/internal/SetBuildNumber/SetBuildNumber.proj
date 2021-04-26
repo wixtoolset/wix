@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.Build.NoTargets/3.0.4">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- Disable central package version management since this project will write the central package version management file -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+
+    <!-- Explicitly set the restore sources because this project may run before the build\artifacts folder has been created -->
+    <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
+    <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SetBuildNumbersDependsOn>
+    __SetPropertiesFromGit;
+      SetAppVeyorBuildNumber;
+      SetGlobalJson;
+      SetDirectoryPackagesProps;
+    </SetBuildNumbersDependsOn>
+
+    <GlobalJsonPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\global.json))</GlobalJsonPath>
+    <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\Directory.Packages.props))</CentralPackageVersionsPath>
+  </PropertyGroup>
+
+  <Target Name="SetAppVeyorBuildNumber"
+          Condition=" '$(APPVEYOR)'=='True' ">
+    <PropertyGroup>
+      <AppVeyorBuildNumber>$(InformationalVersion)</AppVeyorBuildNumber>
+      <AppVeyorBuildNumber Condition=" 'APPVEYOR_PULL_REQUEST_NUMBER'!='' ">PR#$(APPVEYOR_PULL_REQUEST_NUMBER)-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
+    </PropertyGroup>
+
+    <Message Importance="high" Text="  $(AppVeyorBuildNumber)" />
+
+    <Exec Command='appveyor UpdateBuild -Version "$(AppVeyorBuildNumber)"' />
+  </Target>
+
+
+  <Target Name="SetGlobalJson"
+          Inputs="global.json.pp"
+          Outputs="$(GlobalJsonPath)">
+    <PropertyGroup>
+      <GlobaJsonTextHeader>/* DO NOT MODIFY! Auto-generated from internal\SetBuildNumber\global.json.pp */</GlobaJsonTextHeader>
+      <GlobalJsonText>$([System.IO.File]::ReadAllText(global.json.pp))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{apiversion}', $(ApiVersion)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{fileversion}', $(FileVersion)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{fullversion}', $(InformationalVersion)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{informationalversion}', $(InformationalVersion)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{height}', $(GitCommits)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{packageversion}', $(PackageVersion)))</GlobalJsonText>
+      <GlobalJsonText>$(GlobalJsonText.Replace('{version}', $(Version)))</GlobalJsonText>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(GlobalJsonPath)"
+                      Lines="$(GlobaJsonTextHeader);$(GlobalJsonText)"
+                      Overwrite="true" 
+                      WriteOnlyWhenDifferent="true" />
+
+    <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(GlobalJsonPath)" />
+  </Target>
+
+
+  <Target Name="SetDirectoryPackagesProps"
+          Inputs="Directory.Packages.props.pp"
+          Outputs="$(CentralPackageVersionsPath)">
+    <PropertyGroup>
+      <CentralPackageVersionsTextHeader>&lt;!-- DO NOT MODIFY! Auto-generated from internal\SetBuildNumber\Directory.Packages.props.pp --&gt;</CentralPackageVersionsTextHeader>
+      <CentralPackageVersionsText>$([System.IO.File]::ReadAllText(Directory.Packages.props.pp))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{apiversion}', $(ApiVersion)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{fileversion}', $(FileVersion)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{fullversion}', $(InformationalVersion)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{informationalversion}', $(InformationalVersion)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{height}', $(GitCommits)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{packageversion}', $(PackageVersion)))</CentralPackageVersionsText>
+      <CentralPackageVersionsText>$(CentralPackageVersionsText.Replace('{version}', $(Version)))</CentralPackageVersionsText>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(CentralPackageVersionsPath)"
+                      Lines="$(CentralPackageVersionsTextHeader);$(CentralPackageVersionsText)"
+                      Overwrite="true" 
+                      WriteOnlyWhenDifferent="true" />
+
+    <Message Importance="high" Text="$(MSBuildProjectName) -&gt; $(CentralPackageVersionsPath)" />
+  </Target>
+
+
+  <Target Name="SetBuildNumbers"
+          DependsOnTargets="$(SetBuildNumbersDependsOn)"
+          BeforeTargets="AfterBuild" />
+
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.1.2" />
+  </ItemGroup>
+</Project>

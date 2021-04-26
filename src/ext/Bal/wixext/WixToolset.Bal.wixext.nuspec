@@ -15,12 +15,12 @@
   </metadata>
 
   <files>
-    <file src="$projectFolder$$id$.targets" target="build" />
+    <file src="$projectFolder$\$id$.targets" target="build" />
 
-    <file src="netstandard2.0\$id$.dll" target="tools" />
+    <file src="$id$.dll" target="tools" />
 
-    <file src="x86\*.pdb" target="pdbs\x86" />
-    <file src="x64\*.pdb" target="pdbs\x64" />
-    <file src="ARM64\*.pdb" target="pdbs\ARM64" />
+    <file src="..\x86\*.pdb" target="pdbs\x86" />
+    <file src="..\x64\*.pdb" target="pdbs\x64" />
+    <file src="..\ARM64\*.pdb" target="pdbs\ARM64" />
   </files>
 </package>

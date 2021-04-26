@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msmqca", "src\ca\msmqca.vcxproj", "{CAD56A7E-342B-4324-9DCB-BCEB8F3BC80D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msmqca", "ca\msmqca.vcxproj", "{CAD56A7E-342B-4324-9DCB-BCEB8F3BC80D}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "msmq", "src\wixlib\msmq.wixproj", "{42493058-5FC8-4F85-9884-FF3190E084B6}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "msmq", "wixlib\msmq.wixproj", "{42493058-5FC8-4F85-9884-FF3190E084B6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Msmq.wixext", "src\wixext\WixToolset.Msmq.wixext.csproj", "{B990D81B-9F60-4EEE-B31D-B5D1EAA799EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Msmq.wixext", "wixext\WixToolset.Msmq.wixext.csproj", "{B990D81B-9F60-4EEE-B31D-B5D1EAA799EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Msmq", "src\test\WixToolsetTest.Msmq\WixToolsetTest.Msmq.csproj", "{B63DA068-338F-473B-9097-FC4E64830A2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Msmq", "test\WixToolsetTest.Msmq\WixToolsetTest.Msmq.csproj", "{B63DA068-338F-473B-9097-FC4E64830A2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

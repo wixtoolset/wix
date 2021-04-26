@@ -14,10 +14,10 @@
   </metadata>
 
   <files>
-    <file src="$projectFolder$$id$.targets" target="build" />
+    <file src="$projectFolder$\$id$.targets" target="build" />
 
-    <file src="netstandard2.0\$id$.dll" target="tools" />
+    <file src="$id$.dll" target="tools" />
 
-    <file src="x86\*.pdb" target="pdbs\x86" />
+    <file src="..\x86\*.pdb" target="pdbs\x86" />
   </files>
 </package>

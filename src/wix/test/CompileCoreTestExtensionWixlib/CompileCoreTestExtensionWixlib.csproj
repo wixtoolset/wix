@@ -6,6 +6,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <ItemGroup>

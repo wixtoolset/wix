@@ -2,14 +2,14 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <DirectoryRef Id="CommonFilesFolder">
+    <StandardDirectory Id="CommonFilesFolder">
       <Directory Id="MSShared" Name="Microsoft Shared">
         <Directory Id="DevHelp" Name="DevHelp">
           <Directory Id="VSIPCC" Name="VSIPCC">
           </Directory>
         </Directory>
       </Directory>
-    </DirectoryRef>
+    </StandardDirectory>
   </Fragment>
 
   <Fragment Id="HTML_Help_Registration_">

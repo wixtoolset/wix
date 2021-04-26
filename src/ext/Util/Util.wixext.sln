@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilbe", "src\be\utilbe.vcxproj", "{630C1EE7-2517-4A8C-83E3-DA1150308B58}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilbe", "be\utilbe.vcxproj", "{630C1EE7-2517-4A8C-83E3-DA1150308B58}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilca", "src\ca\utilca.vcxproj", "{076018F7-19BD-423A-ABBF-229273DA08D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilca", "ca\utilca.vcxproj", "{076018F7-19BD-423A-ABBF-229273DA08D8}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "util", "src\wixlib\util.wixproj", "{1ACFFEFD-505A-41A5-ACBF-A02B7B473AA2}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "util", "wixlib\util.wixproj", "{1ACFFEFD-505A-41A5-ACBF-A02B7B473AA2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Util.wixext", "src\wixext\WixToolset.Util.wixext.csproj", "{6CF033EB-0A39-4AC6-9D41-9BD506352045}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Util.wixext", "wixext\WixToolset.Util.wixext.csproj", "{6CF033EB-0A39-4AC6-9D41-9BD506352045}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Util", "src\test\WixToolsetTest.Util\WixToolsetTest.Util.csproj", "{D5D34EC4-AF91-4B11-AC0A-FA5242AE924B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Util", "test\WixToolsetTest.Util\WixToolsetTest.Util.csproj", "{D5D34EC4-AF91-4B11-AC0A-FA5242AE924B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

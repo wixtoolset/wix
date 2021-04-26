@@ -17,17 +17,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
-    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.50" />
-    <PackageReference Include="WixToolset.Data" Version="4.0.218" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.58" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" />
+    <PackageReference Include="Microsoft.Win32.Registry" />
+    <PackageReference Include="System.Security.Principal.Windows" />
+    <PackageReference Include="WixBuildTools.TestSupport" />
+    <PackageReference Include="WixToolset.Data" />
+    <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 </Project>

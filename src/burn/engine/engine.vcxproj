@@ -2,9 +2,6 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" />
-  <Import Project="..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" />
-
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -45,7 +42,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories Condition=" '$(DirectReference)'=='true' ">$(ProjectDir)..\..\..\balutil\src\WixToolset.BootstrapperCore.Native\inc;$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\..\api\burn\WixToolset.BootstrapperCore.Native\inc;$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ImportGroup Label="ExtensionSettings">
@@ -97,13 +94,14 @@
     <ClCompile Include="variable.cpp" />
     <ClCompile Include="variant.cpp" />
   </ItemGroup>
+
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
-    <ClInclude Include="..\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h" />
-    <ClInclude Include="..\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h" />
-    <ClInclude Include="..\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h" />
-    <ClInclude Include="..\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h" />
     <ClInclude Include="burnextension.h" />
     <ClInclude Include="cabextract.h" />
     <ClInclude Include="cache.h" />
@@ -144,9 +142,6 @@
     <ClInclude Include="variable.h" />
     <ClInclude Include="variant.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
 
   <ItemGroup>
     <CustomBuild Include="engine.mc">
@@ -157,12 +152,12 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
     </CustomBuild>
   </ItemGroup>
 
-  <Target Name="SetWixVersion" DependsOnTargets="GetBuildVersion" BeforeTargets="ClCompile">
+  <Target Name="SetWixVersion" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="ClCompile">
     <PropertyGroup>
-      <rmj>$(MajorMinorVersion.Split(`.`)[0])</rmj>
-      <rmm>$(MajorMinorVersion.Split(`.`)[1])</rmm>
-      <rup>0</rup>
-      <rpr>$(BuildNumber)</rpr>
+      <rmj>$(GitBaseVersionMajor)</rmj>
+      <rmm>$(GitBaseVersionMinor)</rmm>
+      <rup>$(GitBaseVersionPatch)</rup>
+      <rpr>$(GitCommits)</rpr>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
       <wixver>rmj=$(rmj);rmm=$(rmm);rup=$(rup);rpr=$(rpr);szVerMajorMinorBuild="$(szVerMajorMinorBuild)"</wixver>
     </PropertyGroup>
@@ -173,14 +168,13 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       </ClCompile>
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.DUtil" />
+
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" PrivateAssets="All" />
+  </ItemGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props'))" />
-  </Target>
 </Project>

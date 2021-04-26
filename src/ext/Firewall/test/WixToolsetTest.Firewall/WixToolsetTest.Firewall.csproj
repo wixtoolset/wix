@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
+    <SignOutput>false</SignOutput>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -12,14 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\UsingFirewall\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFirewall\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFirewall\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingFirewall\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingOutboundFirewall\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingOutboundFirewall\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingOutboundFirewall\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\UsingOutboundFirewall\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,19 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Core" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 </Project>

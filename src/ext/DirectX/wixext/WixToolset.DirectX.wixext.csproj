@@ -17,15 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Data" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Extensibility" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\wixlib\directx.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
   </ItemGroup>
 </Project>

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<!--
-  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.props
-  then update all of the repos.
--->
+
 <Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <EnableSourceLink Condition=" '$(NCrunch)' == '1' ">false</EnableSourceLink>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
-    <BaseOutputPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</BaseOutputPath>
+    <RootBuildFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</RootBuildFolder>
+    <RootPackagesFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\packages\))</RootPackagesFolder>
+    <ArtifactsFolder>$(RootBuildFolder)artifacts\</ArtifactsFolder>
+    <ToolsFolder>$(RootBuildFolder).tools</ToolsFolder>
+    <PackageOutputPath>$(ArtifactsFolder)</PackageOutputPath>
+    <BaseOutputPath>$(RootBuildFolder)$(SegmentName)\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(ProjectName)\</BaseIntermediateOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
 
@@ -22,9 +25,9 @@
 
     <GitThisAssembly>false</GitThisAssembly>
     <GitVersionFile>version.txt</GitVersionFile>
+    <GitInfoReportImportance>low</GitInfoReportImportance>
     <GitBaseVersionRegex Condition="'$(GitBaseVersionRegex)' == ''">v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+)\-v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})$</GitBaseVersionRegex>
   </PropertyGroup>
 
   <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />
-  <Import Project="Custom.Build.props" Condition=" Exists('Custom.Build.props') " />
 </Project>

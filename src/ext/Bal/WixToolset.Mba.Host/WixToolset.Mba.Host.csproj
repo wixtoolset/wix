@@ -15,14 +15,15 @@
   <ItemGroup>
     <None Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" />
-  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System.Configuration" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Mba.Core" />
+  </ItemGroup>
+
   <ItemGroup>
     <HeaderPath Include="$(BaseOutputPath)obj\$(AssemblyName).h">
       <Visible>False</Visible>
@@ -43,12 +44,5 @@
     <ItemGroup>
       <FileWrites Include="@(HeaderPath)" />
     </ItemGroup>
-  </Target>
-
-  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion">
-    <PropertyGroup>
-      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
-      <NuspecProperties>Id=$(AssemblyName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl)</NuspecProperties>
-    </PropertyGroup>
   </Target>
 </Project>

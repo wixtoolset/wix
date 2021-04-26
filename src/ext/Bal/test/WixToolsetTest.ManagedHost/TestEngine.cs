@@ -10,7 +10,7 @@ namespace WixToolsetTest.ManagedHost
 
     public class TestEngine
     {
-        private static readonly string TestEngineFile = TestData.Get(@"..\Win32\examples\Example.TestEngine\Example.TestEngine.exe");
+        private static readonly string TestEngineFile = TestData.Get(@"..\x86\examples\Example.TestEngine\Example.TestEngine.exe");
 
         public TestEngineResult RunReloadEngine(string bundleFilePath, string tempFolderPath)
         {

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<!--
-  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.targets
-  then update all of the repos.
--->
+
 <Project>
+  <!-- <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="GitInfo" Version="2.1.2" PrivateAssets="All" />
+  </ItemGroup> -->
+
   <PropertyGroup>
-    <SigningToolFolder>$(BaseOutputPath)obj\.tools</SigningToolFolder>
+    <SigningToolFolder>$(ToolsFolder)</SigningToolFolder>
     <SigningToolExe>$(SigningToolFolder)\SignClient.exe</SigningToolExe>
     <SigningFilelist>$(SigningToolFolder)\empty-filelist.txt</SigningFilelist>
     <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
@@ -20,11 +22,19 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="__SetPropertiesFromGit" DependsOnTargets="GitVersion">
+  <PropertyGroup>
+    <GetPackageVersionDependsOn>
+      $(GetPackageVersionDependsOn);
+      __SetPropertiesFromGit;
+    </GetPackageVersionDependsOn>
+  </PropertyGroup>
+
+  <Target Name="__SetPropertiesFromGit" DependsOnTargets="GitVersion" Condition=" '$(GitInfoImported)'=='true' ">
     <PropertyGroup>
       <AssemblyVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
       <FileVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
       <PackageVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)</PackageVersion>
+      <Version>$(PackageVersion)</Version>
       <InformationalVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(GitSha)</InformationalVersion>
       <!-- We already included the $(GitSha) in the informational version so do not include it again.  -->
       <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
@@ -42,6 +52,7 @@
   <PropertyGroup>
     <GenerateNuspecDependsOn>
       $(GenerateNuspecDependsOn);
+      __SetPropertiesFromGit;
       __SetNuspecProperties
     </GenerateNuspecDependsOn>
   </PropertyGroup>
@@ -51,10 +62,14 @@
     <PropertyGroup>
       <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(GitRepositoryUrl)'!='' ">$(GitRepositoryUrl.Replace('.git',''))</ProjectUrl>
 
-      <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
-      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$([System.IO.Path]::GetFullPath($(OutputPath)..))\</NuspecBasePath>
-      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Authors="$(Authors)";Configuration=$(Configuration);Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Version=$(PackageVersion);RepositoryCommit=$(GitSha);RepositoryType=git;RepositoryUrl=$(GitRepositoryUrl);ProjectFolder=$(MSBuildProjectDirectory)\;ProjectUrl=$(ProjectUrl)</NuspecProperties>
+      <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildProjectName).nuspec</NuspecFile>
+      <PackageId Condition=" '$(PackageId)'=='' ">$(MSBuildProjectName)</PackageId>
+      <Title Condition=" '$(Title)'=='' ">$(Description)</Title>
+      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(OutputPath)</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Version=$(PackageVersion);Authors=$(Authors);Configuration=$(Configuration)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);RepositoryType=git;RepositoryCommit=$(GitSha);RepositoryUrl=$(GitRepositoryUrl)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ProjectUrl=$(ProjectUrl);ProjectFolder=$(MSBuildProjectDirectory)</NuspecProperties>
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
       <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
@@ -69,12 +84,14 @@
 
   <Target Name="PackNative" DependsOnTargets="__SetNuspecProperties"
           Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+    <Error Text="There must be package reference to 'GitInfo'. Ensure the project was restored as well."
+           Condition=" '$(GitInfoImported)'!='true' " />
 
-    <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(BaseOutputPath)$(Configuration)" -BasePath "$(NuspecBasePath)" -Properties $(NuspecProperties)' 
+    <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(PackageOutputPath.Trim(&quot;\&quot;))" -BasePath $(NuspecBasePath) -Properties "$(NuspecProperties)"'
           WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
-      <NuGetPackOutput Include="$(BaseOutputPath)$(Configuration)\**\$(PackageId)*.nupkg" />
+      <NuGetPackOutput Include="$(PackageOutputPath)\$(PackageId).$(PackageVersion).nupkg" />
     </ItemGroup>
   </Target>
 
