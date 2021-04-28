@@ -222,7 +222,8 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnDetectPackageComplete(
         __in_z LPCWSTR /*wzPackageId*/,
         __in HRESULT /*hrStatus*/,
-        __in BOOTSTRAPPER_PACKAGE_STATE /*state*/
+        __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,
+        __in BOOL /*fCached*/
         )
     {
         return S_OK;
@@ -257,9 +258,12 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnPlanPackageBegin(
         __in_z LPCWSTR /*wzPackageId*/,
         __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,
-        __in BOOL /*fInstallCondition*/,
+        __in BOOL /*fCached*/,
+        __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT /*installCondition*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
+        __in BOOTSTRAPPER_CACHE_TYPE /*recommendedCacheType*/,
         __inout BOOTSTRAPPER_REQUEST_STATE* /*pRequestState*/,
+        __inout BOOTSTRAPPER_CACHE_TYPE* /*pRequestedCacheType*/,
         __inout BOOL* /*pfCancel*/
         )
     {
@@ -313,7 +317,9 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnPlannedPackage(
         __in_z LPCWSTR /*wzPackageId*/,
         __in BOOTSTRAPPER_ACTION_STATE /*execute*/,
-        __in BOOTSTRAPPER_ACTION_STATE /*rollback*/
+        __in BOOTSTRAPPER_ACTION_STATE /*rollback*/,
+        __in BOOL /*fPlannedCache*/,
+        __in BOOL /*fPlannedUncache*/
         )
     {
         return S_OK;

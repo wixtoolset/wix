@@ -7,18 +7,18 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
     STDMETHOD(EscapeString)(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD * pcchOut
+        __inout SIZE_T* pcchOut
         ) = 0;
 
     STDMETHOD(EvaluateCondition)(
         __in_z LPCWSTR wzCondition,
-        __out BOOL * pf
+        __out BOOL* pf
         ) = 0;
 
     STDMETHOD(FormatString)(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD * pcchOut
+        __inout SIZE_T* pcchOut
         ) = 0;
 
     STDMETHOD(GetVariableNumeric)(
@@ -29,13 +29,13 @@ DECLARE_INTERFACE_IID_(IBundleExtensionEngine, IUnknown, "9D027A39-F6B6-42CC-973
     STDMETHOD(GetVariableString)(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T* pcchValue
         ) = 0;
 
     STDMETHOD(GetVariableVersion)(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T* pcchValue
         ) = 0;
 
     STDMETHOD(Log)(

@@ -251,16 +251,13 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.DetectPackageComplete"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="hrStatus"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectPackageComplete(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             int hrStatus,
-            [MarshalAs(UnmanagedType.U4)] PackageState state
+            [MarshalAs(UnmanagedType.U4)] PackageState state,
+            [MarshalAs(UnmanagedType.Bool)] bool fCached
             );
 
         /// <summary>
@@ -309,21 +306,17 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanPackageBegin"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="state"></param>
-        /// <param name="fInstallCondition"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="pRequestedState"></param>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPackageBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.U4)] PackageState state,
-            [MarshalAs(UnmanagedType.Bool)] bool fInstallCondition,
+            [MarshalAs(UnmanagedType.Bool)] bool fCached,
+            [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
+            [MarshalAs(UnmanagedType.U4)] BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
+            [MarshalAs(UnmanagedType.U4)] ref BOOTSTRAPPER_CACHE_TYPE pRequestedCacheType,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
@@ -406,16 +399,14 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlannedPackage"/>.
         /// </summary>
-        /// <param name="wzPackageId"></param>
-        /// <param name="execute"></param>
-        /// <param name="rollback"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlannedPackage(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.U4)] ActionState execute,
-            [MarshalAs(UnmanagedType.U4)] ActionState rollback
+            [MarshalAs(UnmanagedType.U4)] ActionState rollback,
+            [MarshalAs(UnmanagedType.Bool)] bool fPlannedCache,
+            [MarshalAs(UnmanagedType.Bool)] bool fPlannedUncache
             );
 
         /// <summary>
@@ -1642,6 +1633,27 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// The cache strategy to be used for the package.
+    /// </summary>
+    public enum BOOTSTRAPPER_CACHE_TYPE
+    {
+        /// <summary>
+        /// The package will be cached in order to securely run the package, but will always be cleaned from the cache at the end.
+        /// </summary>
+        Remove,
+
+        /// <summary>
+        /// The package will be cached in order to run the package, and then kept in the cache until the package is uninstalled.
+        /// </summary>
+        Keep,
+
+        /// <summary>
+        /// The package will always be cached and stay in the cache, unless the package and bundle are both being uninstalled.
+        /// </summary>
+        Force,
+    }
+
+    /// <summary>
     /// The available actions for <see cref="IDefaultBootstrapperApplication.CacheAcquireComplete"/>.
     /// </summary>
     public enum BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION
@@ -1734,6 +1746,27 @@ namespace WixToolset.Mba.Core
         /// Instructs the engine to stop processing the chain and suspend the current state.
         /// </summary>
         Suspend,
+    }
+
+    /// <summary>
+    /// The result of evaluating a condition from a package.
+    /// </summary>
+    public enum BOOTSTRAPPER_PACKAGE_CONDITION_RESULT
+    {
+        /// <summary>
+        /// No condition was authored.
+        /// </summary>
+        Default,
+
+        /// <summary>
+        /// Evaluated to false.
+        /// </summary>
+        False,
+
+        /// <summary>
+        /// Evaluated to true.
+        /// </summary>
+        True,
     }
 
     /// <summary>

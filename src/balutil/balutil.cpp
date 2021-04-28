@@ -96,7 +96,7 @@ DAPI_(HRESULT) BalFormatString(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cch = 0;
+    SIZE_T cch = 0;
 
     if (!vpEngine)
     {
@@ -106,7 +106,7 @@ DAPI_(HRESULT) BalFormatString(
 
     if (*psczOut)
     {
-        hr = StrMaxLength(*psczOut, reinterpret_cast<DWORD_PTR*>(&cch));
+        hr = StrMaxLength(*psczOut, &cch);
         ExitOnFailure(hr, "Failed to determine length of value.");
     }
 
@@ -172,7 +172,7 @@ DAPI_(BOOL) BalVariableExists(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cch = 0;
+    SIZE_T cch = 0;
 
     if (!vpEngine)
     {
@@ -194,7 +194,7 @@ DAPI_(HRESULT) BalGetStringVariable(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cch = 0;
+    SIZE_T cch = 0;
 
     if (!vpEngine)
     {
@@ -204,7 +204,7 @@ DAPI_(HRESULT) BalGetStringVariable(
 
     if (*psczValue)
     {
-        hr = StrMaxLength(*psczValue, reinterpret_cast<DWORD_PTR*>(&cch));
+        hr = StrMaxLength(*psczValue, &cch);
         ExitOnFailure(hr, "Failed to determine length of value.");
     }
 

@@ -39,57 +39,41 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IEngine.GetVariableString(string)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="wzValue"></param>
-        /// <param name="pcchValue"></param>
-        /// <returns></returns>
         [PreserveSig]
         int GetVariableString(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
                                               IntPtr wzValue,
-            [MarshalAs(UnmanagedType.U4)] ref int pcchValue
+                                          ref IntPtr pcchValue
             );
 
         /// <summary>
         /// See <see cref="IEngine.GetVariableVersion(string)"/>.
         /// </summary>
-        /// <param name="wzVariable"></param>
-        /// <param name="wzValue"></param>
-        /// <param name="pcchValue"></param>
-        /// <returns></returns>
         [PreserveSig]
         int GetVariableVersion(
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
                                               IntPtr wzValue,
-            [MarshalAs(UnmanagedType.U4)] ref int pcchValue
+                                          ref IntPtr pcchValue
             );
 
         /// <summary>
         /// See <see cref="IEngine.FormatString(string)"/>.
         /// </summary>
-        /// <param name="wzIn"></param>
-        /// <param name="wzOut"></param>
-        /// <param name="pcchOut"></param>
-        /// <returns></returns>
         [PreserveSig]
         int FormatString(
             [MarshalAs(UnmanagedType.LPWStr)] string wzIn,
             [MarshalAs(UnmanagedType.LPWStr), Out] StringBuilder wzOut,
-            [MarshalAs(UnmanagedType.U4)] ref int pcchOut
+            ref IntPtr pcchOut
             );
 
         /// <summary>
         /// See <see cref="IEngine.EscapeString(string)"/>.
         /// </summary>
-        /// <param name="wzIn"></param>
-        /// <param name="wzOut"></param>
-        /// <param name="pcchOut"></param>
-        /// <returns></returns>
         [PreserveSig]
         int EscapeString(
             [MarshalAs(UnmanagedType.LPWStr)] string wzIn,
             [MarshalAs(UnmanagedType.LPWStr), Out] StringBuilder wzOut,
-            [MarshalAs(UnmanagedType.U4)] ref int pcchOut
+            ref IntPtr pcchOut
             );
 
         /// <summary>

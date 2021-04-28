@@ -159,7 +159,7 @@ static HRESULT BalBaseBAProcOnDetectPackageComplete(
     __inout BA_ONDETECTPACKAGECOMPLETE_RESULTS* /*pResults*/
     )
 {
-    return pBA->OnDetectPackageComplete(pArgs->wzPackageId, pArgs->hrStatus, pArgs->state);
+    return pBA->OnDetectPackageComplete(pArgs->wzPackageId, pArgs->hrStatus, pArgs->state, pArgs->fCached);
 }
 
 static HRESULT BalBaseBAProcOnPlanRelatedBundle(
@@ -177,7 +177,7 @@ static HRESULT BalBaseBAProcOnPlanPackageBegin(
     __inout BA_ONPLANPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnPlanPackageBegin(pArgs->wzPackageId, pArgs->state, pArgs->fInstallCondition, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
+    return pBA->OnPlanPackageBegin(pArgs->wzPackageId, pArgs->state, pArgs->fCached, pArgs->installCondition, pArgs->recommendedState, pArgs->recommendedCacheType, &pResults->requestedState, &pResults->requestedCacheType, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnPlanPatchTarget(
@@ -213,7 +213,7 @@ static HRESULT BalBaseBAProcOnPlannedPackage(
     __inout BA_ONPLANNEDPACKAGE_RESULTS* /*pResults*/
     )
 {
-    return pBA->OnPlannedPackage(pArgs->wzPackageId, pArgs->execute, pArgs->rollback);
+    return pBA->OnPlannedPackage(pArgs->wzPackageId, pArgs->execute, pArgs->rollback, pArgs->fPlannedCache, pArgs->fPlannedUncache);
 }
 
 static HRESULT BalBaseBAProcOnApplyBegin(

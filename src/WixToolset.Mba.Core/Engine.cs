@@ -62,7 +62,7 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public bool ContainsVariable(string name)
         {
-            int capacity = 0;
+            IntPtr capacity = new IntPtr(0);
             int ret = this.engine.GetVariableString(name, IntPtr.Zero, ref capacity);
             return NativeMethods.E_NOTFOUND != ret;
         }
@@ -101,14 +101,15 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public string EscapeString(string input)
         {
-            int capacity = InitialBufferSize;
-            StringBuilder sb = new StringBuilder(capacity);
+            IntPtr capacity = new IntPtr(InitialBufferSize);
+            StringBuilder sb = new StringBuilder(capacity.ToInt32());
 
             // Get the size of the buffer.
             int ret = this.engine.EscapeString(input, sb, ref capacity);
             if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
             {
-                sb.Capacity = ++capacity; // Add one for the null terminator.
+                capacity = new IntPtr(capacity.ToInt32() + 1); // Add one for the null terminator.
+                sb.Capacity = capacity.ToInt32();
                 ret = this.engine.EscapeString(input, sb, ref capacity);
             }
 
@@ -132,14 +133,15 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public string FormatString(string format)
         {
-            int capacity = InitialBufferSize;
-            StringBuilder sb = new StringBuilder(capacity);
+            IntPtr capacity = new IntPtr(InitialBufferSize);
+            StringBuilder sb = new StringBuilder(capacity.ToInt32());
 
             // Get the size of the buffer.
             int ret = this.engine.FormatString(format, sb, ref capacity);
             if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
             {
-                sb.Capacity = ++capacity; // Add one for the null terminator.
+                capacity = new IntPtr(capacity.ToInt32() + 1); // Add one for the null terminator.
+                sb.Capacity = capacity.ToInt32();
                 ret = this.engine.FormatString(format, sb, ref capacity);
             }
 
@@ -343,9 +345,9 @@ namespace WixToolset.Mba.Core
         /// <exception cref="Exception">An error occurred getting the variable.</exception>
         internal IntPtr getStringVariable(string name, out int length)
         {
-            int capacity = InitialBufferSize;
+            IntPtr capacity = new IntPtr(InitialBufferSize);
             bool success = false;
-            IntPtr pValue = Marshal.AllocCoTaskMem(capacity * UnicodeEncoding.CharSize);
+            IntPtr pValue = Marshal.AllocCoTaskMem(capacity.ToInt32() * UnicodeEncoding.CharSize);
             try
             {
                 // Get the size of the buffer.
@@ -353,7 +355,7 @@ namespace WixToolset.Mba.Core
                 if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
                 {
                     // Don't need to add 1 for the null terminator, the engine already includes that.
-                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity * UnicodeEncoding.CharSize);
+                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity.ToInt32() * UnicodeEncoding.CharSize);
                     ret = this.engine.GetVariableString(name, pValue, ref capacity);
                 }
 
@@ -363,9 +365,10 @@ namespace WixToolset.Mba.Core
                 }
 
                 // The engine only returns the exact length of the string if the buffer was too small, so calculate it ourselves.
-                for (length = 0; length < capacity; ++length)
+                int maxLength = capacity.ToInt32();
+                for (length = 0; length < maxLength; ++length)
                 {
-                    if(0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
+                    if (0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
                     {
                         break;
                     }
@@ -392,9 +395,9 @@ namespace WixToolset.Mba.Core
         /// <exception cref="Exception">An error occurred getting the variable.</exception>
         internal IntPtr getVersionVariable(string name, out int length)
         {
-            int capacity = InitialBufferSize;
+            IntPtr capacity = new IntPtr(InitialBufferSize);
             bool success = false;
-            IntPtr pValue = Marshal.AllocCoTaskMem(capacity * UnicodeEncoding.CharSize);
+            IntPtr pValue = Marshal.AllocCoTaskMem(capacity.ToInt32() * UnicodeEncoding.CharSize);
             try
             {
                 // Get the size of the buffer.
@@ -402,7 +405,7 @@ namespace WixToolset.Mba.Core
                 if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
                 {
                     // Don't need to add 1 for the null terminator, the engine already includes that.
-                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity * UnicodeEncoding.CharSize);
+                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity.ToInt32() * UnicodeEncoding.CharSize);
                     ret = this.engine.GetVariableVersion(name, pValue, ref capacity);
                 }
 
@@ -412,7 +415,8 @@ namespace WixToolset.Mba.Core
                 }
 
                 // The engine only returns the exact length of the string if the buffer was too small, so calculate it ourselves.
-                for (length = 0; length < capacity; ++length)
+                int maxLength = capacity.ToInt32();
+                for (length = 0; length < maxLength; ++length)
                 {
                     if (0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
                     {

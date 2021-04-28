@@ -16,25 +16,25 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
     STDMETHOD(GetVariableString)(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T* pcchValue
         ) = 0;
 
     STDMETHOD(GetVariableVersion)(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T * pcchValue
         ) = 0;
 
     STDMETHOD(FormatString)(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD* pcchOut
+        __inout SIZE_T * pcchOut
         ) = 0;
 
     STDMETHOD(EscapeString)(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD* pcchOut
+        __inout SIZE_T * pcchOut
         ) = 0;
 
     STDMETHOD(EvaluateCondition)(
@@ -114,7 +114,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         ) = 0;
 
     STDMETHOD(Apply)(
-        __in_opt HWND hwndParent
+        __in HWND hwndParent
         ) = 0;
 
     STDMETHOD(Quit)(

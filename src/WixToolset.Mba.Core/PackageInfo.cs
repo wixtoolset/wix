@@ -10,27 +10,6 @@ namespace WixToolset.Mba.Core
     /// <summary>
     /// 
     /// </summary>
-    public enum CacheType
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        No,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Yes,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Always,
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public enum PackageType
     {
         /// <summary>
@@ -113,7 +92,7 @@ namespace WixToolset.Mba.Core
         public string InstallCondition { get; internal set; }
 
         /// <inheritdoc/>
-        public CacheType CacheType { get; internal set; }
+        public BOOTSTRAPPER_CACHE_TYPE CacheType { get; internal set; }
 
         /// <inheritdoc/>
         public bool PrereqPackage { get; internal set; }
@@ -198,7 +177,7 @@ namespace WixToolset.Mba.Core
         /// <param name="node"></param>
         /// <param name="attributeName"></param>
         /// <returns></returns>
-        public static CacheType? GetCacheTypeAttribute(XPathNavigator node, string attributeName)
+        public static BOOTSTRAPPER_CACHE_TYPE? GetCacheTypeAttribute(XPathNavigator node, string attributeName)
         {
             string attributeValue = BootstrapperApplicationData.GetAttribute(node, attributeName);
 
@@ -207,17 +186,17 @@ namespace WixToolset.Mba.Core
                 return null;
             }
 
-            if (attributeValue.Equals("yes", StringComparison.InvariantCulture))
+            if (attributeValue.Equals("keep", StringComparison.InvariantCulture))
             {
-                return CacheType.Yes;
+                return BOOTSTRAPPER_CACHE_TYPE.Keep;
             }
-            else if (attributeValue.Equals("always", StringComparison.InvariantCulture))
+            else if (attributeValue.Equals("force", StringComparison.InvariantCulture))
             {
-                return CacheType.Always;
+                return BOOTSTRAPPER_CACHE_TYPE.Force;
             }
             else
             {
-                return CacheType.No;
+                return BOOTSTRAPPER_CACHE_TYPE.Remove;
             }
         }
 

@@ -1343,9 +1343,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectPackageComplete(string wzPackageId, int hrStatus, PackageState state)
+        int IBootstrapperApplication.OnDetectPackageComplete(string wzPackageId, int hrStatus, PackageState state, bool fCached)
         {
-            DetectPackageCompleteEventArgs args = new DetectPackageCompleteEventArgs(wzPackageId, hrStatus, state);
+            DetectPackageCompleteEventArgs args = new DetectPackageCompleteEventArgs(wzPackageId, hrStatus, state, fCached);
             this.OnDetectPackageComplete(args);
 
             return args.HResult;
@@ -1378,9 +1378,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, PackageState state, bool fInstallCondition, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanPackageBegin(string wzPackageId, PackageState state, bool fCached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, ref RequestState pRequestedState, ref BOOTSTRAPPER_CACHE_TYPE pRequestedCacheType, ref bool fCancel)
         {
-            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, state, fInstallCondition, recommendedState, pRequestedState, fCancel);
+            PlanPackageBeginEventArgs args = new PlanPackageBeginEventArgs(wzPackageId, state, fCached, installCondition, recommendedState, recommendedCacheType, pRequestedState, pRequestedCacheType, fCancel);
             this.OnPlanPackageBegin(args);
 
             pRequestedState = args.State;
@@ -1428,9 +1428,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlannedPackage(string wzPackageId, ActionState execute, ActionState rollback)
+        int IBootstrapperApplication.OnPlannedPackage(string wzPackageId, ActionState execute, ActionState rollback, bool fPlannedCache, bool fPlannedUncache)
         {
-            var args = new PlannedPackageEventArgs(wzPackageId, execute, rollback);
+            var args = new PlannedPackageEventArgs(wzPackageId, execute, rollback, fPlannedCache, fPlannedUncache);
             this.OnPlannedPackage(args);
 
             return args.HResult;

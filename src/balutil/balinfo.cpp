@@ -261,17 +261,17 @@ static HRESULT ParsePackagesFromXml(
         hr = XmlGetAttributeEx(pNode, L"Cache", &scz);
         ExitOnFailure(hr, "Failed to get cache type for package.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"no", -1))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"remove", -1))
         {
-            prgPackages[iPackage].cacheType = BAL_INFO_CACHE_TYPE_NO;
+            prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_REMOVE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"yes", -1))
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"keep", -1))
         {
-            prgPackages[iPackage].cacheType = BAL_INFO_CACHE_TYPE_YES;
+            prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_KEEP;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"always", -1))
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"force", -1))
         {
-            prgPackages[iPackage].cacheType = BAL_INFO_CACHE_TYPE_ALWAYS;
+            prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_FORCE;
         }
 
         ++iPackage;

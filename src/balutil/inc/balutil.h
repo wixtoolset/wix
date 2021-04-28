@@ -51,7 +51,7 @@ DAPI_(void) BalInitialize(
 ********************************************************************/
 DAPI_(HRESULT) BalInitializeFromCreateArgs(
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __out IBootstrapperEngine** ppEngine
+    __out_opt IBootstrapperEngine** ppEngine
     );
 
 /*******************************************************************

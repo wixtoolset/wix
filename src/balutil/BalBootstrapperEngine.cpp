@@ -107,7 +107,7 @@ public: // IBootstrapperEngine
     virtual STDMETHODIMP GetVariableString(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T* pcchValue
         )
     {
         HRESULT hr = S_OK;
@@ -134,7 +134,7 @@ public: // IBootstrapperEngine
     virtual STDMETHODIMP GetVariableVersion(
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-        __inout DWORD* pcchValue
+        __inout SIZE_T* pcchValue
         )
     {
         HRESULT hr = S_OK;
@@ -161,7 +161,7 @@ public: // IBootstrapperEngine
     virtual STDMETHODIMP FormatString(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD* pcchOut
+        __inout SIZE_T* pcchOut
         )
     {
         HRESULT hr = S_OK;
@@ -188,7 +188,7 @@ public: // IBootstrapperEngine
     virtual STDMETHODIMP EscapeString(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-        __inout DWORD* pcchOut
+        __inout SIZE_T* pcchOut
         )
     {
         HRESULT hr = S_OK;
@@ -485,7 +485,7 @@ public: // IBootstrapperEngine
     }
 
     virtual STDMETHODIMP Apply(
-        __in_opt HWND hwndParent
+        __in HWND hwndParent
         )
     {
         BAENGINE_APPLY_ARGS args = { };

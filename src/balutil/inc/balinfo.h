@@ -18,13 +18,6 @@ typedef enum BAL_INFO_PACKAGE_TYPE
     BAL_INFO_PACKAGE_TYPE_BUNDLE_PATCH,
 } BAL_INFO_PACKAGE_TYPE;
 
-typedef enum BAL_INFO_CACHE_TYPE
-{
-    BAL_INFO_CACHE_TYPE_NO,
-    BAL_INFO_CACHE_TYPE_YES,
-    BAL_INFO_CACHE_TYPE_ALWAYS,
-} BAL_INFO_CACHE_TYPE;
-
 
 typedef struct _BAL_INFO_PACKAGE
 {
@@ -39,7 +32,7 @@ typedef struct _BAL_INFO_PACKAGE
     LPWSTR sczUpgradeCode;
     LPWSTR sczVersion;
     LPWSTR sczInstallCondition;
-    BAL_INFO_CACHE_TYPE cacheType;
+    BOOTSTRAPPER_CACHE_TYPE cacheType;
     BOOL fPrereqPackage;
     LPWSTR sczPrereqLicenseFile;
     LPWSTR sczPrereqLicenseUrl;

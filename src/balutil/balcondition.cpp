@@ -78,7 +78,7 @@ DAPI_(HRESULT) BalConditionEvaluate(
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cchMessage = 0;
+    SIZE_T cchMessage = 0;
 
     hr = pEngine->EvaluateCondition(pCondition->sczCondition, pfResult);
     ExitOnFailure(hr, "Failed to evaluate condition with bootstrapper engine.");
@@ -91,7 +91,7 @@ DAPI_(HRESULT) BalConditionEvaluate(
             ExitOnFailure(hr, "Failed to get length of message.");
         }
 
-        hr = pEngine->FormatString(pCondition->sczMessage, *psczMessage, reinterpret_cast<DWORD*>(&cchMessage));
+        hr = pEngine->FormatString(pCondition->sczMessage, *psczMessage, &cchMessage);
         if (E_MOREDATA == hr)
         {
             ++cchMessage;
@@ -99,7 +99,7 @@ DAPI_(HRESULT) BalConditionEvaluate(
             hr = StrAllocSecure(psczMessage, cchMessage);
             ExitOnFailure(hr, "Failed to allocate string for condition's formatted message.");
 
-            hr = pEngine->FormatString(pCondition->sczMessage, *psczMessage, reinterpret_cast<DWORD*>(&cchMessage));
+            hr = pEngine->FormatString(pCondition->sczMessage, *psczMessage, &cchMessage);
         }
         ExitOnFailure(hr, "Failed to format condition's message.");
     }

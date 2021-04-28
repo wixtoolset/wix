@@ -617,22 +617,18 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
-    /// Additional arguments used when the detection for a specific package has completed.
+    /// Additional arguments for <see cref="IDefaultBootstrapperApplication.DetectPackageComplete"/>.
     /// </summary>
     [Serializable]
     public class DetectPackageCompleteEventArgs : StatusEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="DetectPackageCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="packageId">The identity of the package detected.</param>
-        /// <param name="hrStatus">The return code of the operation.</param>
-        /// <param name="state">The state of the specified package.</param>
-        public DetectPackageCompleteEventArgs(string packageId, int hrStatus, PackageState state)
+        /// <summary />
+        public DetectPackageCompleteEventArgs(string packageId, int hrStatus, PackageState state, bool cached)
             : base(hrStatus)
         {
             this.PackageId = packageId;
             this.State = state;
+            this.Cached = cached;
         }
 
         /// <summary>
@@ -644,6 +640,11 @@ namespace WixToolset.Mba.Core
         /// Gets the state of the specified package.
         /// </summary>
         public PackageState State { get; private set; }
+
+        /// <summary>
+        /// Gets whether any part of the package is cached.
+        /// </summary>
+        public bool Cached { get; private set; }
     }
 
     /// <summary>
@@ -725,23 +726,18 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlanPackageBeginEventArgs : CancellableHResultEventArgs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="currentState"></param>
-        /// <param name="installCondition"></param>
-        /// <param name="recommendedState"></param>
-        /// <param name="state"></param>
-        /// <param name="cancelRecommendation"></param>
-        public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool installCondition, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        /// <summary />
+        public PlanPackageBeginEventArgs(string packageId, PackageState currentState, bool cached, BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition, RequestState recommendedState, BOOTSTRAPPER_CACHE_TYPE recommendedCacheType, RequestState state, BOOTSTRAPPER_CACHE_TYPE cacheType, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.CurrentState = currentState;
+            this.Cached = cached;
             this.InstallCondition = installCondition;
             this.RecommendedState = recommendedState;
+            this.RecommendedCacheType = recommendedCacheType;
             this.State = state;
+            this.CacheType = cacheType;
         }
 
         /// <summary>
@@ -755,9 +751,14 @@ namespace WixToolset.Mba.Core
         public PackageState CurrentState { get; private set; }
 
         /// <summary>
+        /// Gets whether any part of the package is cached.
+        /// </summary>
+        public bool Cached { get; private set; }
+
+        /// <summary>
         /// Gets the evaluated result of the package's install condition.
         /// </summary>
-        public bool InstallCondition { get; private set; }
+        public BOOTSTRAPPER_PACKAGE_CONDITION_RESULT InstallCondition { get; private set; }
 
         /// <summary>
         /// Gets the recommended requested state for the package.
@@ -765,9 +766,19 @@ namespace WixToolset.Mba.Core
         public RequestState RecommendedState { get; private set; }
 
         /// <summary>
+        /// The authored cache type of the package.
+        /// </summary>
+        public BOOTSTRAPPER_CACHE_TYPE RecommendedCacheType { get; private set; }
+
+        /// <summary>
         /// Gets or sets the requested state for the package.
         /// </summary>
         public RequestState State { get; set; }
+
+        /// <summary>
+        /// Gets or sets the requested cache type for the package.
+        /// </summary>
+        public BOOTSTRAPPER_CACHE_TYPE CacheType { get; set; }
     }
 
     /// <summary>
@@ -936,17 +947,14 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class PlannedPackageEventArgs : HResultEventArgs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="execute"></param>
-        /// <param name="rollback"></param>
-        public PlannedPackageEventArgs(string packageId, ActionState execute, ActionState rollback)
+        /// <summary />
+        public PlannedPackageEventArgs(string packageId, ActionState execute, ActionState rollback, bool cache, bool uncache)
         {
             this.PackageId = packageId;
             this.Execute = execute;
             this.Rollback = rollback;
+            this.Cache = cache;
+            this.Uncache = uncache;
         }
 
         /// <summary>
@@ -963,6 +971,16 @@ namespace WixToolset.Mba.Core
         /// Gets the planned rollback action.
         /// </summary>
         public ActionState Rollback { get; private set; }
+
+        /// <summary>
+        /// Gets whether the package will be cached.
+        /// </summary>
+        public bool Cache { get; private set; }
+
+        /// <summary>
+        /// Gets whether the package will be removed from the package cache.
+        /// </summary>
+        public bool Uncache { get; private set; }
     }
 
     /// <summary>

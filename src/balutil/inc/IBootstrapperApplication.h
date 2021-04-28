@@ -135,7 +135,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(OnDetectPackageComplete)(
         __in_z LPCWSTR wzPackageId,
         __in HRESULT hrStatus,
-        __in BOOTSTRAPPER_PACKAGE_STATE state
+        __in BOOTSTRAPPER_PACKAGE_STATE state,
+        __in BOOL fCached
         ) = 0;
 
     // OnDetectPackageComplete - called after the engine completes detection.
@@ -164,9 +165,12 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(OnPlanPackageBegin)(
         __in_z LPCWSTR wzPackageId,
         __in BOOTSTRAPPER_PACKAGE_STATE state,
-        __in BOOL fInstallCondition,
+        __in BOOL fCached,
+        __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
+        __in BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
+        __inout BOOTSTRAPPER_CACHE_TYPE* pRequestedCacheType,
         __inout BOOL* pfCancel
         ) = 0;
 
@@ -214,7 +218,9 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(OnPlannedPackage)(
         __in_z LPCWSTR wzPackageId,
         __in BOOTSTRAPPER_ACTION_STATE execute,
-        __in BOOTSTRAPPER_ACTION_STATE rollback
+        __in BOOTSTRAPPER_ACTION_STATE rollback,
+        __in BOOL fPlannedCache,
+        __in BOOL fPlannedUncache
         ) = 0;
 
     // OnPlanComplete - called when the engine completes planning.

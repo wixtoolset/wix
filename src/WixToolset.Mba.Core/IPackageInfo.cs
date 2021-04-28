@@ -10,7 +10,7 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
-        CacheType CacheType { get; }
+        BOOTSTRAPPER_CACHE_TYPE CacheType { get; }
 
         /// <summary>
         /// Place for the BA to store it's own custom data for this package.
