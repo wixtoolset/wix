@@ -26,27 +26,27 @@ HRESULT ExternalEngineGetVariableString(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-    __inout DWORD* pcchValue
+    __inout SIZE_T* pcchValue
     );
 
 HRESULT ExternalEngineGetVariableVersion(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-    __inout DWORD* pcchValue
+    __inout SIZE_T* pcchValue
     );
 
 HRESULT ExternalEngineFormatString(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzIn,
     __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-    __inout DWORD* pcchOut
+    __inout SIZE_T* pcchOut
     );
 
 HRESULT ExternalEngineEscapeString(
     __in_z LPCWSTR wzIn,
     __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-    __inout DWORD* pcchOut
+    __inout SIZE_T* pcchOut
     );
 
 HRESULT ExternalEngineEvaluateCondition(

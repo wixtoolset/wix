@@ -134,7 +134,7 @@ EXTERN_C HRESULT BurnExtensionLoad(
         args.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_ARGS);
         args.pfnBundleExtensionEngineProc = EngineForExtensionProc;
         args.pvBundleExtensionEngineProcContext = pEngineContext;
-        args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 8, 31, 0);
+        args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 4, 27, 0);
         args.wzBootstrapperWorkingFolder = pEngineContext->pEngineState->userExperience.sczTempDirectory;
         args.wzBundleExtensionDataPath = sczBundleExtensionDataPath;
         args.wzExtensionId = pExtension->sczId;

@@ -183,7 +183,7 @@ typedef struct _BAENGINE_ESCAPESTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzOut;
     // Should be initialized to the size of wzOut.
-    DWORD cchOut;
+    SIZE_T cchOut;
 } BAENGINE_ESCAPESTRING_RESULTS;
 
 typedef struct _BAENGINE_EVALUATECONDITION_ARGS
@@ -209,7 +209,7 @@ typedef struct _BAENGINE_FORMATSTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzOut;
     // Should be initialized to the size of wzOut.
-    DWORD cchOut;
+    SIZE_T cchOut;
 } BAENGINE_FORMATSTRING_RESULTS;
 
 typedef struct _BAENGINE_GETPACKAGECOUNT_ARGS
@@ -246,7 +246,7 @@ typedef struct _BAENGINE_GETVARIABLESTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
-    DWORD cchValue;
+    SIZE_T cchValue;
 } BAENGINE_GETVARIABLESTRING_RESULTS;
 
 typedef struct _BAENGINE_GETVARIABLEVERSION_ARGS
@@ -260,7 +260,7 @@ typedef struct _BAENGINE_GETVARIABLEVERSION_RESULTS
     DWORD cbSize;
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
-    DWORD cchValue;
+    SIZE_T cchValue;
 } BAENGINE_GETVARIABLEVERSION_RESULTS;
 
 typedef struct _BAENGINE_LAUNCHAPPROVEDEXE_ARGS

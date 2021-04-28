@@ -6,7 +6,7 @@
 static HRESULT CopyStringToExternal(
     __in_z LPWSTR wzValue,
     __in_z_opt LPWSTR wzBuffer,
-    __inout DWORD* pcchBuffer
+    __inout SIZE_T* pcchBuffer
     );
 
 // function definitions
@@ -44,7 +44,7 @@ HRESULT ExternalEngineGetVariableString(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-    __inout DWORD* pcchValue
+    __inout SIZE_T* pcchValue
     )
 {
     HRESULT hr = S_OK;
@@ -72,7 +72,7 @@ HRESULT ExternalEngineGetVariableVersion(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
-    __inout DWORD* pcchValue
+    __inout SIZE_T* pcchValue
     )
 {
     HRESULT hr = S_OK;
@@ -100,7 +100,7 @@ HRESULT ExternalEngineFormatString(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_z LPCWSTR wzIn,
     __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-    __inout DWORD* pcchOut
+    __inout SIZE_T* pcchOut
     )
 {
     HRESULT hr = S_OK;
@@ -127,7 +127,7 @@ HRESULT ExternalEngineFormatString(
 HRESULT ExternalEngineEscapeString(
     __in_z LPCWSTR wzIn,
     __out_ecount_opt(*pcchOut) LPWSTR wzOut,
-    __inout DWORD* pcchOut
+    __inout SIZE_T* pcchOut
     )
 {
     HRESULT hr = S_OK;
@@ -771,7 +771,7 @@ LExit:
 static HRESULT CopyStringToExternal(
     __in_z LPWSTR wzValue,
     __in_z_opt LPWSTR wzBuffer,
-    __inout DWORD* pcchBuffer
+    __inout SIZE_T* pcchBuffer
     )
 {
     HRESULT hr = S_OK;
@@ -788,7 +788,7 @@ static HRESULT CopyStringToExternal(
 
     if (fTooSmall)
     {
-        hr = ::StringCchLengthW(wzValue, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(pcchBuffer));
+        hr = ::StringCchLengthW(wzValue, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(pcchBuffer));
         if (SUCCEEDED(hr))
         {
             hr = E_MOREDATA;

@@ -54,7 +54,7 @@ typedef struct _BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzOut;
     // Should be initialized to the size of wzOut.
-    DWORD cchOut;
+    SIZE_T cchOut;
 } BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS;
 
 typedef struct _BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS
@@ -80,7 +80,7 @@ typedef struct _BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzOut;
     // Should be initialized to the size of wzOut.
-    DWORD cchOut;
+    SIZE_T cchOut;
 } BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS;
 
 typedef struct _BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS
@@ -106,7 +106,7 @@ typedef struct _BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS
     DWORD cbSize;
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
-    DWORD cchValue;
+    SIZE_T cchValue;
 } BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS;
 
 typedef struct _BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS
@@ -120,7 +120,7 @@ typedef struct _BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS
     DWORD cbSize;
     LPWSTR wzValue;
     // Should be initialized to the size of wzValue.
-    DWORD cchValue;
+    SIZE_T cchValue;
 } BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS;
 
 typedef struct _BUNDLE_EXTENSION_ENGINE_LOG_ARGS
