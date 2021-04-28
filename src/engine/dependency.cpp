@@ -1065,7 +1065,6 @@ static void CalculateDependencyActionStates(
         {
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
             *pDependencyRollbackAction = BURN_DEPENDENCY_ACTION_UNREGISTER;
             break;
         }

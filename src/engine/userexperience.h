@@ -279,7 +279,8 @@ BAAPI UserExperienceOnDetectPackageComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in HRESULT hrStatus,
-    __in BOOTSTRAPPER_PACKAGE_STATE state
+    __in BOOTSTRAPPER_PACKAGE_STATE state,
+    __in BOOL fCached
     );
 BAAPI UserExperienceOnDetectRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -448,14 +449,18 @@ BAAPI UserExperienceOnPlannedPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOTSTRAPPER_ACTION_STATE execute,
-    __in BOOTSTRAPPER_ACTION_STATE rollback
+    __in BOOTSTRAPPER_ACTION_STATE rollback,
+    __in BOOL fPlannedCache,
+    __in BOOL fPlannedUncache
     );
 BAAPI UserExperienceOnPlanPackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BOOL fInstallCondition,
-    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
+    __in BOOL fCached,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
+    __inout BOOTSTRAPPER_CACHE_TYPE* pRequestedCacheType
     );
 BAAPI UserExperienceOnPlanPackageComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,

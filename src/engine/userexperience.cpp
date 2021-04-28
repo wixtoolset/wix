@@ -1141,7 +1141,8 @@ EXTERN_C BAAPI UserExperienceOnDetectPackageComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in HRESULT hrStatus,
-    __in BOOTSTRAPPER_PACKAGE_STATE state
+    __in BOOTSTRAPPER_PACKAGE_STATE state,
+    __in BOOL fCached
     )
 {
     HRESULT hr = S_OK;
@@ -1152,6 +1153,7 @@ EXTERN_C BAAPI UserExperienceOnDetectPackageComplete(
     args.wzPackageId = wzPackageId;
     args.hrStatus = hrStatus;
     args.state = state;
+    args.fCached = fCached;
 
     results.cbSize = sizeof(results);
 
@@ -1937,7 +1939,9 @@ EXTERN_C BAAPI UserExperienceOnPlannedPackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOTSTRAPPER_ACTION_STATE execute,
-    __in BOOTSTRAPPER_ACTION_STATE rollback
+    __in BOOTSTRAPPER_ACTION_STATE rollback,
+    __in BOOL fPlannedCache,
+    __in BOOL fPlannedUncache
     )
 {
     HRESULT hr = S_OK;
@@ -1948,6 +1952,8 @@ EXTERN_C BAAPI UserExperienceOnPlannedPackage(
     args.wzPackageId = wzPackageId;
     args.execute = execute;
     args.rollback = rollback;
+    args.fPlannedCache = fPlannedCache;
+    args.fPlannedUncache = fPlannedUncache;
 
     results.cbSize = sizeof(results);
 
@@ -1962,8 +1968,10 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOTSTRAPPER_PACKAGE_STATE state,
-    __in BOOL fInstallCondition,
-    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
+    __in BOOL fCached,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
+    __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
+    __inout BOOTSTRAPPER_CACHE_TYPE* pRequestedCacheType
     )
 {
     HRESULT hr = S_OK;
@@ -1973,11 +1981,14 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
     args.state = state;
-    args.fInstallCondition = fInstallCondition;
+    args.fCached = fCached;
+    args.installCondition = installCondition;
     args.recommendedState = *pRequestedState;
+    args.recommendedCacheType = *pRequestedCacheType;
 
     results.cbSize = sizeof(results);
     results.requestedState = *pRequestedState;
+    results.requestedCacheType = *pRequestedCacheType;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANPACKAGEBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnPlanPackageBegin failed.");
@@ -1987,6 +1998,7 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
     *pRequestedState = results.requestedState;
+    *pRequestedCacheType = results.requestedCacheType;
 
 LExit:
     return hr;

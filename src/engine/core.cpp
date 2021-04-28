@@ -1640,12 +1640,6 @@ static HRESULT DetectPackage(
         ExitOnRootFailure(hr, "Package type not supported by detect yet.");
     }
 
-    // TODO: consider how to notify the UX that a package is cached.
-    //else if (BOOTSTRAPPER_PACKAGE_STATE_CACHED > pPackage->currentState && pPackage->fCached)
-    //{
-    //     pPackage->currentState = BOOTSTRAPPER_PACKAGE_STATE_CACHED;
-    //}
-
 LExit:
     if (FAILED(hr))
     {
@@ -1654,7 +1648,7 @@ LExit:
 
     if (fBegan)
     {
-        UserExperienceOnDetectPackageComplete(&pEngineState->userExperience, pPackage->sczId, hr, pPackage->currentState);
+        UserExperienceOnDetectPackageComplete(&pEngineState->userExperience, pPackage->sczId, hr, pPackage->currentState, pPackage->fCached);
     }
 
     return hr;

@@ -390,8 +390,6 @@ extern "C" LPCSTR LoggingPackageStateToString(
         return "Obsolete";
     case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
         return "Absent";
-    case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-        return "Cached";
     case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
         return "Present";
     case BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED:

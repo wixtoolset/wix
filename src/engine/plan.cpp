@@ -137,6 +137,10 @@ static BOOL NeedsCache(
     __in BURN_PACKAGE* pPackage,
     __in BOOL fExecute
     );
+static BOOL ForceCache(
+    __in BURN_PLAN* pPlan,
+    __in BURN_PACKAGE* pPackage
+    );
 
 // function definitions
 
@@ -312,27 +316,19 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __in BOOL fPermanent,
-    __in BURN_CACHE_TYPE cacheType,
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOL fInstallCondition,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     )
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_REQUEST_STATE defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-    BOOL fFallbackToCache = BURN_CACHE_TYPE_ALWAYS == cacheType && BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_PACKAGE_STATE_CACHED > currentState;
 
-    // If doing layout, then always default to requesting the file be cached.
+    // If doing layout, then always default to requesting the package be cached.
     if (BOOTSTRAPPER_ACTION_LAYOUT == action)
     {
         *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
-    }
-    else if (BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == currentState && BOOTSTRAPPER_ACTION_UNINSTALL != action)
-    {
-        // Superseded means the package is on the machine but not active, so only uninstall operations are allowed.
-        // Requesting present makes sure always-cached packages are cached.
-        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
     }
     else if (BOOTSTRAPPER_RELATION_PATCH == relationType && BURN_PACKAGE_TYPE_MSP == packageType)
     {
@@ -341,20 +337,22 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
         }
-        else if (fFallbackToCache)
-        {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
-        }
         else
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
         }
     }
+    else if (BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == currentState && BOOTSTRAPPER_ACTION_UNINSTALL != action)
+    {
+        // Superseded means the package is on the machine but not active, so only uninstall operations are allowed.
+        // All other operations do nothing.
+        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+    }
     else if (BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE == currentState && !(BOOTSTRAPPER_ACTION_UNINSTALL == action && BURN_PACKAGE_TYPE_MSP == packageType))
     {
         // Obsolete means the package is not on the machine and should not be installed, *except* patches can be obsolete
         // and present so allow them to be removed during uninstall. Everyone else, gets nothing.
-        *pRequestState = fFallbackToCache ? BOOTSTRAPPER_REQUEST_STATE_CACHE : BOOTSTRAPPER_REQUEST_STATE_NONE;
+        *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
     }
     else // pick the best option for the action state and install condition.
     {
@@ -363,18 +361,13 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
 
         // If we're doing an install, use the install condition
         // to determine whether to use the default request state or make the package absent.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && !fInstallCondition)
+        if (BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_PACKAGE_CONDITION_FALSE == installCondition)
         {
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
         }
         else // just set the package to the default request state.
         {
             *pRequestState = defaultRequestState;
-        }
-
-        if (fFallbackToCache && BOOTSTRAPPER_REQUEST_STATE_CACHE > *pRequestState)
-        {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
         }
     }
 
@@ -844,8 +837,8 @@ static HRESULT PlanPackagesHelper(
     {
         DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == pPlan->action) ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
-        
-        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback);
+
+        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, pPackage->fPlannedCache, pPackage->fPlannedUncache);
     }
 
 LExit:
@@ -861,6 +854,7 @@ static HRESULT InitializePackage(
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition = BOOTSTRAPPER_PACKAGE_CONDITION_DEFAULT;
     BOOL fInstallCondition = FALSE;
     BOOL fBeginCalled = FALSE;
 
@@ -874,20 +868,18 @@ static HRESULT InitializePackage(
     {
         hr = ConditionEvaluate(pVariables, pPackage->sczInstallCondition, &fInstallCondition);
         ExitOnFailure(hr, "Failed to evaluate install condition.");
-    }
-    else
-    {
-        fInstallCondition = TRUE;
+
+        installCondition = fInstallCondition ? BOOTSTRAPPER_PACKAGE_CONDITION_TRUE : BOOTSTRAPPER_PACKAGE_CONDITION_FALSE;
     }
 
     // Remember the default requested state so the engine doesn't get blamed for planning the wrong thing if the BA changes it.
-    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, !pPackage->fUninstallable, pPackage->cacheType, pPlan->action, fInstallCondition, relationType, &pPackage->defaultRequested);
+    hr = PlanDefaultPackageRequestState(pPackage->type, pPackage->currentState, !pPackage->fUninstallable, pPlan->action, installCondition, relationType, &pPackage->defaultRequested);
     ExitOnFailure(hr, "Failed to set default package state.");
 
     pPackage->requested = pPackage->defaultRequested;
     fBeginCalled = TRUE;
 
-    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, fInstallCondition, &pPackage->requested);
+    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, pPackage->fCached, installCondition, &pPackage->requested, &pPackage->cacheType);
     ExitOnRootFailure(hr, "BA aborted plan package begin.");
 
     if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
@@ -926,8 +918,11 @@ static HRESULT ProcessPackage(
 
     if (BOOTSTRAPPER_ACTION_LAYOUT == pPlan->action)
     {
-        hr = PlanLayoutPackage(pPlan, pPackage);
-        ExitOnFailure(hr, "Failed to plan layout package.");
+        if (BOOTSTRAPPER_REQUEST_STATE_NONE != pPackage->requested)
+        {
+            hr = PlanLayoutPackage(pPlan, pPackage);
+            ExitOnFailure(hr, "Failed to plan layout package.");
+        }
     }
     else
     {
@@ -939,6 +934,17 @@ static HRESULT ProcessPackage(
         }
         else
         {
+            if (ForceCache(pPlan, pPackage))
+            {
+                hr = AddCachePackage(pPlan, pPackage, phSyncpointEvent);
+                ExitOnFailure(hr, "Failed to plan cache package.");
+
+                if (pPackage->fPerMachine)
+                {
+                    pPlan->fPerMachine = TRUE;
+                }
+            }
+
             // Make sure the package is properly ref-counted even if no plan is requested.
             hr = PlanDependencyActions(fBundlePerMachine, pPlan, pPackage);
             ExitOnFailure(hr, "Failed to plan dependency actions for package: %ls", pPackage->sczId);
@@ -1072,8 +1078,7 @@ extern "C" HRESULT PlanExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fRequestedCache = BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested ||
-                           BOOTSTRAPPER_REQUEST_STATE_ABSENT < pPackage->requested && BURN_CACHE_TYPE_ALWAYS == pPackage->cacheType;
+    BOOL fRequestedCache = BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested || ForceCache(pPlan, pPackage);
 
     hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary);
     ExitOnFailure(hr, "Failed to calculate plan actions for package: %ls", pPackage->sczId);
@@ -1097,12 +1102,12 @@ extern "C" HRESULT PlanExecutePackage(
 
     // Add the cache and install size to estimated size if it will be on the machine at the end of the install
     if (BOOTSTRAPPER_REQUEST_STATE_PRESENT == pPackage->requested ||
-        BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested ||
+        fRequestedCache ||
         (BOOTSTRAPPER_PACKAGE_STATE_PRESENT == pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_ABSENT < pPackage->requested)
        )
     {
         // If the package will remain in the cache, add the package size to the estimated size
-        if (BURN_CACHE_TYPE_NO < pPackage->cacheType)
+        if (BOOTSTRAPPER_CACHE_TYPE_REMOVE < pPackage->cacheType)
         {
             pPlan->qwEstimatedSize += pPackage->qwSize;
         }
@@ -1522,12 +1527,12 @@ extern "C" HRESULT PlanCleanPackage(
     BURN_CLEAN_ACTION* pCleanAction = NULL;
 
     // The following is a complex set of logic that determines when a package should be cleaned from the cache.
-    if (BURN_CACHE_TYPE_ALWAYS > pPackage->cacheType || BOOTSTRAPPER_ACTION_CACHE > pPlan->action)
+    if (BOOTSTRAPPER_CACHE_TYPE_FORCE > pPackage->cacheType || BOOTSTRAPPER_ACTION_CACHE > pPlan->action)
     {
         // The following are all different reasons why the package should be cleaned from the cache.
         // The else-ifs are used to make the conditions easier to see (rather than have them combined
         // in one huge condition).
-        if (BURN_CACHE_TYPE_YES > pPackage->cacheType)  // easy, package is not supposed to stay cached.
+        if (BOOTSTRAPPER_CACHE_TYPE_KEEP > pPackage->cacheType)  // easy, package is not supposed to stay cached.
         {
             fPlanCleanPackage = TRUE;
         }
@@ -1867,6 +1872,7 @@ static void ResetPlannedPackageState(
     )
 {
     // Reset package state that is a result of planning.
+    pPackage->cacheType = pPackage->authoredCacheType;
     pPackage->defaultRequested = BOOTSTRAPPER_REQUEST_STATE_NONE;
     pPackage->requested = BOOTSTRAPPER_REQUEST_STATE_NONE;
     pPackage->fPlannedCache = FALSE;
@@ -1948,10 +1954,6 @@ static HRESULT GetActionDefaultRequestState(
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
             break;
 
-        case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-            break;
-
         default:
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
             break;
@@ -1977,10 +1979,6 @@ static HRESULT GetActionDefaultRequestState(
         {
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
             *pRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
-            break;
-
-        case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_CACHE;
             break;
 
         case BOOTSTRAPPER_PACKAGE_STATE_PRESENT:
@@ -2522,6 +2520,15 @@ static BOOL NeedsCache(
     {
         return BOOTSTRAPPER_ACTION_STATE_UNINSTALL < action;
     }
+}
+
+static BOOL ForceCache(
+    __in BURN_PLAN* pPlan,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    // All packages that have cacheType set to force should be cached if the bundle is going to be present.
+    return BOOTSTRAPPER_CACHE_TYPE_FORCE == pPackage->cacheType && BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action;
 }
 
 static void CacheActionLog(

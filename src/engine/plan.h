@@ -309,9 +309,8 @@ HRESULT PlanDefaultPackageRequestState(
     __in BURN_PACKAGE_TYPE packageType,
     __in BOOTSTRAPPER_PACKAGE_STATE currentState,
     __in BOOL fPermanent,
-    __in BURN_CACHE_TYPE cacheType,
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOL fInstallCondition,
+    __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __out BOOTSTRAPPER_REQUEST_STATE* pRequestState
     );

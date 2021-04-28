@@ -41,13 +41,6 @@ enum BURN_PACKAGE_TYPE
     BURN_PACKAGE_TYPE_MSU,
 };
 
-enum BURN_CACHE_TYPE
-{
-    BURN_CACHE_TYPE_NO,
-    BURN_CACHE_TYPE_YES,
-    BURN_CACHE_TYPE_ALWAYS,
-};
-
 enum BURN_DEPENDENCY_ACTION
 {
     BURN_DEPENDENCY_ACTION_NONE,
@@ -223,7 +216,7 @@ typedef struct _BURN_PACKAGE
     BOOL fVital;
     BOOL fCanAffectRegistration;
 
-    BURN_CACHE_TYPE cacheType;
+    BOOTSTRAPPER_CACHE_TYPE authoredCacheType;
     LPWSTR sczCacheId;
 
     DWORD64 qwInstallSize;
@@ -235,6 +228,7 @@ typedef struct _BURN_PACKAGE
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
     BOOL fCached;                               // only valid after Detect.
     BOOL fPackageProviderExists;                // only valid after Detect.
+    BOOTSTRAPPER_CACHE_TYPE cacheType;          // only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE defaultRequested;// only valid during Plan.
     BOOTSTRAPPER_REQUEST_STATE requested;       // only valid during Plan.
     BOOL fPlannedCache;                         // only valid during Plan.

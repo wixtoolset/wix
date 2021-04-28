@@ -146,7 +146,7 @@ extern "C" HRESULT ExeEngineDetectPackage(
 
     if (pPackage->fCanAffectRegistration)
     {
-        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
 LExit:

@@ -700,7 +700,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
 
     if (pPackage->fCanAffectRegistration)
     {
-        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
+        pPackage->installRegistrationState = BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState ? BURN_PACKAGE_REGISTRATION_STATE_PRESENT : BURN_PACKAGE_REGISTRATION_STATE_ABSENT;
     }
 
 LExit:
@@ -768,7 +768,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
     if (pPackage->Msi.cFeatures)
     {
         // If the package is present and we're repairing it.
-        BOOL fRepairingPackage = (BOOTSTRAPPER_PACKAGE_STATE_CACHED < pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested);
+        BOOL fRepairingPackage = (BOOTSTRAPPER_PACKAGE_STATE_ABSENT < pPackage->currentState && BOOTSTRAPPER_REQUEST_STATE_REPAIR == pPackage->requested);
 
         // plan features
         for (DWORD i = 0; i < pPackage->Msi.cFeatures; ++i)
@@ -829,21 +829,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         }
         break;
 
-    case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
-        switch (pPackage->requested)
-        {
-        case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
-        case BOOTSTRAPPER_REQUEST_STATE_MEND: __fallthrough;
-        case BOOTSTRAPPER_REQUEST_STATE_REPAIR:
-            execute = BOOTSTRAPPER_ACTION_STATE_INSTALL;
-            break;
-
-        default:
-            execute = BOOTSTRAPPER_ACTION_STATE_NONE;
-            break;
-        }
-        break;
-
     case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
     case BOOTSTRAPPER_PACKAGE_STATE_ABSENT:
         switch (pPackage->requested)
@@ -892,7 +877,6 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
 
         case BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE: __fallthrough;
         case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
-        case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
             // If the package is uninstallable and we requested to put the package on the machine then
             // remove the package during rollback.
             if (pPackage->fUninstallable &&

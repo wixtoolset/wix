@@ -118,20 +118,20 @@ extern "C" HRESULT PackagesParseFromXml(
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"remove", -1))
             {
-                pPackage->cacheType = BURN_CACHE_TYPE_NO;
+                pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_REMOVE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"keep", -1))
             {
-                pPackage->cacheType = BURN_CACHE_TYPE_YES;
+                pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_KEEP;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"force", -1))
             {
-                pPackage->cacheType = BURN_CACHE_TYPE_ALWAYS;
+                pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_FORCE;
             }
             else
             {
                 hr = E_UNEXPECTED;
-                ExitOnFailure(hr, "Invalid cache type: %ls", scz);
+                ExitOnRootFailure(hr, "Invalid cache type: %ls", scz);
             }
         }
         ExitOnFailure(hr, "Failed to get @Cache.");

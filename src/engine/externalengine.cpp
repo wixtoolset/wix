@@ -582,6 +582,11 @@ HRESULT ExternalEnginePlan(
 {
     HRESULT hr = S_OK;
 
+    if (BOOTSTRAPPER_ACTION_LAYOUT > action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED < action)
+    {
+        ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid action to Plan: %u.", action);
+    }
+
     if (!::PostThreadMessageW(dwThreadId, WM_BURN_PLAN, 0, action))
     {
         ExitWithLastError(hr, "Failed to post plan message.");
@@ -622,7 +627,7 @@ HRESULT ExternalEngineApply(
     ExitOnNull(hwndParent, hr, E_INVALIDARG, "BA passed NULL hwndParent to Apply.");
     if (!::IsWindow(hwndParent))
     {
-        ExitOnFailure(hr = E_INVALIDARG, "BA passed invalid hwndParent to Apply.");
+        ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid hwndParent to Apply.");
     }
 
     if (!::PostThreadMessageW(dwThreadId, WM_BURN_APPLY, 0, reinterpret_cast<LPARAM>(hwndParent)))

@@ -451,7 +451,6 @@ extern "C" HRESULT MspEnginePlanCalculatePackage(
                 break;
 
             case BOOTSTRAPPER_PACKAGE_STATE_ABSENT: __fallthrough;
-            case BOOTSTRAPPER_PACKAGE_STATE_CACHED:
                 switch (pTargetProduct->requested)
                 {
                 case BOOTSTRAPPER_REQUEST_STATE_PRESENT: __fallthrough;
