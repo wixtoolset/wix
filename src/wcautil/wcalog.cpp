@@ -54,10 +54,10 @@ BOOL WIXAPI IsVerboseLogging()
             // if the property wasn't set, check the MsiLogging property (MSI 4.0+)
             HRESULT hr = WcaGetProperty(L"MsiLogging", &pwzMsiLogging);
             ExitOnFailure(hr, "failed to get MsiLogging property");
-            int cchMsiLogging = lstrlenW(pwzMsiLogging);
-            if (0 < cchMsiLogging)
+
+            if (pwzMsiLogging)
             {
-                for (int i = 0; i < cchMsiLogging; i++)
+                for (int i = 0; pwzMsiLogging[i]; i++)
                 {
                     if (L'v' == pwzMsiLogging[i] || L'V' == pwzMsiLogging[i])
                     {

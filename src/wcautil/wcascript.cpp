@@ -247,9 +247,8 @@ extern "C" HRESULT WIXAPI WcaCaScriptWriteString(
 {
     HRESULT hr = S_OK;
     DWORD cbFile = 0;
-    DWORD cbWrite = 0;
-    DWORD cbTotalWritten = 0;
     WCHAR delim[] = { MAGIC_MULTISZ_DELIM }; // magic char followed by NULL terminator
+    SIZE_T cch = 0;
 
     cbFile = ::SetFilePointer(hScript->hScriptFile, 0, NULL, FILE_END);
     if (INVALID_SET_FILE_POINTER == cbFile)
@@ -261,32 +260,15 @@ extern "C" HRESULT WIXAPI WcaCaScriptWriteString(
     // before adding our new data on the end of the file.
     if (0 < cbFile)
     {
-        cbWrite = sizeof(delim);
-        cbTotalWritten = 0;
-        while (cbTotalWritten < cbWrite)
-        {
-            DWORD cbWritten = 0;
-            if (!::WriteFile(hScript->hScriptFile, reinterpret_cast<BYTE*>(delim) + cbTotalWritten, cbWrite - cbTotalWritten, &cbWritten, NULL))
-            {
-                ExitWithLastError(hr, "Failed to write data to ca script.");
-            }
-
-            cbTotalWritten += cbWritten;
-        }
+        hr = FileWriteHandle(hScript->hScriptFile, reinterpret_cast<LPCBYTE>(delim), sizeof(delim));
+        ExitOnFailure(hr, "Failed to write data to ca script.");
     }
 
-    cbWrite = lstrlenW(wzValue) * sizeof(WCHAR);
-    cbTotalWritten = 0;
-    while (cbTotalWritten < cbWrite)
-    {
-        DWORD cbWritten = 0;
-        if (!::WriteFile(hScript->hScriptFile, reinterpret_cast<const BYTE*>(wzValue) + cbTotalWritten, cbWrite - cbTotalWritten, &cbWritten, NULL))
-        {
-            ExitWithLastError(hr, "Failed to write data to ca script.");
-        }
+    hr = ::StringCchLengthW(wzValue, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cch));
+    ExitOnRootFailure(hr, "Failed to get length of ca script string.");
 
-        cbTotalWritten += cbWritten;
-    }
+    hr = FileWriteHandle(hScript->hScriptFile, reinterpret_cast<LPCBYTE>(wzValue), static_cast<DWORD>(cch) * sizeof(WCHAR));
+    ExitOnFailure(hr, "Failed to write data to ca script.");
 
 LExit:
     return hr;

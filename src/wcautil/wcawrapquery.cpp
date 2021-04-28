@@ -88,7 +88,7 @@ eColumnDataType WIXAPI GetDataTypeFromString(
     LPCWSTR pwzTypeString
     )
 {
-    if (NULL == pwzTypeString || 0 == wcslen(pwzTypeString))
+    if (!pwzTypeString || !*pwzTypeString)
     {
         return cdtUnknown;
     }
@@ -350,7 +350,7 @@ HRESULT WIXAPI WcaWrapQuery(
             hr = WcaGetRecordString(hRec, dwComponentColumn, &pwzData);
             ExitOnFailure(hr, "Failed to get component from column %d while adding extra columns", dwComponentColumn);
 
-            if (0 == lstrlenW(pwzData))
+            if (!pwzData || !*pwzData)
             {
                 // If no component was provided, set these both to zero as though a structure to store them were allocated with memory zero'd out
                 isInstalled = (INSTALLSTATE)0;

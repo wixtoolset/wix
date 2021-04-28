@@ -467,12 +467,13 @@ extern "C" HRESULT WIXAPI WcaGetProperty(
 
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
-    DWORD_PTR cch = 0;
+    DWORD cch = 0;
+    SIZE_T cchMax = 0;
 
     if (!*ppwzData)
     {
         WCHAR szEmpty[1] = L"";
-        er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, szEmpty, (DWORD *)&cch);
+        er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, szEmpty, &cch);
         if (ERROR_MORE_DATA == er || ERROR_SUCCESS == er)
         {
             hr = StrAlloc(ppwzData, ++cch);
@@ -481,22 +482,24 @@ extern "C" HRESULT WIXAPI WcaGetProperty(
         {
             hr = HRESULT_FROM_WIN32(er);
         }
-        ExitOnFailure(hr, "Failed to allocate string for Property '%ls'", wzProperty);
+        ExitOnRootFailure(hr, "Failed to allocate string for Property '%ls'", wzProperty);
     }
     else
     {
-        hr = StrMaxLength(*ppwzData, &cch);
+        hr = StrMaxLength(*ppwzData, &cchMax);
         ExitOnFailure(hr, "Failed to get previous size of property data string.");
+
+        cch = (DWORD)min(MAXDWORD, cchMax);
     }
 
-    er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, *ppwzData, (DWORD *)&cch);
+    er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, *ppwzData, &cch);
     if (ERROR_MORE_DATA == er)
     {
         Assert(*ppwzData);
         hr = StrAlloc(ppwzData, ++cch);
         ExitOnFailure(hr, "Failed to allocate string for Property '%ls'", wzProperty);
 
-        er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, *ppwzData, (DWORD *)&cch);
+        er = ::MsiGetPropertyW(WcaGetInstallHandle(), wzProperty, *ppwzData, &cch);
     }
     ExitOnWin32Error(er, hr, "Failed to get data for property '%ls'", wzProperty);
 
@@ -554,7 +557,8 @@ extern "C" HRESULT WIXAPI WcaGetFormattedString(
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
     PMSIHANDLE hRecord = ::MsiCreateRecord(1);
-    DWORD_PTR cch = 0;
+    DWORD cch = 0;
+    SIZE_T cchMax = 0;
 
     er = ::MsiRecordSetStringW(hRecord, 0, wzString);
     ExitOnWin32Error(er, hr, "Failed to set record field 0 with '%ls'", wzString);
@@ -562,7 +566,7 @@ extern "C" HRESULT WIXAPI WcaGetFormattedString(
     if (!*ppwzData)
     {
         WCHAR szEmpty[1] = L"";
-        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, szEmpty, (DWORD *)&cch);
+        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, szEmpty, &cch);
         if (ERROR_MORE_DATA == er || ERROR_SUCCESS == er)
         {
             hr = StrAlloc(ppwzData, ++cch);
@@ -575,17 +579,19 @@ extern "C" HRESULT WIXAPI WcaGetFormattedString(
     }
     else
     {
-        hr = StrMaxLength(*ppwzData, &cch);
+        hr = StrMaxLength(*ppwzData, &cchMax);
         ExitOnFailure(hr, "Failed to get previous size of property data string");
+
+        cch = (DWORD)min(MAXDWORD, cchMax);
     }
 
-    er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, *ppwzData, (DWORD *)&cch);
+    er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, *ppwzData, &cch);
     if (ERROR_MORE_DATA == er)
     {
         hr = StrAlloc(ppwzData, ++cch);
         ExitOnFailure(hr, "Failed to allocate string for formatted string: '%ls'", wzString);
 
-        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, *ppwzData, (DWORD *)&cch);
+        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecord, *ppwzData, &cch);
     }
     ExitOnWin32Error(er, hr, "Failed to get formatted string: '%ls'", wzString);
 
@@ -637,12 +643,13 @@ extern "C" HRESULT WIXAPI WcaGetTargetPath(
     HRESULT hr = S_OK;
 
     UINT er = ERROR_SUCCESS;
-    DWORD_PTR cch = 0;
+    DWORD cch = 0;
+    SIZE_T cchMax = 0;
 
     if (!*ppwzData)
     {
         WCHAR szEmpty[1] = L"";
-        er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, szEmpty, (DWORD*)&cch);
+        er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, szEmpty, &cch);
         if (ERROR_MORE_DATA == er || ERROR_SUCCESS == er)
         {
             ++cch; //Add one for the null terminator
@@ -656,18 +663,20 @@ extern "C" HRESULT WIXAPI WcaGetTargetPath(
     }
     else
     {
-        hr = StrMaxLength(*ppwzData, &cch);
+        hr = StrMaxLength(*ppwzData, &cchMax);
         ExitOnFailure(hr, "Failed to get previous size of string");
+
+        cch = (DWORD)min(MAXDWORD, cchMax);
     }
 
-    er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, *ppwzData, (DWORD*)&cch);
+    er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, *ppwzData, &cch);
     if (ERROR_MORE_DATA == er)
     {
         ++cch;
         hr = StrAlloc(ppwzData, cch);
         ExitOnFailure(hr, "Failed to allocate string for target path of folder: '%ls'", wzFolder);
 
-        er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, *ppwzData, (DWORD*)&cch);
+        er = ::MsiGetTargetPathW(WcaGetInstallHandle(), wzFolder, *ppwzData, &cch);
     }
     ExitOnWin32Error(er, hr, "Failed to get target path for folder '%ls'", wzFolder);
 
@@ -802,12 +811,13 @@ extern "C" HRESULT WIXAPI WcaGetRecordString(
 
     HRESULT hr = S_OK;
     UINT er;
-    DWORD_PTR cch = 0;
+    DWORD cch = 0;
+    SIZE_T cchMax = 0;
 
     if (!*ppwzData)
     {
         WCHAR szEmpty[1] = L"";
-        er = ::MsiRecordGetStringW(hRec, uiField, szEmpty, (DWORD*)&cch);
+        er = ::MsiRecordGetStringW(hRec, uiField, szEmpty, &cch);
         if (ERROR_MORE_DATA == er || ERROR_SUCCESS == er)
         {
             hr = StrAlloc(ppwzData, ++cch);
@@ -820,17 +830,19 @@ extern "C" HRESULT WIXAPI WcaGetRecordString(
     }
     else
     {
-        hr = StrMaxLength(*ppwzData, &cch);
+        hr = StrMaxLength(*ppwzData, &cchMax);
         ExitOnFailure(hr, "Failed to get previous size of string");
+
+        cch = (DWORD)min(MAXDWORD, cchMax);
     }
 
-    er = ::MsiRecordGetStringW(hRec, uiField, *ppwzData, (DWORD*)&cch);
+    er = ::MsiRecordGetStringW(hRec, uiField, *ppwzData, &cch);
     if (ERROR_MORE_DATA == er)
     {
         hr = StrAlloc(ppwzData, ++cch);
         ExitOnFailure(hr, "Failed to allocate memory for record string");
 
-        er = ::MsiRecordGetStringW(hRec, uiField, *ppwzData, (DWORD*)&cch);
+        er = ::MsiRecordGetStringW(hRec, uiField, *ppwzData, &cch);
     }
     ExitOnWin32Error(er, hr, "Failed to get string from record");
 
@@ -910,7 +922,8 @@ extern "C" HRESULT WIXAPI WcaGetRecordFormattedString(
 
     HRESULT hr = S_OK;
     UINT er;
-    DWORD_PTR cch = 0;
+    DWORD cch = 0;
+    SIZE_T cchMax = 0;
     PMSIHANDLE hRecFormat;
 
     // get the format string
@@ -932,16 +945,18 @@ extern "C" HRESULT WIXAPI WcaGetRecordFormattedString(
     ExitOnFailure(hr, "failed to set string to format record");
 
     // format the string
-    hr = StrMaxLength(*ppwzData, &cch);
+    hr = StrMaxLength(*ppwzData, &cchMax);
     ExitOnFailure(hr, "failed to get max length of string");
 
-    er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecFormat, *ppwzData, (DWORD*)&cch);
+    cch = (DWORD)min(MAXDWORD, cchMax);
+
+    er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecFormat, *ppwzData, &cch);
     if (ERROR_MORE_DATA == er)
     {
         hr = StrAlloc(ppwzData, ++cch);
         ExitOnFailure(hr, "Failed to allocate memory for record string");
 
-        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecFormat, *ppwzData, (DWORD*)&cch);
+        er = ::MsiFormatRecordW(WcaGetInstallHandle(), hRecFormat, *ppwzData, &cch);
     }
     ExitOnWin32Error(er, hr, "Failed to format string");
 
@@ -1273,7 +1288,7 @@ extern "C" HRESULT WIXAPI WcaReadIntegerFromCaData(
     )
 {
     LPCWSTR pwz = BreakDownCustomActionData(ppwzCustomActionData);
-    if (!pwz || 0 == wcslen(pwz))
+    if (!pwz || !*pwz)
         return E_NOMOREITEMS;
 
     *piResult = wcstol(pwz, NULL, 10);
@@ -1319,24 +1334,34 @@ extern "C" HRESULT WIXAPI WcaWriteStringToCaData(
 {
     HRESULT hr = S_OK;
     WCHAR delim[] = {MAGIC_MULTISZ_DELIM, 0}; // magic char followed by NULL terminator
+    SIZE_T cchString = 0;
+    SIZE_T cchCustomActionData = 0;
+    SIZE_T cchMax = 0;
 
     if (!ppwzCustomActionData)
     {
         ExitFunction1(hr = E_INVALIDARG);
     }
 
-    DWORD cchString = lstrlenW(wzString) + 1; // assume we'll be adding the delim
-    DWORD_PTR cchCustomActionData = 0;
+    hr = ::StringCchLengthW(wzString, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(&cchString));
+    ExitOnRootFailure(hr, "failed to get length of ca data string");
+
+    ++cchString; // assume we'll be adding the delim
 
     if (*ppwzCustomActionData)
     {
         hr = StrMaxLength(*ppwzCustomActionData, &cchCustomActionData);
-        ExitOnFailure(hr, "failed to get length of custom action data");
+        ExitOnFailure(hr, "failed to get max length of custom action data");
+
+        hr = ::StringCchLengthW(*ppwzCustomActionData, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(&cchMax));
+        ExitOnRootFailure(hr, "failed to get length of custom action data");
     }
 
-    if ((cchCustomActionData - lstrlenW(*ppwzCustomActionData)) < cchString + 1)
+    if ((cchCustomActionData - cchMax) < cchString + 1)
     {
         cchCustomActionData += cchString + 1 + 255;  // add 255 for good measure
+        cchCustomActionData = min(STRSAFE_MAX_LENGTH, cchCustomActionData);
+
         hr = StrAlloc(ppwzCustomActionData, cchCustomActionData);
         ExitOnFailure(hr, "Failed to allocate memory for CustomActionData string");
     }
@@ -1344,11 +1369,11 @@ extern "C" HRESULT WIXAPI WcaWriteStringToCaData(
     if (**ppwzCustomActionData) // if data exists toss the delimiter on before adding more to the end
     {
         hr = ::StringCchCatW(*ppwzCustomActionData, cchCustomActionData, delim);
-        ExitOnFailure(hr, "Failed to concatenate CustomActionData string");
+        ExitOnRootFailure(hr, "Failed to concatenate CustomActionData string");
     }
 
     hr = ::StringCchCatW(*ppwzCustomActionData, cchCustomActionData, wzString);
-    ExitOnFailure(hr, "Failed to concatenate CustomActionData string");
+    ExitOnRootFailure(hr, "Failed to concatenate CustomActionData string");
 
 LExit:
     return hr;
