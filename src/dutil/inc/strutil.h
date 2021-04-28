@@ -277,12 +277,12 @@ void DAPI StrStringToLower(
 HRESULT DAPI StrAllocStringToUpperInvariant(
     __deref_out_z LPWSTR* pscz,
     __in_z LPCWSTR wzSource,
-    __in int cchSource
+    __in SIZE_T cchSource
     );
 HRESULT DAPI StrAllocStringToLowerInvariant(
     __deref_out_z LPWSTR* pscz,
     __in_z LPCWSTR wzSource,
-    __in int cchSource
+    __in SIZE_T cchSource
     );
 
 HRESULT DAPI StrArrayAllocString(

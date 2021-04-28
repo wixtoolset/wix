@@ -122,9 +122,7 @@ DAPI_(HRESULT) DepCheckDependency(
     LPWSTR sczKey = NULL;
     HKEY hkKey = NULL;
     DWORD64 dw64Version = 0;
-    int cchMinVersion = 0;
     DWORD64 dw64MinVersion = 0;
-    int cchMaxVersion = 0;
     DWORD64 dw64MaxVersion = 0;
     BOOL fAllowEqual = FALSE;
     LPWSTR sczName = NULL;
@@ -171,10 +169,9 @@ DAPI_(HRESULT) DepCheckDependency(
     // Check MinVersion if provided.
     if (wzMinVersion)
     {
-        cchMinVersion = lstrlenW(wzMinVersion);
-        if (0 < cchMinVersion)
+        if (*wzMinVersion)
         {
-            hr = FileVersionFromStringEx(wzMinVersion, cchMinVersion, &dw64MinVersion);
+            hr = FileVersionFromStringEx(wzMinVersion, 0, &dw64MinVersion);
             DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMinVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMinVersionInclusive;
@@ -206,10 +203,9 @@ DAPI_(HRESULT) DepCheckDependency(
     // Check MaxVersion if provided.
     if (wzMaxVersion)
     {
-        cchMaxVersion = lstrlenW(wzMaxVersion);
-        if (0 < cchMaxVersion)
+        if (*wzMaxVersion)
         {
-            hr = FileVersionFromStringEx(wzMaxVersion, cchMaxVersion, &dw64MaxVersion);
+            hr = FileVersionFromStringEx(wzMaxVersion, 0, &dw64MaxVersion);
             DepExitOnFailure(hr, "Failed to get the 64-bit version number from \"%ls\".", wzMaxVersion);
 
             fAllowEqual = iAttributes & RequiresAttributesMaxVersionInclusive;

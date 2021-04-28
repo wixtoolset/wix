@@ -776,11 +776,15 @@ extern "C" HRESULT LogStringWorkRaw(
     Assert(szLogData && *szLogData);
 
     HRESULT hr = S_OK;
+    size_t cchLogData = 0;
     DWORD cbLogData = 0;
     DWORD cbTotal = 0;
     DWORD cbWrote = 0;
 
-    cbLogData = lstrlenA(szLogData);
+    hr = ::StringCchLengthA(szLogData, STRSAFE_MAX_CCH, &cchLogData);
+    LoguExitOnRootFailure(hr, "Failed to get length of raw string");
+
+    cbLogData = (DWORD)cchLogData;
 
     // If the log hasn't been initialized yet, store it in a buffer
     if (INVALID_HANDLE_VALUE == LogUtil_hLog)

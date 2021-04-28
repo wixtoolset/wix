@@ -294,12 +294,15 @@ extern "C" HRESULT DAPI RegKeyEnum(
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
+    SIZE_T cb = 0;
     DWORD cch = 0;
 
     if (psczKey && *psczKey)
     {
-        hr = StrMaxLength(*psczKey, reinterpret_cast<DWORD_PTR*>(&cch));
+        hr = StrMaxLength(*psczKey, &cb);
         RegExitOnFailure(hr, "Failed to determine length of string.");
+
+        cch = (DWORD)min(DWORD_MAX, cb);
     }
 
     if (2 > cch)
@@ -462,6 +465,7 @@ extern "C" HRESULT DAPI RegReadString(
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
+    SIZE_T cbValue = 0;
     DWORD cch = 0;
     DWORD cb = 0;
     DWORD dwType = 0;
@@ -469,8 +473,10 @@ extern "C" HRESULT DAPI RegReadString(
 
     if (psczValue && *psczValue)
     {
-        hr = StrMaxLength(*psczValue, reinterpret_cast<DWORD_PTR*>(&cch));
+        hr = StrMaxLength(*psczValue, &cbValue);
         RegExitOnFailure(hr, "Failed to determine length of string.");
+
+        cch = (DWORD)min(DWORD_MAX, cbValue);
     }
 
     if (2 > cch)
@@ -1000,18 +1006,18 @@ static HRESULT WriteStringToRegistry(
     __in_z_opt LPCWSTR wzName,
     __in_z_opt LPCWSTR wzValue,
     __in DWORD dwType
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
-    DWORD cbValue = 0;
+    size_t cbValue = 0;
 
     if (wzValue)
     {
-        hr = ::StringCbLengthW(wzValue, STRSAFE_MAX_CCH * sizeof(TCHAR), reinterpret_cast<size_t*>(&cbValue));
+        hr = ::StringCbLengthW(wzValue, STRSAFE_MAX_CCH * sizeof(TCHAR), &cbValue);
         RegExitOnFailure(hr, "Failed to determine length of registry value: %ls", wzName);
 
-        er = vpfnRegSetValueExW(hk, wzName, 0, dwType, reinterpret_cast<const BYTE *>(wzValue), cbValue);
+        er = vpfnRegSetValueExW(hk, wzName, 0, dwType, reinterpret_cast<const BYTE *>(wzValue), static_cast<DWORD>(cbValue));
         RegExitOnWin32Error(er, hr, "Failed to set registry value: %ls", wzName);
     }
     else

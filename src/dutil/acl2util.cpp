@@ -23,7 +23,7 @@ NOTE: psczSid should be freed with StrFree()
 ********************************************************************/
 extern "C" HRESULT DAPI AclCalculateServiceSidString(
     __in LPCWSTR wzServiceName,
-    __in int cchServiceName,
+    __in SIZE_T cchServiceName,
     __deref_out_z LPWSTR* psczSid
     )
 {
@@ -39,7 +39,7 @@ extern "C" HRESULT DAPI AclCalculateServiceSidString(
 
     if (0 == cchServiceName)
     {
-        hr = ::StringCchLengthW(wzServiceName, INT_MAX, reinterpret_cast<size_t*>(&cchServiceName));
+        hr = ::StringCchLengthW(wzServiceName, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchServiceName));
         AclExitOnFailure(hr, "Failed to get the length of the service name.");
     }
 
@@ -49,7 +49,7 @@ extern "C" HRESULT DAPI AclCalculateServiceSidString(
     pbHash = reinterpret_cast<BYTE*>(MemAlloc(cbHash, TRUE));
     AclExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to allocate hash byte array.");
 
-    hr = CrypHashBuffer(reinterpret_cast<BYTE*>(sczUpperServiceName), cchServiceName * 2, PROV_RSA_FULL, CALG_SHA1, pbHash, cbHash);
+    hr = CrypHashBuffer(reinterpret_cast<BYTE*>(sczUpperServiceName), cchServiceName * sizeof(WCHAR), PROV_RSA_FULL, CALG_SHA1, pbHash, cbHash);
     AclExitOnNull(pbHash, hr, E_OUTOFMEMORY, "Failed to hash the service name.");
 
     hr = StrAllocFormatted(psczSid, L"S-1-5-80-%u-%u-%u-%u-%u",
@@ -80,7 +80,7 @@ extern "C" HRESULT DAPI AclGetAccountSidStringEx(
     )
 {
     HRESULT hr = S_OK;
-    int cchAccount = 0;
+    SIZE_T cchAccount = 0;
     PSID psid = NULL;
     LPWSTR pwz = NULL;
     LPWSTR sczSid = NULL;
@@ -103,7 +103,7 @@ extern "C" HRESULT DAPI AclGetAccountSidStringEx(
     {
         if (HRESULT_FROM_WIN32(ERROR_NONE_MAPPED) == hr)
         {
-            HRESULT hrLength = ::StringCchLengthW(wzAccount, INT_MAX, reinterpret_cast<size_t*>(&cchAccount));
+            HRESULT hrLength = ::StringCchLengthW(wzAccount, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchAccount));
             AclExitOnFailure(hrLength, "Failed to get the length of the account name.");
 
             if (11 < cchAccount && CSTR_EQUAL == CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, L"NT SERVICE\\", 11, wzAccount, 11))

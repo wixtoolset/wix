@@ -1305,7 +1305,7 @@ extern "C" HRESULT DAPI XmlSaveDocumentToBuffer(
     XmlExitOnFailure(hr, "Failed to get stream size.");
 
     // allocate buffer
-    pbDest = static_cast<BYTE*>(MemAlloc((SIZE_T)statstg.cbSize.LowPart, TRUE));
+    pbDest = static_cast<BYTE*>(MemAlloc(statstg.cbSize.LowPart, TRUE));
     XmlExitOnNull(pbDest, hr, E_OUTOFMEMORY, "Failed to allocate destination buffer.");
 
     // read data from stream

@@ -299,7 +299,14 @@ extern "C" HRESULT DAPI MetaGetValue(
         MetaExitOnNull(pmr->pbMDData, hr, E_OUTOFMEMORY, "failed to allocate memory for metabase value");
     }
     else  // set the size of the data to the actual size of the memory
-        pmr->dwMDDataLen = (DWORD)MemSize(pmr->pbMDData);
+    {
+        SIZE_T cb = MemSize(pmr->pbMDData);
+        if (cb > DWORD_MAX)
+        {
+            MetaExitOnRootFailure(hr = E_INVALIDSTATE, "metabase data is too large: %Iu", cb);
+        }
+        pmr->dwMDDataLen = (DWORD)cb;
+    }
 
     hr = piMetabase->GetData(mhKey, wzKey, pmr, &cbRequired);
     if (HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER) == hr)

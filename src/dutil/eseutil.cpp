@@ -312,12 +312,14 @@ HRESULT AllocIndexCreateStruct(
     EseExitOnNull(*ppjicIndexCreate, hr, E_OUTOFMEMORY, "Failed to allocate index create structure for database");
 
     // Record the size including both null terminators - the struct requires this
-    DWORD dwSize = 0;
-    dwSize = lstrlen(pszMultiSzKeys) + 1; // add 1 to include null character at the end
-    EseExitOnFailure(hr, "Failed to get size of keys string");
+    size_t cchSize = 0;
+    hr = ::StringCchLengthA(pszMultiSzKeys, STRSAFE_MAX_LENGTH, &cchSize);
+    EseExitOnRootFailure(hr, "Failed to get size of keys string");
+
+    ++cchSize; // add 1 to include null character at the end
 
     // At this point convert all question marks to null characters
-    for (i = 0; i < dwSize; ++i)
+    for (i = 0; i < cchSize; ++i)
     {
         if ('?' == pszMultiSzKeys[i])
         {
@@ -328,7 +330,7 @@ HRESULT AllocIndexCreateStruct(
     (*ppjicIndexCreate)->cbStruct = sizeof(JET_INDEXCREATE);
     (*ppjicIndexCreate)->szIndexName = pszIndexName;
     (*ppjicIndexCreate)->szKey = pszMultiSzKeys;
-    (*ppjicIndexCreate)->cbKey = dwSize;
+    (*ppjicIndexCreate)->cbKey = (DWORD)cchSize;
     (*ppjicIndexCreate)->grbit = JET_bitIndexUnique | JET_bitIndexPrimary;
     (*ppjicIndexCreate)->ulDensity = 80;
     (*ppjicIndexCreate)->lcid = 1033;
@@ -884,7 +886,16 @@ HRESULT DAPI EseSetColumnString(
 {
     HRESULT hr = S_OK;
     JET_ERR jEr = JET_errSuccess;
-    ULONG cbValueSize = static_cast<ULONG>((wcslen(pwzValue) + 1) * sizeof(WCHAR)); // add 1 for null character, then multiply by size of WCHAR to get bytes
+    size_t cchValue = 0;
+    ULONG cbValueSize = 0;
+
+    if (pwzValue)
+    {
+        hr = ::StringCchLengthW(pwzValue, STRSAFE_MAX_LENGTH, &cchValue);
+        EseExitOnRootFailure(hr, "Failed to get string length: %ls", pwzValue);
+    }
+
+    cbValueSize = static_cast<ULONG>((cchValue + 1) * sizeof(WCHAR)); // add 1 for null character, then multiply by size of WCHAR to get bytes
 
     jEr = JetSetColumn(jsSession, tsTable.jtTable, tsTable.pcsColumns[dwColumn].jcColumn, pwzValue, cbValueSize, 0, NULL);
     ExitOnJetFailure(jEr, hr, "Failed to set string value into column of database: %ls", pwzValue);
@@ -1196,11 +1207,17 @@ HRESULT DAPI EseSetQueryColumnString(
 {
     HRESULT hr = S_OK;
     DWORD dwStringSize = 0;
+    size_t cchString = 0;
     ESE_QUERY *peqHandle = static_cast<ESE_QUERY *>(eqhHandle);
     JET_GRBIT jGrb = 0;
 
-    dwStringSize = sizeof(WCHAR) * (lstrlenW(pszString) + 1); // Add 1 for null terminator
+    if (pszString)
+    {
+        hr = ::StringCchLengthW(pszString, STRSAFE_MAX_LENGTH, &cchString);
+        EseExitOnRootFailure(hr, "Failed to get size of column string");
+    }
 
+    dwStringSize = static_cast<DWORD>(sizeof(WCHAR) * (cchString + 1)); // Add 1 for null terminator
 
     if (fFinal)
     {

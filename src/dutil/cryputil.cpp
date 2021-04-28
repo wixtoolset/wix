@@ -291,6 +291,9 @@ HRESULT DAPI CrypHashBuffer(
     HRESULT hr = S_OK;
     HCRYPTPROV hProv = NULL;
     HCRYPTHASH hHash = NULL;
+    DWORD cbDataHashed = 0;
+    SIZE_T cbTotal = 0;
+    SIZE_T cbRemaining = 0;
 
     // get handle to the crypto provider
     if (!::CryptAcquireContextW(&hProv, NULL, NULL, dwProvType, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
@@ -304,10 +307,17 @@ HRESULT DAPI CrypHashBuffer(
         CrypExitWithLastError(hr, "Failed to initiate hash.");
     }
 
-    if (!::CryptHashData(hHash, pbBuffer, static_cast<DWORD>(cbBuffer), 0))
+    do
     {
-        CrypExitWithLastError(hr, "Failed to hash data.");
-    }
+        cbRemaining = cbBuffer - cbTotal;
+        cbDataHashed = (DWORD)min(DWORD_MAX, cbRemaining);
+        if (!::CryptHashData(hHash, pbBuffer + cbTotal, cbDataHashed, 0))
+        {
+            CrypExitWithLastError(hr, "Failed to hash data.");
+        }
+
+        cbTotal += cbDataHashed;
+    } while (cbTotal < cbBuffer);
 
     // get hash value
     if (!::CryptGetHashParam(hHash, HP_HASHVAL, pbHash, &cbHash, 0))

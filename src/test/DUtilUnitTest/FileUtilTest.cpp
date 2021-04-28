@@ -50,7 +50,7 @@ namespace DutilTests
         }
 
     private:
-        void TestFile(LPWSTR wzDir, LPCWSTR wzTempDir, LPWSTR wzFileName, DWORD dwExpectedStringLength, FILE_ENCODING feExpectedEncoding)
+        void TestFile(LPWSTR wzDir, LPCWSTR wzTempDir, LPWSTR wzFileName, size_t cbExpectedStringLength, FILE_ENCODING feExpectedEncoding)
         {
             HRESULT hr = S_OK;
             LPWSTR sczFullPath = NULL;
@@ -61,6 +61,7 @@ namespace DutilTests
             DWORD cbFile1 = 0;
             BYTE *pbFile2 = NULL;
             DWORD cbFile2 = 0;
+            size_t cbActualStringLength = 0;
 
             try
             {
@@ -77,10 +78,13 @@ namespace DutilTests
                     NativeAssert::Succeeded(hr, "FileToString() returned NULL for file: {0}", sczFullPath);
                 }
 
-                if ((DWORD)lstrlenW(sczContents) != dwExpectedStringLength)
+                hr = ::StringCchLengthW(sczContents, STRSAFE_MAX_CCH, &cbActualStringLength);
+                NativeAssert::Succeeded(hr, "Failed to get length of text from file: {0}", sczFullPath);
+
+                if (cbActualStringLength != cbExpectedStringLength)
                 {
                     hr = E_FAIL;
-                    ExitOnFailure(hr, "FileToString() returned wrong size for file: %ls (expected size %u, found size %u)", sczFullPath, dwExpectedStringLength, lstrlenW(sczContents));
+                    ExitOnFailure(hr, "FileToString() returned wrong size for file: %ls (expected size %Iu, found size %Iu)", sczFullPath, cbExpectedStringLength, cbActualStringLength);
                 }
 
                 if (feEncodingFound != feExpectedEncoding)

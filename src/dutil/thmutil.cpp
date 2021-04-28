@@ -1519,12 +1519,15 @@ DAPI_(HRESULT) ThemeGetTextControl(
 {
     HRESULT hr = S_OK;
     HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
+    SIZE_T cbSize = 0;
     DWORD cchText = 0;
     DWORD cchTextRead = 0;
 
     // Ensure the string has room for at least one character.
-    hr = StrMaxLength(*psczText, reinterpret_cast<DWORD_PTR*>(&cchText));
+    hr = StrMaxLength(*psczText, &cbSize);
     ThmExitOnFailure(hr, "Failed to get text buffer length.");
+
+    cchText = (DWORD)min(DWORD_MAX, cbSize);
 
     if (!cchText)
     {

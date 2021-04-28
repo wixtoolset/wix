@@ -62,7 +62,7 @@ HRESULT DAPI FileVersionFromString(
     );
 HRESULT DAPI FileVersionFromStringEx(
     __in_z LPCWSTR wzVersion,
-    __in DWORD cchVersion,
+    __in SIZE_T cchVersion,
     __out DWORD64* pqwVersion
     );
 HRESULT DAPI FileVersionToStringEx(
@@ -129,6 +129,11 @@ HRESULT DAPI FileReadPartialEx(
     __in DWORD cbMaxRead,
     __in BOOL fPartialOK,
     __in DWORD dwShareMode
+    );
+HRESULT DAPI FileReadHandle(
+    __in HANDLE hFile,
+    __in_bcount(cbDest) LPBYTE pbDest,
+    __in SIZE_T cbDest
     );
 HRESULT DAPI FileWrite(
     __in_z LPCWSTR pwzFileName,

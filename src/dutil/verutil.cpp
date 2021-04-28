@@ -244,7 +244,7 @@ DAPI_(void) VerFreeVersion(
 
 DAPI_(HRESULT) VerParseVersion(
     __in_z LPCWSTR wzVersion,
-    __in DWORD cchVersion,
+    __in SIZE_T cchVersion,
     __in BOOL fStrict,
     __out VERUTIL_VERSION** ppVersion
     )
@@ -267,9 +267,14 @@ DAPI_(HRESULT) VerParseVersion(
     }
 
     // Get string length if not provided.
-    if (0 == cchVersion)
+    if (!cchVersion)
     {
-        cchVersion = lstrlenW(wzVersion);
+        hr = ::StringCchLengthW(wzVersion, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchVersion));
+        VerExitOnRootFailure(hr, "Failed to get length of version string: %ls", wzVersion);
+    }
+    else if (INT_MAX < cchVersion)
+    {
+        VerExitOnRootFailure(hr = E_INVALIDARG, "Version string is too long: %Iu", cchVersion);
     }
 
     if (L'v' == *wzVersion || L'V' == *wzVersion)

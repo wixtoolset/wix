@@ -155,40 +155,33 @@ __out LPWSTR *ppwzFileNameNoExtension
     Assert(wzFileName && *wzFileName);
    
     HRESULT hr = S_OK;
-   
-    SIZE_T cchFileName = wcslen(wzFileName);
-   
+    size_t cchFileName = 0;
     LPWSTR pwzFileNameNoExtension = NULL;
-    DWORD cchFileNameNoExtension = 0;
-   
-    // Filename without extension can not be longer than _MAX_FNAME
-    // Filename without extension should also not be longer than filename itself
-    if (_MAX_FNAME > cchFileName)
-    {
-        cchFileNameNoExtension = (DWORD) cchFileName;
-    }
-    else
-    {
-        cchFileNameNoExtension = _MAX_FNAME;
-    }
-   
+    size_t cchFileNameNoExtension = 0;
+    errno_t err = 0;
+
+    hr = ::StringCchLengthW(wzFileName, STRSAFE_MAX_LENGTH, &cchFileName);
+    FileExitOnRootFailure(hr, "failed to get length of file name: %ls", wzFileName);
+
+    cchFileNameNoExtension = cchFileName + 1;
+
     hr = StrAlloc(&pwzFileNameNoExtension, cchFileNameNoExtension);
     FileExitOnFailure(hr, "failed to allocate space for File Name without extension");
-   
+
     // _wsplitpath_s can handle drive/path/filename/extension
-    errno_t err = _wsplitpath_s(wzFileName, NULL, NULL, NULL, NULL, pwzFileNameNoExtension, cchFileNameNoExtension, NULL, NULL);
-    if (0 != err)
+    err = _wsplitpath_s(wzFileName, NULL, NULL, NULL, NULL, pwzFileNameNoExtension, cchFileNameNoExtension, NULL, NULL);
+    if (err)
     {
         hr = E_INVALIDARG;
-        FileExitOnFailure(hr, "failed to parse filename: %ls", wzFileName);
+        FileExitOnRootFailure(hr, "failed to parse filename: '%ls', error: %d", wzFileName, err);
     }
-   
+
     *ppwzFileNameNoExtension = pwzFileNameNoExtension;
     pwzFileNameNoExtension = NULL;
-   
+
 LExit:
     ReleaseStr(pwzFileNameNoExtension);
-   
+
     return hr;
 }
 
@@ -237,8 +230,12 @@ extern "C" HRESULT DAPI FileAddSuffixToBaseName(
 
     HRESULT hr = S_OK;
     LPWSTR sczNewFileName = NULL;
+    size_t cchFileName = 0;
 
-    LPCWSTR wzExtension = wzFileName + lstrlenW(wzFileName);
+    hr = ::StringCchLengthW(wzFileName, STRSAFE_MAX_CCH, &cchFileName);
+    FileExitOnRootFailure(hr, "Failed to get length of file name: %ls", wzFileName);
+
+    LPCWSTR wzExtension = wzFileName + cchFileName;
     while (wzFileName < wzExtension && L'.' != *wzExtension)
     {
         --wzExtension;
@@ -410,7 +407,7 @@ LExit:
 *******************************************************************/
 extern "C" HRESULT DAPI FileVersionFromStringEx(
     __in_z LPCWSTR wzVersion,
-    __in DWORD cchVersion,
+    __in SIZE_T cchVersion,
     __out DWORD64* pqwVersion
     )
 {
@@ -428,7 +425,9 @@ extern "C" HRESULT DAPI FileVersionFromStringEx(
     // get string length if not provided
     if (0 >= cchVersion)
     {
-        cchVersion = lstrlenW(wzVersion);
+        hr = ::StringCchLengthW(wzVersion, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchVersion));
+        FileExitOnRootFailure(hr, "Failed to get length of file version string: %ls", wzVersion);
+
         if (0 >= cchVersion)
         {
             ExitFunction1(hr = E_INVALIDARG);
@@ -996,6 +995,41 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT DAPI FileReadHandle(
+    __in HANDLE hFile,
+    __in_bcount(cbDest) LPBYTE pbDest,
+    __in SIZE_T cbDest
+    )
+{
+    HRESULT hr = 0;
+    DWORD cbDataRead = 0;
+    SIZE_T cbRemaining = cbDest;
+    SIZE_T cbTotal = 0;
+
+    while (0 < cbRemaining)
+    {
+        if (!::ReadFile(hFile, pbDest + cbTotal, (DWORD)min(DWORD_MAX, cbRemaining), &cbDataRead, NULL))
+        {
+            DWORD er = ::GetLastError();
+            if (ERROR_MORE_DATA == er)
+            {
+                hr = S_OK;
+            }
+            else
+            {
+                hr = HRESULT_FROM_WIN32(er);
+            }
+            FileExitOnRootFailure(hr, "Failed to read data from file handle.");
+        }
+
+        cbRemaining -= cbDataRead;
+        cbTotal += cbDataRead;
+    }
+
+LExit:
+    return hr;
+}
+
 
 /*******************************************************************
  FileWrite - write a file from memory
@@ -1044,18 +1078,20 @@ extern "C" HRESULT DAPI FileWriteHandle(
 {
     HRESULT hr = S_OK;
     DWORD cbDataWritten = 0;
-    DWORD cbTotal = 0;
+    SIZE_T cbTotal = 0;
+    SIZE_T cbRemaining = cbData;
 
     // Write out all of the data.
-    do
+    while (0 < cbRemaining)
     {
-        if (!::WriteFile(hFile, pbData + cbTotal, (DWORD)(cbData - cbTotal), &cbDataWritten, NULL))
+        if (!::WriteFile(hFile, pbData + cbTotal, (DWORD)min(DWORD_MAX, cbRemaining), &cbDataWritten, NULL))
         {
             FileExitOnLastError(hr, "Failed to write data to file handle.");
         }
 
+        cbRemaining -= cbDataWritten;
         cbTotal += cbDataWritten;
-    } while (cbTotal < cbData);
+    }
 
 LExit:
     return hr;
@@ -1115,7 +1151,7 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
     __in DWORD64 cbCopy,
     __in_opt LPPROGRESS_ROUTINE lpProgressRoutine,
     __in_opt LPVOID lpData
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD64 cbTotalCopied = 0;
@@ -1135,21 +1171,24 @@ extern "C" HRESULT DAPI FileCopyUsingHandlesWithProgress(
         liSourceSize.QuadPart = cbCopy;
     }
 
-    dwResult = lpProgressRoutine(liSourceSize, liTotalCopied, liZero, liZero, 0, CALLBACK_STREAM_SWITCH, hSource, hTarget, lpData);
-    switch (dwResult)
+    if (lpProgressRoutine)
     {
-    case PROGRESS_CONTINUE:
-        break;
+        dwResult = lpProgressRoutine(liSourceSize, liTotalCopied, liZero, liZero, 0, CALLBACK_STREAM_SWITCH, hSource, hTarget, lpData);
+        switch (dwResult)
+        {
+        case PROGRESS_CONTINUE:
+            break;
 
-    case PROGRESS_CANCEL:
-        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
+        case PROGRESS_CANCEL:
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
-    case PROGRESS_STOP:
-        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
+        case PROGRESS_STOP:
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
 
-    case PROGRESS_QUIET:
-        lpProgressRoutine = NULL;
-        break;
+        case PROGRESS_QUIET:
+            lpProgressRoutine = NULL;
+            break;
+        }
     }
 
     // Set size of the target file.
@@ -1929,23 +1968,27 @@ extern "C" HRESULT DAPI FileFromString(
     LPSTR sczUtf8String = NULL;
     BYTE *pbFullFileBuffer = NULL;
     const BYTE *pcbFullFileBuffer = NULL;
-    DWORD cbFullFileBuffer = 0;
-    DWORD cbStrLen = 0;
+    SIZE_T cbFullFileBuffer = 0;
+    SIZE_T cbStrLen = 0;
 
     switch (feEncoding)
     {
     case FILE_ENCODING_UTF8:
         hr = StrAnsiAllocString(&sczUtf8String, sczString, 0, CP_UTF8);
         FileExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
-        
-        cbFullFileBuffer = lstrlenA(sczUtf8String);
+
+        hr = ::StringCchLengthA(sczUtf8String, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cbFullFileBuffer));
+        FileExitOnRootFailure(hr, "Failed to get length of UTF-8 string");
+
         pcbFullFileBuffer = reinterpret_cast<BYTE *>(sczUtf8String);
         break;
     case FILE_ENCODING_UTF8_WITH_BOM:
         hr = StrAnsiAllocString(&sczUtf8String, sczString, 0, CP_UTF8);
         FileExitOnFailure(hr, "Failed to convert string to UTF-8 to write UTF-8 file");
-        
-        cbStrLen = lstrlenA(sczUtf8String);
+
+        hr = ::StringCchLengthA(sczUtf8String, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cbStrLen));
+        FileExitOnRootFailure(hr, "Failed to get length of UTF-8 string");
+
         cbFullFileBuffer = sizeof(UTF8BOM) + cbStrLen;
 
         pbFullFileBuffer = reinterpret_cast<BYTE *>(MemAlloc(cbFullFileBuffer, TRUE));
@@ -1956,11 +1999,17 @@ extern "C" HRESULT DAPI FileFromString(
         pcbFullFileBuffer = pbFullFileBuffer;
         break;
     case FILE_ENCODING_UTF16:
-        cbFullFileBuffer = lstrlenW(sczString) * sizeof(WCHAR);
+        hr = ::StringCchLengthW(sczString, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cbStrLen));
+        FileExitOnRootFailure(hr, "Failed to get length of string");
+
+        cbFullFileBuffer = cbStrLen * sizeof(WCHAR);
         pcbFullFileBuffer = reinterpret_cast<const BYTE *>(sczString);
         break;
     case FILE_ENCODING_UTF16_WITH_BOM:
-        cbStrLen = lstrlenW(sczString) * sizeof(WCHAR);
+        hr = ::StringCchLengthW(sczString, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cbStrLen));
+        FileExitOnRootFailure(hr, "Failed to get length of string");
+
+        cbStrLen *= sizeof(WCHAR);
         cbFullFileBuffer = sizeof(UTF16BOM) + cbStrLen;
 
         pbFullFileBuffer = reinterpret_cast<BYTE *>(MemAlloc(cbFullFileBuffer, TRUE));

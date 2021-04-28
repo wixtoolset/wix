@@ -400,7 +400,7 @@ extern "C" HRESULT DAPI DirGetCurrent(
         DirExitOnFailure(hr, "Failed to determine size of current directory.");
     }
 
-    DWORD cchRequired = ::GetCurrentDirectoryW(static_cast<DWORD>(cch), 0 == cch ? NULL : *psczCurrentDirectory);
+    DWORD cchRequired = ::GetCurrentDirectoryW((DWORD)min(DWORD_MAX, cch), 0 == cch ? NULL : *psczCurrentDirectory);
     if (0 == cchRequired)
     {
         DirExitWithLastError(hr, "Failed to get current directory.");

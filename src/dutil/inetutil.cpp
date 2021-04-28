@@ -86,7 +86,8 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
     )
 {
     HRESULT hr = S_OK;
-    DWORD_PTR cbValue = 0;
+    SIZE_T cbOriginal = 0;
+    DWORD cbValue = 0;
     DWORD dwIndex = 0;
 
     // If nothing was provided start off with some arbitrary size.
@@ -96,10 +97,12 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
         InetExitOnFailure(hr, "Failed to allocate memory for value.");
     }
 
-    hr = StrSize(*psczValue, &cbValue);
+    hr = StrSize(*psczValue, &cbOriginal);
     InetExitOnFailure(hr, "Failed to get size of value.");
 
-    if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), reinterpret_cast<DWORD*>(&cbValue), &dwIndex))
+    cbValue = (DWORD)min(DWORD_MAX, cbOriginal);
+
+    if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), &cbValue, &dwIndex))
     {
         DWORD er = ::GetLastError();
         if (ERROR_INSUFFICIENT_BUFFER == er)
@@ -109,7 +112,7 @@ extern "C" HRESULT DAPI InternetQueryInfoString(
             hr = StrAlloc(psczValue, cbValue / sizeof(WCHAR));
             InetExitOnFailure(hr, "Failed to allocate value.");
 
-            if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), reinterpret_cast<DWORD*>(&cbValue), &dwIndex))
+            if (!::HttpQueryInfoW(hRequest, dwInfo, static_cast<void*>(*psczValue), &cbValue, &dwIndex))
             {
                 er = ::GetLastError();
             }

@@ -288,13 +288,16 @@ static HRESULT StringBlockChangeString(
 {
     HRESULT hr = S_OK;
     LPWSTR pwzData = NULL;
-    DWORD cchData = lstrlenW(szData);
+    size_t cchData = 0;
+
+    hr = ::StringCchLengthW(szData, STRSAFE_MAX_LENGTH, &cchData);
+    ReswExitOnRootFailure(hr, "Failed to get block string length.");
 
     pwzData = static_cast<LPWSTR>(MemAlloc((cchData + 1) * sizeof(WCHAR), TRUE));
     ReswExitOnNull(pwzData, hr, E_OUTOFMEMORY, "Failed to allocate new block string.");
 
     hr = ::StringCchCopyW(pwzData, cchData + 1, szData);
-    ReswExitOnFailure(hr, "Failed to copy new block string.");
+    ReswExitOnRootFailure(hr, "Failed to copy new block string.");
 
     ReleaseNullMem(pStrBlock->rgwz[dwStringId]);
 

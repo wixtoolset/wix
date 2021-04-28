@@ -178,6 +178,18 @@ DAPI_(HRESULT) PathConcat(
     );
 
 /*******************************************************************
+ PathConcatCch - like .NET's Path.Combine, lets you build up a path
+    one piece -- file or directory -- at a time.
+*******************************************************************/
+DAPI_(HRESULT) PathConcatCch(
+    __in_opt LPCWSTR wzPath1,
+    __in SIZE_T cchPath1,
+    __in_opt LPCWSTR wzPath2,
+    __in SIZE_T cchPath2,
+    __deref_out_z LPWSTR* psczCombined
+    );
+
+/*******************************************************************
  PathEnsureQuoted - ensures that a path is quoted; optionally,
      this function also terminates a directory with a backslash
      if it is not already.

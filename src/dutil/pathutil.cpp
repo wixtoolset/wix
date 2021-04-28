@@ -181,7 +181,7 @@ DAPI_(HRESULT) PathGetDirectory(
     )
 {
     HRESULT hr = S_OK;
-    DWORD cchDirectory = DWORD_MAX;
+    size_t cchDirectory = SIZE_T_MAX;
 
     for (LPCWSTR wz = wzPath; *wz; ++wz)
     {
@@ -191,11 +191,11 @@ DAPI_(HRESULT) PathGetDirectory(
         //     : => relative path from mapped root
         if (L'\\' == *wz || L'/' == *wz || (L':' == *wz && wz == wzPath + 1))
         {
-            cchDirectory = static_cast<DWORD>(wz - wzPath) + 1;
+            cchDirectory = static_cast<size_t>(wz - wzPath) + 1;
         }
     }
 
-    if (DWORD_MAX == cchDirectory)
+    if (SIZE_T_MAX == cchDirectory)
     {
         // we were given just a file name, so there's no directory available
         return S_FALSE;
@@ -233,7 +233,7 @@ DAPI_(HRESULT) PathGetParentPath(
 
     if (wzParent)
     {
-        DWORD cchPath = static_cast<DWORD>(wzParent - wzPath) + 1;
+        size_t cchPath = static_cast<size_t>(wzParent - wzPath) + 1;
 
         hr = StrAllocString(psczParent, wzPath, cchPath);
         PathExitOnFailure(hr, "Failed to copy directory.");
@@ -260,6 +260,7 @@ DAPI_(HRESULT) PathExpand(
     DWORD cch = 0;
     LPWSTR sczExpandedPath = NULL;
     DWORD cchExpandedPath = 0;
+    SIZE_T cbSize = 0;
 
     LPWSTR sczFullPath = NULL;
 
@@ -305,8 +306,10 @@ DAPI_(HRESULT) PathExpand(
             }
             PathExitOnFailure(hr, "Failed to prefix long path after expanding environment variables.");
 
-            hr = StrMaxLength(sczExpandedPath, reinterpret_cast<DWORD_PTR *>(&cchExpandedPath));
+            hr = StrMaxLength(sczExpandedPath, &cbSize);
             PathExitOnFailure(hr, "Failed to get max length of expanded path.");
+
+            cchExpandedPath = (DWORD)min(DWORD_MAX, cbSize);
         }
     }
 
@@ -317,7 +320,7 @@ DAPI_(HRESULT) PathExpand(
     {
         LPWSTR wzFileName = NULL;
         LPCWSTR wzPath = sczExpandedPath ? sczExpandedPath : wzRelativePath;
-        DWORD cchFullPath = PATH_GOOD_ENOUGH < cchExpandedPath ? cchExpandedPath : PATH_GOOD_ENOUGH;
+        DWORD cchFullPath = max(PATH_GOOD_ENOUGH, cchExpandedPath);
 
         hr = StrAlloc(&sczFullPath, cchFullPath);
         PathExitOnFailure(hr, "Failed to allocate space for full path.");
@@ -836,8 +839,7 @@ DAPI_(BOOL) PathIsAbsolute(
     __in_z LPCWSTR wzPath
     )
 {
-    DWORD dwLength = lstrlenW(wzPath);
-    return (1 < dwLength) && (wzPath[0] == L'\\') || (wzPath[1] == L':');
+    return wzPath && wzPath[0] && wzPath[1] && (wzPath[0] == L'\\') || (wzPath[1] == L':');
 }
 
 
@@ -847,27 +849,39 @@ DAPI_(HRESULT) PathConcat(
     __deref_out_z LPWSTR* psczCombined
     )
 {
+    return PathConcatCch(wzPath1, 0, wzPath2, 0, psczCombined);
+}
+
+
+DAPI_(HRESULT) PathConcatCch(
+    __in_opt LPCWSTR wzPath1,
+    __in SIZE_T cchPath1,
+    __in_opt LPCWSTR wzPath2,
+    __in SIZE_T cchPath2,
+    __deref_out_z LPWSTR* psczCombined
+    )
+{
     HRESULT hr = S_OK;
 
     if (!wzPath2 || !*wzPath2)
     {
-        hr = StrAllocString(psczCombined, wzPath1, 0);
+        hr = StrAllocString(psczCombined, wzPath1, cchPath1);
         PathExitOnFailure(hr, "Failed to copy just path1 to output.");
     }
     else if (!wzPath1 || !*wzPath1 || PathIsAbsolute(wzPath2))
     {
-        hr = StrAllocString(psczCombined, wzPath2, 0);
+        hr = StrAllocString(psczCombined, wzPath2, cchPath2);
         PathExitOnFailure(hr, "Failed to copy just path2 to output.");
     }
     else
     {
-        hr = StrAllocString(psczCombined, wzPath1, 0);
+        hr = StrAllocString(psczCombined, wzPath1, cchPath1);
         PathExitOnFailure(hr, "Failed to copy path1 to output.");
 
         hr = PathBackslashTerminate(psczCombined);
         PathExitOnFailure(hr, "Failed to backslashify.");
 
-        hr = StrAllocConcat(psczCombined, wzPath2, 0);
+        hr = StrAllocConcat(psczCombined, wzPath2, cchPath2);
         PathExitOnFailure(hr, "Failed to append path2 to output.");
     }
 
@@ -1001,15 +1015,25 @@ DAPI_(HRESULT) PathGetHierarchyArray(
     LPWSTR sczPathCopy = NULL;
     LPWSTR sczNewPathCopy = NULL;
     DWORD cArraySpacesNeeded = 0;
+    size_t cchPath = 0;
 
-    for (int i = 0; i < lstrlenW(wzPath); ++i)
+    hr = ::StringCchLengthW(wzPath, STRSAFE_MAX_LENGTH, &cchPath);
+    PathExitOnRootFailure(hr, "Failed to get string length of path: %ls", wzPath);
+
+    if (!cchPath)
+    {
+        ExitFunction1(hr = E_INVALIDARG);
+    }
+
+    for (size_t i = 0; i < cchPath; ++i)
     {
         if (wzPath[i] == L'\\')
         {
             ++cArraySpacesNeeded;
         }
     }
-    if (wzPath[lstrlenW(wzPath) - 1] != L'\\')
+
+    if (wzPath[cchPath - 1] != L'\\')
     {
         ++cArraySpacesNeeded;
     }
@@ -1034,10 +1058,12 @@ DAPI_(HRESULT) PathGetHierarchyArray(
         hr = StrAllocString((*prgsczPathArray) + cArraySpacesNeeded - 1 - i, sczPathCopy, 0);
         PathExitOnFailure(hr, "Failed to copy path");
 
+        DWORD cchPathCopy = lstrlenW(sczPathCopy);
+
         // If it ends in a backslash, it's a directory path, so cut off everything the last backslash before we get the directory portion of the path
-        if (wzPath[lstrlenW(sczPathCopy) - 1] == L'\\')
+        if (wzPath[cchPathCopy - 1] == L'\\')
         {
-            sczPathCopy[lstrlenW(sczPathCopy) - 1] = L'\0';
+            sczPathCopy[cchPathCopy - 1] = L'\0';
         }
         
         hr = PathGetDirectory(sczPathCopy, &sczNewPathCopy);

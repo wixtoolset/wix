@@ -74,7 +74,7 @@ void DAPI VerFreeVersion(
 *******************************************************************/
 HRESULT DAPI VerParseVersion(
     __in_z LPCWSTR wzVersion,
-    __in DWORD cchVersion,
+    __in SIZE_T cchVersion,
     __in BOOL fStrict,
     __out VERUTIL_VERSION** ppVersion
     );

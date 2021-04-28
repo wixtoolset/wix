@@ -388,7 +388,7 @@ static HRESULT ParseEnclosure(
                     if (dwDigestStringLength != cchDigestString)
                     {
                         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                        ApupExitOnRootFailure(hr, "Invalid digest length (%zu) for digest algorithm (%u).", cchDigestString, dwDigestStringLength);
+                        ApupExitOnRootFailure(hr, "Invalid digest length (%Iu) for digest algorithm (%u).", cchDigestString, dwDigestStringLength);
                     }
 
                     pEnclosure->cbDigest = sizeof(BYTE) * dwDigestLength;

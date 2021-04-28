@@ -127,9 +127,13 @@ extern "C" void DAPI Dutil_AssertMsg(
                 hAssertFile = ::CreateFileA(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
                 if (INVALID_HANDLE_VALUE != hAssertFile)
                 {
-                    ::SetFilePointer(hAssertFile, 0, 0, FILE_END);
-                    ::StringCchCatA(szMsg, countof(szMsg), "\r\n");
-                    ::WriteFile(hAssertFile, szMsg, lstrlenA(szMsg), &cch, NULL);
+                    if (INVALID_SET_FILE_POINTER != ::SetFilePointer(hAssertFile, 0, 0, FILE_END))
+                    {
+                        if (SUCCEEDED(::StringCchCatA(szMsg, countof(szMsg), "\r\n")))
+                        {
+                            ::WriteFile(hAssertFile, szMsg, lstrlenA(szMsg), &cch, NULL);
+                        }
+                    }
                 }
             }
         }

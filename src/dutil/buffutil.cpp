@@ -70,7 +70,7 @@ extern "C" HRESULT BuffReadNumber64(
     __in SIZE_T cbBuffer,
     __inout SIZE_T* piBuffer,
     __out DWORD64* pdw64
-)
+    )
 {
     Assert(pbBuffer);
     Assert(piBuffer);
@@ -98,11 +98,11 @@ LExit:
 }
 
 extern "C" HRESULT BuffReadPointer(
-    __in_bcount(cbBuffer) const BYTE * pbBuffer,
+    __in_bcount(cbBuffer) const BYTE* pbBuffer,
     __in SIZE_T cbBuffer,
     __inout SIZE_T* piBuffer,
     __out DWORD_PTR* pdw64
-)
+    )
 {
     Assert(pbBuffer);
     Assert(piBuffer);
@@ -141,8 +141,8 @@ extern "C" HRESULT BuffReadString(
     Assert(pscz);
 
     HRESULT hr = S_OK;
-    DWORD cch = 0;
-    DWORD cb = 0;
+    SIZE_T cch = 0;
+    SIZE_T cb = 0;
     SIZE_T cbAvailable = 0;
 
     // get availiable data size
@@ -150,19 +150,19 @@ extern "C" HRESULT BuffReadString(
     BuffExitOnRootFailure(hr, "Failed to calculate available data size for character count.");
 
     // verify buffer size
-    if (sizeof(DWORD) > cbAvailable)
+    if (sizeof(SIZE_T) > cbAvailable)
     {
         hr = E_INVALIDARG;
         BuffExitOnRootFailure(hr, "Buffer too small.");
     }
 
     // read character count
-    cch = *(const DWORD*)(pbBuffer + *piBuffer);
+    cch = *(const SIZE_T*)(pbBuffer + *piBuffer);
 
-    hr = ::DWordMult(cch, static_cast<DWORD>(sizeof(WCHAR)), &cb);
+    hr = ::SIZETMult(cch, sizeof(WCHAR), &cb);
     BuffExitOnRootFailure(hr, "Overflow while multiplying to calculate buffer size");
 
-    hr = ::SIZETAdd(*piBuffer, sizeof(DWORD), piBuffer);
+    hr = ::SIZETAdd(*piBuffer, sizeof(SIZE_T), piBuffer);
     BuffExitOnRootFailure(hr, "Overflow while adding to calculate buffer size");
 
     // get availiable data size
@@ -198,8 +198,8 @@ extern "C" HRESULT BuffReadStringAnsi(
     Assert(pscz);
 
     HRESULT hr = S_OK;
-    DWORD cch = 0;
-    DWORD cb = 0;
+    SIZE_T cch = 0;
+    SIZE_T cb = 0;
     SIZE_T cbAvailable = 0;
 
     // get availiable data size
@@ -207,19 +207,19 @@ extern "C" HRESULT BuffReadStringAnsi(
     BuffExitOnRootFailure(hr, "Failed to calculate available data size for character count.");
 
     // verify buffer size
-    if (sizeof(DWORD) > cbAvailable)
+    if (sizeof(SIZE_T) > cbAvailable)
     {
         hr = E_INVALIDARG;
         BuffExitOnRootFailure(hr, "Buffer too small.");
     }
 
     // read character count
-    cch = *(const DWORD*)(pbBuffer + *piBuffer);
+    cch = *(const SIZE_T*)(pbBuffer + *piBuffer);
 
-    hr = ::DWordMult(cch, static_cast<DWORD>(sizeof(CHAR)), &cb);
+    hr = ::SIZETMult(cch, sizeof(CHAR), &cb);
     BuffExitOnRootFailure(hr, "Overflow while multiplying to calculate buffer size");
 
-    hr = ::SIZETAdd(*piBuffer, sizeof(DWORD), piBuffer);
+    hr = ::SIZETAdd(*piBuffer, sizeof(SIZE_T), piBuffer);
     BuffExitOnRootFailure(hr, "Overflow while adding to calculate buffer size");
 
     // get availiable data size
@@ -257,23 +257,24 @@ extern "C" HRESULT BuffReadStream(
     Assert(pcbStream);
 
     HRESULT hr = S_OK;
-    DWORD64 cb = 0;
+    SIZE_T cb = 0;
     SIZE_T cbAvailable = 0;
+    errno_t err = 0;
 
     // get availiable data size
     hr = ::SIZETSub(cbBuffer, *piBuffer, &cbAvailable);
     BuffExitOnRootFailure(hr, "Failed to calculate available data size for stream size.");
 
     // verify buffer size
-    if (sizeof(DWORD64) > cbAvailable)
+    if (sizeof(SIZE_T) > cbAvailable)
     {
         hr = E_INVALIDARG;
         BuffExitOnRootFailure(hr, "Buffer too small.");
     }
 
     // read stream size
-    cb = *(const DWORD64*)(pbBuffer + *piBuffer);
-    *piBuffer += sizeof(DWORD64);
+    cb = *(const SIZE_T*)(pbBuffer + *piBuffer);
+    *piBuffer += sizeof(SIZE_T);
 
     // get availiable data size
     hr = ::SIZETSub(cbBuffer, *piBuffer, &cbAvailable);
@@ -287,15 +288,20 @@ extern "C" HRESULT BuffReadStream(
     }
 
     // allocate buffer
-    *ppbStream = (BYTE*)MemAlloc((SIZE_T)cb, TRUE);
+    *ppbStream = (BYTE*)MemAlloc(cb, TRUE);
     BuffExitOnNull(*ppbStream, hr, E_OUTOFMEMORY, "Failed to allocate stream.");
 
     // read stream data
-    memcpy_s(*ppbStream, cbBuffer - *piBuffer, pbBuffer + *piBuffer, (SIZE_T)cb);
-    *piBuffer += (SIZE_T)cb;
+    err = memcpy_s(*ppbStream, cbBuffer - *piBuffer, pbBuffer + *piBuffer, cb);
+    if (err)
+    {
+        BuffExitOnRootFailure(hr = E_INVALIDARG, "Failed to read stream from buffer, error: %d", err);
+    }
+
+    *piBuffer += cb;
 
     // return stream size
-    *pcbStream = (SIZE_T)cb;
+    *pcbStream = cb;
 
 LExit:
     return hr;
@@ -304,7 +310,7 @@ LExit:
 extern "C" HRESULT BuffWriteNumber(
     __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
-    __in DWORD_PTR dw
+    __in DWORD dw
     )
 {
     Assert(ppbBuffer);
@@ -317,7 +323,7 @@ extern "C" HRESULT BuffWriteNumber(
     BuffExitOnFailure(hr, "Failed to ensure buffer size.");
 
     // copy data to buffer
-    *(DWORD_PTR*)(*ppbBuffer + *piBuffer) = dw;
+    *(DWORD*)(*ppbBuffer + *piBuffer) = dw;
     *piBuffer += sizeof(DWORD);
 
 LExit:
@@ -351,7 +357,7 @@ extern "C" HRESULT BuffWritePointer(
     __deref_inout_bcount(*piBuffer) BYTE** ppbBuffer,
     __inout SIZE_T* piBuffer,
     __in DWORD_PTR dw
-)
+    )
 {
     Assert(ppbBuffer);
     Assert(piBuffer);
@@ -380,19 +386,33 @@ extern "C" HRESULT BuffWriteString(
     Assert(piBuffer);
 
     HRESULT hr = S_OK;
-    DWORD cch = (DWORD)lstrlenW(scz);
-    SIZE_T cb = cch * sizeof(WCHAR);
+    SIZE_T cch = 0;
+    SIZE_T cb = 0;
+    errno_t err = 0;
+
+    if (scz)
+    {
+        hr = ::StringCchLengthW(scz, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cch));
+        BuffExitOnRootFailure(hr, "Failed to get string size.")
+    }
+
+    cb = cch * sizeof(WCHAR);
 
     // make sure we have a buffer with sufficient space
-    hr = EnsureBufferSize(ppbBuffer, *piBuffer + (sizeof(DWORD) + cb));
+    hr = EnsureBufferSize(ppbBuffer, *piBuffer + (sizeof(SIZE_T) + cb));
     BuffExitOnFailure(hr, "Failed to ensure buffer size.");
 
     // copy character count to buffer
-    *(DWORD*)(*ppbBuffer + *piBuffer) = cch;
-    *piBuffer += sizeof(DWORD);
+    *(SIZE_T*)(*ppbBuffer + *piBuffer) = cch;
+    *piBuffer += sizeof(SIZE_T);
 
     // copy data to buffer
-    memcpy_s(*ppbBuffer + *piBuffer, cb, scz, cb);
+    err = memcpy_s(*ppbBuffer + *piBuffer, cb, scz, cb);
+    if (err)
+    {
+        BuffExitOnRootFailure(hr = E_INVALIDARG, "Failed to write string to buffer: '%ls', error: %d", scz, err);
+    }
+
     *piBuffer += cb;
 
 LExit:
@@ -409,19 +429,33 @@ extern "C" HRESULT BuffWriteStringAnsi(
     Assert(piBuffer);
 
     HRESULT hr = S_OK;
-    DWORD cch = (DWORD)lstrlenA(scz);
-    SIZE_T cb = cch * sizeof(CHAR);
+    SIZE_T cch = 0;
+    SIZE_T cb = 0;
+    errno_t err = 0;
+
+    if (scz)
+    {
+        hr = ::StringCchLengthA(scz, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cch));
+        BuffExitOnRootFailure(hr, "Failed to get string size.")
+    }
+
+    cb = cch * sizeof(CHAR);
 
     // make sure we have a buffer with sufficient space
-    hr = EnsureBufferSize(ppbBuffer, *piBuffer + (sizeof(DWORD) + cb));
+    hr = EnsureBufferSize(ppbBuffer, *piBuffer + (sizeof(SIZE_T) + cb));
     BuffExitOnFailure(hr, "Failed to ensure buffer size.");
 
     // copy character count to buffer
-    *(DWORD*)(*ppbBuffer + *piBuffer) = cch;
-    *piBuffer += sizeof(DWORD);
+    *(SIZE_T*)(*ppbBuffer + *piBuffer) = cch;
+    *piBuffer += sizeof(SIZE_T);
 
     // copy data to buffer
-    memcpy_s(*ppbBuffer + *piBuffer, cb, scz, cb);
+    err = memcpy_s(*ppbBuffer + *piBuffer, cb, scz, cb);
+    if (err)
+    {
+        BuffExitOnRootFailure(hr = E_INVALIDARG, "Failed to write string to buffer: '%hs', error: %d", scz, err);
+    }
+
     *piBuffer += cb;
 
 LExit:
@@ -440,18 +474,24 @@ extern "C" HRESULT BuffWriteStream(
     Assert(pbStream);
 
     HRESULT hr = S_OK;
-    DWORD64 cb = cbStream;
+    SIZE_T cb = cbStream;
+    errno_t err = 0;
 
     // make sure we have a buffer with sufficient space
-    hr = EnsureBufferSize(ppbBuffer, *piBuffer + cbStream + sizeof(DWORD64));
+    hr = EnsureBufferSize(ppbBuffer, *piBuffer + cbStream + sizeof(SIZE_T));
     BuffExitOnFailure(hr, "Failed to ensure buffer size.");
 
     // copy byte count to buffer
-    *(DWORD64*)(*ppbBuffer + *piBuffer) = cb;
-    *piBuffer += sizeof(DWORD64);
+    *(SIZE_T*)(*ppbBuffer + *piBuffer) = cb;
+    *piBuffer += sizeof(SIZE_T);
 
     // copy data to buffer
-    memcpy_s(*ppbBuffer + *piBuffer, cbStream, pbStream, cbStream);
+    err = memcpy_s(*ppbBuffer + *piBuffer, cbStream, pbStream, cbStream);
+    if (err)
+    {
+        BuffExitOnRootFailure(hr = E_INVALIDARG, "Failed to write stream to buffer, error: %d", err);
+    }
+
     *piBuffer += cbStream;
 
 LExit:
