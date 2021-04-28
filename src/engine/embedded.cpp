@@ -22,14 +22,14 @@ static HRESULT OnEmbeddedErrorMessage(
     __in PFN_GENERICMESSAGEHANDLER pfnMessageHandler,
     __in LPVOID pvContext,
     __in_bcount(cbData) BYTE* pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out DWORD* pdwResult
     );
 static HRESULT OnEmbeddedProgress(
     __in PFN_GENERICMESSAGEHANDLER pfnMessageHandler,
     __in LPVOID pvContext,
     __in_bcount(cbData) BYTE* pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out DWORD* pdwResult
     );
 
@@ -142,7 +142,7 @@ static HRESULT OnEmbeddedErrorMessage(
     __in PFN_GENERICMESSAGEHANDLER pfnMessageHandler,
     __in LPVOID pvContext,
     __in_bcount(cbData) BYTE* pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out DWORD* pdwResult
     )
 {
@@ -176,7 +176,7 @@ static HRESULT OnEmbeddedProgress(
     __in PFN_GENERICMESSAGEHANDLER pfnMessageHandler,
     __in LPVOID pvContext,
     __in_bcount(cbData) BYTE* pbData,
-    __in DWORD cbData,
+    __in SIZE_T cbData,
     __out DWORD* pdwResult
     )
 {

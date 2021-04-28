@@ -157,7 +157,7 @@ static HRESULT OnApplyInitialize(
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnApplyUninitialize(
     __in HANDLE* phLock
@@ -166,39 +166,39 @@ static HRESULT OnSessionBegin(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnSessionResume(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnSaveState(
     __in BURN_REGISTRATION* pRegistration,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnCacheCompletePayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnCacheVerifyPayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static void OnCacheCleanup(
     __in_z LPCWSTR wzBundleId
@@ -206,7 +206,7 @@ static void OnCacheCleanup(
 static HRESULT OnProcessDependentRegistration(
     __in const BURN_REGISTRATION* pRegistration,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecuteExePackage(
     __in HANDLE hPipe,
@@ -214,40 +214,40 @@ static HRESULT OnExecuteExePackage(
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecuteMsiPackage(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecuteMspPackage(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecuteMsuPackage(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecutePackageProviderAction(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnExecutePackageDependencyAction(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT CALLBACK BurnCacheMessageHandler(
     __in BURN_CACHE_MESSAGE* pMessage,
@@ -275,29 +275,29 @@ static int MsiExecuteMessageHandler(
 static HRESULT OnCleanPackage(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnLaunchApprovedExe(
     __in HANDLE hPipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnMsiBeginTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnMsiCommitTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT OnMsiRollbackTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     );
 static HRESULT ElevatedOnPauseAUBegin(
     __in HANDLE hPipe
@@ -603,7 +603,7 @@ HRESULT ElevationSaveState(
     DWORD dwResult = 0;
 
     // send message
-    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE, pbBuffer, (DWORD)cbBuffer, NULL, NULL, &dwResult);
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE, pbBuffer, cbBuffer, NULL, NULL, &dwResult);
     ExitOnFailure(hr, "Failed to send message to per-machine process.");
 
     hr = (HRESULT)dwResult;
@@ -858,6 +858,8 @@ extern "C" HRESULT ElevationMsiCommitTransaction(
     hr = static_cast<HRESULT>(dwResult);
 
 LExit:
+    ReleaseBuffer(pbData);
+
     return hr;
 }
 
@@ -884,6 +886,8 @@ extern "C" HRESULT ElevationMsiRollbackTransaction(
     hr = static_cast<HRESULT>(dwResult);
 
 LExit:
+    ReleaseBuffer(pbData);
+
     return hr;
 }
 
@@ -1612,7 +1616,7 @@ static HRESULT ProcessMsiPackageMessages(
         message.rgwzData = (LPCWSTR*)rgwzMsiData;
     }
 
-    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, (DWORD*)&message.dwAllowedResults);
+    hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &message.dwAllowedResults);
     ExitOnFailure(hr, "Failed to read UI flags.");
 
     // Process the rest of the message.
@@ -1907,7 +1911,7 @@ static HRESULT OnApplyInitialize(
     __in HANDLE* phLock,
     __in BOOL* pfDisabledWindowsUpdate,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2031,7 +2035,7 @@ static HRESULT OnSessionBegin(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2077,7 +2081,7 @@ static HRESULT OnSessionResume(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2106,7 +2110,7 @@ static HRESULT OnSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2136,7 +2140,7 @@ LExit:
 static HRESULT OnSaveState(
     __in BURN_REGISTRATION* pRegistration,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2154,7 +2158,7 @@ static HRESULT OnCacheCompletePayload(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2213,7 +2217,7 @@ static HRESULT OnCacheVerifyPayload(
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2273,7 +2277,7 @@ static void OnCacheCleanup(
 static HRESULT OnProcessDependentRegistration(
     __in const BURN_REGISTRATION* pRegistration,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2309,7 +2313,7 @@ static HRESULT OnExecuteExePackage(
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2393,7 +2397,7 @@ static HRESULT OnExecuteMsiPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2490,7 +2494,7 @@ static HRESULT OnExecuteMspPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2585,7 +2589,7 @@ static HRESULT OnExecuteMsuPackage(
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2644,7 +2648,7 @@ static HRESULT OnExecutePackageProviderAction(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2684,7 +2688,7 @@ static HRESULT OnExecutePackageDependencyAction(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2953,7 +2957,7 @@ LExit:
 static HRESULT OnCleanPackage(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -2982,7 +2986,7 @@ static HRESULT OnLaunchApprovedExe(
     __in BURN_APPROVED_EXES* pApprovedExes,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -3051,7 +3055,7 @@ LExit:
 static HRESULT OnMsiBeginTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -3067,7 +3071,7 @@ static HRESULT OnMsiBeginTransaction(
     hr = BuffReadString(pbData, cbData, &iData, &sczLogPath);
     ExitOnFailure(hr, "Failed to read transaction log path.");
 
-    PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
+    hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
     pRollbackBoundary->sczLogPath = sczLogPath;
@@ -3089,7 +3093,7 @@ LExit:
 static HRESULT OnMsiCommitTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -3105,7 +3109,7 @@ static HRESULT OnMsiCommitTransaction(
     hr = BuffReadString(pbData, cbData, &iData, &sczLogPath);
     ExitOnFailure(hr, "Failed to read transaction log path.");
 
-    PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
+    hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
     pRollbackBoundary->sczLogPath = sczLogPath;
@@ -3127,7 +3131,7 @@ LExit:
 static HRESULT OnMsiRollbackTransaction(
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
-    __in DWORD cbData
+    __in SIZE_T cbData
     )
 {
     HRESULT hr = S_OK;
@@ -3143,7 +3147,7 @@ static HRESULT OnMsiRollbackTransaction(
     hr = BuffReadString(pbData, cbData, &iData, &sczLogPath);
     ExitOnFailure(hr, "Failed to read transaction log path.");
 
-    PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
+    hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
     pRollbackBoundary->sczLogPath = sczLogPath;

@@ -1106,7 +1106,7 @@ static HRESULT FormatString(
     ::EnterCriticalSection(&pVariables->csAccess);
 
     // allocate buffer for format string
-    hr = ::StringCchLengthW(wzIn, STRSAFE_MAX_CCH - 1, &cchIn);
+    hr = ::StringCchLengthW(wzIn, STRSAFE_MAX_LENGTH, &cchIn);
     ExitOnFailure(hr, "Failed to length of format string.");
 
     hr = StrAlloc(&sczFormat, cchIn + 1);

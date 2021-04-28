@@ -324,6 +324,7 @@ static HRESULT InitializeEngineState(
     LPCWSTR wzParam = NULL;
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
+    DWORD64 qw = 0;
 
     pEngineState->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     pEngineState->dwElevatedLoggingTlsId = TLS_OUT_OF_INDEXES;
@@ -343,8 +344,10 @@ static HRESULT InitializeEngineState(
                     ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
                 }
 
-                hr = StrStringToUInt32(wzParam, 0, reinterpret_cast<UINT*>(&hSourceEngineFile));
+                hr = StrStringToUInt64(wzParam, 0, &qw);
                 ExitOnFailure(hr, "Failed to parse file handle: '%ls'", (wzParam));
+
+                hSourceEngineFile = (HANDLE)qw;
             }
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &pEngineState->argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)))
             {
@@ -354,8 +357,10 @@ static HRESULT InitializeEngineState(
                     ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
                 }
 
-                hr = StrStringToUInt32(wzParam, 0, reinterpret_cast<UINT*>(&hSectionFile));
+                hr = StrStringToUInt64(wzParam, 0, &qw);
                 ExitOnFailure(hr, "Failed to parse file handle: '%ls'", (wzParam));
+
+                hSectionFile = (HANDLE)qw;
             }
         }
     }

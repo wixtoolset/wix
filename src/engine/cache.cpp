@@ -1119,7 +1119,7 @@ extern "C" void CacheCleanup(
     LPWSTR sczDelete = NULL;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATAW wfd = { };
-    DWORD cFileName = 0;
+    size_t cchFileName = 0;
 
     hr = CacheGetCompletedPath(fPerMachine, UNVERIFIED_CACHE_FOLDER_NAME, &sczFolder);
     if (SUCCEEDED(hr))
@@ -1146,17 +1146,15 @@ extern "C" void CacheCleanup(
                             continue;
                         }
 
-                        // For extra safety and to silence OACR.
-                        wfd.cFileName[MAX_PATH - 1] = L'\0';
-
                         // Skip resume files (they end with ".R").
-                        cFileName = lstrlenW(wfd.cFileName);
-                        if (2 < cFileName && L'.' == wfd.cFileName[cFileName - 2] && (L'R' == wfd.cFileName[cFileName - 1] || L'r' == wfd.cFileName[cFileName - 1]))
+                        hr = ::StringCchLengthW(wfd.cFileName, MAX_PATH, &cchFileName);
+                        if (FAILED(hr) ||
+                            2 < cchFileName && L'.' == wfd.cFileName[cchFileName - 2] && (L'R' == wfd.cFileName[cchFileName - 1] || L'r' == wfd.cFileName[cchFileName - 1]))
                         {
                             continue;
                         }
 
-                        hr = PathConcat(sczFolder, wfd.cFileName, &sczDelete);
+                        hr = PathConcatCch(sczFolder, 0, wfd.cFileName, cchFileName, &sczDelete);
                         if (SUCCEEDED(hr))
                         {
                             hr = FileEnsureDelete(sczDelete);

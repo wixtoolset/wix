@@ -1050,7 +1050,7 @@ extern "C" HRESULT CoreAppendFileHandleAttachedToCommandLine(
         ExitWithLastError(hr, "Failed to duplicate file handle for attached container.");
     }
 
-    hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%u", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, hExecutableFile);
+    hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, reinterpret_cast<size_t>(hExecutableFile));
     ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
     *phExecutableFile = hExecutableFile;
@@ -1078,12 +1078,12 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
     hExecutableFile = ::CreateFileW(wzExecutablePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, &securityAttributes, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE != hExecutableFile)
     {
-        hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%u", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, hExecutableFile);
+        hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
         ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
         if (psczObfuscatedCommandLine)
         {
-            hr = StrAllocFormatted(psczObfuscatedCommandLine, L"%ls -%ls=%u", *psczObfuscatedCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, hExecutableFile);
+            hr = StrAllocFormatted(psczObfuscatedCommandLine, L"%ls -%ls=%Iu", *psczObfuscatedCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
             ExitOnFailure(hr, "Failed to append the file handle to the obfuscated command line.");
         }
 
@@ -1499,8 +1499,7 @@ static HRESULT ParseCommandLine(
             {
                 // Already processed in InitializeEngineState.
             }
-            else if (lstrlenW(&argv[i][1]) >= lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX) &&
-                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), BURN_COMMANDLINE_SWITCH_PREFIX, lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX)))
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), BURN_COMMANDLINE_SWITCH_PREFIX, lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX)))
             {
                 // Skip (but log) any other private burn switches we don't recognize, so that
                 // adding future private variables doesn't break old bundles

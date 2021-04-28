@@ -717,10 +717,10 @@ static HRESULT GetNonSessionSpecificTempFolder(
 {
     HRESULT hr = S_OK;
     WCHAR wzTempFolder[MAX_PATH] = { };
-    DWORD cchTempFolder = 0;
+    SIZE_T cchTempFolder = 0;
     DWORD dwSessionId = 0;
     LPWSTR sczSessionId = 0;
-    DWORD cchSessionId = 0;
+    SIZE_T cchSessionId = 0;
 
     if (!::GetTempPathW(countof(wzTempFolder), wzTempFolder))
     {
@@ -740,7 +740,7 @@ static HRESULT GetNonSessionSpecificTempFolder(
         hr = ::StringCchLengthW(sczSessionId, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchSessionId));
         ExitOnFailure(hr, "Failed to get length of session id string.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzTempFolder + cchTempFolder - cchSessionId, cchSessionId, sczSessionId, cchSessionId))
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzTempFolder + cchTempFolder - cchSessionId, static_cast<DWORD>(cchSessionId), sczSessionId, static_cast<DWORD>(cchSessionId)))
         {
             cchTempFolder -= cchSessionId;
         }

@@ -27,7 +27,7 @@ typedef enum _BURN_PIPE_MESSAGE_TYPE : DWORD
 typedef struct _BURN_PIPE_MESSAGE
 {
     DWORD dwMessage;
-    DWORD cbData;
+    SIZE_T cbData;
 
     BOOL fAllocatedData;
     LPVOID pvData;

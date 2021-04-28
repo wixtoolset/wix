@@ -448,7 +448,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
 
     // build command
-    if (0 < lstrlenW(sczArguments))
+    if (*sczArguments)
     {
         hr = VariableFormatString(pVariables, sczArguments, &sczArgumentsFormatted, NULL);
         ExitOnFailure(hr, "Failed to format argument string.");

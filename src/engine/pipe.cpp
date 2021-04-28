@@ -429,7 +429,6 @@ extern "C" HRESULT PipeWaitForChildConnect(
     DWORD cbSecret = lstrlenW(wzSecret) * sizeof(WCHAR);
     DWORD dwCurrentProcessId = ::GetCurrentProcessId();
     DWORD dwAck = 0;
-    DWORD cb = 0;
 
     for (DWORD i = 0; i < countof(hPipes) && INVALID_HANDLE_VALUE != hPipes[i]; ++i)
     {
@@ -487,26 +486,18 @@ extern "C" HRESULT PipeWaitForChildConnect(
         }
 
         // Prove we are the one that created the elevated process by passing the secret.
-        if (!::WriteFile(hPipe, &cbSecret, sizeof(cbSecret), &cb, NULL))
-        {
-            ExitWithLastError(hr, "Failed to write secret length to pipe.");
-        }
+        hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&cbSecret), sizeof(cbSecret));
+        ExitOnFailure(hr, "Failed to write secret length to pipe.");
 
-        if (!::WriteFile(hPipe, wzSecret, cbSecret, &cb, NULL))
-        {
-            ExitWithLastError(hr, "Failed to write secret to pipe.");
-        }
+        hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(wzSecret), cbSecret);
+        ExitOnFailure(hr, "Failed to write secret to pipe.");
 
-        if (!::WriteFile(hPipe, &dwCurrentProcessId, sizeof(dwCurrentProcessId), &cb, NULL))
-        {
-            ExitWithLastError(hr, "Failed to write our process id to pipe.");
-        }
+        hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&dwCurrentProcessId), sizeof(dwCurrentProcessId));
+        ExitOnFailure(hr, "Failed to write our process id to pipe.");
 
         // Wait until the elevated process responds that it is ready to go.
-        if (!::ReadFile(hPipe, &dwAck, sizeof(dwAck), &cb, NULL))
-        {
-            ExitWithLastError(hr, "Failed to read ACK from pipe.");
-        }
+        hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(&dwAck), sizeof(dwAck));
+        ExitOnFailure(hr, "Failed to read ACK from pipe.");
 
         // The ACK should match out expected child process id.
         //if (pConnection->dwProcessId != dwAck)
@@ -724,17 +715,8 @@ static HRESULT WritePipeMessage(
     ExitOnFailure(hr, "Failed to allocate message to write.");
 
     // Write the message.
-    DWORD cbWrote = 0;
-    SIZE_T cbTotalWritten = 0;
-    while (cbTotalWritten < cb)
-    {
-        if (!::WriteFile(hPipe, pv, (DWORD)(cb - cbTotalWritten), &cbWrote, NULL))
-        {
-            ExitWithLastError(hr, "Failed to write message type to pipe.");
-        }
-
-        cbTotalWritten += cbWrote;
-    }
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(pv), cb);
+    ExitOnFailure(hr, "Failed to write message type to pipe.");
 
 LExit:
     ReleaseMem(pv);
@@ -747,46 +729,25 @@ static HRESULT GetPipeMessage(
     )
 {
     HRESULT hr = S_OK;
-    DWORD rgdwMessageAndByteCount[2] = { };
-    DWORD cb = 0;
-    DWORD cbRead = 0;
+    BYTE pbMessageAndByteCount[sizeof(DWORD) + sizeof(SIZE_T)] = { };
 
-    while (cbRead < sizeof(rgdwMessageAndByteCount))
+    hr = FileReadHandle(hPipe, pbMessageAndByteCount, sizeof(pbMessageAndByteCount));
+    if (HRESULT_FROM_WIN32(ERROR_BROKEN_PIPE) == hr)
     {
-        if (!::ReadFile(hPipe, reinterpret_cast<BYTE*>(rgdwMessageAndByteCount) + cbRead, sizeof(rgdwMessageAndByteCount) - cbRead, &cb, NULL))
-        {
-            DWORD er = ::GetLastError();
-            if (ERROR_MORE_DATA == er)
-            {
-                hr = S_OK;
-            }
-            else if (ERROR_BROKEN_PIPE == er) // parent process shut down, time to exit.
-            {
-                memset(rgdwMessageAndByteCount, 0, sizeof(rgdwMessageAndByteCount));
-                hr = S_FALSE;
-                break;
-            }
-            else
-            {
-                hr = HRESULT_FROM_WIN32(er);
-            }
-            ExitOnRootFailure(hr, "Failed to read message from pipe.");
-        }
-
-        cbRead += cb;
+        memset(pbMessageAndByteCount, 0, sizeof(pbMessageAndByteCount));
+        hr = S_FALSE;
     }
+    ExitOnFailure(hr, "Failed to read message from pipe.");
 
-    pMsg->dwMessage = rgdwMessageAndByteCount[0];
-    pMsg->cbData = rgdwMessageAndByteCount[1];
+    pMsg->dwMessage = *(DWORD*)(pbMessageAndByteCount);
+    pMsg->cbData = *(SIZE_T*)(pbMessageAndByteCount + sizeof(DWORD));
     if (pMsg->cbData)
     {
         pMsg->pvData = MemAlloc(pMsg->cbData, FALSE);
         ExitOnNull(pMsg->pvData, hr, E_OUTOFMEMORY, "Failed to allocate data for message.");
 
-        if (!::ReadFile(hPipe, pMsg->pvData, pMsg->cbData, &cb, NULL))
-        {
-            ExitWithLastError(hr, "Failed to read data for message.");
-        }
+        hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(pMsg->pvData), pMsg->cbData);
+        ExitOnFailure(hr, "Failed to read data for message.");
 
         pMsg->fAllocatedData = TRUE;
     }
@@ -810,15 +771,11 @@ static HRESULT ChildPipeConnected(
     LPWSTR sczVerificationSecret = NULL;
     DWORD cbVerificationSecret = 0;
     DWORD dwVerificationProcessId = 0;
-    DWORD dwRead = 0;
     DWORD dwAck = ::GetCurrentProcessId(); // send our process id as the ACK.
-    DWORD cb = 0;
 
     // Read the verification secret.
-    if (!::ReadFile(hPipe, &cbVerificationSecret, sizeof(cbVerificationSecret), &dwRead, NULL))
-    {
-        ExitWithLastError(hr, "Failed to read size of verification secret from parent pipe.");
-    }
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(&cbVerificationSecret), sizeof(cbVerificationSecret));
+    ExitOnFailure(hr, "Failed to read size of verification secret from parent pipe.");
 
     if (255 < cbVerificationSecret / sizeof(WCHAR))
     {
@@ -829,10 +786,8 @@ static HRESULT ChildPipeConnected(
     hr = StrAlloc(&sczVerificationSecret, cbVerificationSecret / sizeof(WCHAR) + 1);
     ExitOnFailure(hr, "Failed to allocate buffer for verification secret.");
 
-    if (!::ReadFile(hPipe, sczVerificationSecret, cbVerificationSecret, &dwRead, NULL))
-    {
-        ExitWithLastError(hr, "Failed to read verification secret from parent pipe.");
-    }
+    FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(sczVerificationSecret), cbVerificationSecret);
+    ExitOnFailure(hr, "Failed to read verification secret from parent pipe.");
 
     // Verify the secrets match.
     if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, 0, sczVerificationSecret, -1, wzSecret, -1))
@@ -842,10 +797,8 @@ static HRESULT ChildPipeConnected(
     }
 
     // Read the verification process id.
-    if (!::ReadFile(hPipe, &dwVerificationProcessId, sizeof(dwVerificationProcessId), &dwRead, NULL))
-    {
-        ExitWithLastError(hr, "Failed to read verification process id from parent pipe.");
-    }
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(&dwVerificationProcessId), sizeof(dwVerificationProcessId));
+    ExitOnFailure(hr, "Failed to read verification process id from parent pipe.");
 
     // If a process id was not provided, we'll trust the process id from the parent.
     if (*pdwProcessId == 0)
@@ -859,10 +812,8 @@ static HRESULT ChildPipeConnected(
     }
 
     // All is well, tell the parent process.
-    if (!::WriteFile(hPipe, &dwAck, sizeof(dwAck), &cb, NULL))
-    {
-        ExitWithLastError(hr, "Failed to inform parent process that child is running.");
-    }
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&dwAck), sizeof(dwAck));
+    ExitOnFailure(hr, "Failed to inform parent process that child is running.");
 
 LExit:
     ReleaseStr(sczVerificationSecret);

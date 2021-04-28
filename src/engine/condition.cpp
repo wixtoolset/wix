@@ -513,6 +513,7 @@ static HRESULT NextSymbol(
 {
     HRESULT hr = S_OK;
     WORD charType = 0;
+    ptrdiff_t cchPosition = 0;
     DWORD iPosition = 0;
     DWORD n = 0;
 
@@ -530,7 +531,13 @@ static HRESULT NextSymbol(
         }
         ++pContext->wzRead;
     }
-    iPosition = (DWORD)(pContext->wzRead - pContext->wzCondition);
+
+    cchPosition = pContext->wzRead - pContext->wzCondition;
+    if (DWORD_MAX < cchPosition || 0 > cchPosition)
+    {
+        ExitOnFailure(hr = E_INVALIDARG, "Symbol was too long: %ls", pContext->wzCondition);
+    }
+    iPosition = (DWORD)cchPosition;
 
     // read depending on first character type
     switch (pContext->wzRead[0])
@@ -922,8 +929,19 @@ static HRESULT CompareStringValues(
 {
     HRESULT hr = S_OK;
     DWORD dwCompareString = (comparison & INSENSITIVE) ? NORM_IGNORECASE : 0;
-    int cchLeft = lstrlenW(wzLeftOperand);
-    int cchRight = lstrlenW(wzRightOperand);
+    size_t cchLeftSize = 0;
+    size_t cchRightSize = 0;
+    int cchLeft = 0;
+    int cchRight = 0;
+
+    hr = ::StringCchLengthW(wzLeftOperand, STRSAFE_MAX_CCH, &cchLeftSize);
+    ExitOnRootFailure(hr, "Failed to get length of left string: %ls", wzLeftOperand);
+
+    hr = ::StringCchLengthW(wzRightOperand, STRSAFE_MAX_CCH, &cchRightSize);
+    ExitOnRootFailure(hr, "Failed to get length of right string: %ls", wzRightOperand);
+
+    cchLeft = static_cast<int>(cchLeftSize);
+    cchRight = static_cast<int>(cchRightSize);
 
     switch (comparison)
     {
