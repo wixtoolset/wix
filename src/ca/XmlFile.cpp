@@ -854,7 +854,6 @@ extern "C" UINT __stdcall ExecXmlFileRollback(
     LPWSTR pwzFileName = NULL;
     LPBYTE pbData = NULL;
     DWORD_PTR cbData = 0;
-    DWORD cbDataWritten = 0;
 
     FILETIME ft;
 
@@ -913,10 +912,8 @@ extern "C" UINT __stdcall ExecXmlFileRollback(
     ExitOnInvalidHandleWithLastError(hFile, hr, "failed to open file: %ls", pwzFileName);
 
     // Write out the old data
-    if (!::WriteFile(hFile, pbData, (DWORD)cbData, &cbDataWritten, NULL))
-        ExitOnLastError(hr, "failed to write to file: %ls", pwzFileName);
-
-    Assert(cbData == cbDataWritten);
+    hr = FileWriteHandle(hFile, pbData, cbData);
+    ExitOnFailure(hr, "failed to write to file: %ls", pwzFileName);
 
     ReleaseFile(hFile);
 

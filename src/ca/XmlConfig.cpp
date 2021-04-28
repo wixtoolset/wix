@@ -171,7 +171,7 @@ static HRESULT ReadXmlConfigTable(
         ExitOnFailure(hr, "failed to get component name for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
         // Get the component's state
-        if (0 < lstrlenW(pwzData))
+        if (pwzData && *pwzData)
         {
             hr = StringCchCopyW((*ppxfcTail)->wzComponent, countof((*ppxfcTail)->wzComponent), pwzData);
             ExitOnFailure(hr, "failed to copy component id");
@@ -1041,7 +1041,6 @@ extern "C" UINT __stdcall ExecXmlConfigRollback(
     LPWSTR pwzFileName = NULL;
     LPBYTE pbData = NULL;
     DWORD_PTR cbData = 0;
-    DWORD cbDataWritten = 0;
 
     FILETIME ft;
 
@@ -1099,12 +1098,8 @@ extern "C" UINT __stdcall ExecXmlConfigRollback(
     ExitOnInvalidHandleWithLastError(hFile, hr, "failed to open file: %ls", pwzFileName);
 
     // Write out the old data
-    if (!::WriteFile(hFile, pbData, (DWORD)cbData, &cbDataWritten, NULL))
-    {
-        ExitOnLastError(hr, "failed to write to file: %ls", pwzFileName);
-    }
-
-    Assert(cbData == cbDataWritten);
+    hr = FileWriteHandle(hFile, pbData, cbData);
+    ExitOnFailure(hr, "failed to write to file: %ls", pwzFileName);
 
     ReleaseFile(hFile);
 

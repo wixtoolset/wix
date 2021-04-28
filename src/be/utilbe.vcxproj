@@ -69,9 +69,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.BextUtil" Version="4.0.55" />
-    <PackageReference Include="WixToolset.BootstrapperCore.Native" Version="4.0.110" />
-    <PackageReference Include="WixToolset.DUtil" Version="4.0.70" />
+    <PackageReference Include="WixToolset.BextUtil" Version="4.0.58" />
+    <PackageReference Include="WixToolset.BootstrapperCore.Native" Version="4.0.141" />
+    <PackageReference Include="WixToolset.DUtil" Version="4.0.72" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
   </ItemGroup>

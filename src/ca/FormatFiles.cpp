@@ -203,7 +203,7 @@ extern "C" UINT __stdcall WixExecFormatFiles(
         hr = FileGetTime(sczFilePath, NULL, NULL, &filetime);
         ExitOnFailure(hr, "Failed to get modified time of file : %ls", sczFilePath);
 
-        hr = FileWrite(sczFilePath, FILE_ATTRIBUTE_NORMAL, pbData, static_cast<DWORD>(cbData), NULL);
+        hr = FileWrite(sczFilePath, FILE_ATTRIBUTE_NORMAL, pbData, cbData, NULL);
         ExitOnFailure(hr, "Failed to write file content: %ls", sczFilePath);
 
         hr = FileSetTime(sczFilePath, NULL, NULL, &filetime);
