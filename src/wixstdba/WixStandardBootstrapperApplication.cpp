@@ -389,9 +389,12 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnPlanPackageBegin(
         __in_z LPCWSTR wzPackageId,
         __in BOOTSTRAPPER_PACKAGE_STATE state,
-        __in BOOL fInstallCondition,
+        __in BOOL fCached,
+        __in BOOTSTRAPPER_PACKAGE_CONDITION_RESULT installCondition,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
-        __inout BOOTSTRAPPER_REQUEST_STATE *pRequestState,
+        __in BOOTSTRAPPER_CACHE_TYPE recommendedCacheType,
+        __inout BOOTSTRAPPER_REQUEST_STATE* pRequestState,
+        __inout BOOTSTRAPPER_CACHE_TYPE* pRequestedCacheType,
         __inout BOOL* pfCancel
         )
     {
@@ -408,7 +411,7 @@ public: // IBootstrapperApplication
             hr = GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage);
             if (SUCCEEDED(hr) && pPackage->fPrereqPackage && pPackageInfo)
             {
-                pPackageInfo->fPlannedToBeInstalled = fInstall = fInstallCondition;
+                pPackageInfo->fPlannedToBeInstalled = fInstall = BOOTSTRAPPER_PACKAGE_CONDITION_FALSE != installCondition;
             }
 
             if (fInstall)
@@ -418,6 +421,12 @@ public: // IBootstrapperApplication
             else
             {
                 *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+            }
+
+            // Don't force cache packages while installing prerequisites.
+            if (BOOTSTRAPPER_CACHE_TYPE_FORCE == *pRequestedCacheType)
+            {
+                *pRequestedCacheType = BOOTSTRAPPER_CACHE_TYPE_KEEP;
             }
         }
         else if (m_sczAfterForcedRestartPackage) // after force restart, skip packages until after the package that caused the restart.
@@ -442,7 +451,7 @@ public: // IBootstrapperApplication
             }
         }
 
-        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fInstallCondition, recommendedState, pRequestState, pfCancel);
+        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
     }
 
 
@@ -2247,7 +2256,7 @@ private: // privates
         LPCWSTR wzLocFileName = m_fPrereq ? L"mbapreq.wxl" : L"thm.wxl";
 
         // Find and load .wxl file.
-        hr = LocProbeForFileEx(wzModulePath, wzLocFileName, wzLanguage, &sczLocPath, TRUE);
+        hr = LocProbeForFile(wzModulePath, wzLocFileName, wzLanguage, &sczLocPath);
         BalExitOnFailure(hr, "Failed to probe for loc file: %ls in path: %ls", wzLocFileName, wzModulePath);
 
         hr = LocLoadFromFile(sczLocPath, &m_pWixLoc);
@@ -2294,7 +2303,7 @@ private: // privates
         LPWSTR sczThemePath = NULL;
         LPCWSTR wzThemeFileName = m_fPrereq ? L"mbapreq.thm" : L"thm.xml";
 
-        hr = LocProbeForFileEx(wzModulePath, wzThemeFileName, wzLanguage, &sczThemePath, TRUE);
+        hr = LocProbeForFile(wzModulePath, wzThemeFileName, wzLanguage, &sczThemePath);
         BalExitOnFailure(hr, "Failed to probe for theme file: %ls in path: %ls", wzThemeFileName, wzModulePath);
 
         hr = ThemeLoadFromFile(sczThemePath, &m_pTheme);
@@ -2960,7 +2969,7 @@ private: // privates
                                     hr = StrAllocString(&sczLicenseFilename, PathFile(sczLicenseFormatted), 0);
                                     if (SUCCEEDED(hr))
                                     {
-                                        hr = LocProbeForFileEx(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath, TRUE);
+                                        hr = LocProbeForFile(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath);
                                         if (SUCCEEDED(hr))
                                         {
                                             hr = ThemeLoadRichEditFromFile(m_pTheme, WIXSTDBA_CONTROL_EULA_RICHEDIT, sczLicensePath, m_hModule);
@@ -3477,7 +3486,7 @@ private: // privates
                 hr = PathGetDirectory(sczLicensePath, &sczLicenseDirectory);
                 if (SUCCEEDED(hr))
                 {
-                    hr = LocProbeForFileEx(sczLicenseDirectory, PathFile(sczLicenseUrl), m_sczLanguage, &sczLicensePath, TRUE);
+                    hr = LocProbeForFile(sczLicenseDirectory, PathFile(sczLicenseUrl), m_sczLanguage, &sczLicensePath);
                 }
             }
         }
