@@ -32,6 +32,7 @@ static void ShowErrorMessage(__in HRESULT hr);
 //Global variables
 PRINTDLGEXW* vpPrintDlg = NULL; //Parameters for print (needed on both sides of WndProc callbacks)
 LPSTR vpszEulaText = NULL;
+LPCWSTR vwzRichEditClass = NULL;
 HRESULT vhr = S_OK; //Global hr, used by the functions called from WndProc to set errorcode
 
 
@@ -72,8 +73,18 @@ extern "C" UINT __stdcall PrintEula(MSIHANDLE hInstall)
         ExitOnFailure(hr, "failed to read Eula text from MSI database");
 
         // Have to load Rich Edit since we'll be creating a Rich Edit control in the window
-        hr = LoadSystemLibrary(L"Riched20.dll", &hRichEdit);
-        ExitOnFailure(hr, "failed to load rich edit 2.0 library");
+        hr = LoadSystemLibrary(L"Msftedit.dll", &hRichEdit);
+        if (SUCCEEDED(hr))
+        {
+            vwzRichEditClass = MSFTEDIT_CLASS;
+        }
+        else
+        {
+            hr = LoadSystemLibrary(L"Riched20.dll", &hRichEdit);
+            ExitOnFailure(hr, "failed to load rich edit 2.0 library");
+
+            vwzRichEditClass = RICHEDIT_CLASSW;
+        }
 
         hr = CreateRichTextWindow(&hWndMain, &fRegisteredClass);
         ExitOnFailure(hr, "failed to create rich text window for printing");
@@ -113,6 +124,7 @@ LExit:
         ::UnregisterClassW(WINDOW_CLASS, NULL);
     }
 
+    vwzRichEditClass = NULL;
     if (NULL != hRichEdit)
     {
         ::FreeLibrary(hRichEdit);
@@ -242,7 +254,7 @@ LRESULT CALLBACK WndProc(
     switch (message)
     {
     case WM_CREATE:
-        hWndRichEdit = ::CreateWindowExW(WS_EX_CLIENTEDGE, RICHEDIT_CLASSW, L"", ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_VSCROLL, CONTROL_X_COORDINATE, CONTROL_Y_COORDINATE, CONTROL_WIDTH, CONTROL_HEIGHT, hWnd, NULL, NULL, NULL);
+        hWndRichEdit = ::CreateWindowExW(WS_EX_CLIENTEDGE, vwzRichEditClass, L"", ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_VSCROLL, CONTROL_X_COORDINATE, CONTROL_Y_COORDINATE, CONTROL_WIDTH, CONTROL_HEIGHT, hWnd, NULL, NULL, NULL);
         break;
     case WM_COMMAND:
         wmId = LOWORD(wParam);
