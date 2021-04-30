@@ -32,7 +32,7 @@
 
     <PackageGroup Id="$(var.NetFx462WebId)">
       <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462WebDetectCondition)" InstallCondition="!(wix.NetFx462WebInstallCondition)" Id="$(var.NetFx462WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog">
-        <ExePackagePayload Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe" DownloadUrl="$(var.NetFx462WebLink)" Description="Microsoft .NET Framework 4.6.2 Setup" Hash="31D7081BFFEEB5F32457096E51A29236306E5D971DE7EDB80A51188BCCDA9B9F17F0C3593D30828FC140B7A023F5B6842BC922F2023C7B8EA3786C2DBEC40472" ProductName="Microsoft .NET Framework 4.6.2" Size="1429344" Version="4.6.1590.0" />
+        <ExePackagePayload Name="!(wix.NetFx462WebPackageDirectory)NDP462-KB3151802-Web.exe" DownloadUrl="$(var.NetFx462WebLink)" Description="Microsoft .NET Framework 4.6.2 Setup" Hash="72CC8904EA9AC4248874FD888E2C63737DFFF920E4002EB1426318EFD2650D1D5055DFC80C1F398278F7246A3827FC0ED3C044471C67A40CDE66D3796F854DCE" ProductName="Microsoft .NET Framework 4.6.2" Size="1408232" Version="4.6.1590.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
@@ -54,7 +54,7 @@
 
     <PackageGroup Id="$(var.NetFx462RedistId)">
       <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462RedistDetectCondition)" InstallCondition="!(wix.NetFx462RedistInstallCondition)" Id="$(var.NetFx462RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog">
-        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" Description="Microsoft .NET Framework 4.6.2 Setup" Hash="E183B33F93FD5F9AA93A1EC02103D2548CA22E3447EF2CEEDE89A5DEBEFC4F2C20990567EB17AFA412E0698D577ADDA373E433847EC8B79EC04BE3C86EDD9F0E" ProductName="Microsoft .NET Framework 4.6.2" Size="62008080" Version="4.6.1590.0" />
+        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" Description="Microsoft .NET Framework 4.6.2 Setup" Hash="5EFE9C21F355B91D12CB6B328737E8D01B6A7F8F815C477F6971A2267381B943BE6245E4B0021376EBE91C794812E93C7D4108348D837B2866FD86475F012908" ProductName="Microsoft .NET Framework 4.6.2" Size="62005552" Version="4.6.1590.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
