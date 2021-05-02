@@ -122,6 +122,9 @@ void CacheSendErrorCallback(
     __out_opt BOOL* pfRetry
     );
 BOOL CacheBundleRunningFromCache();
+HRESULT CachePreparePackage(
+    __in BURN_PACKAGE* pPackage
+    );
 HRESULT CacheBundleToCleanRoom(
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath

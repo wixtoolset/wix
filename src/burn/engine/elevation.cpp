@@ -14,6 +14,7 @@ typedef enum _BURN_ELEVATION_MESSAGE_TYPE
     BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME,
     BURN_ELEVATION_MESSAGE_TYPE_SESSION_END,
     BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE,
+    BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE,
     BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD,
     BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD,
     BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP,
@@ -183,6 +184,11 @@ static HRESULT OnSessionEnd(
     );
 static HRESULT OnSaveState(
     __in BURN_REGISTRATION* pRegistration,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    );
+static HRESULT OnCachePreparePackage(
+    __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
     __in SIZE_T cbData
     );
@@ -609,6 +615,32 @@ HRESULT ElevationSaveState(
     hr = (HRESULT)dwResult;
 
 LExit:
+    return hr;
+}
+
+extern "C" HRESULT ElevationCachePreparePackage(
+    __in HANDLE hPipe,
+    __in BURN_PACKAGE* pPackage
+    )
+{
+    HRESULT hr = S_OK;
+    BYTE* pbData = NULL;
+    SIZE_T cbData = 0;
+    DWORD dwResult = 0;
+
+    // Serialize message data.
+    hr = BuffWriteString(&pbData, &cbData, pPackage ? pPackage->sczId : NULL);
+    ExitOnFailure(hr, "Failed to write package id to message buffer.");
+
+    // Send message.
+    hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE, pbData, cbData, NULL, NULL, &dwResult);
+    ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE message to per-machine process.");
+
+    hr = (HRESULT)dwResult;
+
+LExit:
+    ReleaseBuffer(pbData);
+
     return hr;
 }
 
@@ -1856,6 +1888,10 @@ static HRESULT ProcessElevatedChildCacheMessage(
 
     switch (pMsg->dwMessage)
     {
+    case BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE:
+        hrResult = OnCachePreparePackage(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        break;
+
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD:
         hrResult = OnCacheCompletePayload(pContext->hPipe, pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
@@ -2153,6 +2189,41 @@ LExit:
     return hr;
 }
 
+static HRESULT OnCachePreparePackage(
+    __in BURN_PACKAGES* pPackages,
+    __in BYTE* pbData,
+    __in SIZE_T cbData
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T iData = 0;
+    LPWSTR scz = NULL;
+    BURN_PACKAGE* pPackage = NULL;
+
+    // Deserialize message data.
+    hr = BuffReadString(pbData, cbData, &iData, &scz);
+    ExitOnFailure(hr, "Failed to read package id.");
+
+    if (scz && *scz)
+    {
+        hr = PackageFindById(pPackages, scz, &pPackage);
+        ExitOnFailure(hr, "Failed to find package: %ls", scz);
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+        ExitOnRootFailure(hr, "Invalid data passed to cache prepare package.");
+    }
+
+    hr = CachePreparePackage(pPackage);
+    ExitOnFailure(hr, "Failed to prepare cache package.");
+
+LExit:
+    ReleaseStr(scz);
+
+    return hr;
+}
+
 static HRESULT OnCacheCompletePayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGES* pPackages,
@@ -2225,7 +2296,6 @@ static HRESULT OnCacheVerifyPayload(
     LPWSTR scz = NULL;
     BURN_PACKAGE* pPackage = NULL;
     BURN_PAYLOAD* pPayload = NULL;
-    LPWSTR sczCacheDirectory = NULL;
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &scz);
@@ -2248,10 +2318,13 @@ static HRESULT OnCacheVerifyPayload(
 
     if (pPackage && pPayload)
     {
-        hr = CacheGetCompletedPath(TRUE, pPackage->sczCacheId, &sczCacheDirectory);
-        ExitOnFailure(hr, "Failed to get cached path for package with cache id: %ls", pPackage->sczCacheId);
+        if (!pPackage->sczCacheFolder)
+        {
+            hr = E_INVALIDSTATE;
+            ExitOnRootFailure(hr, "Cache verify payload called without starting its package.");
+        }
 
-        hr = CacheVerifyPayload(pPayload, sczCacheDirectory, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
+        hr = CacheVerifyPayload(pPayload, pPackage->sczCacheFolder, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
     }
     else
     {
@@ -2261,7 +2334,6 @@ static HRESULT OnCacheVerifyPayload(
     // Nothing should be logged on failure.
 
 LExit:
-    ReleaseStr(sczCacheDirectory);
     ReleaseStr(scz);
 
     return hr;

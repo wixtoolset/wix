@@ -549,12 +549,19 @@ extern "C" HRESULT ApplyCache(
         case BURN_CACHE_ACTION_TYPE_PACKAGE:
             pPackage = pCacheAction->package.pPackage;
 
-            if (!pPackage->fPerMachine && !cacheContext.wzLayoutDirectory)
+            if (!cacheContext.wzLayoutDirectory)
             {
-                hr = CacheGetCompletedPath(FALSE, pPackage->sczCacheId, &pPackage->sczCacheFolder);
-                ExitOnFailure(hr, "Failed to get cached path for package with cache id: %ls", pPackage->sczCacheId);
+                if (!pPackage->fPerMachine || INVALID_HANDLE_VALUE == cacheContext.hPipe)
+                {
+                    hr = CachePreparePackage(pPackage);
 
-                cacheContext.hPipe = INVALID_HANDLE_VALUE;
+                    cacheContext.hPipe = INVALID_HANDLE_VALUE;
+                }
+                else
+                {
+                    hr = ElevationCachePreparePackage(hPipe, pPackage);
+                }
+                LogExitOnFailure(hr, MSG_CACHE_PREPARE_PACKAGE_FAILED, "Cache prepare package failed: %ls", pPackage->sczId, NULL, NULL);
             }
 
             hr = ApplyCachePackage(&cacheContext, pPackage);
