@@ -80,10 +80,9 @@ HRESULT CacheCalculateContainerWorkingPath(
     __in BURN_CONTAINER* pContainer,
     __deref_out_z LPWSTR* psczWorkingPath
     );
-HRESULT CacheGetRootCompletedPath(
-    __in BOOL fPerMachine,
-    __in BOOL fForceInitialize,
-    __deref_out_z LPWSTR* psczRootCompletedPath
+HRESULT CacheGetPerMachineRootCompletedPath(
+    __out_z LPWSTR* psczCurrentRootCompletedPath,
+    __out_z LPWSTR* psczDefaultRootCompletedPath
     );
 HRESULT CacheGetCompletedPath(
     __in BOOL fPerMachine,

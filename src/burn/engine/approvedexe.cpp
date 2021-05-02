@@ -217,6 +217,7 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
 {
     HRESULT hr = S_OK;
     LPWSTR scz = NULL;
+    LPWSTR sczSecondary = NULL;
 
     const LPCWSTR vrgSecureFolderVariables[] = {
         L"ProgramFiles64Folder",
@@ -243,9 +244,19 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
     }
 
     // The problem with using a Variable for the root package cache folder is that it might not have been secured yet.
-    // Getting it through CacheGetRootCompletedPath makes sure it has been secured.
-    hr = CacheGetRootCompletedPath(TRUE, TRUE, &scz);
+    // Getting it through CacheGetPerMachineRootCompletedPath makes sure it has been secured.
+    hr = CacheGetPerMachineRootCompletedPath(&scz, &sczSecondary);
     ExitOnFailure(hr, "Failed to get the root package cache folder.");
+
+    // If the package cache is redirected, hr is S_FALSE.
+    if (S_FALSE == hr)
+    {
+        hr = PathDirectoryContainsPath(sczSecondary, pLaunchApprovedExe->sczExecutablePath);
+        if (S_OK == hr)
+        {
+            ExitFunction();
+        }
+    }
 
     hr = PathDirectoryContainsPath(scz, pLaunchApprovedExe->sczExecutablePath);
     if (S_OK == hr)
@@ -257,6 +268,7 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
 
 LExit:
     ReleaseStr(scz);
+    ReleaseStr(sczSecondary);
 
     return hr;
 }
