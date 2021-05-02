@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <InstallerPlatform>x64</InstallerPlatform>
-    <SuppressSpecificWarnings>1154;$(SuppressSpecificWarnings)</SuppressSpecificWarnings>
     <BA>hyperlinkLicense</BA>
     <UpgradeCode>{6E86B95A-24F6-4C89-AF2E-470C0C734FCB}</UpgradeCode>
   </PropertyGroup>
