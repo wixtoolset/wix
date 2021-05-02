@@ -42,9 +42,10 @@ namespace WixTestTools
         /// <remarks>
         /// The package or bundle must install into [ProgramFilesFolder]\~Test WiX\[TestGroupName]\([Additional]).
         /// </remarks>
-        public string GetTestInstallFolder(string additionalPath = null)
+        public string GetTestInstallFolder(bool x64, string additionalPath = null)
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "~Test WiX", this.TestGroupName, additionalPath ?? String.Empty);
+            var baseDirectory = x64 ? Environment.SpecialFolder.ProgramFiles : Environment.SpecialFolder.ProgramFilesX86;
+            return Path.Combine(Environment.GetFolderPath(baseDirectory), "~Test WiX", this.TestGroupName, additionalPath ?? String.Empty);
         }
 
         /// <summary>
@@ -55,9 +56,10 @@ namespace WixTestTools
         /// <remarks>
         /// The package must write into HKLM\Software\WiX\Tests\[TestGroupName]\([Additional]).
         /// </remarks>
-        public RegistryKey GetTestRegistryRoot(string additionalPath = null)
+        public RegistryKey GetTestRegistryRoot(bool x64, string additionalPath = null)
         {
-            var key = String.Format(@"Software\WOW6432Node\WiX\Tests\{0}\{1}", this.TestGroupName, additionalPath ?? String.Empty);
+            var baseKey = x64 ? "Software" : @"Software\WOW6432Node";
+            var key = String.Format(@"{0}\WiX\Tests\{1}\{2}", baseKey, this.TestGroupName, additionalPath ?? String.Empty);
             return Registry.LocalMachine.OpenSubKey(key, true);
         }
 

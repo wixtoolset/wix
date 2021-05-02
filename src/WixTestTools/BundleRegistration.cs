@@ -88,9 +88,10 @@ namespace WixTestTools
 
         public string Version { get; set; }
 
-        public static bool TryGetPerMachineBundleRegistrationById(string bundleId, out BundleRegistration registration)
+        public static bool TryGetPerMachineBundleRegistrationById(string bundleId, bool x64, out BundleRegistration registration)
         {
-            var registrationKeyPath = $"{BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY_WOW6432NODE}\\{bundleId}";
+            var baseKeyPath = x64 ? BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY : BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY_WOW6432NODE;
+            var registrationKeyPath = $"{baseKeyPath}\\{bundleId}";
             using var registrationKey = Registry.LocalMachine.OpenSubKey(registrationKeyPath);
             var success = registrationKey != null;
             registration = success ? GetBundleRegistration(registrationKey) : null;

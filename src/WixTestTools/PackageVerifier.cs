@@ -5,7 +5,6 @@ namespace WixTestTools
     using System;
     using System.IO;
     using System.Linq;
-    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using Xunit;
@@ -14,28 +13,18 @@ namespace WixTestTools
     {
         public string PackagePdb { get; }
 
-        private WindowsInstallerData WiData { get; set; }
+        private bool IsX64 { get; }
+
+        private WindowsInstallerData WiData { get; }
 
         public string GetInstalledFilePath(string filename)
         {
-            return this.TestContext.GetTestInstallFolder(Path.Combine(this.GetInstallFolderName(), filename));
-        }
-
-        private WindowsInstallerData GetWindowsInstallerData()
-        {
-            if (this.WiData == null)
-            {
-                using var wixOutput = WixOutput.Read(this.PackagePdb);
-                this.WiData = WindowsInstallerData.Load(wixOutput);
-            }
-
-            return this.WiData;
+            return this.TestContext.GetTestInstallFolder(this.IsX64, Path.Combine(this.GetInstallFolderName(), filename));
         }
 
         public string GetInstallFolderName()
         {
-            var wiData = this.GetWindowsInstallerData();
-            var row = wiData.Tables["Directory"].Rows.Single(r => r.FieldAsString(0) == "INSTALLFOLDER");
+            var row = this.WiData.Tables["Directory"].Rows.Single(r => r.FieldAsString(0) == "INSTALLFOLDER");
             var value = row.FieldAsString(2);
             var longNameIndex = value.IndexOf('|') + 1;
             if (longNameIndex > 0)
@@ -47,8 +36,7 @@ namespace WixTestTools
 
         public string GetProperty(string name)
         {
-            var wiData = this.GetWindowsInstallerData();
-            var row = wiData.Tables["Property"].Rows.Cast<PropertyRow>().Single(r => r.Property == name);
+            var row = this.WiData.Tables["Property"].Rows.Cast<PropertyRow>().Single(r => r.Property == name);
             return row.Value;
         }
 
@@ -67,7 +55,7 @@ namespace WixTestTools
 
         public void DeleteTestRegistryValue(string name)
         {
-            using (var root = this.TestContext.GetTestRegistryRoot())
+            using (var root = this.TestContext.GetTestRegistryRoot(this.IsX64))
             {
                 Assert.NotNull(root);
                 root.DeleteValue(name);
@@ -76,13 +64,13 @@ namespace WixTestTools
 
         public void VerifyTestRegistryRootDeleted()
         {
-            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot();
+            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot(this.IsX64);
             Assert.Null(testRegistryRoot);
         }
 
         public void VerifyTestRegistryValue(string name, string expectedValue)
         {
-            using (var root = this.TestContext.GetTestRegistryRoot())
+            using (var root = this.TestContext.GetTestRegistryRoot(this.IsX64))
             {
                 Assert.NotNull(root);
                 var actualValue = root.GetValue(name) as string;

@@ -73,10 +73,11 @@ namespace WixTestTools
         public bool TryGetRegistration(out BundleRegistration registration)
         {
             var bundleSymbol = this.GetBundleSymbol();
+            var x64 = bundleSymbol.Platform != Platform.X86;
             var bundleId = bundleSymbol.BundleId;
             if (bundleSymbol.PerMachine)
             {
-                return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleId, out registration);
+                return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleId, x64, out registration);
             }
             else
             {
@@ -132,9 +133,9 @@ namespace WixTestTools
             Assert.True(Directory.Exists(cachePath));
         }
 
-        public void VerifyExeTestRegistryRootDeleted(string name)
+        public void VerifyExeTestRegistryRootDeleted(string name, bool x64 = false)
         {
-            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot(name);
+            using var testRegistryRoot = this.TestContext.GetTestRegistryRoot(x64, name);
             if (testRegistryRoot != null)
             {
                 var actualValue = testRegistryRoot.GetValue("Version") as string;
@@ -142,9 +143,9 @@ namespace WixTestTools
             }
         }
 
-        public void VerifyExeTestRegistryValue(string name, string expectedValue)
+        public void VerifyExeTestRegistryValue(string name, string expectedValue, bool x64 = false)
         {
-            using (var root = this.TestContext.GetTestRegistryRoot(name))
+            using (var root = this.TestContext.GetTestRegistryRoot(x64, name))
             {
                 Assert.NotNull(root);
                 var actualValue = root.GetValue("Version") as string;

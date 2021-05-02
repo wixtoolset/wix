@@ -35,7 +35,7 @@
   </Package>
 
   <Fragment>
-    <StandardDirectory Id="ProgramFilesFolder">
+    <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="WixDir" Name="~Test WiX">
         <Directory Id="TestDir" Name="$(var.TestGroupName)">
           <Directory Id="INSTALLFOLDER" Name="$(var.PackageName)" />

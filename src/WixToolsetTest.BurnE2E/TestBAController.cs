@@ -9,13 +9,14 @@ namespace WixToolsetTest.BurnE2E
 
     public class TestBAController : IDisposable
     {
-        private const string BaseRegKeyPath = @"Software\WOW6432Node\WiX\Tests";
-
-        public TestBAController(WixTestContext testContext)
+        public TestBAController(WixTestContext testContext, bool x64 = false)
         {
             this.TestGroupName = testContext.TestGroupName;
-            this.TestBaseRegKeyPath = String.Format(@"{0}\TestBAControl\{1}", BaseRegKeyPath, this.TestGroupName);
+            this.BaseRegKeyPath = x64 ? @"Software\WiX\Tests" : @"Software\WOW6432Node\WiX\Tests";
+            this.TestBaseRegKeyPath = String.Format(@"{0}\TestBAControl\{1}", this.BaseRegKeyPath, this.TestGroupName);
         }
+
+        private string BaseRegKeyPath { get; }
 
         private string TestBaseRegKeyPath { get; }
 
@@ -179,8 +180,8 @@ namespace WixToolsetTest.BurnE2E
 
         public void Dispose()
         {
-            Registry.LocalMachine.DeleteSubKeyTree($@"{BaseRegKeyPath}\{this.TestGroupName}", false);
-            Registry.LocalMachine.DeleteSubKeyTree($@"{BaseRegKeyPath}\TestBAControl", false);
+            Registry.LocalMachine.DeleteSubKeyTree($@"{this.BaseRegKeyPath}\{this.TestGroupName}", false);
+            Registry.LocalMachine.DeleteSubKeyTree($@"{this.BaseRegKeyPath}\TestBAControl", false);
         }
     }
 }

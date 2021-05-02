@@ -4,6 +4,10 @@ namespace WixTestTools
 {
     using System;
     using System.IO;
+    using System.Linq;
+    using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller;
     using static WixTestTools.MSIExec;
 
     public partial class PackageInstaller : IDisposable
@@ -13,6 +17,16 @@ namespace WixTestTools
             this.Package = Path.Combine(testContext.TestDataFolder, $"{filename}.msi");
             this.PackagePdb = Path.Combine(testContext.TestDataFolder, $"{filename}.wixpdb");
             this.TestContext = testContext;
+
+            using var wixOutput = WixOutput.Read(this.PackagePdb);
+
+            var intermediate = Intermediate.Load(wixOutput);
+            var section = intermediate.Sections.Single();
+            var platformSummary = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+            var platformString = platformSummary.Value.Split(new char[] { ';' }, 2)[0];
+            this.IsX64 = platformString != "Intel";
+
+            this.WiData = WindowsInstallerData.Load(wixOutput);
         }
 
         public string Package { get; }
