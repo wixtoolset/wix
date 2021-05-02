@@ -5,6 +5,7 @@ namespace WixToolsetTest.BurnE2E
     using System.Collections.Generic;
     using System.IO;
     using WixBuildTools.TestSupport;
+    using WixTestTools;
     using WixToolset.Mba.Core;
     using Xunit;
     using Xunit.Abstractions;
@@ -12,6 +13,32 @@ namespace WixToolsetTest.BurnE2E
     public class CacheTests : BurnE2ETests
     {
         public CacheTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+        [Fact]
+        public void CanCache5GBFile()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleC = this.CreateBundleInstaller("BundleC");
+
+            packageA.VerifyInstalled(false);
+
+            // Recreate the 5GB payload to avoid having to copy it to the VM to run the tests.
+            var targetFilePath = Path.Combine(this.TestContext.TestDataFolder, "fivegb.file");
+            if (!File.Exists(targetFilePath))
+            {
+                var testTool = new TestTool(Path.Combine(TestData.Get(), "win-x86", "TestExe.exe"))
+                {
+                    Arguments = "/lf \"" + targetFilePath + "|5368709120\"",
+                    ExpectedExitCode = 0,
+                };
+                testTool.Run(true);
+            }
+
+            bundleC.Install();
+            bundleC.VerifyRegisteredAndInPackageCache();
+
+            packageA.VerifyInstalled(true);
+        }
 
         [Fact]
         public void CanDownloadPayloadsFromMissingAttachedContainer()
