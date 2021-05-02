@@ -25,10 +25,11 @@ static HRESULT GetLastUsedSourceFolder(
     __in BURN_VARIABLES* pVariables,
     __out_z LPWSTR* psczLastSource
     );
+static HRESULT SecurePerMachineCacheRoot();
 static HRESULT CreateCompletedPath(
     __in BOOL fPerMachine,
     __in LPCWSTR wzCacheId,
-    __out LPWSTR* psczCacheDirectory
+    __out_z LPWSTR* psczCacheDirectory
     );
 static HRESULT CreateUnverifiedPath(
     __in BOOL fPerMachine,
@@ -341,23 +342,31 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CacheGetRootCompletedPath(
-    __in BOOL fPerMachine,
-    __in BOOL fForceInitialize,
-    __deref_out_z LPWSTR* psczRootCompletedPath
+extern "C" HRESULT CacheGetPerMachineRootCompletedPath(
+    __out_z LPWSTR* psczCurrentRootCompletedPath,
+    __out_z LPWSTR* psczDefaultRootCompletedPath
     )
 {
     HRESULT hr = S_OK;
 
-    if (fForceInitialize)
+    *psczCurrentRootCompletedPath = NULL;
+    *psczDefaultRootCompletedPath = NULL;
+
+    hr = SecurePerMachineCacheRoot();
+    ExitOnFailure(hr, "Failed to secure per-machine cache root.");
+
+    hr = GetRootPath(TRUE, TRUE, psczCurrentRootCompletedPath);
+    ExitOnFailure(hr, "Failed to get per-machine cache root.");
+
+    if (S_FALSE == hr)
     {
-        hr = CreateCompletedPath(fPerMachine, L"", psczRootCompletedPath);
-    }
-    else
-    {
-        hr = GetRootPath(fPerMachine, TRUE, psczRootCompletedPath);
+        hr = GetRootPath(TRUE, FALSE, psczDefaultRootCompletedPath);
+        ExitOnFailure(hr, "Failed to get default per-machine cache root.");
+
+        hr = S_FALSE;
     }
 
+LExit:
     return hr;
 }
 
@@ -1337,23 +1346,23 @@ static HRESULT GetLastUsedSourceFolder(
     return hr;
 }
 
-static HRESULT CreateCompletedPath(
-    __in BOOL fPerMachine,
-    __in LPCWSTR wzId,
-    __out LPWSTR* psczCacheDirectory
-    )
+static HRESULT SecurePerMachineCacheRoot()
 {
     static BOOL fPerMachineCacheRootVerified = FALSE;
+    static BOOL fOriginalPerMachineCacheRootVerified = FALSE;
 
     HRESULT hr = S_OK;
+    BOOL fRedirected = FALSE;
     LPWSTR sczCacheDirectory = NULL;
 
-    // If we are doing a permachine install but have not yet verified that the root cache folder
-    // was created with the correct ACLs yet, do that now.
-    if (fPerMachine && !fPerMachineCacheRootVerified)
+    if (!fPerMachineCacheRootVerified)
     {
-        hr = GetRootPath(fPerMachine, TRUE, &sczCacheDirectory);
+        // If we are doing a permachine install but have not yet verified that the root cache folder
+        // was created with the correct ACLs yet, do that now.
+        hr = GetRootPath(TRUE, TRUE, &sczCacheDirectory);
         ExitOnFailure(hr, "Failed to get cache directory.");
+
+        fRedirected = S_FALSE == hr;
 
         hr = DirEnsureExists(sczCacheDirectory, NULL);
         ExitOnFailure(hr, "Failed to create cache directory: %ls", sczCacheDirectory);
@@ -1362,6 +1371,48 @@ static HRESULT CreateCompletedPath(
         ExitOnFailure(hr, "Failed to secure cache directory: %ls", sczCacheDirectory);
 
         fPerMachineCacheRootVerified = TRUE;
+
+        if (!fRedirected)
+        {
+            fOriginalPerMachineCacheRootVerified = TRUE;
+        }
+    }
+
+    if (!fOriginalPerMachineCacheRootVerified)
+    {
+        // If we are doing a permachine install but have not yet verified that the original root cache folder
+        // was created with the correct ACLs yet, do that now.
+        hr = GetRootPath(TRUE, FALSE, &sczCacheDirectory);
+        ExitOnFailure(hr, "Failed to get original cache directory.");
+
+        hr = DirEnsureExists(sczCacheDirectory, NULL);
+        ExitOnFailure(hr, "Failed to create original cache directory: %ls", sczCacheDirectory);
+
+        hr = SecurePath(sczCacheDirectory);
+        ExitOnFailure(hr, "Failed to secure original cache directory: %ls", sczCacheDirectory);
+
+        fOriginalPerMachineCacheRootVerified = TRUE;
+    }
+
+LExit:
+    ReleaseStr(sczCacheDirectory);
+
+    return hr;
+}
+
+static HRESULT CreateCompletedPath(
+    __in BOOL fPerMachine,
+    __in LPCWSTR wzId,
+    __out_z LPWSTR* psczCacheDirectory
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCacheDirectory = NULL;
+
+    if (fPerMachine)
+    {
+        hr = SecurePerMachineCacheRoot();
+        ExitOnFailure(hr, "Failed to secure per-machine cache root.");
     }
 
     // Get the cache completed path, ensure it exists, and reset any permissions people
