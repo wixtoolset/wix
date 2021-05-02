@@ -134,6 +134,14 @@ typedef struct _BURN_ENGINE_STATE
     LPWSTR* argv;
 } BURN_ENGINE_STATE;
 
+typedef struct _BURN_APPLY_CONTEXT
+{
+    CRITICAL_SECTION csApply;
+    DWORD cOverallProgressTicks;
+    BOOL fRollback;
+    HANDLE hCacheThread;
+} BURN_APPLY_CONTEXT;
+
 
 // function declarations
 

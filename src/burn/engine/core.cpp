@@ -8,8 +8,7 @@
 struct BURN_CACHE_THREAD_CONTEXT
 {
     BURN_ENGINE_STATE* pEngineState;
-    DWORD* pcOverallProgressTicks;
-    BOOL* pfRollback;
+    BURN_APPLY_CONTEXT* pApplyContext;
 };
 
 
@@ -606,14 +605,13 @@ extern "C" HRESULT CoreApply(
 {
     HRESULT hr = S_OK;
     HANDLE hLock = NULL;
-    DWORD cOverallProgressTicks = 0;
-    HANDLE hCacheThread = NULL;
     BOOL fApplyInitialize = FALSE;
     BOOL fElevated = FALSE;
     BOOL fRegistered = FALSE;
-    BOOL fRollback = FALSE;
     BOOL fSuspend = FALSE;
     BOOTSTRAPPER_APPLY_RESTART restart = BOOTSTRAPPER_APPLY_RESTART_NONE;
+    BURN_APPLY_CONTEXT applyContext = { };
+    BOOL fDeleteApplyCs = FALSE;
     BURN_CACHE_THREAD_CONTEXT cacheThreadContext = { };
     DWORD dwPhaseCount = 0;
     BOOTSTRAPPER_APPLYCOMPLETE_ACTION applyCompleteAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_NONE;
@@ -675,6 +673,9 @@ extern "C" HRESULT CoreApply(
         ExitFunction();
     }
 
+    fDeleteApplyCs = TRUE;
+    ::InitializeCriticalSection(&applyContext.csApply);
+
     // Ensure the engine is cached to the working path.
     if (!pEngineState->sczBundleEngineWorkingPath)
     {
@@ -707,33 +708,32 @@ extern "C" HRESULT CoreApply(
     {
         // Launch the cache thread.
         cacheThreadContext.pEngineState = pEngineState;
-        cacheThreadContext.pcOverallProgressTicks = &cOverallProgressTicks;
-        cacheThreadContext.pfRollback = &fRollback;
+        cacheThreadContext.pApplyContext = &applyContext;
 
-        hCacheThread = ::CreateThread(NULL, 0, CacheThreadProc, &cacheThreadContext, 0, NULL);
-        ExitOnNullWithLastError(hCacheThread, hr, "Failed to create cache thread.");
+        applyContext.hCacheThread = ::CreateThread(NULL, 0, CacheThreadProc, &cacheThreadContext, 0, NULL);
+        ExitOnNullWithLastError(applyContext.hCacheThread, hr, "Failed to create cache thread.");
 
         // If we're not caching in parallel, wait for the cache thread to terminate.
         if (!pEngineState->fParallelCacheAndExecute)
         {
-            hr = WaitForCacheThread(hCacheThread);
+            hr = WaitForCacheThread(applyContext.hCacheThread);
             ExitOnFailure(hr, "Failed while caching, aborting execution.");
 
-            ReleaseHandle(hCacheThread);
+            ReleaseHandle(applyContext.hCacheThread);
         }
     }
 
     // Execute.
     if (pEngineState->plan.cExecuteActions)
     {
-        hr = ApplyExecute(pEngineState, hCacheThread, &cOverallProgressTicks, &fRollback, &fSuspend, &restart);
+        hr = ApplyExecute(pEngineState, &applyContext, &fSuspend, &restart);
         UserExperienceExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that execute completed.
     }
 
     // Wait for cache thread to terminate, this should return immediately unless we're waiting for layout to complete.
-    if (hCacheThread)
+    if (applyContext.hCacheThread)
     {
-        HRESULT hrCached = WaitForCacheThread(hCacheThread);
+        HRESULT hrCached = WaitForCacheThread(applyContext.hCacheThread);
         if (SUCCEEDED(hr))
         {
             hr = hrCached;
@@ -741,7 +741,7 @@ extern "C" HRESULT CoreApply(
     }
 
     // If something went wrong or force restarted, skip cleaning.
-    if (FAILED(hr) || fRollback || fSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
+    if (FAILED(hr) || applyContext.fRollback || fSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
     {
         ExitFunction();
     }
@@ -756,7 +756,7 @@ LExit:
     // Unregister.
     if (fRegistered)
     {
-        ApplyUnregister(pEngineState, FAILED(hr) || fRollback, fSuspend, restart);
+        ApplyUnregister(pEngineState, FAILED(hr) || applyContext.fRollback, fSuspend, restart);
     }
 
     if (fElevated)
@@ -777,7 +777,12 @@ LExit:
         ::CloseHandle(hLock);
     }
 
-    ReleaseHandle(hCacheThread);
+    ReleaseHandle(applyContext.hCacheThread);
+
+    if (fDeleteApplyCs)
+    {
+        DeleteCriticalSection(&applyContext.csApply);
+    }
 
     UserExperienceOnApplyComplete(&pEngineState->userExperience, hr, restart, &applyCompleteAction);
     if (BOOTSTRAPPER_APPLYCOMPLETE_ACTION_RESTART == applyCompleteAction)
@@ -1712,8 +1717,6 @@ static DWORD WINAPI CacheThreadProc(
     HRESULT hr = S_OK;
     BURN_CACHE_THREAD_CONTEXT* pContext = reinterpret_cast<BURN_CACHE_THREAD_CONTEXT*>(lpThreadParameter);
     BURN_ENGINE_STATE* pEngineState = pContext->pEngineState;
-    DWORD* pcOverallProgressTicks = pContext->pcOverallProgressTicks;
-    BOOL* pfRollback = pContext->pfRollback;
     BOOL fComInitialized = FALSE;
 
     // initialize COM
@@ -1722,7 +1725,7 @@ static DWORD WINAPI CacheThreadProc(
     fComInitialized = TRUE;
 
     // cache packages
-    hr = ApplyCache(pEngineState->section.hSourceEngineFile, &pEngineState->userExperience, &pEngineState->variables, &pEngineState->plan, pEngineState->companionConnection.hCachePipe, pcOverallProgressTicks, pfRollback);
+    hr = ApplyCache(pEngineState->section.hSourceEngineFile, &pEngineState->userExperience, &pEngineState->variables, &pEngineState->plan, pEngineState->companionConnection.hCachePipe, pContext->pApplyContext);
 
 LExit:
     UserExperienceExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that cache completed.

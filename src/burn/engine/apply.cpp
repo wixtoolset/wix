@@ -56,11 +56,11 @@ typedef struct _BURN_CACHE_PROGRESS_CONTEXT
 typedef struct _BURN_EXECUTE_CONTEXT
 {
     BURN_USER_EXPERIENCE* pUX;
+    BURN_APPLY_CONTEXT* pApplyContext;
     BOOL fRollback;
     BURN_PACKAGE* pExecutingPackage;
     DWORD cExecutedPackages;
     DWORD cExecutePackagesTotal;
-    DWORD* pcOverallProgressTicks;
 } BURN_EXECUTE_CONTEXT;
 
 
@@ -187,7 +187,6 @@ static void DoRollbackCache(
 static HRESULT DoExecuteAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
-    __in_opt HANDLE hCacheThread,
     __in BURN_EXECUTE_CONTEXT* pContext,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
@@ -284,7 +283,7 @@ static HRESULT ReportOverallProgressTicks(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BOOL fRollback,
     __in DWORD cOverallProgressTicksTotal,
-    __in DWORD cOverallProgressTicks
+    __in BURN_APPLY_CONTEXT* pApplyContext
     );
 static HRESULT ExecutePackageComplete(
     __in BURN_USER_EXPERIENCE* pUX,
@@ -499,16 +498,13 @@ extern "C" HRESULT ApplyCache(
     __in BURN_VARIABLES* pVariables,
     __in BURN_PLAN* pPlan,
     __in HANDLE hPipe,
-    __inout DWORD* pcOverallProgressTicks,
-    __inout BOOL* pfRollback
+    __in BURN_APPLY_CONTEXT* pContext
     )
 {
     HRESULT hr = S_OK;
     DWORD dwCheckpoint = 0;
     BURN_CACHE_CONTEXT cacheContext = { };
     BURN_PACKAGE* pPackage = NULL;
-
-    *pfRollback = FALSE;
 
     hr = UserExperienceOnCacheBegin(pUX);
     ExitOnRootFailure(hr, "BA aborted cache.");
@@ -539,9 +535,7 @@ extern "C" HRESULT ApplyCache(
             hr = ApplyLayoutBundle(&cacheContext, pCacheAction->bundleLayout.pPayloadGroup, pCacheAction->bundleLayout.sczExecutableName, pCacheAction->bundleLayout.sczUnverifiedPath, pCacheAction->bundleLayout.qwBundleSize);
             ExitOnFailure(hr, "Failed cache action: %ls", L"layout bundle");
 
-            ++(*pcOverallProgressTicks);
-
-            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks);
+            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, pContext);
             LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"layout bundle");
 
             break;
@@ -567,9 +561,7 @@ extern "C" HRESULT ApplyCache(
             hr = ApplyCachePackage(&cacheContext, pPackage);
             ExitOnFailure(hr, "Failed cache action: %ls", L"cache package");
 
-            ++(*pcOverallProgressTicks);
-
-            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, *pcOverallProgressTicks);
+            hr = ReportOverallProgressTicks(pUX, FALSE, pPlan->cOverallProgressTicksTotal, pContext);
             LogExitOnFailure(hr, MSG_USER_CANCELED, "Cancel during cache: %ls", L"cache package");
 
             break;
@@ -598,7 +590,7 @@ LExit:
     if (FAILED(hr))
     {
         DoRollbackCache(pUX, pPlan, hPipe, dwCheckpoint);
-        *pfRollback = TRUE;
+        pContext->fRollback = TRUE;
     }
 
     // Clean up any remanents in the cache.
@@ -622,9 +614,7 @@ LExit:
 
 extern "C" HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in_opt HANDLE hCacheThread,
-    __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfRollback,
+    __in BURN_APPLY_CONTEXT* pApplyContext,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     )
@@ -637,10 +627,9 @@ extern "C" HRESULT ApplyExecute(
     BOOL fSeekNextRollbackBoundary = FALSE;
 
     context.pUX = &pEngineState->userExperience;
+    context.pApplyContext = pApplyContext;
     context.cExecutePackagesTotal = pEngineState->plan.cExecutePackagesTotal;
-    context.pcOverallProgressTicks = pcOverallProgressTicks;
 
-    *pfRollback = FALSE;
     *pfSuspend = FALSE;
 
     // Send execute begin to BA.
@@ -670,7 +659,7 @@ extern "C" HRESULT ApplyExecute(
         }
 
         // Execute the action.
-        hr = DoExecuteAction(pEngineState, pExecuteAction, hCacheThread, &context, &pRollbackBoundary, &pCheckpoint, pfSuspend, pRestart);
+        hr = DoExecuteAction(pEngineState, pExecuteAction, &context, &pRollbackBoundary, &pCheckpoint, pfSuspend, pRestart);
 
         if (*pfSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == *pRestart)
         {
@@ -698,7 +687,7 @@ extern "C" HRESULT ApplyExecute(
                     IgnoreRollbackError(hrRollback, "Failed commit transaction from disable rollback");
                 }
 
-                *pfRollback = TRUE;
+                pApplyContext->fRollback = TRUE;
                 break;
             }
 
@@ -719,7 +708,7 @@ extern "C" HRESULT ApplyExecute(
             // If the rollback boundary is vital, end execution here.
             if (pRollbackBoundary && pRollbackBoundary->fVital)
             {
-                *pfRollback = TRUE;
+                pApplyContext->fRollback = TRUE;
                 break;
             }
 
@@ -2163,7 +2152,6 @@ static void DoRollbackCache(
 static HRESULT DoExecuteAction(
     __in BURN_ENGINE_STATE* pEngineState,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
-    __in_opt HANDLE hCacheThread,
     __in BURN_EXECUTE_CONTEXT* pContext,
     __inout BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary,
     __inout BURN_EXECUTE_ACTION_CHECKPOINT** ppCheckpoint,
@@ -2195,14 +2183,14 @@ static HRESULT DoExecuteAction(
         case BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT:
             // wait for cache sync-point
             rghWait[0] = pExecuteAction->syncpoint.hEvent;
-            rghWait[1] = hCacheThread;
+            rghWait[1] = pContext->pApplyContext->hCacheThread;
             switch (::WaitForMultipleObjects(rghWait[1] ? 2 : 1, rghWait, FALSE, INFINITE))
             {
             case WAIT_OBJECT_0:
                 break;
 
             case WAIT_OBJECT_0 + 1:
-                if (!::GetExitCodeThread(hCacheThread, (DWORD*)&hr))
+                if (!::GetExitCodeThread(pContext->pApplyContext->hCacheThread, (DWORD*)&hr))
                 {
                     ExitWithLastError(hr, "Failed to get cache thread exit code.");
                 }
@@ -2449,9 +2437,8 @@ static HRESULT ExecuteExePackage(
     ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
-    (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
-    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
     ExitOnRootFailure(hr, "BA aborted EXE package execute progress.");
 
 LExit:
@@ -2514,9 +2501,8 @@ static HRESULT ExecuteMsiPackage(
     }
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
-    (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
-    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
     ExitOnRootFailure(hr, "BA aborted MSI package execute progress.");
 
 LExit:
@@ -2588,9 +2574,8 @@ static HRESULT ExecuteMspPackage(
     }
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
-    (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
-    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
     ExitOnRootFailure(hr, "BA aborted MSP package execute progress.");
 
 LExit:
@@ -2669,9 +2654,8 @@ static HRESULT ExecuteMsuPackage(
     ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
-    (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
-    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
+    hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, pContext->pApplyContext);
     ExitOnRootFailure(hr, "BA aborted MSU package execute progress.");
 
 LExit:
@@ -3040,14 +3024,22 @@ static HRESULT ReportOverallProgressTicks(
     __in BURN_USER_EXPERIENCE* pUX,
     __in BOOL fRollback,
     __in DWORD cOverallProgressTicksTotal,
-    __in DWORD cOverallProgressTicks
+    __in BURN_APPLY_CONTEXT* pApplyContext
     )
 {
     HRESULT hr = S_OK;
-    DWORD dwProgress = cOverallProgressTicksTotal ? (cOverallProgressTicks * 100 / cOverallProgressTicksTotal) : 0;
+    DWORD dwProgress = 0;
+
+    ::EnterCriticalSection(&pApplyContext->csApply);
+
+    pApplyContext->cOverallProgressTicks += fRollback ? -1 : 1;
+
+    dwProgress = cOverallProgressTicksTotal ? (pApplyContext->cOverallProgressTicks * 100 / cOverallProgressTicksTotal) : 0;
 
     // TODO: consider sending different progress numbers in the future.
     hr = UserExperienceOnProgress(pUX, fRollback, dwProgress, dwProgress);
+
+    ::LeaveCriticalSection(&pApplyContext->csApply);
 
     return hr;
 }

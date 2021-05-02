@@ -81,14 +81,11 @@ HRESULT ApplyCache(
     __in BURN_VARIABLES* pVariables,
     __in BURN_PLAN* pPlan,
     __in HANDLE hPipe,
-    __inout DWORD* pcOverallProgressTicks,
-    __inout BOOL* pfRollback
+    __in BURN_APPLY_CONTEXT* pContext
     );
 HRESULT ApplyExecute(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in_opt HANDLE hCacheThread,
-    __inout DWORD* pcOverallProgressTicks,
-    __out BOOL* pfRollback,
+    __in BURN_APPLY_CONTEXT* pApplyContext,
     __out BOOL* pfSuspend,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
