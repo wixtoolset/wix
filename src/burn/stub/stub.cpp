@@ -101,6 +101,8 @@ static void CALLBACK BurnTraceError(
 
     if (fLog)
     {
+        DutilSuppressTraceErrorSource();
         LogErrorStringArgs(hrError, szFormat, args);
+        DutilUnsuppressTraceErrorSource();
     }
 }

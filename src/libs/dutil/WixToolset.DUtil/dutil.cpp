@@ -30,6 +30,8 @@ static REPORT_LEVEL Dutil_rlCurrentTrace = REPORT_STANDARD;
 static BOOL Dutil_fTraceFilenames = FALSE;
 static DUTIL_CALLBACK_TRACEERROR vpfnTraceErrorCallback = NULL;
 
+thread_local static DWORD vtdwSuppressTraceErrorSource = 0;
+
 
 DAPI_(HRESULT) DutilInitialize(
     __in_opt DUTIL_CALLBACK_TRACEERROR pfnTraceErrorCallback
@@ -46,6 +48,28 @@ DAPI_(HRESULT) DutilInitialize(
 DAPI_(void) DutilUninitialize()
 {
     vpfnTraceErrorCallback = NULL;
+}
+
+DAPI_(BOOL) DutilSuppressTraceErrorSource()
+{
+    if (DWORD_MAX == vtdwSuppressTraceErrorSource)
+    {
+        return FALSE;
+    }
+
+    ++vtdwSuppressTraceErrorSource;
+    return TRUE;
+}
+
+DAPI_(BOOL) DutilUnsuppressTraceErrorSource()
+{
+    if (0 == vtdwSuppressTraceErrorSource)
+    {
+        return FALSE;
+    }
+
+    --vtdwSuppressTraceErrorSource;
+    return TRUE;
 }
 
 /*******************************************************************
@@ -427,8 +451,9 @@ DAPIV_(void) Dutil_TraceErrorSource(
     ...
     )
 {
+    // if this callback is currently suppressed, or
     // if this is NOT an error report and we're not logging at this level, bail
-    if (REPORT_ERROR != rl && Dutil_rlCurrentTrace < rl)
+    if (vtdwSuppressTraceErrorSource || REPORT_ERROR != rl && Dutil_rlCurrentTrace < rl)
     {
         return;
     }

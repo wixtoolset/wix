@@ -41,6 +41,23 @@ HRESULT DAPI DutilInitialize(
 *******************************************************************/
 void DAPI DutilUninitialize();
 
+
+/********************************************************************
+ DutilSuppressTraceErrorSource - tells dutil to skip calling
+    pfnTraceErrorCallback for the current thread. This is reference
+    counted, so dutil won't start calling it again until there is an
+    equal number of calls to DutilUnsuppressTraceErrorSource.
+    Returns whether the count was incremented.
+
+*******************************************************************/
+BOOL DAPI DutilSuppressTraceErrorSource();
+
+/********************************************************************
+ DutilUnsuppressTraceErrorSource - opposite of DutilSuppressTraceErrorSource.
+
+*******************************************************************/
+BOOL DAPI DutilUnsuppressTraceErrorSource();
+
 void DAPI Dutil_SetAssertModule(__in HMODULE hAssertModule);
 void DAPI Dutil_SetAssertDisplayFunction(__in DUTIL_ASSERTDISPLAYFUNCTION pfn);
 void DAPI Dutil_Assert(__in_z LPCSTR szFile, __in int iLine);
