@@ -50,6 +50,10 @@ HRESULT ElevationSaveState(
     __in_bcount(cbBuffer) BYTE* pbBuffer,
     __in SIZE_T cbBuffer
     );
+HRESULT ElevationCachePreparePackage(
+    __in HANDLE hPipe,
+    __in BURN_PACKAGE* pPackage
+    );
 HRESULT ElevationCacheCompletePayload(
     __in HANDLE hPipe,
     __in BURN_PACKAGE* pPackage,

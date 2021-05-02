@@ -717,6 +717,13 @@ Language=English
 Acquiring container: %1!ls!, %3!hs! from: %4!ls!
 .
 
+MessageId=337
+Severity=Error
+SymbolicName=MSG_CACHE_PREPARE_PACKAGE_FAILED
+Language=English
+Failed to prepare package: %2!ls!, error: 0x%1!ls!
+.
+
 MessageId=338
 Severity=Success
 SymbolicName=MSG_ACQUIRE_PACKAGE_PAYLOAD
