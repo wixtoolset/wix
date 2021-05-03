@@ -26,6 +26,7 @@ enum BURN_PAYLOAD_STATE
 enum BURN_PAYLOAD_VERIFICATION
 {
     BURN_PAYLOAD_VERIFICATION_NONE,
+    BURN_PAYLOAD_VERIFICATION_AUTHENTICODE,
     BURN_PAYLOAD_VERIFICATION_HASH,
     BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE,
 };
@@ -41,6 +42,10 @@ typedef struct _BURN_PAYLOAD
     DWORD64 qwFileSize;
     LPWSTR sczFilePath; // file path relative to the execute location
 
+    BYTE* pbCertificateRootPublicKeyIdentifier;
+    DWORD cbCertificateRootPublicKeyIdentifier;
+    BYTE* pbCertificateRootThumbprint;
+    DWORD cbCertificateRootThumbprint;
     BYTE* pbHash;
     DWORD cbHash;
     BURN_PAYLOAD_VERIFICATION verification;
