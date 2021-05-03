@@ -114,10 +114,16 @@ static HRESULT RemoveBundleOrPackage(
     __in_z LPCWSTR wzBundleOrPackageId,
     __in_z LPCWSTR wzCacheId
     );
+static HRESULT VerifyFileSize(
+    __in HANDLE hFile,
+    __in DWORD64 qwFileSize,
+    __in_z LPCWSTR wzUnverifiedPayloadPath
+    );
 static HRESULT VerifyHash(
     __in BYTE* pbHash,
     __in DWORD cbHash,
     __in DWORD64 qwFileSize,
+    __in BOOL fVerifyFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile,
     __in BURN_CACHE_STEP cacheStep,
@@ -1513,11 +1519,16 @@ static HRESULT VerifyThenTransferContainer(
         ExitWithLastError(hr, "Failed to open container in working path: %ls", wzUnverifiedContainerPath);
     }
 
-    // Container should have a hash we can use to verify with.
-    if (pContainer->pbHash)
+
+    switch (pContainer->verification)
     {
-        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzUnverifiedContainerPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
+    case BURN_CONTAINER_VERIFICATION_HASH:
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, TRUE, wzUnverifiedContainerPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify container hash: %ls", wzCachedPath);
+        break;
+    default:
+        ExitOnRootFailure(hr = E_INVALIDARG, "Container has no verification information: %ls", pContainer->sczId);
+        break;
     }
 
     LogStringLine(REPORT_STANDARD, "%ls container from working path '%ls' to path '%ls'", fMove ? L"Moving" : L"Copying", wzUnverifiedContainerPath, wzCachedPath);
@@ -1550,10 +1561,16 @@ static HRESULT VerifyThenTransferPayload(
         ExitWithLastError(hr, "Failed to open payload in working path: %ls", wzUnverifiedPayloadPath);
     }
 
-    if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
+    switch (pPayload->verification)
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzUnverifiedPayloadPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
+    case BURN_PAYLOAD_VERIFICATION_HASH:
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, TRUE, wzUnverifiedPayloadPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify payload hash: %ls", wzCachedPath);
+        break;
+    case BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE: __fallthrough;
+    default:
+        ExitOnRootFailure(hr = E_INVALIDARG, "Payload has no verification information: %ls", pPayload->sczKey);
+        break;
     }
 
     LogStringLine(REPORT_STANDARD, "%ls payload from working path '%ls' to path '%ls'", fMove ? L"Moving" : L"Copying", wzUnverifiedPayloadPath, wzCachedPath);
@@ -1627,10 +1644,15 @@ static HRESULT VerifyFileAgainstContainer(
         ExitOnRootFailure(hr, "Failed to open container at path: %ls", wzVerifyPath);
     }
 
-    if (pContainer->pbHash) // the container should have a hash we can use to verify it.
+    switch (pContainer->verification)
     {
-        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
+    case BURN_CONTAINER_VERIFICATION_HASH:
+        hr = VerifyHash(pContainer->pbHash, pContainer->cbHash, pContainer->qwFileSize, TRUE, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify hash of container: %ls", pContainer->sczId);
+        break;
+    default:
+        ExitOnRootFailure(hr = E_INVALIDARG, "Container has no verification information: %ls", pContainer->sczId);
+        break;
     }
 
     if (fAlreadyCached)
@@ -1667,6 +1689,7 @@ static HRESULT VerifyFileAgainstPayload(
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
+    BOOL fVerifyFileSize = FALSE;
 
     // Get the payload on disk actual hash.
     hFile = ::CreateFileW(wzVerifyPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
@@ -1680,10 +1703,33 @@ static HRESULT VerifyFileAgainstPayload(
         ExitOnRootFailure(hr, "Failed to open payload at path: %ls", wzVerifyPath);
     }
 
-    if (pPayload->pbHash) // the payload should have a hash we can use to verify it.
+    switch (pPayload->verification)
     {
-        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
+    case BURN_PAYLOAD_VERIFICATION_HASH:
+        fVerifyFileSize = TRUE;
+
+        hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, fVerifyFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
+
+        break;
+    case BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE:
+        fVerifyFileSize = 0 != pPayload->qwFileSize;
+
+        if (pPayload->pbHash)
+        {
+            hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, fVerifyFileSize, wzVerifyPath, hFile, cacheStep, pfnCacheMessageHandler, pfnProgress, pContext);
+            ExitOnFailure(hr, "Failed to verify hash of payload: %ls", pPayload->sczKey);
+        }
+        else if (fVerifyFileSize)
+        {
+            hr = VerifyFileSize(hFile, pPayload->qwFileSize, wzVerifyPath);
+            ExitOnFailure(hr, "Failed to verify file size for path: %ls", wzVerifyPath);
+        }
+
+        break;
+    default:
+        ExitOnRootFailure(hr = E_INVALIDARG, "Payload has no verification information: %ls", pPayload->sczKey);
+        break;
     }
 
     if (fAlreadyCached)
@@ -2015,10 +2061,32 @@ LExit:
     return hr;
 }
 
+static HRESULT VerifyFileSize(
+    __in HANDLE hFile,
+    __in DWORD64 qwFileSize,
+    __in_z LPCWSTR wzUnverifiedPayloadPath
+    )
+{
+    HRESULT hr = S_OK;
+    LONGLONG llSize = 0;
+
+    hr = FileSizeByHandle(hFile, &llSize);
+    ExitOnFailure(hr, "Failed to get file size for path: %ls", wzUnverifiedPayloadPath);
+
+    if (static_cast<DWORD64>(llSize) != qwFileSize)
+    {
+        ExitOnRootFailure(hr = ERROR_FILE_CORRUPT, "File size mismatch for path: %ls, expected: %llu, actual: %lld", wzUnverifiedPayloadPath, qwFileSize, llSize);
+    }
+
+LExit:
+    return hr;
+}
+
 static HRESULT VerifyHash(
     __in BYTE* pbHash,
     __in DWORD cbHash,
     __in DWORD64 qwFileSize,
+    __in BOOL fVerifyFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile,
     __in BURN_CACHE_STEP cacheStep,
@@ -2032,19 +2100,16 @@ static HRESULT VerifyHash(
     HRESULT hr = S_OK;
     BYTE rgbActualHash[SHA512_HASH_LEN] = { };
     DWORD64 qwHashedBytes = 0;
-    LONGLONG llSize = 0;
     LPWSTR pszExpected = NULL;
     LPWSTR pszActual = NULL;
 
     hr = SendCacheBeginMessage(pfnCacheMessageHandler, pContext, cacheStep);
     ExitOnFailure(hr, "Aborted cache verify hash begin.");
 
-    hr = FileSizeByHandle(hFile, &llSize);
-    ExitOnFailure(hr, "Failed to get file size for path: %ls", wzUnverifiedPayloadPath);
-
-    if (static_cast<DWORD64>(llSize) != qwFileSize)
+    if (fVerifyFileSize)
     {
-        ExitOnFailure(hr = ERROR_FILE_CORRUPT, "File size mismatch for path: %ls, expected: %llu, actual: %lld", wzUnverifiedPayloadPath, qwFileSize, llSize);
+        hr = VerifyFileSize(hFile, qwFileSize, wzUnverifiedPayloadPath);
+        ExitOnFailure(hr, "Failed to verify file size for path: %ls", wzUnverifiedPayloadPath);
     }
 
     // TODO: create a cryp hash file that sends progress.

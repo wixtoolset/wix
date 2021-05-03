@@ -71,6 +71,8 @@ namespace Bootstrapper
                 payload.sczFilePath = L"CacheSignatureTest.File";
                 payload.pbHash = pb;
                 payload.cbHash = cb;
+                payload.qwFileSize = 27;
+                payload.verification = BURN_PAYLOAD_VERIFICATION_HASH;
 
                 hr = CacheCompletePayload(package.fPerMachine, &payload, package.sczCacheId, sczPayloadPath, FALSE, CacheTestEventRoutine, CacheTestProgressRoutine, &context);
                 Assert::Equal(S_OK, hr);
