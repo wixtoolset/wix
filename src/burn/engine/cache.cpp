@@ -17,6 +17,11 @@ static LPWSTR vsczDefaultUserPackageCache = NULL;
 static LPWSTR vsczDefaultMachinePackageCache = NULL;
 static LPWSTR vsczCurrentMachinePackageCache = NULL;
 
+static HRESULT CacheVerifyPayloadSignature(
+    __in BURN_PAYLOAD* pPayload,
+    __in_z LPCWSTR wzUnverifiedPayloadPath,
+    __in HANDLE hFile
+    );
 static HRESULT CalculateWorkingFolder(
     __in_z LPCWSTR wzBundleId,
     __deref_out_z LPWSTR* psczWorkingFolder
@@ -130,6 +135,10 @@ static HRESULT VerifyHash(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
+    );
+static HRESULT VerifyPayloadAgainstCertChain(
+    __in BURN_PAYLOAD* pPayload,
+    __in PCCERT_CHAIN_CONTEXT pChainContext
     );
 static HRESULT SendCacheBeginMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
@@ -1133,6 +1142,56 @@ LExit:
     return hr;
 }
 
+static HRESULT CacheVerifyPayloadSignature(
+    __in BURN_PAYLOAD* pPayload,
+    __in_z LPCWSTR wzUnverifiedPayloadPath,
+    __in HANDLE hFile
+    )
+{
+    HRESULT hr = S_OK;
+    LONG er = ERROR_SUCCESS;
+
+    GUID guidAuthenticode = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    WINTRUST_FILE_INFO wfi = { };
+    WINTRUST_DATA wtd = { };
+    CRYPT_PROVIDER_DATA* pProviderData = NULL;
+    CRYPT_PROVIDER_SGNR* pSigner = NULL;
+
+    // Verify the payload assuming online.
+    wfi.cbStruct = sizeof(wfi);
+    wfi.pcwszFilePath = wzUnverifiedPayloadPath;
+    wfi.hFile = hFile;
+
+    wtd.cbStruct = sizeof(wtd);
+    wtd.dwUnionChoice = WTD_CHOICE_FILE;
+    wtd.pFile = &wfi;
+    wtd.dwStateAction = WTD_STATEACTION_VERIFY;
+    wtd.dwProvFlags = WTD_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT;
+    wtd.dwUIChoice = WTD_UI_NONE;
+
+    er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &guidAuthenticode, &wtd);
+    if (er)
+    {
+        // Verify the payload assuming offline.
+        wtd.dwProvFlags |= WTD_CACHE_ONLY_URL_RETRIEVAL;
+
+        er = ::WinVerifyTrust(static_cast<HWND>(INVALID_HANDLE_VALUE), &guidAuthenticode, &wtd);
+        ExitOnWin32Error(er, hr, "Failed authenticode verification of payload: %ls", wzUnverifiedPayloadPath);
+    }
+
+    pProviderData = ::WTHelperProvDataFromStateData(wtd.hWVTStateData);
+    ExitOnNullWithLastError(pProviderData, hr, "Failed to get provider state from authenticode certificate.");
+
+    pSigner = ::WTHelperGetProvSignerFromChain(pProviderData, 0, FALSE, 0);
+    ExitOnNullWithLastError(pSigner, hr, "Failed to get signer chain from authenticode certificate.");
+
+    hr = VerifyPayloadAgainstCertChain(pPayload, pSigner->pChainContext);
+    ExitOnFailure(hr, "Failed to verify expected payload against actual certificate chain.");
+
+LExit:
+    return hr;
+}
+
 extern "C" void CacheCleanup(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzBundleId
@@ -1563,6 +1622,10 @@ static HRESULT VerifyThenTransferPayload(
 
     switch (pPayload->verification)
     {
+    case BURN_PAYLOAD_VERIFICATION_AUTHENTICODE:
+        hr = CacheVerifyPayloadSignature(pPayload, wzUnverifiedPayloadPath, hFile);
+        ExitOnFailure(hr, "Failed to verify payload signature: %ls", wzCachedPath);
+        break;
     case BURN_PAYLOAD_VERIFICATION_HASH:
         hr = VerifyHash(pPayload->pbHash, pPayload->cbHash, pPayload->qwFileSize, TRUE, wzUnverifiedPayloadPath, hFile, BURN_CACHE_STEP_HASH, pfnCacheMessageHandler, pfnProgress, pContext);
         ExitOnFailure(hr, "Failed to verify payload hash: %ls", wzCachedPath);
@@ -1705,6 +1768,10 @@ static HRESULT VerifyFileAgainstPayload(
 
     switch (pPayload->verification)
     {
+    case BURN_PAYLOAD_VERIFICATION_AUTHENTICODE:
+        hr = CacheVerifyPayloadSignature(pPayload, wzVerifyPath, hFile);
+        ExitOnFailure(hr, "Failed to verify signature of payload: %ls", pPayload->sczKey);
+        break;
     case BURN_PAYLOAD_VERIFICATION_HASH:
         fVerifyFileSize = TRUE;
 
@@ -2140,6 +2207,70 @@ LExit:
 
     ReleaseStr(pszActual);
     ReleaseStr(pszExpected);
+
+    return hr;
+}
+
+static HRESULT VerifyPayloadAgainstCertChain(
+    __in BURN_PAYLOAD* pPayload,
+    __in PCCERT_CHAIN_CONTEXT pChainContext
+    )
+{
+    HRESULT hr = S_OK;
+    PCCERT_CONTEXT pChainElementCertContext = NULL;
+
+    BYTE rgbPublicKeyIdentifier[SHA1_HASH_LEN] = { };
+    DWORD cbPublicKeyIdentifier = sizeof(rgbPublicKeyIdentifier);
+    BYTE* pbThumbprint = NULL;
+    DWORD cbThumbprint = 0;
+
+    // Walk up the chain looking for a certificate in the chain that matches our expected public key identifier
+    // and thumbprint (if a thumbprint was provided).
+    HRESULT hrChainVerification = E_NOTFOUND; // assume we won't find a match.
+    for (DWORD i = 0; i < pChainContext->rgpChain[0]->cElement; ++i)
+    {
+        pChainElementCertContext = pChainContext->rgpChain[0]->rgpElement[i]->pCertContext;
+
+        // Get the certificate's public key identifier.
+        if (!::CryptHashPublicKeyInfo(NULL, CALG_SHA1, 0, X509_ASN_ENCODING, &pChainElementCertContext->pCertInfo->SubjectPublicKeyInfo, rgbPublicKeyIdentifier, &cbPublicKeyIdentifier))
+        {
+            ExitWithLastError(hr, "Failed to get certificate public key identifier.");
+        }
+
+        // Compare the certificate's public key identifier with the payload's public key identifier. If they
+        // match, we're one step closer to the a positive result.
+        if (pPayload->cbCertificateRootPublicKeyIdentifier == cbPublicKeyIdentifier &&
+            0 == memcmp(pPayload->pbCertificateRootPublicKeyIdentifier, rgbPublicKeyIdentifier, cbPublicKeyIdentifier))
+        {
+            // If the payload specified a thumbprint for the certificate, verify it.
+            if (pPayload->pbCertificateRootThumbprint)
+            {
+                hr = CertReadProperty(pChainElementCertContext, CERT_SHA1_HASH_PROP_ID, &pbThumbprint, &cbThumbprint);
+                ExitOnFailure(hr, "Failed to read certificate thumbprint.");
+
+                if (pPayload->cbCertificateRootThumbprint == cbThumbprint &&
+                    0 == memcmp(pPayload->pbCertificateRootThumbprint, pbThumbprint, cbThumbprint))
+                {
+                    // If we got here, we found that our payload public key identifier and thumbprint
+                    // matched an element in the certficate chain.
+                    hrChainVerification = S_OK;
+                    break;
+                }
+
+                ReleaseNullMem(pbThumbprint);
+            }
+            else // no thumbprint match necessary so we're good to go.
+            {
+                hrChainVerification = S_OK;
+                break;
+            }
+        }
+    }
+    hr = hrChainVerification;
+    ExitOnFailure(hr, "Failed to find expected public key in certificate chain.");
+
+LExit:
+    ReleaseMem(pbThumbprint);
 
     return hr;
 }

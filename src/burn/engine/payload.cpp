@@ -132,6 +132,28 @@ extern "C" HRESULT PayloadsParseFromXml(
                 fValidFileSize = TRUE;
             }
 
+            // @CertificateAuthorityKeyIdentifier
+            hr = XmlGetAttributeEx(pixnNode, L"CertificateRootPublicKeyIdentifier", &scz);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @CertificateRootPublicKeyIdentifier.");
+
+                hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootPublicKeyIdentifier, &pPayload->cbCertificateRootPublicKeyIdentifier);
+                ExitOnFailure(hr, "Failed to hex decode @CertificateRootPublicKeyIdentifier.");
+
+                pPayload->verification = BURN_PAYLOAD_VERIFICATION_AUTHENTICODE;
+            }
+
+            // @CertificateThumbprint
+            hr = XmlGetAttributeEx(pixnNode, L"CertificateRootThumbprint", &scz);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @CertificateRootThumbprint.");
+
+                hr = StrAllocHexDecode(scz, &pPayload->pbCertificateRootThumbprint, &pPayload->cbCertificateRootThumbprint);
+                ExitOnFailure(hr, "Failed to hex decode @CertificateRootThumbprint.");
+            }
+
             // @Hash
             hr = XmlGetAttributeEx(pixnNode, L"Hash", &scz);
             if (E_NOTFOUND != hr)
@@ -191,6 +213,8 @@ extern "C" void PayloadUninitialize(
         ReleaseStr(pPayload->sczKey);
         ReleaseStr(pPayload->sczFilePath);
         ReleaseMem(pPayload->pbHash);
+        ReleaseMem(pPayload->pbCertificateRootThumbprint);
+        ReleaseMem(pPayload->pbCertificateRootPublicKeyIdentifier);
         ReleaseStr(pPayload->sczSourcePath);
         ReleaseStr(pPayload->sczLocalFilePath);
         ReleaseStr(pPayload->downloadSource.sczUrl);
