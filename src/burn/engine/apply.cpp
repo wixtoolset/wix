@@ -1410,12 +1410,12 @@ static HRESULT AcquireContainerOrPayload(
             fMinimumFileSize = TRUE;
             qwFileSize = pContainer->qwAttachedOffset + pContainer->qwFileSize;
         }
-        else if (pContainer->pbHash && pContext->wzLayoutDirectory)
+        else
         {
             qwFileSize = pContainer->qwFileSize;
         }
     }
-    else if (pPayload->pbHash)
+    else if (BURN_PAYLOAD_VERIFICATION_HASH == pPayload->verification || BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE == pPayload->verification)
     {
         qwFileSize = pPayload->qwFileSize;
     }

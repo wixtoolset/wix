@@ -69,6 +69,11 @@ extern "C" HRESULT PseudoBundleInitialize(
         memcpy_s(pPayload->pbHash, pPayload->cbHash, pbHash, cbHash);
     }
 
+    if (BOOTSTRAPPER_RELATION_UPDATE == relationType)
+    {
+        pPayload->verification = BURN_PAYLOAD_VERIFICATION_UPDATE_BUNDLE;
+    }
+
     pPackage->Exe.fPseudoBundle = TRUE;
 
     pPackage->type = BURN_PACKAGE_TYPE_EXE;

@@ -50,16 +50,9 @@ extern "C" HRESULT ContainersParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pContainer->sczId);
         ExitOnFailure(hr, "Failed to get @Id.");
 
-        // @Primary
-        hr = XmlGetYesNoAttribute(pixnNode, L"Primary", &pContainer->fPrimary);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Primary.");
-        }
-
         // @Attached
         hr = XmlGetYesNoAttribute(pixnNode, L"Attached", &pContainer->fAttached);
-        if (E_NOTFOUND != hr || pContainer->fPrimary) // if it is a primary container, it has to be attached
+        if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to get @Attached.");
         }
@@ -87,10 +80,7 @@ extern "C" HRESULT ContainersParseFromXml(
         {
             // @FilePath
             hr = XmlGetAttributeEx(pixnNode, L"FilePath", &pContainer->sczFilePath);
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to get @FilePath.");
-            }
+            ExitOnFailure(hr, "Failed to get @FilePath.");
         }
 
         // The source path starts as the file path.
@@ -99,22 +89,31 @@ extern "C" HRESULT ContainersParseFromXml(
 
         // @DownloadUrl
         hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pContainer->downloadSource.sczUrl);
-        if (E_NOTFOUND != hr || (!pContainer->fPrimary && !pContainer->sczSourcePath)) // if the package is not a primary package, it must have a source path or a download url
+        if (E_NOTFOUND != hr)
         {
-            ExitOnFailure(hr, "Failed to get @DownloadUrl. Either @SourcePath or @DownloadUrl needs to be provided.");
+            ExitOnFailure(hr, "Failed to get @DownloadUrl.");
         }
 
         // @Hash
         hr = XmlGetAttributeEx(pixnNode, L"Hash", &pContainer->sczHash);
-        if (SUCCEEDED(hr))
+        ExitOnFailure(hr, "Failed to get @Hash.");
+
+        hr = StrAllocHexDecode(pContainer->sczHash, &pContainer->pbHash, &pContainer->cbHash);
+        ExitOnFailure(hr, "Failed to hex decode the Container/@Hash.");
+
+        // @FileSize
+        hr = XmlGetAttributeEx(pixnNode, L"FileSize", &scz);
+        ExitOnFailure(hr, "Failed to get @FileSize.");
+
+        hr = StrStringToUInt64(scz, 0, &pContainer->qwFileSize);
+        ExitOnFailure(hr, "Failed to parse @FileSize.");
+
+        if (!pContainer->qwFileSize)
         {
-            hr = StrAllocHexDecode(pContainer->sczHash, &pContainer->pbHash, &pContainer->cbHash);
-            ExitOnFailure(hr, "Failed to hex decode the Container/@Hash.");
+            ExitOnRootFailure(hr = E_INVALIDDATA, "File size is required when verifying by hash for container: %ls", pContainer->sczId);
         }
-        else if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @Hash.");
-        }
+
+        pContainer->verification = BURN_CONTAINER_VERIFICATION_HASH;
 
         // prepare next iteration
         ReleaseNullObject(pixnNode);
@@ -136,6 +135,7 @@ extern "C" HRESULT ContainersInitialize(
     )
 {
     HRESULT hr = S_OK;
+    DWORD64 qwSize = 0;
 
     if (pContainers->rgContainers)
     {
@@ -147,8 +147,13 @@ extern "C" HRESULT ContainersInitialize(
             // manifest contained and get the offset to the container.
             if (pContainer->fAttached)
             {
-                hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, pContainer->type, &pContainer->qwAttachedOffset, &pContainer->qwFileSize, &pContainer->fActuallyAttached);
+                hr = SectionGetAttachedContainerInfo(pSection, pContainer->dwAttachedIndex, pContainer->type, &pContainer->qwAttachedOffset, &qwSize, &pContainer->fActuallyAttached);
                 ExitOnFailure(hr, "Failed to get attached container information.");
+
+                if (qwSize != pContainer->qwFileSize)
+                {
+                    ExitOnFailure(hr, "Attached container '%ls' size '%llu' didn't match size from manifest: '%llu'", pContainer->sczId, qwSize, pContainer->qwFileSize);
+                }
             }
         }
     }
@@ -195,7 +200,6 @@ extern "C" HRESULT ContainerOpenUX(
 
     // open attached container
     container.type = BURN_CONTAINER_TYPE_CABINET;
-    container.fPrimary = TRUE;
     container.fAttached = TRUE;
     container.dwAttachedIndex = 0;
 

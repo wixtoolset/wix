@@ -52,6 +52,12 @@ enum BURN_CAB_OPERATION
     BURN_CAB_OPERATION_CLOSE,
 };
 
+enum BURN_CONTAINER_VERIFICATION
+{
+    BURN_CONTAINER_VERIFICATION_NONE,
+    BURN_CONTAINER_VERIFICATION_HASH,
+};
+
 
 // structs
 
@@ -59,7 +65,6 @@ typedef struct _BURN_CONTAINER
 {
     LPWSTR sczId;
     BURN_CONTAINER_TYPE type;
-    BOOL fPrimary;
     BOOL fAttached;
     DWORD dwAttachedIndex;
     DWORD64 qwFileSize;
@@ -69,6 +74,7 @@ typedef struct _BURN_CONTAINER
 
     BYTE* pbHash;
     DWORD cbHash;
+    BURN_CONTAINER_VERIFICATION verification;
     DWORD64 qwAttachedOffset;
     BOOL fActuallyAttached;     // indicates whether an attached container is attached or missing.
 

@@ -27,6 +27,8 @@ extern "C" HRESULT PayloadsParseFromXml(
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     LPWSTR scz = NULL;
+    BOOL fChainPayload = pContainers && pLayoutPayloads; // These are required when parsing chain payloads.
+    BOOL fValidFileSize = FALSE;
 
     // select payload nodes
     hr = XmlSelectNodes(pixnBundle, L"Payload", &pixnNodes);
@@ -51,6 +53,7 @@ extern "C" HRESULT PayloadsParseFromXml(
     for (DWORD i = 0; i < cNodes; ++i)
     {
         BURN_PAYLOAD* pPayload = &pPayloads->rgPayloads[i];
+        fValidFileSize = FALSE;
 
         hr = XmlNextElement(pixnNodes, &pixnNode, NULL);
         ExitOnFailure(hr, "Failed to get next node.");
@@ -63,27 +66,36 @@ extern "C" HRESULT PayloadsParseFromXml(
         hr = XmlGetAttributeEx(pixnNode, L"FilePath", &pPayload->sczFilePath);
         ExitOnFailure(hr, "Failed to get @FilePath.");
 
-        // @Packaging
-        hr = XmlGetAttributeEx(pixnNode, L"Packaging", &scz);
-        ExitOnFailure(hr, "Failed to get @Packaging.");
+        // @SourcePath
+        hr = XmlGetAttributeEx(pixnNode, L"SourcePath", &pPayload->sczSourcePath);
+        ExitOnFailure(hr, "Failed to get @SourcePath.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
+        if (!fChainPayload)
         {
+            // All non-chain payloads are embedded in the UX container.
             pPayload->packaging = BURN_PAYLOAD_PACKAGING_EMBEDDED;
-        }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"external", -1))
-        {
-            pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
         }
         else
         {
-            hr = E_INVALIDARG;
-            ExitOnFailure(hr, "Invalid value for @Packaging: %ls", scz);
-        }
+            // @Packaging
+            hr = XmlGetAttributeEx(pixnNode, L"Packaging", &scz);
+            ExitOnFailure(hr, "Failed to get @Packaging.");
 
-        // @Container
-        if (pContainers)
-        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
+            {
+                pPayload->packaging = BURN_PAYLOAD_PACKAGING_EMBEDDED;
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"external", -1))
+            {
+                pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
+            }
+            else
+            {
+                hr = E_INVALIDARG;
+                ExitOnFailure(hr, "Invalid value for @Packaging: %ls", scz);
+            }
+
+            // @Container
             hr = XmlGetAttributeEx(pixnNode, L"Container", &scz);
             if (E_NOTFOUND != hr || BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
             {
@@ -93,52 +105,67 @@ extern "C" HRESULT PayloadsParseFromXml(
                 hr = ContainerFindById(pContainers, scz, &pPayload->pContainer);
                 ExitOnFailure(hr, "Failed to to find container: %ls", scz);
             }
-        }
 
-        // @LayoutOnly
-        hr = XmlGetYesNoAttribute(pixnNode, L"LayoutOnly", &pPayload->fLayoutOnly);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @LayoutOnly.");
-        }
+            // @LayoutOnly
+            hr = XmlGetYesNoAttribute(pixnNode, L"LayoutOnly", &pPayload->fLayoutOnly);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @LayoutOnly.");
+            }
 
-        // @SourcePath
-        hr = XmlGetAttributeEx(pixnNode, L"SourcePath", &pPayload->sczSourcePath);
-        ExitOnFailure(hr, "Failed to get @SourcePath.");
+            // @DownloadUrl
+            hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pPayload->downloadSource.sczUrl);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @DownloadUrl.");
+            }
 
-        // @DownloadUrl
-        hr = XmlGetAttributeEx(pixnNode, L"DownloadUrl", &pPayload->downloadSource.sczUrl);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @DownloadUrl.");
-        }
+            // @FileSize
+            hr = XmlGetAttributeEx(pixnNode, L"FileSize", &scz);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @FileSize.");
 
-        // @FileSize
-        hr = XmlGetAttributeEx(pixnNode, L"FileSize", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @FileSize.");
+                hr = StrStringToUInt64(scz, 0, &pPayload->qwFileSize);
+                ExitOnFailure(hr, "Failed to parse @FileSize.");
 
-            hr = StrStringToUInt64(scz, 0, &pPayload->qwFileSize);
-            ExitOnFailure(hr, "Failed to parse @FileSize.");
-        }
+                fValidFileSize = TRUE;
+            }
 
-        // @Hash
-        hr = XmlGetAttributeEx(pixnNode, L"Hash", &scz);
-        ExitOnFailure(hr, "Failed to get @Hash.");
+            // @Hash
+            hr = XmlGetAttributeEx(pixnNode, L"Hash", &scz);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @Hash.");
 
-        hr = StrAllocHexDecode(scz, &pPayload->pbHash, &pPayload->cbHash);
-        ExitOnFailure(hr, "Failed to hex decode the Payload/@Hash.");
+                hr = StrAllocHexDecode(scz, &pPayload->pbHash, &pPayload->cbHash);
+                ExitOnFailure(hr, "Failed to hex decode the Payload/@Hash.");
 
-        if (pPayload->fLayoutOnly && pLayoutPayloads)
-        {
-            hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pLayoutPayloads->rgItems), pLayoutPayloads->cItems + 1, sizeof(BURN_PAYLOAD_GROUP_ITEM), 5);
-            ExitOnFailure(hr, "Failed to allocate memory for layout payloads.");
+                if (BURN_PAYLOAD_VERIFICATION_NONE == pPayload->verification)
+                {
+                    pPayload->verification = BURN_PAYLOAD_VERIFICATION_HASH;
+                }
+            }
 
-            pLayoutPayloads->rgItems[pLayoutPayloads->cItems].pPayload = pPayload;
-            ++pLayoutPayloads->cItems;
+            if (BURN_PAYLOAD_VERIFICATION_NONE == pPayload->verification)
+            {
+                ExitOnRootFailure(hr = E_INVALIDDATA, "There was no verification information for payload: %ls", pPayload->sczKey);
+            }
+            else if (BURN_PAYLOAD_VERIFICATION_HASH == pPayload->verification && !fValidFileSize)
+            {
+                ExitOnRootFailure(hr = E_INVALIDDATA, "File size is required when verifying by hash for payload: %ls", pPayload->sczKey);
+            }
 
-            pLayoutPayloads->qwTotalSize += pPayload->qwFileSize;
+            if (pPayload->fLayoutOnly)
+            {
+                hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pLayoutPayloads->rgItems), pLayoutPayloads->cItems + 1, sizeof(BURN_PAYLOAD_GROUP_ITEM), 5);
+                ExitOnFailure(hr, "Failed to allocate memory for layout payloads.");
+
+                pLayoutPayloads->rgItems[pLayoutPayloads->cItems].pPayload = pPayload;
+                ++pLayoutPayloads->cItems;
+
+                pLayoutPayloads->qwTotalSize += pPayload->qwFileSize;
+            }
         }
 
         // prepare next iteration
