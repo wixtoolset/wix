@@ -31,7 +31,7 @@
     <WixVariable Id="NetFx461WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx461WebId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx461FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx461FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx461WebDetectCondition)" InstallCondition="!(wix.NetFx461WebInstallCondition)" Id="$(var.NetFx461WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx461FullLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx461FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx461WebDetectCondition)" InstallCondition="!(wix.NetFx461WebInstallCondition)" Id="$(var.NetFx461WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx461FullLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx461WebPackageDirectory)NDP461-KB3102438-Web.exe" DownloadUrl="$(var.NetFx461WebLink)" Description="Microsoft .NET Framework 4.6.1 Setup" Hash="97C4DD638E2E0324D60BDD1D7BE85603EDBF969898469A524FB271EBA5E22B78CA67DB1F568F5C45393381F1E76408C366AD4A68A7BB00E23D1FB820E67DE99E" ProductName="Microsoft .NET Framework 4.6.1" Size="1424328" Version="4.6.1055.0" />
       </ExePackage>
     </PackageGroup>
@@ -53,7 +53,7 @@
     <WixVariable Id="NetFx461RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx461RedistId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx461FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx461FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx461RedistDetectCondition)" InstallCondition="!(wix.NetFx461RedistInstallCondition)" Id="$(var.NetFx461RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx461FullLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx461FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx461RedistDetectCondition)" InstallCondition="!(wix.NetFx461RedistInstallCondition)" Id="$(var.NetFx461RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx461FullLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx461RedistPackageDirectory)NDP461-KB3102436-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx461RedistLink)" Description="Microsoft .NET Framework 4.6.1 Setup" Hash="43BEF5EB278CF0954EAE1A6FEEC5A9852B932270508DD10647B9EA32DFD3832ECB58172B28707216709705BF0013FCEBB0B39DB31E38786FC2DAE219622EA00F" ProductName="Microsoft .NET Framework 4.6.1" Size="67681000" Version="4.6.1055.0" />
       </ExePackage>
     </PackageGroup>

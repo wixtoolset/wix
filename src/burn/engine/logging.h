@@ -73,6 +73,10 @@ LPCSTR LoggingActionStateToString(
     __in BOOTSTRAPPER_ACTION_STATE actionState
     );
 
+LPCSTR LoggingCacheTypeToString(
+    BOOTSTRAPPER_CACHE_TYPE cacheType
+    );
+
 LPCSTR LoggingDependencyActionToString(
     BURN_DEPENDENCY_ACTION action
     );

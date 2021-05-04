@@ -1998,7 +1998,11 @@ EXTERN_C BAAPI UserExperienceOnPlanPackageBegin(
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
     *pRequestedState = results.requestedState;
-    *pRequestedCacheType = results.requestedCacheType;
+
+    if (BOOTSTRAPPER_CACHE_TYPE_REMOVE <= results.requestedCacheType && BOOTSTRAPPER_CACHE_TYPE_FORCE >= results.requestedCacheType)
+    {
+        *pRequestedCacheType = results.requestedCacheType;
+    }
 
 LExit:
     return hr;

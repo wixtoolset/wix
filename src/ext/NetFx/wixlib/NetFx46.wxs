@@ -32,7 +32,7 @@
     <WixVariable Id="NetFx46WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx46WebId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46WebDetectCondition)" InstallCondition="!(wix.NetFx46WebInstallCondition)" Id="$(var.NetFx46WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46WebDetectCondition)" InstallCondition="!(wix.NetFx46WebInstallCondition)" Id="$(var.NetFx46WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx46WebPackageDirectory)NDP46-KB3045560-Web.exe" DownloadUrl="$(var.NetFx46WebLink)" Description="Microsoft .NET Framework 4.6 Setup" Hash="CAA5F4D4DB0C9DF34252FCB74CF7762214F69D2419865EBC1E6717E6B1348E59A7599A8DECAAB5CEE6974E59D1AE5A749F8C4EC07C8E4C80C90E77B996B3B205" ProductName="Microsoft .NET Framework 4.6" Size="1497400" Version="4.6.81.0" />
       </ExePackage>
     </PackageGroup>
@@ -54,7 +54,7 @@
     <WixVariable Id="NetFx46RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx46RedistId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46RedistDetectCondition)" InstallCondition="!(wix.NetFx46RedistInstallCondition)" Id="$(var.NetFx46RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46RedistDetectCondition)" InstallCondition="!(wix.NetFx46RedistInstallCondition)" Id="$(var.NetFx46RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx46RedistPackageDirectory)NDP46-KB3045557-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx46RedistLink)" Description="Microsoft .NET Framework 4.6 Setup" Hash="C6FC54F648F822515ADACB4C27E0A6DBD6A3EAF2BA3F069C0002750894ECC453EBED8BC8D4FF2AFD73C7B3445C1DA18D43FE361EA5195AE8522249DF36B84B7E" ProductName="Microsoft .NET Framework 4.6" Size="65444688" Version="4.6.81.0" />
       </ExePackage>
     </PackageGroup>
