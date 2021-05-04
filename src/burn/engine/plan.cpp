@@ -1077,7 +1077,7 @@ extern "C" HRESULT PlanExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    BOOL fRequestedCache = BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested || ForceCache(pPlan, pPackage);
+    BOOL fRequestedCache = BOOTSTRAPPER_CACHE_TYPE_REMOVE < pPackage->cacheType && (BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested || ForceCache(pPlan, pPackage));
 
     hr = CalculateExecuteActions(pPackage, pPlan->pActiveRollbackBoundary);
     ExitOnFailure(hr, "Failed to calculate plan actions for package: %ls", pPackage->sczId);
@@ -2531,8 +2531,19 @@ static BOOL ForceCache(
     __in BURN_PACKAGE* pPackage
     )
 {
-    // All packages that have cacheType set to force should be cached if the bundle is going to be present.
-    return BOOTSTRAPPER_CACHE_TYPE_FORCE == pPackage->cacheType && BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action;
+    switch (pPackage->cacheType)
+    {
+    case BOOTSTRAPPER_CACHE_TYPE_KEEP:
+        // During actions that are expected to have source media available,
+        // all packages that have cacheType set to keep should be cached if the package is going to be present.
+        return (BOOTSTRAPPER_ACTION_CACHE == pPlan->action || BOOTSTRAPPER_ACTION_INSTALL == pPlan->action) &&
+               BOOTSTRAPPER_REQUEST_STATE_CACHE < pPackage->requested;
+    case BOOTSTRAPPER_CACHE_TYPE_FORCE:
+        // All packages that have cacheType set to force should be cached if the bundle is going to be present.
+        return BOOTSTRAPPER_ACTION_UNINSTALL < pPlan->action;
+    default:
+        return FALSE;
+    }
 }
 
 static void CacheActionLog(

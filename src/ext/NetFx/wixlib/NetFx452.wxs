@@ -31,7 +31,7 @@
     <WixVariable Id="NetFx452WebPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx452WebId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullWebLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullWebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452WebDetectCondition)" InstallCondition="!(wix.NetFx452WebInstallCondition)" Id="$(var.NetFx452WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullWebLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullWebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452WebDetectCondition)" InstallCondition="!(wix.NetFx452WebInstallCondition)" Id="$(var.NetFx452WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullWebLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx452WebPackageDirectory)NDP452-KB2901954-Web.exe" DownloadUrl="$(var.NetFx452WebLink)" Description="Microsoft .NET Framework 4.5.2 Setup" Hash="90A3A5A57EA8A6508EEE0D129303C7CB012AABF651DD9A6BEFC20DA3BBDB09FC47FD087645051D3D45BFF909DFC6E6039C22C4816FBC793A847E81701248639E" ProductName="Microsoft .NET Framework 4.5.2" Size="1118920" Version="4.5.51209.34209" />
       </ExePackage>
     </PackageGroup>
@@ -53,7 +53,7 @@
     <WixVariable Id="NetFx452RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx452RedistId)">
-      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452RedistDetectCondition)" InstallCondition="!(wix.NetFx452RedistInstallCondition)" Id="$(var.NetFx452RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullLog">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452RedistDetectCondition)" InstallCondition="!(wix.NetFx452RedistInstallCondition)" Id="$(var.NetFx452RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullLog" Cache="no">
         <ExePackagePayload Name="!(wix.NetFx452RedistPackageDirectory)NDP452-KB2901907-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx452RedistLink)" Description="Microsoft .NET Framework 4.5.2 Setup" Hash="033D457229C4FE6EEA7B1E42A3A39DD4CF6A054C5E996CE036942DD2FE9623FD3A0634BE5DCB88506C1C61BF9FF6076F27B4ECEC38F8CF85603AF018111E584D" ProductName="Microsoft .NET Framework 4.5.2" Size="69999448" Version="4.5.51209.34209" />
       </ExePackage>
     </PackageGroup>

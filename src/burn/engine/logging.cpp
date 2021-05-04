@@ -337,6 +337,23 @@ extern "C" LPCSTR LoggingActionStateToString(
     }
 }
 
+extern "C" LPCSTR LoggingCacheTypeToString(
+    BOOTSTRAPPER_CACHE_TYPE cacheType
+    )
+{
+    switch (cacheType)
+    {
+    case BOOTSTRAPPER_CACHE_TYPE_FORCE:
+        return "Force";
+    case BOOTSTRAPPER_CACHE_TYPE_KEEP:
+        return "Keep";
+    case BOOTSTRAPPER_CACHE_TYPE_REMOVE:
+        return "Remove";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingDependencyActionToString(
     BURN_DEPENDENCY_ACTION action
     )

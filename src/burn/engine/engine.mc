@@ -314,7 +314,7 @@ MessageId=201
 Severity=Success
 SymbolicName=MSG_PLANNED_PACKAGE
 Language=English
-Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, cache: %7!hs!, uncache: %8!hs!, dependency: %9!hs!, expected install registration state: %10!hs!, expected cache registration state: %11!hs!
+Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, default cache strategy: %7!hs!, ba requested strategy: %8!hs!, cache: %9!hs!, uncache: %10!hs!, dependency: %11!hs!, expected install registration state: %12!hs!, expected cache registration state: %13!hs!
 .
 
 MessageId=202
