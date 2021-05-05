@@ -10,7 +10,6 @@ namespace WixToolset.WixBA
     using System.Windows;
     using System.Windows.Input;
     using IO = System.IO;
-    using WixToolset.BootstrapperCore;
     using WixToolset.Mba.Core;
 
     /// <summary>

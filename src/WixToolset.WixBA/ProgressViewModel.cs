@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using WixToolset.BootstrapperCore;
 using WixToolset.Mba.Core;
 
 namespace WixToolset.WixBA
