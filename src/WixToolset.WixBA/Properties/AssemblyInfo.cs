@@ -3,7 +3,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using WixToolset.BootstrapperCore;
+using WixToolset.Mba.Core;
 using WixToolset.WixBA;
 
 
