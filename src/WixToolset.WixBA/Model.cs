@@ -5,7 +5,6 @@ namespace WixToolset.WixBA
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using WixToolset.BootstrapperCore;
     using WixToolset.Mba.Core;
 
     /// <summary>

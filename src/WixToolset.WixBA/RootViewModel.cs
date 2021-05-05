@@ -6,7 +6,7 @@ namespace WixToolset.WixBA
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Threading;
-    using WixToolset.BootstrapperCore;
+    using WixToolset.Mba.Core;
 
     /// <summary>
     /// The errors returned from the engine
