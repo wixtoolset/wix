@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
-  <Import Project="..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props" Condition="Exists('..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{7C27518B-84AD-4679-8EF4-29DF552CF1AC}</ProjectGuid>
+    <TargetFramework>net45</TargetFramework>
     <AssemblyName>WixToolset.WixBA</AssemblyName>
-    <OutputType>Library</OutputType>
     <RootNamespace>WixToolset.WixBA</RootNamespace>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>embedded</DebugType>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <AssemblyTitle>WixToolset.WixBA</AssemblyTitle>
+    <Description>WiX Bootstrapper Application</Description>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Hresult.cs" />
-    <Compile Include="Model.cs" />
-    <Compile Include="BrowserProperties.cs" />
-    <Compile Include="NewsItem.cs" />
-    <Compile Include="ProgressViewModel.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="InstallationViewModel.cs" />
-    <Compile Include="WixBAFactory.cs" />
-    <Compile Include="WixDistribution.cs" />
     <Page Include="Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -27,53 +23,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="PropertyNotifyBase.cs" />
-    <Compile Include="RootView.xaml.cs">
-      <DependentUpon>RootView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="RootViewModel.cs" />
-    <Compile Include="UpdateViewModel.cs" />
-    <Compile Include="WindowProperties.cs" />
-    <Compile Include="WixBA.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="WixBA.BootstrapperCore.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\logo-white-hollow.png" />
+    <Resource Include="Resources\logo-black-hollow.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="WixToolset.Mba.Core">
-      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.13\lib\net20\WixToolset.Mba.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\logo-white-hollow.png" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.26" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\logo-black-hollow.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props'))" />
-  </Target>
 </Project>
