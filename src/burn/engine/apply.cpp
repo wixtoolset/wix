@@ -335,6 +335,7 @@ extern "C" void ApplyReset(
     {
         BURN_PACKAGE* pPackage = pPackages->rgPackages + i;
         pPackage->hrCacheResult = S_OK;
+        pPackage->fReachedExecution = FALSE;
         pPackage->transactionRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN;
     }
 }
@@ -433,7 +434,7 @@ LExit:
 
 extern "C" HRESULT ApplyUnregister(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in BOOL fFailedOrRollback,
+    __in BOOL fFailed,
     __in BOOL fSuspend,
     __in BOOTSTRAPPER_APPLY_RESTART restart
     )
@@ -466,7 +467,7 @@ extern "C" HRESULT ApplyUnregister(
 
     // If apply failed in any way and we're going to be keeping the bundle registered then
     // execute any rollback dependency registration actions.
-    if (fFailedOrRollback && fKeepRegistration)
+    if (fFailed && fKeepRegistration)
     {
         // Execute any rollback registration actions.
         HRESULT hrRegistrationRollback = ExecuteDependentRegistrationActions(pEngineState->companionConnection.hPipe, &pEngineState->registration, pEngineState->plan.rgRollbackRegistrationActions, pEngineState->plan.cRollbackRegistrationActions);
@@ -587,11 +588,7 @@ extern "C" HRESULT ApplyCache(
     }
 
 LExit:
-    if (FAILED(hr))
-    {
-        DoRollbackCache(pUX, pPlan, hPipe, dwCheckpoint);
-        pContext->fRollback = TRUE;
-    }
+    pContext->dwCacheCheckpoint = dwCheckpoint;
 
     // Clean up any remanents in the cache.
     if (INVALID_HANDLE_VALUE != hPipe)
@@ -610,6 +607,16 @@ LExit:
 
     UserExperienceOnCacheComplete(pUX, hr);
     return hr;
+}
+
+extern "C" void ApplyCacheRollback(
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_PLAN* pPlan,
+    __in HANDLE hPipe,
+    __in BURN_APPLY_CONTEXT* pContext
+    )
+{
+    DoRollbackCache(pUX, pPlan, hPipe, pContext->dwCacheCheckpoint);
 }
 
 extern "C" HRESULT ApplyExecute(
@@ -687,7 +694,6 @@ extern "C" HRESULT ApplyExecute(
                     IgnoreRollbackError(hrRollback, "Failed commit transaction from disable rollback");
                 }
 
-                pApplyContext->fRollback = TRUE;
                 break;
             }
 
@@ -708,7 +714,6 @@ extern "C" HRESULT ApplyExecute(
             // If the rollback boundary is vital, end execution here.
             if (pRollbackBoundary && pRollbackBoundary->fVital)
             {
-                pApplyContext->fRollback = TRUE;
                 break;
             }
 
@@ -2110,41 +2115,44 @@ static void DoRollbackCache(
     )
 {
     HRESULT hr = S_OK;
-    DWORD iCheckpoint = 0;
-
-    // Scan to last checkpoint.
-    for (DWORD i = 0; i < pPlan->cRollbackCacheActions; ++i)
-    {
-        BURN_CACHE_ACTION* pRollbackCacheAction = &pPlan->rgRollbackCacheActions[i];
-
-        if (BURN_CACHE_ACTION_TYPE_CHECKPOINT == pRollbackCacheAction->type && pRollbackCacheAction->checkpoint.dwId == dwCheckpoint)
-        {
-            iCheckpoint = i;
-            break;
-        }
-    }
+    BURN_PACKAGE* pPackage = NULL;
+    DWORD dwLastCheckpoint = 0;
 
     // Rollback cache actions.
-    if (iCheckpoint)
+    for (DWORD i = pPlan->cRollbackCacheActions; i > 0; --i)
     {
-        // i has to be a signed integer so it doesn't get decremented to 0xFFFFFFFF.
-        for (int i = iCheckpoint - 1; i >= 0; --i)
+        BURN_CACHE_ACTION* pRollbackCacheAction = &pPlan->rgRollbackCacheActions[i - 1];
+
+        switch (pRollbackCacheAction->type)
         {
-            BURN_CACHE_ACTION* pRollbackCacheAction = &pPlan->rgRollbackCacheActions[i];
+        case BURN_CACHE_ACTION_TYPE_CHECKPOINT:
+            dwLastCheckpoint = pRollbackCacheAction->checkpoint.dwId;
+            break;
 
-            switch (pRollbackCacheAction->type)
+        case BURN_CACHE_ACTION_TYPE_ROLLBACK_PACKAGE:
+            pPackage = pRollbackCacheAction->rollbackPackage.pPackage;
+
+            // If the package was executed then it's up to ApplyExecute to rollback its cache.
+            if (!pPackage->fReachedExecution)
             {
-            case BURN_CACHE_ACTION_TYPE_CHECKPOINT:
-                break;
-
-            case BURN_CACHE_ACTION_TYPE_ROLLBACK_PACKAGE:
-                hr = CleanPackage(hPipe, pRollbackCacheAction->rollbackPackage.pPackage);
-                break;
-
-            default:
-                AssertSz(FALSE, "Invalid rollback cache action.");
-                break;
+                if (!pPackage->fCached) // only rollback when it wasn't already cached.
+                {
+                    if (dwLastCheckpoint <= dwCheckpoint) // only rollback when it was attempted to be cached.
+                    {
+                        hr = CleanPackage(hPipe, pPackage);
+                    }
+                }
+                else if (pPackage->fCanAffectRegistration)
+                {
+                    // Don't let this already cached package cause the registration to be kept if the bundle failed and wasn't already registered.
+                    pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                }
             }
+            break;
+
+        default:
+            AssertSz(FALSE, "Invalid rollback cache action.");
+            break;
         }
     }
 }
@@ -2180,9 +2188,11 @@ static HRESULT DoExecuteAction(
             *ppCheckpoint = &pExecuteAction->checkpoint;
             break;
 
-        case BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT:
+        case BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE:
+            pExecuteAction->waitCachePackage.pPackage->fReachedExecution = TRUE;
+
             // wait for cache sync-point
-            rghWait[0] = pExecuteAction->syncpoint.hEvent;
+            rghWait[0] = pExecuteAction->waitCachePackage.pPackage->hCacheEvent;
             rghWait[1] = pContext->pApplyContext->hCacheThread;
             switch (::WaitForMultipleObjects(rghWait[1] ? 2 : 1, rghWait, FALSE, INFINITE))
             {
@@ -2354,10 +2364,17 @@ static HRESULT DoRollbackActions(
                 ExitFunction1(hr = S_OK);
 
             case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
-                // TODO: This used to be skipped if the package was already cached.
-                //       Need to figure out new logic for when (if?) to skip it.
-                hr = CleanPackage(pEngineState->companionConnection.hPipe, pRollbackAction->uncachePackage.pPackage);
-                IgnoreRollbackError(hr, "Failed to uncache package for rollback.");
+                if (!pRollbackAction->uncachePackage.pPackage->fCached) // only rollback when it wasn't already cached.
+                {
+                    hr = CleanPackage(pEngineState->companionConnection.hPipe, pRollbackAction->uncachePackage.pPackage);
+                    IgnoreRollbackError(hr, "Failed to uncache package for rollback.");
+                }
+                else if (pRollbackAction->uncachePackage.pPackage->fCanAffectRegistration)
+                {
+                    // Don't let this already cached package cause the registration to be kept if the bundle failed and wasn't already registered.
+                    pRollbackAction->uncachePackage.pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
+                }
+
                 break;
 
             default:

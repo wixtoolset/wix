@@ -192,19 +192,11 @@ extern "C" HRESULT MsuEnginePlanAddPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in HANDLE hCacheEvent
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
     BURN_EXECUTE_ACTION* pAction = NULL;
-
-    // add wait for cache
-    if (hCacheEvent)
-    {
-        hr = PlanExecuteCacheSyncAndRollback(pPlan, pPackage, hCacheEvent);
-        ExitOnFailure(hr, "Failed to plan package cache syncpoint");
-    }
 
     hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");

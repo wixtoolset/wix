@@ -57,8 +57,7 @@ static HRESULT PlanTargetProduct(
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_ACTION_STATE actionState,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_MSPTARGETPRODUCT* pTargetProduct,
-    __in_opt HANDLE hCacheEvent
+    __in BURN_MSPTARGETPRODUCT* pTargetProduct
     );
 
 
@@ -504,20 +503,10 @@ extern "C" HRESULT MspEnginePlanAddPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in_opt HANDLE hCacheEvent
+    __in BURN_VARIABLES* pVariables
     )
 {
     HRESULT hr = S_OK;
-
-    // TODO: need to handle the case where this patch adds itself to an earlier patch's list of target products. That would
-    //       essentially bump this patch earlier in the plan and we need to make sure this patch is downloaded.
-    // add wait for cache
-    if (hCacheEvent)
-    {
-        hr = PlanExecuteCacheSyncAndRollback(pPlan, pPackage, hCacheEvent);
-        ExitOnFailure(hr, "Failed to plan package cache syncpoint");
-    }
 
     hr = DependencyPlanPackage(NULL, pPackage, pPlan);
     ExitOnFailure(hr, "Failed to plan package dependency actions.");
@@ -536,13 +525,13 @@ extern "C" HRESULT MspEnginePlanAddPackage(
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->execute)
         {
-            hr = PlanTargetProduct(display, pUserExperience, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(display, pUserExperience, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct);
             ExitOnFailure(hr, "Failed to plan target product.");
         }
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->rollback)
         {
-            hr = PlanTargetProduct(display, pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(display, pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct);
             ExitOnFailure(hr, "Failed to plan rollback target product.");
         }
     }
@@ -1089,8 +1078,7 @@ static HRESULT PlanTargetProduct(
     __in BURN_VARIABLES* pVariables,
     __in BOOTSTRAPPER_ACTION_STATE actionState,
     __in BURN_PACKAGE* pPackage,
-    __in BURN_MSPTARGETPRODUCT* pTargetProduct,
-    __in_opt HANDLE hCacheEvent
+    __in BURN_MSPTARGETPRODUCT* pTargetProduct
     )
 {
     HRESULT hr = S_OK;
@@ -1153,16 +1141,17 @@ static HRESULT PlanTargetProduct(
     }
     else
     {
-        if (!fRollback && hCacheEvent)
+        if (!fRollback && pPackage->hCacheEvent)
         {
-            // Since a previouse MSP target action is being updated with the new MSP, 
+            // TODO: need to properly handle rolling back the caching of the package since this causes cache and execute plans to get out of sync.
+            // Since a previous MSP target action is being updated with the new MSP,
             // insert a wait syncpoint to before this action since we need to cache the current MSI before using it.
             BURN_EXECUTE_ACTION* pWaitSyncPointAction = NULL;
             hr = PlanInsertExecuteAction(dwInsertSequence, pPlan, &pWaitSyncPointAction);
             ExitOnFailure(hr, "Failed to insert execute action.");
 
-            pWaitSyncPointAction->type = BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT;
-            pWaitSyncPointAction->syncpoint.hEvent = hCacheEvent;
+            pWaitSyncPointAction->type = BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE;
+            pWaitSyncPointAction->waitCachePackage.pPackage = pPackage;
 
             // Since we inserted an action before the MSP target action that we will be updating, need to update the pointer.
             pAction = pPlan->rgExecuteActions + (dwInsertSequence + 1);

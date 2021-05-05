@@ -28,8 +28,7 @@ HRESULT ExeEnginePlanAddPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __in_opt HANDLE hCacheEvent
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT ExeEngineExecutePackage(
     __in BURN_EXECUTE_ACTION* pExecuteAction,

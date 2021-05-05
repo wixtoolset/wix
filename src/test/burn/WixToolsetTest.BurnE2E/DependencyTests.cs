@@ -79,7 +79,7 @@ namespace WixToolsetTest.BurnE2E
             packageA.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/exea")]
+        [Fact]
         public void CanKeepUpgradedPackageAfterUninstallUpgradedBundle()
         {
             var testRegistryValueExe = "ExeA";
