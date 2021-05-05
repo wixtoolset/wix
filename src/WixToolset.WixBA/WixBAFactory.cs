@@ -3,6 +3,7 @@
 namespace WixToolset.WixBA
 {
     using WixToolset.BootstrapperCore;
+    using WixToolset.Mba.Core;
 
     public class WixBAFactory : BaseBootstrapperApplicationFactory
     {

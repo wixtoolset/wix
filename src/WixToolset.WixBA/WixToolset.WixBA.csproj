@@ -57,7 +57,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WixToolset.BootstrapperCore">
-      <HintPath>..\..\packages\WixToolset.BootstrapperCore.4.0.5\lib\net20\WixToolset.BootstrapperCore.dll</HintPath>
+      <HintPath>..\..\packages\WixToolset.BootstrapperCore.4.0.8\lib\net20\WixToolset.BootstrapperCore.dll</HintPath>
+    </Reference>
+    <Reference Include="WixToolset.Mba.Core">
+      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.9\lib\net20\WixToolset.Mba.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
