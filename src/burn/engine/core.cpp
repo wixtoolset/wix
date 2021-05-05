@@ -467,6 +467,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback;
+    pEngineState->plan.fBundleAlreadyRegistered = pEngineState->registration.fInstalled;
 
     hr = PlanSetVariables(action, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to update action.");
@@ -613,6 +614,7 @@ extern "C" HRESULT CoreApply(
     BURN_APPLY_CONTEXT applyContext = { };
     BOOL fDeleteApplyCs = FALSE;
     BURN_CACHE_THREAD_CONTEXT cacheThreadContext = { };
+    BOOL fRollbackCache = FALSE;
     DWORD dwPhaseCount = 0;
     BOOTSTRAPPER_APPLYCOMPLETE_ACTION applyCompleteAction = BOOTSTRAPPER_APPLYCOMPLETE_ACTION_NONE;
 
@@ -713,6 +715,8 @@ extern "C" HRESULT CoreApply(
         applyContext.hCacheThread = ::CreateThread(NULL, 0, CacheThreadProc, &cacheThreadContext, 0, NULL);
         ExitOnNullWithLastError(applyContext.hCacheThread, hr, "Failed to create cache thread.");
 
+        fRollbackCache = TRUE;
+
         // If we're not caching in parallel, wait for the cache thread to terminate.
         if (!pEngineState->fParallelCacheAndExecute)
         {
@@ -740,23 +744,32 @@ extern "C" HRESULT CoreApply(
         }
     }
 
-    // If something went wrong or force restarted, skip cleaning.
-    if (FAILED(hr) || applyContext.fRollback || fSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
+    if (fSuspend || BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
     {
-        ExitFunction();
+        // Leave cache alone.
+        fRollbackCache = FALSE;
     }
-
-    // Clean.
-    if (pEngineState->plan.cCleanActions)
+    else if (SUCCEEDED(hr))
     {
-        ApplyClean(&pEngineState->userExperience, &pEngineState->plan, pEngineState->companionConnection.hPipe);
+        // Clean.
+        fRollbackCache = FALSE;
+
+        if (pEngineState->plan.cCleanActions)
+        {
+            ApplyClean(&pEngineState->userExperience, &pEngineState->plan, pEngineState->companionConnection.hPipe);
+        }
     }
 
 LExit:
+    if (fRollbackCache)
+    {
+        ApplyCacheRollback(&pEngineState->userExperience, &pEngineState->plan, pEngineState->companionConnection.hCachePipe, &applyContext);
+    }
+
     // Unregister.
     if (fRegistered)
     {
-        ApplyUnregister(pEngineState, FAILED(hr) || applyContext.fRollback, fSuspend, restart);
+        ApplyUnregister(pEngineState, FAILED(hr), fSuspend, restart);
     }
 
     if (fElevated)

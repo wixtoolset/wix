@@ -240,8 +240,10 @@ typedef struct _BURN_PACKAGE
     BURN_DEPENDENCY_ACTION dependencyExecute;   // only valid during Plan.
     BURN_DEPENDENCY_ACTION dependencyRollback;  // only valid during Plan.
     BOOL fDependencyManagerWasHere;             // only valid during Plan.
+    HANDLE hCacheEvent;                         // only valid during Plan.
     LPWSTR sczCacheFolder;                      // only valid during Apply.
     HRESULT hrCacheResult;                      // only valid during Apply.
+    BOOL fReachedExecution;                     // only valid during Apply.
 
     BURN_PACKAGE_REGISTRATION_STATE cacheRegistrationState;          // initialized during Detect, updated during Apply.
     BURN_PACKAGE_REGISTRATION_STATE installRegistrationState;        // initialized during Detect, updated during Apply.

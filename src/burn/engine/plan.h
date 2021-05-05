@@ -48,7 +48,7 @@ enum BURN_EXECUTE_ACTION_TYPE
 {
     BURN_EXECUTE_ACTION_TYPE_NONE,
     BURN_EXECUTE_ACTION_TYPE_CHECKPOINT,
-    BURN_EXECUTE_ACTION_TYPE_WAIT_SYNCPOINT,
+    BURN_EXECUTE_ACTION_TYPE_WAIT_CACHE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE,
     BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE,
@@ -151,8 +151,8 @@ typedef struct _BURN_EXECUTE_ACTION
         BURN_EXECUTE_ACTION_CHECKPOINT checkpoint;
         struct
         {
-            HANDLE hEvent;
-        } syncpoint;
+            BURN_PACKAGE* pPackage;
+        } waitCachePackage;
         struct
         {
             BURN_PACKAGE* pPackage;
@@ -240,6 +240,7 @@ typedef struct _BURN_PLAN
     BOOL fAffectedMachineState;
     BOOL fIgnoreAllDependents;
     LPWSTR sczLayoutDirectory;
+    BOOL fBundleAlreadyRegistered;
 
     DWORD64 qwCacheSizeTotal;
 
@@ -377,8 +378,7 @@ HRESULT PlanExecutePackage(
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
-    __in BURN_VARIABLES* pVariables,
-    __inout HANDLE* phSyncpointEvent
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT PlanDefaultRelatedBundleRequestState(
     __in BOOTSTRAPPER_RELATION_TYPE commandRelationType,
@@ -410,8 +410,7 @@ HRESULT PlanCleanPackage(
     );
 HRESULT PlanExecuteCacheSyncAndRollback(
     __in BURN_PLAN* pPlan,
-    __in BURN_PACKAGE* pPackage,
-    __in HANDLE hCacheEvent
+    __in BURN_PACKAGE* pPackage
     );
 HRESULT PlanExecuteCheckpoint(
     __in BURN_PLAN* pPlan

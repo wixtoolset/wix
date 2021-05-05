@@ -138,8 +138,8 @@ typedef struct _BURN_APPLY_CONTEXT
 {
     CRITICAL_SECTION csApply;
     DWORD cOverallProgressTicks;
-    BOOL fRollback;
     HANDLE hCacheThread;
+    DWORD dwCacheCheckpoint;
 } BURN_APPLY_CONTEXT;
 
 

@@ -71,7 +71,7 @@ HRESULT ApplyRegister(
     );
 HRESULT ApplyUnregister(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in BOOL fFailedOrRollback,
+    __in BOOL fFailed,
     __in BOOL fSuspend,
     __in BOOTSTRAPPER_APPLY_RESTART restart
     );
@@ -79,6 +79,12 @@ HRESULT ApplyCache(
     __in HANDLE hSourceEngineFile,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_VARIABLES* pVariables,
+    __in BURN_PLAN* pPlan,
+    __in HANDLE hPipe,
+    __in BURN_APPLY_CONTEXT* pContext
+    );
+void ApplyCacheRollback(
+    __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in HANDLE hPipe,
     __in BURN_APPLY_CONTEXT* pContext

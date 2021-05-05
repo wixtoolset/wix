@@ -64,7 +64,7 @@ namespace WixToolsetTest.BurnE2E
             packageB.VerifyInstalled(false);
         }
 
-        [Fact(Skip = "https://github.com/wixtoolset/issues/issues/5750")]
+        [Fact]
         public void CanCancelExecuteWhileCaching()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
