@@ -38,6 +38,7 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.DetectUpdateBegin += this.DetectUpdateBegin;
             WixBA.Model.Bootstrapper.DetectUpdate += this.DetectUpdate;
             WixBA.Model.Bootstrapper.DetectUpdateComplete += this.DetectUpdateComplete;
+            WixBA.Model.Bootstrapper.DetectComplete += this.DetectComplete;
 
             this.root.PropertyChanged += new PropertyChangedEventHandler(this.RootPropertyChanged);
 
@@ -201,7 +202,15 @@ namespace WixToolset.WixBA
             else if ((LaunchAction.Uninstall == WixBA.Model.Command.Action) || (UpdateState.Initializing == this.State) || (UpdateState.Checking == this.State))
             {
                 this.State = UpdateState.Unknown;
-            }            
+            }
+        }
+
+        private void DetectComplete(object sender, DetectCompleteEventArgs e)
+        {
+            if (this.State == UpdateState.Initializing || this.State == UpdateState.Checking)
+            {
+                this.State = UpdateState.Unknown;
+            }
         }
     }
 }

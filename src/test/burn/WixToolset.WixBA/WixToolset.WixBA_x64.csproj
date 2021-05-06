@@ -6,7 +6,7 @@
     <AssemblyName>WixToolset.WixBA</AssemblyName>
     <RootNamespace>WixToolset.WixBA</RootNamespace>
     <DebugType>embedded</DebugType>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyTitle>WixToolset.WixBA</AssemblyTitle>
     <Description>WiX Bootstrapper Application</Description>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

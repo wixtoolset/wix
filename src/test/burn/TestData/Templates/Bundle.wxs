@@ -22,6 +22,10 @@
       <!-- pulled in through the PackageGroupRef below -->
     <?elseif $(var.BA) = "TestBAdnc_x64"?>
       <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(var.BA) = "WixBA"?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(var.BA) = "WixBAdnc_x64"?>
+      <!-- pulled in through the PackageGroupRef below -->
     <?elseif $(var.BA) = "hyperlinkLicense"?>
       <BootstrapperApplication>
         <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
@@ -39,6 +43,10 @@
         <PackageGroupRef Id="TestBA_x64" />
       <?elseif $(var.BA) = "TestBAdnc_x64"?>
         <PackageGroupRef Id="TestBAdnc_x64" />
+      <?elseif $(var.BA) = "WixBA"?>
+        <PackageGroupRef Id="WixBA" />
+      <?elseif $(var.BA) = "WixBAdnc_x64"?>
+        <PackageGroupRef Id="WixBAdnc_x64" />
       <?endif?>
 
       <PackageGroupRef Id="BundlePackages" />

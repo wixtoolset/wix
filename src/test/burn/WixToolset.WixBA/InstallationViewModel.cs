@@ -461,8 +461,8 @@ namespace WixToolset.WixBA
 
         private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs e)
         {
-            // If we're able to run our BA, we don't want to install the .NET Framework since the framework on the machine is already good enough.
-            if ( e.PackageId.StartsWith("NetFx4", StringComparison.OrdinalIgnoreCase))
+            // If we're able to run our BA, we don't want to install .NET since the one on the machine is already good enough.
+            if (e.PackageId.StartsWith("NetFx4", StringComparison.OrdinalIgnoreCase) || e.PackageId.StartsWith("DesktopNetCoreRuntime", StringComparison.OrdinalIgnoreCase))
             {
                 e.State = RequestState.None;
             }
