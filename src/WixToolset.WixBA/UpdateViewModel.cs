@@ -171,7 +171,7 @@ namespace WixToolset.WixBA
             // or smaller than ours (we have a private build). If we really wanted to, we could leave the e.StopProcessingUpdates alone and
             // enumerate all of the updates.
             WixBA.Model.Engine.Log(LogLevel.Verbose, String.Format("Potential update v{0} from '{1}'; current version: v{2}", e.Version, e.UpdateLocation, WixBA.Model.Version));
-            if (e.Version > WixBA.Model.Version)
+            if (WixBA.Model.Engine.CompareVersions(e.Version, WixBA.Model.Version) > 0)
             {
                 WixBA.Model.Engine.SetUpdate(null, e.UpdateLocation, e.Size, UpdateHashType.None, null);
                 this.UpdateVersion = String.Concat("v", e.Version.ToString());
