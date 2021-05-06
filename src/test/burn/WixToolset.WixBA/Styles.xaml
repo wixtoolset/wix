@@ -18,8 +18,8 @@
     <System:Double x:Key="FontSizeButton">14</System:Double>
 
     <!-- Images -->
-    <BitmapImage x:Key="LogoOverLightBackground" UriSource="pack://application:,,,/WixBA;component/resources/logo-white-hollow.png" />
-    <BitmapImage x:Key="LogoOverDarkBackground" UriSource="pack://application:,,,/WixBA;component/resources/logo-black-hollow.png" />
+    <BitmapImage x:Key="LogoOverLightBackground" UriSource="pack://application:,,,/WixToolset.WixBA;component/resources/logo-white-hollow.png" />
+    <BitmapImage x:Key="LogoOverDarkBackground" UriSource="pack://application:,,,/WixToolset.WixBA;component/resources/logo-black-hollow.png" />
 
     <!-- Colors -->
     <Color x:Key="ProgressIndicatorColor">#FF1EF1E8</Color>

@@ -163,18 +163,18 @@ namespace WixToolset.WixBA
             WixBA.Model = new Model(this);
             WixBA.Dispatcher = Threading.Dispatcher.CurrentDispatcher;
             RootViewModel viewModel = new RootViewModel();
-
-            // Kick off detect which will populate the view models.
-            this.Engine.Detect();
+            WixBA.View = new RootView(viewModel);
 
             // Create a Window to show UI.
             if (WixBA.Model.Command.Display == Display.Passive ||
                 WixBA.Model.Command.Display == Display.Full)
             {
                 this.Engine.Log(LogLevel.Verbose, "Creating a UI.");
-                WixBA.View = new RootView(viewModel);
                 WixBA.View.Show();
             }
+
+            // Kick off detect which will populate the view models.
+            this.Engine.Detect();
 
             Threading.Dispatcher.Run();
 

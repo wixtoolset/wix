@@ -8,11 +8,13 @@
   </PropertyGroup>
   <ItemGroup>
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net35\win-x64" BindName="net2x64" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net45\win-x64" BindName="net4x64" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net5.0-windows\win-x64" BindName="dnc5x64" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj" />
     <ProjectReference Include="..\..\..\TestExe\TestExe_x64.csproj" />
+    <ProjectReference Include="..\..\..\WixToolset.WixBA\WixToolset.WixBA_x64.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Bal.wixext" />
