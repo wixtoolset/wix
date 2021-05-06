@@ -33,7 +33,6 @@ static void ResetPlannedRollbackBoundaryState(
 static HRESULT PlanPackagesHelper(
     __in BURN_PACKAGE* rgPackages,
     __in DWORD cPackages,
-    __in BOOL fPlanCleanPackages,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -513,7 +512,7 @@ extern "C" HRESULT PlanPackages(
 {
     HRESULT hr = S_OK;
     
-    hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, TRUE, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, pUX, pPlan, pLog, pVariables, display, relationType);
 
     return hr;
 }
@@ -725,9 +724,7 @@ extern "C" HRESULT PlanPassThroughBundle(
     HRESULT hr = S_OK;
 
     // Plan passthrough package.
-    // Passthrough packages are never cleaned up by the calling bundle (they delete themselves when appropriate)
-    // so we don't need to plan clean up.
-    hr = PlanPackagesHelper(pPackage, 1, FALSE, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables, display, relationType);
     ExitOnFailure(hr, "Failed to process passthrough package.");
 
 LExit:
@@ -747,7 +744,7 @@ extern "C" HRESULT PlanUpdateBundle(
     HRESULT hr = S_OK;
 
     // Plan update package.
-    hr = PlanPackagesHelper(pPackage, 1, TRUE, pUX, pPlan, pLog, pVariables, display, relationType);
+    hr = PlanPackagesHelper(pPackage, 1, pUX, pPlan, pLog, pVariables, display, relationType);
     ExitOnFailure(hr, "Failed to process update package.");
 
 LExit:
@@ -757,7 +754,6 @@ LExit:
 static HRESULT PlanPackagesHelper(
     __in BURN_PACKAGE* rgPackages,
     __in DWORD cPackages,
-    __in BOOL fPlanCleanPackages,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -813,7 +809,8 @@ static HRESULT PlanPackagesHelper(
         pRollbackBoundary = NULL;
     }
 
-    if (fPlanCleanPackages)
+    // Passthrough packages are never cleaned up by the calling bundle (they delete themselves when appropriate).
+    if (!pPlan->fEnabledForwardCompatibleBundle)
     {
         // Plan clean up of packages.
         for (DWORD i = 0; i < cPackages; ++i)
@@ -1050,6 +1047,8 @@ extern "C" HRESULT PlanLayoutPackage(
 {
     HRESULT hr = S_OK;
     BURN_CACHE_ACTION* pCacheAction = NULL;
+
+    AssertSz(!pPlan->fEnabledForwardCompatibleBundle, "Passthrough packages must already be cached");
 
     hr = ProcessPayloadGroup(pPlan, &pPackage->payloads);
     ExitOnFailure(hr, "Failed to process payload group for package: %ls.", pPackage->sczId);
@@ -2078,6 +2077,11 @@ static HRESULT AddCachePackageHelper(
     HRESULT hr = S_OK;
     BURN_CACHE_ACTION* pCacheAction = NULL;
     DWORD dwCheckpoint = 0;
+
+    if (pPlan->fEnabledForwardCompatibleBundle) // Passthrough packages must already be cached.
+    {
+        ExitFunction();
+    }
 
     BOOL fPlanned = AlreadyPlannedCachePackage(pPlan, pPackage->sczId, phSyncpointEvent);
     if (fPlanned)
