@@ -79,11 +79,11 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.PlanComplete += this.PlanComplete;
             WixBA.Model.Bootstrapper.ApplyBegin += this.ApplyBegin;
             WixBA.Model.Bootstrapper.CacheAcquireBegin += this.CacheAcquireBegin;
+            WixBA.Model.Bootstrapper.CacheAcquireResolving += this.CacheAcquireResolving;
             WixBA.Model.Bootstrapper.CacheAcquireComplete += this.CacheAcquireComplete;
             WixBA.Model.Bootstrapper.ExecutePackageBegin += this.ExecutePackageBegin;
             WixBA.Model.Bootstrapper.ExecutePackageComplete += this.ExecutePackageComplete;
             WixBA.Model.Bootstrapper.Error += this.ExecuteError;
-            WixBA.Model.Bootstrapper.ResolveSource += this.ResolveSource;
             WixBA.Model.Bootstrapper.ApplyComplete += this.ApplyComplete;
         }
 
@@ -492,9 +492,32 @@ namespace WixToolset.WixBA
             this.cachePackageStart = DateTime.Now;
         }
 
+        private void CacheAcquireResolving(object sender, CacheAcquireResolvingEventArgs e)
+        {
+            if (e.Action == CacheResolveOperation.Download && !this.downloadRetries.ContainsKey(e.PackageOrContainerId))
+            {
+                this.downloadRetries.Add(e.PackageOrContainerId, 0);
+            }
+        }
+
         private void CacheAcquireComplete(object sender, CacheAcquireCompleteEventArgs e)
         {
             this.AddPackageTelemetry("Cache", e.PackageOrContainerId ?? String.Empty, DateTime.Now.Subtract(this.cachePackageStart).TotalMilliseconds, e.Status);
+
+            if (e.Status < 0 && this.downloadRetries.TryGetValue(e.PackageOrContainerId, out var retries) && retries < 3)
+            {
+                this.downloadRetries[e.PackageOrContainerId] = retries + 1;
+                switch (e.Status)
+                {
+                    case -2147023294: //HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT)
+                    case -2147024894: //HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)
+                    case -2147012889: //HRESULT_FROM_WIN32(ERROR_INTERNET_NAME_NOT_RESOLVED)
+                        break;
+                    default:
+                        e.Action = BOOTSTRAPPER_CACHEACQUIRECOMPLETE_ACTION.Retry;
+                        break;
+                }
+            }
         }
 
         private void ExecutePackageBegin(object sender, ExecutePackageBeginEventArgs e)
@@ -582,16 +605,6 @@ namespace WixToolset.WixBA
                     e.Result = Result.Cancel;
                 }
             }
-        }
-
-        private void ResolveSource(object sender, ResolveSourceEventArgs e)
-        {
-            int retries = 0;
-
-            this.downloadRetries.TryGetValue(e.PackageOrContainerId, out retries);
-            this.downloadRetries[e.PackageOrContainerId] = retries + 1;
-
-            e.Action = retries < 3 && !String.IsNullOrEmpty(e.DownloadSource) ? BOOTSTRAPPER_RESOLVESOURCE_ACTION.Download : BOOTSTRAPPER_RESOLVESOURCE_ACTION.None;
         }
 
         private void ApplyComplete(object sender, ApplyCompleteEventArgs e)

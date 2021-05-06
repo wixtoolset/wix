@@ -40,6 +40,9 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.ApplyBegin += this.ApplyBegin;
             WixBA.Model.Bootstrapper.Progress += this.ApplyProgress;
             WixBA.Model.Bootstrapper.CacheAcquireProgress += this.CacheAcquireProgress;
+            WixBA.Model.Bootstrapper.CacheContainerOrPayloadVerifyProgress += CacheContainerOrPayloadVerifyProgress;
+            WixBA.Model.Bootstrapper.CachePayloadExtractProgress += CachePayloadExtractProgress;
+            WixBA.Model.Bootstrapper.CacheVerifyProgress += CacheVerifyProgress;
             WixBA.Model.Bootstrapper.CacheComplete += this.CacheComplete;
         }
 
@@ -175,6 +178,36 @@ namespace WixToolset.WixBA
         }
 
         private void CacheAcquireProgress(object sender, CacheAcquireProgressEventArgs e)
+        {
+            lock (this)
+            {
+                this.cacheProgress = e.OverallPercentage;
+                this.Progress = (this.cacheProgress + this.executeProgress) / this.progressPhases;
+                e.Cancel = this.root.Canceled;
+            }
+        }
+
+        private void CacheContainerOrPayloadVerifyProgress(object sender, CacheContainerOrPayloadVerifyProgressEventArgs e)
+        {
+            lock (this)
+            {
+                this.cacheProgress = e.OverallPercentage;
+                this.Progress = (this.cacheProgress + this.executeProgress) / this.progressPhases;
+                e.Cancel = this.root.Canceled;
+            }
+        }
+
+        private void CachePayloadExtractProgress(object sender, CachePayloadExtractProgressEventArgs e)
+        {
+            lock (this)
+            {
+                this.cacheProgress = e.OverallPercentage;
+                this.Progress = (this.cacheProgress + this.executeProgress) / this.progressPhases;
+                e.Cancel = this.root.Canceled;
+            }
+        }
+
+        private void CacheVerifyProgress(object sender, CacheVerifyProgressEventArgs e)
         {
             lock (this)
             {
