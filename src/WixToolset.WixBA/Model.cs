@@ -27,7 +27,7 @@ namespace WixToolset.WixBA
             this.Command = bootstrapper.Command;
             this.Engine = bootstrapper.Engine;
             this.Telemetry = new List<KeyValuePair<string, string>>();
-            this.Version = this.Engine.VersionVariables[BurnBundleVersionVariable];
+            this.Version = this.Engine.GetVariableVersion(BurnBundleVersionVariable);
         }
 
         public IBootstrapperApplicationData BAManifest { get; }
@@ -69,17 +69,17 @@ namespace WixToolset.WixBA
         {
             get
             {
-                if (!this.Engine.StringVariables.Contains(BurnBundleInstallDirectoryVariable))
+                if (!this.Engine.ContainsVariable(BurnBundleInstallDirectoryVariable))
                 {
                     return null;
                 }
 
-                return this.Engine.StringVariables[BurnBundleInstallDirectoryVariable];
+                return this.Engine.GetVariableString(BurnBundleInstallDirectoryVariable);
             }
 
             set
             {
-                this.Engine.StringVariables[BurnBundleInstallDirectoryVariable] = value;
+                this.Engine.SetVariable(BurnBundleInstallDirectoryVariable, value, false);
             }
         }
 
@@ -90,17 +90,17 @@ namespace WixToolset.WixBA
         {
             get
             {
-                if (!this.Engine.StringVariables.Contains(BurnBundleLayoutDirectoryVariable))
+                if (!this.Engine.ContainsVariable(BurnBundleLayoutDirectoryVariable))
                 {
                     return null;
                 }
 
-                return this.Engine.StringVariables[BurnBundleLayoutDirectoryVariable];
+                return this.Engine.GetVariableString(BurnBundleLayoutDirectoryVariable);
             }
 
             set
             {
-                this.Engine.StringVariables[BurnBundleLayoutDirectoryVariable] = value;
+                this.Engine.SetVariable(BurnBundleLayoutDirectoryVariable, value, false);
             }
         }
 
