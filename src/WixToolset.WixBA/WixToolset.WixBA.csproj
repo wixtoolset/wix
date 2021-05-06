@@ -41,6 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.49" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.58" />
   </ItemGroup>
 </Project>
