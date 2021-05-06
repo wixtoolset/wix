@@ -36,7 +36,7 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.PauseAutomaticUpdatesBegin += this.PauseAutomaticUpdatesBegin;
             WixBA.Model.Bootstrapper.SystemRestorePointBegin += this.SystemRestorePointBegin;
             WixBA.Model.Bootstrapper.PlanBegin += this.PlanBegin;
-            WixBA.Model.Bootstrapper.PlanPackageComplete += this.PlanPackageComplete;
+            WixBA.Model.Bootstrapper.PlannedPackage += this.PlannedPackage;
             WixBA.Model.Bootstrapper.ApplyBegin += this.ApplyBegin;
             WixBA.Model.Bootstrapper.Progress += this.ApplyProgress;
             WixBA.Model.Bootstrapper.CacheAcquireProgress += this.CacheAcquireProgress;
@@ -115,7 +115,7 @@ namespace WixToolset.WixBA
             }
         }
 
-        private void PlanPackageComplete(object sender, PlanPackageCompleteEventArgs e)
+        private void PlannedPackage(object sender, PlannedPackageEventArgs e)
         {
             if (ActionState.None != e.Execute)
             {
