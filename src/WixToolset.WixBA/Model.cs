@@ -60,7 +60,7 @@ namespace WixToolset.WixBA
         /// <summary>
         /// Get the version of the install.
         /// </summary>
-        public Version Version { get; private set; }
+        public string Version { get; private set; }
 
         /// <summary>
         /// Get or set the path where the bundle is installed.
@@ -79,7 +79,7 @@ namespace WixToolset.WixBA
 
             set
             {
-                this.Engine.SetVariable(BurnBundleInstallDirectoryVariable, value, false);
+                this.Engine.SetVariableString(BurnBundleInstallDirectoryVariable, value, false);
             }
         }
 
@@ -100,7 +100,7 @@ namespace WixToolset.WixBA
 
             set
             {
-                this.Engine.SetVariable(BurnBundleLayoutDirectoryVariable, value, false);
+                this.Engine.SetVariableString(BurnBundleLayoutDirectoryVariable, value, false);
             }
         }
 
