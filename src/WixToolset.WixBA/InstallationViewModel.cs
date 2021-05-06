@@ -329,7 +329,7 @@ namespace WixToolset.WixBA
             {
                 if (this.openLogCommand == null)
                 {
-                    this.openLogCommand = new RelayCommand(param => WixBA.OpenLog(new Uri(WixBA.Model.Engine.StringVariables["WixBundleLog"])));
+                    this.openLogCommand = new RelayCommand(param => WixBA.OpenLog(new Uri(WixBA.Model.Engine.GetVariableString("WixBundleLog"))));
                 }
                 return this.openLogCommand;
             }
@@ -341,7 +341,7 @@ namespace WixToolset.WixBA
             {
                 if (this.openLogFolderCommand == null)
                 {
-                    string logFolder = IO.Path.GetDirectoryName(WixBA.Model.Engine.StringVariables["WixBundleLog"]);
+                    string logFolder = IO.Path.GetDirectoryName(WixBA.Model.Engine.GetVariableString("WixBundleLog"));
                     this.openLogFolderCommand = new RelayCommand(param => WixBA.OpenLogFolder(logFolder));
                 }
                 return this.openLogFolderCommand;
