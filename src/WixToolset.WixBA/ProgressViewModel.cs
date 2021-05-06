@@ -33,6 +33,8 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.ExecutePackageBegin += this.ExecutePackageBegin;
             WixBA.Model.Bootstrapper.ExecutePackageComplete += this.ExecutePackageComplete;
             WixBA.Model.Bootstrapper.ExecuteProgress += this.ApplyExecuteProgress;
+            WixBA.Model.Bootstrapper.PauseAutomaticUpdatesBegin += this.PauseAutomaticUpdatesBegin;
+            WixBA.Model.Bootstrapper.SystemRestorePointBegin += this.SystemRestorePointBegin;
             WixBA.Model.Bootstrapper.PlanBegin += this.PlanBegin;
             WixBA.Model.Bootstrapper.PlanPackageComplete += this.PlanPackageComplete;
             WixBA.Model.Bootstrapper.ApplyBegin += this.ApplyBegin;
@@ -140,6 +142,22 @@ namespace WixToolset.WixBA
             lock (this)
             {   // avoid a stale display
                 this.Message = String.Empty;
+            }
+        }
+
+        private void PauseAutomaticUpdatesBegin(object sender, PauseAutomaticUpdatesBeginEventArgs e)
+        {
+            lock (this)
+            {
+                this.Message = "Pausing Windows automatic updates";
+            }
+        }
+
+        private void SystemRestorePointBegin(object sender, SystemRestorePointBeginEventArgs e)
+        {
+            lock (this)
+            {
+                this.Message = "Creating system restore point";
             }
         }
 
