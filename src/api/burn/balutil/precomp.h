@@ -7,6 +7,7 @@
 #include <msi.h>
 #include <wininet.h>
 #include <CommCtrl.h>
+#include <strsafe.h>
 
 #include <dutil.h>
 #include <pathutil.h>

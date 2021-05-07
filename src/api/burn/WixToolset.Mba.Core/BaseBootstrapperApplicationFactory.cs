@@ -44,7 +44,7 @@ namespace WixToolset.Mba.Core
             {
                 cbSize = Marshal.SizeOf(typeof(Command))
             };
-            var pEngine = BalUtil.InitializeFromCreateArgs(pArgs, ref pCommand);
+            var pEngine = MbaNative.InitializeFromCreateArgs(pArgs, ref pCommand);
             engine = new Engine(pEngine);
             bootstrapperCommand = pCommand.GetBootstrapperCommand();
         }
@@ -57,7 +57,7 @@ namespace WixToolset.Mba.Core
         /// <param name="ba">The <see cref="IBootstrapperApplication"/>.</param>
         public static void StoreBAInCreateResults(IntPtr pResults, IBootstrapperApplication ba)
         {
-            BalUtil.StoreBAInCreateResults(pResults, ba);
+            MbaNative.StoreBAInCreateResults(pResults, ba);
         }
     }
 }
