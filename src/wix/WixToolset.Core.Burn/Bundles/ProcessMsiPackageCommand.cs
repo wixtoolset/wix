@@ -394,6 +394,7 @@ namespace WixToolset.Core.Burn.Bundles
                                     UnresolvedSourceFile = cabinetName,
                                     ContainerRef = packagePayload.ContainerRef,
                                     ContentFile = true,
+                                    DownloadUrl = packagePayload.DownloadUrl,
                                     Packaging = packagePayload.Packaging,
                                     ParentPackagePayloadRef = packagePayload.Id.Id,
                                 });
@@ -462,6 +463,7 @@ namespace WixToolset.Core.Burn.Bundles
                                     UnresolvedSourceFile = name,
                                     ContainerRef = packagePayload.ContainerRef,
                                     ContentFile = true,
+                                    DownloadUrl = packagePayload.DownloadUrl,
                                     Packaging = packagePayload.Packaging,
                                     ParentPackagePayloadRef = packagePayload.Id.Id,
                                 });
