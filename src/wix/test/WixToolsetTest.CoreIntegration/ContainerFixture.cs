@@ -15,7 +15,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class ContainerFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildWithCustomAttachedContainer()
         {
             var folder = TestData.Get(@"TestData");
@@ -54,7 +54,7 @@ namespace WixToolsetTest.CoreIntegration
                 var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
                 Assert.Equal(@"<Payload Id='FirstX64' FilePath='FirstX64\FirstX64.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX64/FirstX64/FirstX64.msi' Packaging='embedded' SourcePath='a0' Container='BundlePackages' />", payloads[0].GetTestXml(ignoreAttributes));
                 Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86\FirstX86.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX86.msi/FirstX86/FirstX86.msi' Packaging='embedded' SourcePath='a1' Container='BundlePackages' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a2' Container='BundlePackages' />", payloads[2].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86.msi/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a2' Container='BundlePackages' />", payloads[2].GetTestXml(ignoreAttributes));
                 Assert.Equal(@"<Payload Id='ff2L_N_DLQ.nSUi.l8LxG14gd2V4' FilePath='FirstX64\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX64/ff2L_N_DLQ.nSUi.l8LxG14gd2V4/FirstX64/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a3' Container='BundlePackages' />", payloads[3].GetTestXml(ignoreAttributes));
             }
         }
