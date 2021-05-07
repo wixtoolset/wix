@@ -79,11 +79,43 @@ DAPI_(HRESULT) BalEvaluateCondition(
     );
 
 /*******************************************************************
+BalEscapeString - escapes a string to use as part of a formatted string variable.
+
+ Note: Use StrFree() to release psczOut.
+********************************************************************/
+DAPI_(HRESULT) BalEscapeString(
+    __in_z LPCWSTR wzIn,
+    __inout LPWSTR* psczOut
+    );
+
+/*******************************************************************
+BalEscapeStringFromEngine - escapes a string to use as part of a formatted string variable.
+
+ Note: Use StrFree() to release psczOut.
+********************************************************************/
+DAPI_(HRESULT) BalEscapeStringFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzIn,
+    __inout LPWSTR* psczOut
+    );
+
+/*******************************************************************
 BalFormatString - formats a string using variables in the engine.
 
  Note: Use StrFree() to release psczOut.
 ********************************************************************/
 DAPI_(HRESULT) BalFormatString(
+    __in_z LPCWSTR wzFormat,
+    __inout LPWSTR* psczOut
+    );
+
+/*******************************************************************
+BalFormatStringFromEngine - formats a string using variables in the engine.
+
+ Note: Use StrFree() to release psczOut.
+********************************************************************/
+DAPI_(HRESULT) BalFormatStringFromEngine(
+    __in IBootstrapperEngine* pEngine,
     __in_z LPCWSTR wzFormat,
     __inout LPWSTR* psczOut
     );
@@ -116,6 +148,15 @@ DAPI_(BOOL) BalVariableExists(
     );
 
 /*******************************************************************
+BalVariableExistsFromEngine - checks if a variable exists in the engine.
+
+********************************************************************/
+DAPI_(BOOL) BalVariableExistsFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable
+    );
+
+/*******************************************************************
 BalGetStringVariable - gets a string from a variable in the engine.
 
  Note: Use StrFree() to release psczValue.
@@ -126,13 +167,55 @@ DAPI_(HRESULT) BalGetStringVariable(
     );
 
 /*******************************************************************
+BalGetStringVariableFromEngine - gets a string from a variable in the engine.
+
+ Note: Use StrFree() to release psczValue.
+********************************************************************/
+DAPI_(HRESULT) BalGetStringVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    );
+
+/*******************************************************************
 BalSetStringVariable - sets a string variable in the engine.
+    If the value contains unexpanded variables, set fFormatted to true.
 
 ********************************************************************/
 DAPI_(HRESULT) BalSetStringVariable(
     __in_z LPCWSTR wzVariable,
     __in_z_opt LPCWSTR wzValue,
     __in BOOL fFormatted
+    );
+
+/*******************************************************************
+BalGetVersionVariable - gets a version from a variable in the engine.
+
+ Note: Use StrFree() to release psczValue.
+********************************************************************/
+DAPI_(HRESULT) BalGetVersionVariable(
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    );
+
+/*******************************************************************
+BalGetVersionVariableFromEngine - gets a version from a variable in the engine.
+
+ Note: Use StrFree() to release psczValue.
+********************************************************************/
+DAPI_(HRESULT) BalGetVersionVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    );
+
+/*******************************************************************
+BalSetVersionVariable - sets a version variable in the engine.
+
+********************************************************************/
+DAPI_(HRESULT) BalSetVersionVariable(
+    __in_z LPCWSTR wzVariable,
+    __in_z_opt LPCWSTR wzValue
     );
 
 /*******************************************************************

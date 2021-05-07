@@ -2,8 +2,14 @@
 
 
 EXPORTS
+    BalEscapeStringFromEngine
+    BalFormatStringFromEngine
+    BalGetStringVariableFromEngine
+    BalGetVersionVariableFromEngine
+    BalVariableExistsFromEngine
     InitializeFromCreateArgs
     StoreBAInCreateResults
+    StrFree
     VerCompareParsedVersions
     VerCompareStringVersions
     VerCopyVersion

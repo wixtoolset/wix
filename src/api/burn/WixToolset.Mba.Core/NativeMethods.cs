@@ -34,4 +34,16 @@ namespace WixToolset.Mba.Core
             );
         #endregion
     }
+
+    #region SafeHandles
+    internal abstract class SafeHandleZeroIsDefaultAndInvalid : SafeHandle
+    {
+        public SafeHandleZeroIsDefaultAndInvalid() : base(IntPtr.Zero, true) { }
+
+        public override bool IsInvalid
+        {
+            get { return this.handle == IntPtr.Zero; }
+        }
+    }
+    #endregion
 }

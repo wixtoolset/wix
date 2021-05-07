@@ -83,12 +83,8 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        internal sealed class VersionHandle : SafeHandle
+        internal sealed class VersionHandle : SafeHandleZeroIsDefaultAndInvalid
         {
-            public VersionHandle() : base(IntPtr.Zero, true) { }
-
-            public override bool IsInvalid => false;
-
             protected override bool ReleaseHandle()
             {
                 VerFreeVersion(this.handle);

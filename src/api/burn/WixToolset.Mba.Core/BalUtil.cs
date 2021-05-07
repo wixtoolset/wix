@@ -7,16 +7,39 @@ namespace WixToolset.Mba.Core
 
     internal static class BalUtil
     {
-        [DllImport("mbanative.dll", ExactSpelling = true, PreserveSig = false)]
-        internal static extern IBootstrapperEngine InitializeFromCreateArgs(
-            IntPtr pArgs,
-            ref Command pCommand
+        [DllImport("mbanative.dll", ExactSpelling = true)]
+        internal static extern int BalEscapeStringFromEngine(
+            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzIn,
+            ref StrUtil.StrHandle psczOut
             );
 
         [DllImport("mbanative.dll", ExactSpelling = true)]
-        internal static extern void StoreBAInCreateResults(
-            IntPtr pResults,
-            [MarshalAs(UnmanagedType.Interface)] IBootstrapperApplication pBA
+        internal static extern int BalFormatStringFromEngine(
+            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzFormat,
+            ref StrUtil.StrHandle psczOut
+            );
+
+        [DllImport("mbanative.dll", ExactSpelling = true)]
+        internal static extern int BalGetStringVariableFromEngine(
+            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
+            ref StrUtil.StrHandle psczOut
+            );
+
+        [DllImport("mbanative.dll", ExactSpelling = true)]
+        internal static extern int BalGetVersionVariableFromEngine(
+            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
+            ref StrUtil.StrHandle psczOut
+            );
+
+        [DllImport("mbanative.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool BalVariableExistsFromEngine(
+            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzVariable
             );
     }
 }

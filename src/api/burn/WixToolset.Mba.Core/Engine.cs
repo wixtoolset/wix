@@ -13,8 +13,6 @@ namespace WixToolset.Mba.Core
     /// </summary>
     public sealed class Engine : IEngine
     {
-        // Burn errs on empty strings, so declare initial buffer size.
-        private const int InitialBufferSize = 80;
         private static readonly string normalizeVersionFormatString = "{0} must be less than or equal to " + UInt16.MaxValue;
 
         private IBootstrapperEngine engine;
@@ -62,9 +60,7 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public bool ContainsVariable(string name)
         {
-            IntPtr capacity = new IntPtr(0);
-            int ret = this.engine.GetVariableString(name, IntPtr.Zero, ref capacity);
-            return NativeMethods.E_NOTFOUND != ret;
+            return BalUtil.BalVariableExistsFromEngine(this.engine, name);
         }
 
         /// <inheritdoc/>
@@ -101,24 +97,21 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public string EscapeString(string input)
         {
-            IntPtr capacity = new IntPtr(InitialBufferSize);
-            StringBuilder sb = new StringBuilder(capacity.ToInt32());
-
-            // Get the size of the buffer.
-            int ret = this.engine.EscapeString(input, sb, ref capacity);
-            if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
+            try
             {
-                capacity = new IntPtr(capacity.ToInt32() + 1); // Add one for the null terminator.
-                sb.Capacity = capacity.ToInt32();
-                ret = this.engine.EscapeString(input, sb, ref capacity);
-            }
+                int ret = BalUtil.BalEscapeStringFromEngine(this.engine, input, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
 
-            if (NativeMethods.S_OK != ret)
+                return handle.ToUniString();
+            }
+            finally
             {
-                throw new Win32Exception(ret);
+                handle.Dispose();
             }
-
-            return sb.ToString();
         }
 
         /// <inheritdoc/>
@@ -133,24 +126,21 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public string FormatString(string format)
         {
-            IntPtr capacity = new IntPtr(InitialBufferSize);
-            StringBuilder sb = new StringBuilder(capacity.ToInt32());
-
-            // Get the size of the buffer.
-            int ret = this.engine.FormatString(format, sb, ref capacity);
-            if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
+            try
             {
-                capacity = new IntPtr(capacity.ToInt32() + 1); // Add one for the null terminator.
-                sb.Capacity = capacity.ToInt32();
-                ret = this.engine.FormatString(format, sb, ref capacity);
-            }
+                int ret = BalUtil.BalFormatStringFromEngine(this.engine, format, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
 
-            if (NativeMethods.S_OK != ret)
+                return handle.ToUniString();
+            }
+            finally
             {
-                throw new Win32Exception(ret);
+                handle.Dispose();
             }
-
-            return sb.ToString();
         }
 
         /// <inheritdoc/>
@@ -168,53 +158,60 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public SecureString GetVariableSecureString(string name)
         {
-            var pUniString = this.getStringVariable(name, out var length);
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
             try
             {
-                return this.convertToSecureString(pUniString, length);
+                int ret = BalUtil.BalGetStringVariableFromEngine(this.engine, name, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
+
+                return handle.ToSecureString();
             }
             finally
             {
-                if (IntPtr.Zero != pUniString)
-                {
-                    Marshal.FreeCoTaskMem(pUniString);
-                }
+                handle.Dispose();
             }
         }
 
         /// <inheritdoc/>
         public string GetVariableString(string name)
         {
-            int length;
-            IntPtr pUniString = this.getStringVariable(name, out length);
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
             try
             {
-                return Marshal.PtrToStringUni(pUniString, length);
+                int ret = BalUtil.BalGetStringVariableFromEngine(this.engine, name, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
+
+                return handle.ToUniString();
             }
             finally
             {
-                if (IntPtr.Zero != pUniString)
-                {
-                    Marshal.FreeCoTaskMem(pUniString);
-                }
+                handle.Dispose();
             }
         }
 
         /// <inheritdoc/>
         public string GetVariableVersion(string name)
         {
-            int length;
-            IntPtr pUniString = this.getVersionVariable(name, out length);
+            StrUtil.StrHandle handle = new StrUtil.StrHandle();
             try
             {
-                return Marshal.PtrToStringUni(pUniString, length);
+                int ret = BalUtil.BalGetVersionVariableFromEngine(this.engine, name, ref handle);
+                if (ret != NativeMethods.S_OK)
+                {
+                    throw new Win32Exception(ret);
+                }
+
+                return handle.ToUniString();
             }
             finally
             {
-                if (IntPtr.Zero != pUniString)
-                {
-                    Marshal.FreeCoTaskMem(pUniString);
-                }
+                handle.Dispose();
             }
         }
 
@@ -334,132 +331,6 @@ namespace WixToolset.Mba.Core
         public void Quit(int exitCode)
         {
             this.engine.Quit(exitCode);
-        }
-
-        /// <summary>
-        /// Gets the variable given by <paramref name="name"/> as a string.
-        /// </summary>
-        /// <param name="name">The name of the variable to get.</param>
-        /// <param name="length">The length of the Unicode string.</param>
-        /// <returns>The value by a pointer to a Unicode string.  Must be freed by Marshal.FreeCoTaskMem.</returns>
-        /// <exception cref="Exception">An error occurred getting the variable.</exception>
-        internal IntPtr getStringVariable(string name, out int length)
-        {
-            IntPtr capacity = new IntPtr(InitialBufferSize);
-            bool success = false;
-            IntPtr pValue = Marshal.AllocCoTaskMem(capacity.ToInt32() * UnicodeEncoding.CharSize);
-            try
-            {
-                // Get the size of the buffer.
-                int ret = this.engine.GetVariableString(name, pValue, ref capacity);
-                if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
-                {
-                    // Don't need to add 1 for the null terminator, the engine already includes that.
-                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity.ToInt32() * UnicodeEncoding.CharSize);
-                    ret = this.engine.GetVariableString(name, pValue, ref capacity);
-                }
-
-                if (NativeMethods.S_OK != ret)
-                {
-                    throw Marshal.GetExceptionForHR(ret);
-                }
-
-                // The engine only returns the exact length of the string if the buffer was too small, so calculate it ourselves.
-                int maxLength = capacity.ToInt32();
-                for (length = 0; length < maxLength; ++length)
-                {
-                    if (0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
-                    {
-                        break;
-                    }
-                }
-
-                success = true;
-                return pValue;
-            }
-            finally
-            {
-                if (!success && IntPtr.Zero != pValue)
-                {
-                    Marshal.FreeCoTaskMem(pValue);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the variable given by <paramref name="name"/> as a version string.
-        /// </summary>
-        /// <param name="name">The name of the variable to get.</param>
-        /// <param name="length">The length of the Unicode string.</param>
-        /// <returns>The value by a pointer to a Unicode string.  Must be freed by Marshal.FreeCoTaskMem.</returns>
-        /// <exception cref="Exception">An error occurred getting the variable.</exception>
-        internal IntPtr getVersionVariable(string name, out int length)
-        {
-            IntPtr capacity = new IntPtr(InitialBufferSize);
-            bool success = false;
-            IntPtr pValue = Marshal.AllocCoTaskMem(capacity.ToInt32() * UnicodeEncoding.CharSize);
-            try
-            {
-                // Get the size of the buffer.
-                int ret = this.engine.GetVariableVersion(name, pValue, ref capacity);
-                if (NativeMethods.E_INSUFFICIENT_BUFFER == ret || NativeMethods.E_MOREDATA == ret)
-                {
-                    // Don't need to add 1 for the null terminator, the engine already includes that.
-                    pValue = Marshal.ReAllocCoTaskMem(pValue, capacity.ToInt32() * UnicodeEncoding.CharSize);
-                    ret = this.engine.GetVariableVersion(name, pValue, ref capacity);
-                }
-
-                if (NativeMethods.S_OK != ret)
-                {
-                    throw Marshal.GetExceptionForHR(ret);
-                }
-
-                // The engine only returns the exact length of the string if the buffer was too small, so calculate it ourselves.
-                int maxLength = capacity.ToInt32();
-                for (length = 0; length < maxLength; ++length)
-                {
-                    if (0 == Marshal.ReadInt16(pValue, length * UnicodeEncoding.CharSize))
-                    {
-                        break;
-                    }
-                }
-
-                success = true;
-                return pValue;
-            }
-            finally
-            {
-                if (!success && IntPtr.Zero != pValue)
-                {
-                    Marshal.FreeCoTaskMem(pValue);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Initialize a SecureString with the given Unicode string.
-        /// </summary>
-        /// <param name="pUniString">Pointer to Unicode string.</param>
-        /// <param name="length">The string's length.</param>
-        internal SecureString convertToSecureString(IntPtr pUniString, int length)
-        {
-            if (IntPtr.Zero == pUniString)
-            {
-                return null;
-            }
-
-            SecureString value = new SecureString();
-            short s;
-            char c;
-            for (int charIndex = 0; charIndex < length; charIndex++)
-            {
-                s = Marshal.ReadInt16(pUniString, charIndex * UnicodeEncoding.CharSize);
-                c = (char)s;
-                value.AppendChar(c);
-                s = 0;
-                c = (char)0;
-            }
-            return value;
         }
 
         /// <summary>

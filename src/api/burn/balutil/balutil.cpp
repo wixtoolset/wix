@@ -89,14 +89,12 @@ LExit:
 }
 
 
-// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
-DAPI_(HRESULT) BalFormatString(
-    __in_z LPCWSTR wzFormat,
+DAPI_(HRESULT) BalEscapeString(
+    __in_z LPCWSTR wzIn,
     __inout LPWSTR* psczOut
     )
 {
     HRESULT hr = S_OK;
-    SIZE_T cch = 0;
 
     if (!vpEngine)
     {
@@ -104,13 +102,38 @@ DAPI_(HRESULT) BalFormatString(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
+    hr = BalEscapeStringFromEngine(vpEngine, wzIn, psczOut);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalEscapeStringFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzIn,
+    __inout LPWSTR* psczOut
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
     if (*psczOut)
     {
         hr = StrMaxLength(*psczOut, &cch);
         ExitOnFailure(hr, "Failed to determine length of value.");
     }
+    else
+    {
+        hr = ::StringCchLengthW(wzIn, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(&cch));
+        ExitOnFailure(hr, "Failed to determine length of source.");
 
-    hr = vpEngine->FormatString(wzFormat, *psczOut, &cch);
+        cch = min(STRSAFE_MAX_LENGTH, cch + VARIABLE_GROW_FACTOR);
+        hr = StrAlloc(psczOut, cch);
+        ExitOnFailure(hr, "Failed to pre-allocate value.");
+    }
+
+    hr = pEngine->EscapeString(wzIn, *psczOut, &cch);
     if (E_MOREDATA == hr)
     {
         ++cch;
@@ -118,7 +141,69 @@ DAPI_(HRESULT) BalFormatString(
         hr = StrAllocSecure(psczOut, cch);
         ExitOnFailure(hr, "Failed to allocate value.");
 
-        hr = vpEngine->FormatString(wzFormat, *psczOut, &cch);
+        hr = pEngine->EscapeString(wzIn, *psczOut, &cch);
+    }
+
+LExit:
+    return hr;
+}
+
+
+// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
+DAPI_(HRESULT) BalFormatString(
+    __in_z LPCWSTR wzFormat,
+    __inout LPWSTR* psczOut
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    hr = BalFormatStringFromEngine(vpEngine, wzFormat, psczOut);
+
+LExit:
+    return hr;
+}
+
+
+// The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree.
+DAPI_(HRESULT) BalFormatStringFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzFormat,
+    __inout LPWSTR* psczOut
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
+    if (*psczOut)
+    {
+        hr = StrMaxLength(*psczOut, &cch);
+        ExitOnFailure(hr, "Failed to determine length of value.");
+    }
+    else
+    {
+        hr = ::StringCchLengthW(wzFormat, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(&cch));
+        ExitOnFailure(hr, "Failed to determine length of source.");
+
+        cch = min(STRSAFE_MAX_LENGTH, cch + VARIABLE_GROW_FACTOR);
+        hr = StrAlloc(psczOut, cch);
+        ExitOnFailure(hr, "Failed to pre-allocate value.");
+    }
+
+    hr = pEngine->FormatString(wzFormat, *psczOut, &cch);
+    if (E_MOREDATA == hr)
+    {
+        ++cch;
+
+        hr = StrAllocSecure(psczOut, cch);
+        ExitOnFailure(hr, "Failed to allocate value.");
+
+        hr = pEngine->FormatString(wzFormat, *psczOut, &cch);
     }
 
 LExit:
@@ -172,7 +257,7 @@ DAPI_(BOOL) BalVariableExists(
     )
 {
     HRESULT hr = S_OK;
-    SIZE_T cch = 0;
+    BOOL fExists = FALSE;
 
     if (!vpEngine)
     {
@@ -180,9 +265,23 @@ DAPI_(BOOL) BalVariableExists(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
-    hr = vpEngine->GetVariableString(wzVariable, NULL, &cch);
+    fExists = BalVariableExistsFromEngine(vpEngine, wzVariable);
 
 LExit:
+    return fExists;
+}
+
+
+DAPI_(BOOL) BalVariableExistsFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
+    hr = pEngine->GetVariableString(wzVariable, NULL, &cch);
+
     return E_NOTFOUND != hr;
 }
 
@@ -194,7 +293,6 @@ DAPI_(HRESULT) BalGetStringVariable(
     )
 {
     HRESULT hr = S_OK;
-    SIZE_T cch = 0;
 
     if (!vpEngine)
     {
@@ -202,13 +300,36 @@ DAPI_(HRESULT) BalGetStringVariable(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
+    hr = BalGetStringVariableFromEngine(vpEngine, wzVariable, psczValue);
+
+LExit:
+    return hr;
+}
+
+
+// The contents of psczValue may be sensitive, if variable is hidden should keep value encrypted and SecureZeroFree.
+DAPI_(HRESULT) BalGetStringVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
     if (*psczValue)
     {
         hr = StrMaxLength(*psczValue, &cch);
         ExitOnFailure(hr, "Failed to determine length of value.");
     }
+    else
+    {
+        cch = VARIABLE_GROW_FACTOR;
+        hr = StrAlloc(psczValue, cch);
+        ExitOnFailure(hr, "Failed to pre-allocate value.");
+    }
 
-    hr = vpEngine->GetVariableString(wzVariable, *psczValue, &cch);
+    hr = pEngine->GetVariableString(wzVariable, *psczValue, &cch);
     if (E_MOREDATA == hr)
     {
         ++cch;
@@ -216,7 +337,7 @@ DAPI_(HRESULT) BalGetStringVariable(
         hr = StrAllocSecure(psczValue, cch);
         ExitOnFailure(hr, "Failed to allocate value.");
 
-        hr = vpEngine->GetVariableString(wzVariable, *psczValue, &cch);
+        hr = pEngine->GetVariableString(wzVariable, *psczValue, &cch);
     }
 
 LExit:
@@ -238,6 +359,82 @@ DAPI_(HRESULT) BalSetStringVariable(
     }
 
     hr = vpEngine->SetVariableString(wzVariable, wzValue, fFormatted);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalGetVersionVariable(
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    hr = BalGetVersionVariableFromEngine(vpEngine, wzVariable, psczValue);
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) BalGetVersionVariableFromEngine(
+    __in IBootstrapperEngine* pEngine,
+    __in_z LPCWSTR wzVariable,
+    __inout LPWSTR* psczValue
+    )
+{
+    HRESULT hr = S_OK;
+    SIZE_T cch = 0;
+
+    if (*psczValue)
+    {
+        hr = StrMaxLength(*psczValue, &cch);
+        ExitOnFailure(hr, "Failed to determine length of value.");
+    }
+    else
+    {
+        cch = VARIABLE_GROW_FACTOR;
+        hr = StrAlloc(psczValue, cch);
+        ExitOnFailure(hr, "Failed to pre-allocate value.");
+    }
+
+    hr = pEngine->GetVariableVersion(wzVariable, *psczValue, &cch);
+    if (E_MOREDATA == hr)
+    {
+        ++cch;
+
+        hr = StrAllocSecure(psczValue, cch);
+        ExitOnFailure(hr, "Failed to allocate value.");
+
+        hr = pEngine->GetVariableVersion(wzVariable, *psczValue, &cch);
+    }
+
+LExit:
+    return hr;
+}
+
+DAPI_(HRESULT) BalSetVersionVariable(
+    __in_z LPCWSTR wzVariable,
+    __in_z_opt LPCWSTR wzValue
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!vpEngine)
+    {
+        hr = E_POINTER;
+        ExitOnRootFailure(hr, "BalInitialize() must be called first.");
+    }
+
+    hr = vpEngine->SetVariableVersion(wzVariable, wzValue);
 
 LExit:
     return hr;
