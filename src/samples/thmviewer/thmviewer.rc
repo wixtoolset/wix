@@ -1,0 +1,12 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+#include <winver.h>
+#include <windows.h>
+#include "resource.h"
+
+//#define MANIFEST_RESOURCE_ID 1
+//MANIFEST_RESOURCE_ID RT_MANIFEST "thmviewer.manifest"
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+THMVWR_RES_THEME_FILE RCDATA "Resources\\thm.xml"
+THMVWR_RES_RICHEDIT_FILE RCDATA "Resources\\LoremIpsum.rtf"

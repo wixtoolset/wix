@@ -1,0 +1,19 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="SimpleMM" Language="1033" Version="1.0.0.0" Guid="86FB9E91-ACF3-4EDF-B711-72DAF2443692" InstallerVersion="200">
+    <SummaryInformation Manufacturer="Example Corporation" />
+
+    <ComponentGroupRef Id="ProductComponents" />
+  </Module>
+
+  <Fragment>
+    <Directory Id="MergeRedirectFolder" />
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="MergeRedirectFolder">
+       <Component Id="MMtxt" Guid="2D93B748-4926-4185-BC84-9F1D6883AF20">
+         <File Source="MergeModule.txt" />
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

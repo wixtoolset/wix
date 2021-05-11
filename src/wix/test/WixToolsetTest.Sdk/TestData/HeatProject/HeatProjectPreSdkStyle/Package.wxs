@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="HeatProjectPreSdkStyle" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5622BB42-89F6-4810-A2A3-98AFF28282FE" Compressed="yes" InstallerVersion="200">
+    
+
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature" Title="HeatProjectFeature">
+      <ComponentGroupRef Id="ToolsVersion4Cs.Binaries" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="ToolsVersion4Cs.Binaries" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

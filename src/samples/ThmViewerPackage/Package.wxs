@@ -1,0 +1,30 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="WiX Toolset Theme Viewer" Manufacturer="WiX Toolset" Language="1033" Version="!(bind.fileVersion.ThmViewerFile)" UpgradeCode="59c4b122-5167-445b-8fc4-09dcd4eced89" Compressed="yes" InstallerVersion="200">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="Components" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="Components" Directory="INSTALLFOLDER" Subdirectory="bin">
+      <Component>
+        <File Id="ThmViewerFile" Source="thmviewer.exe" />
+        <Shortcut Name="!(bind.property.ProductName)" Directory="ShortcutFolder" Advertise="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="WiX Toolset v4.0" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ShortcutFolder" Name="WiX Toolset" />
+    </StandardDirectory>
+  </Fragment>
+
+</Wix>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
+    <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\HeatFilePackage\HeatFilePackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFilePackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultipleFilesSameFileName\HeatFileMultipleFilesSameFileName.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultipleFilesSameFileName\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectPreSdkStyle\HeatProjectPreSdkStyle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectPreSdkStyle\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectSdkStyle\HeatProjectSdkStyle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\HeatProjectSdkStyle\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\SdkStyleCs\SdkStyleCs.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\SdkStyleCs\SdkStyleCs.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\ToolsVersion4Cs\Properties\AssemblyInfo.cs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatProject\ToolsVersion4Cs\ToolsVersion4Cs.csproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\MergeMsiPackage\MergeMsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\MergeMsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\data\MergeModule.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\MergeModule.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\SimpleMergeModule.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.de-de.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\UncompressedBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\UncompressedBundle\UncompressedBundle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMsiPackage\SimpleBundle\SimpleBundle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

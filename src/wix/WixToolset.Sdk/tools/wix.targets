@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="_CheckRequiredProperties" DefaultTargets="Build">
+  <PropertyGroup>
+    <WixTargetsImported>true</WixTargetsImported>
+  </PropertyGroup>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Extension Points
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!-- Allow a user-customized targets files to be used as part of the build. -->
+  <Import Project="$(CustomBeforeWixTargets)" Condition=" '$(CustomBeforeWixTargets)' != '' and Exists('$(CustomBeforeWixTargets)')" />
+
+  <!-- These properties can be overridden to support non-default installations. -->
+  <PropertyGroup>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp3.1\</WixBinDir>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net461\x86\</WixBinDir>
+    <WixBinDir64 Condition=" '$(WixBinDir64)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net461\x64\</WixBinDir64>
+    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
+    <WixTasksPath64 Condition=" '$(WixTasksPath64)' == '' and '$(WixBinDir64)' != '' ">$(WixBinDir64)WixToolset.BuildTasks.dll</WixTasksPath64>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WixHarvestTargetsPath Condition=" '$(WixHarvestTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.harvest.targets</WixHarvestTargetsPath>
+    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.signing.targets</WixSigningTargetsPath>
+  </PropertyGroup>
+
+  <!-- This makes the project files a dependency of all targets so that things rebuild if they change -->
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <MSBuildAllProjects Condition="Exists('$(WixHarvestTargetsPath)')">$(MSBuildAllProjects);$(WixHarvestTargetsPath)</MSBuildAllProjects>
+    <MSBuildAllProjects Condition="Exists('$(WixSigningTargetsPath)')">$(MSBuildAllProjects);$(WixSigningTargetsPath)</MSBuildAllProjects>
+    <MSBuildAllProjects Condition="Exists('$(CustomBeforeWixTargets)')">$(MSBuildAllProjects);$(CustomBeforeWixTargets)</MSBuildAllProjects>
+    <MSBuildAllProjects Condition="Exists('$(CustomAfterWixTargets)')">$(MSBuildAllProjects);$(CustomAfterWixTargets)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Declarations for Microsoft.Common.targets
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <PropertyGroup>
+    <DefaultLanguageSourceExtension>.wxs</DefaultLanguageSourceExtension>
+    <Language>wix</Language>
+    <TargetRuntime>wix</TargetRuntime>
+
+    <!-- Use OutputName to set the AssemblyName for Microsoft.Common.targets -->
+    <OutputName Condition=" '$(OutputName)'=='' ">$(MSBuildProjectName)</OutputName>
+    <AssemblyName>$(OutputName)</AssemblyName>
+
+    <!-- Default OutputType to a known WiX Toolset type.  -->
+    <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
+
+    <!-- Default WixPdbType to a known WiX Toolset type.  -->
+    <WixPdbType Condition=" '$(WixPdbType)' == '' ">full</WixPdbType>
+  </PropertyGroup>
+
+  <!--
+  IDE Macros available from both integrated builds and from command line builds.
+  The following properties are 'macros' that are available via IDE for pre and post build steps.
+  All of them should be added to WixBuildMacroCollection to ensure that they are shown in the UI.
+  -->
+  <PropertyGroup Condition=" '$(TargetExt)' == '' ">
+    <TargetExt Condition=" '$(OutputType)' == 'Package' ">.msi</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'Module' ">.msm</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'PatchCreation' ">.pcp</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'Library' ">.wixlib</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'Bundle' ">.exe</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'IntermediatePostLink' ">.wixipl</TargetExt>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+
+  <PropertyGroup>
+    <!-- Default pdb output path to the intermediate output directory -->
+    <PdbOutputDir Condition=" '$(PdbOutputDir)'=='' ">$(TargetDir)</PdbOutputDir>
+    <PdbOutputDir Condition=" !HasTrailingSlash('$(PdbOutputDir)') ">$(PdbOutputDir)\</PdbOutputDir>
+
+    <!-- Example, C:\MyProjects\MyProject\bin\debug\ -->
+    <TargetPdbDir Condition=" '$(PdbOutputDir)'!='' ">$([System.IO.Path]::GetFullPath(`$([System.IO.Path]::Combine(`$(MSBuildProjectDirectory)`, `$(PdbOutputDir)`))`))</TargetPdbDir>
+
+    <!-- Example, MySetup.wixpdb" -->
+    <TargetPdbFileName Condition=" '$(TargetPdbFileName)' == '' ">$(TargetName).wixpdb</TargetPdbFileName>
+
+    <!-- Example, C:\MyProjects\MyProject\bin\debug\MyPackage.wixpdb -->
+    <TargetPdbPath Condition=" '$(TargetPdbPath)' == '' ">$(TargetPdbDir)$(TargetPdbFileName)</TargetPdbPath>
+  </PropertyGroup>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Property Declarations
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!-- These tasks can be used as general-purpose build tasks. -->
+  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="WixBuild" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <!-- These tasks are specific to the build process defined in this file, and are not considered general-purpose build tasks. -->
+  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="CreateItemAvoidingInference" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="CreateProjectReferenceDefineConstants" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="CreateProjectReferenceDefineConstants" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="CreateProjectReferenceDefineConstants" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="WixAssignCulture" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="ResolveWixReferences" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="ReplaceString" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ReplaceString" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="ReplaceString" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <UsingTask TaskName="GenerateCompileWithObjectPath" Condition=" '$(WixTasksPath64)' == '' " AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GenerateCompileWithObjectPath" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath)" Architecture="x86" />
+  <UsingTask TaskName="GenerateCompileWithObjectPath" Condition=" '$(WixTasksPath64)' != '' " AssemblyFile="$(WixTasksPath64)" Architecture="x64" />
+
+  <PropertyGroup>
+    <BindContentsFile Condition=" '$(BindContentsFile)' == '' ">$(MSBuildProjectFile).BindContentsFileList.txt</BindContentsFile>
+    <BindOutputsFile Condition=" '$(BindOutputsFile)' == '' ">$(MSBuildProjectFile).BindOutputsFileList.txt</BindOutputsFile>
+    <BindBuiltOutputsFile Condition=" '$(BindBuiltOutputsFile)' == '' ">$(MSBuildProjectFile).BindBuiltOutputsFileList.txt</BindBuiltOutputsFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CabinetCachePath Condition=" '$(CabinetCachePath)'=='' and '$(ReuseCabinetCache)'=='true' ">$(IntermediateOutputPath)cabcache\</CabinetCachePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixBinDir)</WixExtDir>
+  </PropertyGroup>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Default Compiler, Linker, and Librarian Property Declarations
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!-- If WixExtension was passed in via the command line, then convert it to an ItemGroup -->
+  <ItemGroup>
+    <WixExtension Include="$(WixExtension)"  Condition=" '$(WixExtension)' != '' " />
+  </ItemGroup>
+
+  <!-- Defaut Compiler properties. -->
+  <PropertyGroup>
+    <CompilerNoLogo Condition=" '$(CompilerNoLogo)' == '' ">$(NoLogo)</CompilerNoLogo>
+    <CompilerSuppressAllWarnings Condition=" '$(CompilerSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</CompilerSuppressAllWarnings>
+    <CompilerSuppressSpecificWarnings Condition=" '$(CompilerSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</CompilerSuppressSpecificWarnings>
+    <CompilerTreatWarningsAsErrors Condition=" '$(CompilerTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</CompilerTreatWarningsAsErrors>
+    <CompilerTreatSpecificWarningsAsErrors Condition=" '$(CompilerTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</CompilerTreatSpecificWarningsAsErrors>
+    <CompilerVerboseOutput Condition=" '$(CompilerVerboseOutput)' == '' ">$(VerboseOutput)</CompilerVerboseOutput>
+    <!-- TODO: This probably doesn't work any longer since Platform won't be defined until Microsoft.Common.targets is included -->
+    <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and '$(Platform)' != 'AnyCPU' and '$(Platform)' != 'Any CPU' ">$(Platform)</InstallerPlatform>
+  </PropertyGroup>
+
+  <!-- Default Lib properties. -->
+  <PropertyGroup>
+    <LibNoLogo Condition=" '$(LibNoLogo)' == '' ">$(NoLogo)</LibNoLogo>
+    <LibBindFiles Condition=" '$(LibBindFiles)' == '' ">$(BindFiles)</LibBindFiles>
+    <LibPedantic Condition=" '$(LibPedantic)' == '' ">$(Pedantic)</LibPedantic>
+    <LibSuppressAllWarnings Condition=" '$(LibSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</LibSuppressAllWarnings>
+    <LibSuppressSpecificWarnings Condition=" '$(LibSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</LibSuppressSpecificWarnings>
+    <LibSuppressSchemaValidation Condition=" '$(LibSuppressSchemaValidation)' == '' ">$(SuppressSchemaValidation)</LibSuppressSchemaValidation>
+    <LibSuppressIntermediateFileVersionMatching Condition=" '$(LibSuppressIntermediateFileVersionMatching)' == '' ">$(SuppressIntermediateFileVersionMatching)</LibSuppressIntermediateFileVersionMatching>
+    <LibTreatWarningsAsErrors Condition=" '$(LibTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</LibTreatWarningsAsErrors>
+    <LibTreatSpecificWarningsAsErrors Condition=" '$(LibTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</LibTreatSpecificWarningsAsErrors>
+    <LibVerboseOutput Condition=" '$(LibVerboseOutput)' == '' ">$(VerboseOutput)</LibVerboseOutput>
+  </PropertyGroup>
+
+  <!-- Default Linker properties. -->
+  <PropertyGroup>
+    <LinkerNoLogo Condition=" '$(LinkerNoLogo)' == '' ">$(NoLogo)</LinkerNoLogo>
+    <LinkerBindFiles Condition=" '$(LinkerBindFiles)' == '' ">$(BindFiles)</LinkerBindFiles>
+    <LinkerPedantic Condition=" '$(LinkerPedantic)' == '' ">$(Pedantic)</LinkerPedantic>
+    <LinkerSuppressAllWarnings Condition=" '$(LinkerSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</LinkerSuppressAllWarnings>
+    <LinkerSuppressSpecificWarnings Condition=" '$(LinkerSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</LinkerSuppressSpecificWarnings>
+    <LinkerSuppressSchemaValidation Condition=" '$(LinkerSuppressSchemaValidation)' == '' ">$(SuppressSchemaValidation)</LinkerSuppressSchemaValidation>
+    <LinkerSuppressIntermediateFileVersionMatching Condition=" '$(LinkerSuppressIntermediateFileVersionMatching)' == '' ">$(SuppressIntermediateFileVersionMatching)</LinkerSuppressIntermediateFileVersionMatching>
+    <LinkerTreatWarningsAsErrors Condition=" '$(LinkerTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</LinkerTreatWarningsAsErrors>
+    <LinkerTreatSpecificWarningsAsErrors Condition=" '$(LinkerTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</LinkerTreatSpecificWarningsAsErrors>
+    <LinkerVerboseOutput Condition=" '$(LinkerVerboseOutput)' == '' ">$(VerboseOutput)</LinkerVerboseOutput>
+  </PropertyGroup>
+
+  <!-- If BindInputPaths (or LinkerBindInputPaths) was passed in via the command line, then convert it to an ItemGroup -->
+  <ItemGroup>
+    <BindInputPaths Include="$(BindInputPaths)"  Condition=" '$(BindInputPaths)' != '' " />
+    <LinkerBindInputPaths Include="$(LinkerBindInputPaths)"  Condition=" '$(LinkerBindInputPaths)' != '' " />
+  </ItemGroup>
+
+  <!-- Default Lit and Light "properties" -->
+  <ItemGroup>
+    <LinkerBindInputPaths Condition=" '@(LinkerBindInputPaths)' == '' " Include="@(BindInputPaths)" />
+  </ItemGroup>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Initial Targets
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ==================================================================================================
+  _CheckRequiredProperties
+
+    Checks properties that must be set in the main project file or on the command line before
+    using this .TARGETS file.
+
+    [IN]
+    $(OutputName) - The name of the MSI/MSM/wixlib to build (without the extension)
+    $(OutputType) - Possible values are 'Package', 'PatchCreation', 'Module', 'Library', 'Bundle', 'IntermediatePostLink'
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <_PleaseSetThisInProjectFile>Please set this in the project file before the &lt;Import&gt; of the wix.targets file.</_PleaseSetThisInProjectFile>
+    <_OutputTypeDescription>Possible values are: 'Package', 'Module', 'Library', 'Bundle', 'IntermediatePostLink'. $(_PleaseSetThisInProjectFile)</_OutputTypeDescription>
+  </PropertyGroup>
+  <Target Name="_CheckRequiredProperties">
+
+    <Error
+      Code="WIX100"
+      Condition=" '$(OutputName)' == '' "
+      Text="The OutputName property is not set in project &quot;$(MSBuildProjectFile)&quot;. The OutputName defines the name of the output without a file extension. $(_PleaseSetThisInProjectFile)" />
+
+    <Error
+      Code="WIX101"
+      Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'PatchCreation' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Library' and '$(OutputType)' != 'Bundle' and '$(OutputType)' != 'IntermediatePostLink' "
+      Text="The OutputType property '$(OutputType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. $(_OutputTypeDescription)" />
+
+    <Error
+      Code="WIX102"
+      Condition=" '$(WixPdbType)' != 'none' and '$(WixPdbType)' != 'full' "
+      Text="The WixPdbType property '$(WixPdbType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. Supported values are: 'full', 'none'" />
+
+  </Target>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Build Targets
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ==================================================================================================
+  CoreBuild - OVERRIDE DependsOn
+
+    The core build step calls each of the build targets.
+
+    This is where we insert our targets into the build process.
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <CoreBuildDependsOn>
+      BuildOnlySettings;
+      PrepareForBuild;
+      PreBuildEvent;
+
+      WixBuild;
+      Signing;
+
+      GetTargetPath;
+      PrepareForRun;
+      IncrementalClean;
+      PostBuildEvent
+    </CoreBuildDependsOn>
+  </PropertyGroup>
+
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  Resolve References Targets
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ==================================================================================================
+  ResolveReferences - OVERRIDE DependsOn
+
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <ResolveReferencesDependsOn>
+      BeforeResolveReferences;
+      AssignProjectConfiguration;
+      ResolveProjectReferences;
+      ResolveWixLibraryReferences;
+      ResolveWixExtensionReferences;
+      AfterResolveReferences
+    </ResolveReferencesDependsOn>
+  </PropertyGroup>
+
+  <!--
+  ================================================================================================
+  ResolveProjectReferences
+
+    Builds all of the referenced projects to get their outputs.
+
+    [IN]
+    @(NonVCProjectReference) - The list of non-VC project references.
+
+    [OUT]
+    @(ProjectReferenceWithConfiguration) - The list of non-VC project references.
+    @(WixLibProjects) - Paths to any .wixlibs that were built by referenced projects.
+  ================================================================================================
+  -->
+  <Target
+    Name="ResolveProjectReferences"
+    DependsOnTargets="AssignProjectConfiguration;_SplitProjectReferencesByFileExistence"
+    Condition=" '@(ProjectReferenceWithConfiguration)' != '' ">
+
+    <!-- Issue a warning for each non-existent project. -->
+    <Warning
+      Text="The referenced project '%(_MSBuildProjectReferenceNonexistent.Identity)' does not exist."
+      Condition=" '@(_MSBuildProjectReferenceNonexistent)' != '' " />
+
+    <!--
+    When building this project from the IDE or when building a .sln from the command line or
+    when only building .wixlib project references, gather the referenced build outputs. The
+    code that builds the .sln will already have built the project, so there's no need to do
+    it again here and when building only .wixlib project references we'll use the results to
+    determine which projects to build.
+
+    The ContinueOnError setting is here so that, during project load, as much information as
+    possible will be passed to the compilers.
+    -->
+    <MSBuild
+      Projects="@(_MSBuildProjectReferenceExistent)"
+      Targets="%(_MSBuildProjectReferenceExistent.Targets);GetTargetPath"
+      Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform)"
+      Condition="('$(BuildingSolutionFile)' == 'true' or '$(BuildingInsideVisualStudio)' == 'true' or '$(BuildProjectReferences)' != 'true') and '@(_MSBuildProjectReferenceExistent)' != '' "
+      ContinueOnError="!$(BuildingProject)">
+
+      <Output TaskParameter="TargetOutputs" ItemName="_GatheredProjectReferencePaths" />
+    </MSBuild>
+
+    <!--
+    Determine which project references should be built. Note: we will not build any project references
+    if building in the IDE because it builds project references directly.
+
+    If BuildProjectReferences is 'true' (the default) then take all MSBuild project references that exist
+    on disk and add them to the list of things to build. This is the easy case.
+    -->
+    <CreateItem
+      Include="@(_MSBuildProjectReferenceExistent)"
+      Condition=" '$(BuildProjectReferences)' == 'true' and '$(BuildingInsideVisualStudio)' != 'true' ">
+
+      <Output TaskParameter="Include" ItemName="_ProjectReferencesToBuild" />
+    </CreateItem>
+
+    <!--
+    If BuildProjectReferences is 'wixlib' then build only the MSBuild project references that exist and
+    create a .wixlib file. That requires us to first filter the gathered project references down to only
+    those that build .wixlibs.
+    -->
+    <CreateItem
+      Include="@(_GatheredProjectReferencePaths)"
+      Condition=" '$(BuildProjectReferences)' == 'wixlib' and '%(Extension)' == '.wixlib' and '$(BuildingInsideVisualStudio)' != 'true' ">
+
+      <Output TaskParameter="Include" ItemName="_ReferencedWixLibPaths" />
+    </CreateItem>
+
+    <!--
+    The second step when building only 'wixlib' project references is to create the list of existing MSBuild
+    project references that do *not* build a .wixlib. These are the projects that will be skipped.
+     -->
+    <CreateItem
+      Include="@(_MSBuildProjectReferenceExistent->'%(FullPath)')"
+      Exclude="@(_ReferencedWixLibPaths->'%(MSBuildSourceProjectFile)')"
+      Condition=" '$(BuildProjectReferences)' == 'wixlib' and '$(BuildingInsideVisualStudio)' != 'true' ">
+
+      <Output TaskParameter="Include" ItemName="_ProjectReferencesToSkip" />
+    </CreateItem>
+
+    <!--
+    Finally, when building only 'wixlib' project references, the list of projects to build are naturally the
+    list of projects *not* being skipped.
+    -->
+    <CreateItem
+      Include="@(_MSBuildProjectReferenceExistent->'%(FullPath)')"
+      Exclude="@(_ProjectReferencesToSkip)"
+      Condition=" '$(BuildProjectReferences)' == 'wixlib' and '$(BuildingInsideVisualStudio)' != 'true' ">
+
+      <Output TaskParameter="Include" ItemName="_ProjectReferencesToBuild" />
+    </CreateItem>
+
+    <!-- Display a warning for all projects being skipped. -->
+    <Warning
+      Text="BuildProjectReferences set to '$(BuildProjectReferences)'. Skipping the non-Library project: %(_ProjectReferencesToSkip.Identity)"
+      Condition=" '@(_ProjectReferencesToSkip)' != '' " />
+
+    <Message
+      Importance="low"
+      Text="Project reference to build: %(_ProjectReferencesToBuild.Identity), properties: %(_ProjectReferencesToBuild.Properties)"
+      Condition=" '@(_ProjectReferencesToBuild)' != '' " />
+
+    <!--
+    Build referenced projects when building from the command line.
+
+    The $(ProjectReferenceBuildTargets) will normally be blank so that the project's default target
+    is used during a P2P reference. However if a custom build process requires that the referenced
+    project has a different target to build it can be specified.
+    -->
+    <MSBuild
+      Projects="@(_ProjectReferencesToBuild)"
+      Targets="$(ProjectReferenceBuildTargets)"
+      Properties="%(_ProjectReferencesToBuild.SetConfiguration);%(_ProjectReferencesToBuild.SetPlatform)"
+      Condition=" '@(_ProjectReferencesToBuild)' != '' ">
+
+      <Output TaskParameter="TargetOutputs" ItemName="_BuiltProjectReferencePaths" />
+    </MSBuild>
+
+    <!--
+    VC project references must build GetNativeTargetPath because neither GetTargetPath nor the return of the default build
+    target return the output for a native .vcxproj.
+    -->
+    <MSBuild
+      Projects="@(_MSBuildProjectReferenceExistent)"
+      Targets="GetNativeTargetPath"
+      Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform)"
+      Condition=" '@(ProjectReferenceWithConfiguration)' != '' and '%(_MSBuildProjectReferenceExistent.Extension)' == '.vcxproj' ">
+
+      <Output TaskParameter="TargetOutputs" ItemName="_ResolvedProjectReferencePaths" />
+      <Output TaskParameter="TargetOutputs" ItemName="_MSBuildResolvedProjectReferencePaths" />
+    </MSBuild>
+
+    <!-- Assign the unique gathered and built project references to the resolved project
+         reference paths. -->
+    <RemoveDuplicates Inputs="@(_GatheredProjectReferencePaths);@(_BuiltProjectReferencePaths)">
+      <Output TaskParameter="Filtered" ItemName="_ResolvedProjectReferencePaths" />
+      <Output TaskParameter="Filtered" ItemName="_MSBuildResolvedProjectReferencePaths" />
+    </RemoveDuplicates>
+
+    <!-- Create list of all .wixlib project references. -->
+    <CreateItem
+      Include="@(_ResolvedProjectReferencePaths)"
+      Condition=" '%(Extension)' == '.wixlib' ">
+
+      <Output TaskParameter="Include" ItemName="WixLibProjects" />
+    </CreateItem>
+
+    <Message
+      Importance="low"
+      Text="Library from referenced projects: %(WixLibProjects.Identity)"
+      Condition=" '@(WixLibProjects)' != '' " />
+
+  </Target>
+
+  <!--
+  ================================================================================================
+  ResolveWixLibraryReferences
+
+    Resolve the library references to full paths.
+
+    [IN]
+    @(WixLibrary) - The list of .wixlib files.
+
+    [OUT]
+    @(_ResolvedWixLibraryPaths) - Item group with full paths to libraries
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <ResolveWixLibraryReferencesDependsOn></ResolveWixLibraryReferencesDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="ResolveWixLibraryReferences"
+    DependsOnTargets="$(ResolveWixLibraryReferencesDependsOn)"
+    Condition=" '@(WixLibrary)' != ''">
+
+    <!--
+    The WixLibrarySearchPaths property is set to find assemblies in the following order:
+
+        (1) $(ReferencePaths) - the reference paths property, which comes from the .USER file.
+        (2) The hintpath from the referenced item itself, indicated by {HintPathFromItem}.
+        (3) Treat the reference's Include as if it were a real file name.
+        (4) Path specified by the WixExtDir property.
+    -->
+    <CreateProperty Condition=" '$(WixLibrarySearchPaths)' == '' " Value="
+      $(ReferencePaths);
+      {HintPathFromItem};
+      {RawFileName};
+      $(WixExtDir)
+      ">
+      <Output TaskParameter="Value" PropertyName="WixLibrarySearchPaths" />
+    </CreateProperty>
+
+    <ResolveWixReferences
+      WixReferences="@(WixLibrary)"
+      SearchPaths="$(WixLibrarySearchPaths)"
+      SearchFilenameExtensions=".wixlib">
+      <Output TaskParameter="ResolvedWixReferences" ItemName="_AllResolvedWixLibraryPaths" />
+    </ResolveWixReferences>
+
+    <!-- Remove duplicate library items that would cause build errors -->
+    <RemoveDuplicates Inputs="@(_AllResolvedWixLibraryPaths)">
+      <Output TaskParameter="Filtered" ItemName="_ResolvedWixLibraryPaths" />
+    </RemoveDuplicates>
+
+  </Target>
+
+  <!--
+  ==================================================================================================
+  ResolveWixExtensionReferences
+
+    Resolves WiX extension references to full paths. Any properties you use
+    to resolve paths to extensions must be defined before importing this
+    file or the extensions will be automatically resolved to $(WixExtDir).
+
+    [IN]
+    @(WixExtension) - WixExtension item group
+
+    [OUT]
+    @(_ResolvedWixExtensionPaths) - Item group with full paths to extensions
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <ResolveWixExtensionReferencesDependsOn></ResolveWixExtensionReferencesDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="ResolveWixExtensionReferences"
+    DependsOnTargets="$(ResolveWixExtensionReferencesDependsOn)"
+    Condition=" '@(WixExtension)' != ''">
+
+    <!--
+    The WixExtensionSearchPaths property is set to find assemblies in the following order:
+
+        (1) $(ReferencePaths) - the reference paths property, which comes from the .USER file.
+        (2) The hintpath from the referenced item itself, indicated by {HintPathFromItem}.
+        (3) Treat the reference's Include as if it were a real file name.
+        (4) Path specified by the WixExtDir property.
+    -->
+    <CreateProperty Condition=" '$(WixExtensionSearchPaths)' == '' " Value="
+      $(ReferencePaths);
+      {HintPathFromItem};
+      {RawFileName};
+      $(WixExtDir)
+      ">
+      <Output TaskParameter="Value" PropertyName="WixExtensionSearchPaths" />
+    </CreateProperty>
+
+    <ResolveWixReferences
+      WixReferences="@(WixExtension)"
+      SearchPaths="$(WixExtensionSearchPaths)"
+      SearchFilenameExtensions=".dll">
+      <Output TaskParameter="ResolvedWixReferences" ItemName="_AllResolvedWixExtensionPaths" />
+    </ResolveWixReferences>
+
+    <!-- Remove duplicate extension items that would cause build errors -->
+    <RemoveDuplicates Inputs="@(_AllResolvedWixExtensionPaths)">
+      <Output TaskParameter="Filtered" ItemName="_ResolvedWixExtensionPaths" />
+    </RemoveDuplicates>
+  </Target>
+
+  <!--
+  ================================================================================================
+  GetTargetPath - OVERRIDE DependsOn
+
+    This stand-alone target returns the name of the build product (i.e. MSI, MSM) that would be
+    produced if we built this project.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <GetTargetPathDependsOn>AssignTargetPaths</GetTargetPathDependsOn>
+  </PropertyGroup>
+
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  WixBuild Targets
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ==================================================================================================
+  WixBuild
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <WixBuildDependsOn>
+      ResolveReferences;
+      BeforeCompile;
+      _TimeStampBeforeCompile;
+
+      CalculateDefineConstants;
+      Harvest;
+
+      GenerateCompileWithObjectPath;
+
+      AssignTargetPaths;
+      ReadPreviousBindInputsAndBuiltOutputs;
+
+      CoreWixBuild;
+
+      UpdateLinkFileWrites;
+      _TimeStampAfterCompile;
+      AfterCompile
+    </WixBuildDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="WixBuild"
+    DependsOnTargets="$(WixBuildDependsOn)" />
+
+  <Target
+      Name="CoreWixBuild"
+      Inputs="@(Compile);
+      @(Content);
+      @(EmbeddedResource);
+      @(WixObject);
+      @(_ResolvedProjectReferencePaths);
+      @(_ResolvedWixLibraryPaths);
+      @(_ResolvedWixExtensionPaths);
+      @(_BindInputs);
+      $(MSBuildAllProjects)"
+      Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
+      Condition=" '@(Compile)' != '' ">
+
+    <PropertyGroup>
+      <!--<OutputFile>$([System.IO.Path]::GetFullPath($(TargetDir)%(CultureGroup.OutputFolder)$(TargetFileName)))</OutputFile>-->
+      <OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)))</OutputFile>
+      <!--<OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)))</OutputFile>-->
+      <PdbOutputFile>$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)</PdbOutputFile>
+    </PropertyGroup>
+
+    <WixBuild
+        SourceFiles="@(_CompileWithObjectPath)"
+        LibraryFiles="@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
+        LocalizationFiles="@(EmbeddedResource)"
+
+        Cultures="%(CultureGroup.Identity)"
+
+        ExtensionDirectory="$(WixExtDir)"
+        Extensions="@(_ResolvedWixExtensionPaths)"
+
+        IntermediateDirectory="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)"
+
+        OutputFile="$(OutputFile)"
+        OutputType="$(OutputType)"
+        PdbFile="$(PdbOutputFile)"
+        PdbType="$(WixPdbType)"
+
+        AdditionalOptions="$(CompilerAdditionalOptions) $(LinkerAdditionalOptions)"
+        DefineConstants="$(DefineConstants);$(SolutionDefineConstants);$(ProjectDefineConstants);$(ProjectReferenceDefineConstants)"
+        IncludeSearchPaths="$(IncludeSearchPaths)"
+        InstallerPlatform="$(InstallerPlatform)"
+        NoLogo="true"
+        Pedantic="$(Pedantic)"
+        ReferencePaths="$(ReferencePaths)"
+
+        SuppressSpecificWarnings="$(CompilerSuppressSpecificWarnings);$(LinkerSuppressSpecificWarnings)"
+        TreatSpecificWarningsAsErrors="$(CompilerTreatSpecificWarningsAsErrors)"
+
+        BindInputPaths="@(LinkerBindInputPaths)"
+        BindFiles="$(LinkerBindFiles)"
+        BindContentsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)"
+        BindOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)"
+        BindBuiltOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)"
+
+        CabinetCachePath="$(CabinetCachePath)"
+        CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
+        DefaultCompressionLevel="$(DefaultCompressionLevel)"
+
+        UnreferencedSymbolsFile="$(UnreferencedSymbolsFile)"
+        WixProjectFile="$(ProjectPath)"
+        WixVariables="$(WixVariables)"
+
+        SuppressValidation="$(SuppressValidation)"
+        SuppressIces="$(SuppressIces)"
+        AdditionalCub="$(AdditionalCub)"
+
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)" />
+
+    <!--
+    SuppressAllWarnings="$(CompilerSuppressAllWarnings);$(LinkerSuppressAllWarnings)"
+    TreatWarningsAsErrors="$(CompilerTreatWarningsAsErrors);$(LinkerTreatWarningsAsErrors)"
+    VerboseOutput="$(CompilerVerboseOutput);$(LinkerVerboseOutput)"
+    -->
+  </Target>
+
+
+  <!--
+  ==================================================================================================
+  CalculateDefineConstants
+
+    Adds project references to the constants passed into the compiler.
+
+    [IN]
+    @(_ResolvedProjectReferencePaths) - paths to projects' outputs
+    $(VSProjectConfigurations) - map of project names to configurations, provided by VS when building in the IDE
+
+    [OUT]
+    $(ProjectReferenceDefineConstants) - the list of referenced project variables to be passed into the compiler
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <CalculateDefineConstantsDependsOn>ResolveReferences</CalculateDefineConstantsDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="CalculateDefineConstants"
+      DependsOnTargets="$(CalculateDefineConstantsDependsOn)"
+      Condition=" '@(_ResolvedProjectReferencePaths)' != '' ">
+
+    <PropertyGroup>
+      <ProjectDefineConstants>
+        Configuration=$(ConfigurationName);
+        OutDir=$(OutDir);
+        Platform=$(PlatformName);
+        ProjectDir=$(ProjectDir);
+        ProjectExt=$(ProjectExt);
+        ProjectFileName=$(ProjectFileName);
+        ProjectName=$(ProjectName);
+        ProjectPath=$(ProjectPath);
+        TargetDir=$(TargetDir);
+        TargetExt=$(TargetExt);
+        TargetFileName=$(TargetFileName);
+        TargetName=$(TargetName);
+        TargetPath=$(TargetPath);
+      </ProjectDefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <SolutionDefineConstants Condition=" '$(DevEnvDir)'!='*Undefined*' ">$(SolutionDefineConstants);DevEnvDir=$(DevEnvDir)</SolutionDefineConstants>
+      <SolutionDefineConstants Condition=" '$(SolutionDir)'!='*Undefined*' ">$(SolutionDefineConstants);SolutionDir=$(SolutionDir)</SolutionDefineConstants>
+      <SolutionDefineConstants Condition=" '$(SolutionExt)'!='*Undefined*' ">$(SolutionDefineConstants);SolutionExt=$(SolutionExt)</SolutionDefineConstants>
+      <SolutionDefineConstants Condition=" '$(SolutionFileName)'!='*Undefined*' ">$(SolutionDefineConstants);SolutionFileName=$(SolutionFileName)</SolutionDefineConstants>
+      <SolutionDefineConstants Condition=" '$(SolutionName)'!='*Undefined*' ">$(SolutionDefineConstants);SolutionName=$(SolutionName)</SolutionDefineConstants>
+      <SolutionDefineConstants Condition=" '$(SolutionPath)'!='*Undefined*' ">$(SolutionDefineConstants);SolutionPath=$(SolutionPath)</SolutionDefineConstants>
+    </PropertyGroup>
+
+    <CreateProjectReferenceDefineConstants
+        ProjectReferencePaths="@(_ResolvedProjectReferencePaths)"
+        ProjectConfigurations="$(VSProjectConfigurations)">
+
+      <Output TaskParameter="DefineConstants" PropertyName="ProjectReferenceDefineConstants" />
+    </CreateProjectReferenceDefineConstants>
+
+    <ItemGroup>
+      <LinkerBindInputPaths Include="%(_ResolvedProjectReferencePaths.RootDir)%(_ResolvedProjectReferencePaths.Directory)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+  ================================================================================================
+  GenerateCompileWithObjectPath
+
+    Generates metadata on the for compile output objects.
+
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <GenerateCompileWithObjectPathDependsOn></GenerateCompileWithObjectPathDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="GenerateCompileWithObjectPath"
+      Condition=" '@(Compile)' != '' ">
+
+    <GenerateCompileWithObjectPath
+        Compile="@(Compile)"
+        IntermediateOutputPath="$(IntermediateOutputPath)">
+      <Output TaskParameter="CompileWithObjectPath" ItemName="_CompileWithObjectPath" />
+    </GenerateCompileWithObjectPath>
+  </Target>
+
+  <!--
+  ================================================================================================
+  AssignTargetPaths - OVERRIDE Target
+
+    Determines the final list of culture groups to build based on either the Cultures property or
+    those specified in .wxl files.
+
+      Culture groups specified in the Cultures property must be specified as a semi-colon
+      delimited  list of groups, with comma-delimited cultures within a group.
+      For example:
+        <Cultures>en-US,en;en-GB,en</Cultures>
+      This will build 2 targets, outputing to en-US and en-GB sub-folders.  Light will first look
+      for strings in the first culture (en-US or en-GB) then the second (en).
+
+      Cultures of .wxl files will be used when the Culture property is not set.  The culture of a
+      .wxl file is determined by the Culture attribute in the WixLocalization element in the file
+
+    Sets the OutputFolder metadata on each culture group.  In most cases this is the same as the
+    first culture in the culture group.  When the Culture's property is unspecified and no .wxl
+    files are provided this is the same as the output directory.  When the Culture's property
+    specifies a single culture group and no .wxl files are provided this is the same as the output
+    directory.
+
+    Updates the TargetPath and TargetPdbPath properties to be used in subsequent targets.
+
+    [IN]
+    @(EmbeddedResource) - The list of wxl files to use for localization.
+    $(Cultures) - The list of culture groups to build.
+
+    [OUT]
+    @(CultureGroup) - The list of culture group strings with OutputFolder metadata
+    $(TargetPath) - Property list of target link output MSIs/MSMs
+    $(TargetPdbPath) - Property list of target output pdbs
+
+  ================================================================================================
+  -->
+  <Target
+      Name="AssignTargetPaths"
+      Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
+
+    <WixAssignCulture Cultures="$(Cultures)" Files="@(EmbeddedResource)">
+      <Output TaskParameter="CultureGroups" ItemName="CultureGroup" />
+    </WixAssignCulture>
+
+    <!-- Expand the culture groups then put them back into the appropriate property -->
+    <ItemGroup>
+      <_CulturedTargetPath Include="$(TargetDir)%(CultureGroup.OutputFolder)$(TargetFileName)" />
+      <_CulturedTargetPdbPath Include="$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbFileName)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <TargetPath>@(_CulturedTargetPath)</TargetPath>
+      <TargetPdbPath>@(_CulturedTargetPdbPath)</TargetPdbPath>
+    </PropertyGroup>
+  </Target>
+
+  <!--
+  ================================================================================================
+  ReadPreviousBindInputsAndBuiltOutputs
+
+    Reads a previous build's Bind contents and built outputs file into @(_BindInputs) and
+    @(_BindBuiltOutputs) respectively.
+
+    Note: Only the *built* outputs are used because using files copied to output folder
+          can cause perpetual incremental build.
+
+          Imagine the case where you have: Msi.wixproj -> Lib.wixproj -> Exe.csproj. The
+          Exe.csproj cannot be both an input to Lib.wixproj and an output of Msi.wixproj
+          (as an uncompressed file) because the Lib.wixproj will always newer than the
+          Exe.csproj.
+
+    [IN]
+
+    [OUT]
+    @(_BindInputs) - the content files required to bind (i.e. the Binary/@SourceFile and File/@Source files).
+    @(_BindBuiltOutputs) - the previously built .msi, .msm, .pcp, .exe .wixpdb, .cabs, etc.
+                           Does not include content copied to output folder.
+  ================================================================================================
+  -->
+  <Target
+    Name="ReadPreviousBindInputsAndBuiltOutputs">
+
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)">
+      <Output TaskParameter="Lines" ItemName="_BindInputs" />
+    </ReadLinesFromFile>
+
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
+      <Output TaskParameter="Lines" ItemName="_BindBuiltOutputs" />
+    </ReadLinesFromFile>
+
+    <Message Importance="low" Text="Previous bind inputs: @(_BindInputs)" />
+    <Message Importance="low" Text="Previous bind outputs: @(_BindBuiltOutputs)" />
+  </Target>
+
+  <!--
+  ================================================================================================
+  UpdateLinkFileWrites
+
+    Reads the bind outputs file(s) output generated during WixBuild to correctly set the @(FileWrites)
+    item. Most targets have it easy because they can do a static mapping from inputs to the outputs.
+    However, the WixBuild target outputs are determined after a rather complex calculation we call
+    linking and binding!
+
+    This target runs independently after Link to ensure that @(FileWrites) is updated even if the
+    "WixBuild" task fails.
+
+    [IN]
+    Path to bind outputs file(s).
+
+    [OUT]
+    @(FileWrites) updated with outputs from bind.
+  ================================================================================================
+  -->
+  <Target
+      Name="UpdateLinkFileWrites">
+
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)">
+      <Output TaskParameter="Lines" ItemName="FileWrites"/>
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)') " />
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)') " />
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)') " />
+    </ItemGroup>
+
+    <Message Importance="low" Text="Build files after link: @(FileWrites)" />
+  </Target>
+
+  <!--
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  AllProjectOutputGroups Section
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ==================================================================================================
+  AllProjectOutputGroups - OVERRIDE Target
+
+  ==================================================================================================
+  -->
+  <Target
+      Name="AllProjectOutputGroups"
+      DependsOnTargets="
+        BuiltProjectOutputGroup;
+        DebugSymbolsProjectOutputGroup;
+        SourceFilesProjectOutputGroup;
+        ContentFilesProjectOutputGroup" />
+
+  <!--
+  This is the key output for the BuiltProjectOutputGroup and is meant to be read directly from the IDE.
+  Reading an item is faster than invoking a target.
+  -->
+  <ItemGroup>
+    <BuiltProjectOutputGroupKeyOutput Include="$(TargetPath)">
+      <IsKeyOutput>true</IsKeyOutput>
+      <FinalOutputPath>$(TargetPath)</FinalOutputPath>
+      <TargetPath>$(TargetFileName)</TargetPath>
+    </BuiltProjectOutputGroupKeyOutput>
+  </ItemGroup>
+
+  <!--
+  ==================================================================================================
+  BuiltProjectOutputGroup - OVERRIDE Target
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <BuiltProjectOutputGroupDependsOn>PrepareForBuild;AssignTargetPaths</BuiltProjectOutputGroupDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="BuiltProjectOutputGroup"
+    Outputs="@(BuiltProjectOutputGroupOutput)"
+    DependsOnTargets="$(BuiltProjectOutputGroupDependsOn)">
+
+    <!-- Don't add BuiltProjectOutputGroupKeyOutput - to avoid duplicates, we only want to get the updated list of TargetPaths from the TargetPath property below -->
+
+    <!-- Try to read the outputs from the bind outputs text file since that's the output list straight from linker. -->
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
+      <Output TaskParameter="Lines" ItemName="_BuiltProjectOutputGroupOutputIntermediate"/>
+    </ReadLinesFromFile>
+
+    <!-- If we didn't get anything from the bind outputs text file, default to the target path. -->
+    <ItemGroup Condition=" '@(_BuiltProjectOutputGroupOutputIntermediate)'=='' ">
+      <_BuiltProjectOutputGroupOutputIntermediate Include="$(TargetPath)" />
+    </ItemGroup>
+
+    <!-- Convert intermediate items into final items; this way we can get the full path for each item -->
+    <ItemGroup>
+      <BuiltProjectOutputGroupOutput Include="@(_BuiltProjectOutputGroupOutputIntermediate->'%(FullPath)')">
+        <!-- For compatibility with 2.0 -->
+        <OriginalItemSpec Condition="'%(_BuiltProjectOutputGroupOutputIntermediate.OriginalItemSpec)' == ''">%(_BuiltProjectOutputGroupOutputIntermediate.FullPath)</OriginalItemSpec>
+      </BuiltProjectOutputGroupOutput>
+    </ItemGroup>
+  </Target>
+
+  <!--
+  ==================================================================================================
+  DebugSymbolsProjectOutputGroup
+
+    Populates the Debug Symbols project output group.
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <DebugSymbolsProjectOutputGroupDependsOn>AssignTargetPaths</DebugSymbolsProjectOutputGroupDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="DebugSymbolsProjectOutputGroup"
+    Outputs="@(DebugSymbolsProjectOutputGroupOutput)"
+    DependsOnTargets="$(DebugSymbolsProjectOutputGroupDependsOn)">
+
+    <!-- Include build output pdb(s).  Different than predefined itemgroup since AssignTargetPaths target may change -->
+    <ItemGroup>
+      <DebugSymbolsProjectOutputGroupOutput Include="$(TargetPdbPath)" Condition=" '$(SuppressPdbOutput)' != 'true' "/>
+    </ItemGroup>
+  </Target>
+
+
+  <!--
+  ==================================================================================================
+  CopyFilesToOutputDirectory - OVERRIDE Target
+
+  Copy all build outputs, satellites and other necessary files to the final directory.
+  ============================================================
+  -->
+  <Target
+      Name="CopyFilesToOutputDirectory">
+
+    <PropertyGroup>
+      <!-- By default we're using hard links to copy to the output directory, disabling this could slow the build significantly -->
+      <CreateHardLinksForCopyFilesToOutputDirectoryIfPossible Condition=" '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)' == '' ">true</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <CopyBuildOutputToOutputDirectory Condition="'$(CopyBuildOutputToOutputDirectory)'==''">true</CopyBuildOutputToOutputDirectory>
+      <CopyOutputSymbolsToOutputDirectory Condition="'$(CopyOutputSymbolsToOutputDirectory)'==''">true</CopyOutputSymbolsToOutputDirectory>
+      <FullIntermediateOutputPath>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)))</FullIntermediateOutputPath>
+    </PropertyGroup>
+
+    <!-- Copy the bound files. -->
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
+      <Output TaskParameter="Lines" ItemName="_FullPathToCopy"/>
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <_FullPathToCopy Include="$(OutputFile)" Condition=" '@(_FullPathToCopy)'=='' " />
+      <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.Identity)))" />
+    </ItemGroup>
+
+    <Copy
+        SourceFiles="@(_RelativePath->'$(IntermediateOutputPath)%(Identity)')"
+        DestinationFiles="@(_RelativePath->'$(OutDir)%(Identity)')"
+        SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+        OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+        Retries="$(CopyRetryCount)"
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+        UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+        Condition="'$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)' != 'true'"
+            >
+
+      <Output TaskParameter="DestinationFiles" ItemName="MainAssembly"/>
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+
+    </Copy>
+
+    <Message Importance="High" Text="$(MSBuildProjectName) -&gt; $(TargetPath)" Condition="'$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)'!='true'" />
+    <!--<Message Importance="High" Text="$(MSBuildProjectName) -&gt; @(MainAssembly->'%(FullPath)')" Condition="'$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)'!='true'" />-->
+
+    <!-- Copy the debug information file (.pdb), if any
+    <Copy
+        SourceFiles="@(_DebugSymbolsIntermediatePath)"
+        DestinationFiles="@(_DebugSymbolsOutputPath)"
+        SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+        OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+        Retries="$(CopyRetryCount)"
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+        UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+        Condition="'$(_DebugSymbolsProduced)'=='true' and '$(SkipCopyingSymbolsToOutputDirectory)' != 'true' and '$(CopyOutputSymbolsToOutputDirectory)'=='true'">
+
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+
+    </Copy>
+    -->
+  </Target>
+
+
+  <Import Project="$(WixHarvestTargetsPath)" Condition=" '$(WixHarvestTargetsPath)' != '' and Exists('$(WixHarvestTargetsPath)')" />
+  <Import Project="$(WixSigningTargetsPath)" Condition=" '$(WixSigningTargetsPath)' != '' and Exists('$(WixSigningTargetsPath)')" />
+
+  <!-- Extension point: Define CustomAfterWixTargets to a .targets file that you want to include after this file. -->
+  <Import Project="$(CustomAfterWixTargets)" Condition=" '$(CustomAfterWixTargets)' != '' and Exists('$(CustomAfterWixTargets)')" />
+
+</Project>

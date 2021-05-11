@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+    <Description></Description>
+    <Title>WiX Toolset MSBuild Tasks</Title>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp3.1' ">win-x86</RuntimeIdentifier>
+    <!-- https://github.com/Microsoft/msbuild/issues/2360 -->
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net461'">
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />
+    <PackageReference Include="WixToolset.Core" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net461' and '$(OS)' != 'Windows_NT'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' ">
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

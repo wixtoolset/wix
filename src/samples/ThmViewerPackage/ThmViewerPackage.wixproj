@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+
+  <PropertyGroup>
+    <ProjectGuid>59c4b122-5167-445b-8fc4-09dcd4eced89</ProjectGuid>
+    <OutputName>thmviewer</OutputName>
+    <OutputType>Package</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Package.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\thmviewer\thmviewer.vcxproj">
+      <Name>thmviewer</Name>
+      <Project>{95228C13-97F5-484A-B4A2-ECF4618B0881}</Project>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.3.3.37\build\Nerdbank.GitVersioning.targets')" />
+</Project>

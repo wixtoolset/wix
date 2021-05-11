@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="yes" InstallerVersion="200">
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature" Title="ATitle">
+      <MergeRef Id="SimpleMM" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage">
+        <Merge Id="SimpleMM" Language="1033" SourceFile="$(var.SimpleMergeModule.TargetPath)" DiskId="1" />
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+</Wix>

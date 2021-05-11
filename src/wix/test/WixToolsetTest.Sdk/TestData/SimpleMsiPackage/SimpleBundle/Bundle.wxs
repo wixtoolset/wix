@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="SimpleBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="6670d5c9-bbec-4828-ab60-4a1c0ffeb97d">
+        <BootstrapperApplication>
+            <BootstrapperApplicationDll SourceFile="test.txt" />
+        </BootstrapperApplication>
+
+        <Chain>
+            <ExePackage Permanent="yes" DetectCondition="no" SourceFile="test.txt" />
+        </Chain>
+    </Bundle>
+</Wix>

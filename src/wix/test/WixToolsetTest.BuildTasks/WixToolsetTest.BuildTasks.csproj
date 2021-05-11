@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" Link="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\Package.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.Sdk\TestData\SimpleMsiPackage\MsiPackage\data\test.txt" Link="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netcoreapp3.1' " />
+    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

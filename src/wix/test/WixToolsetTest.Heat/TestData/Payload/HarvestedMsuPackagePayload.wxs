@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <MsuPackagePayload Hash="904ADEA6AB675ACE16483138BF3F5850FD56ACB6E3A13AFA7263ED49C68CCE6CF84D6AAD6F99AAF175A95EE1A56C787C5AD968019056490B1073E7DBB7B9B7BE" Size="309544" />
+    </Fragment>
+</Wix>
