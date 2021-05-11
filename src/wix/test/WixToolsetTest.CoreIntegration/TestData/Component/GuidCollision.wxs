@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Guid="5917d193-7b5f-4d5d-bc2e-06aa210699cb">
+                <RegistryValue Root="HKLM" Key="SOFTWARE\WixToolset" Name="Test" Value="test value" />
+            </Component>
+
+            <Component Guid="5917d193-7b5f-4d5d-bc2e-06aa210699cb">
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

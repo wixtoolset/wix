@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MspPackage Id="PatchA" SourceFile="PatchA.msp" PerMachine="yes" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

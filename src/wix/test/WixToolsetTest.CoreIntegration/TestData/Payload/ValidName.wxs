@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PayloadGroup Id="ValidName">
+            <Payload SourceFile="dir\file.ext" Name="dir\file.ext" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

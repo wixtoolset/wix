@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="MinimalPackageGroup" />
+        </PackageGroup>
+
+        <BundleCustomData Id="BundleCustomTableBA">
+            <BundleAttributeDefinition Id="Id" />
+            <BundleAttributeDefinition Id="Column2" />
+
+            <BundleElement>
+                <BundleAttribute Id="Id" Value="one" />
+                <BundleAttribute Id="Column2" Value="two" />
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Column2" Value="&lt;" />
+                <BundleAttribute Id="Id" Value="&gt;" />
+            </BundleElement>
+        </BundleCustomData>
+
+        <BundleCustomData Id="BundleCustomTableBE" ExtensionId="CustomTableExtension">
+            <BundleAttributeDefinition Id="Id" />
+            <BundleAttributeDefinition Id="Column2" />
+        </BundleCustomData>
+    </Fragment>
+
+    <Fragment>
+        <BundleCustomDataRef Id="BundleCustomTableBA">
+            <BundleElement>
+                <BundleAttribute Id="Id" Value="1" />
+                <BundleAttribute Id="Column2" Value="2" />
+            </BundleElement>
+        </BundleCustomDataRef>
+
+        <BundleCustomDataRef Id="BundleCustomTableBE">
+            <BundleElement>
+                <BundleAttribute Id="Id" Value="one" />
+                <BundleAttribute Id="Column2" Value="two" />
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Column2" Value="&lt;" />
+                <BundleAttribute Id="Id" Value="&gt;" />
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Id" Value="1" />
+                <BundleAttribute Id="Column2" Value="2" />
+            </BundleElement>
+        </BundleCustomDataRef>
+
+        <BundleExtension Id="CustomTableExtension" SourceFile="fakeba.dll" Name="fakebext.dll" />
+    </Fragment>
+</Wix>

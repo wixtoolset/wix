@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WixToolset.Core\WixToolset.Core.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+    <ProjectReference Include="..\Example.Extension\Example.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

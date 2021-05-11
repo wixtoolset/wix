@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ex="http://www.example.com/scheams/v1/wxs">
+  <Fragment>
+    <ComponentGroup Id="OtherComponents" Directory="INSTALLFOLDER">
+       <Component>
+         <File Source="other.txt" />
+         <ex:Example Id="Other" Value="Value" />
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="BinFolder" />
+    </Fragment>
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="BinFolder" Name="Example Corporation\Test Product\bin" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>

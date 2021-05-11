@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ExtensionWxs Include="..\Example.Extension\Data\example.wxs">
+      <WixlibPath>$(BaseOutputPath)TestData\$(Configuration)\example.wixlib</WixlibPath>
+    </ExtensionWxs>
+  </ItemGroup>
+
+  <Target Name="BuildExtensionWixlibs"
+          AfterTargets="AfterBuild"
+          Inputs="@(ExtensionWxs)"
+          Outputs="%(ExtensionWxs.WixlibPath)"
+          Condition=" '$(NCrunch)'!='1' ">
+
+    <Exec Command="dotnet @(TargetPathWithTargetPlatformMoniker) &quot;$(IntermediateOutputPath) &quot; &quot;%(ExtensionWxs.WixlibPath)&quot; &quot;%(ExtensionWxs.Filename)%(ExtensionWxs.Extension)&quot;"
+          WorkingDirectory="%(ExtensionWxs.RelativeDir)" />
+
+    <Message Importance="high" Text="@(ExtensionWxs) -&gt; %(ExtensionWxs.WixlibPath)" />
+  </Target>
+</Project>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+        </ComponentGroup>
+
+        <UI Id="CustomUI">
+            <TextStyle Id="CustomFont" FaceName="!(loc.CustomFontName)" Size="!(loc.CustomFontSize)" />
+        </UI>
+    </Fragment>
+</Wix>

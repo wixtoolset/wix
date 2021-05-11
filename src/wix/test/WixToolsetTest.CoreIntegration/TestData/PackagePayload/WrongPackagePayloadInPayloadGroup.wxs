@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <MsiPackage Id="WrongPackagePayloadInPayloadGroup">
+                <PayloadGroupRef Id="WrongPackagePayloadGroup" />
+            </MsiPackage>
+        </PackageGroup>
+    </Fragment>
+    <Fragment>
+        <PayloadGroup Id="WrongPackagePayloadGroup">
+            <ExePackagePayload SourceFile="burn.exe" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Name="Foo.exe" Source="test.txt" />
+                <ProgId Id="Foo.File.hol.15" Advertise="yes" Description="Foo Holiday File">
+                    <ProgId Id="Foo.File.hol" />
+                    <Extension Id="hol">
+                        <Verb Id="Open" Argument="/hol &quot;%1&quot;" Sequence="1" />
+                    </Extension>
+                </ProgId>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

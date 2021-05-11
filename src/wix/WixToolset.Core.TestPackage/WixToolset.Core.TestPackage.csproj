@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net461;net472</TargetFrameworks>
+    <Description>Internal WiX Toolset Test Package</Description>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" IncludeAssets="true" />
+    <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" IncludeAssets="true" />
+    <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" IncludeAssets="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.assert" Version="2.4.0" />
+  </ItemGroup>
+</Project>

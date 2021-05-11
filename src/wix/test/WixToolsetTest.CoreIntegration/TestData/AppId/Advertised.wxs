@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="AppIdComp" Directory="INSTALLFOLDER" Guid="171BEE79-43CC-4A28-892F-7EFAC696FA4B">
+                <File Id="AppIdComp.txt" Source="test.txt" Name="AppIdComp.txt"></File>
+                <AppId Id="D6040299-B15C-4C94-AE26-0C9B60D14C35" Advertise="yes" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

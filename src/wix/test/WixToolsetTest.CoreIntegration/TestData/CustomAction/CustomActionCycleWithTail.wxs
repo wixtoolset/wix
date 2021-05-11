@@ -1,0 +1,20 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+        </ComponentGroup>
+
+        <Binary Id="Binary1" SourceFile="test.txt" />
+        <CustomAction Id="Action1" DllEntry="EntryPoint1" BinaryRef="Binary1" />
+        <CustomAction Id="Action2" DllEntry="EntryPoint2" BinaryRef="Binary1" />
+        <CustomAction Id="Action3" DllEntry="EntryPoint3" BinaryRef="Binary1" />
+        <CustomAction Id="Action4" DllEntry="EntryPoint4" BinaryRef="Binary1" />
+
+        <InstallExecuteSequence>
+            <Custom Action="Action1" After="Action2" />
+            <Custom Action="Action2" After="Action3" />
+            <Custom Action="Action3" After="Action4" />
+            <Custom Action="Action4" After="Action2" />
+        </InstallExecuteSequence>
+    </Fragment>
+</Wix>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+        </ComponentGroup>
+
+        <Property Id="SAMPLECOMPFOUND">
+            <ComponentSearch Id="SampleCompSearch" Guid="{4D9A0D20-D0CC-40DE-B580-EAD38B985217}"></ComponentSearch>
+        </Property>
+    </Fragment>
+</Wix>

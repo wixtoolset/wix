@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="FirstX86" />
+            <PackageGroupRef Id="FirstX64" />
+        </PackageGroup>
+        <PackageGroup Id="FirstX86">
+            <MsiPackage SourceFile="FirstX86.msi">
+                <PayloadGroupRef Id="Shared" />
+            </MsiPackage>
+        </PackageGroup>
+        <PackageGroup Id="FirstX64">
+            <MsiPackage SourceFile="FirstX64.msi">
+                <PayloadGroupRef Id="Shared" />
+            </MsiPackage>
+        </PackageGroup>
+        <Container Id="FirstX86" Name="FirstX86" Type="detached">
+            <PackageGroupRef Id="FirstX86" />
+        </Container>
+        <Container Id="FirstX64" Name="FirstX64" Type="detached">
+            <PackageGroupRef Id="FirstX64" />
+        </Container>
+        <PayloadGroup Id="Shared">
+            <Payload Id="SharedPayload" SourceFile="$(sys.SOURCEFILEPATH)" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <MsiPackage SourceFile="FirstX86.msi" />
+            <PackageGroupRef Id="FirstX64" />
+        </PackageGroup>
+        <PackageGroup Id="FirstX64">
+            <MsiPackage SourceFile="FirstX64.msi" />
+        </PackageGroup>
+        <Container Id="FirstX64" Name="FirstX64" Type="detached">
+            <PackageGroupRef Id="FirstX64" />
+        </Container>
+    </Fragment>
+</Wix>

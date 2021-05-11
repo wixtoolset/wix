@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+        </ComponentGroup>
+
+        <Upgrade Id="B05772EA-82B8-4DE0-B7EB-45B5F0CCFE6D">
+            <UpgradeVersion Minimum="1.0.0" Property="RELPRODFOUND"></UpgradeVersion>
+        </Upgrade>
+    </Fragment>
+</Wix>

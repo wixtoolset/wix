@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+        </ComponentGroup>
+
+        <CustomTable Id="CustomTable1">
+            <Column Id="Column1" Type="string" PrimaryKey="yes" Category="text" Modularize="column" Description="The first custom column." />
+            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Description="The custom table's Component reference" Modularize="column" />
+            <Row>
+                <Data Column="Column1" Value="Row1" />
+                <Data Column="Component_" Value="test.txt" />
+            </Row>
+            <Row>
+                <Data Column="Column1" Value="Row2" />
+                <Data Column="Component_" Value="test.txt" />
+            </Row>
+        </CustomTable>
+
+        <CustomTable Id="CustomTable2" Unreal="yes">
+            <Column Id="ColumnA" Type="string" PrimaryKey="yes" />
+            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Modularize="column" />
+            <Row>
+                <Data Column="ColumnA" Value="RowA" />
+                <Data Column="Component_" Value="test.txt" />
+            </Row>
+            <Row>
+                <Data Column="ColumnA" Value="RowB" />
+                <Data Column="Component_" Value="test.txt" />
+            </Row>
+        </CustomTable>
+    </Fragment>
+</Wix>

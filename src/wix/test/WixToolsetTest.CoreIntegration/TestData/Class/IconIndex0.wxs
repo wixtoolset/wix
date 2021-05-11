@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="ClassComp" Directory="INSTALLFOLDER" Guid="9BFDA7DC-CA16-40B3-A6B5-961E60B30892">
+                <File Source="test.txt" Name="ClassComp.txt"></File>
+                <Class Id="3FAED4CC-C473-4B8A-BE8B-303871377A4A" Advertise="yes" Context="LocalServer32" Description="FakeClass3FAE" ThreadingModel="apartment" Version="0.0.0.1" Icon="SampleIcon" IconIndex="0" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

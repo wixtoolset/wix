@@ -1,0 +1,48 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+        
+
+        <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+        <InstallExecuteSequence>
+            <ValidateProductID Suppress="yes" />
+        </InstallExecuteSequence>
+
+        <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="Foo1" />
+            <ComponentGroupRef Id="Foo2" />
+        </Feature>
+
+        <!--<CustomActionRef Id="SetFoo" />-->
+
+    </Package>
+
+    <Fragment Id="SetFoo">
+        <CustomAction Id="SetFoo" Property="FOO" Value="BOB" />
+        <CustomAction Id="SetBar" Property="BAR" Value="BOB" />
+    </Fragment>
+
+    <Fragment Id="Foo1">
+        <ComponentGroup Id="Foo1" />
+
+        <InstallExecuteSequence>
+            <Custom Action="SetFoo" Before="SetBar" />
+            <Custom Action="SetBar" Overridable="yes" Before="AppSearch" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment Id="Foo2">
+        <ComponentGroup Id="Foo2" />
+        
+        <InstallExecuteSequence>
+            <Custom Action="SetBar" Before="AppSearch" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment Id="Directories">
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>

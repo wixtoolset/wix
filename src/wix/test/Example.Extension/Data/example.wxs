@@ -1,0 +1,15 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <Property Id="PropertyFromExampleWir" Value="FromWir" />
+
+    <Binary Id="BinFromWir" SourceFile="example.txt" />
+  </Fragment>
+  <Fragment>
+    <BootstrapperApplication Id="fakeba">
+      <BootstrapperApplicationDll SourceFile="example.txt" />
+    </BootstrapperApplication>
+  </Fragment>
+  <Fragment>
+    <BundleExtension Id="ExampleBundleExtension" SourceFile="example.txt" />
+  </Fragment>
+</Wix>

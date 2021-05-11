@@ -1,0 +1,5 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Bundle Name="BurnBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="B94478B1-E1F3-4700-9CE8-6AA090854AEC">
+        <ApprovedExeForElevation Id="TestExe" Key="WixToolset\BurnTesting" Value="Test" Bitness="always32" />
+    </Bundle>
+</Wix>

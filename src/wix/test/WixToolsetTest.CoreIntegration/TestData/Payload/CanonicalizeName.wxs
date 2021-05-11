@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PayloadGroup Id="CanonicalizeName">
+            <Payload SourceFile="dir\file.ext" Name="a\..\c\.\d.exe" />
+        </PayloadGroup>
+    </Fragment>
+</Wix>

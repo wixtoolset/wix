@@ -1,0 +1,36 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <UI Id="CustomDialog">
+            <Dialog Id="FirstDialog" Width="100" Height="100">
+                <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="FirstDialogTitle" />
+                <Control Id="Header" Type="Text" X="0" Y="13" Width="90" Height="13" TabSkip="no" Text="FirstDialogHeader" HideCondition="Installed" DisableCondition="Installed" />
+            </Dialog>
+            <Dialog Id="SecondDialog" Width="100" Height="100">
+                <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="SecondDialogTitle" />
+                <Control Id="OptionalCheckBox" Type="CheckBox" X="0" Y="13" Width="100" Height="40" Hidden="yes" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]" ToolTip="Optional checkbox" Help="Check this box for fun" ShowCondition="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed" />
+            </Dialog>
+
+            <InstallUISequence>
+                <Show Dialog="SecondDialog" Before="FirstDialog" Overridable="yes" Condition="NOT Installed" />
+            </InstallUISequence>
+        </UI>
+    </Fragment>
+    <Fragment>
+        <UI Id="CustomUI">
+            <DialogRef Id="FirstDialog" />
+            <DialogRef Id="SecondDialog" />
+
+            <Publish Dialog="FirstDialog" Control="Next" Event="NewDialog" Value="SecondDialog" Condition="Installed AND PATCH" />
+
+            <InstallUISequence>
+                <Show Dialog="FirstDialog" Before="SecondDialog" Condition="Installed AND PATCH" />
+                <Show Dialog="SecondDialog" Before="ExecuteAction" Condition="NOT Installed" />
+            </InstallUISequence>
+        </UI>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

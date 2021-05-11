@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Directory="INSTALLFOLDER">
+                <File Id="test.txt" Source="test.txt" />
+                <ServiceInstall Name="SampleService" ErrorControl="ignore" Start="disabled" Type="ownProcess" />
+                <ServiceControl Name="SampleService" Start="install" Stop="uninstall" Remove="uninstall" Wait="yes" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

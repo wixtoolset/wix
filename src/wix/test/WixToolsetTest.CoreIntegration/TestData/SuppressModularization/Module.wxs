@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Module Id="MergeModule1" Language="1033" Version="1.0.0.0" Guid="243FB739-4D05-472F-9CFB-EF6B1017B6DE">
+    <SummaryInformation Manufacturer="!(loc.Manufacturer)" />
+
+    <Property Id="Test" Hidden="true" SuppressModularization="true" />
+    <CustomAction Id="Test" DllEntry="TestEntry" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" BinaryRef="FakeCA" />
+
+    <Binary Id="FakeCA" SourceFile="test.txt" />
+  </Module>
+</Wix>
