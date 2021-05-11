@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.IO.FileSystem.AccessControl" version="4.6.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="netstandard2.0\$id$.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
+
+    <file src="netstandard2.0\cubes\darice.cub" target="lib\netstandard2.0\cubes" />
+    <file src="netstandard2.0\cubes\mergemod.cub" target="lib\netstandard2.0\cubes" />
+
+    <file src="netstandard2.0\targets\$id$.targets" target="build" />
+    <file src="netstandard2.0\targets\$id$.targets" target="buildTransitive" />
+
+    <file src="ARM64\mergemod.dll" target="runtimes\win-arm64\native" />
+    <file src="ARM64\wixnative.exe" target="runtimes\win-arm64\native" />
+    <file src="ARM64\wixnative.pdb" target="runtimes\win-arm64\native" />
+    <file src="Win32\mergemod.dll" target="runtimes\win-x86\native" />
+    <file src="Win32\wixnative.exe" target="runtimes\win-x86\native" />
+    <file src="Win32\wixnative.pdb" target="runtimes\win-x86\native" />
+    <file src="x64\mergemod.dll" target="runtimes\win-x64\native" />
+    <file src="x64\wixnative.exe" target="runtimes\win-x64\native" />
+    <file src="x64\wixnative.pdb" target="runtimes\win-x64\native" />
+  </files>
+</package>

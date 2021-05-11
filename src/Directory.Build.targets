@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!--
+  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.targets
+  then update all of the repos.
+-->
+<Project>
+  <PropertyGroup>
+    <SigningToolFolder>$(BaseOutputPath)obj\.tools</SigningToolFolder>
+    <SigningToolExe>$(SigningToolFolder)\SignClient.exe</SigningToolExe>
+    <SigningFilelist>$(SigningToolFolder)\empty-filelist.txt</SigningFilelist>
+    <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
+  </PropertyGroup>
+
+  <Target Name="__FixupGitBaseVersion" BeforeTargets="_GitPopulateVersionInfo">
+    <PropertyGroup>
+      <GitBaseVersion>$(GitBaseVersion.Replace('{apiversion}', '$(ApiVersion)'))</GitBaseVersion>
+      <GitBaseVersion>$(GitBaseVersion.Replace('{height}', '$(GitCommits)'))</GitBaseVersion>
+      <GitBaseVersion>$(GitBaseVersion.Replace('{commits}', '$(GitCommits)'))</GitBaseVersion>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="__SetPropertiesFromGit" DependsOnTargets="GitVersion">
+    <PropertyGroup>
+      <AssemblyVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
+      <FileVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
+      <PackageVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)</PackageVersion>
+      <InformationalVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(GitSha)</InformationalVersion>
+      <!-- We already included the $(GitSha) in the informational version so do not include it again.  -->
+      <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+    <Message Importance="$(GitInfoReportImportance)" Text="Properties from Git:
+  GitCommits: $(GitCommits)
+  AssemblyVersion: $(AssemblyVersion)
+  FileVersion: $(FileVersion)
+  InformationalVersion: $(InformationalVersion)
+  PackageVersion: $(PackageVersion)
+" />
+  </Target>
+
+  <PropertyGroup>
+    <GenerateNuspecDependsOn>
+      $(GenerateNuspecDependsOn);
+      __SetNuspecProperties
+    </GenerateNuspecDependsOn>
+  </PropertyGroup>
+
+  <Target Name="__SetNuspecProperties" DependsOnTargets="__SetPropertiesFromGit"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+    <PropertyGroup>
+      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(GitRepositoryUrl)'!='' ">$(GitRepositoryUrl.Replace('.git',''))</ProjectUrl>
+
+      <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$([System.IO.Path]::GetFullPath($(OutputPath)..))\</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Authors="$(Authors)";Configuration=$(Configuration);Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Version=$(PackageVersion);RepositoryCommit=$(GitSha);RepositoryType=git;RepositoryUrl=$(GitRepositoryUrl);ProjectFolder=$(MSBuildProjectDirectory)\;ProjectUrl=$(ProjectUrl)</NuspecProperties>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <Message Importance="$(GitInfoReportImportance)" Text="NuSpec info:
+  NuspecFile: $(NuspecFile)
+  NuspecBasePath: $(NuspecBasePath)
+  NuspecProperties: $(NuspecProperties)
+" />
+
+  </Target>
+
+  <Target Name="PackNative" DependsOnTargets="__SetNuspecProperties"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+
+    <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(BaseOutputPath)$(Configuration)" -BasePath "$(NuspecBasePath)" -Properties $(NuspecProperties)' 
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+    <ItemGroup>
+      <NuGetPackOutput Include="$(BaseOutputPath)$(Configuration)\**\$(PackageId)*.nupkg" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GetSignClient"
+          Condition=" !Exists('$(SigningToolExe)') ">
+
+    <WriteLinesToFile File='$(SigningFilelist)' Lines='do-not-sign-files-in-nupkg' Overwrite='true' />
+
+    <Exec Command='dotnet.exe tool install --tool-path "$(SigningToolFolder)" SignClient' />
+  </Target>
+
+  <Target Name="SignOutput" DependsOnTargets="_GetSignClient" AfterTargets="AfterBuild"
+          Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' and 
+                      ('$(MSBuildProjectExtension)'=='.csproj' or ('$(MSBuildProjectExtension)'=='.vcxproj' and '$(ConfigurationType)'!='StaticLibrary'))">
+
+    <Exec Command='"$(SigningToolExe)" sign -i $(TargetPath) -c "$(SigningConfiguration)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Target Name="SignNupkg" DependsOnTargets="_GetSignClient" AfterTargets="Pack;PackNative"
+          Condition=" '$(SigningUser)'!='' and '@(NuGetPackOutput)'!='' and '$(SignNupkg)'!='false' ">
+    <ItemGroup>
+      <SigningNupkgs Include="@(NuGetPackOutput)" Condition=" '%(Extension)'=='.nupkg' " />
+    </ItemGroup>
+
+    <Exec Command='"$(SigningToolExe)" sign -i "@(SigningNupkgs->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
+  <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
+</Project>
