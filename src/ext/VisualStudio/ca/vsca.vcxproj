@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{45308B85-0628-4978-8FC8-6AD9E1AD5949}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <TargetName>vsca</TargetName>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <ProjectModuleDefinitionFile>vsca.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset VS CustomAction</Description>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vsca.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="vsca.def" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.14.114" />
+    <PackageReference Include="WixToolset.Dutil" Version="4.0.65" />
+    <PackageReference Include="WixToolset.WcaUtil" Version="4.0.18" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

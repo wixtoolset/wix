@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <DirectoryRef Id="CommonFilesFolder">
+      <Directory Id="MSShared" Name="Microsoft Shared">
+        <Directory Id="DevHelp" Name="DevHelp">
+          <Directory Id="VSIPCC" Name="VSIPCC">
+          </Directory>
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment Id="HTML_Help_Registration_">
+    <Binary Id="BIN_File_46002" SourceFile="$(sys.SOURCEFILEDIR)\Redist\BIN_File_46002.dll" />
+    <Binary Id="BIN_File_46001" SourceFile="$(sys.SOURCEFILEDIR)\Redist\BIN_File_46001.dll" />
+    <Binary Id="BIN_File_107602" SourceFile="$(sys.SOURCEFILEDIR)\Redist\BIN_File_107602.dll" />
+    <!-- We are stuck using GUID'ed ids here because they were hardcoded in the Help2 dlls-->
+    <CustomAction Id="CA_BeginHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="BeginTransaction" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RegisterPlugIn.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RegisterPlugIn2" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_CommitHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="CommitTransaction" Return="ignore" Execute="commit" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_CommitHelpTransactionNoRB.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="CommitTransaction" Return="ignore" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_ExportTempHxDs.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="ExportTempHxDs" BinaryRef="BIN_File_46002" />
+    <CustomAction Id="CA_RegisterNamespace.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RegisterNamespace2" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RollbackTempHxDs.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RemoveTempHxDs" Execute="rollback" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RegisterMicrosoftHelp" Return="ignore" BinaryRef="BIN_File_46002" />
+    <CustomAction Id="CA_RegisterHelpFile.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RegisterHelpFile" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RegisterFilter.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RegisterFilter2" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RemoveNamespace.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RemoveNamespace" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RemoveTempHxDs.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RemoveTempHxDs" Return="ignore" BinaryRef="BIN_File_46001" />
+    <!-- This isn't actually executed, but the Help2 dlls use it to find the key for the binary file-->
+    <CustomAction Id="CA_DummyForHXDS_DLL.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="Bogus" BinaryRef="BIN_File_107602" />
+    <CustomAction Id="CA_RollbackHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RollbackTransaction" Execute="rollback" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_RemoveHelpFile.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="RemoveHelpFile" Execute="deferred" Impersonate="no" BinaryRef="BIN_File_46001" />
+    <CustomAction Id="CA_UnRegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" DllEntry="UnRegisterMicrosoftHelp" Return="ignore" BinaryRef="BIN_File_46002" />
+
+    <InstallExecuteSequence>
+      <Custom Action="CA_ExportTempHxDs.3643236F_FC70_11D3_A536_0090278A1BB8" Before="ProcessComponents" />
+
+      <Custom Action="CA_RollbackHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" Before="CA_BeginHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" />
+      <Custom Action="CA_BeginHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" After="RemoveFiles" />
+      <Custom Action="CA_UnRegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" After="CA_BeginHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" />
+
+      <Custom Action="CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8" After="InstallFiles" />
+
+      <Custom Action="CA_CommitHelpTransaction.3643236F_FC70_11D3_A536_0090278A1BB8" Before="InstallFinalize" Condition="( NOT RollbackDisabled )" />
+      <Custom Action="CA_CommitHelpTransactionNoRB.3643236F_FC70_11D3_A536_0090278A1BB8" Before="InstallFinalize" Condition="( RollbackDisabled )" />
+      <Custom Action="CA_RemoveTempHxDs.3643236F_FC70_11D3_A536_0090278A1BB8" After="InstallFinalize" />
+    </InstallExecuteSequence>
+
+    <CustomTable Id="HelpPlugin">
+      <Column Id="HelpNamespace_" Type="string" Width="72" PrimaryKey="yes" />
+      <Column Id="HelpNamespace_Parent" Type="string" Width="72" PrimaryKey="yes" />
+      <Column Id="File_HxT" Nullable="yes" Type="string" Width="72" />
+      <Column Id="File_HxA" Nullable="yes" Type="string" Width="72" />
+      <Column Id="File_ParentHxT" Nullable="yes" Type="string" Width="72" />
+    </CustomTable>
+
+    <CustomTable Id="HelpNamespace">
+      <Column Id="NamespaceKey" Type="string" Width="72" PrimaryKey="yes" />
+      <Column Id="NamespaceName" Type="string" Width="0" />
+      <Column Id="File_Collection" Type="string" Width="72" />
+      <Column Id="Description" Nullable="yes" Localizable="yes" Type="string" Width="0" />
+    </CustomTable>
+  </Fragment>
+</Wix>

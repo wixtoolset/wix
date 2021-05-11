@@ -1,0 +1,11 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!--
+  Do NOT modify this file. Update the canonical version in Home\repo-template\src\CSharp.Build.props
+  then update all of the repos.
+-->
+<Project>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)wix.snk))</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+</Project>
