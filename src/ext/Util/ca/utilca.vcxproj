@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|X64">
+      <Configuration>Debug</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|X64">
+      <Configuration>Release</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{076018F7-19BD-423A-ABBF-229273DA08D8}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <TargetName>utilca</TargetName>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <ProjectModuleDefinitionFile>utilca.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset Util CustomAction</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>activeds.lib;adsiid.lib;msi.lib;netapi32.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="BroadcastSettingChange.cpp" />
+    <ClCompile Include="CheckReboot.cpp" />
+    <ClCompile Include="CloseApps.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="exitearlywithsuccess.cpp" />
+    <ClCompile Include="FormatFiles.cpp" />
+    <ClCompile Include="netshortcuts.cpp" />
+    <ClCompile Include="OsInfo.cpp" />
+    <ClCompile Include="qtexecca.cpp" />
+    <ClCompile Include="RemoveFoldersEx.cpp" />
+    <ClCompile Include="RemoveRegistryKeysEx.cpp" />
+    <ClCompile Include="RestartManager.cpp" />
+    <ClCompile Include="scaexec.cpp" />
+    <ClCompile Include="scamanifest.cpp" />
+    <ClCompile Include="scaperf.cpp" />
+    <ClCompile Include="scaperfexec.cpp" />
+    <ClCompile Include="scasched.cpp" />
+    <ClCompile Include="scasmbexec.cpp" />
+    <ClCompile Include="scasmbsched.cpp" />
+    <ClCompile Include="scauser.cpp" />
+    <ClCompile Include="secureobj.cpp" />
+    <ClCompile Include="serviceconfig.cpp" />
+    <ClCompile Include="shellexecca.cpp" />
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="TouchFile.cpp" />
+    <ClCompile Include="utilca.cpp" />
+    <ClCompile Include="XmlConfig.cpp" />
+    <ClCompile Include="XmlFile.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="caDecor.h" />
+    <ClInclude Include="cost.h" />
+    <ClInclude Include="CustomMsiErrors.h" />
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="sca.h" />
+    <ClInclude Include="scacost.h" />
+    <ClInclude Include="scasmb.h" />
+    <ClInclude Include="scasmbexec.h" />
+    <ClInclude Include="scauser.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="utilca.def" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Dutil" Version="4.0.72" />
+    <PackageReference Include="WixToolset.WcaUtil" Version="4.0.19" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

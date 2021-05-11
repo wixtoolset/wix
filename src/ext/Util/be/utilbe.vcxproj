@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|X64">
+      <Configuration>Debug</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|X64">
+      <Configuration>Release</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{630C1EE7-2517-4A8C-83E3-DA1150308B58}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <TargetName>utilbe</TargetName>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <ProjectModuleDefinitionFile>utilbe.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset Util BundleExtension</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="detectsha2support.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilbe.cpp" />
+    <ClCompile Include="UtilBundleExtension.cpp" />
+    <ClCompile Include="utilsearch.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="beDecor.h" />
+    <ClInclude Include="detectsha2support.h" />
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="UtilBundleExtension.h" />
+    <ClInclude Include="utilsearch.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="utilbe.def" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BextUtil" Version="4.0.58" />
+    <PackageReference Include="WixToolset.BootstrapperCore.Native" Version="4.0.141" />
+    <PackageReference Include="WixToolset.DUtil" Version="4.0.72" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

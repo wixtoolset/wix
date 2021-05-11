@@ -1,0 +1,14 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <util:User Id="Everyone" Name="Everyone" />
+
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt" />
+                <util:FileShare Id="ExampleFileShare" Description="An example file share" Name="example">
+                    <util:FileSharePermission User="Everyone" Read="yes" />
+                </util:FileShare>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

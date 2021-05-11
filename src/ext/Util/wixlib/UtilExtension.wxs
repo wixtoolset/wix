@@ -1,0 +1,64 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include caDecor.wxi ?>
+    <?include caerr.wxi ?>
+
+    <Fragment>
+        <UI Id="ConfigureUsersErrorText">
+            <Error Id="$(var.msierrUSRFailedUserCreate)" Message="!(loc.msierrUSRFailedUserCreate)" />
+            <Error Id="$(var.msierrUSRFailedUserCreatePswd)" Message="!(loc.msierrUSRFailedUserCreatePswd)" />
+            <Error Id="$(var.msierrUSRFailedUserGroupAdd)" Message="!(loc.msierrUSRFailedUserGroupAdd)" />
+            <Error Id="$(var.msierrUSRFailedGrantLogonAsService)" Message="Failed to grant 'logon as service' rights to user.  ([2]   [3]   [4]   [5])" />
+            <Error Id="$(var.msierrUSRFailedUserCreateExists)" Message="!(loc.msierrUSRFailedUserCreateExists)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="ConfigureSmbErrorsText">
+            <Error Id="$(var.msierrSMBFailedCreate)" Message="!(loc.msierrSMBFailedCreate)" />
+            <Error Id="$(var.msierrSMBFailedDrop)" Message="!(loc.msierrSMBFailedDrop)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="PerCounterDataErrorsText">
+            <Error Id="$(var.msierrInstallPerfCounterData)" Message="!(loc.msierrInstallPerfCounterData)" />
+            <Error Id="$(var.msierrUninstallPerfCounterData)" Message="!(loc.msierrUninstallPerfCounterData)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="ConfigurePerfmonErrorsText">
+            <Error Id="$(var.msierrPERFMONFailedRegisterDLL)" Message="!(loc.msierrPERFMONFailedRegisterDLL)" />
+            <Error Id="$(var.msierrPERFMONFailedUnregisterDLL)" Message="!(loc.msierrPERFMONFailedUnregisterDLL)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="SecureObjectsErrors">
+            <Error Id="$(var.msierrSecureObjectsFailedCreateSD)" Message="!(loc.msierrSecureObjectsFailedCreateSD)" />
+            <Error Id="$(var.msierrSecureObjectsFailedSet)" Message="!(loc.msierrSecureObjectsFailedSet)" />
+            <Error Id="$(var.msierrSecureObjectsUnknownType)" Message="!(loc.msierrSecureObjectsUnknownType)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="XmlFileErrorsText">
+            <Error Id="$(var.msierrXmlFileFailedRead)" Message="!(loc.msierrXmlFileFailedRead)" />
+            <Error Id="$(var.msierrXmlFileFailedOpen)" Message="!(loc.msierrXmlFileFailedOpen)" />
+            <Error Id="$(var.msierrXmlFileFailedSelect)" Message="!(loc.msierrXmlFileFailedSelect)" />
+            <Error Id="$(var.msierrXmlFileFailedSave)" Message="!(loc.msierrXmlFileFailedSave)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="XmlConfigErrorsText">
+            <Error Id="$(var.msierrXmlConfigFailedRead)" Message="!(loc.msierrXmlConfigFailedRead)" />
+            <Error Id="$(var.msierrXmlConfigFailedOpen)" Message="!(loc.msierrXmlConfigFailedOpen)" />
+            <Error Id="$(var.msierrXmlConfigFailedSelect)" Message="!(loc.msierrXmlConfigFailedSelect)" />
+            <Error Id="$(var.msierrXmlConfigFailedSave)" Message="!(loc.msierrXmlConfigFailedSave)" />
+        </UI>
+    </Fragment>
+</Wix>
