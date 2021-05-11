@@ -1,0 +1,22 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+   <?include caSuffix.wxi ?>
+   
+   <Fragment>
+      <InstallExecuteSequence>
+          <Custom Action="MsiProcessDrivers" After="InstallFiles" Condition="VersionNT &gt; 400" />
+          <Custom Action="MsiCleanupOnSuccess" After="InstallFinalize" Condition="VersionNT &gt; 400" />
+      </InstallExecuteSequence>
+      
+      <Binary Id="DIFxApp.dll$(var.Suffix)" SourceFile="$(var.platform)\DIFxApp.dll" />
+      <Binary Id="DIFxAppA.dll$(var.Suffix)" SourceFile="$(var.platform)\DIFxAppA.dll" />
+
+      <CustomAction Id="MsiProcessDrivers$(var.Suffix)" DllEntry="ProcessDriverPackages" SuppressModularization="yes" Execute="immediate" BinaryRef="DIFxApp.dll$(var.Suffix)" />
+      <CustomAction Id="MsiInstallDrivers$(var.Suffix)" DllEntry="InstallDriverPackages" SuppressModularization="yes" Execute="deferred" Impersonate="no" BinaryRef="DIFxAppA.dll$(var.Suffix)" />
+      <CustomAction Id="MsiUninstallDrivers$(var.Suffix)" DllEntry="UninstallDriverPackages" SuppressModularization="yes" Execute="deferred" Impersonate="no" BinaryRef="DIFxAppA.dll$(var.Suffix)" />
+      <CustomAction Id="MsiRollbackInstall$(var.Suffix)" DllEntry="RollbackInstall" SuppressModularization="yes" Execute="rollback" Impersonate="no" BinaryRef="DIFxAppA.dll$(var.Suffix)" />
+      <CustomAction Id="MsiCleanupOnSuccess$(var.Suffix)" DllEntry="CleanupOnSuccess" SuppressModularization="yes" Execute="immediate" BinaryRef="DIFxApp.dll$(var.Suffix)" />
+   </Fragment>
+</Include>
