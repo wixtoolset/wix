@@ -1,0 +1,58 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include caerr.wxi ?>
+
+    <Fragment>
+        <Property Id="IISMAJORVERSION">
+            <RegistrySearch Id="IIsMajorVersionSearch" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Name="MajorVersion" Type="raw" />
+        </Property>
+
+        <Property Id="IISMINORVERSION">
+            <RegistrySearch Id="IIsMinorVersionSearch" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Name="MinorVersion" Type="raw" />
+        </Property>
+    </Fragment>
+
+    <Fragment>
+      <UI Id="WixIIsErrors">
+        <Error Id="$(var.msierrIISCannotConnect)" Message="!(loc.msierrIISCannotConnect)" />
+        <Error Id="$(var.msierrIISFailedReadWebSite)" Message="!(loc.msierrIISFailedReadWebSite)" />
+        <Error Id="$(var.msierrIISFailedReadWebDirs)" Message="!(loc.msierrIISFailedReadWebDirs)" />
+        <Error Id="$(var.msierrIISFailedReadVDirs)" Message="!(loc.msierrIISFailedReadVDirs)" />
+        <Error Id="$(var.msierrIISFailedReadFilters)" Message="!(loc.msierrIISFailedReadFilters)" />
+        <Error Id="$(var.msierrIISFailedReadMimeMap)" Message="!(loc.msierrIISFailedReadMimeMap)" />
+        <Error Id="$(var.msierrIISFailedReadAppPool)" Message="!(loc.msierrIISFailedReadAppPool)" />
+        <Error Id="$(var.msierrIISFailedReadProp)" Message="!(loc.msierrIISFailedReadProp)" />
+        <Error Id="$(var.msierrIISFailedReadWebSvcExt)" Message="!(loc.msierrIISFailedReadWebSvcExt)" />
+        <Error Id="$(var.msierrIISFailedReadWebError)" Message="!(loc.msierrIISFailedReadWebError)" />
+        <Error Id="$(var.msierrIISFailedReadHttpHeader)" Message="!(loc.msierrIISFailedReadHttpHeader)" />
+
+        <Error Id="$(var.msierrIISFailedSchedTransaction)" Message="!(loc.msierrIISFailedSchedTransaction)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallWebs)" Message="!(loc.msierrIISFailedSchedInstallWebs)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallWebDirs)" Message="!(loc.msierrIISFailedSchedInstallWebDirs)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallVDirs)" Message="!(loc.msierrIISFailedSchedInstallVDirs)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallFilters)" Message="!(loc.msierrIISFailedSchedInstallFilters)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallAppPool)" Message="!(loc.msierrIISFailedSchedInstallAppPool)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallProp)" Message="!(loc.msierrIISFailedSchedInstallProp)" />
+        <Error Id="$(var.msierrIISFailedSchedInstallWebSvcExt)" Message="!(loc.msierrIISFailedSchedInstallWebSvcExt)" />
+
+        <Error Id="$(var.msierrIISFailedSchedUninstallWebs)" Message="!(loc.msierrIISFailedSchedUninstallWebs)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallWebDirs)" Message="!(loc.msierrIISFailedSchedUninstallWebDirs)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallVDirs)" Message="!(loc.msierrIISFailedSchedUninstallVDirs)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallFilters)" Message="!(loc.msierrIISFailedSchedUninstallFilters)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallAppPool)" Message="!(loc.msierrIISFailedSchedUninstallAppPool)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallProp)" Message="!(loc.msierrIISFailedSchedUninstallProp)" />
+        <Error Id="$(var.msierrIISFailedSchedUninstallWebSvcExt)" Message="!(loc.msierrIISFailedSchedUninstallWebSvcExt)" />
+
+        <Error Id="$(var.msierrIISFailedStartTransaction)" Message="!(loc.msierrIISFailedStartTransaction)" />
+        <Error Id="$(var.msierrIISFailedOpenKey)" Message="!(loc.msierrIISFailedOpenKey)" />
+        <Error Id="$(var.msierrIISFailedCreateKey)" Message="!(loc.msierrIISFailedCreateKey)" />
+        <Error Id="$(var.msierrIISFailedWriteData)" Message="!(loc.msierrIISFailedWriteData)" />
+        <Error Id="$(var.msierrIISFailedCreateApp)" Message="!(loc.msierrIISFailedCreateApp)" />
+        <Error Id="$(var.msierrIISFailedDeleteKey)" Message="!(loc.msierrIISFailedDeleteKey)" />
+        <Error Id="$(var.msierrIISFailedDeleteValue)" Message="!(loc.msierrIISFailedDeleteValue)" />
+        <Error Id="$(var.msierrIISFailedCommitInUse)" Message="!(loc.msierrIISFailedCommitInUse)" />
+      </UI>
+    </Fragment>
+</Wix>
