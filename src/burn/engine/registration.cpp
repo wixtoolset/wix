@@ -1137,14 +1137,15 @@ static HRESULT GetBundleManufacturer(
     )
 {
     HRESULT hr = S_OK;
+    LPCWSTR wzPublisher = pRegistration->sczPublisher ? pRegistration->sczPublisher : L"";
 
     hr = VariableGetString(pVariables, BURN_BUNDLE_MANUFACTURER, psczBundleManufacturer);
     if (E_NOTFOUND == hr)
     {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_MANUFACTURER, pRegistration->sczPublisher, FALSE, FALSE);
+        hr = VariableSetString(pVariables, BURN_BUNDLE_MANUFACTURER, wzPublisher, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set bundle manufacturer.");
 
-        hr = StrAllocString(psczBundleManufacturer, pRegistration->sczPublisher, 0);
+        hr = StrAllocString(psczBundleManufacturer, wzPublisher, 0);
     }
     ExitOnFailure(hr, "Failed to get bundle manufacturer.");
 
@@ -1159,14 +1160,15 @@ static HRESULT GetBundleName(
     )
 {
     HRESULT hr = S_OK;
+    LPCWSTR wzDisplayName = pRegistration->sczDisplayName ? pRegistration->sczDisplayName : L"";
 
     hr = VariableGetString(pVariables, BURN_BUNDLE_NAME, psczBundleName);
     if (E_NOTFOUND == hr)
     {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_NAME, pRegistration->sczDisplayName, FALSE, FALSE);
+        hr = VariableSetString(pVariables, BURN_BUNDLE_NAME, wzDisplayName, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set bundle name.");
 
-        hr = StrAllocString(psczBundleName, pRegistration->sczDisplayName, 0);
+        hr = StrAllocString(psczBundleName, wzDisplayName, 0);
     }
     ExitOnFailure(hr, "Failed to get bundle name.");
 

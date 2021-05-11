@@ -33,7 +33,7 @@ namespace Bootstrapper
         {
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void MsiTransactionInstallTest()
         {
             HRESULT hr = S_OK;
@@ -170,7 +170,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PackageC", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void MsiTransactionUninstallTest()
         {
             HRESULT hr = S_OK;
@@ -279,7 +279,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PackageC", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void RelatedBundleMissingFromCacheTest()
         {
             HRESULT hr = S_OK;
@@ -362,7 +362,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SingleMsiCacheTest()
         {
             HRESULT hr = S_OK;
@@ -433,7 +433,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SingleMsiInstallTest()
         {
             HRESULT hr = S_OK;
@@ -517,7 +517,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SingleMsiInstalledWithNoInstalledPackagesModifyTest()
         {
             HRESULT hr = S_OK;
@@ -577,7 +577,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SingleMsiUninstallTest()
         {
             HRESULT hr = S_OK;
@@ -650,7 +650,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SingleMsiUninstallTestFromUpgradeBundleWithSameExactPackage()
         {
             HRESULT hr = S_OK;
@@ -713,7 +713,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_IGNORED, BURN_PACKAGE_REGISTRATION_STATE_IGNORED);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SlipstreamInstallTest()
         {
             HRESULT hr = S_OK;
@@ -824,7 +824,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[2], L"PatchA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
-        [Fact(Skip = "Disable due to hang on CI")]
+        [Fact]
         void SlipstreamUninstallTest()
         {
             HRESULT hr = S_OK;
@@ -1106,9 +1106,13 @@ namespace Bootstrapper
             HRESULT hr = S_OK;
             BURN_RELATED_BUNDLES* pRelatedBundles = &pEngineState->registration.relatedBundles;
             BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
+            LPCWSTR wzFilePath = pEngineState->registration.sczExecutableName;
 
             hr = StrAllocString(&dependencyProvider.sczKey, wzId, 0);
             NativeAssert::Succeeded(hr, "Failed to copy provider key");
+
+            hr = StrAllocString(&dependencyProvider.sczDisplayName, wzId, 0);
+            NativeAssert::Succeeded(hr, "Failed to copy display name");
 
             dependencyProvider.fImported = TRUE;
 
@@ -1126,7 +1130,7 @@ namespace Bootstrapper
             pRelatedBundle->fPlannable = TRUE;
             pRelatedBundle->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
-            hr = PseudoBundleInitialize(0, &pRelatedBundle->package, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, NULL, NULL, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
+            hr = PseudoBundleInitialize(0, &pRelatedBundle->package, TRUE, wzId, pRelatedBundle->relationType, BOOTSTRAPPER_PACKAGE_STATE_PRESENT, TRUE, wzFilePath, wzFilePath, NULL, 0, FALSE, L"-quiet", L"-repair -quiet", L"-uninstall -quiet", &dependencyProvider, NULL, 0);
             NativeAssert::Succeeded(hr, "Failed to initialize related bundle to represent bundle: %ls", wzId);
 
             ++pRelatedBundles->cRelatedBundles;
