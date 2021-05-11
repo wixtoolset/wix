@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>WixToolset.Mba.Host</AssemblyName>
+    <RootNamespace>WixToolset.Mba.Host</RootNamespace>
+    <TargetFrameworks>net20</TargetFrameworks>
+    <Description>Managed Bootstrapper Application entry point</Description>
+    <DebugType>embedded</DebugType>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <HeaderPath Include="$(BaseOutputPath)obj\$(AssemblyName).h">
+      <Visible>False</Visible>
+    </HeaderPath>
+  </ItemGroup>
+
+  <Target Name="GenerateIdentityHeader" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="@(HeaderPath)">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyIdentity" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <Line Include='#define MBA_ASSEMBLY_FULL_NAME L"%(AssemblyIdentity.Identity)"' />
+      <Line Include='#define MBA_CONFIG_FILE_NAME L"$(AssemblyName).config"' />
+      <Line Include='#define MBA_ENTRY_TYPE L"$(RootNamespace).BootstrapperApplicationFactory"' />
+    </ItemGroup>
+    <Message Importance="normal" Text="Generating identity definitions into @(HeaderPath->'%(FullPath)')" />
+    <WriteLinesToFile File="@(HeaderPath)" Lines="@(Line)" Overwrite="True" />
+    <ItemGroup>
+      <FileWrites Include="@(HeaderPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion">
+    <PropertyGroup>
+      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+      <NuspecProperties>Id=$(AssemblyName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>

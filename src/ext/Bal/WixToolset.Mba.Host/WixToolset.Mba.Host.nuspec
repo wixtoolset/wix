@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>WiX Toolset Team</authors>
+    <owners>WiX Toolset Team</owners>
+    <license type="expression">MS-RL</license>
+    <projectUrl>https://github.com/wixtoolset/Bal.wixext</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <group targetFramework=".NETFramework2.0" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="net20\$id$.config" target="samples" />
+    <file src="net20\$id$.dll" target="lib\net20" />
+  </files>
+</package>

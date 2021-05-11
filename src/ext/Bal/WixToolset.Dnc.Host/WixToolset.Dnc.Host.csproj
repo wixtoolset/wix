@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>WixToolset.Dnc.Host</RootNamespace>
+    <Description>WiX Toolset .NET Core BA Host</Description>
+    <Title>WiX Toolset .NET Core BA Host</Title>
+    <DebugType>embedded</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HeaderPath Include="$(BaseOutputPath)obj\$(AssemblyName).h">
+      <Visible>False</Visible>
+    </HeaderPath>
+  </ItemGroup>
+
+  <Target Name="GenerateIdentityHeader" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="@(HeaderPath)">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyIdentity" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <Line Include='#define DNC_ASSEMBLY_FILE_NAME L"$(AssemblyName).dll"' />
+      <Line Include='#define DNC_ASSEMBLY_FULL_NAME "%(AssemblyIdentity.Identity)"' />
+      <Line Include='#define DNC_ENTRY_TYPE "$(RootNamespace).BootstrapperApplicationFactory"' />
+      <Line Include='#define DNC_ENTRY_TYPEW L"$(RootNamespace).BootstrapperApplicationFactory,$(AssemblyName)"' />
+      <Line Include='#define DNC_STATIC_ENTRY_METHOD "CreateBAFactory"' />
+      <Line Include='#define DNC_STATIC_ENTRY_METHODW L"CreateBAFactory"' />
+      <Line Include='#define DNC_STATIC_ENTRY_DELEGATEW L"$(RootNamespace).StaticEntryDelegate,$(AssemblyName)"' />
+    </ItemGroup>
+    <Message Importance="normal" Text="Generating identity definitions into @(HeaderPath->'%(FullPath)')" />
+    <WriteLinesToFile File="@(HeaderPath)" Lines="@(Line)" Overwrite="True" />
+    <ItemGroup>
+      <FileWrites Include="@(HeaderPath)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
