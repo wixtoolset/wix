@@ -1,0 +1,26 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt">
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </File>
+                <CreateFolder>
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </CreateFolder>
+                <ServiceInstall Name="testsvc" Type="ownProcess" Start="disabled" ErrorControl="normal">
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </ServiceInstall>
+                <Registry Action="createKey" Root="HKLM" Key="TestKey">
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </Registry>
+                <RegistryKey Id="ExampleRegistryKey" ForceCreateOnInstall="yes" Root="HKLM" Key="TestRegistryKey">
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </RegistryKey>
+                <RegistryValue Root="HKLM" Key="TestRegistryValueKey" Value="abc">
+                    <util:PermissionEx User="Everyone" GenericAll="yes" />
+                </RegistryValue>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

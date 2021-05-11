@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="SymbolizerWixout" Language="1033" Version="1.0.0.0" Manufacturer="FireGiant" UpgradeCode="14a02d7f-9b32-4c92-b1f1-da518bf4e32a">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" IgnoreRemoveFailure="yes" />
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature" Title="SymbolizerWixout" Level="1">
+      <Feature Id="ChildFeature">
+        <ComponentGroupRef Id="ProductComponents" />
+      </Feature>
+    </Feature>
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_462_OR_LATER_INSTALLED" />
+    <CustomActionRef Id="WixFailWhenDeferred" />
+    <Property Id="WIXFAILWHENDEFERRED" Value="1" Secure="yes" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="SymbolizerWixout" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent">
+        <File Checksum="yes" ReadOnly="yes" Source="$(env.WIX)\bin\candle.exe" Assembly=".net" AssemblyApplication="candle.exe" />
+        <RegistryValue Root="HKLM" Key="SOFTWARE\WiX Toolset" Name="[ProductName]Installed" Value="1" Type="integer" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
