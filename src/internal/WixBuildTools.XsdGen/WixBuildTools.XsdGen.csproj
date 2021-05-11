@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks> -->
+    <TargetFrameworks>net461</TargetFrameworks>
+    <IsTool>true</IsTool>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <NoWarn>CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\WixBuildTools.XsdGen.targets" PackagePath="build\" />
+    <Content Include="buildCrossTargeting\WixBuildTools.XsdGen.targets" PackagePath="buildCrossTargeting\" />
+
+    <Content Include="$(OutputPath)net461\$(TargetFileName)" PackagePath="tools\full" />
+    <!-- <Content Include="$(OutputPath)netcoreapp2.0\$(TargetFileName)" PackagePath="tools\core" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
