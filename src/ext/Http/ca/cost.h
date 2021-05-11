@@ -1,0 +1,6 @@
+#pragma once
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+
+const UINT COST_HTTP_URL_ACL = 2000;
+const UINT COST_HTTP_SNI_SSL = 2000;
