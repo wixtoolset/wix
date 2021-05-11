@@ -1,0 +1,29 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include caerr.wxi ?>
+
+  <Fragment>
+    <UI>
+      <ProgressText Action="MessageQueuingExecuteInstall" Template="!(loc.MessageQueuingExecuteInstallTemplate)" Message="!(loc.MessageQueuingExecuteInstall)" />
+      <ProgressText Action="MessageQueuingExecuteUninstall" Template="!(loc.MessageQueuingExecuteUninstallTemplate)" Message="!(loc.MessageQueuingExecuteUninstall)" />
+    </UI>
+
+    <CustomAction Id="MessageQueuingInstall" DllEntry="MessageQueuingInstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="MsmqCA" />
+    <CustomAction Id="MessageQueuingUninstall" DllEntry="MessageQueuingUninstall" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="MsmqCA" />
+    <CustomAction Id="MessageQueuingExecuteInstall" DllEntry="MessageQueuingExecuteInstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
+    <CustomAction Id="MessageQueuingRollbackInstall" DllEntry="MessageQueuingRollbackInstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
+    <CustomAction Id="MessageQueuingExecuteUninstall" DllEntry="MessageQueuingExecuteUninstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
+    <CustomAction Id="MessageQueuingRollbackUninstall" DllEntry="MessageQueuingRollbackUninstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="MsmqCA" />
+
+    <InstallExecuteSequence>
+      <Custom Action="MessageQueuingUninstall" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
+      <Custom Action="MessageQueuingInstall" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+    <Binary Id="MsmqCA" SourceFile="msmqca.dll" />
+  </Fragment>
+</Wix>

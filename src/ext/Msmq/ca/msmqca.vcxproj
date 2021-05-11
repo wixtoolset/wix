@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props')" />
+  <Import Project="..\..\packages\WixToolset.WcaUtil.4.0.17\build\WixToolset.WcaUtil.props" Condition="Exists('..\..\packages\WixToolset.WcaUtil.4.0.17\build\WixToolset.WcaUtil.props')" />
+
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CAD56A7E-342B-4324-9DCB-BCEB8F3BC80D}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <TargetName>msmqca</TargetName>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <ProjectModuleDefinitionFile>msmqca.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset MSMQ CustomAction</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="mqexec.cpp" />
+    <ClCompile Include="mqqueueexec.cpp" />
+    <ClCompile Include="mqqueuesched.cpp" />
+    <ClCompile Include="mqsched.cpp" />
+    <ClCompile Include="mqutilexec.cpp" />
+    <ClCompile Include="mqutilsched.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="mqcost.h" />
+    <ClInclude Include="mqqueueexec.h" />
+    <ClInclude Include="mqqueuesched.h" />
+    <ClInclude Include="mqutilexec.h" />
+    <ClInclude Include="mqutilsched.h" />
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="msmqca.def" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.56\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.WcaUtil.4.0.17\build\WixToolset.WcaUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.WcaUtil.4.0.17\build\WixToolset.WcaUtil.props'))" />
+  </Target>
+</Project>
