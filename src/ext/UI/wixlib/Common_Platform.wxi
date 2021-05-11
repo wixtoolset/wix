@@ -1,0 +1,19 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include caSuffix.wxi ?>
+    <Fragment>
+    <!-- print EULA functionality -->
+        <CustomAction Id="WixUIPrintEula$(var.Suffix)" DllEntry="PrintEula" Return="ignore" Execute="immediate" BinaryRef="WixUIWixca$(var.Suffix)" />
+    </Fragment>
+
+    <Fragment>
+    <!-- Validate install directory -->
+        <CustomAction Id="WixUIValidatePath$(var.Suffix)" DllEntry="ValidatePath" Return="ignore" Execute="immediate" BinaryRef="WixUIWixca$(var.Suffix)" />
+    </Fragment>
+
+    <Fragment>
+        <Binary Id="WixUIWixca$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))uica.dll" />
+    </Fragment>
+</Include>

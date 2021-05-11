@@ -1,0 +1,69 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <Binary Id="WixUI_Bmp_Banner" SourceFile="!(wix.WixUIBannerBmp=$(var.bannerBmp))" />
+        <Binary Id="WixUI_Bmp_Dialog" SourceFile="!(wix.WixUIDialogBmp=$(var.dialogBmp))" />
+        <Binary Id="WixUI_Ico_Exclam" SourceFile="!(wix.WixUIExclamationIco=$(var.exclamationIco))" />
+        <Binary Id="WixUI_Ico_Info" SourceFile="!(wix.WixUIInfoIco=$(var.infoIco))" />
+        <Binary Id="WixUI_Bmp_New" SourceFile="!(wix.WixUINewIco=$(var.newIco))" />
+        <Binary Id="WixUI_Bmp_Up" SourceFile="!(wix.WixUIUpIco=$(var.upIco))" />
+        <WixVariable Id="WixUICostingPopupOptOut" Value="1" Overridable="yes" />
+
+        <UI Id="WixUI_Common">
+            <!-- ui text -->
+            <UIText Id="AbsentPath" />
+            <UIText Id="bytes" Value="!(loc.UITextbytes)" />
+            <UIText Id="GB" Value="!(loc.UITextGB)" />
+            <UIText Id="KB" Value="!(loc.UITextKB)" />
+            <UIText Id="MB" Value="!(loc.UITextMB)" />
+            <UIText Id="MenuAbsent" Value="!(loc.UITextMenuAbsent)" />
+            <UIText Id="MenuAdvertise" Value="!(loc.UITextMenuAdvertise)" />
+            <UIText Id="MenuAllCD" Value="!(loc.UITextMenuAllCD)" />
+            <UIText Id="MenuAllLocal" Value="!(loc.UITextMenuAllLocal)" />
+            <UIText Id="MenuAllNetwork" Value="!(loc.UITextMenuAllNetwork)" />
+            <UIText Id="MenuCD" Value="!(loc.UITextMenuCD)" />
+            <UIText Id="MenuLocal" Value="!(loc.UITextMenuLocal)" />
+            <UIText Id="MenuNetwork" Value="!(loc.UITextMenuNetwork)" />
+            <UIText Id="NewFolder" Value="!(loc.UITextNewFolder)" />
+            <UIText Id="ScriptInProgress" Value="!(loc.UITextScriptInProgress)" />
+            <UIText Id="SelAbsentAbsent" Value="!(loc.UITextSelAbsentAbsent)" />
+            <UIText Id="SelAbsentAdvertise" Value="!(loc.UITextSelAbsentAdvertise)" />
+            <UIText Id="SelAbsentCD" Value="!(loc.UITextSelAbsentCD)" />
+            <UIText Id="SelAbsentLocal" Value="!(loc.UITextSelAbsentLocal)" />
+            <UIText Id="SelAbsentNetwork" Value="!(loc.UITextSelAbsentNetwork)" />
+            <UIText Id="SelAdvertiseAbsent" Value="!(loc.UITextSelAdvertiseAbsent)" />
+            <UIText Id="SelAdvertiseAdvertise" Value="!(loc.UITextSelAdvertiseAdvertise)" />
+            <UIText Id="SelAdvertiseCD" Value="!(loc.UITextSelAdvertiseCD)" />
+            <UIText Id="SelAdvertiseLocal" Value="!(loc.UITextSelAdvertiseLocal)" />
+            <UIText Id="SelAdvertiseNetwork" Value="!(loc.UITextSelAdvertiseNetwork)" />
+            <UIText Id="SelCDAbsent" Value="!(loc.UITextSelCDAbsent)" />
+            <UIText Id="SelCDAdvertise" Value="!(loc.UITextSelCDAdvertise)" />
+            <UIText Id="SelCDCD" Value="!(loc.UITextSelCDCD)" />
+            <UIText Id="SelCDLocal" Value="!(loc.UITextSelCDLocal)" />
+            <UIText Id="SelChildCostNeg" Value="!(loc.UITextSelChildCostNeg)" />
+            <UIText Id="SelChildCostPos" Value="!(loc.UITextSelChildCostPos)" />
+            <UIText Id="SelCostPending" Value="!(loc.UITextSelCostPending)" />
+            <UIText Id="SelLocalAbsent" Value="!(loc.UITextSelLocalAbsent)" />
+            <UIText Id="SelLocalAdvertise" Value="!(loc.UITextSelLocalAdvertise)" />
+            <UIText Id="SelLocalCD" Value="!(loc.UITextSelLocalCD)" />
+            <UIText Id="SelLocalLocal" Value="!(loc.UITextSelLocalLocal)" />
+            <UIText Id="SelLocalNetwork" Value="!(loc.UITextSelLocalNetwork)" />
+            <UIText Id="SelNetworkAbsent" Value="!(loc.UITextSelNetworkAbsent)" />
+            <UIText Id="SelNetworkAdvertise" Value="!(loc.UITextSelNetworkAdvertise)" />
+            <UIText Id="SelNetworkLocal" Value="!(loc.UITextSelNetworkLocal)" />
+            <UIText Id="SelNetworkNetwork" Value="!(loc.UITextSelNetworkNetwork)" />
+            <UIText Id="SelParentCostNegNeg" Value="!(loc.UITextSelParentCostNegNeg)" />
+            <UIText Id="SelParentCostNegPos" Value="!(loc.UITextSelParentCostNegPos)" />
+            <UIText Id="SelParentCostPosNeg" Value="!(loc.UITextSelParentCostPosNeg)" />
+            <UIText Id="SelParentCostPosPos" Value="!(loc.UITextSelParentCostPosPos)" />
+            <UIText Id="TimeRemaining" Value="!(loc.UITextTimeRemaining)" />
+            <UIText Id="VolumeCostAvailable" Value="!(loc.UITextVolumeCostAvailable)" />
+            <UIText Id="VolumeCostDifference" Value="!(loc.UITextVolumeCostDifference)" />
+            <UIText Id="VolumeCostRequired" Value="!(loc.UITextVolumeCostRequired)" />
+            <UIText Id="VolumeCostSize" Value="!(loc.UITextVolumeCostSize)" />
+            <UIText Id="VolumeCostVolume" Value="!(loc.UITextVolumeCostVolume)" />
+        </UI>
+    </Fragment>
+</Wix>

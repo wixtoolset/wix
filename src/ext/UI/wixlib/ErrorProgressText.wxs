@@ -1,0 +1,244 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <UI Id="WixUI_ErrorProgressText">
+            <!-- action text -->
+            <ProgressText Action="InstallValidate" Message="!(loc.ProgressTextInstallValidate)" />
+            <ProgressText Action="InstallFiles" Template="!(loc.ProgressTextInstallFilesTemplate)" Message="!(loc.ProgressTextInstallFiles)" />
+            <ProgressText Action="InstallAdminPackage" Template="!(loc.ProgressTextInstallAdminPackageTemplate)" Message="!(loc.ProgressTextInstallAdminPackage)" />
+            <ProgressText Action="FileCost" Message="!(loc.ProgressTextFileCost)" />
+            <ProgressText Action="CostInitialize" Message="!(loc.ProgressTextCostInitialize)" />
+            <ProgressText Action="CostFinalize" Message="!(loc.ProgressTextCostFinalize)" />
+            <ProgressText Action="CreateShortcuts" Template="!(loc.ProgressTextCreateShortcutsTemplate)" Message="!(loc.ProgressTextCreateShortcuts)" />
+            <ProgressText Action="PublishComponents" Template="!(loc.ProgressTextPublishComponentsTemplate)" Message="!(loc.ProgressTextPublishComponents)" />
+            <ProgressText Action="PublishFeatures" Template="!(loc.ProgressTextPublishFeaturesTemplate)" Message="!(loc.ProgressTextPublishFeatures)" />
+            <ProgressText Action="PublishProduct" Message="!(loc.ProgressTextPublishProduct)" />
+            <ProgressText Action="RegisterClassInfo" Template="!(loc.ProgressTextRegisterClassInfoTemplate)" Message="!(loc.ProgressTextRegisterClassInfo)" />
+            <ProgressText Action="RegisterExtensionInfo" Template="!(loc.ProgressTextRegisterExtensionInfoTemplate)" Message="!(loc.ProgressTextRegisterExtensionInfo)" />
+            <ProgressText Action="RegisterMIMEInfo" Template="!(loc.ProgressTextRegisterMIMEInfoTemplate)" Message="!(loc.ProgressTextRegisterMIMEInfo)" />
+            <ProgressText Action="RegisterProgIdInfo" Template="!(loc.ProgressTextRegisterProgIdInfoTemplate)" Message="!(loc.ProgressTextRegisterProgIdInfo)" />
+            <ProgressText Action="AllocateRegistrySpace" Template="!(loc.ProgressTextAllocateRegistrySpaceTemplate)" Message="!(loc.ProgressTextAllocateRegistrySpace)" />
+            <ProgressText Action="AppSearch" Template="!(loc.ProgressTextAppSearchTemplate)" Message="!(loc.ProgressTextAppSearch)" />
+            <ProgressText Action="BindImage" Template="!(loc.ProgressTextBindImageTemplate)" Message="!(loc.ProgressTextBindImage)" />
+            <ProgressText Action="CCPSearch" Message="!(loc.ProgressTextCCPSearch)" />
+            <ProgressText Action="CreateFolders" Template="!(loc.ProgressTextCreateFoldersTemplate)" Message="!(loc.ProgressTextCreateFolders)" />
+            <ProgressText Action="DeleteServices" Template="!(loc.ProgressTextDeleteServicesTemplate)" Message="!(loc.ProgressTextDeleteServices)" />
+            <ProgressText Action="DuplicateFiles" Template="!(loc.ProgressTextDuplicateFilesTemplate)" Message="!(loc.ProgressTextDuplicateFiles)" />
+            <ProgressText Action="FindRelatedProducts" Template="!(loc.ProgressTextFindRelatedProductsTemplate)" Message="!(loc.ProgressTextFindRelatedProducts)" />
+            <ProgressText Action="InstallODBC" Message="!(loc.ProgressTextInstallODBC)" />
+            <ProgressText Action="InstallServices" Template="!(loc.ProgressTextInstallServicesTemplate)" Message="!(loc.ProgressTextInstallServices)" />
+            <ProgressText Action="LaunchConditions" Message="!(loc.ProgressTextLaunchConditions)" />
+            <ProgressText Action="MigrateFeatureStates" Template="!(loc.ProgressTextMigrateFeatureStatesTemplate)" Message="!(loc.ProgressTextMigrateFeatureStates)" />
+            <ProgressText Action="MoveFiles" Template="!(loc.ProgressTextMoveFilesTemplate)" Message="!(loc.ProgressTextMoveFiles)" />
+            <ProgressText Action="PatchFiles" Template="!(loc.ProgressTextPatchFilesTemplate)" Message="!(loc.ProgressTextPatchFiles)" />
+            <ProgressText Action="ProcessComponents" Message="!(loc.ProgressTextProcessComponents)" />
+            <ProgressText Action="RegisterComPlus" Template="!(loc.ProgressTextRegisterComPlusTemplate)" Message="!(loc.ProgressTextRegisterComPlus)" />
+            <ProgressText Action="RegisterFonts" Template="!(loc.ProgressTextRegisterFontsTemplate)" Message="!(loc.ProgressTextRegisterFonts)" />
+            <ProgressText Action="RegisterProduct" Template="!(loc.ProgressTextRegisterProductTemplate)" Message="!(loc.ProgressTextRegisterProduct)" />
+            <ProgressText Action="RegisterTypeLibraries" Template="!(loc.ProgressTextRegisterTypeLibrariesTemplate)" Message="!(loc.ProgressTextRegisterTypeLibraries)" />
+            <ProgressText Action="RegisterUser" Template="!(loc.ProgressTextRegisterUserTemplate)" Message="!(loc.ProgressTextRegisterUser)" />
+            <ProgressText Action="RemoveDuplicateFiles" Template="!(loc.ProgressTextRemoveDuplicateFilesTemplate)" Message="!(loc.ProgressTextRemoveDuplicateFiles)" />
+            <ProgressText Action="RemoveEnvironmentStrings" Template="!(loc.ProgressTextRemoveEnvironmentStringsTemplate)" Message="!(loc.ProgressTextRemoveEnvironmentStrings)" />
+            <ProgressText Action="RemoveExistingProducts" Template="!(loc.ProgressTextRemoveExistingProductsTemplate)" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+            <ProgressText Action="RemoveFiles" Template="!(loc.ProgressTextRemoveFilesTemplate)" Message="!(loc.ProgressTextRemoveFiles)" />
+            <ProgressText Action="RemoveFolders" Template="!(loc.ProgressTextRemoveFoldersTemplate)" Message="!(loc.ProgressTextRemoveFolders)" />
+            <ProgressText Action="RemoveIniValues" Template="!(loc.ProgressTextRemoveIniValuesTemplate)" Message="!(loc.ProgressTextRemoveIniValues)" />
+            <ProgressText Action="RemoveODBC" Message="!(loc.ProgressTextRemoveODBC)" />
+            <ProgressText Action="RemoveRegistryValues" Template="!(loc.ProgressTextRemoveRegistryValuesTemplate)" Message="!(loc.ProgressTextRemoveRegistryValues)" />
+            <ProgressText Action="RemoveShortcuts" Template="!(loc.ProgressTextRemoveShortcutsTemplate)" Message="!(loc.ProgressTextRemoveShortcuts)" />
+            <ProgressText Action="RMCCPSearch" Message="!(loc.ProgressTextRMCCPSearch)" />
+            <ProgressText Action="SelfRegModules" Template="!(loc.ProgressTextSelfRegModulesTemplate)" Message="!(loc.ProgressTextSelfRegModules)" />
+            <ProgressText Action="SelfUnregModules" Template="!(loc.ProgressTextSelfUnregModulesTemplate)" Message="!(loc.ProgressTextSelfUnregModules)" />
+            <ProgressText Action="SetODBCFolders" Message="!(loc.ProgressTextSetODBCFolders)" />
+            <ProgressText Action="StartServices" Template="!(loc.ProgressTextStartServicesTemplate)" Message="!(loc.ProgressTextStartServices)" />
+            <ProgressText Action="StopServices" Template="!(loc.ProgressTextStopServicesTemplate)" Message="!(loc.ProgressTextStopServices)" />
+            <ProgressText Action="UnpublishComponents" Template="!(loc.ProgressTextUnpublishComponentsTemplate)" Message="!(loc.ProgressTextUnpublishComponents)" />
+            <ProgressText Action="UnpublishFeatures" Template="!(loc.ProgressTextUnpublishFeaturesTemplate)" Message="!(loc.ProgressTextUnpublishFeatures)" />
+            <ProgressText Action="UnregisterClassInfo" Template="!(loc.ProgressTextUnregisterClassInfoTemplate)" Message="!(loc.ProgressTextUnregisterClassInfo)" />
+            <ProgressText Action="UnregisterComPlus" Template="!(loc.ProgressTextUnregisterComPlusTemplate)" Message="!(loc.ProgressTextUnregisterComPlus)" />
+            <ProgressText Action="UnregisterExtensionInfo" Template="!(loc.ProgressTextUnregisterExtensionInfoTemplate)" Message="!(loc.ProgressTextUnregisterExtensionInfo)" />
+            <ProgressText Action="UnregisterFonts" Template="!(loc.ProgressTextUnregisterFontsTemplate)" Message="!(loc.ProgressTextUnregisterFonts)" />
+            <ProgressText Action="UnregisterMIMEInfo" Template="!(loc.ProgressTextUnregisterMIMEInfoTemplate)" Message="!(loc.ProgressTextUnregisterMIMEInfo)" />
+            <ProgressText Action="UnregisterProgIdInfo" Template="!(loc.ProgressTextUnregisterProgIdInfoTemplate)" Message="!(loc.ProgressTextUnregisterProgIdInfo)" />
+            <ProgressText Action="UnregisterTypeLibraries" Template="!(loc.ProgressTextUnregisterTypeLibrariesTemplate)" Message="!(loc.ProgressTextUnregisterTypeLibraries)" />
+            <ProgressText Action="WriteEnvironmentStrings" Template="!(loc.ProgressTextWriteEnvironmentStringsTemplate)" Message="!(loc.ProgressTextWriteEnvironmentStrings)" />
+            <ProgressText Action="WriteIniValues" Template="!(loc.ProgressTextWriteIniValuesTemplate)" Message="!(loc.ProgressTextWriteIniValues)" />
+            <ProgressText Action="WriteRegistryValues" Template="!(loc.ProgressTextWriteRegistryValuesTemplate)" Message="!(loc.ProgressTextWriteRegistryValues)" />
+            <ProgressText Action="Advertise" Message="!(loc.ProgressTextAdvertise)" />
+            <ProgressText Action="GenerateScript" Template="!(loc.ProgressTextGenerateScriptTemplate)" Message="!(loc.ProgressTextGenerateScript)" />
+            <ProgressText Action="InstallSFPCatalogFile" Template="!(loc.ProgressTextInstallSFPCatalogFileTemplate)" Message="!(loc.ProgressTextInstallSFPCatalogFile)" />
+            <ProgressText Action="MsiPublishAssemblies" Template="!(loc.ProgressTextMsiPublishAssembliesTemplate)" Message="!(loc.ProgressTextMsiPublishAssemblies)" />
+            <ProgressText Action="MsiUnpublishAssemblies" Template="!(loc.ProgressTextMsiUnpublishAssembliesTemplate)" Message="!(loc.ProgressTextMsiUnpublishAssemblies)" />
+            <ProgressText Action="Rollback" Template="!(loc.ProgressTextRollbackTemplate)" Message="!(loc.ProgressTextRollback)" />
+            <ProgressText Action="RollbackCleanup" Template="!(loc.ProgressTextRollbackCleanupTemplate)" Message="!(loc.ProgressTextRollbackCleanup)" />
+            <ProgressText Action="UnmoveFiles" Template="!(loc.ProgressTextUnmoveFilesTemplate)" Message="!(loc.ProgressTextUnmoveFiles)" />
+            <ProgressText Action="UnpublishProduct" Message="!(loc.ProgressTextUnpublishProduct)" />
+            <!-- error text -->
+            <Error Id="0" Message="!(loc.Error0)" />
+            <Error Id="1" Message="!(loc.Error1)" />
+            <Error Id="2" Message="!(loc.Error2)" />
+            <Error Id="3" />
+            <Error Id="4" Message="!(loc.Error4)" />
+            <Error Id="5" Message="!(loc.Error5)" />
+            <Error Id="6" />
+            <Error Id="7" Message="!(loc.Error7)" />
+            <Error Id="8" Message="!(loc.Error8)" />
+            <Error Id="9" Message="!(loc.Error9)" />
+            <Error Id="10" Message="!(loc.Error10)" />
+            <Error Id="11" Message="!(loc.Error11)" />
+            <Error Id="12" Message="!(loc.Error12)" />
+            <Error Id="13" Message="!(loc.Error13)" />
+            <Error Id="14" Message="!(loc.Error14)" />
+            <Error Id="15" Message="!(loc.Error15)" />
+            <Error Id="16" Message="!(loc.Error16)" />
+            <Error Id="17" Message="!(loc.Error17)" />
+            <Error Id="18" Message="!(loc.Error18)" />
+            <Error Id="19" Message="!(loc.Error19)" />
+            <Error Id="20" Message="!(loc.Error20)" />
+            <Error Id="21" Message="!(loc.Error21)" />
+            <Error Id="22" Message="!(loc.Error22)" />
+            <Error Id="23" Message="!(loc.Error23)" />
+            <Error Id="32" Message="!(loc.Error32)" />
+            <Error Id="33" Message="!(loc.Error33)" />
+            <Error Id="1101" Message="!(loc.Error1101)" />
+            <Error Id="1301" Message="!(loc.Error1301)" />
+            <Error Id="1302" Message="!(loc.Error1302)" />
+            <Error Id="1303" Message="!(loc.Error1303)" />
+            <Error Id="1304" Message="!(loc.Error1304)" />
+            <Error Id="1305" Message="!(loc.Error1305)" />
+            <Error Id="1306" Message="!(loc.Error1306)" />
+            <Error Id="1307" Message="!(loc.Error1307)" />
+            <Error Id="1308" Message="!(loc.Error1308)" />
+            <Error Id="1309" Message="!(loc.Error1309)" />
+            <Error Id="1310" Message="!(loc.Error1310)" />
+            <Error Id="1311" Message="!(loc.Error1311)" />
+            <Error Id="1312" Message="!(loc.Error1312)" />
+            <Error Id="1313" Message="!(loc.Error1313)" />
+            <Error Id="1314" Message="!(loc.Error1314)" />
+            <Error Id="1315" Message="!(loc.Error1315)" />
+            <Error Id="1316" Message="!(loc.Error1316)" />
+            <Error Id="1317" Message="!(loc.Error1317)" />
+            <Error Id="1318" Message="!(loc.Error1318)" />
+            <Error Id="1319" Message="!(loc.Error1319)" />
+            <Error Id="1320" Message="!(loc.Error1320)" />
+            <Error Id="1321" Message="!(loc.Error1321)" />
+            <Error Id="1322" Message="!(loc.Error1322)" />
+            <Error Id="1323" Message="!(loc.Error1323)" />
+            <Error Id="1324" Message="!(loc.Error1324)" />
+            <Error Id="1325" Message="!(loc.Error1325)" />
+            <Error Id="1326" Message="!(loc.Error1326)" />
+            <Error Id="1327" Message="!(loc.Error1327)" />
+            <Error Id="1328" Message="!(loc.Error1328)" />
+            <Error Id="1329" Message="!(loc.Error1329)" />
+            <Error Id="1330" Message="!(loc.Error1330)" />
+            <Error Id="1331" Message="!(loc.Error1331)" />
+            <Error Id="1332" Message="!(loc.Error1332)" />
+            <Error Id="1333" Message="!(loc.Error1333)" />
+            <Error Id="1334" Message="!(loc.Error1334)" />
+            <Error Id="1335" Message="!(loc.Error1335)" />
+            <Error Id="1336" Message="!(loc.Error1336)" />
+            <Error Id="1401" Message="!(loc.Error1401)" />
+            <Error Id="1402" Message="!(loc.Error1402)" />
+            <Error Id="1403" Message="!(loc.Error1403)" />
+            <Error Id="1404" Message="!(loc.Error1404)" />
+            <Error Id="1405" Message="!(loc.Error1405)" />
+            <Error Id="1406" Message="!(loc.Error1406)" />
+            <Error Id="1407" Message="!(loc.Error1407)" />
+            <Error Id="1408" Message="!(loc.Error1408)" />
+            <Error Id="1409" Message="!(loc.Error1409)" />
+            <Error Id="1410" Message="!(loc.Error1410)" />
+            <Error Id="1500" Message="!(loc.Error1500)" />
+            <Error Id="1501" Message="!(loc.Error1501)" />
+            <Error Id="1502" Message="!(loc.Error1502)" />
+            <Error Id="1503" Message="!(loc.Error1503)" />
+            <Error Id="1601" Message="!(loc.Error1601)" />
+            <Error Id="1602" Message="!(loc.Error1602)" />
+            <Error Id="1603" Message="!(loc.Error1603)" />
+            <Error Id="1604" Message="!(loc.Error1604)" />
+            <Error Id="1605" Message="!(loc.Error1605)" />
+            <Error Id="1606" Message="!(loc.Error1606)" />
+            <Error Id="1607" Message="!(loc.Error1607)" />
+            <Error Id="1608" Message="!(loc.Error1608)" />
+            <Error Id="1609" Message="!(loc.Error1609)" />
+            <Error Id="1701" Message="!(loc.Error1701)" />
+            <Error Id="1702" Message="!(loc.Error1702)" />
+            <Error Id="1703" Message="!(loc.Error1703)" />
+            <Error Id="1704" Message="!(loc.Error1704)" />
+            <Error Id="1705" Message="!(loc.Error1705)" />
+            <Error Id="1706" Message="!(loc.Error1706)" />
+            <Error Id="1707" Message="!(loc.Error1707)" />
+            <Error Id="1708" Message="!(loc.Error1708)" />
+            <Error Id="1709" Message="!(loc.Error1709)" />
+            <Error Id="1710" Message="!(loc.Error1710)" />
+            <Error Id="1711" Message="!(loc.Error1711)" />
+            <Error Id="1712" Message="!(loc.Error1712)" />
+            <Error Id="1713" Message="!(loc.Error1713)" />
+            <Error Id="1714" Message="!(loc.Error1714)" />
+            <Error Id="1715" Message="!(loc.Error1715)" />
+            <Error Id="1716" Message="!(loc.Error1716)" />
+            <Error Id="1717" Message="!(loc.Error1717)" />
+            <Error Id="1718" Message="!(loc.Error1718)" />
+            <Error Id="1719" Message="!(loc.Error1719)" />
+            <Error Id="1720" Message="!(loc.Error1720)" />
+            <Error Id="1721" Message="!(loc.Error1721)" />
+            <Error Id="1722" Message="!(loc.Error1722)" />
+            <Error Id="1723" Message="!(loc.Error1723)" />
+            <Error Id="1724" Message="!(loc.Error1724)" />
+            <Error Id="1725" Message="!(loc.Error1725)" />
+            <Error Id="1726" Message="!(loc.Error1726)" />
+            <Error Id="1727" Message="!(loc.Error1727)" />
+            <Error Id="1728" Message="!(loc.Error1728)" />
+            <Error Id="1729" Message="!(loc.Error1729)" />
+            <Error Id="1730" Message="!(loc.Error1730)" />
+            <Error Id="1731" Message="!(loc.Error1731)" />
+            <Error Id="1732" Message="!(loc.Error1732)" />
+            <Error Id="1801" Message="!(loc.Error1801)" />
+            <Error Id="1802" Message="!(loc.Error1802)" />
+            <Error Id="1803" Message="!(loc.Error1803)" />
+            <Error Id="1804" Message="!(loc.Error1804)" />
+            <Error Id="1805" Message="!(loc.Error1805)" />
+            <Error Id="1806" Message="!(loc.Error1806)" />
+            <Error Id="1807" Message="!(loc.Error1807)" />
+            <Error Id="1901" Message="!(loc.Error1901)" />
+            <Error Id="1902" Message="!(loc.Error1902)" />
+            <Error Id="1903" Message="!(loc.Error1903)" />
+            <Error Id="1904" Message="!(loc.Error1904)" />
+            <Error Id="1905" Message="!(loc.Error1905)" />
+            <Error Id="1906" Message="!(loc.Error1906)" />
+            <Error Id="1907" Message="!(loc.Error1907)" />
+            <Error Id="1908" Message="!(loc.Error1908)" />
+            <Error Id="1909" Message="!(loc.Error1909)" />
+            <Error Id="1910" Message="!(loc.Error1910)" />
+            <Error Id="1911" Message="!(loc.Error1911)" />
+            <Error Id="1912" Message="!(loc.Error1912)" />
+            <Error Id="1913" Message="!(loc.Error1913)" />
+            <Error Id="1914" Message="!(loc.Error1914)" />
+            <Error Id="1915" Message="!(loc.Error1915)" />
+            <Error Id="1916" Message="!(loc.Error1916)" />
+            <Error Id="1917" Message="!(loc.Error1917)" />
+            <Error Id="1918" Message="!(loc.Error1918)" />
+            <Error Id="1919" Message="!(loc.Error1919)" />
+            <Error Id="1920" Message="!(loc.Error1920)" />
+            <Error Id="1921" Message="!(loc.Error1921)" />
+            <Error Id="1922" Message="!(loc.Error1922)" />
+            <Error Id="1923" Message="!(loc.Error1923)" />
+            <Error Id="1924" Message="!(loc.Error1924)" />
+            <Error Id="1925" Message="!(loc.Error1925)" />
+            <Error Id="1926" Message="!(loc.Error1926)" />
+            <Error Id="1927" Message="!(loc.Error1927)" />
+            <Error Id="1928" Message="!(loc.Error1928)" />
+            <Error Id="1929" Message="!(loc.Error1929)" />
+            <Error Id="1930" Message="!(loc.Error1930)" />
+            <Error Id="1931" Message="!(loc.Error1931)" />
+            <Error Id="1932" Message="!(loc.Error1932)" />
+            <Error Id="1933" Message="!(loc.Error1933)" />
+            <Error Id="1934" Message="!(loc.Error1934)" />
+            <Error Id="1935" Message="!(loc.Error1935)" />
+            <Error Id="1936" Message="!(loc.Error1936)" />
+            <Error Id="1937" Message="!(loc.Error1937)" />
+            <Error Id="1938" Message="!(loc.Error1938)" />
+        </UI>
+    </Fragment>
+</Wix>
