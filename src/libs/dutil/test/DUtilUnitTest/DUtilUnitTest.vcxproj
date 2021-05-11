@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectTypes>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</ProjectTypes>
+    <ProjectGuid>{AB7EE608-E5FB-42A5-831F-0DEEEA141223}</ProjectGuid>
+    <RootNamespace>DUtilUnitTests</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <SignOutput>false</SignOutput>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalIncludeDirectories>..\..\dutil\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>rpcrt4.lib;Mpr.lib;Ws2_32.lib;urlmon.lib;wininet.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="ApupUtilTests.cpp" />
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="DictUtilTest.cpp" />
+    <ClCompile Include="DirUtilTests.cpp" />
+    <ClCompile Include="DUtilTests.cpp" />
+    <ClCompile Include="error.cpp" />
+    <ClCompile Include="FileUtilTest.cpp" />
+    <ClCompile Include="GuidUtilTest.cpp" />
+    <ClCompile Include="IniUtilTest.cpp" />
+    <ClCompile Include="MemUtilTest.cpp" />
+    <ClCompile Include="MonUtilTest.cpp" />
+    <ClCompile Include="PathUtilTest.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <!-- Warnings from referencing netstandard dlls -->
+      <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="SceUtilTest.cpp" Condition=" Exists('$(SqlCESdkIncludePath)') " />
+    <ClCompile Include="StrUtilTest.cpp" />
+    <ClCompile Include="UriUtilTest.cpp" />
+    <ClCompile Include="VerUtilTests.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="error.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+    <ResourceCompile Include="UnitTest.rc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestData\ApupUtilTests\FeedBv2.0.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.4.0.47\lib\net472\WixBuildTools.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport.Native">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\lib\net472\WixBuildTools.TestSupport.Native.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\dutil\dutil.vcxproj">
+      <Project>{1244E671-F108-4334-BA52-8A7517F26ECD}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets'))" />
+  </Target>
+</Project>

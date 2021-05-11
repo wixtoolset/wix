@@ -1,0 +1,227 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+#include "precomp.h"
+
+using namespace Gdiplus;
+
+
+// Exit macros
+#define GdipExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnLastErrorDebugTrace(x, s, ...) ExitOnLastErrorDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, x, s, __VA_ARGS__)
+#define GdipExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_GDIPUTIL, p, x, e, s, __VA_ARGS__)
+#define GdipExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, p, x, s, __VA_ARGS__)
+#define GdipExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_GDIPUTIL, p, x, e, s, __VA_ARGS__)
+#define GdipExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_GDIPUTIL, p, x, s, __VA_ARGS__)
+#define GdipExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_GDIPUTIL, e, x, s, __VA_ARGS__)
+#define GdipExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_GDIPUTIL, g, x, s, __VA_ARGS__)
+
+/********************************************************************
+ GdipInitialize - initializes GDI+.
+
+ Note: pOutput must be non-NULL if pInput->SuppressBackgroundThread
+       is TRUE. See GdiplusStartup() for more information.
+********************************************************************/
+extern "C" HRESULT DAPI GdipInitialize(
+    __in const Gdiplus::GdiplusStartupInput* pInput,
+    __out ULONG_PTR* pToken,
+    __out_opt Gdiplus::GdiplusStartupOutput *pOutput
+    )
+{
+    AssertSz(!pInput->SuppressBackgroundThread || pOutput, "pOutput required if background thread suppressed.");
+
+    HRESULT hr = S_OK;
+    Status status = Ok;
+
+    status = GdiplusStartup(pToken, pInput, pOutput);
+    GdipExitOnGdipFailure(status, hr, "Failed to initialize GDI+.");
+
+LExit:
+    return hr;
+}
+
+/********************************************************************
+ GdipUninitialize - uninitializes GDI+.
+
+********************************************************************/
+extern "C" void DAPI GdipUninitialize(
+    __in ULONG_PTR token
+    )
+{
+    GdiplusShutdown(token);
+}
+
+/********************************************************************
+ GdipBitmapFromResource - read a GDI+ image out of a resource stream
+
+********************************************************************/
+extern "C" HRESULT DAPI GdipBitmapFromResource(
+    __in_opt HINSTANCE hinst,
+    __in_z LPCSTR szId,
+    __out Bitmap **ppBitmap
+    )
+{
+    HRESULT hr = S_OK;
+    LPVOID pvData = NULL;
+    DWORD cbData = 0;
+    HGLOBAL hGlobal = NULL;;
+    LPVOID pv = NULL;
+    IStream *pStream = NULL;
+    Bitmap *pBitmap = NULL;
+    Status gs = Ok;
+
+    hr = ResReadData(hinst, szId, &pvData, &cbData);
+    GdipExitOnFailure(hr, "Failed to load GDI+ bitmap from resource.");
+
+    // Have to copy the fixed resource data into moveable (heap) memory
+    // since that's what GDI+ expects.
+    hGlobal = ::GlobalAlloc(GMEM_MOVEABLE, cbData);
+    GdipExitOnNullWithLastError(hGlobal, hr, "Failed to allocate global memory.");
+
+    pv = ::GlobalLock(hGlobal);
+    GdipExitOnNullWithLastError(pv, hr, "Failed to lock global memory.");
+
+    memcpy(pv, pvData, cbData);
+
+    ::GlobalUnlock(pv); // no point taking any more memory than we have already
+    pv = NULL;
+
+    hr = ::CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
+    GdipExitOnFailure(hr, "Failed to allocate stream from global memory.");
+
+    hGlobal = NULL; // we gave the global memory to the stream object so it will close it
+
+    pBitmap = Bitmap::FromStream(pStream);
+    GdipExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from stream.");
+
+    gs = pBitmap->GetLastStatus();
+    GdipExitOnGdipFailure(gs, hr, "Failed to load bitmap from stream.");
+
+    *ppBitmap = pBitmap;
+    pBitmap = NULL;
+
+LExit:
+    if (pBitmap)
+    {
+        delete pBitmap;
+    }
+
+    ReleaseObject(pStream);
+
+    if (pv)
+    {
+        ::GlobalUnlock(pv);
+    }
+
+    if (hGlobal)
+    {
+        ::GlobalFree(hGlobal);
+    }
+
+    return hr;
+}
+
+
+/********************************************************************
+ GdipBitmapFromFile - read a GDI+ image from a file.
+
+********************************************************************/
+extern "C" HRESULT DAPI GdipBitmapFromFile(
+    __in_z LPCWSTR wzFileName,
+    __out Bitmap **ppBitmap
+    )
+{
+    HRESULT hr = S_OK;
+    Bitmap *pBitmap = NULL;
+    Status gs = Ok;
+
+    GdipExitOnNull(ppBitmap, hr, E_INVALIDARG, "Invalid null wzFileName");
+
+    pBitmap = Bitmap::FromFile(wzFileName);
+    GdipExitOnNull(pBitmap, hr, E_OUTOFMEMORY, "Failed to allocate bitmap from file.");
+
+    gs = pBitmap->GetLastStatus();
+    GdipExitOnGdipFailure(gs, hr, "Failed to load bitmap from file: %ls", wzFileName);
+
+    *ppBitmap = pBitmap;
+    pBitmap = NULL;
+
+LExit:
+    if (pBitmap)
+    {
+        delete pBitmap;
+    }
+
+    return hr;
+}
+
+
+HRESULT DAPI GdipHresultFromStatus(
+    __in Gdiplus::Status gs
+    )
+{
+    switch (gs)
+    {
+    case Ok:
+        return S_OK;
+
+    case GenericError:
+        return E_FAIL;
+
+    case InvalidParameter:
+        return E_INVALIDARG;
+
+    case OutOfMemory:
+        return E_OUTOFMEMORY;
+
+    case ObjectBusy:
+        return HRESULT_FROM_WIN32(ERROR_BUSY);
+
+    case InsufficientBuffer:
+        return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+
+    case NotImplemented:
+        return E_NOTIMPL;
+
+    case Win32Error:
+        return E_FAIL;
+
+    case WrongState:
+        return E_FAIL;
+
+    case Aborted:
+        return E_ABORT;
+
+    case FileNotFound:
+        return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+
+    case ValueOverflow:
+        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+
+    case AccessDenied:
+        return E_ACCESSDENIED;
+
+    case UnknownImageFormat:
+        return HRESULT_FROM_WIN32(ERROR_BAD_FORMAT);
+
+    case FontFamilyNotFound: __fallthrough;
+    case FontStyleNotFound: __fallthrough;
+    case NotTrueTypeFont:
+        return E_UNEXPECTED;
+
+    case UnsupportedGdiplusVersion:
+        return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+
+    case GdiplusNotInitialized:
+        return E_UNEXPECTED;
+
+    case PropertyNotFound: __fallthrough;
+    case PropertyNotSupported:
+        return E_FAIL;
+    }
+
+    return E_UNEXPECTED;
+}
