@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);CompanyName=$(Company)</DefineConstants>
+    <OutputPath_x86>$(OutputPath)x86\</OutputPath_x86>
+    <OutputPath_x64>$(OutputPath)x64\</OutputPath_x64>
+    <OutputPath_arm>$(OutputPath)ARM\</OutputPath_arm>
+    <OutputPath_arm64>$(OutputPath)ARM64\</OutputPath_arm64>
+    <OutputPath_win32>$(OutputPath)Win32\</OutputPath_win32>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BindInputPaths Include="$(OutputPath_x86)">
+      <BindName>x86</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath_x64)">
+      <BindName>x64</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath_arm)">
+      <BindName>arm</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath_arm64)">
+      <BindName>arm64</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath_win32)">
+      <BindName>win32</BindName>
+    </BindInputPaths>
+  </ItemGroup>
+</Project>

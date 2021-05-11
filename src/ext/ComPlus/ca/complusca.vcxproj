@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BDEF51ED-E242-4FA2-801A-01B127DF851A}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <TargetName>complusca</TargetName>
+    <ProjectModuleDefinitionFile>complusca.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset ComPlus CustomAction</Description>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="cpappexec.cpp" />
+    <ClCompile Include="cpapproleexec.cpp" />
+    <ClCompile Include="cpapprolesched.cpp" />
+    <ClCompile Include="cpappsched.cpp" />
+    <ClCompile Include="cpasmexec.cpp" />
+    <ClCompile Include="cpasmsched.cpp" />
+    <ClCompile Include="cpexec.cpp" />
+    <ClCompile Include="cppartexec.cpp" />
+    <ClCompile Include="cppartroleexec.cpp" />
+    <ClCompile Include="cppartrolesched.cpp" />
+    <ClCompile Include="cppartsched.cpp" />
+    <ClCompile Include="cpsched.cpp" />
+    <ClCompile Include="cpsubsexec.cpp" />
+    <ClCompile Include="cpsubssched.cpp" />
+    <ClCompile Include="cputilexec.cpp" />
+    <ClCompile Include="cputilsched.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="cpappexec.h" />
+    <ClInclude Include="cpapproleexec.h" />
+    <ClInclude Include="cpapprolesched.h" />
+    <ClInclude Include="cpappsched.h" />
+    <ClInclude Include="cpasmexec.h" />
+    <ClInclude Include="cpasmsched.h" />
+    <ClInclude Include="cpcost.h" />
+    <ClInclude Include="cppartexec.h" />
+    <ClInclude Include="cppartroleexec.h" />
+    <ClInclude Include="cppartrolesched.h" />
+    <ClInclude Include="cppartsched.h" />
+    <ClInclude Include="cpsubsexec.h" />
+    <ClInclude Include="cpsubssched.h" />
+    <ClInclude Include="cputilexec.h" />
+    <ClInclude Include="cputilsched.h" />
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="complusca.def" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Dutil" Version="4.0.62" />
+    <PackageReference Include="WixToolset.WcaUtil" Version="4.0.18" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
