@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5B3714B6-3A76-463E-8595-D48DA276C512}</ProjectGuid>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <TargetName>wcautil</TargetName>
+    <MultiTargetLibrary>true</MultiTargetLibrary>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <Description>WiX Toolset Custom Action native utility library</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="Shared">
+    <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  </ImportGroup>
+  <Import Project="..\NativeMultiTargeting.Build.props" />
+
+  <ItemGroup>
+    <ClCompile Include="exbinary.cpp" />
+    <ClCompile Include="wcalog.cpp" />
+    <ClCompile Include="wcascript.cpp" />
+    <ClCompile Include="wcautil.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="wcawrapquery.cpp" />
+    <ClCompile Include="wcawow64.cpp" />
+    <ClCompile Include="wcawrap.cpp" />
+    <ClCompile Include="qtexec.cpp" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'Win32'">
+    <ClInclude Include="custommsierrors.h">
+      <GenerateWixInclude>caerr.wxi</GenerateWixInclude>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' != 'Win32'">
+    <ClInclude Include="custommsierrors.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="inc\wcalog.h" />
+    <ClInclude Include="inc\wcautil.h" />
+    <ClInclude Include="inc\wcawow64.h" />
+    <ClInclude Include="inc\wcawrapquery.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+
+  <Target Name="PackNativeNuget"
+          DependsOnTargets="GetBuildVersion">
+    <Exec Command='nuget pack wcautil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.WcaUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props'))" />
+  </Target>
+</Project>

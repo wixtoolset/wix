@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wcautil", "src\wcautil\wcautil.vcxproj", "{5B3714B6-3A76-463E-8595-D48DA276C512}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|ARM64.Build.0 = Debug|ARM64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|x64.ActiveCfg = Debug|x64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|x64.Build.0 = Debug|x64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|x86.ActiveCfg = Debug|Win32
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Debug|x86.Build.0 = Debug|Win32
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|ARM64.ActiveCfg = Release|ARM64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|ARM64.Build.0 = Release|ARM64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|x64.ActiveCfg = Release|x64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|x64.Build.0 = Release|x64
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|x86.ActiveCfg = Release|Win32
+		{5B3714B6-3A76-463E-8595-D48DA276C512}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD209744-C40E-4C34-8CB4-BC6B71F9A133}
+	EndGlobalSection
+EndGlobal
