@@ -1,0 +1,21 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:dep="http://wixtoolset.org/schemas/v4/wxs/dependency">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" InstallerVersion="200">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+
+    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+      <Component Directory="INSTALLFOLDER">
+        <File Name="example.txt" Source="Package.wxs" />
+        <Provides Key="UsingProvides" dep:Check="yes" />
+        <Provides>
+          <Requires ProviderKey="UsingRequires" Minimum="1.0.0.0" dep:Enforce="yes" />
+        </Provides>
+      </Component>
+    </Feature>
+
+  </Package>
+</Wix>
