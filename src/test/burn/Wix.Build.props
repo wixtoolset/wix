@@ -1,0 +1,11 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project>
+  <PropertyGroup>
+    <TestGroupName Condition=" '$(TestGroupName)'=='' ">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))</TestGroupName>
+    <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(TestGroupName)\$(ProjectName)\</BaseIntermediateOutputPath>
+    <OutputPath>$(OutputPath)netcoreapp3.1\TestData\$(TestGroupName)\</OutputPath>
+    <DefaultCompressionLevel>None</DefaultCompressionLevel>
+    <CompilerAdditionalOptions>-wx</CompilerAdditionalOptions>
+    <SuppressSpecificWarnings>1154;$(SuppressSpecificWarnings)</SuppressSpecificWarnings>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,18 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project Sdk="WixToolset.Sdk">
+  <Import Project="..\BundleBv1\BundleB.props" />
+  <PropertyGroup>
+    <SuppressSpecificWarnings>1151</SuppressSpecificWarnings>
+    <BA>TestBAdnc</BA>
+    <Version>2.0.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackageA\PackageA.wixproj" />
+    <ProjectReference Include="..\PackageBv2\PackageBv2.wixproj" />
+    <ProjectReference Include="..\PackageF\PackageF.wixproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.101" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.73" />
+  </ItemGroup>
+</Project>

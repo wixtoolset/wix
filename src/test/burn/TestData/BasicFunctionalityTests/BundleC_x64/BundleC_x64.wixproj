@@ -1,0 +1,21 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <BA>TestBAdnc_x64</BA>
+    <UpgradeCode>{638D31D0-92BA-4BCD-82F0-7F549820D9AB}</UpgradeCode>
+    <InstallerPlatform>x64</InstallerPlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
+    <Compile Include="..\BundleA_x64\BundleA_x64.wxs" Link="BundleC_x64.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackageA_x64\PackageA_x64.wixproj" />
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib_x64\testbawixlib_x64.wixproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.101" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.73" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,26 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?ifndef Version?>
+<?define Version = 1.0.0.0?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes">
+    <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
+
+    <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
+
+    <!-- ParallelCache="yes" should be the only thing different from the template -->
+    <Chain ParallelCache="yes">
+      <PackageGroupRef Id="TestBA" />
+
+      <PackageGroupRef Id="BundlePackages" />
+    </Chain>
+  </Bundle>
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" />
+      <MsiPackage Id="PackageB" SourceFile="$(var.PackageB.TargetPath)" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

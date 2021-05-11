@@ -1,0 +1,30 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Fragment>
+    <BootstrapperApplication>
+      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.deps.json" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.runtimeconfig.json" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\mbanative.dll" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\WixToolset.Mba.Core.dll" />
+      <bal:WixDotNetCoreBootstrapperApplicationHost />
+    </BootstrapperApplication>
+
+    <PackageGroup Id="TestBAdnc">
+      <PackageGroupRef Id="NetFx48WebAsPrereq" /> <!-- Yes, this is wrong but we don't have .NET 5 packages yet -->
+    </PackageGroup>
+  </Fragment>
+  <Fragment>
+    <BootstrapperApplication>
+      <Payload Name="WixToolset.Mba.Host.config" SourceFile="!(bindpath.net2x86)\TestBA.BootstrapperCore.config" />
+      <Payload SourceFile="!(bindpath.net2x86)\TestBA.dll" />
+      <Payload SourceFile="!(bindpath.net2x86)\mbanative.dll" />
+      <Payload SourceFile="!(bindpath.net2x86)\WixToolset.Mba.Core.dll" />
+      <bal:WixManagedBootstrapperApplicationHost />
+    </BootstrapperApplication>
+
+    <PackageGroup Id="TestBA">
+      <PackageGroupRef Id="NetFx48WebAsPrereq" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

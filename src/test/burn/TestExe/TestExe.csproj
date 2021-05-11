@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net35;netcoreapp3.1</TargetFrameworks>
+    <AssemblyName>TestExe</AssemblyName>
+    <RootNamespace>TestExe</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <DebugType>embedded</DebugType>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <UseAppHost>true</UseAppHost>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
+    <Reference Include="System.Management" />
+  </ItemGroup>
+</Project>

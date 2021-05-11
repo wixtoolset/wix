@@ -1,0 +1,22 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?ifndef Version?>
+<?define Version = 1.0.0.0?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Patch AllowRemoval="yes" Classification="Update" Description="Patch A in test $(var.TestGroupName)" DisplayName="$(var.TestGroupName) - Patch A" Manufacturer="Example Corporation" MinorUpdateTargetRTM="yes">
+        <Media Id="100" Cabinet="PatchA" EmbedCab="yes">
+            <PatchBaseline
+              Id="PatchA"
+              BaselineFile="$(var.PackageAv1.TargetDir)$(var.PackageAv1.TargetName).wixpdb"
+              UpdateFile="$(var.PackageAv1_0_1.TargetDir)$(var.PackageAv1_0_1.TargetName).wixpdb"
+            />
+        </Media>
+
+        <PatchFamily Id="A" Version="$(var.Version)" Supersede="yes">
+          <ComponentRef Id="RegistryComponent"/>
+          <PropertyRef Id="TestVersion"/>
+        </PatchFamily>
+    </Patch>
+</Wix>

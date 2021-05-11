@@ -1,0 +1,22 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Fragment>
+    <BootstrapperApplication Id="BrokenDnc">
+      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.deps.json" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\mbanative.dll" />
+      <Payload SourceFile="!(bindpath.dnc5x86)\WixToolset.Mba.Core.dll" />
+      <bal:WixDotNetCoreBootstrapperApplicationHost />
+    </BootstrapperApplication>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
+      <MsiPackage Id="PackageF" SourceFile="$(var.PackageF.TargetPath)" Cache="always" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

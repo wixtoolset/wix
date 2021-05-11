@@ -1,0 +1,12 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <RelatedBundle Id="{B1617DA6-F824-4B9F-B9B2-A6AFD07A652D}" Action="Detect" />
+
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />
+      <MsiPackage Id="PackageE" SourceFile="$(var.PackageEv1.TargetPath)" />
+    </PackageGroup>
+  </Fragment>
+</Wix>

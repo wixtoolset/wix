@@ -1,0 +1,26 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" />
+    </PackageGroup>
+
+    <!-- Reenable when fixed
+    <Container Id="PackagesContainer" Name="packages.cab" DownloadUrl="$(var.WebServerBaseUrl)BundleA/{2}">
+    -->
+    <Container Id="PackagesContainer" Name="packages.cab" DownloadUrl="$(var.WebServerBaseUrl)BundleA/packages.cab">
+      <PackageGroupRef Id="BundlePackages" />
+    </Container>
+  </Fragment>
+
+  <Fragment>
+    <PayloadGroup Id="LayoutOnlyPayloads">
+      <Payload Id="LayoutOnlyPayload" SourceFile="$(sys.SOURCEFILEPATH)" Compressed="no" DownloadUrl="$(var.WebServerBaseUrl)BundleA/LayoutOnlyPayload" />
+      <!-- Reenable when fixed
+      <Payload Id="LayoutOnlyPayload" SourceFile="$(sys.SOURCEFILEPATH)" Compressed="no" DownloadUrl="$(var.WebServerBaseUrl)BundleA/{1}" />
+      -->
+    </PayloadGroup>
+  </Fragment>
+</Wix>
