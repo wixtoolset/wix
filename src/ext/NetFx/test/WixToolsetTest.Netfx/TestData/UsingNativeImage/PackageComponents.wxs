@@ -1,0 +1,11 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+       <Component>
+         <File Name="fake.ddl" Source="example.txt">
+           <netfx:NativeImage Id="ExampleNgen" />
+         </File>
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

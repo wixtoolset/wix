@@ -1,0 +1,198 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+        .NET Framework installation state properties
+
+        Official documentation can be found at the following location:
+
+           .NET Framework 4.5 - http://msdn.microsoft.com/en-us/library/5a4x27ek.aspx, http://msdn.microsoft.com/en-us/library/ee942965(v=VS.110).aspx
+    -->
+
+  <?define NetFx45MinRelease = 378389?>
+  <?define NetFx45WebLink = http://go.microsoft.com/fwlink/?LinkId=225704 ?>
+  <?define NetFx45RedistLink = http://go.microsoft.com/fwlink/?LinkId=225702 ?>
+  <?define NetFx45EulaLink = http://go.microsoft.com/fwlink/?LinkID=260867 ?>
+  <?define NetFx45WebId = NetFx45Web ?>
+  <?define NetFx45RedistId = NetFx45Redist ?>
+
+  <Fragment>
+    <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
+    <Property Id="WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED" Secure="yes" />
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_45_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx45MinRelease)&quot;" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearch Id="NETFRAMEWORK45" Variable="NETFRAMEWORK45" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Value="Release" Result="value" />
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45" Secure="yes">
+      <RegistrySearch Id="NetFramework45" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Arabic language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_AR_SA_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45ArSaLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1025" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Chinese (Simplified) language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_ZH_CN_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45ZhCnLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\2052" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Chinese (Traditional) language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_ZH_TW_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45ZhTwLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1028" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Czech language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_CS_CZ_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45CsCzLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1029" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Danish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_DA_DK_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45DaDkLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1030" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Dutch language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_NL_NL_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45NlNlLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1043" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Finnish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_FI_FI_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45FiFiLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1035" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 French language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_FR_FR_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45FrFrLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1036" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 German language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_DE_DE_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45DeDeLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1031" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Greek language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_EL_GR_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45ElGrLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1032" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Hebrew language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_HE_IL_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45HeIlLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1037" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Hungarian language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_HU_HU_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45HuHuLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1038" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Italian language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_IT_IT_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45ItItLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1040" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Japanese language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_JA_JP_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45JaJpLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1041" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Korean language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_KO_KR_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45KoKrLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1042" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Norwegian language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_NB_NO_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45NbNoLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1044" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Polish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_PL_PL_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45PlPlLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1045" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Portuguese (Brazil) language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_PT_BR_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45PtBrLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1046" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Portuguese (Portugal) language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_PT_PT_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45PtPtLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\2070" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Russian language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_RU_RU_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45RuRuLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1049" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Spanish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_ES_ES_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45EsEsLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\3082" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Swedish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_SV_SE_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45SvSeLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1053" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- set to Release number of the .NET Framework 4.5 Turkish language pack if installed (not set otherwise) -->
+  <Fragment>
+    <Property Id="NETFRAMEWORK45_TR_TR_LANGPACK" Secure="yes">
+      <RegistrySearch Id="NETFRAMEWORK45TrTrLp" Root="HKLM" Key="Software\Microsoft\NET Framework Setup\NDP\v4\Full\1055" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+</Wix>

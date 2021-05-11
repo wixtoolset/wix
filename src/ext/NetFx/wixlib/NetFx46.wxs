@@ -1,0 +1,70 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+        .NET Framework installation state properties
+
+        Official documentation can be found at the following location:
+
+           .NET Framework 4.5/4.5.1/4.5.2/4.6 - http://msdn.microsoft.com/en-us/library/w0x726c2(v=vs.110).aspx
+    -->
+
+  <?define NetFx46MinRelease = 393295 ?>
+  <?define NetFx46WebLink = https://go.microsoft.com/fwlink/?LinkId=560371 ?>
+  <?define NetFx46RedistLink = https://go.microsoft.com/fwlink/?LinkId=560369 ?>
+  <?define NetFx46EulaLink = https://go.microsoft.com/fwlink/?LinkID=558772 ?>
+  <?define NetFx46WebId = NetFx46Web ?>
+  <?define NetFx46RedistId = NetFx46Redist ?>
+
+  <Fragment>
+    <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
+    <Property Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED" Secure="yes" />
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx46MinRelease)&quot;" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx46WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx46MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx46WebInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx46WebPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx46WebId)">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46WebDetectCondition)" InstallCondition="!(wix.NetFx46WebInstallCondition)" Id="$(var.NetFx46WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog">
+        <ExePackagePayload Name="!(wix.NetFx46WebPackageDirectory)NDP46-KB3045560-Web.exe" DownloadUrl="$(var.NetFx46WebLink)" Description="Microsoft .NET Framework 4.6 Setup" Hash="CAA5F4D4DB0C9DF34252FCB74CF7762214F69D2419865EBC1E6717E6B1348E59A7599A8DECAAB5CEE6974E59D1AE5A749F8C4EC07C8E4C80C90E77B996B3B205" ProductName="Microsoft .NET Framework 4.6" Size="1497400" Version="4.6.81.0" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx46WebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx46WebId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx46WebId)" LicenseUrl="$(var.NetFx46EulaLink)" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx46RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx46MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx46RedistInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx46RedistPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx46RedistId)">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx46FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx46FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx46RedistDetectCondition)" InstallCondition="!(wix.NetFx46RedistInstallCondition)" Id="$(var.NetFx46RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx46FullLog">
+        <ExePackagePayload Name="!(wix.NetFx46RedistPackageDirectory)NDP46-KB3045557-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx46RedistLink)" Description="Microsoft .NET Framework 4.6 Setup" Hash="C6FC54F648F822515ADACB4C27E0A6DBD6A3EAF2BA3F069C0002750894ECC453EBED8BC8D4FF2AFD73C7B3445C1DA18D43FE361EA5195AE8522249DF36B84B7E" ProductName="Microsoft .NET Framework 4.6" Size="65444688" Version="4.6.81.0" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx46RedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx46RedistId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx46RedistId)" LicenseUrl="$(var.NetFx46EulaLink)" />
+  </Fragment>
+</Wix>

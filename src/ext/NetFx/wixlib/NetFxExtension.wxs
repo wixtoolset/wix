@@ -1,0 +1,38 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <!--
+        .NET Framework installation state properties
+    -->
+
+  <!-- Location of .NET Framework redistributable install root directory -->
+  <Fragment>
+    <Property Id="NETFRAMEWORKINSTALLROOTDIR" Secure="yes">
+      <RegistrySearch Id="NetFxInstallRootSearch" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot" />
+    </Property>
+  </Fragment>
+
+  <!-- location of the Windows SDK current active version installation root -->
+  <Fragment>
+    <Property Id="WINDOWSSDKCURRENTVERSIONDIR" Secure="yes">
+      <RegistrySearch Id="WindowsSdkCurrentVersionDir" Root="HKLM" Key="Software\Microsoft\Microsoft SDKs\Windows" Name="CurrentInstallFolder" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- The Windows SDK current active version -->
+  <Fragment>
+    <Property Id="WINDOWSSDKCURRENTVERSION" Secure="yes">
+      <RegistrySearch Id="WindowsSdkCurrentVersion" Root="HKLM" Key="Software\Microsoft\Microsoft SDKs\Windows" Name="CurrentVersion" Type="raw" />
+    </Property>
+  </Fragment>
+
+  <!-- Release value of .NET 4.5 and later -->
+  <Fragment>
+    <Property Id="WIXNETFX4RELEASEINSTALLED" Secure="yes">
+      <RegistrySearch Id="NetFx4ReleaseInstalled" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Name="Release" Type="raw" />
+    </Property>
+  </Fragment>
+
+</Wix>

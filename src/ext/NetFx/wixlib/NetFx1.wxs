@@ -1,0 +1,30 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+    <!--
+        .NET Framework installation state properties
+
+        Official documentation can be found at the following location:
+
+           .NET Framework 1.0 - http://msdn.microsoft.com/library/ms994349.aspx
+    -->
+
+    <!-- set to 3321-3705 if the .NET Framework 1.0 is installed (not set otherwise) -->
+    <Fragment>
+        <Property Id="NETFRAMEWORK10" Secure="yes">
+            <RegistrySearch Id="NetFramework10" Root="HKLM" Key="SOFTWARE\Microsoft\.NETFramework\policy\v1.0" Name="3705" Type="raw" />
+        </Property>
+    </Fragment>
+
+    <!-- Location of .NET Framework 1.0 redistributable install root directory -->
+    <Fragment>
+        <Property Id="NETFRAMEWORK10INSTALLROOTDIR" Secure="yes">
+            <RegistrySearch Id="NetFxInstallRootForNetfx10Search" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework" Name="InstallRoot">
+                <DirectorySearch Id="NetFx10InstallRootSearch" Path="v1.0.3705" Depth="0" />
+            </RegistrySearch>
+        </Property>
+    </Fragment>
+
+</Wix>

@@ -1,0 +1,69 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+        .NET Framework installation state properties
+
+        Official documentation can be found at the following location:
+
+           .NET Framework 4.5/4.5.1/4.5.2 - http://msdn.microsoft.com/en-us/library/w0x726c2(v=vs.110).aspx
+    -->
+
+  <?define NetFx452MinRelease = 379893 ?>
+  <?define NetFx452WebLink = https://go.microsoft.com/fwlink/?LinkId=397707 ?>
+  <?define NetFx452RedistLink = https://go.microsoft.com/fwlink/?LinkId=397708 ?>
+  <?define NetFx452EulaLink = https://wixtoolset.org/licenses/netfx452 ?>
+  <?define NetFx452WebId = NetFx452Web ?>
+  <?define NetFx452RedistId = NetFx452Redist ?>
+
+  <Fragment>
+    <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
+    <Property Id="WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED" Secure="yes" />
+    <SetProperty Id="WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED" Value="1" After="AppSearch" Condition="WIXNETFX4RELEASEINSTALLED &gt;= &quot;#$(var.NetFx452MinRelease)&quot;" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx452WebDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx452MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx452WebInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx452WebPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx452WebId)">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullWebLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullWebLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452WebDetectCondition)" InstallCondition="!(wix.NetFx452WebInstallCondition)" Id="$(var.NetFx452WebId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullWebLog">
+        <ExePackagePayload Name="!(wix.NetFx452WebPackageDirectory)NDP452-KB2901954-Web.exe" DownloadUrl="$(var.NetFx452WebLink)" Description="Microsoft .NET Framework 4.5.2 Setup" Hash="90A3A5A57EA8A6508EEE0D129303C7CB012AABF651DD9A6BEFC20DA3BBDB09FC47FD087645051D3D45BFF909DFC6E6039C22C4816FBC793A847E81701248639E" ProductName="Microsoft .NET Framework 4.5.2" Size="1118920" Version="4.5.51209.34209" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx452WebId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx452WebId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx452WebId)" LicenseUrl="$(var.NetFx452EulaLink)" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="NETFRAMEWORK45" />
+
+    <WixVariable Id="NetFx452RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx452MinRelease)" Overridable="yes" />
+    <WixVariable Id="NetFx452RedistInstallCondition" Value="" Overridable="yes" />
+    <WixVariable Id="NetFx452RedistPackageDirectory" Value="redist\" Overridable="yes" />
+
+    <PackageGroup Id="$(var.NetFx452RedistId)">
+      <ExePackage InstallArguments="/q /norestart /log &quot;[NetFx452FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx452FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx452RedistDetectCondition)" InstallCondition="!(wix.NetFx452RedistInstallCondition)" Id="$(var.NetFx452RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx452FullLog">
+        <ExePackagePayload Name="!(wix.NetFx452RedistPackageDirectory)NDP452-KB2901907-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx452RedistLink)" Description="Microsoft .NET Framework 4.5.2 Setup" Hash="033D457229C4FE6EEA7B1E42A3A39DD4CF6A054C5E996CE036942DD2FE9623FD3A0634BE5DCB88506C1C61BF9FF6076F27B4ECEC38F8CF85603AF018111E584D" ProductName="Microsoft .NET Framework 4.5.2" Size="69999448" Version="4.5.51209.34209" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx452RedistId)AsPrereq">
+      <PackageGroupRef Id="$(var.NetFx452RedistId)" />
+    </PackageGroup>
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx452RedistId)" LicenseUrl="$(var.NetFx452EulaLink)" />
+  </Fragment>
+</Wix>
