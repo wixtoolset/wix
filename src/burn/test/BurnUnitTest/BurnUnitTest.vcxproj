@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" />
+  <Import Project="..\..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectTypes>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</ProjectTypes>
+    <ProjectGuid>{9D1F1BA3-9393-4833-87A3-D5F1FC08EF67}</ProjectGuid>
+    <RootNamespace>UnitTest</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <SignOutput>false</SignOutput>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalIncludeDirectories Condition=" '$(DirectReference)'=='true' ">$(ProjectDir)..\..\..\..\balutil\src\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>$(ProjectAdditionalIncludeDirectories);..\..\engine</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;wininet.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="CacheTest.cpp" />
+    <ClCompile Include="ElevationTest.cpp" />
+    <ClCompile Include="ManifestHelpers.cpp" />
+    <ClCompile Include="ManifestTest.cpp" />
+    <ClCompile Include="PlanTest.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <!-- Warnings from referencing netstandard dlls -->
+      <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="RegistrationTest.cpp" />
+    <ClCompile Include="SearchTest.cpp" />
+    <ClCompile Include="VariableHelpers.cpp" />
+    <ClCompile Include="VariableTest.cpp" />
+    <ClCompile Include="VariantTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BurnTestException.h" />
+    <ClInclude Include="BurnTestFixture.h" />
+    <ClInclude Include="BurnUnitTest.h" />
+    <ClInclude Include="ManifestHelpers.h" />
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="VariableHelpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <ResourceCompile Include="BurnUnitTest.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestData\CacheTest\CacheSignatureTest.File" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\BasicFunctionality_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\MsiTransaction_BundleAv1_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\Slipstream_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.4.0.50\lib\net472\WixBuildTools.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport.Native">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\lib\net472\WixBuildTools.TestSupport.Native.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\engine\engine.vcxproj">
+      <Project>{8119537D-E1D9-6591-D51A-49770A2F9C37}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.47\build\WixBuildTools.TestSupport.Native.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.DUtil.4.0.70\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.57\build\WixToolset.BootstrapperCore.Native.props'))" />
+  </Target>
+</Project>

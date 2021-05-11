@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$$id$.props" target="buildTransitive" />
+    <file src="..\..\build\$configuration$\Win32\burn.exe" target="tools\x86" />
+    <file src="..\..\build\$configuration$\Win32\burn.pdb" target="tools\x86" />
+    <file src="..\..\build\$configuration$\x64\burn.exe" target="tools\x64" />
+    <file src="..\..\build\$configuration$\x64\burn.pdb" target="tools\x64" />
+    <file src="..\..\build\$configuration$\arm64\burn.exe" target="tools\arm64" />
+    <file src="..\..\build\$configuration$\arm64\burn.pdb" target="tools\arm64" />
+  </files>
+</package>

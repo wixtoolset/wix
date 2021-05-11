@@ -1,0 +1,102 @@
+#pragma once
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+
+#include <windows.h>
+#include <aclapi.h>
+
+#include <math.h>
+#include <msiquery.h>
+#include <sddl.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <softpub.h>
+#include <strsafe.h>
+#include <intsafe.h>
+#include <mscat.h>
+#include <lmcons.h>
+#include <wininet.h>
+#include <stddef.h>
+#include <VersionHelpers.h>
+
+#include <dutilsources.h>
+#include <burnsources.h>
+
+#include <dutil.h>
+#include <verutil.h>
+#include <aclutil.h>
+#include <apputil.h>
+#include <buffutil.h>
+#include <cabutil.h>
+#include <cryputil.h>
+#include <dirutil.h>
+#include <fileutil.h>
+#include <guidutil.h>
+#include <logutil.h>
+#include <memutil.h>
+#include <osutil.h>
+#include <pathutil.h>
+#include <polcutil.h>
+#include <procutil.h>
+#include <regutil.h>
+#include <resrutil.h>
+#include <shelutil.h>
+#include <srputil.h>
+#include <strutil.h>
+#include <svcutil.h>
+#include <userutil.h>
+#include <wiutil.h>
+#include <wuautil.h>
+#include <xmlutil.h>
+#include <dictutil.h>
+#include <deputil.h>
+#include <dlutil.h>
+#include <atomutil.h>
+#include <apuputil.h>
+#include <dpiutil.h>
+
+#include "BootstrapperEngine.h"
+#include "BootstrapperApplication.h"
+#include "BundleExtensionEngine.h"
+#include "BundleExtension.h"
+
+#include "platform.h"
+#include "variant.h"
+#include "variable.h"
+#include "condition.h"
+#include "section.h"
+#include "approvedexe.h"
+#include "container.h"
+#include "payload.h"
+#include "cabextract.h"
+#include "burnextension.h"
+#include "search.h"
+#include "userexperience.h"
+#include "package.h"
+#include "update.h"
+#include "pseudobundle.h"
+#include "registration.h"
+#include "relatedbundle.h"
+#include "detect.h"
+#include "plan.h"
+#include "logging.h"
+#include "pipe.h"
+#include "core.h"
+#include "cache.h"
+#include "apply.h"
+#include "exeengine.h"
+#include "msiengine.h"
+#include "mspengine.h"
+#include "msuengine.h"
+#include "dependency.h"
+#include "elevation.h"
+#include "embedded.h"
+#include "manifest.h"
+#include "splashscreen.h"
+#include "uithread.h"
+#include "netfxchainer.h"
+
+#include "externalengine.h"
+#include "EngineForApplication.h"
+#include "EngineForExtension.h"
+#include "engine.messages.h"
