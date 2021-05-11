@@ -28,7 +28,7 @@
           Condition=" '$(APPVEYOR)'=='True' ">
     <PropertyGroup>
       <AppVeyorBuildNumber>$(InformationalVersion)</AppVeyorBuildNumber>
-      <AppVeyorBuildNumber Condition=" 'APPVEYOR_PULL_REQUEST_NUMBER'!='' ">PR#$(APPVEYOR_PULL_REQUEST_NUMBER)-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
+      <AppVeyorBuildNumber Condition=" '$(APPVEYOR_PULL_REQUEST_NUMBER)'!='' ">PR#$(APPVEYOR_PULL_REQUEST_NUMBER)-$(AppVeyorBuildNumber)</AppVeyorBuildNumber>
     </PropertyGroup>
 
     <Message Importance="high" Text="  $(AppVeyorBuildNumber)" />
