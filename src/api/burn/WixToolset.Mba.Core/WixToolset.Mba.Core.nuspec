@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <license type="expression">MS-RL</license>
+    <projectUrl>https://github.com/wixtoolset/balutil</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <group targetFramework=".NETFramework2.0" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="net20\$id$.dll" target="lib\net20" />
+    <file src="net20\$id$.xml" target="lib\net20" />
+    <file src="netstandard2.0\$id$.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
+
+    <file src="v142\ARM64\mbanative.dll" target="runtimes\win-arm64\native" />
+    <file src="v142\ARM64\mbanative.pdb" target="runtimes\win-arm64\native" />
+    <file src="v142\x64\mbanative.dll" target="runtimes\win-x64\native" />
+    <file src="v142\x64\mbanative.pdb" target="runtimes\win-x64\native" />
+    <file src="v142\x86\mbanative.dll" target="runtimes\win-x86\native" />
+    <file src="v142\x86\mbanative.pdb" target="runtimes\win-x86\native" />
+  </files>
+</package>

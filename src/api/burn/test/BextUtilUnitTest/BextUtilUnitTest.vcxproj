@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.141\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.141\build\WixToolset.BootstrapperCore.Native.props')" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.props" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.props')" />
+  <Import Project="..\..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectTypes>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</ProjectTypes>
+    <ProjectGuid>{B69E6422-49B0-4E28-92F9-B8A7410A6ED9}</ProjectGuid>
+    <RootNamespace>UnitTest</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <SignOutput>false</SignOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <ProjectAdditionalIncludeDirectories>..\..\bextutil\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries></ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <!-- Warnings from referencing netstandard dlls -->
+      <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="TestBundleExtension.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="WixBuildTools.TestSupport">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.4.0.50\lib\net472\WixBuildTools.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="WixBuildTools.TestSupport.Native">
+      <HintPath>..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\lib\net472\WixBuildTools.TestSupport.Native.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\balutil\balutil.vcxproj">
+      <Project>{06027492-1CB9-48BC-B31E-C1F9356ED07E}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets" Condition="Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixBuildTools.TestSupport.Native.4.0.50\build\WixBuildTools.TestSupport.Native.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.DUtil.4.0.72\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.141\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.141\build\WixToolset.BootstrapperCore.Native.props'))" />
+  </Target>
+</Project>

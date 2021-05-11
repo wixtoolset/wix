@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>WiX Toolset Team</authors>
+    <owners>WiX Toolset Team</owners>
+    <license type="expression">MS-RL</license>
+    <projectUrl>https://github.com/wixtoolset/BootstrapperCore</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+  </metadata>
+
+  <files>
+    <file src="build\$id$.props" target="build\" />
+    <file src="inc\*" target="build\native\include" />
+  </files>
+</package>

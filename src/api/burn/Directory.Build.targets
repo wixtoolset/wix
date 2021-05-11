@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!--
+  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.targets
+  then update all of the repos.
+-->
+<Project>
+  <PropertyGroup>
+    <SigningToolFolder>$(BaseOutputPath)obj\.tools</SigningToolFolder>
+    <SigningToolExe>$(SigningToolFolder)\SignClient.exe</SigningToolExe>
+    <SigningFilelist>$(SigningToolFolder)\empty-filelist.txt</SigningFilelist>
+    <SigningConfiguration>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), signing.json))\signing.json</SigningConfiguration>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
+    <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <Target Name="SetNuspecProperties" DependsOnTargets="InitializeSourceControlInformation" AfterTargets="GetBuildVersion"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+    <PropertyGroup>
+      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(PrivateRepositoryUrl)'!='' ">$(PrivateRepositoryUrl.Replace('.git',''))</ProjectUrl>
+
+      <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+      <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(MSBuildProjectDirectory)</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Authors="$(Authors)";Configuration=$(Configuration);Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Version=$(NPMPackageVersion);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildProjectDirectory)\;ProjectUrl=$(ProjectUrl)</NuspecProperties>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="PackNative" DependsOnTargets="GetBuildVersion;SetNuspecProperties"
+          Condition=" Exists('$(MSBuildProjectName).nuspec') ">
+
+    <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(BaseOutputPath)$(Configuration)" -BasePath "$(NuspecBasePath)" -Properties $(NuspecProperties)' 
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+    <ItemGroup>
+      <NuGetPackOutput Include="$(BaseOutputPath)$(Configuration)\**\$(PackageId)*.nupkg" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GetSignClient"
+          Condition=" !Exists('$(SigningToolExe)') ">
+
+    <WriteLinesToFile File='$(SigningFilelist)' Lines='do-not-sign-files-in-nupkg' Overwrite='true' />
+
+    <Exec Command='dotnet.exe tool install --tool-path "$(SigningToolFolder)" SignClient' />
+  </Target>
+
+  <Target Name="SignOutput" DependsOnTargets="_GetSignClient" AfterTargets="AfterBuild"
+          Condition=" '$(SigningUser)'!='' and '$(SignOutput)'!='false' and 
+                      ('$(MSBuildProjectExtension)'=='.csproj' or ('$(MSBuildProjectExtension)'=='.vcxproj' and '$(ConfigurationType)'!='StaticLibrary'))">
+
+    <Exec Command='"$(SigningToolExe)" sign -i $(TargetPath) -c "$(SigningConfiguration)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Target Name="SignNupkg" DependsOnTargets="_GetSignClient" AfterTargets="Pack;PackNative"
+          Condition=" '$(SigningUser)'!='' and '@(NuGetPackOutput)'!='' and '$(SignNupkg)'!='false' ">
+    <ItemGroup>
+      <SigningNupkgs Include="@(NuGetPackOutput)" Condition=" '%(Extension)'=='.nupkg' " />
+    </ItemGroup>
+
+    <Exec Command='"$(SigningToolExe)" sign -i "@(SigningNupkgs->&apos;%(Identity)&apos;)" -c "$(SigningConfiguration)" -f "$(SigningFilelist)" -n "WiX Toolset" -d "WiX Toolset" -u https://wixtoolset.org/ -r "$(SigningUser)" -s "$(SigningSecret)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
+  <Import Project="Directory$(MSBuildProjectExtension).targets" Condition=" Exists('Directory$(MSBuildProjectExtension).targets') " />
+  <Import Project="Custom.Build.targets" Condition=" Exists('Custom.Build.targets') " />
+</Project>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
+    <AssemblyName>WixToolset.Mba.Core</AssemblyName>
+    <RootNamespace>WixToolset.Mba.Core</RootNamespace>
+    <DebugType>embedded</DebugType>
+    <Description>Managed Bootstrapper Application Core</Description>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+    <NativeFileListPath Condition=" '$(NCrunch)'=='' ">$(MSBuildProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
+    <NativeFileListPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
+  </PropertyGroup>
+
+  <Target Name="BuildMbaNative" BeforeTargets="GetCopyToOutputDirectoryItems" Condition=" '$(NCrunch)'=='' ">
+    <MSBuild Projects="..\mbanative\mbanative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;ContentFilesProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+      <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
+    </MSBuild>
+
+    <WriteLinesToFile File="$(NativeFileListPath)" Lines="@(_NativeProjectOutput)" Overwrite="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(NativeFileListPath)" />
+
+      <AllItemsFullPathWithTargetPath Include="@(_NativeProjectOutput->'%(FullPath)')">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>%(Filename)%(Extension)</TargetPath>
+      </AllItemsFullPathWithTargetPath>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="NCrunchCopyNative" AfterTargets="AfterBuild" Condition=" '$(NCrunch)'=='1' ">
+    <ReadLinesFromFile File="$(NativeFileListPath)">
+      <Output TaskParameter="Lines" ItemName="_NCrunchNativeProjectOutput" />
+    </ReadLinesFromFile>
+
+    <Error Text="You must build $(MSBuildProjectName) to create the referenced native projects. Once built, 'Reload and rebuild' the project in the NCrunch Tests. The $(NativeFileListPath) file must not be empty." Condition=" '@(_NCrunchNativeProjectOutput)'=='' " />
+
+    <Copy SourceFiles="@(_NCrunchNativeProjectOutput)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true">
+      <Output TaskParameter="CopiedFiles" ItemName="_NCrunchNativeCopied" />
+    </Copy>
+
+    <ItemGroup>
+      <FileWrites Include="@(_NCrunchNativeCopied)" />
+    </ItemGroup>
+  </Target>
+</Project>
