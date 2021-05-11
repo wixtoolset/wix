@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectGuid>{4F55F9B8-D8B6-41EB-8796-221B4CD98324}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WixToolsetTests.Dtf</RootNamespace>
+    <AssemblyName>WixToolsetTests.Dtf.Linq</AssemblyName>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <CreateDocumentation>false</CreateDocumentation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="LinqTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj" />
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller.Linq\WixToolset.Dtf.WindowsInstaller.Linq.csproj" />
+    <ProjectReference Include="..\WixToolsetTests.Dtf.WindowsInstaller\WixToolsetTests.Dtf.WindowsInstaller.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectGuid>{27C20359-3910-423D-8058-6403935B98C6}</ProjectGuid>
+
+    <Name>Documentation</Name>
+
+    <!-- SHFB properties -->
+    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
+    <HtmlHelpName>DTFAPI</HtmlHelpName>
+    <MissingTags>Namespace, TypeParameter</MissingTags>
+    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, ProtectedInternalAsProtected, SealedProtected</VisibleItems>
+
+    <RootNamespaceTitle>Deployment Tools Foundation Namespaces</RootNamespaceTitle>
+    <HelpTitle>Deployment Tools Foundation</HelpTitle>
+    <FeedbackEMailAddress>wix-users%40lists.sourceforge.net</FeedbackEMailAddress>
+    <FooterText>&amp;lt%3bscript src=&amp;quot%3bhelplink.js&amp;quot%3b&amp;gt%3b&amp;lt%3b/script&amp;gt%3b</FooterText>
+    <PresentationStyle>Prototype</PresentationStyle>
+    <NamingMethod>MemberName</NamingMethod>
+    <FrameworkVersion>.NET Framework 3.5</FrameworkVersion>
+  </PropertyGroup>
+
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.props" />
+  <PropertyGroup>
+    <NamespaceSummaries>
+      <NamespaceSummaryItem name="(global)" isDocumented="False" xmlns="" />
+      <NamespaceSummaryItem name="WixToolset.Dtf.Compression" isDocumented="True" xmlns="">Framework for archive packing and unpacking.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.Compression.Cab" isDocumented="True" xmlns="">Implements cabinet archive packing and unpacking.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.Compression.Zip" isDocumented="True" xmlns="">Implements zip archive packing and unpacking.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.Resources" isDocumented="True" xmlns="">Classes for reading and writing resource data in executable files.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.WindowsInstaller" isDocumented="True" xmlns="">Complete class library for the Windows Installer APIs.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.WindowsInstaller.Linq" isDocumented="True" xmlns="">LINQ extensions for querying Windows Installer databases (experimental).</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="WixToolset.Dtf.WindowsInstaller.Linq.Entities" isDocumented="False" xmlns="" />
+      <NamespaceSummaryItem name="WixToolset.Dtf.WindowsInstaller.Package" isDocumented="True" xmlns="">Extended classes for working with Windows Installer installation and patch packages.</NamespaceSummaryItem>
+    </NamespaceSummaries>
+
+    <DocumentationSources>
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.Cab.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.Cab.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.Zip.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Compression.Zip.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Resources.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.Resources.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.Package.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.Package.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.Linq.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(DirTargetWix)\WixToolset.Dtf.WindowsInstaller.Linq.xml" xmlns="" />
+    </DocumentationSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="helplink.js" />
+    <Content Include="Compression2.png" />
+    <Content Include="Compression1.png" />
+    <Content Include="Compression.htm" />
+    <Content Include="WindowsInstaller.htm" />
+    <Content Include="WindowsInstaller3.png" />
+    <Content Include="WindowsInstaller2.png" />
+    <Content Include="WindowsInstaller1.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  </ItemGroup>
+
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+</Project>

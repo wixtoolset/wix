@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>WixToolset.Dtf.WindowsInstaller</RootNamespace>
+    <AssemblyName>WixToolset.Dtf.WindowsInstaller.Package</AssemblyName>
+    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
+    <Description>Extended managed libraries for Windows Installer</Description>
+    <CreateDocumentationFile>true</CreateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj" />
+    <ProjectReference Include="..\WixToolset.Dtf.Compression\WixToolset.Dtf.Compression.csproj" />
+    <ProjectReference Include="..\WixToolset.Dtf.Compression.Cab\WixToolset.Dtf.Compression.Cab.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

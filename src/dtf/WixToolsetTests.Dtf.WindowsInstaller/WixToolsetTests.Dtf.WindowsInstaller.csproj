@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectGuid>{16F5202F-9276-4166-975C-C9654BAF8012}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WixToolsetTests.Dtf</RootNamespace>
+    <AssemblyName>WixToolsetTests.Dtf.WindowsInstaller</AssemblyName>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <CreateDocumentation>false</CreateDocumentation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="EmbeddedExternalUI.cs" />
+    <Compile Include="Schema.cs" />
+    <Compile Include="WindowsInstallerTest.cs" />
+    <Compile Include="WindowsInstallerTransactions.cs" />
+    <Compile Include="WindowsInstallerUtils.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

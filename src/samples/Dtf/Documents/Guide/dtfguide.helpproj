@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{3CFD8620-B41C-470C-ABEF-9D38076A2A8D}</ProjectGuid>
+    <TargetName>dtf</TargetName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HelpProjectFile Include="dtf.hhp" />
+    <HelpProjectContent Include="DTF.hhc" />
+    <HelpProjectContent Include="DTF.hhk" />
+    <HelpProjectContent Include="Content\*.*" />
+    <HelpProjectContent Include="styles\*.*" />
+    <HelpProjectContent Include="DTFAPI.chm">
+      <SourcePath>$(OutputPath)DTFAPI.chm</SourcePath>
+    </HelpProjectContent>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reference\dtfref.shfbproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+</Project>

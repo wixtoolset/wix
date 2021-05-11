@@ -1,0 +1,10 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+#define VER_DLL
+#define VER_LANG_NEUTRAL
+#define VER_ORIGINAL_FILENAME "SfxCA.dll"
+#define VER_INTERNAL_NAME "SfxCA"
+#define VER_FILE_DESCRIPTION "DTF Self-Extracting Custom Action"
+
+// Additional resources here
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{864B8C50-7895-4485-AC89-900D86FD8C0D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WixToolset.Dtf.Samples.EmbeddedUI</RootNamespace>
+    <AssemblyName>WixToolset.Dtf.Samples.EmbeddedUI</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="InstallProgressCounter.cs" />
+    <Compile Include="SampleEmbeddedUI.cs" />
+    <Compile Include="SetupWizard.xaml.cs">
+      <DependentUpon>SetupWizard.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="SetupWizard.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\WixToolset.Dtf.WindowsInstaller\WixToolset.Dtf.WindowsInstaller.csproj">
+      <Project>{24121677-0ed0-41b5-833f-1b9a18e87bf4}</Project>
+      <Name>WixToolset.Dtf.WindowsInstaller</Name>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+<!--
+  <PropertyGroup>
+    <PostBuildEvent>"$(TargetDir)..\x86\MakeSfxCA.exe" "$(TargetPath)" "$(TargetDir)SfxCA.dll" "$(IntermediateOutputPath)$(TargetFileName)" "$(TargetDir)WixToolset.Dtf.WindowsInstaller.dll"</PostBuildEvent>
+  </PropertyGroup>
+-->
+  
+</Project>
