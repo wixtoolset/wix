@@ -1,0 +1,15 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include caerr.wxi ?>
+
+    <Fragment>
+        <UI>
+            <Error Id="$(var.msierrSQLFailedCreateDatabase)" Message="!(loc.msierrSQLFailedCreateDatabase)" />
+            <Error Id="$(var.msierrSQLFailedDropDatabase)" Message="!(loc.msierrSQLFailedDropDatabase)" />
+            <Error Id="$(var.msierrSQLFailedConnectDatabase)" Message="!(loc.msierrSQLFailedConnectDatabase)" />
+            <Error Id="$(var.msierrSQLFailedExecString)" Message="!(loc.msierrSQLFailedExecString)" />
+            <Error Id="$(var.msierrSQLDatabaseAlreadyExists)" Message="!(loc.msierrSQLDatabaseAlreadyExists)" />
+        </UI>
+    </Fragment>
+</Wix>

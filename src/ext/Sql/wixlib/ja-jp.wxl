@@ -1,0 +1,16 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="ja-jp" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="msierrSQLFailedCreateDatabase" Overridable="yes">エラー [2]： SQL データベース [3] 作成に失敗しました、エラー詳細： [4]。</String>
+  <String Id="msierrSQLFailedDropDatabase" Overridable="yes">エラー [2]： SQL データベース [3] の削除に失敗しました、エラー詳細： [4]。</String>
+  <String Id="msierrSQLFailedConnectDatabase" Overridable="yes">SQL データベースへ接続できませんでした。  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrSQLFailedExecString" Overridable="yes">エラー [2]： SQL ストリングの実行に失敗しました、エラー詳細： [3]、 SQL キー： [4] SQL ストリング： [5]</String>
+  <String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes">データベース [3] は既に存在します。続行しますか？</String>
+
+  <String Id="ConfigureSql" Overridable="yes">SQL サーバーを構成しています</String>
+  <String Id="CreateDatabase" Overridable="yes">データベースを作成しています</String>
+  <String Id="DropDatabase" Overridable="yes">データベースを削除しています</String>
+  <String Id="ExecuteSqlStrings" Overridable="yes">SQL ストリングを実行しています</String>
+  <String Id="RollbackExecuteSqlStrings" Overridable="yes">SQL ストリングをロールバックしています</String>
+</WixLocalization>

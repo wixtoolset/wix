@@ -1,0 +1,35 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?include caDecor.wxi ?>
+
+    <Fragment>
+        <UI>
+            <ProgressText Action="$(var.Prefix)InstallSqlData$(var.Suffix)" Message="!(loc.ConfigureSql)" />
+            <ProgressText Action="$(var.Prefix)UninstallSqlData$(var.Suffix)" Message="!(loc.ConfigureSql)" />
+            <ProgressText Action="$(var.Prefix)CreateDatabase$(var.Suffix)" Message="!(loc.CreateDatabase)" />
+            <ProgressText Action="$(var.Prefix)DropDatabase$(var.Suffix)" Message="!(loc.DropDatabase)" />
+            <ProgressText Action="$(var.Prefix)ExecuteSqlStrings$(var.Suffix)" Message="!(loc.ExecuteSqlStrings)" />
+            <ProgressText Action="$(var.Prefix)RollbackExecuteSqlStrings$(var.Suffix)" Message="!(loc.RollbackExecuteSqlStrings)" />
+        </UI>
+
+        <!-- The SQL custom actions impersonate the user because the user's credentials are used when connecting to the database if none are provided. -->
+        <CustomAction Id="$(var.Prefix)InstallSqlData$(var.Suffix)" DllEntry="InstallSqlData" Execute="immediate" Return="check" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)UninstallSqlData$(var.Suffix)" DllEntry="UninstallSqlData" Execute="immediate" Return="check" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)CreateDatabase$(var.Suffix)" DllEntry="CreateDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackCreateDatabase$(var.Suffix)" DllEntry="DropDatabase" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DropDatabase$(var.Suffix)" DllEntry="DropDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)ExecuteSqlStrings$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)RollbackExecuteSqlStrings$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)UninstallSqlData$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="NOT SKIPUNINSTALLSQLDATA AND VersionNT &gt; 400" />
+            <Custom Action="$(var.Prefix)InstallSqlData$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="NOT SKIPINSTALLSQLDATA AND VersionNT &gt; 400" />
+        </InstallExecuteSequence>
+    </Fragment>
+
+    <!-- Server Custom Action DLL Definitions -->
+    <Fragment>
+        <Binary Id="SqlCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))sqlca.dll" />
+    </Fragment>
+</Include>

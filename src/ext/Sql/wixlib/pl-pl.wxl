@@ -1,0 +1,16 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="pl-pl" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <String Id="msierrSQLFailedCreateDatabase" Overridable="yes">Błąd [2]: nie udało się utworzyć bazy danych: [3]. Szczegóły błędu: [4].</String>
+    <String Id="msierrSQLFailedDropDatabase" Overridable="yes">Błąd [2]: nie udało się usunąć bazy danych: [3]. Szczegóły błędu: [4].</String>
+    <String Id="msierrSQLFailedConnectDatabase" Overridable="yes">Nie udało się połączyć z bazą danych.  ([2]   [3]   [4]   [5])</String>
+    <String Id="msierrSQLFailedExecString" Overridable="yes">Błąd [2]: nie udało się wykonać zapytania SQL. Szczegóły błędu: [3], klucz: [4] zapytanie SQL: [5]</String>
+    <String Id="msierrSQLDatabaseAlreadyExists" Overridable="yes">Baza danych [3] już istnieje. Czy chcesz kontynuować?</String>
+
+    <String Id="ConfigureSql" Overridable="yes">Konfigurowanie programu SQL Server</String>
+    <String Id="CreateDatabase" Overridable="yes">Tworzenie baz danych</String>
+    <String Id="DropDatabase" Overridable="yes">Usuwanie baz danych</String>
+    <String Id="ExecuteSqlStrings" Overridable="yes">Wykonywanie zapytań SQL</String>
+    <String Id="RollbackExecuteSqlStrings" Overridable="yes">Cofanie zapytań SQL</String>
+</WixLocalization>

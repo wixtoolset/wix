@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:sql="http://wixtoolset.org/schemas/v4/wxs/sql">
+  <Fragment>
+    <Binary Id="ScriptBinary" SourceFile="example.txt" />
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component Id="DatabaseComponent" Guid="{322802E7-D65E-4C91-924F-FC6D30FEEB34}">
+            <File Id="TestFileSpec" Source="example.txt" />
+            <File Id="TestLogFileSpec" Source="example.txt" />
+
+            <sql:SqlDatabase Id="TestDB" Database="MyDB" Server="MySQLHostName" Instance="MyInstanceName" CreateOnInstall="yes" DropOnUninstall="yes" ConfirmOverwrite="yes">
+                <sql:SqlString Id="TestString" SQL="CREATE TABLE TestTable1(name varchar(20), value varchar(20))" ExecuteOnInstall="yes" />
+                <sql:SqlFileSpec Id="TestFileSpecId" Filename="TestFileSpec" Name="TestFileSpecLogicalName" Size="10MB" GrowthSize="10%" MaxSize="100MB" />
+                <sql:SqlLogFileSpec Id="TestLogFileSpecId" Filename="TestLogFileSpec" Name="TestLogFileSpecLogicalName" Size="1MB" GrowthSize="1%" MaxSize="10MB" />
+            </sql:SqlDatabase>
+
+            <sql:SqlScript Id="TestScript" BinaryRef="ScriptBinary" SqlDb="TestDB" ExecuteOnInstall="yes" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

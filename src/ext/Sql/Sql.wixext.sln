@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlca", "src\ca\sqlca.vcxproj", "{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "sql", "src\wixlib\sql.wixproj", "{9ACF1A20-D801-45CC-A463-F9D13E506AA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Sql.wixext", "src\wixext\WixToolset.Sql.wixext.csproj", "{0E05519A-0045-4AEC-BD0C-D9205FF1468F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Sql", "src\test\WixToolsetTest.Sql\WixToolsetTest.Sql.csproj", "{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|Any CPU.Build.0 = Debug|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|x86.ActiveCfg = Debug|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Debug|x86.Build.0 = Debug|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Release|Any CPU.ActiveCfg = Release|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Release|x86.ActiveCfg = Release|Win32
+		{4DCA6E4B-A1F1-4450-BC2D-94AC20F31935}.Release|x86.Build.0 = Release|Win32
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Debug|Any CPU.Build.0 = Debug|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Debug|x86.ActiveCfg = Debug|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Debug|x86.Build.0 = Debug|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Release|Any CPU.ActiveCfg = Release|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Release|x86.ActiveCfg = Release|x86
+		{9ACF1A20-D801-45CC-A463-F9D13E506AA3}.Release|x86.Build.0 = Release|x86
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Debug|x86.Build.0 = Debug|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Release|x86.ActiveCfg = Release|Any CPU
+		{0E05519A-0045-4AEC-BD0C-D9205FF1468F}.Release|x86.Build.0 = Release|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE72A369-03CA-4EBC-BC7B-A8BBF5BBD3E0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DEFEE3BB-E557-4B77-A85C-ECA19D6F5DF5}
+	EndGlobalSection
+EndGlobal
