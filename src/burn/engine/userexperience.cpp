@@ -2119,7 +2119,8 @@ EXTERN_C BAAPI UserExperienceOnProgress(
 }
 
 EXTERN_C BAAPI UserExperienceOnRegisterBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     )
 {
     HRESULT hr = S_OK;
@@ -2127,8 +2128,10 @@ EXTERN_C BAAPI UserExperienceOnRegisterBegin(
     BA_ONREGISTERBEGIN_RESULTS results = { };
 
     args.cbSize = sizeof(args);
+    args.recommendedRegistrationType = *pRegistrationType;
 
     results.cbSize = sizeof(results);
+    results.registrationType = *pRegistrationType;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONREGISTERBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnRegisterBegin failed.");
@@ -2136,6 +2139,10 @@ EXTERN_C BAAPI UserExperienceOnRegisterBegin(
     if (results.fCancel)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    else if (BOOTSTRAPPER_REGISTRATION_TYPE_NONE < results.registrationType && BOOTSTRAPPER_REGISTRATION_TYPE_FULL >= results.registrationType)
+    {
+        *pRegistrationType = results.registrationType;
     }
 
 LExit:
@@ -2316,7 +2323,7 @@ LExit:
 
 EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __inout BOOL* pfKeepRegistration
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     )
 {
     HRESULT hr = S_OK;
@@ -2324,16 +2331,17 @@ EXTERN_C BAAPI UserExperienceOnUnregisterBegin(
     BA_ONUNREGISTERBEGIN_RESULTS results = { };
 
     args.cbSize = sizeof(args);
-    args.fKeepRegistration = *pfKeepRegistration;
+    args.recommendedRegistrationType = *pRegistrationType;
 
     results.cbSize = sizeof(results);
+    results.registrationType = *pRegistrationType;
 
     hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONUNREGISTERBEGIN, &args, &results);
     ExitOnFailure(hr, "BA OnUnregisterBegin failed.");
 
-    if (!args.fKeepRegistration && results.fForceKeepRegistration)
+    if (BOOTSTRAPPER_REGISTRATION_TYPE_NONE < results.registrationType && BOOTSTRAPPER_REGISTRATION_TYPE_FULL >= results.registrationType)
     {
-        *pfKeepRegistration = TRUE;
+        *pRegistrationType = results.registrationType;
     }
 
 LExit:

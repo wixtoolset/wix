@@ -32,6 +32,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ParentName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
             },
             typeof(WixBundleSymbol));
     }
@@ -65,6 +66,7 @@ namespace WixToolset.Data.Symbols
         ParentName,
         BundleId,
         ProviderKey,
+        InProgressName,
     }
 
     [Flags]
@@ -219,6 +221,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleSymbolFields.ProviderKey];
             set => this.Set((int)WixBundleSymbolFields.ProviderKey, value);
+        }
+
+        public string InProgressName
+        {
+            get => (string)this.Fields[(int)WixBundleSymbolFields.InProgressName];
+            set => this.Set((int)WixBundleSymbolFields.InProgressName, value);
         }
 
         public PackagingType DefaultPackagingType => (this.Compressed.HasValue && !this.Compressed.Value) ? PackagingType.External : PackagingType.Embedded;

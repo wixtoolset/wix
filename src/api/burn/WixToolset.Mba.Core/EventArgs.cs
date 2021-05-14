@@ -1184,22 +1184,31 @@ namespace WixToolset.Mba.Core
     public class RegisterBeginEventArgs : CancellableHResultEventArgs
     {
         /// <summary />
-        public RegisterBeginEventArgs(bool cancelRecommendation)
+        public RegisterBeginEventArgs(RegistrationType recommendedRegistrationType, bool cancelRecommendation, RegistrationType registrationType)
             : base(cancelRecommendation)
         {
+            this.RecommendedRegistrationType = recommendedRegistrationType;
+            this.RegistrationType = registrationType;
         }
+
+        /// <summary>
+        /// Gets the recommended registration type.
+        /// </summary>
+        public RegistrationType RecommendedRegistrationType { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the registration type.
+        /// </summary>
+        public RegistrationType RegistrationType { get; set; }
     }
 
     /// <summary>
-    /// Additional arguments used when the engine has completed registering the location and visilibity of the bundle.
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.RegisterComplete"/>.
     /// </summary>
     [Serializable]
     public class RegisterCompleteEventArgs : StatusEventArgs
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="RegisterCompleteEventArgs"/> class.
-        /// </summary>
-        /// <param name="hrStatus">The return code of the operation.</param>
+        /// <summary />
         public RegisterCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {
@@ -1212,26 +1221,22 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class UnregisterBeginEventArgs : HResultEventArgs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="keepRegistration"></param>
-        /// <param name="forceKeepRegistration"></param>
-        public UnregisterBeginEventArgs(bool keepRegistration, bool forceKeepRegistration)
+        /// <summary />
+        public UnregisterBeginEventArgs(RegistrationType recommendedRegistrationType, RegistrationType registrationType)
         {
-            this.KeepRegistration = keepRegistration;
-            this.ForceKeepRegistration = forceKeepRegistration;
+            this.RecommendedRegistrationType = recommendedRegistrationType;
+            this.RegistrationType = registrationType;
         }
 
         /// <summary>
-        /// Indicates whether the engine will uninstall the bundle.
+        /// Gets the recommended registration type.
         /// </summary>
-        public bool ForceKeepRegistration { get; set; }
+        public RegistrationType RecommendedRegistrationType { get; private set; }
 
         /// <summary>
-        /// If <see cref="KeepRegistration"/> is FALSE, then this can be set to TRUE to make the engine keep the bundle installed.
+        /// Gets or sets the registration type.
         /// </summary>
-        public bool KeepRegistration { get; private set; }
+        public RegistrationType RegistrationType { get; set; }
     }
 
     /// <summary>
@@ -1240,10 +1245,7 @@ namespace WixToolset.Mba.Core
     [Serializable]
     public class UnregisterCompleteEventArgs : StatusEventArgs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hrStatus"></param>
+        /// <summary />
         public UnregisterCompleteEventArgs(int hrStatus)
             : base(hrStatus)
         {

@@ -486,7 +486,8 @@ BAAPI UserExperienceOnProgress(
     __in DWORD dwOverallPercentage
     );
 BAAPI UserExperienceOnRegisterBegin(
-    __in BURN_USER_EXPERIENCE* pUserExperience
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     );
 BAAPI UserExperienceOnRegisterComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -522,7 +523,7 @@ BAAPI UserExperienceOnSystemShutdown(
     );
 BAAPI UserExperienceOnUnregisterBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __inout BOOL* pfKeepRegistration
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     );
 BAAPI UserExperienceOnUnregisterComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,

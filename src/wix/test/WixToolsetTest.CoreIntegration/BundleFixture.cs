@@ -116,7 +116,7 @@ namespace WixToolsetTest.CoreIntegration
                     var registrationElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration");
                     var registrationElement = (XmlNode)Assert.Single(registrationElements);
                     Assert.Equal($"<Registration Id='{bundleSymbol.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleId}'>" +
-                        "<Arp Register='yes' DisplayName='~TestBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' />" +
+                        "<Arp Register='yes' DisplayName='~TestBundle' DisplayVersion='1.0.0.0' InProgressDisplayName='~InProgressTestBundle' Publisher='Example Corporation' />" +
                         "</Registration>", registrationElement.GetTestXml());
 
                     var msiPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='test.msi']");

@@ -122,6 +122,7 @@ namespace WixToolset.Core
             WixBundleAttributes attributes = 0;
             string helpTelephone = null;
             string helpUrl = null;
+            string inProgressName = null;
             string manufacturer = null;
             string name = null;
             string tag = null;
@@ -190,6 +191,9 @@ namespace WixToolset.Core
                     case "IconSourceFile":
                         iconSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
+                    case "InProgressName":
+                        inProgressName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "Name":
                         name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
@@ -247,6 +251,12 @@ namespace WixToolset.Core
                 }
             }
 
+            if (String.IsNullOrEmpty(name) && !String.IsNullOrEmpty(inProgressName))
+            {
+                name = inProgressName;
+                inProgressName = null;
+            }
+
             if (String.IsNullOrEmpty(name))
             {
                 logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup:log");
@@ -280,7 +290,6 @@ namespace WixToolset.Core
                 }
             }
 
-            var baSeen = false;
             var chainSeen = false;
             var logSeen = false;
 
@@ -294,13 +303,7 @@ namespace WixToolset.Core
                         this.ParseApprovedExeForElevation(child);
                         break;
                     case "BootstrapperApplication":
-                        if (baSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "BootstrapperApplication"));
-                        }
                         this.ParseBootstrapperApplicationElement(child);
-                        baSeen = true;
                         break;
                     case "BootstrapperApplicationRef":
                         this.ParseBootstrapperApplicationRefElement(child);
@@ -397,6 +400,7 @@ namespace WixToolset.Core
                     UpgradeCode = upgradeCode,
                     Version = version,
                     Copyright = copyright,
+                    InProgressName = inProgressName,
                     Name = name,
                     Manufacturer = manufacturer,
                     Attributes = attributes,
@@ -437,6 +441,12 @@ namespace WixToolset.Core
                 });
 
                 // Ensure that the bundle stores the well-known persisted values.
+                this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_INPROGRESS_NAME))
+                {
+                    Hidden = false,
+                    Persisted = true,
+                });
+
                 this.Core.AddSymbol(new WixBundleVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, BurnConstants.BURN_BUNDLE_NAME))
                 {
                     Hidden = false,

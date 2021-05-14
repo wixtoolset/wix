@@ -263,11 +263,11 @@ static HRESULT BalBaseBAProcOnError(
 
 static HRESULT BalBaseBAProcOnRegisterBegin(
     __in IBootstrapperApplication* pBA,
-    __in BA_ONREGISTERBEGIN_ARGS* /*pArgs*/,
+    __in BA_ONREGISTERBEGIN_ARGS* pArgs,
     __inout BA_ONREGISTERBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnRegisterBegin(&pResults->fCancel);
+    return pBA->OnRegisterBegin(pArgs->recommendedRegistrationType, &pResults->fCancel, &pResults->registrationType);
 }
 
 static HRESULT BalBaseBAProcOnRegisterComplete(
@@ -456,7 +456,7 @@ static HRESULT BalBaseBAProcOnUnregisterBegin(
     __inout BA_ONUNREGISTERBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnUnregisterBegin(pArgs->fKeepRegistration, &pResults->fForceKeepRegistration);
+    return pBA->OnUnregisterBegin(pArgs->recommendedRegistrationType, &pResults->registrationType);
 }
 
 static HRESULT BalBaseBAProcOnUnregisterComplete(

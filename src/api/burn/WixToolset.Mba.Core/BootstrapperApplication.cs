@@ -1490,12 +1490,13 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnRegisterBegin(ref bool fCancel)
+        int IBootstrapperApplication.OnRegisterBegin(RegistrationType recommendedRegistrationType, ref bool fCancel, ref RegistrationType registrationType)
         {
-            RegisterBeginEventArgs args = new RegisterBeginEventArgs(fCancel);
+            RegisterBeginEventArgs args = new RegisterBeginEventArgs(recommendedRegistrationType, fCancel, registrationType);
             this.OnRegisterBegin(args);
 
             fCancel = args.Cancel;
+            registrationType = args.RegistrationType;
             return args.HResult;
         }
 
@@ -1679,12 +1680,12 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnUnregisterBegin(bool fKeepRegistration, ref bool fForceKeepRegistration)
+        int IBootstrapperApplication.OnUnregisterBegin(RegistrationType recommendedRegistrationType, ref RegistrationType registrationType)
         {
-            UnregisterBeginEventArgs args = new UnregisterBeginEventArgs(fKeepRegistration, fForceKeepRegistration);
+            UnregisterBeginEventArgs args = new UnregisterBeginEventArgs(recommendedRegistrationType, registrationType);
             this.OnUnregisterBegin(args);
 
-            fForceKeepRegistration = args.ForceKeepRegistration;
+            registrationType = args.RegistrationType;
             return args.HResult;
         }
 

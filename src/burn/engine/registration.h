@@ -123,6 +123,7 @@ typedef struct _BURN_REGISTRATION
 
     // ARP registration
     LPWSTR sczDisplayName;
+    LPWSTR sczInProgressDisplayName;
     LPWSTR sczDisplayVersion;
     LPWSTR sczPublisher;
     LPWSTR sczHelpLink;
@@ -190,11 +191,13 @@ HRESULT RegistrationSessionBegin(
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
-    __in DWORD64 qwEstimatedSize
+    __in DWORD64 qwEstimatedSize,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT RegistrationSessionResume(
     __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
@@ -202,7 +205,8 @@ HRESULT RegistrationSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction
+    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT RegistrationSaveState(
     __in BURN_REGISTRATION* pRegistration,

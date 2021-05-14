@@ -31,19 +31,22 @@ HRESULT ElevationSessionBegin(
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOperations,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
-    __in DWORD64 qwEstimatedSize
+    __in DWORD64 qwEstimatedSize,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT ElevationSessionResume(
     __in HANDLE hPipe,
     __in_z LPCWSTR wzResumeCommandLine,
     __in BOOL fDisableResume,
-    __in BURN_VARIABLES* pVariables
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction
+    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
 HRESULT ElevationSaveState(
     __in HANDLE hPipe,

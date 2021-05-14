@@ -123,6 +123,10 @@ LPCSTR LoggingPerMachineToString(
     __in BOOL fPerMachine
     );
 
+LPCSTR LoggingRegistrationTypeToString(
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
+    );
+
 LPCSTR LoggingRestartToString(
     __in BOOTSTRAPPER_APPLY_RESTART restart
     );

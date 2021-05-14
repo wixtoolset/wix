@@ -379,7 +379,9 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnRegisterBegin(
-        __inout BOOL* /*pfCancel*/
+        __in BOOTSTRAPPER_REGISTRATION_TYPE /*recommendedRegistrationType*/,
+        __inout BOOL* /*pfCancel*/,
+        __inout BOOTSTRAPPER_REGISTRATION_TYPE* /*pRegistrationType*/
         )
     {
         return S_OK;
@@ -597,8 +599,8 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnUnregisterBegin(
-        __in BOOL /*fKeepRegistration*/,
-        __inout BOOL* /*pfForceKeepRegistration*/
+        __in BOOTSTRAPPER_REGISTRATION_TYPE /*recommendedRegistrationType*/,
+        __inout BOOTSTRAPPER_REGISTRATION_TYPE* /*pRegistrationType*/
         )
     {
         return S_OK;

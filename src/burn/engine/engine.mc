@@ -889,7 +889,7 @@ MessageId=372
 Severity=Success
 SymbolicName=MSG_SESSION_END
 Language=English
-Session end, registration key: %1!ls!, resume: %2!hs!, restart: %3!hs!, disable resume: %4!hs!
+Session end, registration key: %1!ls!, resume: %2!hs!, restart: %3!hs!, disable resume: %4!hs!, default registration: %5!hs!, ba requested registration: %6!hs!
 .
 
 MessageId=373

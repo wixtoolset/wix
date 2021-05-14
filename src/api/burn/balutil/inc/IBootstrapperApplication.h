@@ -280,7 +280,9 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnRegisterBegin - called when the engine registers the bundle.
     //
     STDMETHOD(OnRegisterBegin)(
-        __inout BOOL* pfCancel
+        __in BOOTSTRAPPER_REGISTRATION_TYPE recommendedRegistrationType,
+        __inout BOOL* pfCancel,
+        __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
         ) = 0;
 
     // OnRegisterComplete - called when the engine registration is
@@ -519,8 +521,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnUnregisterBegin - called when the engine unregisters the bundle.
     //
     STDMETHOD(OnUnregisterBegin)(
-        __in BOOL fKeepRegistration,
-        __inout BOOL* pfForceKeepRegistration
+        __in BOOTSTRAPPER_REGISTRATION_TYPE recommendedRegistrationType,
+        __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
         ) = 0;
 
     // OnUnregisterComplete - called when the engine unregistration is complete.
