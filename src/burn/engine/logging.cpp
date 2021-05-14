@@ -561,6 +561,23 @@ extern "C" LPCSTR LoggingPerMachineToString(
     return "PerUser";
 }
 
+extern "C" LPCSTR LoggingRegistrationTypeToString(
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
+    )
+{
+    switch (registrationType)
+    {
+    case BOOTSTRAPPER_REGISTRATION_TYPE_NONE:
+        return "None";
+    case BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS:
+        return "InProgress";
+    case BOOTSTRAPPER_REGISTRATION_TYPE_FULL:
+        return "Full";
+    default:
+        return "Invalid";
+    }
+}
+
 extern "C" LPCSTR LoggingRestartToString(
     __in BOOTSTRAPPER_APPLY_RESTART restart
     )

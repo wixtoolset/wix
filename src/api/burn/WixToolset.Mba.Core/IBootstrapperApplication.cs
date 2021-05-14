@@ -500,12 +500,12 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.RegisterBegin"/>.
         /// </summary>
-        /// <param name="fCancel"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnRegisterBegin(
-            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            [MarshalAs(UnmanagedType.I4)] RegistrationType recommendedRegistrationType,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
+            [MarshalAs(UnmanagedType.I4)] ref RegistrationType pRegistrationType
             );
 
         /// <summary>
@@ -820,14 +820,11 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.UnregisterBegin"/>.
         /// </summary>
-        /// <param name="fKeepRegistration"></param>
-        /// <param name="fForceKeepRegistration"></param>
-        /// <returns></returns>
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnUnregisterBegin(
-            [MarshalAs(UnmanagedType.Bool)] bool fKeepRegistration,
-            [MarshalAs(UnmanagedType.Bool)] ref bool fForceKeepRegistration
+            [MarshalAs(UnmanagedType.I4)] RegistrationType recommendedRegistrationType,
+            [MarshalAs(UnmanagedType.I4)] ref RegistrationType pRegistrationType
             );
 
         /// <summary>
@@ -1257,6 +1254,28 @@ namespace WixToolset.Mba.Core
         /// 
         /// </summary>
         Always,
+    }
+
+    /// <summary>
+    /// The display name to use when registering in Add/Remove Programs.
+    /// </summary>
+    public enum RegistrationType
+    {
+        /// <summary>
+        /// No registration.
+        /// The engine will ignore None if it recommended InProgress or Full.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// The in-progress display name.
+        /// </summary>
+        InProgress,
+
+        /// <summary>
+        /// The default display name.
+        /// </summary>
+        Full,
     }
 
     /// <summary>

@@ -75,7 +75,8 @@ static HRESULT WINAPI AuthenticationRequired(
 
 static void CalculateKeepRegistration(
     __in BURN_ENGINE_STATE* pEngineState,
-    __inout BOOL* pfKeepRegistration
+    __in BOOL fLog,
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     );
 static HRESULT ExecuteDependentRegistrationActions(
     __in HANDLE hPipe,
@@ -376,8 +377,11 @@ extern "C" HRESULT ApplyRegister(
 {
     HRESULT hr = S_OK;
     LPWSTR sczEngineWorkingPath = NULL;
+    BOOTSTRAPPER_REGISTRATION_TYPE registrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
 
-    hr = UserExperienceOnRegisterBegin(&pEngineState->userExperience);
+    CalculateKeepRegistration(pEngineState, FALSE, &registrationType);
+
+    hr = UserExperienceOnRegisterBegin(&pEngineState->userExperience, &registrationType);
     ExitOnRootFailure(hr, "BA aborted register begin.");
 
     // If we have a resume mode that suggests the bundle is on the machine.
@@ -386,12 +390,12 @@ extern "C" HRESULT ApplyRegister(
         // resume previous session
         if (pEngineState->registration.fPerMachine)
         {
-            hr = ElevationSessionResume(pEngineState->companionConnection.hPipe, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables);
+            hr = ElevationSessionResume(pEngineState->companionConnection.hPipe, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, registrationType);
             ExitOnFailure(hr, "Failed to resume registration session in per-machine process.");
         }
         else
         {
-            hr = RegistrationSessionResume(&pEngineState->registration, &pEngineState->variables);
+            hr = RegistrationSessionResume(&pEngineState->registration, &pEngineState->variables, registrationType);
             ExitOnFailure(hr, "Failed to resume registration session.");
         }
     }
@@ -403,12 +407,12 @@ extern "C" HRESULT ApplyRegister(
         // begin new session
         if (pEngineState->registration.fPerMachine)
         {
-            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize);
+            hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
         }
         else
         {
-            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize);
+            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session.");
         }
     }
@@ -441,17 +445,11 @@ extern "C" HRESULT ApplyUnregister(
 {
     HRESULT hr = S_OK;
     BURN_RESUME_MODE resumeMode = BURN_RESUME_MODE_NONE;
-    BOOL fKeepRegistration = pEngineState->plan.fDisallowRemoval;
+    BOOTSTRAPPER_REGISTRATION_TYPE defaultRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
+    BOOTSTRAPPER_REGISTRATION_TYPE registrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
 
-    CalculateKeepRegistration(pEngineState, &fKeepRegistration);
-
-    hr = UserExperienceOnUnregisterBegin(&pEngineState->userExperience, &fKeepRegistration);
-    ExitOnRootFailure(hr, "BA aborted unregister begin.");
-
-    // Calculate the correct resume mode. If a restart has been initiated, that trumps all other
+    // Calculate special cases for the resume mode. If a restart has been initiated, that trumps all other
     // modes. If the user chose to suspend the install then we'll use that as the resume mode.
-    // Barring those special cases, if it was determined that we should keep the registration then
-    // do that, otherwise the resume mode was initialized to none and registration will be removed.
     if (BOOTSTRAPPER_APPLY_RESTART_INITIATED == restart)
     {
         resumeMode = BURN_RESUME_MODE_REBOOT_PENDING;
@@ -460,28 +458,50 @@ extern "C" HRESULT ApplyUnregister(
     {
         resumeMode = BURN_RESUME_MODE_SUSPEND;
     }
-    else if (fKeepRegistration)
+    else if (pEngineState->plan.fDisallowRemoval)
+    {
+        resumeMode = BURN_RESUME_MODE_ARP;
+    }
+
+    // If there was a special case, make sure the registration is kept.
+    if (BURN_RESUME_MODE_NONE < resumeMode)
+    {
+        defaultRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+    }
+
+    CalculateKeepRegistration(pEngineState, TRUE, &defaultRegistrationType);
+
+    registrationType = defaultRegistrationType;
+
+    hr = UserExperienceOnUnregisterBegin(&pEngineState->userExperience, &registrationType);
+    ExitOnRootFailure(hr, "BA aborted unregister begin.");
+
+    // Barring the special cases, if it was determined that we should keep the registration then
+    // do that, otherwise the resume mode is NONE and registration will be removed.
+    if (BURN_RESUME_MODE_NONE == resumeMode && BOOTSTRAPPER_REGISTRATION_TYPE_NONE < registrationType)
     {
         resumeMode = BURN_RESUME_MODE_ARP;
     }
 
     // If apply failed in any way and we're going to be keeping the bundle registered then
     // execute any rollback dependency registration actions.
-    if (fFailed && fKeepRegistration)
+    if (fFailed && BURN_RESUME_MODE_NONE < resumeMode)
     {
         // Execute any rollback registration actions.
         HRESULT hrRegistrationRollback = ExecuteDependentRegistrationActions(pEngineState->companionConnection.hPipe, &pEngineState->registration, pEngineState->plan.rgRollbackRegistrationActions, pEngineState->plan.cRollbackRegistrationActions);
-        UNREFERENCED_PARAMETER(hrRegistrationRollback);
+        IgnoreRollbackError(hrRegistrationRollback, "Dependent registration actions failed");
     }
+
+    LogId(REPORT_STANDARD, MSG_SESSION_END, pEngineState->registration.sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingRestartToString(restart), LoggingBoolToString(pEngineState->registration.fDisableResume), LoggingRegistrationTypeToString(defaultRegistrationType), LoggingRegistrationTypeToString(registrationType));
 
     if (pEngineState->registration.fPerMachine)
     {
-        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction);
+        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-machine process.");
     }
     else
     {
-        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction);
+        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-user process.");
     }
 
@@ -751,10 +771,14 @@ extern "C" void ApplyClean(
 
 static void CalculateKeepRegistration(
     __in BURN_ENGINE_STATE* pEngineState,
-    __inout BOOL* pfKeepRegistration
+    __in BOOL fLog,
+    __inout BOOTSTRAPPER_REGISTRATION_TYPE* pRegistrationType
     )
 {
-    LogId(REPORT_STANDARD, MSG_POST_APPLY_CALCULATE_REGISTRATION);
+    if (fLog)
+    {
+        LogId(REPORT_STANDARD, MSG_POST_APPLY_CALCULATE_REGISTRATION);
+    }
 
     for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
     {
@@ -765,17 +789,28 @@ static void CalculateKeepRegistration(
             MspEngineFinalizeInstallRegistrationState(pPackage);
         }
 
-        LogId(REPORT_STANDARD, MSG_POST_APPLY_PACKAGE, pPackage->sczId, LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
+        if (fLog)
+        {
+            LogId(REPORT_STANDARD, MSG_POST_APPLY_PACKAGE, pPackage->sczId, LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
+        }
 
         if (!pPackage->fCanAffectRegistration)
         {
             continue;
         }
 
-        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState ||
-            BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState)
+        if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState)
         {
-            *pfKeepRegistration = TRUE;
+            *pRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
+
+            if (!fLog)
+            {
+                break;
+            }
+        }
+        else if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState && BOOTSTRAPPER_REGISTRATION_TYPE_NONE == *pRegistrationType)
+        {
+            *pRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
         }
     }
 }

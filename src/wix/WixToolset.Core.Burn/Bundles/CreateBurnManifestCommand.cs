@@ -210,6 +210,11 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);
                 writer.WriteAttributeString("DisplayVersion", this.BundleSymbol.Version);
 
+                if (!String.IsNullOrEmpty(this.BundleSymbol.InProgressName))
+                {
+                    writer.WriteAttributeString("InProgressDisplayName", this.BundleSymbol.InProgressName);
+                }
+
                 if (!String.IsNullOrEmpty(this.BundleSymbol.Manufacturer))
                 {
                     writer.WriteAttributeString("Publisher", this.BundleSymbol.Manufacturer);

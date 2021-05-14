@@ -477,7 +477,8 @@ extern "C" HRESULT ElevationSessionBegin(
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOperations,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
-    __in DWORD64 qwEstimatedSize
+    __in DWORD64 qwEstimatedSize,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
@@ -504,6 +505,9 @@ extern "C" HRESULT ElevationSessionBegin(
     hr = BuffWriteNumber64(&pbData, &cbData, qwEstimatedSize);
     ExitOnFailure(hr, "Failed to write estimated size to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
+    ExitOnFailure(hr, "Failed to write registration type to message buffer.");
+
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
 
@@ -527,7 +531,8 @@ extern "C" HRESULT ElevationSessionResume(
     __in HANDLE hPipe,
     __in_z LPCWSTR wzResumeCommandLine,
     __in BOOL fDisableResume,
-    __in BURN_VARIABLES* pVariables
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
@@ -541,6 +546,9 @@ extern "C" HRESULT ElevationSessionResume(
 
     hr = BuffWriteNumber(&pbData, &cbData, fDisableResume);
     ExitOnFailure(hr, "Failed to write resume flag.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
+    ExitOnFailure(hr, "Failed to write registration type to message buffer.");
 
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
@@ -565,7 +573,8 @@ extern "C" HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction
+    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
@@ -582,6 +591,9 @@ extern "C" HRESULT ElevationSessionEnd(
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)dependencyRegistrationAction);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)registrationType);
+    ExitOnFailure(hr, "Failed to write registration type to message buffer.");
 
     // send message
     hr = PipeSendMessage(hPipe, BURN_ELEVATION_MESSAGE_TYPE_SESSION_END, pbData, cbData, NULL, NULL, &dwResult);
@@ -2080,6 +2092,7 @@ static HRESULT OnSessionBegin(
     DWORD dwRegistrationOperations = 0;
     DWORD dwDependencyRegistrationAction = 0;
     DWORD64 qwEstimatedSize = 0;
+    DWORD dwRegistrationType = 0;
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczEngineWorkingPath);
@@ -2100,11 +2113,14 @@ static HRESULT OnSessionBegin(
     hr = BuffReadNumber64(pbData, cbData, &iData, &qwEstimatedSize);
     ExitOnFailure(hr, "Failed to read estimated size.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
+    ExitOnFailure(hr, "Failed to read dependency registration action.");
+
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Begin session in per-machine process.
-    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize);
+    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to begin registration session.");
 
 LExit:
@@ -2122,6 +2138,7 @@ static HRESULT OnSessionResume(
 {
     HRESULT hr = S_OK;
     SIZE_T iData = 0;
+    DWORD dwRegistrationType = 0;
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &pRegistration->sczResumeCommandLine);
@@ -2130,11 +2147,14 @@ static HRESULT OnSessionResume(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDisableResume);
     ExitOnFailure(hr, "Failed to read resume flag.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
+    ExitOnFailure(hr, "Failed to read dependency registration action.");
+
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
 
     // resume session in per-machine process
-    hr = RegistrationSessionResume(pRegistration, pVariables);
+    hr = RegistrationSessionResume(pRegistration, pVariables, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to resume registration session.");
 
 LExit:
@@ -2154,6 +2174,7 @@ static HRESULT OnSessionEnd(
     DWORD dwResumeMode = 0;
     DWORD dwRestart = 0;
     DWORD dwDependencyRegistrationAction = 0;
+    DWORD dwRegistrationType = 0;
 
     // Deserialize message data.
     hr = BuffReadNumber(pbData, cbData, &iData, &dwResumeMode);
@@ -2165,8 +2186,11 @@ static HRESULT OnSessionEnd(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwDependencyRegistrationAction);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationType);
+    ExitOnFailure(hr, "Failed to read dependency registration action.");
+
     // suspend session in per-machine process
-    hr = RegistrationSessionEnd(pRegistration, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction);
+    hr = RegistrationSessionEnd(pRegistration, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to suspend registration session.");
 
 LExit:

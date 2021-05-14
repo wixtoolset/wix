@@ -46,12 +46,23 @@ static HRESULT SetPaths(
 static HRESULT GetBundleManufacturer(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __out LPWSTR* psczBundleManufacturer
+    __out_z LPWSTR* psczBundleManufacturer
+    );
+static HRESULT GetBundleInProgressName(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
+    __out_z LPWSTR* psczBundleName
     );
 static HRESULT GetBundleName(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __out LPWSTR* psczBundleName
+    __out_z LPWSTR* psczBundleName
+    );
+static HRESULT EnsureRegistrationVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in_z LPCWSTR wzDefaultValue,
+    __out_z LPWSTR* psczValue
     );
 static HRESULT UpdateResumeMode(
     __in BURN_REGISTRATION* pRegistration,
@@ -91,7 +102,8 @@ static HRESULT RegWriteStringVariable(
 static HRESULT UpdateBundleNameRegistration(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in HKEY hkRegistration
+    __in HKEY hkRegistration,
+    __in BOOL fInProgressRegistration
     );
 static BOOL IsWuRebootPending();
 static BOOL IsBundleRebootPending(
@@ -174,6 +186,13 @@ extern "C" HRESULT RegistrationParseFromXml(
         if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to get @DisplayName.");
+        }
+
+        // @InProgressDisplayName
+        hr = XmlGetAttributeEx(pixnArpNode, L"InProgressDisplayName", &pRegistration->sczInProgressDisplayName);
+        if (E_NOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed to get @InProgressDisplayName.");
         }
 
         // @DisplayVersion
@@ -372,6 +391,7 @@ extern "C" void RegistrationUninitialize(
     ReleaseStr(pRegistration->sczStateFile);
 
     ReleaseStr(pRegistration->sczDisplayName);
+    ReleaseStr(pRegistration->sczInProgressDisplayName);
     ReleaseStr(pRegistration->sczDisplayVersion);
     ReleaseStr(pRegistration->sczPublisher);
     ReleaseStr(pRegistration->sczHelpLink);
@@ -421,8 +441,7 @@ extern "C" HRESULT RegistrationSetVariables(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczBundleManufacturer = NULL;
-    LPWSTR sczBundleName = NULL;
+    LPWSTR scz = NULL;
 
     if (pRegistration->fInstalled)
     {
@@ -431,10 +450,13 @@ extern "C" HRESULT RegistrationSetVariables(
     }
 
     // Ensure the registration bundle name is updated.
-    hr = GetBundleName(pRegistration, pVariables, &sczBundleName);
+    hr = GetBundleInProgressName(pRegistration, pVariables, &scz);
     ExitOnFailure(hr, "Failed to initialize bundle name.");
 
-    hr = GetBundleManufacturer(pRegistration, pVariables, &sczBundleName);
+    hr = GetBundleName(pRegistration, pVariables, &scz);
+    ExitOnFailure(hr, "Failed to initialize bundle name.");
+
+    hr = GetBundleManufacturer(pRegistration, pVariables, &scz);
     ExitOnFailure(hr, "Failed to initialize bundle manufacturer.");
 
     if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
@@ -456,8 +478,7 @@ extern "C" HRESULT RegistrationSetVariables(
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
 LExit:
-    ReleaseStr(sczBundleManufacturer);
-    ReleaseStr(sczBundleName);
+    ReleaseStr(scz);
 
     return hr;
 }
@@ -595,13 +616,16 @@ extern "C" HRESULT RegistrationSessionBegin(
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
-    __in DWORD64 qwEstimatedSize
+    __in DWORD64 qwEstimatedSize,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
     DWORD dwSize = 0;
     HKEY hkRegistration = NULL;
     LPWSTR sczPublisher = NULL;
+
+    AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
 
     LogId(REPORT_VERBOSE, MSG_SESSION_BEGIN, pRegistration->sczRegistrationKey, dwRegistrationOptions, LoggingBoolToString(pRegistration->fDisableResume));
 
@@ -668,7 +692,7 @@ extern "C" HRESULT RegistrationSessionBegin(
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_DISPLAY_ICON);
 
         // update display name
-        hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration);
+        hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
         ExitOnFailure(hr, "Failed to update name and publisher.");
 
         // DisplayVersion: provided by UI
@@ -841,11 +865,14 @@ LExit:
 *******************************************************************/
 extern "C" HRESULT RegistrationSessionResume(
     __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables
+    __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
+
+    AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
 
     // open registration key
     hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, &hkRegistration);
@@ -856,7 +883,7 @@ extern "C" HRESULT RegistrationSessionResume(
     ExitOnFailure(hr, "Failed to update resume mode.");
 
     // update display name
-    hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration);
+    hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
     ExitOnFailure(hr, "Failed to update name and publisher.");
 
 LExit:
@@ -876,15 +903,14 @@ extern "C" HRESULT RegistrationSessionEnd(
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction
+    __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
+    __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczRebootRequiredKey = NULL;
     HKEY hkRebootRequired = NULL;
     HKEY hkRegistration = NULL;
-
-    LogId(REPORT_STANDARD, MSG_SESSION_END, pRegistration->sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingRestartToString(restart), LoggingBoolToString(pRegistration->fDisableResume));
 
     // If a restart is required for any reason, write a volatile registry key to track of
     // of that fact until the reboot has taken place.
@@ -910,6 +936,8 @@ extern "C" HRESULT RegistrationSessionEnd(
     // If no resume mode, then remove the bundle registration.
     if (BURN_RESUME_MODE_NONE == resumeMode)
     {
+        AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE == registrationType, "Registration type must be NONE if resume mode is NONE");
+
         // If we just registered the bundle dependency but something went wrong and caused us to not
         // keep the bundle registration (like rollback) or we are supposed to unregister the bundle
         // dependency when unregistering the bundle, do so.
@@ -939,9 +967,15 @@ extern "C" HRESULT RegistrationSessionEnd(
     }
     else // the mode needs to be updated so open the registration key.
     {
+        AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type must not be NONE if resume mode is not NONE");
+
         // Open registration key.
         hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, &hkRegistration);
         ExitOnFailure(hr, "Failed to open registration key.");
+
+        // update display name
+        hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
+        ExitOnFailure(hr, "Failed to update name and publisher.");
     }
 
     // Update resume mode.
@@ -1133,21 +1167,30 @@ LExit:
 static HRESULT GetBundleManufacturer(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __out LPWSTR* psczBundleManufacturer
+    __out_z LPWSTR* psczBundleManufacturer
     )
 {
     HRESULT hr = S_OK;
     LPCWSTR wzPublisher = pRegistration->sczPublisher ? pRegistration->sczPublisher : L"";
 
-    hr = VariableGetString(pVariables, BURN_BUNDLE_MANUFACTURER, psczBundleManufacturer);
-    if (E_NOTFOUND == hr)
-    {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_MANUFACTURER, wzPublisher, FALSE, FALSE);
-        ExitOnFailure(hr, "Failed to set bundle manufacturer.");
-
-        hr = StrAllocString(psczBundleManufacturer, wzPublisher, 0);
-    }
+    hr = EnsureRegistrationVariable(pVariables, BURN_BUNDLE_MANUFACTURER, wzPublisher, psczBundleManufacturer);
     ExitOnFailure(hr, "Failed to get bundle manufacturer.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT GetBundleInProgressName(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_VARIABLES* pVariables,
+    __out_z LPWSTR* psczInProgressBundleName
+    )
+{
+    HRESULT hr = S_OK;
+    LPCWSTR wzInProgressDisplayName = pRegistration->sczInProgressDisplayName ? pRegistration->sczInProgressDisplayName : L"";
+
+    hr = EnsureRegistrationVariable(pVariables, BURN_BUNDLE_INPROGRESS_NAME, wzInProgressDisplayName, psczInProgressBundleName);
+    ExitOnFailure(hr, "Failed to ensure in-progress bundle name.");
 
 LExit:
     return hr;
@@ -1156,21 +1199,37 @@ LExit:
 static HRESULT GetBundleName(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __out LPWSTR* psczBundleName
+    __out_z LPWSTR* psczBundleName
     )
 {
     HRESULT hr = S_OK;
     LPCWSTR wzDisplayName = pRegistration->sczDisplayName ? pRegistration->sczDisplayName : L"";
 
-    hr = VariableGetString(pVariables, BURN_BUNDLE_NAME, psczBundleName);
+    hr = EnsureRegistrationVariable(pVariables, BURN_BUNDLE_NAME, wzDisplayName, psczBundleName);
+    ExitOnFailure(hr, "Failed to ensure bundle name.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT EnsureRegistrationVariable(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in_z LPCWSTR wzDefaultValue,
+    __out_z LPWSTR* psczValue
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = VariableGetString(pVariables, wzVariable, psczValue);
     if (E_NOTFOUND == hr)
     {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_NAME, wzDisplayName, FALSE, FALSE);
-        ExitOnFailure(hr, "Failed to set bundle name.");
+        hr = VariableSetString(pVariables, wzVariable, wzDefaultValue, FALSE, FALSE);
+        ExitOnFailure(hr, "Failed to set registration variable.");
 
-        hr = StrAllocString(psczBundleName, wzDisplayName, 0);
+        hr = StrAllocString(psczValue, wzDefaultValue, 0);
     }
-    ExitOnFailure(hr, "Failed to get bundle name.");
+    ExitOnFailure(hr, "Failed to get registration variable.");
 
 LExit:
     return hr;
@@ -1584,15 +1643,26 @@ LExit:
 static HRESULT UpdateBundleNameRegistration(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in HKEY hkRegistration
+    __in HKEY hkRegistration,
+    __in BOOL fInProgressRegistration
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczDisplayName = NULL;
 
-    // DisplayName: provided by UI
-    hr = GetBundleName(pRegistration, pVariables, &sczDisplayName);
-    hr = RegWriteString(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_DISPLAY_NAME, SUCCEEDED(hr) ? sczDisplayName : pRegistration->sczDisplayName);
+    if (fInProgressRegistration)
+    {
+        hr = GetBundleInProgressName(pRegistration, pVariables, &sczDisplayName);
+        ExitOnFailure(hr, "Failed to get bundle in-progress name.");
+    }
+
+    if (!sczDisplayName || !*sczDisplayName)
+    {
+        hr = GetBundleName(pRegistration, pVariables, &sczDisplayName);
+        ExitOnFailure(hr, "Failed to get bundle name.");
+    }
+
+    hr = RegWriteString(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_DISPLAY_NAME, sczDisplayName);
     ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_DISPLAY_NAME);
 
 LExit:
