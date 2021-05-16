@@ -1,15 +1,4 @@
 <Project>
-  <PropertyGroup>
-    <DtfBuildSuffix>-build.1</DtfBuildSuffix>
-    <InternalBuildSuffix>-build.2</InternalBuildSuffix>
-    <LibsBuildSuffix>-build.1</LibsBuildSuffix>
-    <ApiBuildSuffix>-build.2</ApiBuildSuffix>
-    <BurnBuildSuffix>-build.2</BurnBuildSuffix>
-    <WixBuildSuffix>-build.3</WixBuildSuffix>
-    <BalBuildSuffix>-build.2</BalBuildSuffix>
-    <UtilBuildSuffix>-build.1</UtilBuildSuffix>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageVersion Include="WixToolset.Dtf.Compression" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.Compression.Cab" Version="{packageversion}" />
@@ -61,8 +50,6 @@
     <PackageVersion Include="NuGet.Protocol" Version="5.6.0" />
     <PackageVersion Include="NuGet.Versioning" Version="5.6.0" />
   </ItemGroup>
-
-
 
   <ItemGroup Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" >
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3"/>
