@@ -3,7 +3,7 @@
 
 @set _C=Debug
 :parse_args
-@if /i "%1"=="release" set _C=Release& shift
+@if /i "%1"=="release" set _C=Release
 @if not "%1"=="" shift & goto parse_args
 
 @echo build %_C%
