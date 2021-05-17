@@ -5,8 +5,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>WixToolset.Bal</RootNamespace>
-    <Description>WiX Toolset Bal Extension</Description>
-    <Title>WiX Toolset Bal Extension</Title>
+    <Description>WiX Toolset Bundle extension</Description>
+    <Title>WiX Toolset Bundle extension</Title>
     <DebugType>embedded</DebugType>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>

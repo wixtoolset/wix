@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <Description>WiX Toolset create installation packages.</Description>
+    <Description>WiX Toolset creates installation packages.</Description>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackAsTool>true</PackAsTool>

@@ -5,7 +5,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Description>WiX Toolset Command-line interface</Description>
+    <Title>The WiX Toolset command-line interface.</Title>
+    <Description>The WiX Toolset lets developers create installers for Windows. This package contains the WiX Toolset command-line interface.</Description>
     <PackageId>wix</PackageId>
     <NuspecBasePath>$(OutputPath)publish\wix\</NuspecBasePath>
   </PropertyGroup>
