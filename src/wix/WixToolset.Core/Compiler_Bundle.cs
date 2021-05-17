@@ -1967,7 +1967,7 @@ namespace WixToolset.Core
             };
             string after = null;
             string installCondition = null;
-            var cache = YesNoAlwaysType.Yes; // the default is to cache everything in tradeoff for stability over disk space.
+            var cache = BundleCacheType.Keep; // the default is to cache everything in tradeoff for stability over disk space.
             string cacheId = null;
             string description = null;
             string displayName = null;
@@ -2028,19 +2028,19 @@ namespace WixToolset.Core
                         var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         switch (value)
                         {
-                        case "always":
-                            cache = YesNoAlwaysType.Always;
+                        case "force":
+                            cache = BundleCacheType.Force;
                             break;
-                        case "yes":
-                            cache = YesNoAlwaysType.Yes;
+                        case "keep":
+                            cache = BundleCacheType.Keep;
                             break;
-                        case "no":
-                            cache = YesNoAlwaysType.No;
+                        case "remove":
+                            cache = BundleCacheType.Remove;
                             break;
                         case "":
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "always", "yes", "no"));
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "force", "keep", "remove"));
                             break;
                         }
                         break;
@@ -2316,17 +2316,13 @@ namespace WixToolset.Core
                     Type = packageType,
                     Attributes = attributes,
                     InstallCondition = installCondition,
+                    Cache = cache,
                     CacheId = cacheId,
                     Description = description,
                     DisplayName = displayName,
                     LogPathVariable = logPathVariable,
                     RollbackLogPathVariable = rollbackPathVariable,
                 });
-
-                if (YesNoAlwaysType.NotSet != cache)
-                {
-                    chainPackageSymbol.Cache = cache;
-                }
 
                 if (YesNoType.NotSet != vital)
                 {

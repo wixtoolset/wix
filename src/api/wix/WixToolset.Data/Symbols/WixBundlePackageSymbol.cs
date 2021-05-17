@@ -117,9 +117,9 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePackageSymbolFields.InstallCondition, value);
         }
 
-        public YesNoAlwaysType Cache
+        public BundleCacheType? Cache
         {
-            get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageSymbolFields.Cache], true, out YesNoAlwaysType value) ? value : YesNoAlwaysType.NotSet;
+            get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageSymbolFields.Cache], true, out BundleCacheType value) ? value : (BundleCacheType?)null;
             set => this.Set((int)WixBundlePackageSymbolFields.Cache, value.ToString().ToLowerInvariant());
         }
 

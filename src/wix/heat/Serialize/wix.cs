@@ -253,46 +253,45 @@ namespace WixToolset.Harvesters.Serialize
             }
             return true;
         }
-        
+
         /// <summary>
-        /// Parses a YesNoAlwaysType from a string.
+        /// Parses a BundleCacheType from a string.
         /// </summary>
-        public static YesNoAlwaysType ParseYesNoAlwaysType(string value)
+        public static BundleCacheType ParseBundleCacheType(string value)
         {
-            YesNoAlwaysType parsedValue;
-            Enums.TryParseYesNoAlwaysType(value, out parsedValue);
+            Enums.TryBundleCacheType(value, out var parsedValue);
             return parsedValue;
         }
         
         /// <summary>
         /// Tries to parse a YesNoAlwaysType from a string.
         /// </summary>
-        public static bool TryParseYesNoAlwaysType(string value, out YesNoAlwaysType parsedValue)
+        public static bool TryBundleCacheType(string value, out BundleCacheType parsedValue)
         {
-            parsedValue = YesNoAlwaysType.NotSet;
+            parsedValue = BundleCacheType.NotSet;
             if (string.IsNullOrEmpty(value))
             {
                 return false;
             }
-            if (("always" == value))
+
+            if (("force" == value))
             {
-                parsedValue = YesNoAlwaysType.always;
+                parsedValue = BundleCacheType.force;
             }
             else
             {
-                if (("no" == value))
+                if (("remove" == value))
                 {
-                    parsedValue = YesNoAlwaysType.no;
+                    parsedValue = BundleCacheType.remove;
                 }
                 else
                 {
-                    if (("yes" == value))
+                    if (("keep" == value))
                     {
-                        parsedValue = YesNoAlwaysType.yes;
+                        parsedValue = BundleCacheType.keep;
                     }
                     else
                     {
-                        parsedValue = YesNoAlwaysType.IllegalValue;
                         return false;
                     }
                 }
@@ -656,18 +655,15 @@ namespace WixToolset.Harvesters.Serialize
     /// Values of this type will either be "always", "yes", or "no".
     /// </summary>
     [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
-    public enum YesNoAlwaysType
+    public enum BundleCacheType
     {
-        
-        IllegalValue = int.MaxValue,
-        
         NotSet = -1,
         
-        always,
+        force,
         
-        no,
+        remove,
         
-        yes,
+        keep,
     }
     
     /// <summary>
@@ -3732,7 +3728,7 @@ namespace WixToolset.Harvesters.Serialize
         
         private bool installConditionFieldSet;
         
-        private YesNoAlwaysType cacheField;
+        private BundleCacheType cacheField;
         
         private bool cacheFieldSet;
         
@@ -3939,7 +3935,7 @@ namespace WixToolset.Harvesters.Serialize
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
-        public YesNoAlwaysType Cache
+        public BundleCacheType Cache
         {
             get
             {
@@ -4285,17 +4281,17 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (this.cacheFieldSet)
             {
-                if ((this.cacheField == YesNoAlwaysType.always))
+                if ((this.cacheField == BundleCacheType.force))
                 {
-                    writer.WriteAttributeString("Cache", "always");
+                    writer.WriteAttributeString("Cache", "force");
                 }
-                if ((this.cacheField == YesNoAlwaysType.no))
+                if ((this.cacheField == BundleCacheType.remove))
                 {
-                    writer.WriteAttributeString("Cache", "no");
+                    writer.WriteAttributeString("Cache", "remove");
                 }
-                if ((this.cacheField == YesNoAlwaysType.yes))
+                if ((this.cacheField == BundleCacheType.keep))
                 {
-                    writer.WriteAttributeString("Cache", "yes");
+                    writer.WriteAttributeString("Cache", "keep");
                 }
             }
             if (this.cacheIdFieldSet)
@@ -4463,7 +4459,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (("Cache" == name))
             {
-                this.cacheField = Enums.ParseYesNoAlwaysType(value);
+                this.cacheField = Enums.ParseBundleCacheType(value);
                 this.cacheFieldSet = true;
             }
             if (("CacheId" == name))
@@ -4571,7 +4567,7 @@ namespace WixToolset.Harvesters.Serialize
         
         private bool installConditionFieldSet;
         
-        private YesNoAlwaysType cacheField;
+        private BundleCacheType cacheField;
         
         private bool cacheFieldSet;
         
@@ -4767,9 +4763,9 @@ namespace WixToolset.Harvesters.Serialize
         }
         
         /// <summary>
-        /// Whether to cache the package. The default is "yes".
+        /// Whether to cache the package. The default is "keep".
         /// </summary>
-        public YesNoAlwaysType Cache
+        public BundleCacheType Cache
         {
             get
             {
@@ -5073,17 +5069,17 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (this.cacheFieldSet)
             {
-                if ((this.cacheField == YesNoAlwaysType.always))
+                if ((this.cacheField == BundleCacheType.force))
                 {
-                    writer.WriteAttributeString("Cache", "always");
+                    writer.WriteAttributeString("Cache", "force");
                 }
-                if ((this.cacheField == YesNoAlwaysType.no))
+                if ((this.cacheField == BundleCacheType.remove))
                 {
-                    writer.WriteAttributeString("Cache", "no");
+                    writer.WriteAttributeString("Cache", "remove");
                 }
-                if ((this.cacheField == YesNoAlwaysType.yes))
+                if ((this.cacheField == BundleCacheType.keep))
                 {
-                    writer.WriteAttributeString("Cache", "yes");
+                    writer.WriteAttributeString("Cache", "keep");
                 }
             }
             if (this.cacheIdFieldSet)
@@ -5233,7 +5229,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (("Cache" == name))
             {
-                this.cacheField = Enums.ParseYesNoAlwaysType(value);
+                this.cacheField = Enums.ParseBundleCacheType(value);
                 this.cacheFieldSet = true;
             }
             if (("CacheId" == name))
@@ -5331,7 +5327,7 @@ namespace WixToolset.Harvesters.Serialize
         
         private bool installConditionFieldSet;
         
-        private YesNoAlwaysType cacheField;
+        private BundleCacheType cacheField;
         
         private bool cacheFieldSet;
         
@@ -5529,7 +5525,7 @@ namespace WixToolset.Harvesters.Serialize
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
-        public YesNoAlwaysType Cache
+        public BundleCacheType Cache
         {
             get
             {
@@ -5838,17 +5834,17 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (this.cacheFieldSet)
             {
-                if ((this.cacheField == YesNoAlwaysType.always))
+                if ((this.cacheField == BundleCacheType.force))
                 {
-                    writer.WriteAttributeString("Cache", "always");
+                    writer.WriteAttributeString("Cache", "force");
                 }
-                if ((this.cacheField == YesNoAlwaysType.no))
+                if ((this.cacheField == BundleCacheType.remove))
                 {
-                    writer.WriteAttributeString("Cache", "no");
+                    writer.WriteAttributeString("Cache", "remove");
                 }
-                if ((this.cacheField == YesNoAlwaysType.yes))
+                if ((this.cacheField == BundleCacheType.keep))
                 {
-                    writer.WriteAttributeString("Cache", "yes");
+                    writer.WriteAttributeString("Cache", "keep");
                 }
             }
             if (this.cacheIdFieldSet)
@@ -5980,7 +5976,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (("Cache" == name))
             {
-                this.cacheField = Enums.ParseYesNoAlwaysType(value);
+                this.cacheField = Enums.ParseBundleCacheType(value);
                 this.cacheFieldSet = true;
             }
             if (("CacheId" == name))
@@ -6078,7 +6074,7 @@ namespace WixToolset.Harvesters.Serialize
         
         private bool installConditionFieldSet;
         
-        private YesNoAlwaysType cacheField;
+        private BundleCacheType cacheField;
         
         private bool cacheFieldSet;
         
@@ -6294,7 +6290,7 @@ namespace WixToolset.Harvesters.Serialize
         /// <summary>
         /// Whether to cache the package. The default is "yes".
         /// </summary>
-        public YesNoAlwaysType Cache
+        public BundleCacheType Cache
         {
             get
             {
@@ -6675,17 +6671,17 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (this.cacheFieldSet)
             {
-                if ((this.cacheField == YesNoAlwaysType.always))
+                if ((this.cacheField == BundleCacheType.force))
                 {
-                    writer.WriteAttributeString("Cache", "always");
+                    writer.WriteAttributeString("Cache", "force");
                 }
-                if ((this.cacheField == YesNoAlwaysType.no))
+                if ((this.cacheField == BundleCacheType.remove))
                 {
-                    writer.WriteAttributeString("Cache", "no");
+                    writer.WriteAttributeString("Cache", "remove");
                 }
-                if ((this.cacheField == YesNoAlwaysType.yes))
+                if ((this.cacheField == BundleCacheType.keep))
                 {
-                    writer.WriteAttributeString("Cache", "yes");
+                    writer.WriteAttributeString("Cache", "keep");
                 }
             }
             if (this.cacheIdFieldSet)
@@ -6855,7 +6851,7 @@ namespace WixToolset.Harvesters.Serialize
             }
             if (("Cache" == name))
             {
-                this.cacheField = Enums.ParseYesNoAlwaysType(value);
+                this.cacheField = Enums.ParseBundleCacheType(value);
                 this.cacheFieldSet = true;
             }
             if (("CacheId" == name))
