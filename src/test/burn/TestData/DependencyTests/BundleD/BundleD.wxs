@@ -4,7 +4,7 @@
   <Fragment>
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />
-      <ExePackage Id="TestExe" Cache="no" PerMachine="yes" Permanent="yes" InstallArguments="/ec 1603">
+      <ExePackage Id="TestExe" Cache="remove" PerMachine="yes" Permanent="yes" InstallArguments="/ec 1603">
         <PayloadGroupRef Id="TestExePayloads" />
       </ExePackage>
     </PackageGroup>

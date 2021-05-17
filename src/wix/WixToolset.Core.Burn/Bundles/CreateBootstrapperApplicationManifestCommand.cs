@@ -166,13 +166,13 @@ namespace WixToolset.Core.Burn.Bundles
 
                 switch (package.PackageSymbol.Cache)
                 {
-                    case YesNoAlwaysType.No:
+                    case BundleCacheType.Remove:
                         writer.WriteAttributeString("Cache", "remove");
                         break;
-                    case YesNoAlwaysType.Yes:
+                    case BundleCacheType.Keep:
                         writer.WriteAttributeString("Cache", "keep");
                         break;
-                    case YesNoAlwaysType.Always:
+                    case BundleCacheType.Force:
                         writer.WriteAttributeString("Cache", "force");
                         break;
                 }

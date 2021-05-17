@@ -224,7 +224,7 @@ namespace WixToolset.Converters
                 { WixConverter.ModuleElementName, this.ConvertModuleElement },
                 { WixConverter.MsiPackageElementName, this.ConvertWindowsInstallerPackageElement },
                 { WixConverter.MspPackageElementName, this.ConvertWindowsInstallerPackageElement },
-                { WixConverter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
+                { WixConverter.MsuPackageElementName, this.ConvertMsuPackageElement },
                 { WixConverter.OldProvidesElementName, this.ConvertProvidesElement },
                 { WixConverter.OldRequiresElementName, this.ConvertRequiresElement },
                 { WixConverter.OldRequiresRefElementName, this.ConvertRequiresRefElement },
@@ -1114,6 +1114,8 @@ namespace WixToolset.Converters
         {
             this.ConvertSuppressSignatureValidation(element);
 
+            this.UpdatePackageCacheAttribute(element);
+
             foreach (var attributeName in new[] { "InstallCommand", "RepairCommand", "UninstallCommand" })
             {
                 var newName = attributeName.Replace("Command", "Arguments");
@@ -1178,6 +1180,13 @@ namespace WixToolset.Converters
                     }
                 }
             }
+        }
+
+        private void ConvertMsuPackageElement(XElement element)
+        {
+            this.ConvertSuppressSignatureValidation(element);
+
+            this.UpdatePackageCacheAttribute(element);
         }
 
         private void ConvertProductElement(XElement element)
@@ -1589,6 +1598,8 @@ namespace WixToolset.Converters
         {
             this.ConvertSuppressSignatureValidation(element);
 
+            this.UpdatePackageCacheAttribute(element);
+
             if (null != element.Attribute("DisplayInternalUI"))
             {
                 this.OnError(ConverterTestType.DisplayInternalUiNotConvertable, element, "The DisplayInternalUI functionality has fundamentally changed and requires BootstrapperApplication support.");
@@ -1789,6 +1800,32 @@ namespace WixToolset.Converters
                 var value = this.UpdateWin64ValueToBitnessValue(win64);
                 element.Add(new XAttribute("Bitness", value));
                 win64.Remove();
+            }
+        }
+
+        private void UpdatePackageCacheAttribute(XElement element)
+        {
+            var cacheAttribute = element.Attribute("Cache");
+            var cacheValue = cacheAttribute?.Value;
+            string replacement = null;
+
+            switch (cacheValue)
+            {
+                case "yes":
+                    replacement = "keep";
+                    break;
+                case "no":
+                    replacement = "remove";
+                    break;
+                case "always":
+                    replacement = "force";
+                    break;
+            }
+
+            if (!String.IsNullOrEmpty(replacement) &&
+                this.OnError(ConverterTestType.BundlePackageCacheAttributeValueObsolete, element, "The chain package element 'Cache' attribute contains obsolete '{0}' value. The value should be '{1}' instead.", cacheValue, replacement))
+            {
+                cacheAttribute.SetValue(replacement);
             }
         }
 
@@ -2430,6 +2467,11 @@ namespace WixToolset.Converters
             /// Naked custom action and property references replaced with WixUtilExtension elements.
             /// </summary>
             UtilReferencesReplaced,
+
+            /// <summary>
+            /// Cache attribute value updated.
+            /// </summary>
+            BundlePackageCacheAttributeValueObsolete,
         }
     }
 }
