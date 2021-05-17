@@ -22,6 +22,7 @@
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
     <PackageLicenseExpression>MS-RL</PackageLicenseExpression>
     <Product>WiX Toolset</Product>
+    <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
 
     <GitThisAssembly>false</GitThisAssembly>
     <GitVersionFile>version.txt</GitVersionFile>

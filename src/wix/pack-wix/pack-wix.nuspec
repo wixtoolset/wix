@@ -6,6 +6,7 @@
     <title>$title$</title>
     <description>$description$</description>
     <authors>$authors$</authors>
+    <icon>wix-white-bg.png</icon>
     <license type="expression">MS-RL</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
@@ -18,6 +19,7 @@
 
   <files>
     <file src="$projectFolder$\DotnetToolSettings.xml" target="tools\netcoreapp3.1\any" />
+    <file src="$projectFolder$\..\..\internal\images\wix-white-bg.png" />
     <file src="**" target="tools\netcoreapp3.1\any" />
   </files>
 </package>
