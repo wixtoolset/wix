@@ -6,5 +6,6 @@
     <TargetExt>.exe</TargetExt>
     <HarvestDirectoryAdditionalOptions>-generate payloadgroup</HarvestDirectoryAdditionalOptions>
     <OutputPath>$(OutputPath)examples\</OutputPath>
+    <DefaultCompressionLevel>None</DefaultCompressionLevel>
   </PropertyGroup>
 </Project>

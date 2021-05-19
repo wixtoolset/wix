@@ -219,7 +219,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } },
                 };
-                Assert.Equal("<Payload Id='ExampleBext' FilePath='fakebext.dll' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' />", bundleExtensionPayloads[0].GetTestXml(ignored));
+                Assert.Equal("<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='*' />", bundleExtensionPayloads[0].GetTestXml(ignored));
             }
         }
 

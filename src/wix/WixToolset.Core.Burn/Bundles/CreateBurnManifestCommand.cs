@@ -691,12 +691,8 @@ namespace WixToolset.Core.Burn.Bundles
 
             writer.WriteStartElement("Payload");
 
-            // TODO: The engine should be updated to not require FileSize, Hash, or Packaging for UX payloads since the values are never used.
             writer.WriteAttributeString("Id", payload.Id.Id);
             writer.WriteAttributeString("FilePath", payload.Name);
-            writer.WriteAttributeString("FileSize", payload.FileSize.Value.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("Hash", payload.Hash);
-            writer.WriteAttributeString("Packaging", "embedded");
             writer.WriteAttributeString("SourcePath", payload.EmbeddedId);
 
             writer.WriteEndElement();

@@ -54,23 +54,37 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.UpdatePayloadPackagingType(payload);
 
-                if (!this.PayloadHarvester.HarvestStandardInformation(payload))
+                if (payload.ContainerRef == BurnConstants.BurnUXContainerName)
                 {
-                    // Remote payloads obviously cannot be embedded.
-                    Debug.Assert(PackagingType.Embedded != payload.Packaging);
-                }
-                else // not a remote payload so we have a lot more to update.
-                {
-                    // External payloads need to be transfered.
-                    if (PackagingType.External == payload.Packaging)
-                    {
-                        var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, Path.Combine(this.LayoutDirectory, payload.Name), false, payload.SourceLineNumbers);
-                        fileTransfers.Add(transfer);
-                    }
+                    Debug.Assert(PackagingType.Embedded == payload.Packaging);
+
+                    // Nothing needs to be harvested because the engine only uses Id, Name (FilePath), and EmbeddedId (SourcePath).
 
                     if (payload.ContentFile)
                     {
                         trackedFiles.Add(this.BackendHelper.TrackFile(sourceFile.Path, TrackedFileType.Input, payload.SourceLineNumbers));
+                    }
+                }
+                else
+                {
+                    if (!this.PayloadHarvester.HarvestStandardInformation(payload))
+                    {
+                        // Remote payloads obviously cannot be embedded.
+                        Debug.Assert(PackagingType.Embedded != payload.Packaging);
+                    }
+                    else // not a remote payload so we have a lot more to update.
+                    {
+                        // External payloads need to be transfered.
+                        if (PackagingType.External == payload.Packaging)
+                        {
+                            var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, Path.Combine(this.LayoutDirectory, payload.Name), false, payload.SourceLineNumbers);
+                            fileTransfers.Add(transfer);
+                        }
+
+                        if (payload.ContentFile)
+                        {
+                            trackedFiles.Add(this.BackendHelper.TrackFile(sourceFile.Path, TrackedFileType.Input, payload.SourceLineNumbers));
+                        }
                     }
                 }
             }
