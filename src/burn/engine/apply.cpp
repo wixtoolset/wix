@@ -4,9 +4,9 @@
 
 
 #ifdef DEBUG
-    #define IgnoreRollbackError(x, f, ...) if (FAILED(x)) { TraceError(x, f, __VA_ARGS__); }
+    #define IgnoreRollbackError(x, f, ...) if (FAILED(x)) { TraceError(x, f, __VA_ARGS__); }; x = S_OK
 #else
-    #define IgnoreRollbackError(x, f, ...)
+    #define IgnoreRollbackError(x, f, ...) x = S_OK
 #endif
 
 const DWORD BURN_CACHE_MAX_RECOMMENDED_VERIFY_TRYAGAIN_ATTEMPTS = 2;
