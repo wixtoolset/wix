@@ -24,6 +24,16 @@ msbuild -p:Configuration=%_C% -p:Platform=ARM64 wixnative\wixnative.vcxproj || e
 msbuild -p:Configuration=%_C% || exit /b
 
 
+:: Pre-Publish Test
+
+dotnet test -c %_C% --no-build test\WixToolsetTest.Converters || exit /b
+dotnet test -c %_C% --no-build test\WixToolsetTest.Converters.Symbolizer || exit /b
+dotnet test -c %_C% --no-build test\WixToolsetTest.Core.Burn || exit /b
+dotnet test -c %_C% --no-build test\WixToolsetTest.Core.Native || exit /b
+dotnet test -c %_C% --no-build test\WixToolsetTest.CoreIntegration || exit /b
+dotnet test -c %_C% --no-build test\WixToolsetTest.Heat || exit /b
+
+
 :: Publish
 msbuild -t:Publish -p:Configuration=%_C% -p:TargetFramework=netcoreapp3.1 -p:PublishDir=%_P%wix\ wix\wix.csproj || exit /b
 
