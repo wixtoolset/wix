@@ -14,6 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="TestData\AdvertisedTypeLib\MinorVersion8Bit.wxs" />
+    <None Remove="TestData\AdvertisedTypeLib\MinorVersion9Bit.wxs" />
+    <None Remove="TestData\Registry\MajorVersion16Bit.wxs" />
+    <None Remove="TestData\Registry\MajorVersion17Bit.wxs" />
+    <None Remove="TestData\Registry\MinorVersion17Bit.wxs" />
+    <None Remove="TestData\AdvertisedTypeLib\MajorVersion16Bit.wxs" />
+    <None Remove="TestData\AdvertisedTypeLib\MajorVersion17Bit.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
