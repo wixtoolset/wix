@@ -4364,6 +4364,7 @@ namespace WixToolset.Core
             var language = CompilerConstants.IntegerNotSet;
             var majorVersion = CompilerConstants.IntegerNotSet;
             var minorVersion = CompilerConstants.IntegerNotSet;
+            XAttribute minorVersionAttrib = null;
             var resourceId = CompilerConstants.LongNotSet;
 
             foreach (var attrib in node.Attributes())
@@ -4416,7 +4417,7 @@ namespace WixToolset.Core
                         majorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, UInt16.MaxValue);
                         break;
                     case "MinorVersion":
-                        minorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
+                        minorVersionAttrib = attrib;
                         break;
                     case "ResourceId":
                         resourceId = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, Int32.MinValue, Int32.MaxValue);
@@ -4451,6 +4452,17 @@ namespace WixToolset.Core
 
             helpDirectoryId = this.HandleSubdirectory(sourceLineNumbers, node, helpDirectoryId, helpSubdirectory, "HelpDirectory", "HelpSubdirectory");
 
+            // if the advertise state has not been set, default to non-advertised
+            if (YesNoType.NotSet == advertise)
+            {
+                advertise = YesNoType.No;
+            }
+
+            if (null != minorVersionAttrib)
+            {
+                minorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, minorVersionAttrib, 0, YesNoType.No == advertise ? UInt16.MaxValue : byte.MaxValue);
+            }
+
             // build up the typelib version string for the registry if the major or minor version was specified
             string registryVersion = null;
             if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
@@ -4472,12 +4484,6 @@ namespace WixToolset.Core
                 {
                     registryVersion = String.Concat(registryVersion, ".0");
                 }
-            }
-
-            // if the advertise state has not been set, default to non-advertised
-            if (YesNoType.NotSet == advertise)
-            {
-                advertise = YesNoType.No;
             }
 
             foreach (var child in node.Elements())
