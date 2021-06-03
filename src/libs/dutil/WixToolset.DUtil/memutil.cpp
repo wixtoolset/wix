@@ -214,6 +214,27 @@ LExit:
 }
 
 
+extern "C" HRESULT DAPI MemEnsureArraySizeForNewItems(
+    __inout LPVOID* ppvArray,
+    __in DWORD cArray,
+    __in DWORD cNewItems,
+    __in SIZE_T cbArrayType,
+    __in DWORD dwGrowthCount
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cNew = 0;
+
+    hr = ::DWordAdd(cArray, cNewItems, &cNew);
+    MemExitOnFailure(hr, "Integer overflow when calculating new element count.");
+
+    hr = MemEnsureArraySize(ppvArray, cNew, cbArrayType, dwGrowthCount);
+
+LExit:
+    return hr;
+}
+
+
 extern "C" HRESULT DAPI MemInsertIntoArray(
     __deref_inout_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
     __in DWORD dwInsertIndex,
@@ -232,7 +253,7 @@ extern "C" HRESULT DAPI MemInsertIntoArray(
         ExitFunction1(hr = S_OK);
     }
 
-    hr = MemEnsureArraySize(ppvArray, cExistingArray + cInsertItems, cbArrayType, dwGrowthCount);
+    hr = MemEnsureArraySizeForNewItems(ppvArray, cExistingArray, cInsertItems, cbArrayType, dwGrowthCount);
     MemExitOnFailure(hr, "Failed to resize array while inserting items");
 
     pbArray = reinterpret_cast<BYTE *>(*ppvArray);

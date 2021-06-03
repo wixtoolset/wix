@@ -9,13 +9,17 @@
 #define ThmExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
 #define ThmExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
 #define ThmExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
+#define ThmExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_THMUTIL, x, e, s, __VA_ARGS__)
 #define ThmExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
 #define ThmExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_THMUTIL, p, x, e, s, __VA_ARGS__)
 #define ThmExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_THMUTIL, p, x, s, __VA_ARGS__)
 #define ThmExitOnNullDebugTrace(p, x, e, s, ...)  ExitOnNullDebugTraceSource(DUTIL_SOURCE_THMUTIL, p, x, e, s, __VA_ARGS__)
 #define ThmExitOnInvalidHandleWithLastError(p, x, s, ...) ExitOnInvalidHandleWithLastErrorSource(DUTIL_SOURCE_THMUTIL, p, x, s, __VA_ARGS__)
 #define ThmExitOnWin32Error(e, x, s, ...) ExitOnWin32ErrorSource(DUTIL_SOURCE_THMUTIL, e, x, s, __VA_ARGS__)
+#define ThmExitOnOptionalXmlQueryFailure(x, b, s, ...) ExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_THMUTIL, x, b, s, __VA_ARGS__)
+#define ThmExitOnRequiredXmlQueryFailure(x, s, ...) ExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
 #define ThmExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_THMUTIL, g, x, s, __VA_ARGS__)
+
 
 // from CommCtrl.h
 #ifndef BS_COMMANDLINK
@@ -136,12 +140,22 @@ static HRESULT ParseControl(
     __in IXMLDOMNode* pixn,
     __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
-    __in BOOL fSkipDimensions,
     __in_opt THEME_PAGE* pPage
+    );
+static void InitializeThemeControl(
+    THEME_CONTROL* pControl
     );
 static HRESULT ParseActions(
     __in IXMLDOMNode* pixn,
     __in THEME_CONTROL* pControl
+    );
+static HRESULT ParseBillboardPanels(
+    __in_opt HMODULE hModule,
+    __in_opt LPCWSTR wzRelativePath,
+    __in IXMLDOMNode* pElement,
+    __in THEME* pTheme,
+    __in THEME_CONTROL* pParentControl,
+    __in_opt THEME_PAGE* pPage
     );
 static HRESULT ParseColumns(
     __in IXMLDOMNode* pixn,
@@ -2366,9 +2380,13 @@ static HRESULT ParseImageLists(
                 }
 
                 ++i;
+                ReleaseNullObject(pixnImage);
             }
         }
         ++dwImageListIndex;
+
+        ReleaseNullObject(pixnlImages);
+        ReleaseNullObject(pixnImageList);
     }
 
 LExit:
@@ -2438,7 +2456,6 @@ static HRESULT ParseControls(
     BSTR bstrType = NULL;
     DWORD cNewControls = 0;
     DWORD iControl = 0;
-    DWORD iPageControl = 0;
     DWORD* pcControls = NULL;
     THEME_CONTROL** prgControls = NULL;
 
@@ -2458,14 +2475,13 @@ static HRESULT ParseControls(
         ExitFunction1(hr = S_OK);
     }
 
-    hr = MemReAllocArray(reinterpret_cast<LPVOID*>(prgControls), *pcControls, sizeof(THEME_CONTROL), cNewControls);
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgControls), *pcControls, cNewControls, sizeof(THEME_CONTROL), 0);
     ThmExitOnFailure(hr, "Failed to reallocate theme controls.");
 
     cNewControls += *pcControls;
 
     if (pPage)
     {
-        iPageControl = pPage->cControlIndices;
         pPage->cControlIndices += cNewControls;
     }
 
@@ -2556,24 +2572,12 @@ static HRESULT ParseControls(
             THEME_CONTROL* pControl = *prgControls + iControl;
             pControl->type = type;
 
-            // billboard children are always the size of the billboard
-            BOOL fBillboardSizing = pParentControl && THEME_CONTROL_TYPE_BILLBOARD == pParentControl->type;
-
-            hr = ParseControl(hModule, wzRelativePath, pixn, pTheme, pControl, fBillboardSizing, pPage);
+            hr = ParseControl(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
             ThmExitOnFailure(hr, "Failed to parse control.");
-
-            if (fBillboardSizing)
-            {
-                pControl->nX = pControl->nDefaultDpiX = 0;
-                pControl->nY = pControl->nDefaultDpiY = 0;
-                pControl->nWidth = pControl->nDefaultDpiWidth = 0;
-                pControl->nHeight = pControl->nDefaultDpiHeight = 0;
-            }
 
             if (pPage)
             {
                 pControl->wPageId = pPage->wId;
-                ++iPageControl;
             }
 
             ++iControl;
@@ -2606,16 +2610,19 @@ static HRESULT ParseControl(
     __in IXMLDOMNode* pixn,
     __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
-    __in BOOL fSkipDimensions,
     __in_opt THEME_PAGE* pPage
     )
 {
     HRESULT hr = S_OK;
+    BOOL fFound = FALSE;
     DWORD dwValue = 0;
     BOOL fValue = FALSE;
     BSTR bstrText = NULL;
     BOOL fAnyTextChildren = FALSE;
     BOOL fAnyNoteChildren = FALSE;
+    BOOL fSkipDimensions = FALSE;
+
+    InitializeThemeControl(pControl);
 
     hr = XmlGetAttributeEx(pixn, L"Name", &pControl->sczName);
     if (E_NOTFOUND == hr)
@@ -2682,24 +2689,12 @@ static HRESULT ParseControl(
     ThmExitOnFailure(hr, "Failed while parsing control image.");
 
     hr = XmlGetAttributeNumber(pixn, L"SourceX", reinterpret_cast<DWORD*>(&pControl->nSourceX));
-    if (S_FALSE == hr)
-    {
-        pControl->nSourceX = -1;
-    }
     ThmExitOnFailure(hr, "Failed when querying control SourceX attribute.");
 
     hr = XmlGetAttributeNumber(pixn, L"SourceY", reinterpret_cast<DWORD*>(&pControl->nSourceY));
-    if (S_FALSE == hr)
-    {
-        pControl->nSourceY = -1;
-    }
     ThmExitOnFailure(hr, "Failed when querying control SourceY attribute.");
 
     hr = XmlGetAttributeNumber(pixn, L"FontId", &pControl->dwFontId);
-    if (S_FALSE == hr)
-    {
-        pControl->dwFontId = THEME_INVALID_ID;
-    }
     ThmExitOnFailure(hr, "Failed when querying control FontId attribute.");
 
     // Parse the optional window style.
@@ -2777,39 +2772,29 @@ static HRESULT ParseControl(
         ThmExitOnFailure(hr, "Failed to parse note text nodes of the control.");
     }
 
-    if (fAnyTextChildren || fAnyNoteChildren)
+    if (!fAnyTextChildren && !fAnyNoteChildren)
     {
-        pControl->uStringId = UINT_MAX;
-    }
-    else
-    {
-        hr = XmlGetAttributeNumber(pixn, L"StringId", reinterpret_cast<DWORD*>(&pControl->uStringId));
-        ThmExitOnFailure(hr, "Failed when querying control StringId attribute.");
+        hr = XmlGetAttributeNumber(pixn, L"StringId", &dwValue);
+        ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed when querying control StringId attribute.");
 
-        if (S_FALSE == hr)
+        if (fFound)
         {
-            pControl->uStringId = UINT_MAX;
-
-            if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type || THEME_CONTROL_TYPE_PANEL == pControl->type)
-            {
-                // Billboards and panels have child elements and we don't want to pick up child element text in the parents.
-                hr = S_OK;
-            }
-            else
+            pControl->uStringId = dwValue;
+        }
+        else
+        {
+            // Billboards and panels have child elements and we don't want to pick up child element text in the parents.
+            if (THEME_CONTROL_TYPE_BILLBOARD != pControl->type && THEME_CONTROL_TYPE_PANEL != pControl->type)
             {
                 hr = XmlGetText(pixn, &bstrText);
-                ThmExitOnFailure(hr, "Failed to get control inner text.");
+                ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed to get control inner text.");
 
-                if (S_OK == hr)
+                if (fFound)
                 {
                     hr = StrAllocString(&pControl->sczText, bstrText, 0);
                     ThmExitOnFailure(hr, "Failed to copy control text.");
 
                     ReleaseNullBSTR(bstrText);
-                }
-                else if (S_FALSE == hr)
-                {
-                    hr = S_OK;
                 }
             }
         }
@@ -2832,7 +2817,7 @@ static HRESULT ParseControl(
         }
         ThmExitOnFailure(hr, "Failed when querying Billboard/@Interval attribute.");
 
-        hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
+        hr = ParseBillboardPanels(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
         ThmExitOnFailure(hr, "Failed to parse billboard children.");
     }
     else if (THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
@@ -2860,17 +2845,9 @@ static HRESULT ParseControl(
     else if (THEME_CONTROL_TYPE_HYPERLINK == pControl->type || THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
         hr = XmlGetAttributeNumber(pixn, L"HoverFontId", &pControl->dwFontHoverId);
-        if (S_FALSE == hr)
-        {
-            pControl->dwFontHoverId = THEME_INVALID_ID;
-        }
         ThmExitOnFailure(hr, "Failed when querying control HoverFontId attribute.");
 
         hr = XmlGetAttributeNumber(pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
-        if (S_FALSE == hr)
-        {
-            pControl->dwFontSelectedId = THEME_INVALID_ID;
-        }
         ThmExitOnFailure(hr, "Failed when querying control SelectedFontId attribute.");
     }
     else if (THEME_CONTROL_TYPE_LABEL == pControl->type)
@@ -3038,6 +3015,18 @@ LExit:
     return hr;
 }
 
+static void InitializeThemeControl(
+    THEME_CONTROL* pControl
+    )
+{
+    pControl->dwFontHoverId = THEME_INVALID_ID;
+    pControl->dwFontId = THEME_INVALID_ID;
+    pControl->dwFontSelectedId = THEME_INVALID_ID;
+    pControl->nSourceX = -1;
+    pControl->nSourceY = -1;
+    pControl->uStringId = UINT_MAX;
+}
+
 
 static HRESULT ParseActions(
     __in IXMLDOMNode* pixn,
@@ -3134,6 +3123,61 @@ LExit:
 }
 
 
+static HRESULT ParseBillboardPanels(
+    __in_opt HMODULE hModule,
+    __in_opt LPCWSTR wzRelativePath,
+    __in IXMLDOMNode* pElement,
+    __in THEME* pTheme,
+    __in THEME_CONTROL* pParentControl,
+    __in_opt THEME_PAGE* pPage
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNodeList* pixnl = NULL;
+    IXMLDOMNode* pixnChild = NULL;
+    DWORD dwValue = 0;
+    THEME_CONTROL* pControl = NULL;
+
+    hr = XmlSelectNodes(pElement, L"BillboardPanel", &pixnl);
+    ThmExitOnFailure(hr, "Failed to select child billboard panel nodes.");
+
+    hr = pixnl->get_length(reinterpret_cast<long*>(&dwValue));
+    ThmExitOnFailure(hr, "Failed to count the number of billboard panel nodes.");
+
+    if (!dwValue)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Billboard must have at least one BillboardPanel.");
+    }
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pParentControl->rgControls), pParentControl->cControls, dwValue, sizeof(THEME_CONTROL), 0);
+    ThmExitOnFailure(hr, "Failed to ensure theme control array size for BillboardPanels.");
+
+    while (S_OK == (hr = XmlNextElement(pixnl, &pixnChild, NULL)))
+    {
+        pControl = pParentControl->rgControls + pParentControl->cControls;
+        pParentControl->cControls += 1;
+        pControl->type = THEME_CONTROL_TYPE_PANEL;
+        InitializeThemeControl(pControl);
+
+        if (pPage)
+        {
+            pControl->wPageId = pPage->wId;
+        }
+
+        hr = ParseControls(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage);
+        ThmExitOnFailure(hr, "Failed to parse control.");
+
+        ReleaseNullObject(pixnChild);
+    }
+
+LExit:
+    ReleaseObject(pixnl);
+    ReleaseObject(pixnChild);
+
+    return hr;
+}
+
+
 static HRESULT ParseColumns(
     __in IXMLDOMNode* pixn,
     __in THEME_CONTROL* pControl
@@ -3186,6 +3230,7 @@ static HRESULT ParseColumns(
 
             ++i;
             ReleaseNullBSTR(bstrText);
+            ReleaseNullObject(pixnChild);
         }
     }
 
@@ -3209,8 +3254,6 @@ static HRESULT ParseRadioButtons(
 {
     HRESULT hr = S_OK;
     DWORD cRadioButtons = 0;
-    DWORD iControl = 0;
-    DWORD iPageControl = 0;
     IXMLDOMNodeList* pixnlRadioButtons = NULL;
     IXMLDOMNodeList* pixnl = NULL;
     IXMLDOMNode* pixnRadioButtons = NULL;
@@ -3241,53 +3284,54 @@ static HRESULT ParseRadioButtons(
         hr = pixnl->get_length(reinterpret_cast<long*>(&cRadioButtons));
         ThmExitOnFailure(hr, "Failed to count the number of RadioButton nodes.");
 
-        if (cRadioButtons)
+        if (!cRadioButtons)
         {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "RadioButtons must have at least one RadioButton.");
+        }
+
+        if (pPage)
+        {
+            pPage->cControlIndices += cRadioButtons;
+        }
+
+        hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgControls), *pcControls, cRadioButtons, sizeof(THEME_CONTROL), 0);
+        ThmExitOnFailure(hr, "Failed to ensure theme control array size for RadioButtons.");
+
+        fFirst = TRUE;
+
+        while (S_OK == (hr = XmlNextElement(pixnl, &pixnChild, NULL)))
+        {
+            pControl = *prgControls + *pcControls;
+            pControl->type = THEME_CONTROL_TYPE_RADIOBUTTON;
+            *pcControls += 1;
+
+            hr = ParseControl(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage);
+            ThmExitOnFailure(hr, "Failed to parse control.");
+
+            if (fFirst)
+            {
+                pControl->dwStyle |= WS_GROUP;
+                fFirst = FALSE;
+            }
+
+            hr = StrAllocString(&pControl->sczVariable, sczName, 0);
+            ThmExitOnFailure(hr, "Failed to copy radio button variable.");
+
             if (pPage)
             {
-                iPageControl = pPage->cControlIndices;
-                pPage->cControlIndices += cRadioButtons;
+                pControl->wPageId = pPage->wId;
             }
 
-            hr = MemReAllocArray(reinterpret_cast<LPVOID*>(prgControls), *pcControls, sizeof(THEME_CONTROL), cRadioButtons);
-            ThmExitOnFailure(hr, "Failed to reallocate theme controls.");
-
-            iControl = *pcControls;
-            *pcControls += cRadioButtons;
-
-            fFirst = TRUE;
-
-            while (S_OK == (hr = XmlNextElement(pixnl, &pixnChild, NULL)))
-            {
-                pControl = *prgControls + iControl;
-                pControl->type = THEME_CONTROL_TYPE_RADIOBUTTON;
-
-                hr = ParseControl(hModule, wzRelativePath, pixnChild, pTheme, pControl, FALSE, pPage);
-                ThmExitOnFailure(hr, "Failed to parse control.");
-
-                if (fFirst)
-                {
-                    pControl->dwStyle |= WS_GROUP;
-                    fFirst = FALSE;
-                }
-
-                hr = StrAllocString(&pControl->sczVariable, sczName, 0);
-                ThmExitOnFailure(hr, "Failed to copy radio button variable.");
-
-                if (pPage)
-                {
-                    pControl->wPageId = pPage->wId;
-                    ++iPageControl;
-                }
-
-                ++iControl;
-            }
-
-            if (!fFirst)
-            {
-                pControl->fLastRadioButton = TRUE;
-            }
+            ReleaseNullObject(pixnChild);
         }
+
+        if (!fFirst)
+        {
+            pControl->fLastRadioButton = TRUE;
+        }
+
+        ReleaseObject(pixnl);
+        ReleaseObject(pixnRadioButtons);
     }
 
 LExit:
@@ -3616,7 +3660,7 @@ static HRESULT EnsureFontInstance(
         }
     }
 
-    hr = MemEnsureArraySize(reinterpret_cast<LPVOID*>(&pFont->rgFontInstances), pFont->cFontInstances, sizeof(THEME_FONT_INSTANCE), GROW_FONT_INSTANCES);
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pFont->rgFontInstances), pFont->cFontInstances, 1, sizeof(THEME_FONT_INSTANCE), GROW_FONT_INSTANCES);
     ThmExitOnFailure(hr, "Failed to allocate memory for font instances.");
 
     pFontInstance = pFont->rgFontInstances + pFont->cFontInstances;
@@ -5017,8 +5061,7 @@ static HRESULT LoadControls(
             __fallthrough;
         case THEME_CONTROL_TYPE_PANEL:
             wzWindowClass = THEME_WC_PANEL;
-            dwWindowBits |= WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-            dwWindowExBits |= WS_EX_TRANSPARENT | WS_EX_CONTROLPARENT;
+            dwWindowExBits |= WS_EX_CONTROLPARENT;
 #ifdef DEBUG
             StrAllocFormatted(&pControl->sczText, L"Panel '%ls', id: %d", pControl->sczName, pControl->wId);
 #endif

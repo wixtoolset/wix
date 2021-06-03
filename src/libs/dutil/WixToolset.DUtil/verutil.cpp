@@ -458,7 +458,7 @@ DAPI_(HRESULT) VerParseVersion(
             break;
         }
 
-        hr = MemReAllocArray(reinterpret_cast<LPVOID*>(&pVersion->rgReleaseLabels), pVersion->cReleaseLabels, sizeof(VERUTIL_VERSION_RELEASE_LABEL), GROW_RELEASE_LABELS - (pVersion->cReleaseLabels % GROW_RELEASE_LABELS));
+        hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pVersion->rgReleaseLabels), pVersion->cReleaseLabels, 1, sizeof(VERUTIL_VERSION_RELEASE_LABEL), GROW_RELEASE_LABELS);
         VerExitOnFailure(hr, "Failed to allocate memory for Verutil version release labels '%ls'", wzVersion);
 
         VERUTIL_VERSION_RELEASE_LABEL* pReleaseLabel = pVersion->rgReleaseLabels + pVersion->cReleaseLabels;
