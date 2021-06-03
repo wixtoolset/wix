@@ -30,6 +30,11 @@ HRESULT DAPI GdipBitmapFromFile(
     __out Gdiplus::Bitmap **ppBitmap
     );
 
+HRESULT DAPI GdipBitmapToGdiBitmap(
+    __in Gdiplus::Bitmap* pBitmap,
+    __out HBITMAP* phBitmap
+    );
+
 HRESULT DAPI GdipHresultFromStatus(
     __in Gdiplus::Status gs
     );
