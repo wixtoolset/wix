@@ -854,7 +854,7 @@ static HRESULT ParseAtomLink(
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"length", -1))
         {
-            hr = XmlGetAttributeLargeNumber(pixnLink, bstrNodeName, &pLink->dw64Length);
+            hr = XmlGetAttributeUInt64(pixnLink, bstrNodeName, &pLink->dw64Length);
             if (E_INVALIDARG == hr)
             {
                 hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
