@@ -11,7 +11,7 @@
 <?endif?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" ProductCode="$(var.ProductCode)" Scope="perUser">
+  <Package Name="~$(var.TestGroupName) - $(var.PackageName)" Language="1033" Version="$(var.Version)" Manufacturer="WixToolset" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" ProductCode="$(var.ProductCode)" Scope="perUser">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <?ifndef CabPrefix?>
     <MediaTemplate EmbedCab="yes" />

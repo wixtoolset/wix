@@ -2,10 +2,10 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <InstallerPlatform>x64</InstallerPlatform>
-    <CabPrefix>a_x64</CabPrefix>
-    <UpgradeCode>{BDB9EF6A-B2DE-4929-9BE3-0CD71BDAEF6E}</UpgradeCode>
+    <CabPrefix>apu_x64</CabPrefix>
+    <UpgradeCode>{89FA641D-019D-42BF-BAD8-654675C83E6B}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\Templates\Package.wxs" Link="Package.wxs" />
+    <Compile Include="..\..\Templates\PackagePerUser.wxs" Link="PackagePerUser.wxs" />
   </ItemGroup>
 </Project>
