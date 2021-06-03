@@ -106,10 +106,25 @@ HRESULT DAPI XmlGetAttributeNumberBase(
     __in int nBase,
     __out DWORD* pdwValue
     );
-HRESULT DAPI XmlGetAttributeLargeNumber(
+HRESULT DAPI XmlGetAttributeUInt16(
     __in IXMLDOMNode* pixnNode,
     __in_z LPCWSTR pwzAttribute,
-    __out DWORD64* pdw64Value
+    __out WORD* pwValue
+    );
+HRESULT DAPI XmlGetAttributeInt32(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out int* piValue
+    );
+HRESULT DAPI XmlGetAttributeUInt32(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out DWORD* pdwValue
+    );
+HRESULT DAPI XmlGetAttributeUInt64(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out DWORD64* pqwValue
     );
 HRESULT DAPI XmlGetNamedItem(
     __in IXMLDOMNamedNodeMap *pixnmAttributes, 

@@ -20,6 +20,7 @@
 #define ThmExitOnRequiredXmlQueryFailure(x, s, ...) ExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_THMUTIL, x, s, __VA_ARGS__)
 #define ThmExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_THMUTIL, g, x, s, __VA_ARGS__)
 
+#define ThmExitOnUnexpectedAttribute(x, n, e, a) { x = ParseUnexpectedAttribute(n, e, a); if (FAILED(x)) { ExitFunction(); } }
 
 // from CommCtrl.h
 #ifndef BS_COMMANDLINK
@@ -86,17 +87,33 @@ static HRESULT ParseTheme(
     __in IXMLDOMDocument* pixd,
     __out THEME** ppTheme
     );
-static HRESULT ParseImage(
+static HRESULT GetAttributeImageFileOrResource(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
     __out HBITMAP* phImage
     );
-static HRESULT ParseIcon(
+static HRESULT ParseCommandLinkImage(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
-    __out HICON* phIcon
+    __in THEME_CONTROL* pControl
+    );
+static HRESULT GetAttributeCoordinateOrDimension(
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout int* pnValue
+    );
+static HRESULT GetAttributeFontId(
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout DWORD* pdwValue
+    );
+static HRESULT ParseSourceXY(
+    __in IXMLDOMNode* pixn,
+    __in BOOL fAllowed,
+    __inout int* pnX,
+    __inout int* pnY
     );
 static HRESULT ParseWindow(
     __in_opt HMODULE hModule,
@@ -138,6 +155,7 @@ static HRESULT ParseControl(
     __in_opt HMODULE hModule,
     __in_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pixn,
+    __in_z LPCWSTR wzElementName,
     __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in_opt THEME_PAGE* pPage
@@ -182,6 +200,11 @@ static HRESULT ParseTooltips(
     __in IXMLDOMNode* pixn,
     __in THEME_CONTROL* pControl,
     __inout BOOL* pfAnyChildren
+    );
+static HRESULT ParseUnexpectedAttribute(
+    __in IXMLDOMNode* pixn,
+    __in_z LPCWSTR wzElementName,
+    __in_z LPCWSTR wzAttribute
     );
 static HRESULT ParseNotes(
     __in IXMLDOMNode* pixn,
@@ -1698,6 +1721,7 @@ static HRESULT ParseTheme(
     HRESULT hr = S_OK;
     THEME* pTheme = NULL;
     IXMLDOMElement *pThemeElement = NULL;
+    BOOL fXmlFound = FALSE;
 
     hr = pixd->get_documentElement(&pThemeElement);
     ThmExitOnFailure(hr, "Failed to get theme element.");
@@ -1709,8 +1733,8 @@ static HRESULT ParseTheme(
     pTheme->nDpi = USER_DEFAULT_SCREEN_DPI;
 
     // Parse the optional background resource image.
-    hr = ParseImage(hModule, wzRelativePath, pThemeElement, &pTheme->hImage);
-    ThmExitOnFailure(hr, "Failed while parsing theme image.");
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pTheme->hImage);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing theme image.");
 
     // Parse the fonts.
     hr = ParseFonts(pThemeElement, pTheme);
@@ -1734,7 +1758,7 @@ LExit:
     return hr;
 }
 
-static HRESULT ParseImage(
+static HRESULT GetAttributeImageFileOrResource(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
@@ -1744,45 +1768,44 @@ static HRESULT ParseImage(
     HRESULT hr = S_OK;
     BSTR bstr = NULL;
     LPWSTR sczImageFile = NULL;
-    int iResourceId = 0;
+    WORD wResourceId = 0;
+    BOOL fFound = FALSE;
     Gdiplus::Bitmap* pBitmap = NULL;
     *phImage = NULL;
 
-    hr = XmlGetAttribute(pElement, L"ImageResource", &bstr);
-    ThmExitOnFailure(hr, "Failed to get image resource attribute.");
+    hr = XmlGetAttributeUInt16(pElement, L"ImageResource", &wResourceId);
+    ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed to get image resource attribute.");
 
-    if (S_OK == hr)
+    if (fFound)
     {
-        iResourceId = wcstol(bstr, NULL, 10);
-
-        hr = GdipBitmapFromResource(hModule, MAKEINTRESOURCE(iResourceId), &pBitmap);
-        // Don't fail.
+        hr = GdipBitmapFromResource(hModule, MAKEINTRESOURCE(wResourceId), &pBitmap);
+        ThmExitOnFailure(hr, "Failed to load image from resource: %hu", wResourceId);
     }
 
-    ReleaseNullBSTR(bstr);
+    hr = XmlGetAttribute(pElement, L"ImageFile", &bstr);
+    ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed to get image file attribute.");
 
-    // Parse the optional background image from a given file.
-    if (!pBitmap)
+    if (fFound)
     {
-        hr = XmlGetAttribute(pElement, L"ImageFile", &bstr);
-        ThmExitOnFailure(hr, "Failed to get image file attribute.");
-
-        if (S_OK == hr)
+        if (pBitmap)
         {
-            if (wzRelativePath)
-            {
-                hr = PathConcat(wzRelativePath, bstr, &sczImageFile);
-                ThmExitOnFailure(hr, "Failed to combine image file path.");
-            }
-            else
-            {
-                hr = PathRelativeToModule(&sczImageFile, bstr, hModule);
-                ThmExitOnFailure(hr, "Failed to get image filename.");
-            }
-
-            hr = GdipBitmapFromFile(sczImageFile, &pBitmap);
-            // Don't fail.
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "ImageFile attribute can't be specified with ImageResource attribute.");
         }
+
+        // Parse the optional background image from a given file.
+        if (wzRelativePath)
+        {
+            hr = PathConcat(wzRelativePath, bstr, &sczImageFile);
+            ThmExitOnFailure(hr, "Failed to combine image file path.");
+        }
+        else
+        {
+            hr = PathRelativeToModule(&sczImageFile, bstr, hModule);
+            ThmExitOnFailure(hr, "Failed to get image filename.");
+        }
+
+        hr = GdipBitmapFromFile(sczImageFile, &pBitmap);
+        ThmExitOnFailure(hr, "Failed to load image from file: %ls", sczImageFile);
     }
 
     // If there is an image, convert it into a bitmap handle.
@@ -1792,8 +1815,10 @@ static HRESULT ParseImage(
         Gdiplus::Status gs = pBitmap->GetHBITMAP(black, phImage);
         ThmExitOnGdipFailure(gs, hr, "Failed to convert GDI+ bitmap into HBITMAP.");
     }
-
-    hr = S_OK;
+    else
+    {
+        hr = E_NOTFOUND;
+    }
 
 LExit:
     if (pBitmap)
@@ -1808,61 +1833,243 @@ LExit:
 }
 
 
-static HRESULT ParseIcon(
+static HRESULT ParseOwnerDrawImage(
+    __in_opt HMODULE hModule,
+    __in_z_opt LPCWSTR wzRelativePath,
+    __in THEME* pTheme,
+    __in IXMLDOMNode* pElement,
+    __in THEME_CONTROL* pControl
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fXmlFound = FALSE;
+    BOOL fFoundImage = FALSE;
+
+    // Parse the optional background resource image.
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->hImage);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing control image.");
+
+    if (fXmlFound)
+    {
+        fFoundImage = TRUE;
+    }
+
+    hr = ParseSourceXY(pElement, NULL != pTheme->hImage, &pControl->nSourceX, &pControl->nSourceY);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control SourceX and SourceY attributes.");
+
+    if (fXmlFound)
+    {
+        if (fFoundImage)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unexpected SourceX attribute with image attribute.");
+        }
+        else if (1 > pControl->nWidth || 1 > pControl->nHeight)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Control Width and Height must be positive when using SourceX and SourceY.");
+        }
+
+        fFoundImage = TRUE;
+    }
+
+    if (THEME_CONTROL_TYPE_IMAGE == pControl->type && !fFoundImage)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Image control didn't specify an image.");
+    }
+
+LExit:
+    return hr;
+}
+
+
+static HRESULT ParseCommandLinkImage(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
-    __out HICON* phIcon
+    __in THEME_CONTROL* pControl
     )
 {
     HRESULT hr = S_OK;
     BSTR bstr = NULL;
-    LPWSTR sczImageFile = NULL;
-    int iResourceId = 0;
-    *phIcon = NULL;
+    BOOL fImageFound = FALSE;
+    BOOL fXmlFound = FALSE;
+    LPWSTR sczIconFile = NULL;
+    WORD wResourceId = 0;
 
-    hr = XmlGetAttribute(pElement, L"IconResource", &bstr);
-    ThmExitOnFailure(hr, "Failed to get icon resource attribute.");
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->hImage);
+    ThmExitOnOptionalXmlQueryFailure(hr, fImageFound, "Failed to parse image attributes for CommandLink.");
 
-    if (S_OK == hr)
+    hr = XmlGetAttributeUInt16(pElement, L"IconResource", &wResourceId);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get icon resource attribute.");
+
+    if (fXmlFound)
     {
-        iResourceId = wcstol(bstr, NULL, 10);
-
-        *phIcon = reinterpret_cast<HICON>(::LoadImageW(hModule, MAKEINTRESOURCEW(iResourceId), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE));
-        ThmExitOnNullWithLastError(*phIcon, hr, "Failed to load icon.");
-    }
-    else
-    {
-        ReleaseNullBSTR(bstr);
-
-        hr = XmlGetAttribute(pElement, L"IconFile", &bstr);
-        ThmExitOnFailure(hr, "Failed to get icon file attribute.");
-
-        if (S_OK == hr)
+        if (fImageFound)
         {
-            if (wzRelativePath)
-            {
-                hr = PathConcat(wzRelativePath, bstr, &sczImageFile);
-                ThmExitOnFailure(hr, "Failed to combine image file path.");
-            }
-            else
-            {
-                hr = PathRelativeToModule(&sczImageFile, bstr, hModule);
-                ThmExitOnFailure(hr, "Failed to get image filename.");
-            }
-
-            *phIcon = reinterpret_cast<HICON>(::LoadImageW(NULL, sczImageFile, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE));
-            ThmExitOnNullWithLastError(*phIcon, hr, "Failed to load icon: %ls.", sczImageFile);
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unexpected IconResource attribute with image attribute.");
         }
+
+        pControl->hIcon = reinterpret_cast<HICON>(::LoadImageW(hModule, MAKEINTRESOURCEW(wResourceId), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE));
+        ThmExitOnNullWithLastError(pControl->hIcon, hr, "Failed to load icon.");
     }
+
+    hr = XmlGetAttribute(pElement, L"IconFile", &bstr);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get icon file attribute.");
+
+    if (fXmlFound)
+    {
+        if (fImageFound)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unexpected IconFile attribute with image attribute.");
+        }
+        else if (pControl->hIcon)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "IconFile attribute can't be specified with IconResource attribute.");
+        }
+
+        if (wzRelativePath)
+        {
+            hr = PathConcat(wzRelativePath, bstr, &sczIconFile);
+            ThmExitOnFailure(hr, "Failed to combine image file path.");
+        }
+        else
+        {
+            hr = PathRelativeToModule(&sczIconFile, bstr, hModule);
+            ThmExitOnFailure(hr, "Failed to get image filename.");
+        }
+
+        pControl->hIcon = reinterpret_cast<HICON>(::LoadImageW(NULL, sczIconFile, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE));
+        ThmExitOnNullWithLastError(pControl->hIcon, hr, "Failed to load icon: %ls.", sczIconFile);
+    }
+
+    ThmExitOnUnexpectedAttribute(hr, pElement, L"CommandLink", L"SourceX");
+    ThmExitOnUnexpectedAttribute(hr, pElement, L"CommandLink", L"SourceY");
 
 LExit:
-    ReleaseStr(sczImageFile);
+    ReleaseStr(sczIconFile);
     ReleaseBSTR(bstr);
 
     return hr;
 }
 
+
+static HRESULT GetAttributeCoordinateOrDimension(
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout int* pnValue
+    )
+{
+    HRESULT hr = S_OK;
+    int nValue = 0;
+    BOOL fXmlFound = FALSE;
+
+    hr = XmlGetAttributeInt32(pixn, wzAttribute, &nValue);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get coordinate or dimension attribute.");
+
+    if (!fXmlFound)
+    {
+        ExitFunction1(hr = E_NOTFOUND);
+    }
+    else if (abs(nValue) > SHORT_MAX)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid coordinate or dimension attribute value: %i", nValue);
+    }
+
+    *pnValue = nValue;
+
+LExit:
+    return hr;
+}
+
+static HRESULT GetAttributeFontId(
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout DWORD* pdwValue
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwValue = 0;
+    BOOL fXmlFound = FALSE;
+
+    hr = XmlGetAttributeUInt32(pixn, wzAttribute, &dwValue);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get font id attribute.");
+
+    if (!fXmlFound)
+    {
+        ExitFunction1(hr = E_NOTFOUND);
+    }
+    else if (THEME_INVALID_ID == dwValue)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid font id value: %u", dwValue);
+    }
+
+    *pdwValue = dwValue;
+
+LExit:
+    return hr;
+}
+
+static HRESULT ParseSourceXY(
+    __in IXMLDOMNode* pixn,
+    __in BOOL fAllowed,
+    __inout int* pnX,
+    __inout int* pnY
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fXFound = FALSE;
+    BOOL fYFound = FALSE;
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceX", pnX);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXFound, "Failed to get SourceX attribute.");
+
+    if (!fXFound)
+    {
+        *pnX = -1;
+    }
+    else
+    {
+        if (!fAllowed)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX cannot be specified without an image specified on Theme.");
+        }
+        else if (0 > *pnX)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX must be non-negative.");
+        }
+    }
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceY", pnY);
+    ThmExitOnOptionalXmlQueryFailure(hr, fYFound, "Failed to get SourceY attribute.");
+
+    if (!fYFound)
+    {
+        if (fXFound)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be specified with SourceX.");
+        }
+
+        *pnY = -1;
+        hr = E_NOTFOUND;
+    }
+    else
+    {
+        if (!fAllowed)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY cannot be specified without an image specified on Theme.");
+        }
+        else if (!fXFound)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be specified with SourceX.");
+        }
+        else if (0 > *pnY)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be non-negative.");
+        }
+    }
+
+LExit:
+    return hr;
+}
 
 static HRESULT ParseWindow(
     __in_opt HMODULE hModule,
@@ -1873,77 +2080,79 @@ static HRESULT ParseWindow(
 {
     HRESULT hr = S_OK;
     IXMLDOMNode* pixn = NULL;
-    DWORD dwValue = 0;
+    BOOL fXmlFound = FALSE;
+    int nValue = 0;
     BSTR bstr = NULL;
     LPWSTR sczIconFile = NULL;
 
     hr = XmlSelectSingleNode(pElement, L"Window", &pixn);
-    if (S_FALSE == hr)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-    }
-    ThmExitOnFailure(hr, "Failed to find window element.");
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find window element.");
 
     hr = XmlGetYesNoAttribute(pixn, L"AutoResize", &pTheme->fAutoResize);
-    if (E_NOTFOUND == hr)
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window AutoResize attribute.");
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"Width", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to get window Width attribute.");
+
+    if (1 > nValue)
     {
-        hr = S_OK;
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@Width must be positive: %i", nValue);
     }
-    ThmExitOnFailure(hr, "Failed to get window AutoResize attribute.");
 
-    hr = XmlGetAttributeNumber(pixn, L"Width", &dwValue);
-    if (S_FALSE == hr)
+    pTheme->nWidth = pTheme->nDefaultDpiWidth = pTheme->nWindowWidth = nValue;
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"Height", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to get window Height attribute.");
+
+    if (1 > nValue)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ThmExitOnRootFailure(hr, "Failed to find window Width attribute.");
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@Height must be positive: %i", nValue);
     }
-    ThmExitOnFailure(hr, "Failed to get window Width attribute.");
 
-    pTheme->nWidth = pTheme->nDefaultDpiWidth = pTheme->nWindowWidth = dwValue;
+    pTheme->nHeight = pTheme->nDefaultDpiHeight = pTheme->nWindowHeight = nValue;
 
-    hr = XmlGetAttributeNumber(pixn, L"Height", &dwValue);
-    if (S_FALSE == hr)
+    hr = GetAttributeCoordinateOrDimension(pixn, L"MinimumWidth", &nValue);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window MinimumWidth attribute.");
+
+    if (fXmlFound)
     {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ThmExitOnRootFailure(hr, "Failed to find window Height attribute.");
+        if (!pTheme->fAutoResize)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@MinimumWidth can't be specified unless AutoResize is enabled.");
+        }
+        else if (1 > nValue || pTheme->nWidth < nValue)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@MinimumWidth must be positive and not greater than Window/@Width: %i", nValue);
+        }
+
+        pTheme->nMinimumWidth = pTheme->nDefaultDpiMinimumWidth = nValue;
     }
-    ThmExitOnFailure(hr, "Failed to get window Height attribute.");
 
-    pTheme->nHeight = pTheme->nDefaultDpiHeight = pTheme->nWindowHeight = dwValue;
+    hr = GetAttributeCoordinateOrDimension(pixn, L"MinimumHeight", &nValue);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window MinimumHeight attribute.");
 
-    hr = XmlGetAttributeNumber(pixn, L"MinimumWidth", &dwValue);
-    if (S_FALSE == hr)
+    if (fXmlFound)
     {
-        dwValue = 0;
-        hr = S_OK;
+        if (!pTheme->fAutoResize)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@MinimumHeight can't be specified unless AutoResize is enabled.");
+        }
+        else if (1 > nValue || pTheme->nHeight < nValue)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@MinimumHeight must be positive and not greater than Window/@Height: %i", nValue);
+        }
+
+        pTheme->nMinimumHeight = pTheme->nDefaultDpiMinimumHeight = nValue;
     }
-    ThmExitOnFailure(hr, "Failed to get window MinimumWidth attribute.");
 
-    pTheme->nMinimumWidth = pTheme->nDefaultDpiMinimumWidth = dwValue;
-
-    hr = XmlGetAttributeNumber(pixn, L"MinimumHeight", &dwValue);
-    if (S_FALSE == hr)
-    {
-        dwValue = 0;
-        hr = S_OK;
-    }
-    ThmExitOnFailure(hr, "Failed to get window MinimumHeight attribute.");
-
-    pTheme->nMinimumHeight = pTheme->nDefaultDpiMinimumHeight = dwValue;
-
-    hr = XmlGetAttributeNumber(pixn, L"FontId", &pTheme->dwFontId);
-    if (S_FALSE == hr)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ThmExitOnRootFailure(hr, "Failed to find window FontId attribute.");
-    }
-    ThmExitOnFailure(hr, "Failed to get window FontId attribute.");
+    hr = GetAttributeFontId(pixn, L"FontId", &pTheme->dwFontId);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to get window FontId attribute.");
 
     // Get the optional window icon from a resource.
     hr = XmlGetAttribute(pixn, L"IconResource", &bstr);
-    ThmExitOnFailure(hr, "Failed to get window IconResource attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window IconResource attribute.");
 
-    if (S_OK == hr)
+    if (fXmlFound)
     {
         pTheme->hIcon = ::LoadIconW(hModule, bstr);
         ThmExitOnNullWithLastError(pTheme->hIcon, hr, "Failed to load window icon from IconResource.");
@@ -1953,10 +2162,15 @@ static HRESULT ParseWindow(
 
     // Get the optional window icon from a file.
     hr = XmlGetAttribute(pixn, L"IconFile", &bstr);
-    ThmExitOnFailure(hr, "Failed to get window IconFile attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window IconFile attribute.");
 
-    if (S_OK == hr)
+    if (fXmlFound)
     {
+        if (pTheme->hIcon)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window/@IconFile can't be specified with IconResource.");
+        }
+
         if (wzRelativePath)
         {
             hr = PathConcat(wzRelativePath, bstr, &sczIconFile);
@@ -1974,48 +2188,37 @@ static HRESULT ParseWindow(
         ReleaseNullBSTR(bstr);
     }
 
-    hr = XmlGetAttributeNumber(pixn, L"SourceX", reinterpret_cast<DWORD*>(&pTheme->nSourceX));
-    if (S_FALSE == hr)
-    {
-        pTheme->nSourceX = -1;
-    }
-    ThmExitOnFailure(hr, "Failed to get window SourceX attribute.");
-
-    hr = XmlGetAttributeNumber(pixn, L"SourceY", reinterpret_cast<DWORD*>(&pTheme->nSourceY));
-    if (S_FALSE == hr)
-    {
-        pTheme->nSourceY = -1;
-    }
-    ThmExitOnFailure(hr, "Failed to get window SourceY attribute.");
+    hr = ParseSourceXY(pixn, NULL != pTheme->hImage, &pTheme->nSourceX, &pTheme->nSourceY);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window SourceX and SourceY attributes.");
 
     // Parse the optional window style.
     hr = XmlGetAttributeNumberBase(pixn, L"HexStyle", 16, &pTheme->dwStyle);
-    ThmExitOnFailure(hr, "Failed to get theme window style (Window@HexStyle) attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get theme window style (Window@HexStyle) attribute.");
 
-    if (S_FALSE == hr)
+    if (!fXmlFound)
     {
-        pTheme->dwStyle = WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU;
+        pTheme->dwStyle = WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
         pTheme->dwStyle |= (0 <= pTheme->nSourceX && 0 <= pTheme->nSourceY) ? WS_POPUP : WS_OVERLAPPED;
     }
 
-    hr = XmlGetAttributeNumber(pixn, L"StringId", reinterpret_cast<DWORD*>(&pTheme->uStringId));
-    ThmExitOnFailure(hr, "Failed to get window StringId attribute.");
+    hr = XmlGetAttributeUInt32(pixn, L"StringId", reinterpret_cast<DWORD*>(&pTheme->uStringId));
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window StringId attribute.");
 
-    if (S_FALSE == hr)
+    if (!fXmlFound)
     {
         pTheme->uStringId = UINT_MAX;
+    }
+    else if (UINT_MAX == pTheme->uStringId)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid StringId: %u", pTheme->uStringId);
+    }
 
-        hr = XmlGetAttribute(pixn, L"Caption", &bstr);
-        ThmExitOnFailure(hr, "Failed to get window Caption attribute.");
+    hr = XmlGetAttributeEx(pixn, L"Caption", &pTheme->sczCaption);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window Caption attribute.");
 
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ThmExitOnRootFailure(hr, "Window elements must contain the Caption or StringId attribute.");
-        }
-
-        hr = StrAllocString(&pTheme->sczCaption, bstr, 0);
-        ThmExitOnFailure(hr, "Failed to copy window Caption attribute.");
+    if (fXmlFound && UINT_MAX != pTheme->uStringId || !fXmlFound && UINT_MAX == pTheme->uStringId)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Window elements must contain either the Caption or StringId attribute.");
     }
 
     // Parse any image lists.
@@ -2049,6 +2252,7 @@ static HRESULT ParseFonts(
     IXMLDOMNode* pixn = NULL;
     BSTR bstrName = NULL;
     DWORD dwId = 0;
+    BOOL fXmlFound = FALSE;
     COLORREF crForeground = THEME_INVISIBLE_COLORREF;
     COLORREF crBackground = THEME_INVISIBLE_COLORREF;
     DWORD dwSystemForegroundColor = FALSE;
@@ -2062,7 +2266,7 @@ static HRESULT ParseFonts(
 
     if (!pTheme->cFonts)
     {
-        ExitFunction1(hr = S_OK);
+        ThmExitOnRootFailure(hr = E_INVALIDDATA, "No font elements found.");
     }
 
     pTheme->rgFonts = static_cast<THEME_FONT*>(MemAlloc(sizeof(THEME_FONT) * pTheme->cFonts, TRUE));
@@ -2070,66 +2274,52 @@ static HRESULT ParseFonts(
 
     while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
     {
-        hr = XmlGetAttributeNumber(pixn, L"Id", &dwId);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find font id.");
+        hr = GetAttributeFontId(pixn, L"Id", &dwId);
+        ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find font id.");
 
         if (pTheme->cFonts <= dwId)
         {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ThmExitOnRootFailure(hr, "Invalid theme font id.");
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid theme font id: %u.", dwId);
         }
 
         THEME_FONT* pFont = pTheme->rgFonts + dwId;
         if (pFont->cFontInstances)
         {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-            ThmExitOnRootFailure(hr, "Theme font id duplicated.");
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Theme font id duplicated.");
         }
 
         pFont->lfQuality = CLEARTYPE_QUALITY;
 
         hr = XmlGetText(pixn, &bstrName);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to get font name.");
+        ThmExitOnRequiredXmlQueryFailure(hr, "Failed to get font name.");
 
         hr = StrAllocString(&pFont->sczFaceName, bstrName, 0);
         ThmExitOnFailure(hr, "Failed to copy font name.");
 
-        hr = XmlGetAttributeNumber(pixn, L"Height", reinterpret_cast<DWORD*>(&pFont->lfHeight));
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find font height attribute.");
+        hr = XmlGetAttributeInt32(pixn, L"Height", reinterpret_cast<int*>(&pFont->lfHeight));
+        ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find font height attribute.");
 
-        hr = XmlGetAttributeNumber(pixn, L"Weight", reinterpret_cast<DWORD*>(&pFont->lfWeight));
-        if (S_FALSE == hr)
+        hr = XmlGetAttributeInt32(pixn, L"Weight", reinterpret_cast<int*>(&pFont->lfWeight));
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find font weight attribute.");
+
+        if (!fXmlFound)
         {
             pFont->lfWeight = FW_DONTCARE;
-            hr = S_OK;
         }
-        ThmExitOnFailure(hr, "Failed to find font weight attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"Underline", reinterpret_cast<BOOL*>(&pFont->lfUnderline));
-        if (E_NOTFOUND == hr)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find font underline attribute.");
+
+        if (!fXmlFound)
         {
             pFont->lfUnderline = FALSE;
-            hr = S_OK;
         }
-        ThmExitOnFailure(hr, "Failed to find font underline attribute.");
 
         hr = GetFontColor(pixn, L"Foreground", &crForeground, &dwSystemForegroundColor);
-        ThmExitOnFailure(hr, "Failed to find font foreground color.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find font foreground color.");
 
         hr = GetFontColor(pixn, L"Background", &crBackground, &dwSystemBackgroundColor);
-        ThmExitOnFailure(hr, "Failed to find font background color.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find font background color.");
 
         pFont->crForeground = crForeground;
         if (THEME_INVISIBLE_COLORREF != pFont->crForeground)
@@ -2173,16 +2363,18 @@ static HRESULT GetFontColor(
 {
     HRESULT hr = S_OK;
     BSTR bstr = NULL;
+    BOOL fXmlFound = FALSE;
 
     *pdwSystemColor = 0;
 
     hr = XmlGetAttribute(pixn, wzAttributeName, &bstr);
-    if (S_FALSE == hr)
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to find font %ls color.", wzAttributeName);
+
+    if (!fXmlFound)
     {
         *pColorRef = THEME_INVISIBLE_COLORREF;
-        ExitFunction1(hr = S_OK);
+        ExitFunction1(hr = E_NOTFOUND);
     }
-    ThmExitOnFailure(hr, "Failed to find font %ls color.", wzAttributeName);
 
     if (pdwSystemColor)
     {
@@ -2220,7 +2412,12 @@ static HRESULT GetFontColor(
         }
         else
         {
-            *pColorRef = wcstoul(bstr, NULL, 16);
+            *pColorRef = ::wcstoul(bstr, NULL, 16);
+
+            if (THEME_INVISIBLE_COLORREF == *pColorRef)
+            {
+                ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid %ls value: %ls.", wzAttributeName, bstr);
+            }
         }
 
         if (*pdwSystemColor)
@@ -2248,6 +2445,7 @@ static HRESULT ParsePages(
     BSTR bstrType = NULL;
     THEME_PAGE* pPage = NULL;
     DWORD iPage = 0;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlSelectNodes(pElement, L"Page", &pixnl);
     ThmExitOnFailure(hr, "Failed to find page elements.");
@@ -2270,11 +2468,7 @@ static HRESULT ParsePages(
         pPage->wId = static_cast<WORD>(iPage + 1);
 
         hr = XmlGetAttributeEx(pixn, L"Name", &pPage->sczName);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        ThmExitOnFailure(hr, "Failed when querying page Name.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying page Name.");
 
         hr = ParseControls(hModule, wzRelativePath, pixn, pTheme, NULL, pPage);
         ThmExitOnFailure(hr, "Failed to parse page controls.");
@@ -2314,9 +2508,10 @@ static HRESULT ParseImageLists(
     IXMLDOMNode* pixnImage = NULL;
     DWORD dwImageListIndex = 0;
     DWORD dwImageCount = 0;
+    THEME_IMAGELIST* pThemeImageList = NULL;
+    BOOL fXmlFound = FALSE;
     HBITMAP hBitmap = NULL;
     BITMAP bm = { };
-    BSTR bstr = NULL;
     DWORD i = 0;
     int iRetVal = 0;
 
@@ -2336,15 +2531,12 @@ static HRESULT ParseImageLists(
 
     while (S_OK == (hr = XmlNextElement(pixnlImageLists, &pixnImageList, NULL)))
     {
-        hr = XmlGetAttribute(pixnImageList, L"Name", &bstr);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find ImageList/@Name attribute.");
+        pThemeImageList = pTheme->rgImageLists + dwImageListIndex;
+        ++dwImageListIndex;
+        i = 0;
 
-        hr = StrAllocString(&pTheme->rgImageLists[dwImageListIndex].sczName, bstr, 0);
-        ThmExitOnFailure(hr, "Failed to make copy of ImageList name.");
+        hr = XmlGetAttributeEx(pixnImageList, L"Name", &pThemeImageList->sczName);
+        ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find ImageList/@Name attribute.");
 
         hr = XmlSelectNodes(pixnImageList, L"Image", &pixnlImages);
         ThmExitOnFailure(hr, "Failed to select child Image nodes.");
@@ -2352,38 +2544,44 @@ static HRESULT ParseImageLists(
         hr = pixnlImages->get_length(reinterpret_cast<long*>(&dwImageCount));
         ThmExitOnFailure(hr, "Failed to count the number of images in list.");
 
-        if (0 < dwImageCount)
+        if (!dwImageCount)
         {
-            i = 0;
-            while (S_OK == (hr = XmlNextElement(pixnlImages, &pixnImage, NULL)))
-            {
-                if (hBitmap)
-                {
-                    ::DeleteObject(hBitmap);
-                    hBitmap = NULL;
-                }
-                hr = ParseImage(hModule, wzRelativePath, pixnImage, &hBitmap);
-                ThmExitOnFailure(hr, "Failed to parse image: %u", i);
-
-                if (0 == i)
-                {
-                    ::GetObjectW(hBitmap, sizeof(BITMAP), &bm);
-
-                    pTheme->rgImageLists[dwImageListIndex].hImageList = ImageList_Create(bm.bmWidth, bm.bmHeight, ILC_COLOR24, dwImageCount, 0);
-                    ThmExitOnNullWithLastError(pTheme->rgImageLists[dwImageListIndex].hImageList, hr, "Failed to create image list.");
-                }
-
-                iRetVal = ImageList_Add(pTheme->rgImageLists[dwImageListIndex].hImageList, hBitmap, NULL);
-                if (-1 == iRetVal)
-                {
-                    ThmExitWithLastError(hr, "Failed to add image %u to image list.", i);
-                }
-
-                ++i;
-                ReleaseNullObject(pixnImage);
-            }
+            ThmExitOnRootFailure(hr = E_INVALIDDATA, "ImageList '%ls' has no images.", pThemeImageList->sczName);
         }
-        ++dwImageListIndex;
+
+        while (S_OK == (hr = XmlNextElement(pixnlImages, &pixnImage, NULL)))
+        {
+            if (hBitmap)
+            {
+                ::DeleteObject(hBitmap);
+                hBitmap = NULL;
+            }
+
+            hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pixnImage, &hBitmap);
+            ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to parse image list: '%ls', item: %u", pThemeImageList->sczName, i);
+
+            if (!fXmlFound)
+            {
+                ThmExitWithRootFailure(hr, E_INVALIDDATA, "Image list: '%ls', item %u didn't specify an image.", pThemeImageList->sczName, i);
+            }
+
+            if (0 == i)
+            {
+                ::GetObjectW(hBitmap, sizeof(BITMAP), &bm);
+
+                pThemeImageList->hImageList = ImageList_Create(bm.bmWidth, bm.bmHeight, ILC_COLOR24, dwImageCount, 0);
+                ThmExitOnNullWithLastError(pThemeImageList->hImageList, hr, "Failed to create image list.");
+            }
+
+            iRetVal = ImageList_Add(pThemeImageList->hImageList, hBitmap, NULL);
+            if (-1 == iRetVal)
+            {
+                ThmExitWithLastError(hr, "Failed to add image %u to image list.", i);
+            }
+
+            ++i;
+            ReleaseNullObject(pixnImage);
+        }
 
         ReleaseNullObject(pixnlImages);
         ReleaseNullObject(pixnImageList);
@@ -2394,7 +2592,6 @@ LExit:
     {
         ::DeleteObject(hBitmap);
     }
-    ReleaseBSTR(bstr);
     ReleaseObject(pixnlImageLists);
     ReleaseObject(pixnImageList);
     ReleaseObject(pixnlImages);
@@ -2572,7 +2769,7 @@ static HRESULT ParseControls(
             THEME_CONTROL* pControl = *prgControls + iControl;
             pControl->type = type;
 
-            hr = ParseControl(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
+            hr = ParseControl(hModule, wzRelativePath, pixn, bstrType, pTheme, pControl, pPage);
             ThmExitOnFailure(hr, "Failed to parse control.");
 
             if (pPage)
@@ -2608,154 +2805,108 @@ static HRESULT ParseControl(
     __in_opt HMODULE hModule,
     __in_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pixn,
+    __in_z LPCWSTR wzElementName,
     __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in_opt THEME_PAGE* pPage
     )
 {
     HRESULT hr = S_OK;
-    BOOL fFound = FALSE;
+    BOOL fXmlFound = FALSE;
     DWORD dwValue = 0;
+    int nValue = 0;
     BOOL fValue = FALSE;
     BSTR bstrText = NULL;
     BOOL fAnyTextChildren = FALSE;
     BOOL fAnyNoteChildren = FALSE;
-    BOOL fSkipDimensions = FALSE;
 
     InitializeThemeControl(pControl);
 
     hr = XmlGetAttributeEx(pixn, L"Name", &pControl->sczName);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    ThmExitOnFailure(hr, "Failed when querying control Name attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control Name attribute.");
 
     hr = XmlGetAttributeEx(pixn, L"EnableCondition", &pControl->sczEnableCondition);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    ThmExitOnFailure(hr, "Failed when querying control EnableCondition attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control EnableCondition attribute.");
 
     hr = XmlGetAttributeEx(pixn, L"VisibleCondition", &pControl->sczVisibleCondition);
-    if (E_NOTFOUND == hr)
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control VisibleCondition attribute.");
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"X", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control X attribute.");
+
+    pControl->nX = pControl->nDefaultDpiX = nValue;
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"Y", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Y attribute.");
+
+    pControl->nY = pControl->nDefaultDpiY = nValue;
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"Height", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Height attribute.");
+
+    pControl->nHeight = pControl->nDefaultDpiHeight = nValue;
+
+    hr = GetAttributeCoordinateOrDimension(pixn, L"Width", &nValue);
+    ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find control Width attribute.");
+
+    pControl->nWidth = pControl->nDefaultDpiWidth = nValue;
+
+    switch (pControl->type)
     {
-        hr = S_OK;
-    }
-    ThmExitOnFailure(hr, "Failed when querying control VisibleCondition attribute.");
-
-    if (!fSkipDimensions)
-    {
-        hr = XmlGetAttributeNumber(pixn, L"X", &dwValue);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find control X attribute.");
-
-        pControl->nX = pControl->nDefaultDpiX = dwValue;
-
-        hr = XmlGetAttributeNumber(pixn, L"Y", &dwValue);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find control Y attribute.");
-
-        pControl->nY = pControl->nDefaultDpiY = dwValue;
-
-        hr = XmlGetAttributeNumber(pixn, L"Height", &dwValue);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find control Height attribute.");
-
-        pControl->nHeight = pControl->nDefaultDpiHeight = dwValue;
-
-        hr = XmlGetAttributeNumber(pixn, L"Width", &dwValue);
-        if (S_FALSE == hr)
-        {
-            hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        }
-        ThmExitOnFailure(hr, "Failed to find control Width attribute.");
-
-        pControl->nWidth = pControl->nDefaultDpiWidth = dwValue;
+    case THEME_CONTROL_TYPE_COMMANDLINK:
+        hr = ParseCommandLinkImage(hModule, wzRelativePath, pixn, pControl);
+        ThmExitOnFailure(hr, "Failed while parsing CommandLink image.");
+        break;
+    case THEME_CONTROL_TYPE_BUTTON:
+    case THEME_CONTROL_TYPE_IMAGE:
+    case THEME_CONTROL_TYPE_PROGRESSBAR:
+        hr = ParseOwnerDrawImage(hModule, wzRelativePath, pTheme, pixn, pControl);
+        ThmExitOnFailure(hr, "Failed while parsing OwnerDraw image.");
+        break;
+    default:
+        ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"ImageId");
+        ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"ImageFile");
+        ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"ImageResource");
+        ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"SourceX");
+        ThmExitOnUnexpectedAttribute(hr, pixn, wzElementName, L"SourceY");
+        break;
     }
 
-    // Parse the optional background resource image.
-    hr = ParseImage(hModule, wzRelativePath, pixn, &pControl->hImage);
-    ThmExitOnFailure(hr, "Failed while parsing control image.");
 
-    hr = XmlGetAttributeNumber(pixn, L"SourceX", reinterpret_cast<DWORD*>(&pControl->nSourceX));
-    ThmExitOnFailure(hr, "Failed when querying control SourceX attribute.");
-
-    hr = XmlGetAttributeNumber(pixn, L"SourceY", reinterpret_cast<DWORD*>(&pControl->nSourceY));
-    ThmExitOnFailure(hr, "Failed when querying control SourceY attribute.");
-
-    hr = XmlGetAttributeNumber(pixn, L"FontId", &pControl->dwFontId);
-    ThmExitOnFailure(hr, "Failed when querying control FontId attribute.");
+    hr = GetAttributeFontId(pixn, L"FontId", &pControl->dwFontId);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control FontId attribute.");
 
     // Parse the optional window style.
     hr = XmlGetAttributeNumberBase(pixn, L"HexStyle", 16, &pControl->dwStyle);
-    ThmExitOnFailure(hr, "Failed when querying control HexStyle attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HexStyle attribute.");
 
     // Parse the tabstop bit "shortcut nomenclature", this could have been set with the style above.
     hr = XmlGetYesNoAttribute(pixn, L"TabStop", &fValue);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    else
-    {
-        ThmExitOnFailure(hr, "Failed when querying control TabStop attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control TabStop attribute.");
 
-        if (fValue)
-        {
-            pControl->dwStyle |= WS_TABSTOP;
-        }
+    if (fXmlFound && fValue)
+    {
+        pControl->dwStyle |= WS_TABSTOP;
     }
 
     hr = XmlGetYesNoAttribute(pixn, L"Visible", &fValue);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    else
-    {
-        ThmExitOnFailure(hr, "Failed when querying control Visible attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control Visible attribute.");
 
-        if (fValue)
-        {
-            pControl->dwStyle |= WS_VISIBLE;
-        }
+    if (fXmlFound && fValue)
+    {
+        pControl->dwStyle |= WS_VISIBLE;
     }
 
     hr = XmlGetYesNoAttribute(pixn, L"HideWhenDisabled", &fValue);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    else
-    {
-        ThmExitOnFailure(hr, "Failed when querying control HideWhenDisabled attribute.");
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HideWhenDisabled attribute.");
 
-        if (fValue)
-        {
-            pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_HIDE_WHEN_DISABLED;
-        }
+    if (fXmlFound && fValue)
+    {
+        pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_HIDE_WHEN_DISABLED;
     }
 
     hr = XmlGetYesNoAttribute(pixn, L"DisableAutomaticBehavior", &pControl->fDisableVariableFunctionality);
-    if (E_NOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-    else
-    {
-        ThmExitOnFailure(hr, "Failed when querying control DisableAutomaticBehavior attribute.");
-    }
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control DisableAutomaticBehavior attribute.");
 
     hr = ParseActions(pixn, pControl);
     ThmExitOnFailure(hr, "Failed to parse action nodes of the control.");
@@ -2774,10 +2925,10 @@ static HRESULT ParseControl(
 
     if (!fAnyTextChildren && !fAnyNoteChildren)
     {
-        hr = XmlGetAttributeNumber(pixn, L"StringId", &dwValue);
-        ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed when querying control StringId attribute.");
+        hr = XmlGetAttributeUInt32(pixn, L"StringId", &dwValue);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control StringId attribute.");
 
-        if (fFound)
+        if (fXmlFound)
         {
             pControl->uStringId = dwValue;
         }
@@ -2787,9 +2938,9 @@ static HRESULT ParseControl(
             if (THEME_CONTROL_TYPE_BILLBOARD != pControl->type && THEME_CONTROL_TYPE_PANEL != pControl->type)
             {
                 hr = XmlGetText(pixn, &bstrText);
-                ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed to get control inner text.");
+                ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control inner text.");
 
-                if (fFound)
+                if (fXmlFound)
                 {
                     hr = StrAllocString(&pControl->sczText, bstrText, 0);
                     ThmExitOnFailure(hr, "Failed to copy control text.");
@@ -2803,115 +2954,93 @@ static HRESULT ParseControl(
     if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"Loop", &pControl->fBillboardLoops);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        ThmExitOnFailure(hr, "Failed when querying Billboard/@Loop attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Billboard/@Loop attribute.");
 
-        pControl->wBillboardInterval = 5000;
-        hr = XmlGetAttributeNumber(pixn, L"Interval", &dwValue);
-        if (S_OK == hr && dwValue)
+        hr = XmlGetAttributeUInt16(pixn, L"Interval", &pControl->wBillboardInterval);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Billboard/@Interval attribute.");
+
+        if (!pControl->wBillboardInterval)
         {
-            pControl->wBillboardInterval = static_cast<WORD>(dwValue & 0xFFFF);
+            pControl->wBillboardInterval = 5000;
         }
-        ThmExitOnFailure(hr, "Failed when querying Billboard/@Interval attribute.");
 
         hr = ParseBillboardPanels(hModule, wzRelativePath, pixn, pTheme, pControl, pPage);
         ThmExitOnFailure(hr, "Failed to parse billboard children.");
     }
-    else if (THEME_CONTROL_TYPE_COMMANDLINK == pControl->type)
-    {
-        hr = ParseIcon(hModule, wzRelativePath, pixn, &pControl->hIcon);
-        ThmExitOnFailure(hr, "Failed while parsing control icon.");
-    }
     else if (THEME_CONTROL_TYPE_EDITBOX == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"FileSystemAutoComplete", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else
-        {
-            ThmExitOnFailure(hr, "Failed when querying Editbox/@FileSystemAutoComplete attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Editbox/@FileSystemAutoComplete attribute.");
 
-            if (fValue)
-            {
-                pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_FILESYSTEM_AUTOCOMPLETE;
-            }
+        if (fXmlFound && fValue)
+        {
+            pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_FILESYSTEM_AUTOCOMPLETE;
         }
     }
     else if (THEME_CONTROL_TYPE_HYPERLINK == pControl->type || THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
-        hr = XmlGetAttributeNumber(pixn, L"HoverFontId", &pControl->dwFontHoverId);
-        ThmExitOnFailure(hr, "Failed when querying control HoverFontId attribute.");
+        hr = GetAttributeFontId(pixn, L"HoverFontId", &pControl->dwFontHoverId);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HoverFontId attribute.");
 
-        hr = XmlGetAttributeNumber(pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
-        ThmExitOnFailure(hr, "Failed when querying control SelectedFontId attribute.");
+        hr = GetAttributeFontId(pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control SelectedFontId attribute.");
     }
     else if (THEME_CONTROL_TYPE_LABEL == pControl->type)
     {
         hr = XmlGetYesNoAttribute(pixn, L"Center", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Label/@Center attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= SS_CENTER;
         }
-        ThmExitOnFailure(hr, "Failed when querying Label/@Center attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"DisablePrefix", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying Label/@DisablePrefix attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= SS_NOPREFIX;
         }
-        ThmExitOnFailure(hr, "Failed when querying Label/@DisablePrefix attribute.");
     }
     else if (THEME_CONTROL_TYPE_LISTVIEW == pControl->type)
     {
         // Parse the optional extended window style.
         hr = XmlGetAttributeNumberBase(pixn, L"HexExtendedStyle", 16, &pControl->dwExtendedStyle);
-        ThmExitOnFailure(hr, "Failed when querying ListView/@HexExtendedStyle attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@HexExtendedStyle attribute.");
 
         hr = XmlGetAttribute(pixn, L"ImageList", &bstrText);
-        if (S_FALSE != hr)
-        {
-            ThmExitOnFailure(hr, "Failed when querying ListView/@ImageList attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageList attribute.");
 
+        if (fXmlFound)
+        {
             hr = FindImageList(pTheme, bstrText, &pControl->rghImageList[0]);
             ThmExitOnFailure(hr, "Failed to find image list %ls while setting ImageList for ListView.", bstrText);
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListSmall", &bstrText);
-        if (S_FALSE != hr)
-        {
-            ThmExitOnFailure(hr, "Failed when querying ListView/@ImageListSmall attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListSmall attribute.");
 
+        if (fXmlFound)
+        {
             hr = FindImageList(pTheme, bstrText, &pControl->rghImageList[1]);
             ThmExitOnFailure(hr, "Failed to find image list %ls while setting ImageListSmall for ListView.", bstrText);
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListState", &bstrText);
-        if (S_FALSE != hr)
-        {
-            ThmExitOnFailure(hr, "Failed when querying ListView/@ImageListState attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListState attribute.");
 
+        if (fXmlFound)
+        {
             hr = FindImageList(pTheme, bstrText, &pControl->rghImageList[2]);
             ThmExitOnFailure(hr, "Failed to find image list %ls while setting ImageListState for ListView.", bstrText);
         }
 
         hr = XmlGetAttribute(pixn, L"ImageListGroupHeader", &bstrText);
-        if (S_FALSE != hr)
-        {
-            ThmExitOnFailure(hr, "Failed when querying ListView/@ImageListGroupHeader attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying ListView/@ImageListGroupHeader attribute.");
 
+        if (fXmlFound)
+        {
             hr = FindImageList(pTheme, bstrText, &pControl->rghImageList[3]);
             ThmExitOnFailure(hr, "Failed to find image list %ls while setting ImageListGroupHeader for ListView.", bstrText);
         }
@@ -2927,11 +3056,7 @@ static HRESULT ParseControl(
     else if (THEME_CONTROL_TYPE_RADIOBUTTON == pControl->type)
     {
         hr = XmlGetAttributeEx(pixn, L"Value", &pControl->sczValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        ThmExitOnFailure(hr, "Failed when querying RadioButton/@Value attribute.");
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying RadioButton/@Value attribute.");
     }
     else if (THEME_CONTROL_TYPE_TAB == pControl->type)
     {
@@ -2943,70 +3068,52 @@ static HRESULT ParseControl(
         pControl->dwStyle |= TVS_DISABLEDRAGDROP;
 
         hr = XmlGetYesNoAttribute(pixn, L"EnableDragDrop", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@EnableDragDrop attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle &= ~TVS_DISABLEDRAGDROP;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@EnableDragDrop attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"FullRowSelect", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@FullRowSelect attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= TVS_FULLROWSELECT;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@FullRowSelect attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"HasButtons", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@HasButtons attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= TVS_HASBUTTONS;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@HasButtons attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"AlwaysShowSelect", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@AlwaysShowSelect attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= TVS_SHOWSELALWAYS;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@AlwaysShowSelect attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"LinesAtRoot", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@LinesAtRoot attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= TVS_LINESATROOT;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@LinesAtRoot attribute.");
 
         hr = XmlGetYesNoAttribute(pixn, L"HasLines", &fValue);
-        if (E_NOTFOUND == hr)
-        {
-            hr = S_OK;
-        }
-        else if (fValue)
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying TreeView/@HasLines attribute.");
+
+        if (fXmlFound && fValue)
         {
             pControl->dwStyle |= TVS_HASLINES;
         }
-        ThmExitOnFailure(hr, "Failed when querying TreeView/@HasLines attribute.");
     }
 
 LExit:
@@ -3188,7 +3295,8 @@ static HRESULT ParseColumns(
     IXMLDOMNodeList* pixnl = NULL;
     IXMLDOMNode* pixnChild = NULL;
     BSTR bstrText = NULL;
-    DWORD dwValue = 0;
+    int nValue = 0;
+    BOOL fXmlFound = FALSE;
 
     hr = XmlSelectNodes(pixn, L"Column", &pixnl);
     ThmExitOnFailure(hr, "Failed to select child column nodes.");
@@ -3209,21 +3317,18 @@ static HRESULT ParseColumns(
             hr = XmlGetText(pixnChild, &bstrText);
             ThmExitOnFailure(hr, "Failed to get inner text of column element.");
 
-            hr = XmlGetAttributeNumber(pixnChild, L"Width", &dwValue);
-            if (S_FALSE == hr)
-            {
-                dwValue = 100;
-            }
-            ThmExitOnFailure(hr, "Failed to get column width attribute.");
+            hr = GetAttributeCoordinateOrDimension(pixnChild, L"Width", &nValue);
+            ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get column width attribute.");
 
-            pColumn->nBaseWidth = pColumn->nDefaultDpiBaseWidth = dwValue;
-
-            hr = XmlGetYesNoAttribute(pixnChild, L"Expands", reinterpret_cast<BOOL*>(&pColumn->fExpands));
-            if (E_NOTFOUND == hr)
+            if (!fXmlFound)
             {
-                hr = S_OK;
+                nValue = 100;
             }
-            ThmExitOnFailure(hr, "Failed to get expands attribute.");
+
+            pColumn->nBaseWidth = pColumn->nDefaultDpiBaseWidth = nValue;
+
+            hr = XmlGetYesNoAttribute(pixnChild, L"Expands", &pColumn->fExpands);
+            ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get expands attribute.");
 
             hr = StrAllocString(&pColumn->pszName, bstrText, 0);
             ThmExitOnFailure(hr, "Failed to copy column name.");
@@ -3305,7 +3410,7 @@ static HRESULT ParseRadioButtons(
             pControl->type = THEME_CONTROL_TYPE_RADIOBUTTON;
             *pcControls += 1;
 
-            hr = ParseControl(hModule, wzRelativePath, pixnChild, pTheme, pControl, pPage);
+            hr = ParseControl(hModule, wzRelativePath, pixnChild, L"RadioButton", pTheme, pControl, pPage);
             ThmExitOnFailure(hr, "Failed to parse control.");
 
             if (fFirst)
@@ -3472,7 +3577,7 @@ static HRESULT ParseTooltips(
     __in IXMLDOMNode* pixn,
     __in THEME_CONTROL* pControl,
     __inout BOOL* pfAnyChildren
-)
+    )
 {
     HRESULT hr = S_OK;
     IXMLDOMNode* pixnChild = NULL;
@@ -3498,6 +3603,32 @@ static HRESULT ParseTooltips(
 LExit:
     ReleaseObject(pixnChild);
     ReleaseBSTR(bstrText);
+
+    return hr;
+}
+
+
+static HRESULT ParseUnexpectedAttribute(
+    __in IXMLDOMNode* pixn,
+    __in_z LPCWSTR wzElementName,
+    __in_z LPCWSTR wzAttribute
+    )
+{
+    HRESULT hr = S_OK;
+    BSTR bstr = NULL;
+
+    hr = XmlGetAttribute(pixn, wzAttribute, &bstr);
+    ThmExitOnFailure(hr, "Failed to get attribute %ls/@%ls", wzElementName, wzAttribute);
+
+    if (S_OK == hr)
+    {
+        ThmExitOnRootFailure(hr = E_INVALIDDATA, "Element '%ls' has unexpected attribute '%ls', value: %ls.", wzElementName, wzAttribute, bstr);
+    }
+
+    hr = S_OK;
+
+LExit:
+    ReleaseBSTR(bstr);
 
     return hr;
 }
