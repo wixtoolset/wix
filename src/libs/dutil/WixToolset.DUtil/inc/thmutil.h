@@ -167,6 +167,7 @@ struct THEME_CONTROL
     LPWSTR sczVisibleCondition;
     BOOL fDisableVariableFunctionality;
 
+    Gdiplus::Bitmap* pBitmap;
     HBITMAP hImage;
     HICON hIcon;
 
@@ -296,7 +297,7 @@ struct THEME
     int nSourceY;
     UINT uStringId;
 
-    HBITMAP hImage;
+    Gdiplus::Bitmap* pBitmap;
 
     DWORD cFonts;
     THEME_FONT* rgFonts;

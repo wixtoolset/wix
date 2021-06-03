@@ -56,6 +56,7 @@ extern "C" void DAPI GdipUninitialize(
 
 /********************************************************************
  GdipBitmapFromResource - read a GDI+ image out of a resource stream
+     of type RT_RCDATA.
 
 ********************************************************************/
 extern "C" HRESULT DAPI GdipBitmapFromResource(
@@ -67,12 +68,13 @@ extern "C" HRESULT DAPI GdipBitmapFromResource(
     HRESULT hr = S_OK;
     LPVOID pvData = NULL;
     DWORD cbData = 0;
-    HGLOBAL hGlobal = NULL;;
+    HGLOBAL hGlobal = NULL;
     LPVOID pv = NULL;
     IStream *pStream = NULL;
     Bitmap *pBitmap = NULL;
     Status gs = Ok;
 
+    // Use ResReadData (RT_RCDATA) instead of Bitmap::FromResource (RT_BITMAP) to support all file formats that GDI+ supports.
     hr = ResReadData(hinst, szId, &pvData, &cbData);
     GdipExitOnFailure(hr, "Failed to load GDI+ bitmap from resource.");
 
@@ -155,6 +157,27 @@ LExit:
         delete pBitmap;
     }
 
+    return hr;
+}
+
+
+/********************************************************************
+ GdipBitmapToGdiBitmap - convert Gdiplus::Bitmap to HBITMAP.
+
+********************************************************************/
+extern "C" HRESULT DAPI GdipBitmapToGdiBitmap(
+    __in Gdiplus::Bitmap* pBitmap,
+    __out HBITMAP* phBitmap
+    )
+{
+    HRESULT hr = S_OK;
+    Status gs = Ok;
+    Color black;
+
+    gs = pBitmap->GetHBITMAP(black, phBitmap);
+    GdipExitOnGdipFailure(gs, hr, "Failed to convert GDI+ bitmap into HBITMAP.");
+
+LExit:
     return hr;
 }
 

@@ -91,7 +91,14 @@ static HRESULT GetAttributeImageFileOrResource(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
-    __out HBITMAP* phImage
+    __out Gdiplus::Bitmap** ppBitmap
+    );
+static HRESULT ParseOwnerDrawImage(
+    __in_opt HMODULE hModule,
+    __in_z_opt LPCWSTR wzRelativePath,
+    __in THEME* pTheme,
+    __in IXMLDOMNode* pElement,
+    __in THEME_CONTROL* pControl
     );
 static HRESULT ParseCommandLinkImage(
     __in_opt HMODULE hModule,
@@ -274,10 +281,35 @@ static HRESULT DrawImage(
     __in DRAWITEMSTRUCT* pdis,
     __in const THEME_CONTROL* pControl
     );
+static HRESULT DrawGdipBitmap(
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight,
+    __in Gdiplus::Bitmap* pBitmap,
+    __in int srcX,
+    __in int srcY,
+    __in int srcWidth,
+    __in int srcHeight
+    );
 static HRESULT DrawProgressBar(
     __in THEME* pTheme,
     __in DRAWITEMSTRUCT* pdis,
     __in const THEME_CONTROL* pControl
+    );
+static HRESULT DrawProgressBarImage(
+    __in THEME* pTheme,
+    __in Gdiplus::Bitmap* pBitmap,
+    __in int srcX,
+    __in int srcY,
+    __in int srcWidth,
+    __in int srcHeight,
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight
     );
 static BOOL DrawHoverControl(
     __in THEME* pTheme,
@@ -631,9 +663,9 @@ DAPI_(void) ThemeFree(
         ReleaseMem(pTheme->rgPages);
         ReleaseMem(pTheme->rgFonts);
 
-        if (pTheme->hImage)
+        if (pTheme->pBitmap)
         {
-            ::DeleteBitmap(pTheme->hImage);
+            delete pTheme->pBitmap;
         }
 
         ReleaseStr(pTheme->sczCaption);
@@ -1273,19 +1305,9 @@ DAPI_(HRESULT) ThemeDrawBackground(
 {
     HRESULT hr = S_FALSE;
 
-    if (pTheme->hImage && 0 <= pTheme->nSourceX && 0 <= pTheme->nSourceY && pps->fErase)
+    if (pTheme->pBitmap && 0 <= pTheme->nSourceX && 0 <= pTheme->nSourceY && pps->fErase)
     {
-        HDC hdcMem = ::CreateCompatibleDC(pps->hdc);
-        HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pTheme->hImage));
-        DWORD dwSourceWidth = pTheme->nDefaultDpiWidth;
-        DWORD dwSourceHeight = pTheme->nDefaultDpiHeight;
-
-        ::StretchBlt(pps->hdc, 0, 0, pTheme->nWidth, pTheme->nHeight, hdcMem, pTheme->nSourceX, pTheme->nSourceY, dwSourceWidth, dwSourceHeight, SRCCOPY);
-
-        ::SelectObject(hdcMem, hDefaultBitmap);
-        ::DeleteDC(hdcMem);
-
-        hr = S_OK;
+        hr = DrawGdipBitmap(pps->hdc, 0, 0, pTheme->nWidth, pTheme->nHeight, pTheme->pBitmap, pTheme->nSourceX, pTheme->nSourceY, pTheme->nDefaultDpiWidth, pTheme->nDefaultDpiHeight);
     }
 
     return hr;
@@ -1733,7 +1755,7 @@ static HRESULT ParseTheme(
     pTheme->nDpi = USER_DEFAULT_SCREEN_DPI;
 
     // Parse the optional background resource image.
-    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pTheme->hImage);
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pTheme->pBitmap);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing theme image.");
 
     // Parse the fonts.
@@ -1762,7 +1784,7 @@ static HRESULT GetAttributeImageFileOrResource(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
     __in IXMLDOMNode* pElement,
-    __out HBITMAP* phImage
+    __out Gdiplus::Bitmap** ppBitmap
     )
 {
     HRESULT hr = S_OK;
@@ -1771,7 +1793,7 @@ static HRESULT GetAttributeImageFileOrResource(
     WORD wResourceId = 0;
     BOOL fFound = FALSE;
     Gdiplus::Bitmap* pBitmap = NULL;
-    *phImage = NULL;
+    *ppBitmap = NULL;
 
     hr = XmlGetAttributeUInt16(pElement, L"ImageResource", &wResourceId);
     ThmExitOnOptionalXmlQueryFailure(hr, fFound, "Failed to get image resource attribute.");
@@ -1808,12 +1830,10 @@ static HRESULT GetAttributeImageFileOrResource(
         ThmExitOnFailure(hr, "Failed to load image from file: %ls", sczImageFile);
     }
 
-    // If there is an image, convert it into a bitmap handle.
     if (pBitmap)
     {
-        Gdiplus::Color black;
-        Gdiplus::Status gs = pBitmap->GetHBITMAP(black, phImage);
-        ThmExitOnGdipFailure(gs, hr, "Failed to convert GDI+ bitmap into HBITMAP.");
+        *ppBitmap = pBitmap;
+        pBitmap = NULL;
     }
     else
     {
@@ -1846,7 +1866,7 @@ static HRESULT ParseOwnerDrawImage(
     BOOL fFoundImage = FALSE;
 
     // Parse the optional background resource image.
-    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->hImage);
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->pBitmap);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing control image.");
 
     if (fXmlFound)
@@ -1854,7 +1874,7 @@ static HRESULT ParseOwnerDrawImage(
         fFoundImage = TRUE;
     }
 
-    hr = ParseSourceXY(pElement, NULL != pTheme->hImage, &pControl->nSourceX, &pControl->nSourceY);
+    hr = ParseSourceXY(pElement, NULL != pTheme->pBitmap, &pControl->nSourceX, &pControl->nSourceY);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control SourceX and SourceY attributes.");
 
     if (fXmlFound)
@@ -1894,9 +1914,16 @@ static HRESULT ParseCommandLinkImage(
     BOOL fXmlFound = FALSE;
     LPWSTR sczIconFile = NULL;
     WORD wResourceId = 0;
+    Gdiplus::Bitmap* pBitmap = NULL;
 
-    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->hImage);
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pBitmap);
     ThmExitOnOptionalXmlQueryFailure(hr, fImageFound, "Failed to parse image attributes for CommandLink.");
+
+    if (pBitmap)
+    {
+        hr = GdipBitmapToGdiBitmap(pBitmap, &pControl->hImage);
+        ThmExitOnFailure(hr, "Failed to convert bitmap for CommandLink.");
+    }
 
     hr = XmlGetAttributeUInt16(pElement, L"IconResource", &wResourceId);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get icon resource attribute.");
@@ -1945,6 +1972,11 @@ static HRESULT ParseCommandLinkImage(
     ThmExitOnUnexpectedAttribute(hr, pElement, L"CommandLink", L"SourceY");
 
 LExit:
+    if (pBitmap)
+    {
+        delete pBitmap;
+    }
+
     ReleaseStr(sczIconFile);
     ReleaseBSTR(bstr);
 
@@ -2188,7 +2220,7 @@ static HRESULT ParseWindow(
         ReleaseNullBSTR(bstr);
     }
 
-    hr = ParseSourceXY(pixn, NULL != pTheme->hImage, &pTheme->nSourceX, &pTheme->nSourceY);
+    hr = ParseSourceXY(pixn, NULL != pTheme->pBitmap, &pTheme->nSourceX, &pTheme->nSourceY);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window SourceX and SourceY attributes.");
 
     // Parse the optional window style.
@@ -2510,8 +2542,8 @@ static HRESULT ParseImageLists(
     DWORD dwImageCount = 0;
     THEME_IMAGELIST* pThemeImageList = NULL;
     BOOL fXmlFound = FALSE;
-    HBITMAP hBitmap = NULL;
-    BITMAP bm = { };
+    Gdiplus::Bitmap* pBitmap = NULL;
+    HBITMAP hImage = NULL;
     DWORD i = 0;
     int iRetVal = 0;
 
@@ -2551,13 +2583,18 @@ static HRESULT ParseImageLists(
 
         while (S_OK == (hr = XmlNextElement(pixnlImages, &pixnImage, NULL)))
         {
-            if (hBitmap)
+            if (pBitmap)
             {
-                ::DeleteObject(hBitmap);
-                hBitmap = NULL;
+                delete pBitmap;
+                pBitmap = NULL;
+            }
+            if (hImage)
+            {
+                ::DeleteObject(hImage);
+                hImage = NULL;
             }
 
-            hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pixnImage, &hBitmap);
+            hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pixnImage, &pBitmap);
             ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to parse image list: '%ls', item: %u", pThemeImageList->sczName, i);
 
             if (!fXmlFound)
@@ -2567,13 +2604,14 @@ static HRESULT ParseImageLists(
 
             if (0 == i)
             {
-                ::GetObjectW(hBitmap, sizeof(BITMAP), &bm);
-
-                pThemeImageList->hImageList = ImageList_Create(bm.bmWidth, bm.bmHeight, ILC_COLOR24, dwImageCount, 0);
+                pThemeImageList->hImageList = ImageList_Create(pBitmap->GetWidth(), pBitmap->GetHeight(), ILC_COLOR24, dwImageCount, 0);
                 ThmExitOnNullWithLastError(pThemeImageList->hImageList, hr, "Failed to create image list.");
             }
 
-            iRetVal = ImageList_Add(pThemeImageList->hImageList, hBitmap, NULL);
+            hr = GdipBitmapToGdiBitmap(pBitmap, &hImage);
+            ThmExitOnFailure(hr, "Failed to convert bitmap for CommandLink.");
+
+            iRetVal = ImageList_Add(pThemeImageList->hImageList, hImage, NULL);
             if (-1 == iRetVal)
             {
                 ThmExitWithLastError(hr, "Failed to add image %u to image list.", i);
@@ -2588,9 +2626,13 @@ static HRESULT ParseImageLists(
     }
 
 LExit:
-    if (hBitmap)
+    if (hImage)
     {
-        ::DeleteObject(hBitmap);
+        ::DeleteObject(hImage);
+    }
+    if (pBitmap)
+    {
+        delete pBitmap;
     }
     ReleaseObject(pixnlImageLists);
     ReleaseObject(pixnImageList);
@@ -3846,39 +3888,37 @@ static HRESULT DrawButton(
     __in const THEME_CONTROL* pControl
     )
 {
-    int nSourceX = pControl->hImage ? 0 : pControl->nSourceX;
-    int nSourceY = pControl->hImage ? 0 : pControl->nSourceY;
-    DWORD dwSourceWidth = pControl->nDefaultDpiWidth;
-    DWORD dwSourceHeight = pControl->nDefaultDpiHeight;
-
-    HDC hdcMem = ::CreateCompatibleDC(pdis->hDC);
-    HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pControl->hImage ? pControl->hImage : pTheme->hImage));
+    HRESULT hr = S_OK;
+    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
+    int nSourceY = pControl->pBitmap ? 0 : pControl->nSourceY;
+    int nSourceWidth = pControl->pBitmap ? pControl->pBitmap->GetWidth() : pControl->nDefaultDpiWidth;
+    int nSourceHeight = pControl->pBitmap ? pControl->pBitmap->GetHeight() / 4 : pControl->nDefaultDpiHeight;
+    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
+    int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
+    int nWidth = pdis->rcItem.right - pdis->rcItem.left;
 
     DWORD_PTR dwStyle = ::GetWindowLongPtrW(pdis->hwndItem, GWL_STYLE);
     // "clicked" gets priority
     if (ODS_SELECTED & pdis->itemState)
     {
-        nSourceY += pControl->nDefaultDpiHeight * 2;
+        nSourceY += nSourceHeight * 2;
     }
     // then hover
     else if (pControl->dwData & THEME_CONTROL_DATA_HOVER)
     {
-        nSourceY += pControl->nDefaultDpiHeight;
+        nSourceY += nSourceHeight;
     }
     // then focused
-    else if (WS_TABSTOP & dwStyle && ODS_FOCUS & pdis->itemState)
+    else if ((WS_TABSTOP & dwStyle) && (ODS_FOCUS & pdis->itemState))
     {
-        nSourceY += pControl->nDefaultDpiHeight * 3;
+        nSourceY += nSourceHeight * 3;
     }
 
-    ::StretchBlt(pdis->hDC, 0, 0, pControl->nWidth, pControl->nHeight, hdcMem, nSourceX, nSourceY, dwSourceWidth, dwSourceHeight, SRCCOPY);
-
-    ::SelectObject(hdcMem, hDefaultBitmap);
-    ::DeleteDC(hdcMem);
+    hr = DrawGdipBitmap(pdis->hDC, 0, 0, nWidth, nHeight, pBitmap, nSourceX, nSourceY, nSourceWidth, nSourceHeight);
 
     DrawControlText(pTheme, pdis, pControl, TRUE, FALSE);
 
-    return S_OK;
+    return hr;
 }
 
 
@@ -3953,31 +3993,69 @@ static HRESULT DrawImage(
     __in const THEME_CONTROL* pControl
     )
 {
-    DWORD dwHeight = pdis->rcItem.bottom - pdis->rcItem.top;
-    DWORD dwWidth = pdis->rcItem.right - pdis->rcItem.left;
-    int nSourceX = pControl->hImage ? 0 : pControl->nSourceX;
-    int nSourceY = pControl->hImage ? 0 : pControl->nSourceY;
-    DWORD dwSourceHeight = pControl->nDefaultDpiHeight;
-    DWORD dwSourceWidth = pControl->nDefaultDpiWidth;
+    HRESULT hr = S_OK;
+    int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
+    int nWidth = pdis->rcItem.right - pdis->rcItem.left;
+    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
+    int nSourceY = pControl->pBitmap ? 0 : pControl->nSourceY;
+    int nSourceWidth = pControl->pBitmap ? pControl->pBitmap->GetWidth() : pControl->nDefaultDpiWidth;
+    int nSourceHeight = pControl->pBitmap ? pControl->pBitmap->GetHeight() : pControl->nDefaultDpiHeight;
+    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
 
-    BLENDFUNCTION bf = { };
-    bf.BlendOp = AC_SRC_OVER;
-    bf.SourceConstantAlpha = 255;
-    bf.AlphaFormat = AC_SRC_ALPHA;
+    hr = DrawGdipBitmap(pdis->hDC, 0, 0, nWidth, nHeight, pBitmap, nSourceX, nSourceY, nSourceWidth, nSourceHeight);
 
-    HDC hdcMem = ::CreateCompatibleDC(pdis->hDC);
-    HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pControl->hImage ? pControl->hImage : pTheme->hImage));
+    return hr;
+}
 
-    // Try to draw the image with transparency and if that fails (usually because the image has no
-    // alpha channel) then draw the image as is.
-    if (!::AlphaBlend(pdis->hDC, 0, 0, dwWidth, dwHeight, hdcMem, nSourceX, nSourceY, dwSourceWidth, dwSourceHeight, bf))
+static HRESULT DrawGdipBitmap(
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight,
+    __in Gdiplus::Bitmap* pBitmap,
+    __in int srcX,
+    __in int srcY,
+    __in int srcWidth,
+    __in int srcHeight
+    )
+{
+    // Note that this only indicates that GDI+ supports transparency from the source image type.
+    // Bitmaps with alpha information will return FALSE, while fully opaque PNGs will return TRUE.
+    BOOL fTransparency = (pBitmap->GetFlags() & Gdiplus::ImageFlagsHasAlpha) == Gdiplus::ImageFlagsHasAlpha;
+    Gdiplus::ImageAttributes attrs;
+    Gdiplus::Rect destRect(destX, destY, destWidth, destHeight);
+    Gdiplus::Graphics graphics(hdc);
+    Gdiplus::Status gs = Gdiplus::Status::Ok;
+
+    // This fixes GDI+ behavior where it badly handles the edges of an image when scaling.
+    // This is easily seen when using an image Progressbar that's 4x1 - the progress bar fades to transparent in both directions.
+    attrs.SetWrapMode(Gdiplus::WrapMode::WrapModeTileFlipXY);
+
+    // graphics.SmoothingMode is not set because it has no impact on DrawImage.
+
+    // This is the best interpolation mode, and the only one that is decent at downscaling.
+    graphics.SetInterpolationMode(Gdiplus::InterpolationMode::InterpolationModeHighQualityBicubic);
+
+    // There's a significant quality improvement when scaling to use the HighQuality pixel offset mode with no measurable difference in performance.
+    graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetMode::PixelOffsetModeHighQuality);
+
+    // If there's transparency, make sure that the blending is done with high quality.
+    // If not, try to skip blending.
+    if (fTransparency)
     {
-        ::StretchBlt(pdis->hDC, 0, 0, dwWidth, dwHeight, hdcMem, nSourceX, nSourceY, dwSourceWidth, dwSourceHeight, SRCCOPY);
+        graphics.SetCompositingMode(Gdiplus::CompositingMode::CompositingModeSourceOver);
+        graphics.SetCompositingQuality(Gdiplus::CompositingQuality::CompositingQualityHighQuality);
+    }
+    else
+    {
+        graphics.SetCompositingMode(Gdiplus::CompositingMode::CompositingModeSourceCopy);
+        graphics.SetCompositingQuality(Gdiplus::CompositingQuality::CompositingQualityHighSpeed);
     }
 
-    ::SelectObject(hdcMem, hDefaultBitmap);
-    ::DeleteDC(hdcMem);
-    return S_OK;
+    gs = graphics.DrawImage(pBitmap, destRect, srcX, srcY, srcWidth, srcHeight, Gdiplus::Unit::UnitPixel, &attrs);
+
+    return GdipHresultFromStatus(gs);
 }
 
 
@@ -3987,38 +4065,74 @@ static HRESULT DrawProgressBar(
     __in const THEME_CONTROL* pControl
     )
 {
-    DWORD dwProgressColor = HIWORD(pControl->dwData);
-    DWORD dwProgressPercentage = LOWORD(pControl->dwData);
-    DWORD dwHeight = pdis->rcItem.bottom - pdis->rcItem.top;
-    DWORD dwCenter = (pdis->rcItem.right - 2) * dwProgressPercentage / 100;
-    DWORD dwSourceHeight = pControl->nDefaultDpiHeight;
-    int nSourceX = pControl->hImage ? 0 : pControl->nSourceX;
-    int nSourceY = (pControl->hImage ? 0 : pControl->nSourceY) + (dwProgressColor * dwSourceHeight);
+    const int nSideWidth = 1;
+    HRESULT hr = S_OK;
+    WORD wProgressColor = HIWORD(pControl->dwData);
+    WORD wProgressPercentage = LOWORD(pControl->dwData);
+    int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
+    int nSourceHeight = pControl->nDefaultDpiHeight;
+    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
+    int nSourceY = (pControl->pBitmap ? 0 : pControl->nSourceY) + (wProgressColor * nSourceHeight);
+    int nFillableWidth = pdis->rcItem.right - 2 * nSideWidth;
+    int nCenter = nFillableWidth > 0 ? nFillableWidth * wProgressPercentage / 100 : 0;
+    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
 
-    HDC hdcMem = ::CreateCompatibleDC(pdis->hDC);
-    HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pControl->hImage ? pControl->hImage : pTheme->hImage));
+    if (0 > nFillableWidth)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
 
     // Draw the left side of the progress bar.
-    ::StretchBlt(pdis->hDC, 0, 0, 1, dwHeight, hdcMem, nSourceX, nSourceY, 1, dwSourceHeight, SRCCOPY);
+    hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX, nSourceY, 1, nSourceHeight, pdis->hDC, 0, 0, nSideWidth, nHeight);
 
     // Draw the filled side of the progress bar, if there is any.
-    if (0 < dwCenter)
+    if (0 < nCenter)
     {
-        ::StretchBlt(pdis->hDC, 1, 0, dwCenter, dwHeight, hdcMem, nSourceX + 1, nSourceY, 1, dwSourceHeight, SRCCOPY);
+        hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 1, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth, 0, nCenter, nHeight);
     }
 
     // Draw the unfilled side of the progress bar, if there is any.
-    if (dwCenter < static_cast<DWORD>(pdis->rcItem.right - 2))
+    if (nCenter < nFillableWidth)
     {
-        ::StretchBlt(pdis->hDC, 1 + dwCenter, 0, pdis->rcItem.right - dwCenter - 1, dwHeight, hdcMem, nSourceX + 2, nSourceY, 1, dwSourceHeight, SRCCOPY);
+        hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 2, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth + nCenter, 0, pdis->rcItem.right - nCenter - nSideWidth, nHeight);
     }
 
     // Draw the right side of the progress bar.
-    ::StretchBlt(pdis->hDC, pdis->rcItem.right - 1, 0, 1, dwHeight, hdcMem, nSourceX + 3, nSourceY, 1, dwSourceHeight, SRCCOPY);
+    hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 3, nSourceY, 1, nSourceHeight, pdis->hDC, pdis->rcItem.right - nSideWidth, 0, nSideWidth, nHeight);
 
-    ::SelectObject(hdcMem, hDefaultBitmap);
-    ::DeleteDC(hdcMem);
-    return S_OK;
+LExit:
+    return hr;
+}
+
+static HRESULT DrawProgressBarImage(
+    __in THEME* /*pTheme*/,
+    __in Gdiplus::Bitmap* pBitmap,
+    __in int srcX,
+    __in int srcY,
+    __in int srcWidth,
+    __in int srcHeight,
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight
+    )
+{
+    HRESULT hr = S_OK;
+    Gdiplus::Rect dest(0, 0, srcWidth, srcHeight);
+    Gdiplus::Bitmap isolated(dest.Width, dest.Height);
+    Gdiplus::Graphics graphics(&isolated);
+    graphics.SetCompositingMode(Gdiplus::CompositingMode::CompositingModeSourceCopy);
+
+    // Isolate the source rectangle into a temporary bitmap because otherwise GDI+ would use pixels outside of that rectangle when stretching.
+    Gdiplus::Status gs = graphics.DrawImage(pBitmap, dest, srcX, srcY, srcWidth, srcHeight, Gdiplus::Unit::UnitPixel);
+    hr = GdipHresultFromStatus(gs);
+    if (SUCCEEDED(hr))
+    {
+        hr = DrawGdipBitmap(hdc, destX, destY, destWidth, destHeight, &isolated, 0, 0, isolated.GetWidth(), isolated.GetHeight());
+    }
+
+    return hr;
 }
 
 
@@ -4103,6 +4217,11 @@ static void FreeControl(
         ReleaseStr(pControl->sczVisibleCondition);
         ReleaseStr(pControl->sczValue);
         ReleaseStr(pControl->sczVariable);
+
+        if (pControl->pBitmap)
+        {
+            delete pControl->pBitmap;
+        }
 
         if (pControl->hImage)
         {
@@ -5203,7 +5322,7 @@ static HRESULT LoadControls(
             __fallthrough;
         case THEME_CONTROL_TYPE_BUTTON:
             wzWindowClass = WC_BUTTONW;
-            if (pControl->hImage || (pTheme->hImage && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
             {
                 dwWindowBits |= BS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
@@ -5237,7 +5356,7 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_IMAGE: // images are basically just owner drawn static controls (so we can draw .jpgs and .pngs instead of just bitmaps).
-            if (pControl->hImage || (pTheme->hImage && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
             {
                 wzWindowClass = THEME_WC_STATICOWNERDRAW;
                 dwWindowBits |= SS_OWNERDRAW;
@@ -5264,7 +5383,7 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_PROGRESSBAR:
-            if (pControl->hImage || (pTheme->hImage && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
             {
                 wzWindowClass = THEME_WC_STATICOWNERDRAW; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
                 dwWindowBits |= SS_OWNERDRAW;
