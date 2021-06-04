@@ -166,8 +166,6 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
-                var warning = Assert.Single(result.Messages.Where(m => m.Level == MessageLevel.Warning));
-                Assert.Equal((int)WarningMessages.Ids.ExperimentalBundlePlatform, warning.Id);
 
                 Assert.True(File.Exists(exePath));
                 Assert.True(File.Exists(pdbPath));
