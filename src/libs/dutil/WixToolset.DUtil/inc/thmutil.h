@@ -75,6 +75,13 @@ typedef enum THEME_CONTROL_TYPE
     THEME_CONTROL_TYPE_TAB,
 } THEME_CONTROL_TYPE;
 
+typedef enum THEME_IMAGE_REFERENCE_TYPE
+{
+    THEME_IMAGE_REFERENCE_TYPE_NONE,
+    THEME_IMAGE_REFERENCE_TYPE_PARTIAL,
+    THEME_IMAGE_REFERENCE_TYPE_COMPLETE,
+} THEME_IMAGE_REFERENCE_TYPE;
+
 typedef enum THEME_SHOW_PAGE_REASON
 {
     THEME_SHOW_PAGE_REASON_DEFAULT,
@@ -97,6 +104,22 @@ struct THEME_COLUMN
     int nBaseWidth;
     int nWidth;
     BOOL fExpands;
+};
+
+
+struct THEME_IMAGE_REFERENCE
+{
+    THEME_IMAGE_REFERENCE_TYPE type;
+    DWORD dwImageInstanceIndex;
+    int nX;
+    int nY;
+    int nHeight;
+    int nWidth;
+};
+
+struct THEME_IMAGE_INSTANCE
+{
+    Gdiplus::Bitmap* pBitmap;
 };
 
 
@@ -159,15 +182,13 @@ struct THEME_CONTROL
     int nY;
     int nHeight;
     int nWidth;
-    int nSourceX;
-    int nSourceY;
     UINT uStringId;
 
     LPWSTR sczEnableCondition;
     LPWSTR sczVisibleCondition;
     BOOL fDisableVariableFunctionality;
 
-    Gdiplus::Bitmap* pBitmap;
+    THEME_IMAGE_REFERENCE imageRef;
     HBITMAP hImage;
     HICON hIcon;
 
@@ -293,14 +314,16 @@ struct THEME
     int nMinimumWidth;
     int nWindowHeight;
     int nWindowWidth;
-    int nSourceX;
-    int nSourceY;
     UINT uStringId;
 
-    Gdiplus::Bitmap* pBitmap;
+    DWORD dwSourceImageInstanceIndex;
+    THEME_IMAGE_REFERENCE windowImageRef;
 
     DWORD cFonts;
     THEME_FONT* rgFonts;
+
+    DWORD cStandaloneImages;
+    THEME_IMAGE_INSTANCE* rgStandaloneImages;
 
     DWORD cPages;
     THEME_PAGE* rgPages;

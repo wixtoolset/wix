@@ -42,6 +42,7 @@
 const DWORD THEME_INVALID_ID = 0xFFFFFFFF;
 const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
 const DWORD GROW_FONT_INSTANCES = 3;
+const DWORD GROW_IMAGE_INSTANCES = 5;
 const DWORD GROW_WINDOW_TEXT = 250;
 const LPCWSTR THEME_WC_HYPERLINK = L"ThemeHyperLink";
 const LPCWSTR THEME_WC_PANEL = L"ThemePanel";
@@ -87,6 +88,11 @@ static HRESULT ParseTheme(
     __in IXMLDOMDocument* pixd,
     __out THEME** ppTheme
     );
+static HRESULT AddStandaloneImage(
+    __in THEME* pTheme,
+    __in Gdiplus::Bitmap** ppBitmap,
+    __out DWORD* pdwIndex
+    );
 static HRESULT GetAttributeImageFileOrResource(
     __in_opt HMODULE hModule,
     __in_z_opt LPCWSTR wzRelativePath,
@@ -118,9 +124,10 @@ static HRESULT GetAttributeFontId(
     );
 static HRESULT ParseSourceXY(
     __in IXMLDOMNode* pixn,
-    __in BOOL fAllowed,
-    __inout int* pnX,
-    __inout int* pnY
+    __in THEME* pTheme,
+    __in int nWidth,
+    __in int nHeight,
+    __inout THEME_IMAGE_REFERENCE* pReference
     );
 static HRESULT ParseWindow(
     __in_opt HMODULE hModule,
@@ -281,6 +288,20 @@ static HRESULT DrawImage(
     __in DRAWITEMSTRUCT* pdis,
     __in const THEME_CONTROL* pControl
     );
+static void GetImageInstance(
+    __in THEME* pTheme,
+    __in const THEME_IMAGE_REFERENCE* pReference,
+    __out const THEME_IMAGE_INSTANCE** ppInstance
+    );
+static HRESULT DrawImageReference(
+    __in THEME* pTheme,
+    __in const THEME_IMAGE_REFERENCE* pReference,
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight
+    );
 static HRESULT DrawGdipBitmap(
     __in HDC hdc,
     __in int destX,
@@ -300,7 +321,7 @@ static HRESULT DrawProgressBar(
     );
 static HRESULT DrawProgressBarImage(
     __in THEME* pTheme,
-    __in Gdiplus::Bitmap* pBitmap,
+    __in const THEME_IMAGE_INSTANCE* pImageInstance,
     __in int srcX,
     __in int srcY,
     __in int srcWidth,
@@ -332,6 +353,9 @@ static void FreeFontInstance(
     );
 static void FreeFont(
     __in THEME_FONT* pFont
+    );
+static void FreeImageInstance(
+    __in THEME_IMAGE_INSTANCE* pImageInstance
     );
 static void FreePage(
     __in THEME_PAGE* pPage
@@ -644,6 +668,11 @@ DAPI_(void) ThemeFree(
             FreeFont(pTheme->rgFonts + i);
         }
 
+        for (DWORD i = 0; i < pTheme->cStandaloneImages; ++i)
+        {
+            FreeImageInstance(pTheme->rgStandaloneImages + i);
+        }
+
         for (DWORD i = 0; i < pTheme->cPages; ++i)
         {
             FreePage(pTheme->rgPages + i);
@@ -661,12 +690,8 @@ DAPI_(void) ThemeFree(
 
         ReleaseMem(pTheme->rgControls);
         ReleaseMem(pTheme->rgPages);
+        ReleaseMem(pTheme->rgStandaloneImages);
         ReleaseMem(pTheme->rgFonts);
-
-        if (pTheme->pBitmap)
-        {
-            delete pTheme->pBitmap;
-        }
 
         ReleaseStr(pTheme->sczCaption);
         ReleaseMem(pTheme);
@@ -1305,9 +1330,9 @@ DAPI_(HRESULT) ThemeDrawBackground(
 {
     HRESULT hr = S_FALSE;
 
-    if (pTheme->pBitmap && 0 <= pTheme->nSourceX && 0 <= pTheme->nSourceY && pps->fErase)
+    if (pps->fErase && THEME_IMAGE_REFERENCE_TYPE_NONE != pTheme->windowImageRef.type)
     {
-        hr = DrawGdipBitmap(pps->hdc, 0, 0, pTheme->nWidth, pTheme->nHeight, pTheme->pBitmap, pTheme->nSourceX, pTheme->nSourceY, pTheme->nDefaultDpiWidth, pTheme->nDefaultDpiHeight);
+        hr = DrawImageReference(pTheme, &pTheme->windowImageRef, pps->hdc, 0, 0, pTheme->nWidth, pTheme->nHeight);
     }
 
     return hr;
@@ -1743,6 +1768,7 @@ static HRESULT ParseTheme(
     HRESULT hr = S_OK;
     THEME* pTheme = NULL;
     IXMLDOMElement *pThemeElement = NULL;
+    Gdiplus::Bitmap* pBitmap = NULL;
     BOOL fXmlFound = FALSE;
 
     hr = pixd->get_documentElement(&pThemeElement);
@@ -1755,8 +1781,18 @@ static HRESULT ParseTheme(
     pTheme->nDpi = USER_DEFAULT_SCREEN_DPI;
 
     // Parse the optional background resource image.
-    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pTheme->pBitmap);
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pBitmap);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing theme image.");
+
+    if (fXmlFound)
+    {
+        hr = AddStandaloneImage(pTheme, &pBitmap, &pTheme->dwSourceImageInstanceIndex);
+        ThmExitOnFailure(hr, "Failed to store theme image.");
+    }
+    else
+    {
+        pTheme->dwSourceImageInstanceIndex = THEME_INVALID_ID;
+    }
 
     // Parse the fonts.
     hr = ParseFonts(pThemeElement, pTheme);
@@ -1772,11 +1808,40 @@ static HRESULT ParseTheme(
 LExit:
     ReleaseObject(pThemeElement);
 
+    if (pBitmap)
+    {
+        delete pBitmap;
+    }
+
     if (pTheme)
     {
         ThemeFree(pTheme);
     }
 
+    return hr;
+}
+
+static HRESULT AddStandaloneImage(
+    __in THEME* pTheme,
+    __in Gdiplus::Bitmap** ppBitmap,
+    __out DWORD* pdwIndex
+    )
+{
+    HRESULT hr = S_OK;
+    THEME_IMAGE_INSTANCE* pInstance = NULL;
+
+    hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pTheme->rgStandaloneImages), pTheme->cStandaloneImages, 1, sizeof(THEME_IMAGE_INSTANCE), GROW_IMAGE_INSTANCES);
+    ThmExitOnFailure(hr, "Failed to allocate memory for image instances.");
+
+    *pdwIndex = pTheme->cStandaloneImages;
+    ++pTheme->cStandaloneImages;
+
+    pInstance = pTheme->rgStandaloneImages + *pdwIndex;
+
+    pInstance->pBitmap = *ppBitmap;
+    *ppBitmap = NULL;
+
+LExit:
     return hr;
 }
 
@@ -1864,17 +1929,23 @@ static HRESULT ParseOwnerDrawImage(
     HRESULT hr = S_OK;
     BOOL fXmlFound = FALSE;
     BOOL fFoundImage = FALSE;
+    Gdiplus::Bitmap* pBitmap = NULL;
 
     // Parse the optional background resource image.
-    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pControl->pBitmap);
+    hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pBitmap);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed while parsing control image.");
 
     if (fXmlFound)
     {
+        hr = AddStandaloneImage(pTheme, &pBitmap, &pControl->imageRef.dwImageInstanceIndex);
+        ThmExitOnFailure(hr, "Failed to store owner draw image.");
+
+        pControl->imageRef.type = THEME_IMAGE_REFERENCE_TYPE_COMPLETE;
+
         fFoundImage = TRUE;
     }
 
-    hr = ParseSourceXY(pElement, NULL != pTheme->pBitmap, &pControl->nSourceX, &pControl->nSourceY);
+    hr = ParseSourceXY(pElement, pTheme, pControl->nWidth, pControl->nHeight, &pControl->imageRef);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get control SourceX and SourceY attributes.");
 
     if (fXmlFound)
@@ -1897,6 +1968,11 @@ static HRESULT ParseOwnerDrawImage(
     }
 
 LExit:
+    if (pBitmap)
+    {
+        delete pBitmap;
+    }
+
     return hr;
 }
 
@@ -2042,35 +2118,50 @@ LExit:
 
 static HRESULT ParseSourceXY(
     __in IXMLDOMNode* pixn,
-    __in BOOL fAllowed,
-    __inout int* pnX,
-    __inout int* pnY
+    __in THEME* pTheme,
+    __in int nWidth,
+    __in int nHeight,
+    __inout THEME_IMAGE_REFERENCE* pReference
     )
 {
     HRESULT hr = S_OK;
     BOOL fXFound = FALSE;
     BOOL fYFound = FALSE;
+    int nX = 0;
+    int nY = 0;
+    DWORD dwImageInstanceIndex = pTheme->dwSourceImageInstanceIndex;
+    THEME_IMAGE_INSTANCE* pInstance = THEME_INVALID_ID != dwImageInstanceIndex ? pTheme->rgStandaloneImages + dwImageInstanceIndex : NULL;
+    int nSourceWidth = pInstance ? pInstance->pBitmap->GetWidth() : 0;
+    int nSourceHeight = pInstance ? pInstance->pBitmap->GetHeight() : 0;
 
-    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceX", pnX);
+    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceX", &nX);
     ThmExitOnOptionalXmlQueryFailure(hr, fXFound, "Failed to get SourceX attribute.");
 
     if (!fXFound)
     {
-        *pnX = -1;
+        nX = -1;
     }
     else
     {
-        if (!fAllowed)
+        if (!pInstance)
         {
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX cannot be specified without an image specified on Theme.");
         }
-        else if (0 > *pnX)
+        else if (0 > nX)
         {
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX must be non-negative.");
         }
+        else if (nSourceWidth <= nX)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX (%i) must be less than the image width: %i.", nX, nSourceWidth);
+        }
+        else if (nSourceWidth <= (nX + nWidth))
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceX (%i) with width %i must be less than the image width: %i.", nX, nWidth, nSourceWidth);
+        }
     }
 
-    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceY", pnY);
+    hr = GetAttributeCoordinateOrDimension(pixn, L"SourceY", &nY);
     ThmExitOnOptionalXmlQueryFailure(hr, fYFound, "Failed to get SourceY attribute.");
 
     if (!fYFound)
@@ -2080,12 +2171,11 @@ static HRESULT ParseSourceXY(
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be specified with SourceX.");
         }
 
-        *pnY = -1;
-        hr = E_NOTFOUND;
+        ExitFunction1(hr = E_NOTFOUND);
     }
     else
     {
-        if (!fAllowed)
+        if (!pInstance)
         {
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY cannot be specified without an image specified on Theme.");
         }
@@ -2093,11 +2183,26 @@ static HRESULT ParseSourceXY(
         {
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be specified with SourceX.");
         }
-        else if (0 > *pnY)
+        else if (0 > nY)
         {
             ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY must be non-negative.");
         }
+        else if (nSourceHeight <= nY)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY (%i) must be less than the image height: %i.", nY, nSourceHeight);
+        }
+        else if (nSourceHeight <= (nY + nHeight))
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "SourceY (%i) with height %i must be less than the image height: %i.", nY, nHeight, nSourceHeight);
+        }
     }
+
+    pReference->type = THEME_IMAGE_REFERENCE_TYPE_PARTIAL;
+    pReference->dwImageInstanceIndex = dwImageInstanceIndex;
+    pReference->nX = nX;
+    pReference->nY = nY;
+    pReference->nWidth = nWidth;
+    pReference->nHeight = nHeight;
 
 LExit:
     return hr;
@@ -2220,7 +2325,7 @@ static HRESULT ParseWindow(
         ReleaseNullBSTR(bstr);
     }
 
-    hr = ParseSourceXY(pixn, NULL != pTheme->pBitmap, &pTheme->nSourceX, &pTheme->nSourceY);
+    hr = ParseSourceXY(pixn, pTheme, pTheme->nDefaultDpiWidth, pTheme->nDefaultDpiHeight, &pTheme->windowImageRef);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get window SourceX and SourceY attributes.");
 
     // Parse the optional window style.
@@ -2230,7 +2335,7 @@ static HRESULT ParseWindow(
     if (!fXmlFound)
     {
         pTheme->dwStyle = WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
-        pTheme->dwStyle |= (0 <= pTheme->nSourceX && 0 <= pTheme->nSourceY) ? WS_POPUP : WS_OVERLAPPED;
+        pTheme->dwStyle |= (THEME_IMAGE_REFERENCE_TYPE_NONE != pTheme->windowImageRef.type) ? WS_POPUP : WS_OVERLAPPED;
     }
 
     hr = XmlGetAttributeUInt32(pixn, L"StringId", reinterpret_cast<DWORD*>(&pTheme->uStringId));
@@ -3171,8 +3276,6 @@ static void InitializeThemeControl(
     pControl->dwFontHoverId = THEME_INVALID_ID;
     pControl->dwFontId = THEME_INVALID_ID;
     pControl->dwFontSelectedId = THEME_INVALID_ID;
-    pControl->nSourceX = -1;
-    pControl->nSourceY = -1;
     pControl->uStringId = UINT_MAX;
 }
 
@@ -3889,35 +3992,57 @@ static HRESULT DrawButton(
     )
 {
     HRESULT hr = S_OK;
-    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
-    int nSourceY = pControl->pBitmap ? 0 : pControl->nSourceY;
-    int nSourceWidth = pControl->pBitmap ? pControl->pBitmap->GetWidth() : pControl->nDefaultDpiWidth;
-    int nSourceHeight = pControl->pBitmap ? pControl->pBitmap->GetHeight() / 4 : pControl->nDefaultDpiHeight;
-    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
+    THEME_IMAGE_REFERENCE buttonImageRef = { };
+    const THEME_IMAGE_INSTANCE* pInstance = NULL;
     int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
     int nWidth = pdis->rcItem.right - pdis->rcItem.left;
+
+    buttonImageRef.type = THEME_IMAGE_REFERENCE_TYPE_PARTIAL;
+    buttonImageRef.dwImageInstanceIndex = pControl->imageRef.dwImageInstanceIndex;
+    GetImageInstance(pTheme, &pControl->imageRef, &pInstance);
+
+    if (THEME_IMAGE_REFERENCE_TYPE_PARTIAL == pControl->imageRef.type)
+    {
+        buttonImageRef.nX = pControl->imageRef.nX;
+        buttonImageRef.nY = pControl->imageRef.nY;
+        buttonImageRef.nWidth = pControl->imageRef.nWidth;
+        buttonImageRef.nHeight = pControl->imageRef.nHeight;
+    }
+    else if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pControl->imageRef.type)
+    {
+        buttonImageRef.nX = 0;
+        buttonImageRef.nY = 0;
+        buttonImageRef.nWidth = pInstance->pBitmap->GetWidth();
+        buttonImageRef.nHeight = pInstance->pBitmap->GetHeight() / 4;
+    }
+    else
+    {
+        AssertSz(FALSE, "Invalid image reference type for drawing");
+        ExitFunction1(hr = E_INVALIDARG);
+    }
 
     DWORD_PTR dwStyle = ::GetWindowLongPtrW(pdis->hwndItem, GWL_STYLE);
     // "clicked" gets priority
     if (ODS_SELECTED & pdis->itemState)
     {
-        nSourceY += nSourceHeight * 2;
+        buttonImageRef.nY += buttonImageRef.nHeight * 2;
     }
     // then hover
     else if (pControl->dwData & THEME_CONTROL_DATA_HOVER)
     {
-        nSourceY += nSourceHeight;
+        buttonImageRef.nY += buttonImageRef.nHeight;
     }
     // then focused
     else if ((WS_TABSTOP & dwStyle) && (ODS_FOCUS & pdis->itemState))
     {
-        nSourceY += nSourceHeight * 3;
+        buttonImageRef.nY += buttonImageRef.nHeight * 3;
     }
 
-    hr = DrawGdipBitmap(pdis->hDC, 0, 0, nWidth, nHeight, pBitmap, nSourceX, nSourceY, nSourceWidth, nSourceHeight);
+    hr = DrawImageReference(pTheme, &buttonImageRef, pdis->hDC, 0, 0, nWidth, nHeight);
 
     DrawControlText(pTheme, pdis, pControl, TRUE, FALSE);
 
+LExit:
     return hr;
 }
 
@@ -3996,14 +4121,62 @@ static HRESULT DrawImage(
     HRESULT hr = S_OK;
     int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
     int nWidth = pdis->rcItem.right - pdis->rcItem.left;
-    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
-    int nSourceY = pControl->pBitmap ? 0 : pControl->nSourceY;
-    int nSourceWidth = pControl->pBitmap ? pControl->pBitmap->GetWidth() : pControl->nDefaultDpiWidth;
-    int nSourceHeight = pControl->pBitmap ? pControl->pBitmap->GetHeight() : pControl->nDefaultDpiHeight;
-    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
 
-    hr = DrawGdipBitmap(pdis->hDC, 0, 0, nWidth, nHeight, pBitmap, nSourceX, nSourceY, nSourceWidth, nSourceHeight);
+    hr = DrawImageReference(pTheme, &pControl->imageRef, pdis->hDC, 0, 0, nWidth, nHeight);
 
+    return hr;
+}
+
+static void GetImageInstance(
+    __in THEME* pTheme,
+    __in const THEME_IMAGE_REFERENCE* pReference,
+    __out const THEME_IMAGE_INSTANCE** ppInstance
+    )
+{
+    *ppInstance = pTheme->rgStandaloneImages + pReference->dwImageInstanceIndex;
+}
+
+static HRESULT DrawImageReference(
+    __in THEME* pTheme,
+    __in const THEME_IMAGE_REFERENCE* pReference,
+    __in HDC hdc,
+    __in int destX,
+    __in int destY,
+    __in int destWidth,
+    __in int destHeight
+    )
+{
+    HRESULT hr = S_OK;
+    const THEME_IMAGE_INSTANCE* pImageInstance = NULL;
+    int nX = 0;
+    int nY = 0;
+    int nWidth = 0;
+    int nHeight = 0;
+
+    GetImageInstance(pTheme, pReference, &pImageInstance);
+    if (THEME_IMAGE_REFERENCE_TYPE_PARTIAL == pReference->type)
+    {
+        nX = pReference->nX;
+        nY = pReference->nY;
+        nWidth = pReference->nWidth;
+        nHeight = pReference->nHeight;
+    }
+    else if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pReference->type)
+    {
+        nX = 0;
+        nY = 0;
+        nWidth = pImageInstance->pBitmap->GetWidth();
+        nHeight = pImageInstance->pBitmap->GetHeight();
+    }
+    else
+    {
+        AssertSz(FALSE, "Invalid image reference type for drawing");
+        ExitFunction1(hr = E_INVALIDARG);
+    }
+
+    hr = DrawGdipBitmap(hdc, destX, destY, destWidth, destHeight, pImageInstance->pBitmap, nX, nY, nWidth, nHeight);
+
+LExit:
     return hr;
 }
 
@@ -4069,36 +4242,56 @@ static HRESULT DrawProgressBar(
     HRESULT hr = S_OK;
     WORD wProgressColor = HIWORD(pControl->dwData);
     WORD wProgressPercentage = LOWORD(pControl->dwData);
+    const THEME_IMAGE_INSTANCE* pInstance = NULL;
     int nHeight = pdis->rcItem.bottom - pdis->rcItem.top;
-    int nSourceHeight = pControl->nDefaultDpiHeight;
-    int nSourceX = pControl->pBitmap ? 0 : pControl->nSourceX;
-    int nSourceY = (pControl->pBitmap ? 0 : pControl->nSourceY) + (wProgressColor * nSourceHeight);
+    int nSourceHeight = 0;
+    int nSourceX = 0;
+    int nSourceY = 0;
     int nFillableWidth = pdis->rcItem.right - 2 * nSideWidth;
     int nCenter = nFillableWidth > 0 ? nFillableWidth * wProgressPercentage / 100 : 0;
-    Gdiplus::Bitmap* pBitmap = pControl->pBitmap ? pControl->pBitmap : pTheme->pBitmap;
 
     if (0 > nFillableWidth)
     {
         ExitFunction1(hr = S_FALSE);
     }
 
+    GetImageInstance(pTheme, &pControl->imageRef, &pInstance);
+
+    if (THEME_IMAGE_REFERENCE_TYPE_PARTIAL == pControl->imageRef.type)
+    {
+        nSourceHeight = pControl->imageRef.nHeight;
+        nSourceX = pControl->imageRef.nX;
+        nSourceY = pControl->imageRef.nY + (wProgressColor * nSourceHeight);
+    }
+    else if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pControl->imageRef.type)
+    {
+        nSourceHeight = pControl->nDefaultDpiHeight;
+        nSourceX = 0;
+        nSourceY = wProgressColor * nSourceHeight;
+    }
+    else
+    {
+        AssertSz(FALSE, "Invalid image reference type for drawing");
+        ExitFunction1(hr = E_INVALIDARG);
+    }
+
     // Draw the left side of the progress bar.
-    hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX, nSourceY, 1, nSourceHeight, pdis->hDC, 0, 0, nSideWidth, nHeight);
+    hr = DrawProgressBarImage(pTheme, pInstance, nSourceX, nSourceY, 1, nSourceHeight, pdis->hDC, 0, 0, nSideWidth, nHeight);
 
     // Draw the filled side of the progress bar, if there is any.
     if (0 < nCenter)
     {
-        hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 1, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth, 0, nCenter, nHeight);
+        hr = DrawProgressBarImage(pTheme, pInstance, nSourceX + 1, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth, 0, nCenter, nHeight);
     }
 
     // Draw the unfilled side of the progress bar, if there is any.
     if (nCenter < nFillableWidth)
     {
-        hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 2, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth + nCenter, 0, pdis->rcItem.right - nCenter - nSideWidth, nHeight);
+        hr = DrawProgressBarImage(pTheme, pInstance, nSourceX + 2, nSourceY, 1, nSourceHeight, pdis->hDC, nSideWidth + nCenter, 0, pdis->rcItem.right - nCenter - nSideWidth, nHeight);
     }
 
     // Draw the right side of the progress bar.
-    hr = DrawProgressBarImage(pTheme, pBitmap, nSourceX + 3, nSourceY, 1, nSourceHeight, pdis->hDC, pdis->rcItem.right - nSideWidth, 0, nSideWidth, nHeight);
+    hr = DrawProgressBarImage(pTheme, pInstance, nSourceX + 3, nSourceY, 1, nSourceHeight, pdis->hDC, pdis->rcItem.right - nSideWidth, 0, nSideWidth, nHeight);
 
 LExit:
     return hr;
@@ -4106,7 +4299,7 @@ LExit:
 
 static HRESULT DrawProgressBarImage(
     __in THEME* /*pTheme*/,
-    __in Gdiplus::Bitmap* pBitmap,
+    __in const THEME_IMAGE_INSTANCE* pImageInstance,
     __in int srcX,
     __in int srcY,
     __in int srcWidth,
@@ -4125,7 +4318,7 @@ static HRESULT DrawProgressBarImage(
     graphics.SetCompositingMode(Gdiplus::CompositingMode::CompositingModeSourceCopy);
 
     // Isolate the source rectangle into a temporary bitmap because otherwise GDI+ would use pixels outside of that rectangle when stretching.
-    Gdiplus::Status gs = graphics.DrawImage(pBitmap, dest, srcX, srcY, srcWidth, srcHeight, Gdiplus::Unit::UnitPixel);
+    Gdiplus::Status gs = graphics.DrawImage(pImageInstance->pBitmap, dest, srcX, srcY, srcWidth, srcHeight, Gdiplus::Unit::UnitPixel);
     hr = GdipHresultFromStatus(gs);
     if (SUCCEEDED(hr))
     {
@@ -4217,11 +4410,6 @@ static void FreeControl(
         ReleaseStr(pControl->sczVisibleCondition);
         ReleaseStr(pControl->sczValue);
         ReleaseStr(pControl->sczVariable);
-
-        if (pControl->pBitmap)
-        {
-            delete pControl->pBitmap;
-        }
 
         if (pControl->hImage)
         {
@@ -4347,6 +4535,17 @@ static void FreeFont(
 
         ReleaseMem(pFont->rgFontInstances);
         ReleaseStr(pFont->sczFaceName);
+    }
+}
+
+
+static void FreeImageInstance(
+    __in THEME_IMAGE_INSTANCE* pImageInstance
+    )
+{
+    if (pImageInstance->pBitmap)
+    {
+        delete pImageInstance->pBitmap;
     }
 }
 
@@ -5298,6 +5497,7 @@ static HRESULT LoadControls(
         LPCWSTR wzWindowClass = NULL;
         DWORD dwWindowBits = WS_CHILD;
         DWORD dwWindowExBits = 0;
+        BOOL fOwnerDrawImage = THEME_IMAGE_REFERENCE_TYPE_NONE != pControl->imageRef.type;
 
         if (fStartNewGroup)
         {
@@ -5322,7 +5522,7 @@ static HRESULT LoadControls(
             __fallthrough;
         case THEME_CONTROL_TYPE_BUTTON:
             wzWindowClass = WC_BUTTONW;
-            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (fOwnerDrawImage)
             {
                 dwWindowBits |= BS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
@@ -5356,7 +5556,7 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_IMAGE: // images are basically just owner drawn static controls (so we can draw .jpgs and .pngs instead of just bitmaps).
-            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (fOwnerDrawImage)
             {
                 wzWindowClass = THEME_WC_STATICOWNERDRAW;
                 dwWindowBits |= SS_OWNERDRAW;
@@ -5383,7 +5583,7 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_PROGRESSBAR:
-            if (pControl->pBitmap || (pTheme->pBitmap && 0 <= pControl->nSourceX && 0 <= pControl->nSourceY))
+            if (fOwnerDrawImage)
             {
                 wzWindowClass = THEME_WC_STATICOWNERDRAW; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
                 dwWindowBits |= SS_OWNERDRAW;
