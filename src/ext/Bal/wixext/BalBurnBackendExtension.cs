@@ -107,12 +107,14 @@ namespace WixToolset.Bal
             }
             else
             {
-                var payloadId = baFunctionsSymbol.Id;
-                var bundlePayloadSymbol = payloadPropertiesSymbols.Single(x => payloadId == x.Id);
+                var payloadId = baFunctionsSymbol.PayloadId;
+                var bundlePayloadSymbol = payloadPropertiesSymbols.Single(x => payloadId == x.Id.Id);
                 if (BurnConstants.BurnUXContainerName != bundlePayloadSymbol.ContainerRef)
                 {
                     this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsSymbol.SourceLineNumbers));
                 }
+
+                baFunctionsSymbol.FilePath = bundlePayloadSymbol.Name;
             }
         }
 

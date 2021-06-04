@@ -3849,9 +3849,6 @@ private: // privates
     {
         HRESULT hr = S_OK;
         IXMLDOMNode* pBAFunctionsNode = NULL;
-        IXMLDOMNode* pPayloadNode = NULL;
-        LPWSTR sczPayloadId = NULL;
-        LPWSTR sczPayloadXPath = NULL;
         LPWSTR sczBafName = NULL;
         LPWSTR sczBafPath = NULL;
         BA_FUNCTIONS_CREATE_ARGS bafCreateArgs = { };
@@ -3865,21 +3862,8 @@ private: // privates
             ExitFunction();
         }
 
-        hr = XmlGetAttributeEx(pBAFunctionsNode, L"PayloadId", &sczPayloadId);
-        BalExitOnFailure(hr, "Failed to get BAFunctions PayloadId.");
-
-        hr = StrAllocFormatted(&sczPayloadXPath, L"/BootstrapperApplicationData/WixPayloadProperties[@Payload='%ls']", sczPayloadId);
-        BalExitOnFailure(hr, "Failed to format BAFunctions payload XPath.");
-
-        hr = XmlSelectSingleNode(pixdManifest, sczPayloadXPath, &pPayloadNode);
-        if (S_FALSE == hr)
-        {
-            hr = E_NOTFOUND;
-        }
-        BalExitOnFailure(hr, "Failed to find WixPayloadProperties node for BAFunctions PayloadId: %ls.", sczPayloadId);
-
-        hr = XmlGetAttributeEx(pPayloadNode, L"Name", &sczBafName);
-        BalExitOnFailure(hr, "Failed to get BAFunctions Name.");
+        hr = XmlGetAttributeEx(pBAFunctionsNode, L"FilePath", &sczBafName);
+        BalExitOnFailure(hr, "Failed to get BAFunctions FilePath.");
 
         hr = PathRelativeToModule(&sczBafPath, sczBafName, m_hModule);
         BalExitOnFailure(hr, "Failed to get path to BAFunctions DLL.");
@@ -3912,10 +3896,7 @@ private: // privates
         }
         ReleaseStr(sczBafPath);
         ReleaseStr(sczBafName);
-        ReleaseStr(sczPayloadXPath);
-        ReleaseStr(sczPayloadId);
         ReleaseObject(pBAFunctionsNode);
-        ReleaseObject(pPayloadNode);
 
         return hr;
     }
