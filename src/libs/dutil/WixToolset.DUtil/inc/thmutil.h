@@ -110,6 +110,7 @@ struct THEME_COLUMN
 struct THEME_IMAGE_REFERENCE
 {
     THEME_IMAGE_REFERENCE_TYPE type;
+    DWORD dwImageIndex;
     DWORD dwImageInstanceIndex;
     int nX;
     int nY;
@@ -120,6 +121,15 @@ struct THEME_IMAGE_REFERENCE
 struct THEME_IMAGE_INSTANCE
 {
     Gdiplus::Bitmap* pBitmap;
+};
+
+struct THEME_IMAGE
+{
+    LPWSTR sczId;
+    DWORD dwIndex;
+
+    DWORD cImageInstances;
+    THEME_IMAGE_INSTANCE* rgImageInstances;
 };
 
 
@@ -342,6 +352,9 @@ struct THEME
     DWORD cFonts;
     THEME_FONT* rgFonts;
 
+    DWORD cImages;
+    THEME_IMAGE* rgImages;
+
     DWORD cStandaloneImages;
     THEME_IMAGE_INSTANCE* rgStandaloneImages;
 
@@ -356,6 +369,7 @@ struct THEME
 
     // internal state variables -- do not use outside ThmUtil.cpp
     STRINGDICT_HANDLE sdhFontDictionary;
+    STRINGDICT_HANDLE sdhImageDictionary;
     HWND hwndParent; // parent for loaded controls
     HWND hwndHover; // current hwnd hovered over
     DWORD dwCurrentPageId;
