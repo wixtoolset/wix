@@ -14,6 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="TestData\ExtendedPreprocessorFalsehood\data\test.txt" />
+    <None Remove="TestData\ExtendedPreprocessorFalsehood\Package.en-us.wxl" />
+    <None Remove="TestData\ExtendedPreprocessorFalsehood\Package.wxs" />
+    <None Remove="TestData\ExtendedPreprocessorFalsehood\PackageComponents.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Core\WixToolset.Core.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
     <ProjectReference Include="..\..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />

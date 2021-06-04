@@ -1,5 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+using System;
+
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
@@ -80,11 +82,11 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
         /// <remarks>
         /// This test will fail on 32-bit operating systems because it depends on "CommonProgramFiles(x86)"
         /// which is only defined on 64-bit Windows.
         /// </remarks>
+        [Fact]
         public void SupportParensInEnvironmentVariables()
         {
             var folder = TestData.Get(@"TestData", "Preprocessor");
@@ -123,6 +125,40 @@ namespace WixToolsetTest.CoreIntegration
 
                 var warning = result.Messages.Where(message => message.Id == (int)WarningMessages.Ids.VariableDeclarationCollision);
                 Assert.Single(warning);
+            }
+        }
+
+        /// <Remarks>
+        /// In addition to null (meaning undefined), "" (the empty string),
+        /// 0 (string that evaluates to zero), "No", "False", and "Off"
+        /// (without regard to capitalization)
+        /// are now recognized as valid representations of false.
+        /// </Remarks>
+        [Fact]
+        public void ExtendedFormsOfFalsehoodAreAccepted()
+        {
+            var folder = TestData.Get(@"TestData\ExtendedPreprocessorFalsehood");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var warnings = result.Messages.Where(message => message.Id == (int)WarningMessages.Ids.PreprocessorWarning && ((string)message.MessageArgs[0]).Contains("is not false", StringComparison.Ordinal)).Select(message => (string)message.MessageArgs[0]).ToList();
+                Assert.Empty(warnings);
             }
         }
 

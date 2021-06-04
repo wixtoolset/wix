@@ -1,0 +1,29 @@
+<?foreach falseValue in ; 0; 00; no; No; NO; false; False; FALSE; off; Off; OFF ?>
+    <?if $(var.falseValue) ?> <?warning  $(var.falseValue) is not false ?> <?endif ?>
+<?endforeach ?>
+
+<?ifdef $(sys.WIXVERSION) ?>
+<?if $(sys.WIXMAJORVERSION) >= 4 AND $(sys.WIXMAJORVERSION) < 5 ?>
+  <?warning WiX v4 is in effect! ?>
+<?endif?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Compressed="no" InstallerVersion="200" Scope="perMachine">
+    
+
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>
