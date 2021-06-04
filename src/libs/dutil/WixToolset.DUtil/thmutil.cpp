@@ -139,6 +139,12 @@ static HRESULT GetAttributeFontId(
     __in LPCWSTR wzAttribute,
     __inout DWORD* pdwValue
     );
+static HRESULT GetAttributeImageId(
+    __in THEME* pTheme,
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout DWORD* pdwValue
+    );
 static HRESULT ParseSourceXY(
     __in IXMLDOMNode* pixn,
     __in THEME* pTheme,
@@ -159,6 +165,12 @@ static HRESULT GetFontColor(
     __out DWORD* pdwSystemColor
     );
 static HRESULT ParseFonts(
+    __in IXMLDOMElement* pElement,
+    __in THEME* pTheme
+    );
+static HRESULT ParseImages(
+    __in_opt HMODULE hModule,
+    __in_opt LPCWSTR wzRelativePath,
     __in IXMLDOMElement* pElement,
     __in THEME* pTheme
     );
@@ -371,6 +383,9 @@ static void FreeFontInstance(
 static void FreeFont(
     __in THEME_FONT* pFont
     );
+static void FreeImage(
+    __in THEME_IMAGE* pImage
+    );
 static void FreeImageInstance(
     __in THEME_IMAGE_INSTANCE* pImageInstance
     );
@@ -486,11 +501,13 @@ static HRESULT LoadControlString(
     __in HMODULE hResModule
     );
 static void ResizeControls(
+    __in THEME* pTheme,
     __in DWORD cControls,
     __in THEME_CONTROL* rgControls,
     __in const RECT* prcParent
     );
 static void ResizeControl(
+    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in const RECT* prcParent
     );
@@ -531,6 +548,12 @@ static void GetControls(
     __in_opt const THEME_CONTROL* pParentControl,
     __out DWORD& cControls,
     __out THEME_CONTROL*& rgControls
+    );
+static void ScaleImageReference(
+    __in THEME* pTheme,
+    __in THEME_IMAGE_REFERENCE* pImageRef,
+    __in int nDestWidth,
+    __in int nDestHeight
     );
 static void UnloadControls(
     __in DWORD cControls,
@@ -685,6 +708,11 @@ DAPI_(void) ThemeFree(
             FreeFont(pTheme->rgFonts + i);
         }
 
+        for (DWORD i = 0; i < pTheme->cImages; ++i)
+        {
+            FreeImage(pTheme->rgImages + i);
+        }
+
         for (DWORD i = 0; i < pTheme->cStandaloneImages; ++i)
         {
             FreeImageInstance(pTheme->rgStandaloneImages + i);
@@ -708,10 +736,12 @@ DAPI_(void) ThemeFree(
         ReleaseMem(pTheme->rgControls);
         ReleaseMem(pTheme->rgPages);
         ReleaseMem(pTheme->rgStandaloneImages);
+        ReleaseMem(pTheme->rgImages);
         ReleaseMem(pTheme->rgFonts);
 
         ReleaseStr(pTheme->sczCaption);
         ReleaseDict(pTheme->sdhFontDictionary);
+        ReleaseDict(pTheme->sdhImageDictionary);
         ReleaseMem(pTheme);
     }
 }
@@ -1063,7 +1093,8 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
             {
                 pTheme->fForceResize = FALSE;
                 ::GetClientRect(pTheme->hwndParent, &rcParent);
-                ResizeControls(pTheme->cControls, pTheme->rgControls, &rcParent);
+                ScaleImageReference(pTheme, &pTheme->windowImageRef, rcParent.right - rcParent.left, rcParent.bottom - rcParent.top);
+                ResizeControls(pTheme, pTheme->cControls, pTheme->rgControls, &rcParent);
                 return 0;
             }
             break;
@@ -1819,6 +1850,10 @@ static HRESULT ParseTheme(
     hr = ParseFonts(pThemeElement, pTheme);
     ThmExitOnFailure(hr, "Failed to parse theme fonts.");
 
+    // Parse the images.
+    hr = ParseImages(hModule, wzRelativePath, pThemeElement, pTheme);
+    ThmExitOnFailure(hr, "Failed to parse theme images.");
+
     // Parse the window element.
     hr = ParseWindow(hModule, wzRelativePath, pThemeElement, pTheme);
     ThmExitOnFailure(hr, "Failed to parse theme window element.");
@@ -1950,9 +1985,25 @@ static HRESULT ParseOwnerDrawImage(
     )
 {
     HRESULT hr = S_OK;
+    DWORD dwValue = 0;
     BOOL fXmlFound = FALSE;
     BOOL fFoundImage = FALSE;
     Gdiplus::Bitmap* pBitmap = NULL;
+
+    hr = GetAttributeImageId(pTheme, pElement, L"ImageId", &dwValue);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to parse ImageId attribute.");
+
+    if (fXmlFound)
+    {
+        pImageRef->type = THEME_IMAGE_REFERENCE_TYPE_COMPLETE;
+        pImageRef->dwImageIndex = dwValue;
+        pImageRef->dwImageInstanceIndex = 0;
+        fFoundImage = TRUE;
+    }
+    else
+    {
+        pImageRef->dwImageIndex = THEME_INVALID_ID;
+    }
 
     // Parse the optional background resource image.
     hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pElement, &pBitmap);
@@ -1960,6 +2011,11 @@ static HRESULT ParseOwnerDrawImage(
 
     if (fXmlFound)
     {
+        if (fFoundImage)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unexpected image attribute with ImageId attribute.");
+        }
+
         hr = AddStandaloneImage(pTheme, &pBitmap, &pImageRef->dwImageInstanceIndex);
         ThmExitOnFailure(hr, "Failed to store owner draw image.");
 
@@ -2284,6 +2340,41 @@ LExit:
     return hr;
 }
 
+static HRESULT GetAttributeImageId(
+    __in THEME* pTheme,
+    __in IXMLDOMNode* pixn,
+    __in LPCWSTR wzAttribute,
+    __inout DWORD* pdwValue
+    )
+{
+    HRESULT hr = S_OK;
+    BSTR bstrId = NULL;
+    THEME_IMAGE* pImage = NULL;
+    BOOL fXmlFound = FALSE;
+
+    hr = XmlGetAttribute(pixn, wzAttribute, &bstrId);
+    ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get image id attribute.");
+
+    if (!fXmlFound)
+    {
+        ExitFunction1(hr = E_NOTFOUND);
+    }
+
+    hr = DictGetValue(pTheme->sdhImageDictionary, bstrId, reinterpret_cast<void**>(&pImage));
+    if (E_NOTFOUND == hr)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unknown image id: %ls", bstrId);
+    }
+    ThmExitOnFailure(hr, "Failed to find image with id: %ls", bstrId);
+
+    *pdwValue = pImage->dwIndex;
+
+LExit:
+    ReleaseBSTR(bstrId);
+
+    return hr;
+}
+
 static HRESULT ParseSourceXY(
     __in IXMLDOMNode* pixn,
     __in THEME* pTheme,
@@ -2366,6 +2457,7 @@ static HRESULT ParseSourceXY(
     }
 
     pReference->type = THEME_IMAGE_REFERENCE_TYPE_PARTIAL;
+    pReference->dwImageIndex = THEME_INVALID_ID;
     pReference->dwImageInstanceIndex = dwImageInstanceIndex;
     pReference->nX = nX;
     pReference->nY = nY;
@@ -2747,6 +2839,131 @@ LExit:
     return hr;
 }
 
+
+static HRESULT ParseImages(
+    __in_opt HMODULE hModule,
+    __in_opt LPCWSTR wzRelativePath,
+    __in IXMLDOMElement* pElement,
+    __in THEME* pTheme
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNodeList* pixnl = NULL;
+    IXMLDOMNode* pixn = NULL;
+    LPWSTR sczImageId = NULL;
+    DWORD dwImageIndex = 0;
+    Gdiplus::Bitmap* pDefaultBitmap = NULL;
+    IXMLDOMNodeList* pixnlAlternates = NULL;
+    IXMLDOMNode* pixnAlternate = NULL;
+    DWORD dwInstances = 0;
+    THEME_IMAGE_INSTANCE* pInstance = NULL;
+    BOOL fXmlFound = FALSE;
+
+    hr = XmlSelectNodes(pElement, L"Image", &pixnl);
+    ThmExitOnFailure(hr, "Failed to find font elements.");
+
+    hr = pixnl->get_length(reinterpret_cast<long*>(&pTheme->cImages));
+    ThmExitOnFailure(hr, "Failed to count the number of theme images.");
+
+    if (!pTheme->cImages)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+
+    pTheme->rgImages = static_cast<THEME_IMAGE*>(MemAlloc(sizeof(THEME_IMAGE) * pTheme->cImages, TRUE));
+    ThmExitOnNull(pTheme->rgImages, hr, E_OUTOFMEMORY, "Failed to allocate theme images.");
+
+    hr = DictCreateWithEmbeddedKey(&pTheme->sdhImageDictionary, pTheme->cImages, reinterpret_cast<void**>(&pTheme->rgImages), offsetof(THEME_IMAGE, sczId), DICT_FLAG_NONE);
+    ThmExitOnFailure(hr, "Failed to create image dictionary.");
+
+    while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
+    {
+        hr = XmlGetAttributeEx(pixn, L"Id", &sczImageId);
+        ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find image id.");
+
+        hr = DictKeyExists(pTheme->sdhImageDictionary, sczImageId);
+        if (E_NOTFOUND != hr)
+        {
+            ThmExitOnFailure(hr, "Failed to check for duplicate image id.");
+            ThmExitOnRootFailure(hr = E_INVALIDDATA, "Theme image id duplicated: %ls", sczImageId);
+        }
+
+        THEME_IMAGE* pImage = pTheme->rgImages + dwImageIndex;
+        pImage->sczId = sczImageId;
+        sczImageId = NULL;
+        pImage->dwIndex = dwImageIndex;
+        ++dwImageIndex;
+
+        hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pixn, &pDefaultBitmap);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to parse Image: %ls", pImage->sczId);
+
+        if (!fXmlFound)
+        {
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Image didn't specify an image: %ls.", pImage->sczId);
+        }
+
+        hr = DictAddValue(pTheme->sdhImageDictionary, pImage);
+        ThmExitOnFailure(hr, "Failed to add image to dictionary.");
+
+        // Parse alternates, if any.
+        hr = XmlSelectNodes(pixn, L"AlternateResolution", &pixnlAlternates);
+        ThmExitOnFailure(hr, "Failed to select child AlternateResolution nodes.");
+
+        hr = pixnlAlternates->get_length(reinterpret_cast<long*>(&dwInstances));
+        ThmExitOnFailure(hr, "Failed to count the number of alternates.");
+
+        dwInstances += 1;
+
+        pImage->rgImageInstances = static_cast<THEME_IMAGE_INSTANCE*>(MemAlloc(sizeof(THEME_IMAGE_INSTANCE) * dwInstances, TRUE));
+        ThmExitOnNull(pImage->rgImageInstances, hr, E_OUTOFMEMORY, "Failed to allocate image instances.");
+
+        pInstance = pImage->rgImageInstances;
+        pInstance->pBitmap = pDefaultBitmap;
+        pDefaultBitmap = NULL;
+        pImage->cImageInstances += 1;
+
+        while (S_OK == (hr = XmlNextElement(pixnlAlternates, &pixnAlternate, NULL)))
+        {
+            pInstance = pImage->rgImageInstances + pImage->cImageInstances;
+
+            hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pixnAlternate, &pInstance->pBitmap);
+            ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to parse Image: '%ls', alternate resolution: %u", pImage->sczId, pImage->cImageInstances);
+
+            if (!fXmlFound)
+            {
+                ThmExitWithRootFailure(hr, E_INVALIDDATA, "Image: '%ls', alternate resolution: %u, didn't specify an image.", pImage->sczId, pImage->cImageInstances);
+            }
+
+            ReleaseNullObject(pixnAlternate);
+
+            pImage->cImageInstances += 1;
+        }
+
+        ReleaseNullObject(pixnlAlternates);
+        ReleaseNullObject(pixn);
+    }
+    ThmExitOnFailure(hr, "Failed to enumerate all images.");
+
+    if (S_FALSE == hr)
+    {
+        hr = S_OK;
+    }
+
+LExit:
+    if (pDefaultBitmap)
+    {
+        delete pDefaultBitmap;
+    }
+
+    ReleaseObject(pixnAlternate);
+    ReleaseObject(pixnlAlternates);
+    ReleaseStr(sczImageId);
+    ReleaseObject(pixn);
+    ReleaseObject(pixnl);
+
+    return hr;
+}
+
 static HRESULT ParsePages(
     __in_opt HMODULE hModule,
     __in_opt LPCWSTR wzRelativePath,
@@ -2853,8 +3070,8 @@ static HRESULT ParseImageLists(
         hr = XmlGetAttributeEx(pixnImageList, L"Name", &pThemeImageList->sczName);
         ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find ImageList/@Name attribute.");
 
-        hr = XmlSelectNodes(pixnImageList, L"Image", &pixnlImages);
-        ThmExitOnFailure(hr, "Failed to select child Image nodes.");
+        hr = XmlSelectNodes(pixnImageList, L"ImageListItem", &pixnlImages);
+        ThmExitOnFailure(hr, "Failed to select child ImageListItem nodes.");
 
         hr = pixnlImages->get_length(reinterpret_cast<long*>(&dwImageCount));
         ThmExitOnFailure(hr, "Failed to count the number of images in list.");
@@ -4300,7 +4517,24 @@ static void GetImageInstance(
     __out const THEME_IMAGE_INSTANCE** ppInstance
     )
 {
-    *ppInstance = pTheme->rgStandaloneImages + pReference->dwImageInstanceIndex;
+    switch (pReference->type)
+    {
+    case THEME_IMAGE_REFERENCE_TYPE_PARTIAL:
+    case THEME_IMAGE_REFERENCE_TYPE_COMPLETE:
+        if (THEME_INVALID_ID == pReference->dwImageIndex)
+        {
+            *ppInstance = pTheme->rgStandaloneImages + pReference->dwImageInstanceIndex;
+        }
+        else
+        {
+            THEME_IMAGE* pImage = pTheme->rgImages + pReference->dwImageIndex;
+            *ppInstance = pImage->rgImageInstances + pReference->dwImageInstanceIndex;
+        }
+        break;
+    default:
+        *ppInstance = NULL;
+        break;
+    }
 }
 
 static HRESULT DrawImageReference(
@@ -4321,24 +4555,24 @@ static HRESULT DrawImageReference(
     int nHeight = 0;
 
     GetImageInstance(pTheme, pReference, &pImageInstance);
-    if (THEME_IMAGE_REFERENCE_TYPE_PARTIAL == pReference->type)
+    ExitOnNull(pImageInstance, hr, E_INVALIDARG, "Invalid image reference for drawing.");
+
+    switch (pReference->type)
     {
+    case THEME_IMAGE_REFERENCE_TYPE_PARTIAL:
         nX = pReference->nX;
         nY = pReference->nY;
         nWidth = pReference->nWidth;
         nHeight = pReference->nHeight;
-    }
-    else if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pReference->type)
-    {
+        break;
+    case THEME_IMAGE_REFERENCE_TYPE_COMPLETE:
         nX = 0;
         nY = 0;
         nWidth = pImageInstance->pBitmap->GetWidth();
         nHeight = pImageInstance->pBitmap->GetHeight();
-    }
-    else
-    {
-        AssertSz(FALSE, "Invalid image reference type for drawing");
-        ExitFunction1(hr = E_INVALIDARG);
+        break;
+    default:
+        ExitFunction1(hr = E_INVALIDARG); // This should be unreachable because GetImageInstance should have returned null.
     }
 
     hr = DrawGdipBitmap(hdc, destX, destY, destWidth, destHeight, pImageInstance->pBitmap, nX, nY, nWidth, nHeight);
@@ -4424,23 +4658,22 @@ static HRESULT DrawProgressBar(
     }
 
     GetImageInstance(pTheme, pImageRef, &pInstance);
+    ExitOnNull(pInstance, hr, E_INVALIDARG, "Invalid image reference for drawing.");
 
-    if (THEME_IMAGE_REFERENCE_TYPE_PARTIAL == pImageRef->type)
+    switch (pImageRef->type)
     {
+    case THEME_IMAGE_REFERENCE_TYPE_PARTIAL:
         nSourceHeight = pImageRef->nHeight;
         nSourceX = pImageRef->nX;
         nSourceY = pImageRef->nY;
-    }
-    else if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pImageRef->type)
-    {
+        break;
+    case THEME_IMAGE_REFERENCE_TYPE_COMPLETE:
         nSourceHeight = pInstance->pBitmap->GetHeight();
         nSourceX = 0;
         nSourceY = 0;
-    }
-    else
-    {
-        AssertSz(FALSE, "Invalid image reference type for drawing");
-        ExitFunction1(hr = E_INVALIDARG);
+        break;
+    default:
+        ExitFunction1(hr = E_INVALIDARG); // This should be unreachable because GetImageInstance should have returned null.
     }
 
     // Draw the left side of the progress bar.
@@ -4720,6 +4953,21 @@ static void FreeFont(
     }
 }
 
+
+static void FreeImage(
+    __in THEME_IMAGE* pImage
+    )
+{
+    if (pImage)
+    {
+        for (DWORD i = 0; i < pImage->cImageInstances; ++i)
+        {
+            FreeImageInstance(pImage->rgImageInstances + i);
+        }
+
+        ReleaseStr(pImage->sczId);
+    }
+}
 
 static void FreeImageInstance(
     __in THEME_IMAGE_INSTANCE* pImageInstance
@@ -6232,6 +6480,7 @@ LExit:
 }
 
 static void ResizeControls(
+    __in THEME* pTheme,
     __in DWORD cControls,
     __in THEME_CONTROL* rgControls,
     __in const RECT* prcParent
@@ -6240,11 +6489,12 @@ static void ResizeControls(
     for (DWORD i = 0; i < cControls; ++i)
     {
         THEME_CONTROL* pControl = rgControls + i;
-        ResizeControl(pControl, prcParent);
+        ResizeControl(pTheme, pControl, prcParent);
     }
 }
 
 static void ResizeControl(
+    __in THEME* pTheme,
     __in THEME_CONTROL* pControl,
     __in const RECT* prcParent
     )
@@ -6266,8 +6516,20 @@ static void ResizeControl(
     }
 #endif
 
-    if (THEME_CONTROL_TYPE_LISTVIEW == pControl->type)
+
+    switch (pControl->type)
     {
+    case THEME_CONTROL_TYPE_BUTTON:
+        for (DWORD i = 0; i < (sizeof(pControl->Button.rgImageRef) / sizeof(pControl->Button.rgImageRef[0])); ++i)
+        {
+            ScaleImageReference(pTheme, pControl->Button.rgImageRef + i, w, h);
+        }
+
+        break;
+    case THEME_CONTROL_TYPE_IMAGE:
+        ScaleImageReference(pTheme, &pControl->Image.imageRef, w, h);
+        break;
+    case THEME_CONTROL_TYPE_LISTVIEW:
         SizeListViewColumns(pControl);
 
         for (DWORD j = 0; j < pControl->ListView.cColumns; ++j)
@@ -6278,12 +6540,21 @@ static void ResizeControl(
                 return;
             }
         }
+
+        break;
+    case THEME_CONTROL_TYPE_PROGRESSBAR:
+        for (DWORD i = 0; i < pControl->ProgressBar.cImageRef; ++i)
+        {
+            ScaleImageReference(pTheme, pControl->ProgressBar.rgImageRef + i, 4, h);
+        }
+
+        break;
     }
 
     if (pControl->cControls)
     {
         ::GetClientRect(pControl->hWnd, &rcControl);
-        ResizeControls(pControl->cControls, pControl->rgControls, &rcControl);
+        ResizeControls(pTheme, pControl->cControls, pControl->rgControls, &rcControl);
     }
 }
 
@@ -6387,6 +6658,67 @@ static void ScaleControl(
     if (pControl->cControls)
     {
         ScaleControls(pTheme, pControl->cControls, pControl->rgControls, nDpi);
+    }
+}
+
+static void ScaleImageReference(
+    __in THEME* pTheme,
+    __in THEME_IMAGE_REFERENCE* pImageRef,
+    __in int nDestWidth,
+    __in int nDestHeight
+    )
+{
+    THEME_IMAGE* pImage = NULL;
+    THEME_IMAGE_INSTANCE* pDownscaleInstance = NULL;
+    THEME_IMAGE_INSTANCE* pUpscaleInstance = NULL;
+    THEME_IMAGE_INSTANCE* pInstance = NULL;
+    DWORD dwIndex = THEME_INVALID_ID;
+    DWORD64 qwPixels = 0;
+    DWORD64 qwBestMatchPixels = 0;
+
+    if (THEME_IMAGE_REFERENCE_TYPE_COMPLETE == pImageRef->type && THEME_INVALID_ID != pImageRef->dwImageIndex)
+    {
+        pImage = pTheme->rgImages + pImageRef->dwImageIndex;
+
+        //The dimensions of the destination rectangle are compared to all of the available sources:
+        //    1. If there is an exact match for width and height then that source will be used (no scaling required).
+        //    2. If there is not an exact match then the smallest source whose width and height are larger or equal to the destination will be used and downscaled.
+        //    3. If there is still no match then the largest source will be used and upscaled.
+        for (DWORD i = 0; i < pImage->cImageInstances; ++i)
+        {
+            pInstance = pImage->rgImageInstances + i;
+
+            if (nDestWidth == (int)pInstance->pBitmap->GetWidth() && nDestHeight == (int)pInstance->pBitmap->GetHeight())
+            {
+                dwIndex = i;
+                break;
+            }
+            else if (nDestWidth <= (int)pInstance->pBitmap->GetWidth() && nDestHeight <= (int)pInstance->pBitmap->GetHeight())
+            {
+                qwPixels = (DWORD64)pInstance->pBitmap->GetWidth() * pInstance->pBitmap->GetHeight();
+                if (!pDownscaleInstance || qwPixels < qwBestMatchPixels)
+                {
+                    qwBestMatchPixels = qwPixels;
+                    pDownscaleInstance = pInstance;
+                    dwIndex = i;
+                }
+            }
+            else if (!pDownscaleInstance)
+            {
+                qwPixels = (DWORD64)pInstance->pBitmap->GetWidth() * pInstance->pBitmap->GetHeight();
+                if (!pUpscaleInstance || qwPixels > qwBestMatchPixels)
+                {
+                    qwBestMatchPixels = qwPixels;
+                    pUpscaleInstance = pInstance;
+                    dwIndex = i;
+                }
+            }
+        }
+
+        if (THEME_INVALID_ID != dwIndex)
+        {
+            pImageRef->dwImageInstanceIndex = dwIndex;
+        }
     }
 }
 
