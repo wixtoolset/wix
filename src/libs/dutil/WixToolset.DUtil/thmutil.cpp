@@ -134,6 +134,7 @@ static HRESULT GetAttributeCoordinateOrDimension(
     __inout int* pnValue
     );
 static HRESULT GetAttributeFontId(
+    __in THEME* pTheme,
     __in IXMLDOMNode* pixn,
     __in LPCWSTR wzAttribute,
     __inout DWORD* pdwValue
@@ -710,6 +711,7 @@ DAPI_(void) ThemeFree(
         ReleaseMem(pTheme->rgFonts);
 
         ReleaseStr(pTheme->sczCaption);
+        ReleaseDict(pTheme->sdhFontDictionary);
         ReleaseMem(pTheme);
     }
 }
@@ -2248,30 +2250,37 @@ LExit:
 }
 
 static HRESULT GetAttributeFontId(
+    __in THEME* pTheme,
     __in IXMLDOMNode* pixn,
     __in LPCWSTR wzAttribute,
     __inout DWORD* pdwValue
     )
 {
     HRESULT hr = S_OK;
-    DWORD dwValue = 0;
+    BSTR bstrId = NULL;
+    THEME_FONT* pFont = NULL;
     BOOL fXmlFound = FALSE;
 
-    hr = XmlGetAttributeUInt32(pixn, wzAttribute, &dwValue);
+    hr = XmlGetAttribute(pixn, wzAttribute, &bstrId);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get font id attribute.");
 
     if (!fXmlFound)
     {
         ExitFunction1(hr = E_NOTFOUND);
     }
-    else if (THEME_INVALID_ID == dwValue)
-    {
-        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid font id value: %u", dwValue);
-    }
 
-    *pdwValue = dwValue;
+    hr = DictGetValue(pTheme->sdhFontDictionary, bstrId, reinterpret_cast<void**>(&pFont));
+    if (E_NOTFOUND == hr)
+    {
+        ThmExitWithRootFailure(hr, E_INVALIDDATA, "Unknown font id: %ls", bstrId);
+    }
+    ThmExitOnFailure(hr, "Failed to find font with id: %ls", bstrId);
+
+    *pdwValue = pFont->dwIndex;
 
 LExit:
+    ReleaseBSTR(bstrId);
+
     return hr;
 }
 
@@ -2441,7 +2450,7 @@ static HRESULT ParseWindow(
         pTheme->nMinimumHeight = pTheme->nDefaultDpiMinimumHeight = nValue;
     }
 
-    hr = GetAttributeFontId(pixn, L"FontId", &pTheme->dwFontId);
+    hr = GetAttributeFontId(pTheme, pixn, L"FontId", &pTheme->dwFontId);
     ThmExitOnRequiredXmlQueryFailure(hr, "Failed to get window FontId attribute.");
 
     // Get the optional window icon from a resource.
@@ -2546,6 +2555,7 @@ static HRESULT ParseFonts(
     HRESULT hr = S_OK;
     IXMLDOMNodeList* pixnl = NULL;
     IXMLDOMNode* pixn = NULL;
+    LPWSTR sczFontId = NULL;
     BSTR bstrName = NULL;
     DWORD dwId = 0;
     BOOL fXmlFound = FALSE;
@@ -2568,21 +2578,26 @@ static HRESULT ParseFonts(
     pTheme->rgFonts = static_cast<THEME_FONT*>(MemAlloc(sizeof(THEME_FONT) * pTheme->cFonts, TRUE));
     ThmExitOnNull(pTheme->rgFonts, hr, E_OUTOFMEMORY, "Failed to allocate theme fonts.");
 
+    hr = DictCreateWithEmbeddedKey(&pTheme->sdhFontDictionary, pTheme->cFonts, reinterpret_cast<void**>(&pTheme->rgFonts), offsetof(THEME_FONT, sczId), DICT_FLAG_NONE);
+    ThmExitOnFailure(hr, "Failed to create font dictionary.");
+
     while (S_OK == (hr = XmlNextElement(pixnl, &pixn, NULL)))
     {
-        hr = GetAttributeFontId(pixn, L"Id", &dwId);
+        hr = XmlGetAttributeEx(pixn, L"Id", &sczFontId);
         ThmExitOnRequiredXmlQueryFailure(hr, "Failed to find font id.");
 
-        if (pTheme->cFonts <= dwId)
+        hr = DictKeyExists(pTheme->sdhFontDictionary, sczFontId);
+        if (E_NOTFOUND != hr)
         {
-            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Invalid theme font id: %u.", dwId);
+            ThmExitOnFailure(hr, "Failed to check for duplicate font id.");
+            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Theme font id duplicated: %ls", sczFontId);
         }
 
         THEME_FONT* pFont = pTheme->rgFonts + dwId;
-        if (pFont->cFontInstances)
-        {
-            ThmExitWithRootFailure(hr, E_INVALIDDATA, "Theme font id duplicated.");
-        }
+        pFont->sczId = sczFontId;
+        sczFontId = NULL;
+        pFont->dwIndex = dwId;
+        ++dwId;
 
         pFont->lfQuality = CLEARTYPE_QUALITY;
 
@@ -2631,6 +2646,9 @@ static HRESULT ParseFonts(
             ThmExitOnNull(pFont->hBackground, hr, E_OUTOFMEMORY, "Failed to create text background brush.");
         }
 
+        hr = DictAddValue(pTheme->sdhFontDictionary, pFont);
+        ThmExitOnFailure(hr, "Failed to add font to dictionary.");
+
         ReleaseNullBSTR(bstrName);
         ReleaseNullObject(pixn);
     }
@@ -2643,6 +2661,7 @@ static HRESULT ParseFonts(
 
 LExit:
     ReleaseBSTR(bstrName);
+    ReleaseStr(sczFontId);
     ReleaseObject(pixn);
     ReleaseObject(pixnl);
 
@@ -3185,7 +3204,7 @@ static HRESULT ParseControl(
     }
 
 
-    hr = GetAttributeFontId(pixn, L"FontId", &pControl->dwFontId);
+    hr = GetAttributeFontId(pTheme, pixn, L"FontId", &pControl->dwFontId);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control FontId attribute.");
 
     // Parse the optional window style.
@@ -3291,10 +3310,10 @@ static HRESULT ParseControl(
     }
     else if (THEME_CONTROL_TYPE_HYPERLINK == pControl->type || THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
-        hr = GetAttributeFontId(pixn, L"HoverFontId", &pControl->dwFontHoverId);
+        hr = GetAttributeFontId(pTheme, pixn, L"HoverFontId", &pControl->dwFontHoverId);
         ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control HoverFontId attribute.");
 
-        hr = GetAttributeFontId(pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
+        hr = GetAttributeFontId(pTheme, pixn, L"SelectedFontId", &pControl->dwFontSelectedId);
         ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control SelectedFontId attribute.");
     }
     else if (THEME_CONTROL_TYPE_LABEL == pControl->type)
@@ -4697,6 +4716,7 @@ static void FreeFont(
 
         ReleaseMem(pFont->rgFontInstances);
         ReleaseStr(pFont->sczFaceName);
+        ReleaseStr(pFont->sczId);
     }
 }
 

@@ -295,6 +295,8 @@ struct THEME_FONT_INSTANCE
 
 struct THEME_FONT
 {
+    LPWSTR sczId;
+    DWORD dwIndex;
     LONG lfHeight;
     LONG lfWeight;
     BYTE lfUnderline;
@@ -353,6 +355,7 @@ struct THEME
     THEME_CONTROL* rgControls;
 
     // internal state variables -- do not use outside ThmUtil.cpp
+    STRINGDICT_HANDLE sdhFontDictionary;
     HWND hwndParent; // parent for loaded controls
     HWND hwndHover; // current hwnd hovered over
     DWORD dwCurrentPageId;
