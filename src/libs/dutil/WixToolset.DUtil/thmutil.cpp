@@ -44,9 +44,6 @@ const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
 const DWORD GROW_FONT_INSTANCES = 3;
 const DWORD GROW_IMAGE_INSTANCES = 5;
 const DWORD GROW_WINDOW_TEXT = 250;
-const LPCWSTR THEME_WC_HYPERLINK = L"ThemeHyperLink";
-const LPCWSTR THEME_WC_PANEL = L"ThemePanel";
-const LPCWSTR THEME_WC_STATICOWNERDRAW = L"ThemeStaticOwnerDraw";
 
 static Gdiplus::GdiplusStartupInput vgsi;
 static Gdiplus::GdiplusStartupOutput vgso = { };
@@ -59,6 +56,9 @@ static WNDPROC vpfnStaticOwnerDrawBaseWndProc = NULL;
 static HMODULE vhModuleMsftEdit = NULL;
 static HMODULE vhModuleRichEd = NULL;
 static HCURSOR vhCursorHand = NULL;
+static LPWSTR vsczHyperlinkClass = NULL;
+static LPWSTR vsczPanelClass = NULL;
+static LPWSTR vsczStaticOwnerDrawClass = NULL;
 
 enum INTERNAL_CONTROL_STYLE
 {
@@ -575,6 +575,15 @@ DAPI_(HRESULT) ThemeInitialize(
     hr = XmlInitialize();
     ThmExitOnFailure(hr, "Failed to initialize XML.");
 
+    hr = StrAllocFormatted(&vsczHyperlinkClass, L"ThemeHyperLink_%p", hModule);
+    ThmExitOnFailure(hr, "Failed to initialize hyperlink class name.");
+
+    hr = StrAllocFormatted(&vsczPanelClass, L"ThemePanel_%p", hModule);
+    ThmExitOnFailure(hr, "Failed to initialize panel class name.");
+
+    hr = StrAllocFormatted(&vsczStaticOwnerDrawClass, L"ThemeStaticOwnerDraw_%p", hModule);
+    ThmExitOnFailure(hr, "Failed to initialize static owner draw class name.");
+
     hr = RegisterWindowClasses(hModule);
     ThmExitOnFailure(hr, "Failed to register theme window classes.");
 
@@ -611,22 +620,28 @@ DAPI_(void) ThemeUninitialize()
 
     if (vhHyperlinkRegisteredModule)
     {
-        ::UnregisterClassW(THEME_WC_HYPERLINK, vhHyperlinkRegisteredModule);
+        ::UnregisterClassW(vsczHyperlinkClass, vhHyperlinkRegisteredModule);
         vhHyperlinkRegisteredModule = NULL;
     }
 
+    ReleaseStr(vsczHyperlinkClass);
+
     if (vhPanelRegisteredModule)
     {
-        ::UnregisterClassW(THEME_WC_PANEL, vhPanelRegisteredModule);
+        ::UnregisterClassW(vsczPanelClass, vhPanelRegisteredModule);
         vhPanelRegisteredModule = NULL;
     }
 
+    ReleaseStr(vsczPanelClass);
+
     if (vhStaticOwnerDrawRegisteredModule)
     {
-        ::UnregisterClassW(THEME_WC_STATICOWNERDRAW, vhStaticOwnerDrawRegisteredModule);
+        ::UnregisterClassW(vsczStaticOwnerDrawClass, vhStaticOwnerDrawRegisteredModule);
         vhStaticOwnerDrawRegisteredModule = NULL;
         vpfnStaticOwnerDrawBaseWndProc = NULL;
     }
+
+    ReleaseStr(vsczStaticOwnerDrawClass);
 
     if (vgdiToken)
     {
@@ -1764,7 +1779,7 @@ static HRESULT RegisterWindowClasses(
         ThmExitWithLastError(hr, "Failed to get button window class.");
     }
 
-    wcHyperlink.lpszClassName = THEME_WC_HYPERLINK;
+    wcHyperlink.lpszClassName = vsczHyperlinkClass;
 #pragma prefast(push)
 #pragma prefast(disable:25068)
     wcHyperlink.hCursor = vhCursorHand;
@@ -1772,7 +1787,7 @@ static HRESULT RegisterWindowClasses(
 
     if (!::RegisterClassW(&wcHyperlink))
     {
-        ThmExitWithLastError(hr, "Failed to get button window class.");
+        ThmExitWithLastError(hr, "Failed to register hyperlink window class.");
     }
     vhHyperlinkRegisteredModule = hModule;
 
@@ -1780,10 +1795,10 @@ static HRESULT RegisterWindowClasses(
     wcPanel.lpfnWndProc = PanelWndProc;
     wcPanel.hInstance = hModule;
     wcPanel.hCursor = ::LoadCursorW(NULL, (LPCWSTR) IDC_ARROW);
-    wcPanel.lpszClassName = THEME_WC_PANEL;
+    wcPanel.lpszClassName = vsczPanelClass;
     if (!::RegisterClassW(&wcPanel))
     {
-        ThmExitWithLastError(hr, "Failed to register window.");
+        ThmExitWithLastError(hr, "Failed to register panel window class.");
     }
     vhPanelRegisteredModule = hModule;
 
@@ -1795,7 +1810,7 @@ static HRESULT RegisterWindowClasses(
     pfnStaticOwnerDrawBaseWndProc = wcStaticOwnerDraw.lpfnWndProc;
     wcStaticOwnerDraw.lpfnWndProc = StaticOwnerDrawWndProc;
     wcStaticOwnerDraw.hInstance = hModule;
-    wcStaticOwnerDraw.lpszClassName = THEME_WC_STATICOWNERDRAW;
+    wcStaticOwnerDraw.lpszClassName = vsczStaticOwnerDrawClass;
     if (!::RegisterClassW(&wcStaticOwnerDraw))
     {
         ThmExitWithLastError(hr, "Failed to register OwnerDraw window class.");
@@ -5947,7 +5962,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_BILLBOARD: 
             __fallthrough;
         case THEME_CONTROL_TYPE_PANEL:
-            wzWindowClass = THEME_WC_PANEL;
+            wzWindowClass = vsczPanelClass;
             dwWindowExBits |= WS_EX_CONTROLPARENT;
 #ifdef DEBUG
             StrAllocFormatted(&pControl->sczText, L"Panel '%ls', id: %d", pControl->sczName, pControl->wId);
@@ -5983,7 +5998,7 @@ static HRESULT LoadControls(
             break;
 
         case THEME_CONTROL_TYPE_HYPERLINK: // hyperlinks are basically just owner drawn buttons.
-            wzWindowClass = THEME_WC_HYPERLINK;
+            wzWindowClass = vsczHyperlinkClass;
             dwWindowBits |= BS_OWNERDRAW | BTNS_NOPREFIX;
             break;
 
@@ -5995,7 +6010,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_IMAGE: // images are basically just owner drawn static controls (so we can draw .jpgs and .pngs instead of just bitmaps).
             if (THEME_IMAGE_REFERENCE_TYPE_NONE != pControl->Image.imageRef.type)
             {
-                wzWindowClass = THEME_WC_STATICOWNERDRAW;
+                wzWindowClass = vsczStaticOwnerDrawClass;
                 dwWindowBits |= SS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
             }
@@ -6022,7 +6037,7 @@ static HRESULT LoadControls(
         case THEME_CONTROL_TYPE_PROGRESSBAR:
             if (pControl->ProgressBar.cImageRef)
             {
-                wzWindowClass = THEME_WC_STATICOWNERDRAW; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
+                wzWindowClass = vsczStaticOwnerDrawClass; // no such thing as an owner drawn progress bar so we'll make our own out of a static control.
                 dwWindowBits |= SS_OWNERDRAW;
                 pControl->dwInternalStyle |= INTERNAL_CONTROL_STYLE_OWNER_DRAW;
             }
