@@ -188,12 +188,38 @@ struct THEME_CONTROL
     LPWSTR sczVisibleCondition;
     BOOL fDisableVariableFunctionality;
 
-    THEME_IMAGE_REFERENCE imageRef;
-    HBITMAP hImage;
-    HICON hIcon;
+    union
+    {
+        struct
+        {
+            THEME_IMAGE_REFERENCE rgImageRef[4];
+        } Button;
+        struct
+        {
+            HBITMAP hImage;
+            HICON hIcon;
 
-    // Don't free these; it's just a handle to the central image lists stored in THEME. The handle is freed once, there.
-    HIMAGELIST rghImageList[4];
+            DWORD cConditionalNotes;
+            THEME_CONDITIONAL_TEXT* rgConditionalNotes;
+        } CommandLink;
+        struct
+        {
+            THEME_IMAGE_REFERENCE imageRef;
+        } Image;
+        struct
+        {
+            // Don't free these; it's just a handle to the central image lists stored in THEME. The handle is freed once, there.
+            HIMAGELIST rghImageList[4];
+
+            THEME_COLUMN* ptcColumns;
+            DWORD cColumns;
+        } ListView;
+        struct
+        {
+            DWORD cImageRef;
+            THEME_IMAGE_REFERENCE* rgImageRef;
+        } ProgressBar;
+    };
 
     DWORD dwStyle;
     DWORD dwExtendedStyle;
@@ -218,10 +244,6 @@ struct THEME_CONTROL
     DWORD dwFontHoverId;
     DWORD dwFontSelectedId;
 
-    // Used by listview controls
-    THEME_COLUMN *ptcColumns;
-    DWORD cColumns;
-
     // Used by radio button controls
     BOOL fLastRadioButton;
     LPWSTR sczValue;
@@ -234,10 +256,6 @@ struct THEME_CONTROL
     // Used by controls that have text
     DWORD cConditionalText;
     THEME_CONDITIONAL_TEXT* rgConditionalText;
-
-    // Used by command link controls
-    DWORD cConditionalNotes;
-    THEME_CONDITIONAL_TEXT* rgConditionalNotes;
 
     // state variables that should be ignored
     HWND hWnd;
