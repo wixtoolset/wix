@@ -24,6 +24,9 @@ namespace WixToolset.Core
         private static readonly Regex DefineRegex = new Regex(@"^\s*(?<varName>.+?)\s*(=\s*(?<varValue>.+?)\s*)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
         private static readonly Regex PragmaRegex = new Regex(@"^\s*(?<pragmaName>.+?)(?<pragmaValue>[\s\(].+?)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
+        // All lower case strings
+        private static readonly List<string> FalseEquivalents = new List<string> { "no", "false", "off" };
+
         private static readonly XmlReaderSettings DocumentXmlReaderSettings = new XmlReaderSettings()
         {
             ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
@@ -1080,15 +1083,38 @@ namespace WixToolset.Core
                     throw new WixException(ErrorMessages.ExpectedVariable(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
-                // false expression
+                // null value ==> false expression
             }
             else if (operation.Length == 0)
             {
                 // There is no right side of the equation.
-                // If the variable was evaluated, it exists, so the expression is true
+                // If the variable was evaluated, it exists.
+
                 if (startsWithVariable)
                 {
-                    expressionValue = true;
+                    var nonZeroFlag = false;
+
+                    foreach (var c in leftValue.Trim())
+                    {
+                        if ('0' != c)
+                        {
+                            nonZeroFlag = true;
+                            break;
+                        }
+                    }
+
+                    if (!nonZeroFlag)
+                    {
+                        // empty string or all-zero string => false expression
+                    }
+                    else
+                    {
+                        var leftValueLower = leftValue.Trim().ToLower();
+                        if (!FalseEquivalents.Exists(s => StringComparer.InvariantCulture.Equals(leftValueLower, s)))
+                        {
+                            expressionValue = true;
+                        }
+                    }
                 }
                 else
                 {
