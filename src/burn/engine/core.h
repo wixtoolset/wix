@@ -133,6 +133,7 @@ typedef struct _BURN_ENGINE_STATE
 
     int argc;
     LPWSTR* argv;
+    BOOL fInvalidCommandLine;
 } BURN_ENGINE_STATE;
 
 typedef struct _BURN_APPLY_CONTEXT
