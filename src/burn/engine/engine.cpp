@@ -341,26 +341,44 @@ static HRESULT InitializeEngineState(
                 wzParam = &pEngineState->argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)];
                 if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
+                    pEngineState->fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
                 }
-
-                hr = StrStringToUInt64(wzParam, 0, &qw);
-                ExitOnFailure(hr, "Failed to parse file handle: '%ls'", (wzParam));
-
-                hSourceEngineFile = (HANDLE)qw;
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        hSourceEngineFile = (HANDLE)qw;
+                    }
+                }
             }
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &pEngineState->argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)))
             {
                 wzParam = &pEngineState->argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)];
                 if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
+                    pEngineState->fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
                 }
-
-                hr = StrStringToUInt64(wzParam, 0, &qw);
-                ExitOnFailure(hr, "Failed to parse file handle: '%ls'", (wzParam));
-
-                hSectionFile = (HANDLE)qw;
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        hSectionFile = (HANDLE)qw;
+                    }
+                }
             }
         }
     }

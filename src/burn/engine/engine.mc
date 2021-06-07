@@ -128,6 +128,13 @@ Language=English
 Bootstrapper application opted out of any engine behavior to automatically uninstall the bundle during shutdown.
 .
 
+MessageId=15
+Severity=Error
+SymbolicName=MSG_FAILED_PARSE_COMMAND_LINE
+Language=English
+Failed to parse command line.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
