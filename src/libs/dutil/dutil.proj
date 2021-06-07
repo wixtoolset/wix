@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
+
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x64;PlatformToolset=v141" />
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=ARM64;PlatformToolset=v141" />
+
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x86;PlatformToolset=v142" />
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=x64;PlatformToolset=v142" />
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Properties="Platform=ARM64;PlatformToolset=v142" />
+
+    <ProjectReference Include="test\DUtilUnitTest\DUtilUnitTest.vcxproj" Targets="Test" />
+
+    <ProjectReference Include="WixToolset.DUtil\dutil.vcxproj" Targets="PackNative" />
+  </ItemGroup>
+</Project>
