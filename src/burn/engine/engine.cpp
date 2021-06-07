@@ -321,10 +321,8 @@ static HRESULT InitializeEngineState(
     )
 {
     HRESULT hr = S_OK;
-    LPCWSTR wzParam = NULL;
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
-    DWORD64 qw = 0;
 
     pEngineState->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     pEngineState->dwElevatedLoggingTlsId = TLS_OUT_OF_INDEXES;
@@ -332,56 +330,9 @@ static HRESULT InitializeEngineState(
     PipeConnectionInitialize(&pEngineState->companionConnection);
     PipeConnectionInitialize(&pEngineState->embeddedConnection);
 
-    for (int i = 0; i < pEngineState->argc; ++i)
-    {
-        if (pEngineState->argv[i][0] == L'-')
-        {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &pEngineState->argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)))
-            {
-                wzParam = &pEngineState->argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)];
-                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
-                {
-                    pEngineState->fInvalidCommandLine = TRUE;
-                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
-                }
-                else
-                {
-                    hr = StrStringToUInt64(wzParam, 0, &qw);
-                    if (FAILED(hr))
-                    {
-                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
-                        hr = S_OK;
-                    }
-                    else
-                    {
-                        hSourceEngineFile = (HANDLE)qw;
-                    }
-                }
-            }
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &pEngineState->argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)))
-            {
-                wzParam = &pEngineState->argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)];
-                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
-                {
-                    pEngineState->fInvalidCommandLine = TRUE;
-                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
-                }
-                else
-                {
-                    hr = StrStringToUInt64(wzParam, 0, &qw);
-                    if (FAILED(hr))
-                    {
-                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
-                        hr = S_OK;
-                    }
-                    else
-                    {
-                        hSectionFile = (HANDLE)qw;
-                    }
-                }
-            }
-        }
-    }
+    // Parse command line.
+    hr = CoreParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &pEngineState->internalCommand.sczSourceProcessPath, &pEngineState->internalCommand.sczOriginalSource, &hSectionFile, &hSourceEngineFile, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &pEngineState->fInvalidCommandLine, &pEngineState->cUnknownArgs, &pEngineState->rgUnknownArgs);
+    ExitOnFailure(hr, "Fatal error while parsing command line.");
 
     hr = SectionInitialize(&pEngineState->section, hSectionFile, hSourceEngineFile);
     ExitOnFailure(hr, "Failed to initialize engine section.");
@@ -398,6 +349,8 @@ static void UninitializeEngineState(
     {
         AppFreeCommandLineArgs(pEngineState->argv);
     }
+
+    ReleaseMem(pEngineState->rgUnknownArgs);
 
     ReleaseStr(pEngineState->sczIgnoreDependencies);
 
@@ -426,6 +379,9 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->command.wzBootstrapperWorkingFolder);
     ReleaseStr(pEngineState->command.wzLayoutDirectory);
     ReleaseStr(pEngineState->command.wzCommandLine);
+
+    ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
+    ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
 
     ReleaseStr(pEngineState->log.sczExtension);
     ReleaseStr(pEngineState->log.sczPrefix);

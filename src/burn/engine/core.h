@@ -77,6 +77,12 @@ enum BURN_AU_PAUSE_ACTION
 
 // structs
 
+typedef struct _BURN_ENGINE_COMMAND
+{
+    LPWSTR sczSourceProcessPath;
+    LPWSTR sczOriginalSource;
+} BURN_ENGINE_COMMAND;
+
 typedef struct _BURN_ENGINE_STATE
 {
     // UX flow control
@@ -134,6 +140,9 @@ typedef struct _BURN_ENGINE_STATE
     int argc;
     LPWSTR* argv;
     BOOL fInvalidCommandLine;
+    BURN_ENGINE_COMMAND internalCommand;
+    DWORD cUnknownArgs;
+    int* rgUnknownArgs;
 } BURN_ENGINE_STATE;
 
 typedef struct _BURN_APPLY_CONTEXT
@@ -221,6 +230,29 @@ HRESULT CoreAppendFileHandleSelfToCommandLine(
     );
 void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState
+    );
+HRESULT CoreParseCommandLine(
+    __in int argc,
+    __in LPWSTR* argv,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BURN_PIPE_CONNECTION* pCompanionConnection,
+    __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
+    __inout BURN_MODE* pMode,
+    __inout BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
+    __inout BOOL* pfDisableSystemRestore,
+    __inout_z LPWSTR* psczSourceProcessPath,
+    __inout_z LPWSTR* psczOriginalSource,
+    __inout HANDLE* phSectionFile,
+    __inout HANDLE* phSourceEngineFile,
+    __inout BOOL* pfDisableUnelevate,
+    __inout DWORD* pdwLoggingAttributes,
+    __inout_z LPWSTR* psczLogFile,
+    __inout_z LPWSTR* psczActiveParent,
+    __inout_z LPWSTR* psczIgnoreDependencies,
+    __inout_z LPWSTR* psczAncestors,
+    __inout BOOL* pfInvalidCommandLine,
+    __inout DWORD* pcUnknownArgs,
+    __inout int** prgUnknownArgs
     );
 
 #if defined(__cplusplus)
