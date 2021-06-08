@@ -158,10 +158,6 @@ namespace WixToolset.Core.Burn.Bundles
 
                 // write the UX element
                 writer.WriteStartElement("UX");
-                if (!String.IsNullOrEmpty(this.BundleSymbol.SplashScreenSourceFile))
-                {
-                    writer.WriteAttributeString("SplashScreen", "yes");
-                }
 
                 // write the UX allPayloads...
                 foreach (var payload in this.UXContainerPayloads)

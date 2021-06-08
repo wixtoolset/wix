@@ -3,7 +3,6 @@
 #include "precomp.h"
 
 #define BURN_SPLASHSCREEN_CLASS_WINDOW L"WixBurnSplashScreen"
-#define IDB_SPLASHSCREEN 1
 
 // struct
 
@@ -21,12 +20,17 @@ struct SPLASHSCREEN_CONTEXT
     HANDLE hInitializedEvent;
     HINSTANCE hInstance;
     LPCWSTR wzCaption;
+    BURN_SPLASH_SCREEN_CONFIGURATION* pSplashScreenConfiguration;
 
     HWND* pHwnd;
 };
 
 // internal function definitions
 
+static HRESULT LoadConfiguration(
+    __in HINSTANCE hInstance,
+    __in BURN_SPLASH_SCREEN_CONFIGURATION** ppSplashScreenConfiguration
+    );
 static DWORD WINAPI ThreadProc(
     __in LPVOID pvContext
     );
@@ -73,6 +77,19 @@ extern "C" void SplashScreenCreate(
     SPLASHSCREEN_CONTEXT context = { };
     HANDLE rgSplashScreenEvents[2] = { };
     DWORD dwSplashScreenThreadId = 0;
+
+    hr = LoadConfiguration(hInstance, &context.pSplashScreenConfiguration);
+    ExitOnFailure(hr, "Failed to load splash screen configuration.");
+
+    switch (context.pSplashScreenConfiguration->type)
+    {
+    case BURN_SPLASH_SCREEN_TYPE_NONE:
+        ExitFunction();
+    case BURN_SPLASH_SCREEN_TYPE_BITMAP_RESOURCE:
+        break;
+    default:
+        ExitWithRootFailure(hr, E_INVALIDDATA, "Invalid splash screen type: %i", context.pSplashScreenConfiguration->type);
+    }
 
     rgSplashScreenEvents[0] = ::CreateEventW(NULL, TRUE, FALSE, NULL);
     ExitOnNullWithLastError(rgSplashScreenEvents[0], hr, "Failed to create modal event.");
@@ -121,6 +138,24 @@ extern "C" HRESULT SplashScreenDisplayError(
 LExit:
     ReleaseStr(sczDisplayString);
 
+    return hr;
+}
+
+
+static HRESULT LoadConfiguration(
+    __in HINSTANCE hInstance,
+    __in BURN_SPLASH_SCREEN_CONFIGURATION** ppSplashScreenConfiguration
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD cbData = 0;
+
+    hr = ResReadData(hInstance, MAKEINTRESOURCEA(IDD_BURN_SPLASH_SCREEN_CONFIGURATION), reinterpret_cast<PVOID*>(ppSplashScreenConfiguration), &cbData);
+    ExitOnFailure(hr, "Failed to read splash screen configuration resource.");
+
+    AssertSz(sizeof(BURN_SPLASH_SCREEN_CONFIGURATION) == cbData, "Splash screen configuration resource size is wrong");
+
+LExit:
     return hr;
 }
 
@@ -242,7 +277,7 @@ static HRESULT LoadSplashScreen(
     RECT* pMonitorRect = NULL;
 
     pSplashScreen->nDpi = USER_DEFAULT_SCREEN_DPI;
-    pSplashScreen->hBitmap = ::LoadBitmapW(pContext->hInstance, MAKEINTRESOURCEW(IDB_SPLASHSCREEN));
+    pSplashScreen->hBitmap = ::LoadBitmapW(pContext->hInstance, MAKEINTRESOURCEW(pContext->pSplashScreenConfiguration->wResourceId));
     ExitOnNullWithLastError(pSplashScreen->hBitmap, hr, "Failed to load splash screen bitmap.");
 
     ::GetObject(pSplashScreen->hBitmap, sizeof(bmp), static_cast<void*>(&bmp));

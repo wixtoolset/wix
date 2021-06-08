@@ -6,6 +6,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
+    using System.Runtime.InteropServices;
     using System.Text;
     using System.Xml;
     using WixToolset.Core.Native;
@@ -303,17 +304,64 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
+            var splashScreenType = BURN_SPLASH_SCREEN_TYPE.BURN_SPLASH_SCREEN_TYPE_NONE;
+
             if (!String.IsNullOrEmpty(bundleInfo.SplashScreenSourceFile))
             {
                 var bitmap = new Dtf.Resources.BitmapResource("#1", burnLocale);
                 bitmap.ReadFromFile(bundleInfo.SplashScreenSourceFile);
                 resources.Add(bitmap);
+
+                splashScreenType = BURN_SPLASH_SCREEN_TYPE.BURN_SPLASH_SCREEN_TYPE_BITMAP_RESOURCE;
             }
+
+            var splashScreenConfig = new BURN_SPLASH_SCREEN_CONFIGURATION
+            {
+                Type = splashScreenType,
+                ResourceId = 1,
+            };
+
+            var splashScreenConfigResource = new Dtf.Resources.Resource(ResourceType.RCData, "#1", burnLocale, splashScreenConfig.ToBytes());
+            resources.Add(splashScreenConfigResource);
 
             var manifestResource = new Resource(ResourceType.Manifest, "#1", burnLocale, applicationManifestData);
             resources.Add(manifestResource);
 
             resources.Save(bundleTempPath);
+        }
+
+        enum BURN_SPLASH_SCREEN_TYPE
+        {
+            BURN_SPLASH_SCREEN_TYPE_NONE,
+            BURN_SPLASH_SCREEN_TYPE_BITMAP_RESOURCE,
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct BURN_SPLASH_SCREEN_CONFIGURATION
+        {
+            [MarshalAs(UnmanagedType.I4)]
+            public BURN_SPLASH_SCREEN_TYPE Type;
+
+            [MarshalAs(UnmanagedType.U2)]
+            public UInt16 ResourceId;
+
+            public byte[] ToBytes()
+            {
+                var cb = Marshal.SizeOf(this);
+                var data = new byte[cb];
+                var pBuffer = Marshal.AllocHGlobal(cb);
+
+                try
+                {
+                    Marshal.StructureToPtr(this, pBuffer, true);
+                    Marshal.Copy(pBuffer, data, 0, cb);
+                    return data;
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(pBuffer);
+                }
+            }
         }
     }
 }
