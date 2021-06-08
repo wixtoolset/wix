@@ -6,11 +6,25 @@
 extern "C" {
 #endif
 
+// IDD_BURN_SPLASH_SCREEN_CONFIGURATION, BURN_SPLASH_SCREEN_TYPE, and BURN_SPLASH_SCREEN_CONFIGURATION must stay in sync with src\wix\WixToolset.Core.Burn\Bundles\CreateBundleExeCommand.cs
+
+#define IDD_BURN_SPLASH_SCREEN_CONFIGURATION 1
 
 // constants
 
+enum BURN_SPLASH_SCREEN_TYPE
+{
+    BURN_SPLASH_SCREEN_TYPE_NONE,
+    BURN_SPLASH_SCREEN_TYPE_BITMAP_RESOURCE,
+};
 
 // structs
+
+typedef struct _BURN_SPLASH_SCREEN_CONFIGURATION
+{
+    BURN_SPLASH_SCREEN_TYPE type;
+    WORD wResourceId;
+} BURN_SPLASH_SCREEN_CONFIGURATION;
 
 
 // functions

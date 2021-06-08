@@ -122,6 +122,11 @@ extern "C" HRESULT EngineRun(
 
     engineState.command.nCmdShow = nCmdShow;
 
+    if (BURN_MODE_ELEVATED != engineState.mode && BOOTSTRAPPER_DISPLAY_NONE < engineState.command.display && !engineState.command.hwndSplashScreen)
+    {
+        SplashScreenCreate(hInstance, NULL, &engineState.command.hwndSplashScreen);
+    }
+
     // initialize platform layer
     PlatformInitialize();
 
@@ -452,7 +457,10 @@ static HRESULT RunUntrusted(
     hr = CoreAppendFileHandleSelfToCommandLine(wzCleanRoomBundlePath, &hFileSelf, &sczParameters, NULL);
     ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
 
-    hr = StrAllocFormattedSecure(&sczParameters, L"%ls %ls", sczParameters, wzCommandLine);
+    hr = CoreAppendSplashScreenWindowToCommandLine(pEngineState->command.hwndSplashScreen, &sczParameters);
+    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
+
+    hr = StrAllocConcatFormattedSecure(&sczParameters, L" %ls", wzCommandLine);
     ExitOnFailure(hr, "Failed to append original command line.");
 
 #ifdef ENABLE_UNELEVATE
@@ -523,11 +531,6 @@ static HRESULT RunNormal(
 
         // If the block told us to abort, abort!
         ExitFunction1(hr = S_OK);
-    }
-
-    if (pEngineState->userExperience.fSplashScreen && BOOTSTRAPPER_DISPLAY_NONE < pEngineState->command.display)
-    {
-        SplashScreenCreate(hInstance, NULL, &pEngineState->command.hwndSplashScreen);
     }
 
     // Create a top-level window to handle system messages.

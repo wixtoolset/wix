@@ -1060,7 +1060,7 @@ extern "C" HRESULT CoreAppendFileHandleAttachedToCommandLine(
         ExitWithLastError(hr, "Failed to duplicate file handle for attached container.");
     }
 
-    hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, reinterpret_cast<size_t>(hExecutableFile));
+    hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, reinterpret_cast<size_t>(hExecutableFile));
     ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
     *phExecutableFile = hExecutableFile;
@@ -1088,12 +1088,12 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
     hExecutableFile = ::CreateFileW(wzExecutablePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, &securityAttributes, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE != hExecutableFile)
     {
-        hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
+        hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
         ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
         if (psczObfuscatedCommandLine)
         {
-            hr = StrAllocFormatted(psczObfuscatedCommandLine, L"%ls -%ls=%Iu", *psczObfuscatedCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
+            hr = StrAllocConcatFormatted(psczObfuscatedCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
             ExitOnFailure(hr, "Failed to append the file handle to the obfuscated command line.");
         }
 
@@ -1104,6 +1104,23 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
 LExit:
     ReleaseFileHandle(hExecutableFile);
 
+    return hr;
+}
+
+extern "C" HRESULT CoreAppendSplashScreenWindowToCommandLine(
+    __in_opt HWND hwndSplashScreen,
+    __deref_inout_z LPWSTR* psczCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (hwndSplashScreen)
+    {
+        hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, reinterpret_cast<size_t>(hwndSplashScreen));
+        ExitOnFailure(hr, "Failed to append the splash screen window to the command line.");
+    }
+
+LExit:
     return hr;
 }
 
@@ -1568,6 +1585,28 @@ extern "C" HRESULT CoreParseCommandLine(
                     else
                     {
                         *phSectionFile = (HANDLE)qw;
+                    }
+                }
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN), BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)))
+            {
+                LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)];
+                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
+                }
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse splash screen window: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        pCommand->hwndSplashScreen = (HWND)qw;
                     }
                 }
             }
