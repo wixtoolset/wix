@@ -41,7 +41,7 @@ namespace WixToolsetTest.BurnE2E
             this.CanInstallAndUninstallSimpleBundle("PackageA_x64", "BundleA_x64");
         }
 
-        [Fact]
+        [Fact(Skip = "Need to update assertions for per-user-ness.")]
         public void CanInstallAndUninstallSimplePerUserBundle_x64_wixstdba()
         {
             this.CanInstallAndUninstallSimpleBundle("PackageApu_x64", "BundleApu_x64");
