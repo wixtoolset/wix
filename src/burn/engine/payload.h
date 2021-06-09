@@ -66,6 +66,7 @@ typedef struct _BURN_PAYLOADS
 {
     BURN_PAYLOAD* rgPayloads;
     DWORD cPayloads;
+    STRINGDICT_HANDLE sdhPayloads; // value is BURN_PAYLOAD*
 } BURN_PAYLOADS;
 
 typedef struct _BURN_PAYLOAD_GROUP_ITEM
@@ -109,7 +110,7 @@ HRESULT PayloadFindById(
     __out BURN_PAYLOAD** ppPayload
     );
 HRESULT PayloadFindEmbeddedBySourcePath(
-    __in BURN_PAYLOADS* pPayloads,
+    __in STRINGDICT_HANDLE sdhPayloads,
     __in_z LPCWSTR wzStreamName,
     __out BURN_PAYLOAD** ppPayload
     );

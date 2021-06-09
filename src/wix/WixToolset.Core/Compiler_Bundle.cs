@@ -351,7 +351,7 @@ namespace WixToolset.Core
                         this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
                         break;
                     case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads, ComplexReferenceChildType.Unknown, null);
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
                         break;
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
@@ -649,8 +649,6 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            Identifier previousId = null;
-            var previousType = ComplexReferenceChildType.Unknown;
 
             foreach (var attrib in node.Attributes())
             {
@@ -675,16 +673,13 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "BootstrapperApplicationDll":
-                            previousId = this.ParseBootstrapperApplicationDllElement(child, id, previousType, previousId);
-                            previousType = ComplexReferenceChildType.Payload;
+                            this.ParseBootstrapperApplicationDllElement(child, id);
                             break;
                         case "Payload":
-                            previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                            previousType = ComplexReferenceChildType.Payload;
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
                         case "PayloadGroupRef":
-                            previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                            previousType = ComplexReferenceChildType.PayloadGroup;
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
                         default:
                             this.Core.UnexpectedElement(node, child);
@@ -708,9 +703,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">Element to parse</param>
         /// <param name="defaultId"></param>
-        /// <param name="previousType"></param>
-        /// <param name="previousId"></param>
-        private Identifier ParseBootstrapperApplicationDllElement(XElement node, Identifier defaultId, ComplexReferenceChildType previousType, Identifier previousId)
+        private Identifier ParseBootstrapperApplicationDllElement(XElement node, Identifier defaultId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
@@ -805,7 +798,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id, previousType, previousId?.Id);
+                compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
                 this.Core.AddSymbol(new WixBundleContainerSymbol(sourceLineNumbers, Compiler.BurnUXContainerId)
                 {
                     Name = "bundle-ux.cab",
@@ -829,8 +822,6 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string id = null;
-            Identifier previousId = null;
-            var previousType = ComplexReferenceChildType.Unknown;
 
             foreach (var attrib in node.Attributes())
             {
@@ -859,12 +850,10 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
+                        this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                         break;
                     case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -1195,8 +1184,6 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
-            Identifier previousId = null;
-            var previousType = ComplexReferenceChildType.Unknown;
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -1241,9 +1228,7 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
             }
 
-            compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id, previousType, previousId?.Id);
-            previousId = compilerPayload.Id;
-            previousType = ComplexReferenceChildType.Payload;
+            compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
 
             foreach (var child in node.Elements())
             {
@@ -1252,12 +1237,10 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Payload":
-                            previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                            previousType = ComplexReferenceChildType.Payload;
+                            this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
                         case "PayloadGroupRef":
-                            previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                            previousType = ComplexReferenceChildType.PayloadGroup;
+                            this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
                         default:
                             this.Core.UnexpectedElement(node, child);
@@ -1388,12 +1371,9 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element. (BA or PayloadGroup)</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        /// <param name="previousType"></param>
-        /// <param name="previousId"></param>
-        private Identifier ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId)
+        private Identifier ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId)
         {
             Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
@@ -1470,7 +1450,7 @@ namespace WixToolset.Core
                 }
             }
 
-            compilerPayload.CreatePayloadSymbol(parentType, parentId?.Id, previousType, previousId?.Id);
+            compilerPayload.CreatePayloadSymbol(parentType, parentId?.Id);
 
             return compilerPayload.Id;
         }
@@ -1514,8 +1494,6 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            var previousType = ComplexReferenceChildType.Unknown;
-            Identifier previousId = null;
             foreach (var child in node.Elements())
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
@@ -1536,12 +1514,10 @@ namespace WixToolset.Core
                         packageType = WixBundlePackageType.Msu;
                         break;
                     case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
+                        this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id);
                         break;
                     case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -1551,12 +1527,9 @@ namespace WixToolset.Core
                     if (packageType.HasValue)
                     {
                         var compilerPayload = this.ParsePackagePayloadElement(null, child, packageType.Value, null);
-                        var payloadSymbol = compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.PayloadGroup, id?.Id, previousType, previousId?.Id);
+                        var payloadSymbol = compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.PayloadGroup, id?.Id);
                         if (payloadSymbol != null)
                         {
-                            previousId = payloadSymbol.Id;
-                            previousType = ComplexReferenceChildType.Payload;
-
                             this.CreatePackagePayloadSymbol(payloadSymbol.SourceLineNumbers, packageType.Value, payloadSymbol.Id, ComplexReferenceParentType.PayloadGroup, id);
                         }
                     }
@@ -1582,12 +1555,9 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="parentType">ComplexReferenceParentType of parent element (BA or PayloadGroup).</param>
         /// <param name="parentId">Identifier of parent element.</param>
-        /// <param name="previousType"></param>
-        /// <param name="previousId"></param>
-        private Identifier ParsePayloadGroupRefElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId, ComplexReferenceChildType previousType, Identifier previousId)
+        private Identifier ParsePayloadGroupRefElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId)
         {
             Debug.Assert(ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
 
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -1620,7 +1590,7 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
-            this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PayloadGroup, id?.Id, previousType, previousId?.Id);
+            this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PayloadGroup, id?.Id, ComplexReferenceChildType.Unknown, null);
 
             return id;
         }
@@ -2259,10 +2229,10 @@ namespace WixToolset.Core
                         }
                         break;
                     case "Payload":
-                        this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id, ComplexReferenceChildType.Unknown, null);
+                        this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id);
                         break;
                     case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id, ComplexReferenceChildType.Unknown, null);
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
                         break;
                     case "Provides":
                         this.ParseProvidesElement(child, packageType, id.Id, out _);

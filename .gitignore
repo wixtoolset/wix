@@ -399,3 +399,5 @@ build/.tools/
 
 # Ignore generated test data
 src/test/burn/TestData/CacheTests/BundleC/fivegb.file
+src/test/burn/TestData/Manual/BundleB/BAPayloads
+src/test/burn/TestData/Manual/BundleB/PackagePayloads

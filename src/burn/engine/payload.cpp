@@ -5,13 +5,6 @@
 
 // internal function declarations
 
-static HRESULT FindEmbeddedBySourcePath(
-    __in BURN_PAYLOADS* pPayloads,
-    __in_opt BURN_CONTAINER* pContainer,
-    __in_z LPCWSTR wzStreamName,
-    __out BURN_PAYLOAD** ppPayload
-    );
-
 
 // function definitions
 
@@ -29,6 +22,7 @@ extern "C" HRESULT PayloadsParseFromXml(
     LPWSTR scz = NULL;
     BOOL fChainPayload = pContainers && pLayoutPayloads; // These are required when parsing chain payloads.
     BOOL fValidFileSize = FALSE;
+    size_t cByteOffset = fChainPayload ? offsetof(BURN_PAYLOAD, sczKey) : offsetof(BURN_PAYLOAD, sczSourcePath);
 
     // select payload nodes
     hr = XmlSelectNodes(pixnBundle, L"Payload", &pixnNodes);
@@ -49,7 +43,11 @@ extern "C" HRESULT PayloadsParseFromXml(
 
     pPayloads->cPayloads = cNodes;
 
-    // parse search elements
+    // create dictionary for payloads
+    hr = DictCreateWithEmbeddedKey(&pPayloads->sdhPayloads, pPayloads->cPayloads, reinterpret_cast<void**>(&pPayloads->rgPayloads), cByteOffset, DICT_FLAG_NONE);
+    ExitOnFailure(hr, "Failed to create dictionary for payloads.");
+
+    // parse payload elements
     for (DWORD i = 0; i < cNodes; ++i)
     {
         BURN_PAYLOAD* pPayload = &pPayloads->rgPayloads[i];
@@ -104,6 +102,8 @@ extern "C" HRESULT PayloadsParseFromXml(
                 // find container
                 hr = ContainerFindById(pContainers, scz, &pPayload->pContainer);
                 ExitOnFailure(hr, "Failed to to find container: %ls", scz);
+
+                pPayload->pContainer->cParsedPayloads += 1;
             }
 
             // @LayoutOnly
@@ -190,11 +190,36 @@ extern "C" HRESULT PayloadsParseFromXml(
             }
         }
 
+        hr = DictAddValue(pPayloads->sdhPayloads, pPayload);
+        ExitOnFailure(hr, "Failed to add payload to payloads dictionary.");
+
         // prepare next iteration
         ReleaseNullObject(pixnNode);
     }
 
     hr = S_OK;
+
+    if (pContainers && pContainers->cContainers)
+    {
+        for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
+        {
+            BURN_PAYLOAD* pPayload = &pPayloads->rgPayloads[i];
+            BURN_CONTAINER* pContainer = pPayload->pContainer;
+
+            if (!pContainer)
+            {
+                continue;
+            }
+            else if (!pContainer->sdhPayloads)
+            {
+                hr = DictCreateWithEmbeddedKey(&pContainer->sdhPayloads, pContainer->cParsedPayloads, NULL, offsetof(BURN_PAYLOAD, sczSourcePath), DICT_FLAG_NONE);
+                ExitOnFailure(hr, "Failed to create dictionary for container payloads.");
+            }
+
+            hr = DictAddValue(pContainer->sdhPayloads, pPayload);
+            ExitOnFailure(hr, "Failed to add payload to container dictionary.");
+        }
+    }
 
 LExit:
     ReleaseObject(pixnNodes);
@@ -237,6 +262,8 @@ extern "C" void PayloadsUninitialize(
         MemFree(pPayloads->rgPayloads);
     }
 
+    ReleaseDict(pPayloads->sdhPayloads);
+
     // clear struct
     memset(pPayloads, 0, sizeof(BURN_PAYLOADS));
 }
@@ -265,7 +292,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
         ExitOnFailure(hr, "Failed to get next stream.");
 
         // find payload by stream name
-        hr = PayloadFindEmbeddedBySourcePath(pPayloads, sczStreamName, &pPayload);
+        hr = PayloadFindEmbeddedBySourcePath(pPayloads->sdhPayloads, sczStreamName, &pPayload);
         ExitOnFailure(hr, "Failed to find embedded payload: %ls", sczStreamName);
 
         // make file path
@@ -313,51 +340,22 @@ extern "C" HRESULT PayloadFindById(
     )
 {
     HRESULT hr = S_OK;
-    BURN_PAYLOAD* pPayload = NULL;
 
-    for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
-    {
-        pPayload = &pPayloads->rgPayloads[i];
+    hr = DictGetValue(pPayloads->sdhPayloads, wzId, reinterpret_cast<void**>(ppPayload));
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPayload->sczKey, -1, wzId, -1))
-        {
-            *ppPayload = pPayload;
-            ExitFunction1(hr = S_OK);
-        }
-    }
-
-    hr = E_NOTFOUND;
-
-LExit:
     return hr;
 }
 
 extern "C" HRESULT PayloadFindEmbeddedBySourcePath(
-    __in BURN_PAYLOADS* pPayloads,
+    __in STRINGDICT_HANDLE sdhPayloads,
     __in_z LPCWSTR wzStreamName,
     __out BURN_PAYLOAD** ppPayload
     )
 {
     HRESULT hr = S_OK;
-    BURN_PAYLOAD* pPayload = NULL;
 
-    for (DWORD i = 0; i < pPayloads->cPayloads; ++i)
-    {
-        pPayload = &pPayloads->rgPayloads[i];
+    hr = DictGetValue(sdhPayloads, wzStreamName, reinterpret_cast<void**>(ppPayload));
 
-        if (BURN_PAYLOAD_PACKAGING_EMBEDDED == pPayload->packaging)
-        {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPayload->sczSourcePath, -1, wzStreamName, -1))
-            {
-                *ppPayload = pPayload;
-                ExitFunction1(hr = S_OK);
-            }
-        }
-    }
-
-    hr = E_NOTFOUND;
-
-LExit:
     return hr;
 }
 

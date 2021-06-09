@@ -35,7 +35,7 @@ extern "C" HRESULT ContainersParseFromXml(
 
     pContainers->cContainers = cNodes;
 
-    // parse search elements
+    // parse container elements
     for (DWORD i = 0; i < cNodes; ++i)
     {
         BURN_CONTAINER* pContainer = &pContainers->rgContainers[i];
@@ -181,6 +181,7 @@ extern "C" void ContainersUninitialize(
             ReleaseStr(pContainer->downloadSource.sczUser);
             ReleaseStr(pContainer->downloadSource.sczPassword);
             ReleaseStr(pContainer->sczUnverifiedPath);
+            ReleaseDict(pContainer->sdhPayloads);
         }
         MemFree(pContainers->rgContainers);
     }

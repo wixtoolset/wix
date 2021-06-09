@@ -604,12 +604,15 @@ namespace WixToolset.Core.Burn.Bundles
 
                 // Write the BundleExtension elements.
                 var bundleExtensions = this.Section.Symbols.OfType<WixBundleExtensionSymbol>();
+                var uxPayloadsById = this.UXContainerPayloads.ToDictionary(p => p.Id.Id);
 
                 foreach (var bundleExtension in bundleExtensions)
                 {
+                    var entryPayload = uxPayloadsById[bundleExtension.PayloadRef];
+
                     writer.WriteStartElement("BundleExtension");
                     writer.WriteAttributeString("Id", bundleExtension.Id.Id);
-                    writer.WriteAttributeString("EntryPayloadId", bundleExtension.PayloadRef);
+                    writer.WriteAttributeString("EntryPayloadSourcePath", entryPayload.EmbeddedId);
 
                     writer.WriteEndElement();
                 }
