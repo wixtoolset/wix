@@ -72,6 +72,9 @@ typedef struct _BURN_CONTAINER
     LPWSTR sczFilePath;         // relative path to container.
     DOWNLOAD_SOURCE downloadSource;
 
+    DWORD cParsedPayloads;
+    STRINGDICT_HANDLE sdhPayloads; // value is BURN_PAYLOAD*
+
     BYTE* pbHash;
     DWORD cbHash;
     BURN_CONTAINER_VERIFICATION verification;

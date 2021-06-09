@@ -1175,7 +1175,7 @@ static HRESULT ExtractContainer(
     {
         BOOL fExtracted = FALSE;
 
-        hr = PayloadFindEmbeddedBySourcePath(pContext->pPayloads, sczStreamName, &pExtract);
+        hr = PayloadFindEmbeddedBySourcePath(pContainer->sdhPayloads, sczStreamName, &pExtract);
         if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to find embedded payload by source path: %ls container: %ls", sczStreamName, pContainer->sczId);

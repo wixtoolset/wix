@@ -239,14 +239,17 @@ namespace WixToolset.Core.Burn
             {
                 foreach (var facade in facades.Values)
                 {
-                    facade.PackageSymbol.Size = 0;
+                    // Use temporary variable to avoid excessive number of PreviousValues.
+                    long packageSize = 0;
 
                     var packagePayloads = packagesPayloads[facade.PackageId];
 
                     foreach (var payload in packagePayloads.Values)
                     {
-                        facade.PackageSymbol.Size += payload.FileSize.Value;
+                        packageSize += payload.FileSize.Value;
                     }
+
+                    facade.PackageSymbol.Size = packageSize;
 
                     if (!facade.PackageSymbol.InstallSize.HasValue)
                     {

@@ -26,6 +26,7 @@ EXTERN_C HRESULT BurnExtensionParseFromXml(
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
+    LPWSTR scz = NULL;
 
     // Select BundleExtension nodes.
     hr = XmlSelectNodes(pixnBundle, L"BundleExtension", &pixnNodes);
@@ -59,11 +60,11 @@ EXTERN_C HRESULT BurnExtensionParseFromXml(
         ExitOnFailure(hr, "Failed to get @Id.");
 
         // @EntryPayloadId
-        hr = XmlGetAttributeEx(pixnNode, L"EntryPayloadId", &pExtension->sczEntryPayloadId);
-        ExitOnFailure(hr, "Failed to get @EntryPayloadId.");
+        hr = XmlGetAttributeEx(pixnNode, L"EntryPayloadSourcePath", &scz);
+        ExitOnFailure(hr, "Failed to get @EntryPayloadSourcePath.");
 
-        hr = PayloadFindById(pBaPayloads, pExtension->sczEntryPayloadId, &pExtension->pEntryPayload);
-        ExitOnFailure(hr, "Failed to find BundleExtension EntryPayload '%ls'.", pExtension->sczEntryPayloadId);
+        hr = PayloadFindEmbeddedBySourcePath(pBaPayloads->sdhPayloads, scz, &pExtension->pEntryPayload);
+        ExitOnFailure(hr, "Failed to find BundleExtension EntryPayload '%ls'.", pExtension->sczId);
 
         // prepare next iteration
         ReleaseNullObject(pixnNode);
@@ -72,6 +73,7 @@ EXTERN_C HRESULT BurnExtensionParseFromXml(
     hr = S_OK;
 
 LExit:
+    ReleaseStr(scz);
     ReleaseObject(pixnNode);
     ReleaseObject(pixnNodes);
 
@@ -92,7 +94,6 @@ EXTERN_C void BurnExtensionUninitialize(
         {
             BURN_EXTENSION* pExtension = &pBurnExtensions->rgExtensions[i];
 
-            ReleaseStr(pExtension->sczEntryPayloadId);
             ReleaseStr(pExtension->sczId);
         }
         MemFree(pBurnExtensions->rgExtensions);
