@@ -514,7 +514,6 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
-            BOOTSTRAPPER_RESUME_TYPE resumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
             BYTE* pbBuffer = NULL;
             SIZE_T cbBuffer = 0;
             
