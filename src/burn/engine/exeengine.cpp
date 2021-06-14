@@ -637,7 +637,7 @@ static HRESULT ParseExitCodesFromXml(
             }
             else
             {
-                hr = StrStringToUInt32(scz, 0, (UINT*) &pExitCode->dwCode);
+                hr = StrStringToInt32(scz, 0, reinterpret_cast<INT*>(&pExitCode->dwCode));
                 ExitOnFailure(hr, "Failed to parse @Code value: %ls", scz);
             }
 
