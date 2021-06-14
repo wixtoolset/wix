@@ -54,14 +54,6 @@ HRESULT DAPI BundleEnumRelatedBundle(
   __inout  PDWORD pdwStartIndex,
   __out_ecount(MAX_GUID_CHARS+1)  LPWSTR lpBundleIdBuf
     );
-/*
-HRESULT DAPI BundleGetBundleVariable(
-    __in LPCWSTR wzBundleId,
-    __in LPCWSTR wzAttribute,
-    __out_ecount_opt(*pcchData) LPWSTR lpData,
-    __inout_opt LPDWORD pcchData
-);
-*/
 
 HRESULT DAPI BundleGetBundleVariable(
     __in_z LPCWSTR wzBundleId,

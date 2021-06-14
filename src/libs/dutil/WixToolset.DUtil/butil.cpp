@@ -34,7 +34,9 @@ static HRESULT OpenBundleKey(
     __in_opt LPCWSTR szSubKey,
     __inout HKEY* key);
 
-
+/********************************************************************
+BundleGetBundleInfo - Read the registration data for a gven bundle
+********************************************************************/
 extern "C" HRESULT DAPI BundleGetBundleInfo(
   __in_z LPCWSTR wzBundleId,
   __in_z LPCWSTR wzAttribute,
@@ -108,6 +110,9 @@ LExit:
 
     return hr;
 }
+
+/********************************************************************
+********************************************************************/
 
 extern "C" HRESULT DAPI BundleEnumRelatedBundle(
   __in_z LPCWSTR wzUpgradeCode,
@@ -233,102 +238,23 @@ LExit:
 }
 
 /********************************************************************
-BundleGetBundleVariable - Queries the bundle installation metadata for a given variable
-
+BundleGetBundleVariable - Queries the bundle installation metadata for a given variable,
+the caller is expected to free the memory returned vis psczValue
 RETURNS:
+S_OK
+ Success, if the variable had a value, it's returned in psczValue
 E_INVALIDARG
-An invalid parameter was passed to the function.
+ An invalid parameter was passed to the function.
 HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT)
-The bundle is not installed
+ The bundle is not installed
 HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY)
-The shared variable is unrecognized
-HRESULT_FROM_WIN32(ERROR_MORE_DATA)
-A buffer is too small to hold the requested data.
-HRESULT_FROM_WIN32(ERROR_SUCCESS)
-When probing for a string variable, if no data pointer is passed but the size is and the variable is found.
+ The variable is unrecognized
 E_NOTIMPL:
-Tried to read a bundle variable for a type which has not been implemented
+ Tried to read a bundle variable for a type which has not been implemented
 
 All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
-/*extern "C" HRESULT DAPI BundleGetBundleVariable(
-    __in LPCWSTR wzBundleId,
-    __in LPCWSTR wzAttribute,
-    __out_ecount_opt(*pcchData) LPWSTR lpData,
-    __inout_opt LPDWORD pcchData
-)
-{
-    Assert(wzBundleId && wzAttribute);
 
-    HRESULT hr = S_OK;
-    BUNDLE_INSTALL_CONTEXT context = BUNDLE_INSTALL_CONTEXT_MACHINE;
-    LPWSTR sczValue = NULL;
-    HKEY hkBundle = NULL;
-    DWORD cbData = 0;
-    DWORD dwType = 0;
-
-    if (!wzBundleId || !wzAttribute || (lpData && !pcchData))
-    {
-        ButilExitOnFailure(hr = E_INVALIDARG, "An invalid parameter was passed to the function.");
-    }
-
-    if (FAILED(hr = OpenBundleKey(wzBundleId, context = BUNDLE_INSTALL_CONTEXT_MACHINE, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, &hkBundle)) &&
-        FAILED(hr = OpenBundleKey(wzBundleId, context = BUNDLE_INSTALL_CONTEXT_USER, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, &hkBundle)))
-    {
-        ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) : hr, "Failed to locate bundle uninstall key variable path.");
-    }
-
-    // If the bundle doesn't have the shared variable defined, return ERROR_UNKNOWN_PROPERTY
-    hr = RegGetType(hkBundle, wzAttribute, &dwType);
-    ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) : hr, "Failed to locate bundle variable.");
-
-    switch (dwType)
-    {
-    case REG_SZ:
-        if (pcchData)
-        {
-            hr = RegReadString(hkBundle, wzAttribute, &sczValue);
-            ButilExitOnFailure(hr, "Failed to read string shared variable.");
-
-            hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cbData));
-            ButilExitOnFailure(hr, "Failed to calculate length of string");
-
-            if (lpData)
-            {
-                if (*pcchData <= cbData)
-                {
-                    *pcchData = ++cbData;
-                    ButilExitOnFailure(hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA), "A buffer is too small to hold the requested data.");
-                }
-                // Safe to copy
-                hr = ::StringCchCatNExW(lpData, *pcchData, sczValue, cbData, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-                ButilExitOnFailure(hr, "Failed to copy the shared variable value to the output buffer.");
-
-                *pcchData = ++cbData;
-            }
-            else
-            {
-                *pcchData = ++cbData;
-                ButilExitOnFailure(hr = HRESULT_FROM_WIN32(ERROR_SUCCESS), "A buffer is too small to hold the requested data.");
-            }
-        }
-
-        break;
-    case REG_NONE:
-        hr = S_OK;
-        break;
-    default:
-        ButilExitOnFailure(hr = E_NOTIMPL, "Reading bundle variable of type 0x%x not implemented.", dwType);
-
-    }
-
-LExit:
-    ReleaseRegKey(hkBundle);
-    ReleaseStr(sczValue);
-
-    return hr;
-}
-*/
 extern "C" HRESULT DAPI BundleGetBundleVariable(
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzVariable,
