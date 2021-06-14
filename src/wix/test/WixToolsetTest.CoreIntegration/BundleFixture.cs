@@ -274,6 +274,9 @@ namespace WixToolsetTest.CoreIntegration
                     var intermediate = Intermediate.Load(wixOutput);
                     var section = intermediate.Sections.Single();
 
+                    var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Where(x => x.Id.Id == "NetFx462Web").Single();
+                    Assert.Equal(Int64.MaxValue, packageSymbol.InstallSize);
+
                     var payloadSymbol = section.Symbols.OfType<WixBundlePayloadSymbol>().Where(x => x.Id.Id == "NetFx462Web").Single();
                     Assert.Equal(Int64.MaxValue, payloadSymbol.FileSize);
                 }

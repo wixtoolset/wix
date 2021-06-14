@@ -8,6 +8,7 @@
                 PerMachine="yes"
                 DetectCondition="A"
                 InstallCondition="B"
+                InstallSize="9223372036854775807"
                 Id="NetFx462Web"
                 Vital="yes"
                 Permanent="yes"

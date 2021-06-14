@@ -1962,7 +1962,7 @@ namespace WixToolset.Core
             var perMachine = YesNoDefaultType.NotSet;
             string detectCondition = null;
             string protocol = null;
-            var installSize = CompilerConstants.IntegerNotSet;
+            long? installSize = null;
             string msuKB = null;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
@@ -2082,7 +2082,7 @@ namespace WixToolset.Core
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "InstallSize":
-                        installSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                        installSize = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, Int64.MaxValue);
                         break;
                     case "KB":
                         msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2314,7 +2314,7 @@ namespace WixToolset.Core
                     chainPackageSymbol.PerMachine = perMachine;
                 }
 
-                if (CompilerConstants.IntegerNotSet != installSize)
+                if (installSize.HasValue)
                 {
                     chainPackageSymbol.InstallSize = installSize;
                 }
