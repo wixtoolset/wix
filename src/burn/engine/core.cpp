@@ -638,8 +638,8 @@ extern "C" HRESULT CoreApply(
 
     pEngineState->plan.fAffectedMachineState = pEngineState->plan.fCanAffectMachineState;
 
-    // Abort if this bundle already requires a restart.
-    if (BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
+    // Abort if could affect machine state and this bundle already requires a restart.
+    if (pEngineState->plan.fCanAffectMachineState && BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
     {
         restart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
 
