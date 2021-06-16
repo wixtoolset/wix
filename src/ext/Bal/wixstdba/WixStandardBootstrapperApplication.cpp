@@ -228,17 +228,18 @@ public: // IBootstrapperApplication
         }
 
         // If a restart was required.
-        if (m_fRestartRequired)
+        if (BOOTSTRAPPER_APPLY_RESTART_NONE != m_restartResult)
         {
-            if (m_fAllowRestart)
+            if (m_fRestartRequired && m_fAllowRestart)
             {
                 *pAction = BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART;
             }
 
             if (m_fPrereq)
             {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, m_fAllowRestart ? "The prerequisites scheduled a restart. The bootstrapper application will be reloaded after the computer is restarted."
-                                                                        : "A restart is required by the prerequisites but the user delayed it. The bootstrapper application will be reloaded after the computer is restarted.");
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART == *pAction
+                    ? "The prerequisites scheduled a restart. The bootstrapper application will be reloaded after the computer is restarted."
+                    : "A restart is required by the prerequisites but the user delayed it. The bootstrapper application will be reloaded after the computer is restarted.");
             }
         }
         else if (m_fPrereqInstalled)
