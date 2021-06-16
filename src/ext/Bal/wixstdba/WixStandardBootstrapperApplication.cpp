@@ -228,9 +228,9 @@ public: // IBootstrapperApplication
         }
 
         // If a restart was required.
-        if (BOOTSTRAPPER_APPLY_RESTART_NONE != m_restartResult)
+        if (m_fRestartRequired)
         {
-            if (m_fRestartRequired && m_fAllowRestart)
+            if (m_fShouldRestart && m_fAllowRestart)
             {
                 *pAction = BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART;
             }
@@ -1097,13 +1097,13 @@ public: // IBootstrapperApplication
         __super::OnApplyComplete(hrStatus, restart, recommendation, pAction);
 
         m_restartResult = restart; // remember the restart result so we return the correct error code no matter what the user chooses to do in the UI.
-
-        // If a restart was encountered and we are not suppressing restarts, then restart is required.
-        m_fRestartRequired = (BOOTSTRAPPER_APPLY_RESTART_NONE != restart && BOOTSTRAPPER_RESTART_NEVER < m_command.restart);
+        m_fRestartRequired = BOOTSTRAPPER_APPLY_RESTART_NONE != restart;
         BalSetStringVariable(WIXSTDBA_VARIABLE_RESTART_REQUIRED, m_fRestartRequired ? L"1" : NULL, FALSE);
 
-        // If a restart is required and we're not displaying a UI or we are not supposed to prompt for restart then allow the restart.
-        m_fAllowRestart = m_fRestartRequired && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_RESTART_PROMPT < m_command.restart);
+        m_fShouldRestart = m_fRestartRequired && BOOTSTRAPPER_RESTART_NEVER < m_command.restart;
+
+        // Automatically restart if we're not displaying a UI or the command line said to always allow restarts.
+        m_fAllowRestart = m_fShouldRestart && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_RESTART_PROMPT < m_command.restart);
 
         if (m_fPrereq)
         {
@@ -3163,20 +3163,11 @@ private: // privates
         m_state = state;
 
         // If our install is at the end (success or failure) and we're not showing full UI or
-        // we successfully installed the prerequisite then exit (prompt for restart if required).
+        // we successfully installed the prerequisite(s) and either no restart is required or can automatically restart
+        // then exit.
         if ((WIXSTDBA_STATE_APPLIED <= m_state && BOOTSTRAPPER_DISPLAY_FULL > m_command.display) ||
-            (WIXSTDBA_STATE_APPLIED == m_state && m_fPrereq))
+            (WIXSTDBA_STATE_APPLIED == m_state && m_fPrereq && (!m_fRestartRequired || m_fShouldRestart && m_fAllowRestart)))
         {
-            // If a restart was required but we were not automatically allowed to
-            // accept the reboot then do the prompt.
-            if (m_fRestartRequired && !m_fAllowRestart)
-            {
-                StrAllocFromError(&sczUnformattedText, HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED), NULL);
-
-                int nResult = ::MessageBoxW(m_hWnd, sczUnformattedText ? sczUnformattedText : L"The requested operation is successful. Changes will not be effective until the system is rebooted.", m_pTheme->sczCaption, MB_ICONEXCLAMATION | MB_OKCANCEL);
-                m_fAllowRestart = (IDOK == nResult);
-            }
-
             // Quietly exit.
             ::PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
         }
@@ -3214,13 +3205,13 @@ private: // privates
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_SUCCESS] == dwNewPageId) // on the "Success" page, check if the restart or launch button should be enabled.
                 {
-                    BOOL fShowRestartButton = FALSE;
+                    BOOL fEnableRestartButton = FALSE;
                     BOOL fLaunchTargetExists = FALSE;
-                    if (m_fRestartRequired)
+                    if (m_fShouldRestart)
                     {
                         if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
                         {
-                            fShowRestartButton = TRUE;
+                            fEnableRestartButton = TRUE;
                         }
                     }
                     else if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON))
@@ -3229,13 +3220,13 @@ private: // privates
                     }
 
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON, fLaunchTargetExists && BOOTSTRAPPER_ACTION_UNINSTALL < m_plannedAction);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, fShowRestartButton);
+                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, fEnableRestartButton);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_FAILURE] == dwNewPageId) // on the "Failure" page, show error message and check if the restart button should be enabled.
                 {
                     BOOL fShowLogLink = (m_Bundle.sczLogVariable && *m_Bundle.sczLogVariable); // if there is a log file variable then we'll assume the log file exists.
                     BOOL fShowErrorMessage = FALSE;
-                    BOOL fShowRestartButton = FALSE;
+                    BOOL fEnableRestartButton = FALSE;
 
                     if (FAILED(m_hrFinal))
                     {
@@ -3317,17 +3308,17 @@ private: // privates
                         fShowErrorMessage = TRUE;
                     }
 
-                    if (m_fRestartRequired)
+                    if (m_fShouldRestart)
                     {
                         if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
                         {
-                            fShowRestartButton = TRUE;
+                            fEnableRestartButton = TRUE;
                         }
                     }
 
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK, fShowLogLink);
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT, fShowErrorMessage);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, fShowRestartButton);
+                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, fEnableRestartButton);
                 }
 
                 HRESULT hr = ThemeShowPage(m_pTheme, dwOldPageId, SW_HIDE);
@@ -3977,6 +3968,7 @@ public:
         m_fDowngrading = FALSE;
         m_restartResult = BOOTSTRAPPER_APPLY_RESTART_NONE;
         m_fRestartRequired = FALSE;
+        m_fShouldRestart = FALSE;
         m_fAllowRestart = FALSE;
 
         m_sczLicenseFile = NULL;
@@ -4079,6 +4071,7 @@ private:
     BOOL m_fDowngrading;
     BOOTSTRAPPER_APPLY_RESTART m_restartResult;
     BOOL m_fRestartRequired;
+    BOOL m_fShouldRestart;
     BOOL m_fAllowRestart;
 
     LPWSTR m_sczLicenseFile;

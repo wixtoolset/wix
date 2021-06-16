@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="sv-se" Language="1053" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="sv-se" Language="1053" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName]-installation</String>
   <String Id="Title">Microsoft .NET Framework krävs för installation av [WixBundleName]</String>
   <String Id="ConfirmCancelMessage">Vill du avbryta?</String>
@@ -22,9 +22,15 @@
   <String Id="ProgressHeader">Installationsförlopp</String>
   <String Id="ProgressLabel">Bearbetar:</String>
   <String Id="ProgressCancelButton">&amp;Avbryt</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Installationen misslyckades</String>
   <String Id="FailureLogLinkText">Installationen misslyckades på grund av ett eller flera problem. Åtgärda problemen och försök igen. Se &lt;a href="#"&gt;loggfilen&lt;/a&gt; för mer information.</String>
   <String Id="FailureRestartText">Starta om datorn för att återställa programmet.</String>
   <String Id="FailureRestartButton">&amp;Starta om</String>
   <String Id="FailureCloseButton">&amp;Stäng</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>

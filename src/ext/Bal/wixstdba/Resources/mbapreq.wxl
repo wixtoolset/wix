@@ -19,6 +19,10 @@
   <String Id="ProgressHeader">Setup Progress</String>
   <String Id="ProgressLabel">Processing:</String>
   <String Id="ProgressCancelButton">&amp;Cancel</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Setup Failed</String>
   <String Id="FailureLogLinkText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the &lt;a href="#"&gt;log file&lt;/a&gt;.</String>
   <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software.</String>

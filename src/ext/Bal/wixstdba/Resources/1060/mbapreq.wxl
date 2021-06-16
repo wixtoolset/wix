@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="sl-si" Language="1060" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="sl-si" Language="1060" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName] Namestitev</String>
   <String Id="Title">Microsoft .NET Framework, potreben za namestitev paketa [WixBundleName]</String>
   <String Id="ConfirmCancelMessage">Ali ste prepričani, da želite preklicati?</String>
@@ -22,9 +22,15 @@
   <String Id="ProgressHeader">Potek namestitve</String>
   <String Id="ProgressLabel">Obdelovanje:</String>
   <String Id="ProgressCancelButton">&amp;Prekliči</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Namestitev ni uspela</String>
   <String Id="FailureLogLinkText">Namestitev ni uspela zaradi ene ali več težav. Odpravite težave in ponovno zaženite namestitev. Za več informacij glejte &lt;a href="#"&gt;dnevniško datoteko&lt;/a&gt;.</String>
   <String Id="FailureRestartText">Za povrnitev prejšnjega stanja programske opreme morate ponovno zagnati računalnik.</String>
   <String Id="FailureRestartButton">&amp;Ponovni zagon</String>
   <String Id="FailureCloseButton">&amp;Zapri</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>
