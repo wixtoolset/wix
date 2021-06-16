@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="el-gr" Language="1032" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="el-gr" Language="1032" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">Εγκατάσταση του [WixBundleName]</String>
   <String Id="Title">Για την εγκατάσταση του [WixBundleName] απαιτείται το Microsoft .NET Framework</String>
   <String Id="ConfirmCancelMessage">Είστε βέβαιοι ότι θέλετε να γίνει ακύρωση;</String>
@@ -24,9 +24,15 @@
   <String Id="ProgressHeader">Πρόοδος εγκατάστασης</String>
   <String Id="ProgressLabel">Επεξεργασία:</String>
   <String Id="ProgressCancelButton">&amp;Άκυρο</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Αποτυχία εγκατάστασης</String>
   <String Id="FailureLogLinkText">Ένα ή περισσότερα προβλήματα προκάλεσαν την αποτυχία της εγκατάστασης. Διορθώστε τα προβλήματα και μετά επαναλάβετε την εγκατάσταση. Για περισσότερες πληροφορίες, ανατρέξτε στο &lt;a href="#"&gt;αρχείο καταγραφής&lt;/a&gt;.</String>
   <String Id="FailureRestartText">Για να ολοκληρωθεί η επαναφορά του λογισμικού, πρέπει να κάνετε επανεκκίνηση του υπολογιστή.</String>
   <String Id="FailureRestartButton">&amp;Επανεκκίνηση</String>
   <String Id="FailureCloseButton">&amp;Κλείσιμο</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>

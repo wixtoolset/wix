@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="it-it" Language="1040" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="it-it" Language="1040" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">Installazione di [WixBundleName]</String>
   <String Id="Title">Microsoft .NET Framework necessario per l'installazione di [WixBundleName]</String>
   <String Id="ConfirmCancelMessage">Annullare?</String>
@@ -23,9 +23,15 @@
   <String Id="ProgressHeader">Stato installazione</String>
   <String Id="ProgressLabel">Elaborazione in corso:</String>
   <String Id="ProgressCancelButton">&amp;Annulla</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Installazione non riuscita</String>
   <String Id="FailureLogLinkText">L'installazione non è riuscita a causa di uno o più problemi. Risolvere i problemi e provare di nuovo l'installazione. Per ulteriori informazioni vedere il &lt;a href="#"&gt;file di log&lt;/a&gt;.</String>
   <String Id="FailureRestartText">È necessario riavviare il computer per completare il rollback del software.</String>
   <String Id="FailureRestartButton">&amp;Riavvia</String>
   <String Id="FailureCloseButton">&amp;Chiudi</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>
