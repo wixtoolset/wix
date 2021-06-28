@@ -38,7 +38,6 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
         {
-
             section.AddSymbol(new WixComplexReferenceSymbol(sourceLineNumbers)
             {
                 Parent = parentId,

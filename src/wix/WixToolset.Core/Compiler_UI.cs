@@ -1534,10 +1534,10 @@ namespace WixToolset.Core
                         SourceFile = String.IsNullOrEmpty(sourceFile) ? null : new IntermediateFieldPathValue { Path = sourceFile }
                     });
 
-                    controlSymbol.Set((int)BBControlSymbolFields.X, x);
-                    controlSymbol.Set((int)BBControlSymbolFields.Y, y);
-                    controlSymbol.Set((int)BBControlSymbolFields.Width, width);
-                    controlSymbol.Set((int)BBControlSymbolFields.Height, height);
+                    controlSymbol.Set((int)ControlSymbolFields.X, x);
+                    controlSymbol.Set((int)ControlSymbolFields.Y, y);
+                    controlSymbol.Set((int)ControlSymbolFields.Width, width);
+                    controlSymbol.Set((int)ControlSymbolFields.Height, height);
 
                     symbol = controlSymbol;
                 }

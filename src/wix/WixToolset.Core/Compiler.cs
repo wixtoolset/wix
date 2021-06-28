@@ -2094,7 +2094,7 @@ namespace WixToolset.Core
         /// Parses a component element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="parentType">Type of component's complex reference parent.  Will be Uknown if there is no parent.</param>
+        /// <param name="parentType">Type of component's complex reference parent.  Will be Unknown if there is no parent.</param>
         /// <param name="parentId">Optional identifier for component's primary parent.</param>
         /// <param name="parentLanguage">Optional string for component's parent's language.</param>
         /// <param name="diskId">Optional disk id inherited from parent directory.</param>
