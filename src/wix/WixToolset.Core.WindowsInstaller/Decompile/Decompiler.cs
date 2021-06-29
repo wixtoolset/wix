@@ -767,6 +767,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             // set the component keypaths
             if (null != componentTable)
             {
+                // Add the TARGETDIR StandardDirectory if a component is directly parented there.
+                if (componentTable.Rows.Any(row => row.FieldAsString(2) == "TARGETDIR")
+                    && this.TryGetIndexedElement("Directory", out var xDirectory, "TARGETDIR"))
+                {
+                    this.RootElement.Add(xDirectory);
+                }
+
                 foreach (var row in componentTable.Rows)
                 {
                     var attributes = row.FieldAsInteger(3);
@@ -2449,6 +2456,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 var table = tables["_SummaryInformation"];
                 var row = table.Rows.SingleOrDefault(r => r.FieldAsInteger(0) == 9);
                 this.ModularizationGuid = row?.FieldAsString(1);
+                this.RootElement.SetAttributeValue("Guid", this.ModularizationGuid);
             }
 
             // index the rows from the extension libraries
@@ -4352,7 +4360,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                 if (id == "TARGETDIR")
                 {
-                    // Skip TARGETDIR (but see below!).
+                    // Skip TARGETDIR -- but it will be added for any components directly targeted.
                 }
                 else if (row.IsColumnNull(1) || WindowsInstallerStandard.IsStandardDirectory(id))
                 {
