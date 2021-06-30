@@ -25,13 +25,12 @@ namespace WixToolset.Mba.Core
         Restart Restart { get; }
 
         /// <summary>
-        /// Gets the command line arguments as a string array.
+        /// Gets the command line arguments.
         /// </summary>
         /// <returns>
-        /// Array of command line arguments not handled by the engine.
+        /// Command line arguments not handled by the engine.
         /// </returns>
-        /// <exception type="Win32Exception">The command line could not be parsed into an array.</exception>
-        string[] CommandLineArgs { get; }
+        string CommandLine { get; }
 
         /// <summary>
         /// Hint for the initial visibility of the window.
@@ -72,5 +71,14 @@ namespace WixToolset.Mba.Core
         /// Gets path to BootstrapperApplicationData.xml.
         /// </summary>
         string BootstrapperApplicationDataPath { get; }
+
+        /// <summary>
+        /// Parses the command line arguments into an <see cref="IMbaCommand"/>.
+        /// </summary>
+        /// <returns>
+        /// The parsed information.
+        /// </returns>
+        /// <exception type="Win32Exception">The command line could not be parsed.</exception>
+        IMbaCommand ParseCommandLine();
     }
 }

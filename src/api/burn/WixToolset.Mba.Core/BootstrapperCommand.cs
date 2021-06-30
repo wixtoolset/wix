@@ -3,6 +3,7 @@
 namespace WixToolset.Mba.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.InteropServices;
 
@@ -11,8 +12,6 @@ namespace WixToolset.Mba.Core
     /// </summary>
     public sealed class BootstrapperCommand : IBootstrapperCommand
     {
-        private readonly string commandLine;
-
         /// <summary>
         /// 
         /// </summary>
@@ -45,7 +44,7 @@ namespace WixToolset.Mba.Core
             this.Action = action;
             this.Display = display;
             this.Restart = restart;
-            this.commandLine = commandLine;
+            this.CommandLine = commandLine;
             this.CmdShow = cmdShow;
             this.Resume = resume;
             this.SplashScreen = splashScreen;
@@ -66,7 +65,7 @@ namespace WixToolset.Mba.Core
         public Restart Restart { get; }
 
         /// <inheritdoc/>
-        public string[] CommandLineArgs => GetCommandLineArgs(this.commandLine);
+        public string CommandLine { get; }
 
         /// <inheritdoc/>
         public int CmdShow { get; }
@@ -92,6 +91,49 @@ namespace WixToolset.Mba.Core
         /// <inheritdoc/>
         public string BootstrapperApplicationDataPath { get; }
 
+        /// <inheritdoc/>
+        public IMbaCommand ParseCommandLine()
+        {
+            var args = ParseCommandLineToArgs(this.CommandLine);
+            var unknownArgs = new List<string>();
+            var variables = new List<KeyValuePair<string, string>>();
+
+            foreach (var arg in args)
+            {
+                var unknownArg = false;
+
+                if (arg[0] == '-' || arg[0] == '/')
+                {
+                    unknownArg = true;
+                }
+                else
+                {
+                    var index = arg.IndexOf('=');
+                    if (index == -1)
+                    {
+                        unknownArg = true;
+                    }
+                    else
+                    {
+                        var name = arg.Substring(0, index);
+                        var value = arg.Substring(index + 1);
+                        variables.Add(new KeyValuePair<string, string>(name, value));
+                    }
+                }
+
+                if (unknownArg)
+                {
+                    unknownArgs.Add(arg);
+                }
+            }
+
+            return new MbaCommand
+            {
+                UnknownCommandLineArgs = unknownArgs.ToArray(),
+                Variables = variables.ToArray(),
+            };
+        }
+
         /// <summary>
         /// Gets the command line arguments as a string array.
         /// </summary>
@@ -102,7 +144,7 @@ namespace WixToolset.Mba.Core
         /// <remarks>
         /// This method uses the same parsing as the operating system which handles quotes and spaces correctly.
         /// </remarks>
-        public static string[] GetCommandLineArgs(string commandLine)
+        public static string[] ParseCommandLineToArgs(string commandLine)
         {
             if (null == commandLine)
             {

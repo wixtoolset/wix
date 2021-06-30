@@ -47,13 +47,48 @@ typedef struct _BAL_INFO_PACKAGES
 } BAL_INFO_PACKAGES;
 
 
+typedef struct _BAL_INFO_OVERRIDABLE_VARIABLE
+{
+    LPWSTR sczName;
+} BAL_INFO_OVERRIDABLE_VARIABLE;
+
+
+typedef struct _BAL_INFO_OVERRIDABLE_VARIABLES
+{
+    BAL_INFO_OVERRIDABLE_VARIABLE* rgVariables;
+    DWORD cVariables;
+    STRINGDICT_HANDLE sdVariables;
+} BAL_INFO_OVERRIDABLE_VARIABLES;
+
+
 typedef struct _BAL_INFO_BUNDLE
 {
     BOOL fPerMachine;
     LPWSTR sczName;
     LPWSTR sczLogVariable;
     BAL_INFO_PACKAGES packages;
+    BAL_INFO_OVERRIDABLE_VARIABLES overridableVariables;
 } BAL_INFO_BUNDLE;
+
+
+typedef struct _BAL_INFO_COMMAND
+{
+    DWORD cUnknownArgs;
+    LPWSTR* rgUnknownArgs;
+    DWORD cVariables;
+    LPWSTR* rgVariableNames;
+    LPWSTR* rgVariableValues;
+} BAL_INFO_COMMAND;
+
+
+/*******************************************************************
+ BalInfoParseCommandLine - parses wzCommandLine from BOOTSTRAPPER_COMMAND.
+
+********************************************************************/
+HRESULT DAPI BalInfoParseCommandLine(
+    __in BAL_INFO_COMMAND* pCommand,
+    __in LPCWSTR wzCommandLine
+    );
 
 
 /*******************************************************************
@@ -97,6 +132,26 @@ DAPI_(HRESULT) BalInfoFindPackageById(
 ********************************************************************/
 DAPI_(void) BalInfoUninitialize(
     __in BAL_INFO_BUNDLE* pBundle
+    );
+
+
+/*******************************************************************
+ BalInfoUninitializeCommandLine - uninitializes BAL_INFO_COMMAND.
+
+********************************************************************/
+void DAPI BalInfoUninitializeCommandLine(
+    __in BAL_INFO_COMMAND* pCommand
+);
+
+
+/*******************************************************************
+ BalInfoSetOverridableVariablesFromEngine - sets overridable variables from command line.
+
+ ********************************************************************/
+HRESULT DAPI BalSetOverridableVariablesFromEngine(
+    __in BAL_INFO_OVERRIDABLE_VARIABLES* pOverridableVariables,
+    __in BAL_INFO_COMMAND* pCommand,
+    __in IBootstrapperEngine* pEngine
     );
 
 

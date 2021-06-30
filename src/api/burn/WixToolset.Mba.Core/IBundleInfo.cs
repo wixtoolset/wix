@@ -22,6 +22,11 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// 
         /// </summary>
+        IOverridableVariables OverridableVariables { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         IDictionary<string, IPackageInfo> Packages { get; }
 
         /// <summary>

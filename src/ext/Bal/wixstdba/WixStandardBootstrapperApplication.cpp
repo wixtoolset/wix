@@ -2095,8 +2095,8 @@ private: // privates
         hr = BalManifestLoad(m_hModule, &pixdManifest);
         BalExitOnFailure(hr, "Failed to load bootstrapper application manifest.");
 
-        hr = ParseOverridableVariablesFromXml(pixdManifest);
-        BalExitOnFailure(hr, "Failed to read overridable variables.");
+        hr = BalInfoParseFromXml(&m_Bundle, pixdManifest);
+        BalExitOnFailure(hr, "Failed to load bundle information.");
 
         hr = ProcessCommandLine(&m_sczLanguage);
         ExitOnFailure(hr, "Unknown commandline parameters.");
@@ -2109,9 +2109,6 @@ private: // privates
 
         hr = LoadTheme(sczModulePath, m_sczLanguage);
         ExitOnFailure(hr, "Failed to load theme.");
-
-        hr = BalInfoParseFromXml(&m_Bundle, pixdManifest);
-        BalExitOnFailure(hr, "Failed to load bundle information.");
 
         hr = BalConditionsParseFromXml(&m_Conditions, pixdManifest, m_pWixLoc);
         BalExitOnFailure(hr, "Failed to load conditions from XML.");
@@ -2173,16 +2170,20 @@ private: // privates
         HRESULT hr = S_OK;
         int argc = 0;
         LPWSTR* argv = NULL;
-        LPWSTR sczVariableName = NULL;
-        LPWSTR sczVariableValue = NULL;
+        BOOL fUnknownArg = FALSE;
 
-        if (m_command.wzCommandLine && *m_command.wzCommandLine)
+        hr = BalInfoParseCommandLine(&m_BalInfoCommand, m_command.wzCommandLine);
+        BalExitOnFailure(hr, "Failed to parse command line with balutil.");
+
+        argc = m_BalInfoCommand.cUnknownArgs;
+        argv = m_BalInfoCommand.rgUnknownArgs;
+
+        if (argc)
         {
-            hr = AppParseCommandLine(m_command.wzCommandLine, &argc, &argv);
-            ExitOnFailure(hr, "Failed to parse command line.");
-
             for (int i = 0; i < argc; ++i)
             {
+                fUnknownArg = FALSE;
+
                 if (argv[i][0] == L'-' || argv[i][0] == L'/')
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"lang", -1))
@@ -2198,51 +2199,31 @@ private: // privates
                         hr = StrAllocString(psczLanguage, &argv[i][0], 0);
                         BalExitOnFailure(hr, "Failed to copy language.");
                     }
-                }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
-                {
-                    m_plannedAction = BOOTSTRAPPER_ACTION_CACHE;
-                }
-                else if (m_sdOverridableVariables)
-                {
-                    const wchar_t* pwc = wcschr(argv[i], L'=');
-                    if (pwc)
+                    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
                     {
-                        hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
-                        BalExitOnFailure(hr, "Failed to copy variable name.");
-
-                        hr = DictKeyExists(m_sdOverridableVariables, sczVariableName);
-                        if (E_NOTFOUND == hr)
-                        {
-                            BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to set non-overridable variable: '%ls'.", sczVariableName);
-                            hr = S_OK;
-                            continue;
-                        }
-                        ExitOnFailure(hr, "Failed to check the dictionary of overridable variables.");
-
-                        hr = StrAllocString(&sczVariableValue, ++pwc, 0);
-                        BalExitOnFailure(hr, "Failed to copy variable value.");
-
-                        hr = m_pEngine->SetVariableString(sczVariableName, sczVariableValue, FALSE);
-                        BalExitOnFailure(hr, "Failed to set variable.");
+                        m_plannedAction = BOOTSTRAPPER_ACTION_CACHE;
                     }
                     else
                     {
-                        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Ignoring unknown argument: %ls", argv[i]);
+                        fUnknownArg = TRUE;
                     }
+                }
+                else
+                {
+                    fUnknownArg = TRUE;
+                }
+
+                if (fUnknownArg)
+                {
+                    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Ignoring unknown argument: %ls", argv[i]);
                 }
             }
         }
 
+        hr = BalSetOverridableVariablesFromEngine(&m_Bundle.overridableVariables, &m_BalInfoCommand, m_pEngine);
+        BalExitOnFailure(hr, "Failed to set overridable variables from the command line.");
+
     LExit:
-        if (argv)
-        {
-            AppFreeCommandLineArgs(argv);
-        }
-
-        ReleaseStr(sczVariableName);
-        ReleaseStr(sczVariableValue);
-
         return hr;
     }
 
@@ -2319,57 +2300,6 @@ private: // privates
     LExit:
         ReleaseStr(sczThemePath);
 
-        return hr;
-    }
-
-
-    HRESULT ParseOverridableVariablesFromXml(
-        __in IXMLDOMDocument* pixdManifest
-        )
-    {
-        HRESULT hr = S_OK;
-        IXMLDOMNode* pNode = NULL;
-        IXMLDOMNodeList* pNodes = NULL;
-        DWORD cNodes = 0;
-        LPWSTR scz = NULL;
-
-        // Get the list of variables users can override on the command line.
-        hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOverridableVariable", &pNodes);
-        if (S_FALSE == hr)
-        {
-            ExitFunction1(hr = S_OK);
-        }
-        ExitOnFailure(hr, "Failed to select overridable variable nodes.");
-
-        hr = pNodes->get_length((long*)&cNodes);
-        ExitOnFailure(hr, "Failed to get overridable variable node count.");
-
-        if (cNodes)
-        {
-            hr = DictCreateStringList(&m_sdOverridableVariables, 32, DICT_FLAG_NONE);
-            ExitOnFailure(hr, "Failed to create the string dictionary.");
-
-            for (DWORD i = 0; i < cNodes; ++i)
-            {
-                hr = XmlNextElement(pNodes, &pNode, NULL);
-                ExitOnFailure(hr, "Failed to get next node.");
-
-                // @Name
-                hr = XmlGetAttributeEx(pNode, L"Name", &scz);
-                ExitOnFailure(hr, "Failed to get @Name.");
-
-                hr = DictAddKey(m_sdOverridableVariables, scz);
-                ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", scz);
-
-                // prepare next iteration
-                ReleaseNullObject(pNode);
-            }
-        }
-
-    LExit:
-        ReleaseObject(pNode);
-        ReleaseObject(pNodes);
-        ReleaseStr(scz);
         return hr;
     }
 
@@ -3951,6 +3881,7 @@ public:
 
         m_pWixLoc = NULL;
         memset(&m_Bundle, 0, sizeof(m_Bundle));
+        memset(&m_BalInfoCommand, 0, sizeof(m_BalInfoCommand));
         memset(&m_Conditions, 0, sizeof(m_Conditions));
         m_sczConfirmCloseMessage = NULL;
         m_sczFailedMessage = NULL;
@@ -3977,7 +3908,6 @@ public:
         m_fSuppressRepair = FALSE;
         m_fSupportCacheOnly = FALSE;
 
-        m_sdOverridableVariables = NULL;
         m_pTaskbarList = NULL;
         m_uTaskbarButtonCreatedMessage = UINT_MAX;
         m_fTaskbarButtonOK = FALSE;
@@ -4013,11 +3943,11 @@ public:
         }
 
         ::DeleteCriticalSection(&m_csShowingInternalUiThisPackage);
-        ReleaseDict(m_sdOverridableVariables);
         ReleaseStr(m_sczFailedMessage);
         ReleaseStr(m_sczConfirmCloseMessage);
         BalConditionsUninitialize(&m_Conditions);
         BalInfoUninitialize(&m_Bundle);
+        BalInfoUninitializeCommandLine(&m_BalInfoCommand);
         LocFree(m_pWixLoc);
 
         ReleaseStr(m_sczLanguage);
@@ -4050,6 +3980,7 @@ private:
 
     WIX_LOCALIZATION* m_pWixLoc;
     BAL_INFO_BUNDLE m_Bundle;
+    BAL_INFO_COMMAND m_BalInfoCommand;
     BAL_CONDITIONS m_Conditions;
     LPWSTR m_sczFailedMessage;
     LPWSTR m_sczConfirmCloseMessage;
@@ -4079,8 +4010,6 @@ private:
     BOOL m_fSuppressDowngradeFailure;
     BOOL m_fSuppressRepair;
     BOOL m_fSupportCacheOnly;
-
-    STRINGDICT_HANDLE m_sdOverridableVariables;
 
     BOOL m_fPrereq;
     BOOL m_fPrereqInstalled;
