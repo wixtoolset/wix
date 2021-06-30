@@ -16,6 +16,7 @@
 #include <strsafe.h>
 
 #include <dutil.h>
+#include <apputil.h>
 #include <pathutil.h>
 #include <locutil.h>
 #include <memutil.h>

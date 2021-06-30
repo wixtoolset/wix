@@ -11,7 +11,88 @@ static HRESULT ParseBalPackageInfoFromXml(
     __in BAL_INFO_PACKAGES* pPackages,
     __in IXMLDOMDocument* pixdManifest
     );
+static HRESULT ParseOverridableVariablesFromXml(
+    __in BAL_INFO_OVERRIDABLE_VARIABLES* pOverridableVariables,
+    __in IXMLDOMDocument* pixdManifest
+    );
 
+
+DAPI_(HRESULT) BalInfoParseCommandLine(
+    __in BAL_INFO_COMMAND* pCommand,
+    __in LPCWSTR wzCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+    int argc = 0;
+    LPWSTR* argv = NULL;
+    BOOL fUnknownArg = FALSE;
+
+    BalInfoUninitializeCommandLine(pCommand);
+
+    if (!wzCommandLine || !*wzCommandLine)
+    {
+        ExitFunction();
+    }
+
+    hr = AppParseCommandLine(wzCommandLine, &argc, &argv);
+    ExitOnFailure(hr, "Failed to parse command line.");
+
+    for (int i = 0; i < argc; ++i)
+    {
+        fUnknownArg = FALSE;
+
+        if (argv[i][0] == L'-' || argv[i][0] == L'/')
+        {
+            fUnknownArg = TRUE;
+        }
+        else
+        {
+            const wchar_t* pwc = wcschr(argv[i], L'=');
+            if (!pwc)
+            {
+                fUnknownArg = TRUE;
+            }
+            else
+            {
+                hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pCommand->rgVariableNames), pCommand->cVariables, 1, sizeof(LPWSTR), 5);
+                ExitOnFailure(hr, "Failed to ensure size for variable names.");
+
+                hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pCommand->rgVariableValues), pCommand->cVariables, 1, sizeof(LPWSTR), 5);
+                ExitOnFailure(hr, "Failed to ensure size for variable values.");
+
+                LPWSTR* psczVariableName = pCommand->rgVariableNames + pCommand->cVariables;
+                LPWSTR* psczVariableValue = pCommand->rgVariableValues + pCommand->cVariables;
+                pCommand->cVariables += 1;
+
+                hr = StrAllocString(psczVariableName, argv[i], pwc - argv[i]);
+                BalExitOnFailure(hr, "Failed to copy variable name.");
+
+                hr = StrAllocString(psczVariableValue, ++pwc, 0);
+                BalExitOnFailure(hr, "Failed to copy variable value.");
+            }
+        }
+
+        if (fUnknownArg)
+        {
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pCommand->rgUnknownArgs), pCommand->cUnknownArgs, 1, sizeof(LPWSTR), 5);
+            BalExitOnFailure(hr, "Failed to ensure size for unknown args.");
+
+            LPWSTR* psczArg = pCommand->rgUnknownArgs + pCommand->cUnknownArgs;
+            pCommand->cUnknownArgs += 1;
+
+            StrAllocString(psczArg, argv[i], 0);
+            BalExitOnFailure(hr, "Failed to copy unknown arg.");
+        }
+    }
+
+LExit:
+    if (argv)
+    {
+        AppFreeCommandLineArgs(argv);
+    }
+
+    return hr;
+}
 
 DAPI_(HRESULT) BalInfoParseFromXml(
     __in BAL_INFO_BUNDLE* pBundle,
@@ -44,6 +125,9 @@ DAPI_(HRESULT) BalInfoParseFromXml(
             ExitOnFailure(hr, "Failed to read bundle information log path variable.");
         }
     }
+
+    hr = ParseOverridableVariablesFromXml(&pBundle->overridableVariables, pixdManifest);
+    BalExitOnFailure(hr, "Failed to parse overridable variables from bootstrapper application data.");
 
     hr = ParsePackagesFromXml(&pBundle->packages, pixdManifest);
     BalExitOnFailure(hr, "Failed to parse package information from bootstrapper application data.");
@@ -163,9 +247,73 @@ DAPI_(void) BalInfoUninitialize(
 
     ReleaseMem(pBundle->packages.rgPackages);
 
+    for (DWORD i = 0; i < pBundle->overridableVariables.cVariables; ++i)
+    {
+        ReleaseStr(pBundle->overridableVariables.rgVariables[i].sczName);
+    }
+
+    ReleaseMem(pBundle->overridableVariables.rgVariables);
+    ReleaseDict(pBundle->overridableVariables.sdVariables);
+
     ReleaseStr(pBundle->sczName);
     ReleaseStr(pBundle->sczLogVariable);
     memset(pBundle, 0, sizeof(BAL_INFO_BUNDLE));
+}
+
+
+DAPI_(void) BalInfoUninitializeCommandLine(
+    __in BAL_INFO_COMMAND* pCommand
+    )
+{
+    for (DWORD i = 0; i < pCommand->cUnknownArgs; ++i)
+    {
+        ReleaseNullStrSecure(pCommand->rgUnknownArgs[i]);
+    }
+
+    ReleaseMem(pCommand->rgUnknownArgs);
+
+    for (DWORD i = 0; i < pCommand->cVariables; ++i)
+    {
+        ReleaseNullStrSecure(pCommand->rgVariableNames[i]);
+        ReleaseNullStrSecure(pCommand->rgVariableValues[i]);
+    }
+
+    ReleaseMem(pCommand->rgVariableNames);
+    ReleaseMem(pCommand->rgVariableValues);
+
+    memset(pCommand, 0, sizeof(BAL_INFO_COMMAND));
+}
+
+
+DAPI_(HRESULT) BalSetOverridableVariablesFromEngine(
+    __in BAL_INFO_OVERRIDABLE_VARIABLES* pOverridableVariables,
+    __in BAL_INFO_COMMAND* pCommand,
+    __in IBootstrapperEngine* pEngine
+    )
+{
+    HRESULT hr = S_OK;
+    BAL_INFO_OVERRIDABLE_VARIABLE* pOverridableVariable = NULL;
+
+    for (DWORD i = 0; i < pCommand->cVariables; ++i)
+    {
+        LPCWSTR wzVariableName = pCommand->rgVariableNames[i];
+        LPCWSTR wzVariableValue = pCommand->rgVariableValues[i];
+
+        hr = DictGetValue(pOverridableVariables->sdVariables, wzVariableName, reinterpret_cast<void**>(&pOverridableVariable));
+        if (E_NOTFOUND == hr)
+        {
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to set non-overridable variable: '%ls'.", wzVariableName);
+            hr = S_OK;
+            continue;
+        }
+        BalExitOnFailure(hr, "Failed to check the dictionary of overridable variables.");
+
+        hr = pEngine->SetVariableString(pOverridableVariable->sczName, wzVariableValue, FALSE);
+        BalExitOnFailure(hr, "Failed to set variable: '%ls'.", pOverridableVariable->sczName);
+    }
+
+LExit:
+    return hr;
 }
 
 
@@ -369,5 +517,60 @@ LExit:
     ReleaseObject(pNode);
     ReleaseObject(pNodeList);
 
+    return hr;
+}
+
+
+static HRESULT ParseOverridableVariablesFromXml(
+    __in BAL_INFO_OVERRIDABLE_VARIABLES* pOverridableVariables,
+    __in IXMLDOMDocument* pixdManifest
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNode* pNode = NULL;
+    IXMLDOMNodeList* pNodes = NULL;
+    BAL_INFO_OVERRIDABLE_VARIABLE* pOverridableVariable = NULL;
+
+    // Get the list of variables users can override on the command line.
+    hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOverridableVariable", &pNodes);
+    if (S_FALSE == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    ExitOnFailure(hr, "Failed to select overridable variable nodes.");
+
+    hr = pNodes->get_length(reinterpret_cast<long*>(&pOverridableVariables->cVariables));
+    ExitOnFailure(hr, "Failed to get overridable variable node count.");
+
+    if (pOverridableVariables->cVariables)
+    {
+        hr = DictCreateWithEmbeddedKey(&pOverridableVariables->sdVariables, pOverridableVariables->cVariables, reinterpret_cast<void**>(&pOverridableVariables->rgVariables), offsetof(BAL_INFO_OVERRIDABLE_VARIABLE, sczName), DICT_FLAG_NONE);
+        ExitOnFailure(hr, "Failed to create the overridable variables string dictionary.");
+
+        hr = MemAllocArray(reinterpret_cast<LPVOID*>(&pOverridableVariables->rgVariables), sizeof(pOverridableVariable), pOverridableVariables->cVariables);
+        ExitOnFailure(hr, "Failed to create the overridable variables array.");
+
+        for (DWORD i = 0; i < pOverridableVariables->cVariables; ++i)
+        {
+            pOverridableVariable = pOverridableVariables->rgVariables + i;
+
+            hr = XmlNextElement(pNodes, &pNode, NULL);
+            ExitOnFailure(hr, "Failed to get next node.");
+
+            // @Name
+            hr = XmlGetAttributeEx(pNode, L"Name", &pOverridableVariable->sczName);
+            ExitOnFailure(hr, "Failed to get name for overridable variable.");
+
+            hr = DictAddValue(pOverridableVariables->sdVariables, pOverridableVariable);
+            ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", pOverridableVariable->sczName);
+
+            // prepare next iteration
+            ReleaseNullObject(pNode);
+        }
+    }
+
+LExit:
+    ReleaseObject(pNode);
+    ReleaseObject(pNodes);
     return hr;
 }

@@ -74,8 +74,6 @@ namespace WixToolset.Test.BA
                 return;
             }
 
-            base.OnStartup(args);
-
             this.action = this.Command.Action;
             this.TestVariables();
 
@@ -84,7 +82,7 @@ namespace WixToolset.Test.BA
 
             List<string> verifyArguments = this.ReadVerifyArguments();
 
-            foreach (string arg in this.Command.CommandLineArgs)
+            foreach (string arg in BootstrapperCommand.ParseCommandLineToArgs(this.Command.CommandLine))
             {
                 // If we're not in the update already, process the updatebundle.
                 if (this.Command.Relation != RelationType.Update && arg.StartsWith("-updatebundle:", StringComparison.OrdinalIgnoreCase))
@@ -115,6 +113,8 @@ namespace WixToolset.Test.BA
                 this.Engine.Quit(-1);
                 return;
             }
+
+            base.OnStartup(args);
 
             int redetectCount;
             string redetect = this.ReadPackageAction(null, "RedetectCount");
