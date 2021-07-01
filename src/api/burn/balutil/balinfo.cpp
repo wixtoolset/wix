@@ -292,12 +292,21 @@ DAPI_(HRESULT) BalSetOverridableVariablesFromEngine(
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczKey = NULL;
     BAL_INFO_OVERRIDABLE_VARIABLE* pOverridableVariable = NULL;
 
     for (DWORD i = 0; i < pCommand->cVariables; ++i)
     {
         LPCWSTR wzVariableName = pCommand->rgVariableNames[i];
         LPCWSTR wzVariableValue = pCommand->rgVariableValues[i];
+
+        if (BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE == pOverridableVariables->commandLineType)
+        {
+            hr = StrAllocStringToUpperInvariant(&sczKey, wzVariableName, 0);
+            ExitOnFailure(hr, "Failed to upper case variable name.");
+
+            wzVariableName = sczKey;
+        }
 
         hr = DictGetValue(pOverridableVariables->sdVariables, wzVariableName, reinterpret_cast<void**>(&pOverridableVariable));
         if (E_NOTFOUND == hr)
@@ -313,6 +322,8 @@ DAPI_(HRESULT) BalSetOverridableVariablesFromEngine(
     }
 
 LExit:
+    ReleaseStr(sczKey);
+
     return hr;
 }
 
@@ -527,9 +538,36 @@ static HRESULT ParseOverridableVariablesFromXml(
     )
 {
     HRESULT hr = S_OK;
+    IXMLDOMNode* pCommandLineNode = NULL;
+    LPWSTR scz = NULL;
     IXMLDOMNode* pNode = NULL;
     IXMLDOMNodeList* pNodes = NULL;
     BAL_INFO_OVERRIDABLE_VARIABLE* pOverridableVariable = NULL;
+
+    hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/CommandLine", &pCommandLineNode);
+    if (S_FALSE == hr)
+    {
+        hr = E_NOTFOUND;
+    }
+    ExitOnFailure(hr, "Failed to select command line information.");
+
+    // @Variables
+    hr = XmlGetAttributeEx(pCommandLineNode, L"Variables", &scz);
+    ExitOnFailure(hr, "Failed to get command line variable type.");
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"upperCase", -1))
+    {
+        pOverridableVariables->commandLineType = BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"caseSensitive", -1))
+    {
+        pOverridableVariables->commandLineType = BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_CASE_SENSITIVE;
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+        ExitOnFailure(hr, "Invalid value for CommandLine/@Variables: %ls", scz);
+    }
 
     // Get the list of variables users can override on the command line.
     hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOverridableVariable", &pNodes);
@@ -570,6 +608,8 @@ static HRESULT ParseOverridableVariablesFromXml(
     }
 
 LExit:
+    ReleaseStr(scz);
+    ReleaseObject(pCommandLineNode);
     ReleaseObject(pNode);
     ReleaseObject(pNodes);
     return hr;

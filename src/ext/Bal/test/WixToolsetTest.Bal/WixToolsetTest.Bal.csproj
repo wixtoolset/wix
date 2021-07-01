@@ -9,11 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\Overridable\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\WixStdBa\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\WixStdBa\Data\test.msi" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\WixStdBa\DisplayInternalUIConditionBundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Target Name="CopyExtensions" AfterTargets="Build">

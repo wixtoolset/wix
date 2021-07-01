@@ -33,6 +33,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.CommandLineVariables), IntermediateFieldType.String),
             },
             typeof(WixBundleSymbol));
     }
@@ -67,6 +68,7 @@ namespace WixToolset.Data.Symbols
         BundleId,
         ProviderKey,
         InProgressName,
+        CommandLineVariables,
     }
 
     [Flags]
@@ -77,6 +79,12 @@ namespace WixToolset.Data.Symbols
         DisableRemove = 0x2,
         SingleChangeUninstallButton = 0x4,
         PerMachine = 0x8,
+    }
+
+    public enum WixBundleCommandLineVariables
+    {
+        UpperCase,
+        CaseSensitive,
     }
 
     public class WixBundleSymbol : IntermediateSymbol
@@ -227,6 +235,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleSymbolFields.InProgressName];
             set => this.Set((int)WixBundleSymbolFields.InProgressName, value);
+        }
+
+        public WixBundleCommandLineVariables CommandLineVariables
+        {
+            get => (WixBundleCommandLineVariables)this.Fields[(int)WixBundleSymbolFields.CommandLineVariables].AsNumber();
+            set => this.Set((int)WixBundleSymbolFields.CommandLineVariables, (int)value);
         }
 
         public PackagingType DefaultPackagingType => (this.Compressed.HasValue && !this.Compressed.Value) ? PackagingType.External : PackagingType.Embedded;
