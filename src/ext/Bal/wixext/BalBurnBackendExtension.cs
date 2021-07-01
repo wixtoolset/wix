@@ -31,6 +31,8 @@ namespace WixToolset.Bal
         {
             base.SymbolsFinalized(section);
 
+            this.VerifyOverridableVariables(section);
+
             var baSymbol = section.Symbols.OfType<WixBootstrapperApplicationDllSymbol>().SingleOrDefault();
             var baId = baSymbol?.Id?.Id;
             if (null == baId)
@@ -115,6 +117,25 @@ namespace WixToolset.Bal
                 }
 
                 baFunctionsSymbol.FilePath = bundlePayloadSymbol.Name;
+            }
+        }
+
+        private void VerifyOverridableVariables(IntermediateSection section)
+        {
+            var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
+            if (bundleSymbol.CommandLineVariables != WixBundleCommandLineVariables.UpperCase)
+            {
+                return;
+            }
+
+            var overridableVariableSymbols = section.Symbols.OfType<WixStdbaOverridableVariableSymbol>().ToList();
+            foreach (var overridableVariableSymbol in overridableVariableSymbols)
+            {
+                var upperName = overridableVariableSymbol.Name.ToUpperInvariant();
+                if (upperName != overridableVariableSymbol.Name)
+                {
+                    this.Messaging.Write(BalErrors.NonUpperCaseOverridableVariable(overridableVariableSymbol.SourceLineNumbers, overridableVariableSymbol.Name, upperName));
+                }
             }
         }
 

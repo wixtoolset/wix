@@ -1,0 +1,17 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Fragment>
+    <PackageGroup Id="BundlePackages">
+      <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)">
+        <MsiProperty Name="INSTALLLOCATION" Value="[INSTALLLOCATION]" />
+        <MsiProperty Name="LICENSEKEY" Value="[LICENSEKEY]" />
+      </MsiPackage>
+    </PackageGroup>
+
+    <Variable Name="INSTALLLOCATION" bal:Overridable="yes" />
+    <Variable Name="LICENSEKEY" Hidden="yes" bal:Overridable="yes" />
+  </Fragment>
+</Wix>

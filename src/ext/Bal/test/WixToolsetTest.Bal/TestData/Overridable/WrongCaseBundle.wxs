@@ -5,7 +5,7 @@
         <BootstrapperApplication>
             <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" Theme="hyperlinkLicense" />
         </BootstrapperApplication>
-        <Variable Name="TEST1" bal:Overridable="yes" />
+        <Variable Name="Test1" bal:Overridable="yes" />
         <Chain>
             <ExePackage Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" />
         </Chain>

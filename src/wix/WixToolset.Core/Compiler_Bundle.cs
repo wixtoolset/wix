@@ -120,6 +120,7 @@ namespace WixToolset.Core
             string aboutUrl = null;
             var compressed = YesNoDefaultType.Default;
             WixBundleAttributes attributes = 0;
+            WixBundleCommandLineVariables commandLineVariables = WixBundleCommandLineVariables.UpperCase;
             string helpTelephone = null;
             string helpUrl = null;
             string inProgressName = null;
@@ -146,6 +147,21 @@ namespace WixToolset.Core
                     {
                     case "AboutUrl":
                         aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "CommandLineVariables":
+                        var commandLineVariablesValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (commandLineVariablesValue)
+                        {
+                        case "upperCase":
+                            commandLineVariables = WixBundleCommandLineVariables.UpperCase;
+                            break;
+                        case "caseSensitive":
+                            commandLineVariables = WixBundleCommandLineVariables.CaseSensitive;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, commandLineVariablesValue, "upperCase", "caseSensitive"));
+                            break;
+                        }
                         break;
                     case "Compressed":
                         compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -408,6 +424,7 @@ namespace WixToolset.Core
                     HelpUrl = helpUrl,
                     HelpTelephone = helpTelephone,
                     UpdateUrl = updateUrl,
+                    CommandLineVariables = commandLineVariables,
                     Compressed = YesNoDefaultType.Yes == compressed ? true : YesNoDefaultType.No == compressed ? (bool?)false : null,
                     IconSourceFile = iconSourceFile,
                     SplashScreenSourceFile = splashScreenSourceFile,

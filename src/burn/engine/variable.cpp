@@ -294,6 +294,7 @@ extern "C" HRESULT VariablesParseFromXml(
     )
 {
     HRESULT hr = S_OK;
+    IXMLDOMNode* pixnCommandLine = NULL;
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
@@ -306,6 +307,32 @@ extern "C" HRESULT VariablesParseFromXml(
     DWORD iVariable = 0;
 
     ::EnterCriticalSection(&pVariables->csAccess);
+
+    // select registration node
+    hr = XmlSelectSingleNode(pixnBundle, L"CommandLine", &pixnCommandLine);
+    if (S_FALSE == hr)
+    {
+        hr = E_NOTFOUND;
+    }
+    ExitOnFailure(hr, "Failed to select CommandLine node.");
+
+    // @Variables
+    hr = XmlGetAttributeEx(pixnCommandLine, L"Variables", &scz);
+    ExitOnFailure(hr, "Failed to get CommandLine/@Variables.");
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"upperCase", -1))
+    {
+        pVariables->commandLineType = BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"caseSensitive", -1))
+    {
+        pVariables->commandLineType = BURN_VARIABLE_COMMAND_LINE_TYPE_CASE_SENSITIVE;
+    }
+    else
+    {
+        hr = E_INVALIDARG;
+        ExitOnFailure(hr, "Invalid value for CommandLine/@Variables: %ls", scz);
+    }
 
     // select variable nodes
     hr = XmlSelectNodes(pixnBundle, L"Variable", &pixnNodes);
@@ -434,6 +461,7 @@ extern "C" HRESULT VariablesParseFromXml(
 LExit:
     ::LeaveCriticalSection(&pVariables->csAccess);
 
+    ReleaseObject(pixnCommandLine);
     ReleaseObject(pixnNodes);
     ReleaseObject(pixnNode);
     ReleaseStr(scz);

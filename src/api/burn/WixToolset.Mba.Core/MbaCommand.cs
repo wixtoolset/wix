@@ -19,9 +19,11 @@ namespace WixToolset.Mba.Core
         {
             foreach (var kvp in this.Variables)
             {
-                if (!overridableVariables.Variables.TryGetValue(kvp.Key, out var overridableVariable))
+                var key = overridableVariables.CommandLineType == VariableCommandLineType.UpperCase ? kvp.Key.ToUpperInvariant() : kvp.Key;
+
+                if (!overridableVariables.Variables.TryGetValue(key, out var overridableVariable))
                 {
-                    engine.Log(LogLevel.Error, string.Format("Ignoring attempt to set non-overridable variable: '{0}'.", kvp.Key));
+                    engine.Log(LogLevel.Error, string.Format("Ignoring attempt to set non-overridable variable: '{0}'.", key));
                 }
                 else
                 {
