@@ -2680,18 +2680,18 @@ namespace WixToolset.Util
                             var bitnessValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (bitnessValue)
                             {
-                            case "always32":
-                                win64 = false;
-                                break;
-                            case "always64":
-                                win64 = true;
-                                break;
-                            case "default":
-                            case "":
-                                break;
-                            default:
-                                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
-                                break;
+                                case "always32":
+                                    win64 = false;
+                                    break;
+                                case "always64":
+                                    win64 = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
                             }
                             break;
                         case "Root":
@@ -3253,6 +3253,11 @@ namespace WixToolset.Util
             int attributes = 0;
             string domain = null;
             string name = null;
+<<<<<<< HEAD
+            string comment = null;
+=======
+            string comment = " Comment Not Set ";
+>>>>>>> Issue5371
             string password = null;
 
             foreach (var attrib in element.Attributes())
@@ -3274,6 +3279,18 @@ namespace WixToolset.Util
                             {
                                 attributes |= UserPasswdCantChange;
                             }
+                            break;
+                        case "Comment":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+<<<<<<< HEAD
+                            comment = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+=======
+                            comment = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib).Trim();
+>>>>>>> Issue5371
                             break;
                         case "CreateUser":
                             if (null == componentId)
@@ -3452,6 +3469,7 @@ namespace WixToolset.Util
                     Name = name,
                     Domain = domain,
                     Password = password,
+                    Comment = comment,
                     Attributes = attributes,
                 });
             }
