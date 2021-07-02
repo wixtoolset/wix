@@ -15,7 +15,7 @@ enum TOUCH_FILE_ATTRIBUTE
 };
 
 
-static BOOL SetExistingFileModifiedTime(
+static HRESULT SetExistingFileModifiedTime(
     __in_z LPCWSTR wzId,
     __in_z LPCWSTR wzPath,
     __in BOOL f64Bit,
@@ -41,7 +41,7 @@ LExit:
         WcaRevertWow64FSRedirection();
     }
 
-    return SUCCEEDED(hr);
+    return hr;
 }
 
 
