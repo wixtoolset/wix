@@ -101,7 +101,6 @@ namespace WixToolsetTest.Mba.Core
             public int cbSize;
             public LaunchAction action;
             public Display display;
-            public Restart restart;
             [MarshalAs(UnmanagedType.LPWStr)] public string wzCommandLine;
             public int nCmdShow;
             public ResumeType resume;

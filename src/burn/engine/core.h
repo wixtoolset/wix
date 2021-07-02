@@ -210,7 +210,6 @@ HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RESTART restart,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
     __in_z_opt LPCWSTR wzActiveParent,

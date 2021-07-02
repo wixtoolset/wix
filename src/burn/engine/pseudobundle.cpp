@@ -205,7 +205,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
 
     // No matter the operation, we're passing the same command-line. That's what makes
     // this a passthrough bundle.
-    hr = CoreRecreateCommandLine(&sczArguments, pCommand->action, pCommand->display, pCommand->restart, pCommand->relationType, TRUE, wzActiveParent, wzAncestors, wzAppendLogPath, pCommand->wzCommandLine);
+    hr = CoreRecreateCommandLine(&sczArguments, pCommand->action, pCommand->display, pCommand->relationType, TRUE, wzActiveParent, wzAncestors, wzAppendLogPath, pCommand->wzCommandLine);
     ExitOnFailure(hr, "Failed to recreate command-line arguments.");
 
     hr = StrAllocString(&pPassthroughPackage->Exe.sczInstallArguments, sczArguments, 0);

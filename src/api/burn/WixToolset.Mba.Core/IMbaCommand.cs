@@ -10,6 +10,11 @@ namespace WixToolset.Mba.Core
     public interface IMbaCommand
     {
         /// <summary>
+        /// Gets the action to perform if a reboot is required.
+        /// </summary>
+        Restart Restart { get; }
+
+        /// <summary>
         /// The command line arguments not parsed into <see cref="IBootstrapperCommand"/> or <see cref="IMbaCommand"/>.
         /// </summary>
         string[] UnknownCommandLineArgs { get; }

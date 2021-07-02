@@ -20,11 +20,6 @@ namespace WixToolset.Mba.Core
         Display Display { get; }
 
         /// <summary>
-        /// Gets the action to perform if a reboot is required.
-        /// </summary>
-        Restart Restart { get; }
-
-        /// <summary>
         /// Gets the command line arguments.
         /// </summary>
         /// <returns>

@@ -924,7 +924,6 @@ extern "C" HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RESTART restart,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
     __in_z_opt LPCWSTR wzActiveParent,
@@ -964,17 +963,6 @@ extern "C" HRESULT CoreRecreateCommandLine(
         break;
     }
     ExitOnFailure(hr, "Failed to append action state to command-line");
-
-    switch (restart)
-    {
-    case BOOTSTRAPPER_RESTART_ALWAYS:
-        hr = StrAllocConcat(psczCommandLine, L" /forcerestart", 0);
-        break;
-    case BOOTSTRAPPER_RESTART_NEVER:
-        hr = StrAllocConcat(psczCommandLine, L" /norestart", 0);
-        break;
-    }
-    ExitOnFailure(hr, "Failed to append restart state to command-line");
 
     if (wzActiveParent)
     {
@@ -1246,32 +1234,10 @@ extern "C" HRESULT CoreParseCommandLine(
                      CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"silent", -1))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_NONE;
-
-                if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
-                {
-                    pCommand->restart = BOOTSTRAPPER_RESTART_AUTOMATIC;
-                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"passive", -1))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_PASSIVE;
-
-                if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
-                {
-                    pCommand->restart = BOOTSTRAPPER_RESTART_AUTOMATIC;
-                }
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"norestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_NEVER;
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"forcerestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_ALWAYS;
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"promptrestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_PROMPT;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"layout", -1))
             {
@@ -1651,11 +1617,6 @@ extern "C" HRESULT CoreParseCommandLine(
     if (BOOTSTRAPPER_DISPLAY_UNKNOWN == pCommand->display)
     {
         pCommand->display = BOOTSTRAPPER_DISPLAY_FULL;
-    }
-
-    if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
-    {
-        pCommand->restart = BOOTSTRAPPER_RESTART_PROMPT;
     }
 
 LExit:

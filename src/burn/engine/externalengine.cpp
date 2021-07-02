@@ -295,7 +295,7 @@ HRESULT ExternalEngineSetUpdate(
     {
         UpdateUninitialize(&pEngineState->update);
 
-        hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, pEngineState->command.display, pEngineState->command.restart, BOOTSTRAPPER_RELATION_NONE, FALSE, pEngineState->registration.sczActiveParent, pEngineState->registration.sczAncestors, NULL, pEngineState->command.wzCommandLine);
+        hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, pEngineState->command.display, BOOTSTRAPPER_RELATION_NONE, FALSE, pEngineState->registration.sczActiveParent, pEngineState->registration.sczAncestors, NULL, pEngineState->command.wzCommandLine);
         ExitOnFailure(hr, "Failed to recreate command-line for update bundle.");
 
         // Bundles would fail to use the downloaded update bundle, as the running bundle would be one of the search paths.

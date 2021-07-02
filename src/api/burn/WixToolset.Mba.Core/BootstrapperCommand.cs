@@ -17,7 +17,6 @@ namespace WixToolset.Mba.Core
         /// </summary>
         /// <param name="action"></param>
         /// <param name="display"></param>
-        /// <param name="restart"></param>
         /// <param name="commandLine"></param>
         /// <param name="cmdShow"></param>
         /// <param name="resume"></param>
@@ -30,7 +29,6 @@ namespace WixToolset.Mba.Core
         public BootstrapperCommand(
             LaunchAction action,
             Display display,
-            Restart restart,
             string commandLine,
             int cmdShow,
             ResumeType resume,
@@ -43,7 +41,6 @@ namespace WixToolset.Mba.Core
         {
             this.Action = action;
             this.Display = display;
-            this.Restart = restart;
             this.CommandLine = commandLine;
             this.CmdShow = cmdShow;
             this.Resume = resume;
@@ -60,9 +57,6 @@ namespace WixToolset.Mba.Core
 
         /// <inheritdoc/>
         public Display Display { get; }
-
-        /// <inheritdoc/>
-        public Restart Restart { get; }
 
         /// <inheritdoc/>
         public string CommandLine { get; }
@@ -97,6 +91,7 @@ namespace WixToolset.Mba.Core
             var args = ParseCommandLineToArgs(this.CommandLine);
             var unknownArgs = new List<string>();
             var variables = new List<KeyValuePair<string, string>>();
+            var restart = Restart.Unknown;
 
             foreach (var arg in args)
             {
@@ -104,7 +99,25 @@ namespace WixToolset.Mba.Core
 
                 if (arg[0] == '-' || arg[0] == '/')
                 {
-                    unknownArg = true;
+                    var parameter = arg.Substring(1).ToLowerInvariant();
+                    switch (parameter)
+                    {
+                        case "norestart":
+                            if (restart == Restart.Unknown)
+                            {
+                                restart = Restart.Never;
+                            }
+                            break;
+                        case "forcerestart":
+                            if (restart == Restart.Unknown)
+                            {
+                                restart = Restart.Always;
+                            }
+                            break;
+                        default:
+                            unknownArg = true;
+                            break;
+                    }
                 }
                 else
                 {
@@ -127,8 +140,14 @@ namespace WixToolset.Mba.Core
                 }
             }
 
+            if (restart == Restart.Unknown)
+            {
+                restart = this.Display < Display.Full ? Restart.Automatic : Restart.Prompt;
+            }
+
             return new MbaCommand
             {
+                Restart = restart,
                 UnknownCommandLineArgs = unknownArgs.ToArray(),
                 Variables = variables.ToArray(),
             };

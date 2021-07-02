@@ -1783,7 +1783,7 @@ extern "C" HRESULT PlanSetResumeCommand(
     HRESULT hr = S_OK;
 
     // build the resume command-line.
-    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, action, pCommand->display, pCommand->restart, pCommand->relationType, pCommand->fPassthrough, pRegistration->sczActiveParent, pRegistration->sczAncestors, pLog->sczPath, pCommand->wzCommandLine);
+    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, action, pCommand->display, pCommand->relationType, pCommand->fPassthrough, pRegistration->sczActiveParent, pRegistration->sczAncestors, pLog->sczPath, pCommand->wzCommandLine);
     ExitOnFailure(hr, "Failed to recreate resume command-line.");
 
 LExit:
