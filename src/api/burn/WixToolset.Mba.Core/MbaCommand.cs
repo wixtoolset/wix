@@ -9,6 +9,8 @@ namespace WixToolset.Mba.Core
     /// </summary>
     internal sealed class MbaCommand : IMbaCommand
     {
+        public Restart Restart { get; internal set; }
+
         public string[] UnknownCommandLineArgs { get; internal set; }
 
         public KeyValuePair<string, string>[] Variables { get; internal set; }

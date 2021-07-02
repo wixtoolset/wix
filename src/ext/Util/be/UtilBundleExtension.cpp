@@ -27,7 +27,7 @@ public: //CBextBaseBundleExtension
         IXMLDOMDocument* pixdManifest = NULL;
         IXMLDOMNode* pixnBundleExtension = NULL;
 
-        hr = CBextBaseBundleExtension::Initialize(pCreateArgs);
+        hr = __super::Initialize(pCreateArgs);
         ExitOnFailure(hr, "CBextBaseBundleExtension initialization failed.");
 
         hr = XmlLoadDocumentFromFile(m_sczBundleExtensionDataPath, &pixdManifest);
@@ -76,7 +76,7 @@ HRESULT UtilBundleExtensionCreate(
     ExitOnNull(pExtension, hr, E_OUTOFMEMORY, "Failed to create new CWixUtilBundleExtension.");
 
     hr = pExtension->Initialize(pArgs);
-    ExitOnFailure(hr, "CWixUtilBundleExtension initialization failed");
+    ExitOnFailure(hr, "CWixUtilBundleExtension initialization failed.");
 
     *ppBundleExtension = pExtension;
     pExtension = NULL;

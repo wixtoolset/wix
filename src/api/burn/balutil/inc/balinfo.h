@@ -18,6 +18,15 @@ typedef enum BAL_INFO_PACKAGE_TYPE
     BAL_INFO_PACKAGE_TYPE_BUNDLE_PATCH,
 } BAL_INFO_PACKAGE_TYPE;
 
+typedef enum _BAL_INFO_RESTART
+{
+    BAL_INFO_RESTART_UNKNOWN,
+    BAL_INFO_RESTART_NEVER,
+    BAL_INFO_RESTART_PROMPT,
+    BAL_INFO_RESTART_AUTOMATIC,
+    BAL_INFO_RESTART_ALWAYS,
+} BAL_INFO_RESTART;
+
 typedef enum _BAL_INFO_VARIABLE_COMMAND_LINE_TYPE
 {
     BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE,
@@ -85,6 +94,7 @@ typedef struct _BAL_INFO_COMMAND
     DWORD cVariables;
     LPWSTR* rgVariableNames;
     LPWSTR* rgVariableValues;
+    BAL_INFO_RESTART restart;
 } BAL_INFO_COMMAND;
 
 
@@ -94,7 +104,7 @@ typedef struct _BAL_INFO_COMMAND
 ********************************************************************/
 HRESULT DAPI BalInfoParseCommandLine(
     __in BAL_INFO_COMMAND* pCommand,
-    __in LPCWSTR wzCommandLine
+    __in const BOOTSTRAPPER_COMMAND* pBootstrapperCommand
     );
 
 

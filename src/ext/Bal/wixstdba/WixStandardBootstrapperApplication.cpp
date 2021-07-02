@@ -206,7 +206,7 @@ public: // IBootstrapperApplication
         m_hUiThread = ::CreateThread(NULL, 0, UiThreadProc, this, 0, &dwUIThreadId);
         if (!m_hUiThread)
         {
-            ExitWithLastError(hr, "Failed to create UI thread.");
+            BalExitWithLastError(hr, "Failed to create UI thread.");
         }
 
     LExit:
@@ -1100,10 +1100,10 @@ public: // IBootstrapperApplication
         m_fRestartRequired = BOOTSTRAPPER_APPLY_RESTART_NONE != restart;
         BalSetStringVariable(WIXSTDBA_VARIABLE_RESTART_REQUIRED, m_fRestartRequired ? L"1" : NULL, FALSE);
 
-        m_fShouldRestart = m_fRestartRequired && BOOTSTRAPPER_RESTART_NEVER < m_command.restart;
+        m_fShouldRestart = m_fRestartRequired && BAL_INFO_RESTART_NEVER < m_BalInfoCommand.restart;
 
         // Automatically restart if we're not displaying a UI or the command line said to always allow restarts.
-        m_fAllowRestart = m_fShouldRestart && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_RESTART_PROMPT < m_command.restart);
+        m_fAllowRestart = m_fShouldRestart && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BAL_INFO_RESTART_PROMPT < m_BalInfoCommand.restart);
 
         if (m_fPrereq)
         {
@@ -1986,6 +1986,62 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
+
+public: //CBalBaseBootstrapperApplication
+    virtual STDMETHODIMP Initialize(
+        __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs
+        )
+    {
+        HRESULT hr = S_OK;
+        LONGLONG llInstalled = 0;
+
+        hr = __super::Initialize(pCreateArgs);
+        BalExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
+
+        memcpy_s(&m_command, sizeof(m_command), pCreateArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
+        memcpy_s(&m_createArgs, sizeof(m_createArgs), pCreateArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
+        m_createArgs.pCommand = &m_command;
+
+        if (m_fPrereq)
+        {
+            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
+            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+        else // maybe modify the action state if the bundle is or is not already installed.
+        {
+            hr = BalGetNumericVariable(L"WixBundleInstalled", &llInstalled);
+            if (SUCCEEDED(hr) && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && llInstalled && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
+            }
+            else if (!llInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+
+        // When resuming from restart doing some install-like operation, try to find the package that forced the
+        // restart. We'll use this information during planning.
+        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
+        {
+            // Ensure the forced restart package variable is null when it is an empty string.
+            hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
+            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
+            {
+                ReleaseNullStr(m_sczAfterForcedRestartPackage);
+            }
+        }
+
+        hr = S_OK;
+
+    LExit:
+        return hr;
+    }
+
+private:
     //
     // UiThreadProc - entrypoint for UI thread.
     //
@@ -2171,9 +2227,6 @@ private: // privates
         int argc = 0;
         LPWSTR* argv = NULL;
         BOOL fUnknownArg = FALSE;
-
-        hr = BalInfoParseCommandLine(&m_BalInfoCommand, m_command.wzCommandLine);
-        BalExitOnFailure(hr, "Failed to parse command line with balutil.");
 
         argc = m_BalInfoCommand.cUnknownArgs;
         argv = m_BalInfoCommand.rgUnknownArgs;
@@ -3139,7 +3192,7 @@ private: // privates
                     BOOL fLaunchTargetExists = FALSE;
                     if (m_fShouldRestart)
                     {
-                        if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
+                        if (BAL_INFO_RESTART_PROMPT == m_BalInfoCommand.restart)
                         {
                             fEnableRestartButton = TRUE;
                         }
@@ -3240,7 +3293,7 @@ private: // privates
 
                     if (m_fShouldRestart)
                     {
-                        if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
+                        if (BAL_INFO_RESTART_PROMPT == m_BalInfoCommand.restart)
                         {
                             fEnableRestartButton = TRUE;
                         }
@@ -3832,57 +3885,20 @@ public:
         __in HMODULE hModule,
         __in BOOL fPrereq,
         __in HRESULT hrHostInitialization,
-        __in IBootstrapperEngine* pEngine,
-        __in const BOOTSTRAPPER_CREATE_ARGS* pArgs
-        ) : CBalBaseBootstrapperApplication(pEngine, pArgs, 3, 3000)
+        __in IBootstrapperEngine* pEngine
+        ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
     {
         m_hModule = hModule;
-        memcpy_s(&m_command, sizeof(m_command), pArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
-        memcpy_s(&m_createArgs, sizeof(m_createArgs), pArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
-        m_createArgs.pCommand = &m_command;
-
-        if (fPrereq)
-        {
-            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
-            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
-        else // maybe modify the action state if the bundle is or is not already installed.
-        {
-            LONGLONG llInstalled = 0;
-            HRESULT hr = BalGetNumericVariable(L"WixBundleInstalled", &llInstalled);
-            if (SUCCEEDED(hr) && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && 0 < llInstalled && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
-            }
-            else if (0 == llInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
+        m_command = { };
+        m_createArgs = { };
 
         m_plannedAction = BOOTSTRAPPER_ACTION_UNKNOWN;
 
-        // When resuming from restart doing some install-like operation, try to find the package that forced the
-        // restart. We'll use this information during planning.
         m_sczAfterForcedRestartPackage = NULL;
 
-        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
-        {
-            // Ensure the forced restart package variable is null when it is an empty string.
-            HRESULT hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
-            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
-            {
-                ReleaseNullStr(m_sczAfterForcedRestartPackage);
-            }
-        }
-
         m_pWixLoc = NULL;
-        memset(&m_Bundle, 0, sizeof(m_Bundle));
-        memset(&m_BalInfoCommand, 0, sizeof(m_BalInfoCommand));
-        memset(&m_Conditions, 0, sizeof(m_Conditions));
+        m_Bundle = { };
+        m_Conditions = { };
         m_sczConfirmCloseMessage = NULL;
         m_sczFailedMessage = NULL;
 
@@ -3947,7 +3963,6 @@ public:
         ReleaseStr(m_sczConfirmCloseMessage);
         BalConditionsUninitialize(&m_Conditions);
         BalInfoUninitialize(&m_Bundle);
-        BalInfoUninitializeCommandLine(&m_BalInfoCommand);
         LocFree(m_pWixLoc);
 
         ReleaseStr(m_sczLanguage);
@@ -3980,7 +3995,6 @@ private:
 
     WIX_LOCALIZATION* m_pWixLoc;
     BAL_INFO_BUNDLE m_Bundle;
-    BAL_INFO_COMMAND m_BalInfoCommand;
     BAL_CONDITIONS m_Conditions;
     LPWSTR m_sczFailedMessage;
     LPWSTR m_sczConfirmCloseMessage;
@@ -4049,8 +4063,11 @@ HRESULT CreateBootstrapperApplication(
         BalExitOnFailure(hr = E_INVALIDARG, "Engine requested Unknown display type.");
     }
 
-    pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine, pArgs);
-    ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new standard bootstrapper application object.");
+    pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine);
+    BalExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new standard bootstrapper application object.");
+
+    hr = pApplication->Initialize(pArgs);
+    ExitOnFailure(hr, "CWixStandardBootstrapperApplication initialization failed.");
 
     pResults->pfnBootstrapperApplicationProc = BalBaseBootstrapperApplicationProc;
     pResults->pvBootstrapperApplicationProcContext = pApplication;

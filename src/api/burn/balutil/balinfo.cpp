@@ -19,7 +19,7 @@ static HRESULT ParseOverridableVariablesFromXml(
 
 DAPI_(HRESULT) BalInfoParseCommandLine(
     __in BAL_INFO_COMMAND* pCommand,
-    __in LPCWSTR wzCommandLine
+    __in const BOOTSTRAPPER_COMMAND* pBootstrapperCommand
     )
 {
     HRESULT hr = S_OK;
@@ -29,13 +29,13 @@ DAPI_(HRESULT) BalInfoParseCommandLine(
 
     BalInfoUninitializeCommandLine(pCommand);
 
-    if (!wzCommandLine || !*wzCommandLine)
+    if (!pBootstrapperCommand->wzCommandLine || !*pBootstrapperCommand->wzCommandLine)
     {
         ExitFunction();
     }
 
-    hr = AppParseCommandLine(wzCommandLine, &argc, &argv);
-    ExitOnFailure(hr, "Failed to parse command line.");
+    hr = AppParseCommandLine(pBootstrapperCommand->wzCommandLine, &argc, &argv);
+    BalExitOnFailure(hr, "Failed to parse command line.");
 
     for (int i = 0; i < argc; ++i)
     {
@@ -43,7 +43,24 @@ DAPI_(HRESULT) BalInfoParseCommandLine(
 
         if (argv[i][0] == L'-' || argv[i][0] == L'/')
         {
-            fUnknownArg = TRUE;
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"norestart", -1))
+            {
+                if (BAL_INFO_RESTART_UNKNOWN == pCommand->restart)
+                {
+                    pCommand->restart = BAL_INFO_RESTART_NEVER;
+                }
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"forcerestart", -1))
+            {
+                if (BAL_INFO_RESTART_UNKNOWN == pCommand->restart)
+                {
+                    pCommand->restart = BAL_INFO_RESTART_ALWAYS;
+                }
+            }
+            else
+            {
+                fUnknownArg = TRUE;
+            }
         }
         else
         {
@@ -55,10 +72,10 @@ DAPI_(HRESULT) BalInfoParseCommandLine(
             else
             {
                 hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pCommand->rgVariableNames), pCommand->cVariables, 1, sizeof(LPWSTR), 5);
-                ExitOnFailure(hr, "Failed to ensure size for variable names.");
+                BalExitOnFailure(hr, "Failed to ensure size for variable names.");
 
                 hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pCommand->rgVariableValues), pCommand->cVariables, 1, sizeof(LPWSTR), 5);
-                ExitOnFailure(hr, "Failed to ensure size for variable values.");
+                BalExitOnFailure(hr, "Failed to ensure size for variable values.");
 
                 LPWSTR* psczVariableName = pCommand->rgVariableNames + pCommand->cVariables;
                 LPWSTR* psczVariableValue = pCommand->rgVariableValues + pCommand->cVariables;
@@ -86,6 +103,11 @@ DAPI_(HRESULT) BalInfoParseCommandLine(
     }
 
 LExit:
+    if (BAL_INFO_RESTART_UNKNOWN == pCommand->restart)
+    {
+        pCommand->restart = BOOTSTRAPPER_DISPLAY_FULL > pBootstrapperCommand->display ? BAL_INFO_RESTART_AUTOMATIC : BAL_INFO_RESTART_PROMPT;
+    }
+
     if (argv)
     {
         AppFreeCommandLineArgs(argv);
