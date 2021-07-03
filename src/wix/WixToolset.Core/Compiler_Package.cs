@@ -4362,8 +4362,8 @@ namespace WixToolset.Core
             string helpDirectoryId = null;
             string helpSubdirectory = null;
             var language = CompilerConstants.IntegerNotSet;
-            var majorVersion = CompilerConstants.IntegerNotSet;
-            var minorVersion = CompilerConstants.IntegerNotSet;
+            XAttribute majorVersionAttrib = null;
+            XAttribute minorVersionAttrib = null;
             var resourceId = CompilerConstants.LongNotSet;
 
             foreach (var attrib in node.Attributes())
@@ -4413,10 +4413,10 @@ namespace WixToolset.Core
                         language = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                         break;
                     case "MajorVersion":
-                        majorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, UInt16.MaxValue);
+                        majorVersionAttrib = attrib;
                         break;
                     case "MinorVersion":
-                        minorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
+                        minorVersionAttrib = attrib;
                         break;
                     case "ResourceId":
                         resourceId = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, Int32.MinValue, Int32.MaxValue);
@@ -4451,11 +4451,20 @@ namespace WixToolset.Core
 
             helpDirectoryId = this.HandleSubdirectory(sourceLineNumbers, node, helpDirectoryId, helpSubdirectory, "HelpDirectory", "HelpSubdirectory");
 
+            // if the advertise state has not been set, default to non-advertised
+            if (YesNoType.NotSet == advertise)
+            {
+                advertise = YesNoType.No;
+            }
+
+            var majorVersion = (null == majorVersionAttrib) ? CompilerConstants.IntegerNotSet : this.Core.GetAttributeIntegerValue(sourceLineNumbers, majorVersionAttrib, 0, UInt16.MaxValue);
+            var minorVersion = (null == minorVersionAttrib) ? CompilerConstants.IntegerNotSet : this.Core.GetAttributeIntegerValue(sourceLineNumbers, minorVersionAttrib, 0, (YesNoType.Yes == advertise) ? Byte.MaxValue : UInt16.MaxValue);
+
             // build up the typelib version string for the registry if the major or minor version was specified
             string registryVersion = null;
-            if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
+            if (null != majorVersionAttrib || null != minorVersionAttrib)
             {
-                if (CompilerConstants.IntegerNotSet != majorVersion)
+                if (null != majorVersionAttrib)
                 {
                     registryVersion = majorVersion.ToString("x", CultureInfo.InvariantCulture.NumberFormat);
                 }
@@ -4464,7 +4473,7 @@ namespace WixToolset.Core
                     registryVersion = "0";
                 }
 
-                if (CompilerConstants.IntegerNotSet != minorVersion)
+                if (null != minorVersionAttrib)
                 {
                     registryVersion = String.Concat(registryVersion, ".", minorVersion.ToString("x", CultureInfo.InvariantCulture.NumberFormat));
                 }
@@ -4472,12 +4481,6 @@ namespace WixToolset.Core
                 {
                     registryVersion = String.Concat(registryVersion, ".0");
                 }
-            }
-
-            // if the advertise state has not been set, default to non-advertised
-            if (YesNoType.NotSet == advertise)
-            {
-                advertise = YesNoType.No;
             }
 
             foreach (var child in node.Elements())
@@ -4549,9 +4552,9 @@ namespace WixToolset.Core
                         FeatureRef = Guid.Empty.ToString("B")
                     });
 
-                    if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
+                    if (null != majorVersionAttrib || null != minorVersionAttrib)
                     {
-                        symbol.Version = (CompilerConstants.IntegerNotSet != majorVersion ? majorVersion * 256 : 0) + (CompilerConstants.IntegerNotSet != minorVersion ? minorVersion : 0);
+                        symbol.Version = (null != majorVersionAttrib ? majorVersion * 256 : 0) + (null != minorVersionAttrib ? minorVersion : 0);
                     }
 
                     if (CompilerConstants.IntegerNotSet != cost)
