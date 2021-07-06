@@ -261,6 +261,8 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP1 = \"VAL1\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"NONE = \"NOT\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 <> \"VAL1\""));
+                Assert::False(EvaluateConditionHelper(&variables, L"PROP1 <>\n\"VAL1\""));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP1 <> \"VAL1\nVAL2\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 ~<> \"VAL1\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 ~<> \"Val1\""));
                 Assert::True(EvaluateConditionHelper(&variables, L"NONE <> \"NOT\""));
