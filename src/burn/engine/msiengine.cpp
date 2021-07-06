@@ -1146,7 +1146,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
 
     if (pExecuteAction->msiPackage.sczLogPath && *pExecuteAction->msiPackage.sczLogPath)
     {
-        hr = WiuEnableLog(dwLogMode, pExecuteAction->msiPackage.sczLogPath, 0);
+        hr = WiuEnableLog(dwLogMode, pExecuteAction->msiPackage.sczLogPath, INSTALLLOGATTRIBUTES_APPEND);
         ExitOnFailure(hr, "Failed to enable logging for package: %ls to: %ls", pPackage->sczId, pExecuteAction->msiPackage.sczLogPath);
     }
 
