@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.Build.Traversal/3.0.23">
+  <ItemGroup>
+    <!-- Restore: Explicitly restore the test projects, which need some hand-holding. -->
+    <ProjectReference Include="test\BalUtilUnitTest\BalUtilUnitTest.vcxproj" Targets="Restore" BuildInParallel="false" />
+    <ProjectReference Include="test\BextUtilUnitTest\BextUtilUnitTest.vcxproj" Targets="Restore" BuildInParallel="false" />
+
+    <!-- Build -->
+
+    <!-- Let bextutil build balutil. -->
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x64;PlatformToolset=v141" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=ARM64;PlatformToolset=v141" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Properties="Platform=ARM64" />
+    
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86;PlatformToolset=v140" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64;PlatformToolset=v140" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86;PlatformToolset=v141" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64;PlatformToolset=v141" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=ARM64;PlatformToolset=v141" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x86" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="mbanative\mbanative.vcxproj" Properties="Platform=ARM64" />
+
+    <ProjectReference Include="WixToolset.Mba.Core\WixToolset.Mba.Core.csproj" Properties="Platform=AnyCPU" />
+
+    <!-- Test -->
+    <ProjectReference Include="test\BalUtilUnitTest\BalUtilUnitTest.vcxproj" Targets="Test" />
+    <ProjectReference Include="test\BextUtilUnitTest\BextUtilUnitTest.vcxproj" Targets="Test" />
+
+    <!-- Pack -->
+    <ProjectReference Include="balutil\balutil.vcxproj" Targets="PackNative" />
+    <ProjectReference Include="bextutil\bextutil.vcxproj" Targets="PackNative" />
+    <ProjectReference Include="WixToolset.BootstrapperCore.Native\WixToolset.BootstrapperCore.Native.proj" Targets="Restore;PackNative" />
+    <ProjectReference Include="WixToolset.Mba.Core\WixToolset.Mba.Core.csproj" Properties="NoBuild=true" Targets="Pack" />
+  </ItemGroup>
+</Project>
