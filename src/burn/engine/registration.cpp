@@ -1021,7 +1021,6 @@ extern "C" HRESULT RegistrationSaveState(
     LPWSTR sczVariableKey = NULL;
     LPWSTR sczVariableValue = NULL;
     LPWSTR sczValueName = NULL;
-    // DWORD dwIndex = 0;
     DWORD dwType = 0;
     DWORD dwNumberOfExistingValues = 0;
 
@@ -1067,25 +1066,10 @@ extern "C" HRESULT RegistrationSaveState(
         ExitOnFailure(hr, "Failed to delete registration variable value.");
     }
 
-    /*
-    while (E_NOMOREITEMS != (hr = RegValueEnum(hkRegistration, dwIndex, &sczValueName, &dwType)))
-    {
-        ExitOnFailure(hr, "Failed to enumerate value %u", dwIndex);
-
-        hr = RegDeleteValue(hkRegistration, sczValueName);
-        ExitOnFailure(hr, "Failed to delete registration variable value.");
-    }
-    */
-
     // Write variables.
     for (DWORD i = 0; i < variables.cVariables; ++i)
     {
         BURN_VARIABLE* pVariable = &variables.rgVariables[i];
-
-        //if (!pVariable->fPersisted)
-        //{
-        //    continue;
-        //}
 
         // Write variable value.
         switch (pVariable->Value.Type)
