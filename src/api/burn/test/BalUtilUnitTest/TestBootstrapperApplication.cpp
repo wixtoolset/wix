@@ -8,9 +8,8 @@ class CTestBootstrapperApplication : public CBalBaseBootstrapperApplication
 {
 public:
     CTestBootstrapperApplication(
-        __in IBootstrapperEngine* pEngine,
-        __in const BOOTSTRAPPER_CREATE_ARGS* pArgs
-        ) : CBalBaseBootstrapperApplication(pEngine, pArgs)
+        __in IBootstrapperEngine* pEngine
+        ) : CBalBaseBootstrapperApplication(pEngine)
     {
     }
 };
@@ -25,8 +24,11 @@ HRESULT CreateBootstrapperApplication(
     HRESULT hr = S_OK;
     CTestBootstrapperApplication* pApplication = NULL;
 
-    pApplication = new CTestBootstrapperApplication(pEngine, pArgs);
+    pApplication = new CTestBootstrapperApplication(pEngine);
     ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new test bootstrapper application object.");
+
+    hr = pApplication->Initialize(pArgs);
+    ExitOnFailure(hr, "CTestBootstrapperApplication initialization failed.");
 
     pResults->pfnBootstrapperApplicationProc = BalBaseBootstrapperApplicationProc;
     pResults->pvBootstrapperApplicationProcContext = pApplication;

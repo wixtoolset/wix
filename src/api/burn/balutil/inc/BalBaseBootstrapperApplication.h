@@ -9,6 +9,7 @@
 #include "IBootstrapperApplication.h"
 
 #include "balutil.h"
+#include "balinfo.h"
 #include "balretry.h"
 
 class CBalBaseBootstrapperApplication : public IBootstrapperApplication
@@ -794,7 +795,7 @@ public: // IBootstrapperApplication
     {
         HRESULT hr = S_OK;
         BOOL fRestartRequired = BOOTSTRAPPER_APPLY_RESTART_REQUIRED == restart;
-        BOOL fShouldBlockRestart = BOOTSTRAPPER_DISPLAY_FULL <= m_display && BOOTSTRAPPER_RESTART_PROMPT >= m_restart;
+        BOOL fShouldBlockRestart = BOOTSTRAPPER_DISPLAY_FULL <= m_display && BAL_INFO_RESTART_PROMPT >= m_BalInfoCommand.restart;
 
         if (fRestartRequired && !fShouldBlockRestart)
         {
@@ -976,6 +977,22 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+public: //CBalBaseBootstrapperApplication
+    virtual STDMETHODIMP Initialize(
+        __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs
+        )
+    {
+        HRESULT hr = S_OK;
+
+        m_display = pCreateArgs->pCommand->display;
+
+        hr = BalInfoParseCommandLine(&m_BalInfoCommand, pCreateArgs->pCommand);
+        BalExitOnFailure(hr, "Failed to parse command line with balutil.");
+
+    LExit:
+        return hr;
+    }
+
 protected:
     //
     // PromptCancel - prompts the user to close (if not forced).
@@ -1029,20 +1046,19 @@ protected:
 
     CBalBaseBootstrapperApplication(
         __in IBootstrapperEngine* pEngine,
-        __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
         __in DWORD dwRetryCount = 0,
         __in DWORD dwRetryTimeout = 1000
         )
     {
         m_cReferences = 1;
-        m_display = pArgs->pCommand->display;
-        m_restart = pArgs->pCommand->restart;
+        m_display = BOOTSTRAPPER_DISPLAY_UNKNOWN;
 
         pEngine->AddRef();
         m_pEngine = pEngine;
 
         ::InitializeCriticalSection(&m_csCanceled);
         m_fCanceled = FALSE;
+        m_BalInfoCommand = { };
         m_fApplying = FALSE;
         m_fRollingBack = FALSE;
 
@@ -1054,6 +1070,7 @@ protected:
 
     virtual ~CBalBaseBootstrapperApplication()
     {
+        BalInfoUninitializeCommandLine(&m_BalInfoCommand);
         BalRetryUninitialize();
         ::DeleteCriticalSection(&m_csCanceled);
 
@@ -1064,10 +1081,11 @@ protected:
     CRITICAL_SECTION m_csCanceled;
     BOOL m_fCanceled;
 
+    BAL_INFO_COMMAND m_BalInfoCommand;
+
 private:
     long m_cReferences;
     BOOTSTRAPPER_DISPLAY m_display;
-    BOOTSTRAPPER_RESTART m_restart;
     IBootstrapperEngine* m_pEngine;
 
     BOOL m_fApplying;

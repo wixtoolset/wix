@@ -80,7 +80,7 @@ public: // IBundleExtension
 public: //CBextBaseBundleExtension
     virtual STDMETHODIMP Initialize(
         __in const BUNDLE_EXTENSION_CREATE_ARGS* pCreateArgs
-    )
+        )
     {
         HRESULT hr = S_OK;
 

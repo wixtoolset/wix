@@ -13,7 +13,6 @@ typedef struct _BURN_EXTENSION_ENGINE_CONTEXT BURN_EXTENSION_ENGINE_CONTEXT;
 
 typedef struct _BURN_EXTENSION
 {
-    LPWSTR sczEntryPayloadId;
     LPWSTR sczId;
 
     BURN_PAYLOAD* pEntryPayload;

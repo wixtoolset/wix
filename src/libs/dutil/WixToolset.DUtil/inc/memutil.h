@@ -44,6 +44,13 @@ HRESULT DAPI MemEnsureArraySize(
     __in SIZE_T cbArrayType,
     __in DWORD dwGrowthCount
     );
+HRESULT DAPI MemEnsureArraySizeForNewItems(
+    __inout LPVOID* ppvArray,
+    __in DWORD cArray,
+    __in DWORD cNewItems,
+    __in SIZE_T cbArrayType,
+    __in DWORD dwGrowthCount
+    );
 HRESULT DAPI MemInsertIntoArray(
     __deref_inout_bcount((cExistingArray + cInsertItems) * cbArrayType) LPVOID* ppvArray,
     __in DWORD dwInsertIndex,

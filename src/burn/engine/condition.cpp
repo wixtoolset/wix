@@ -525,7 +525,7 @@ static HRESULT NextSymbol(
     while (L'\0' != pContext->wzRead[0])
     {
         ::GetStringTypeW(CT_CTYPE1, pContext->wzRead, 1, &charType);
-        if (0 == (C1_BLANK & charType))
+        if (0 == ((C1_BLANK | C1_SPACE) & charType))
         {
             break; // no blank, done
         }

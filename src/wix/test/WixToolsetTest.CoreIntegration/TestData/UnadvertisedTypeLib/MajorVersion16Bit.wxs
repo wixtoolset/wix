@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="TypeLibComp" Directory="INSTALLFOLDER" Guid="8E262DD2-04FE-4213-92D9-CFA0D392DC46">
+                <File Source="test.txt" Name="TypeLibComp.txt">
+                    <TypeLib Id="FF19093C-EA7A-4C41-9C1B-D706ECD9009F" Advertise="no" Language="1033" MajorVersion="65535" MinorVersion="0" />
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

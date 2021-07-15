@@ -645,13 +645,14 @@ namespace WixToolset.Core.Link
                 this.AddAfter(nestedAfterItems, messageHandler);
             }
 
-            // We *don't* propagate ordering information from Packages or
+            // We *don't* propagate ordering information from Packages, PayloadGroups, or
             // Containers to their children, because ordering doesn't matter
             // for them, and a Payload in two Packages (or Containers) can
             // cause a circular reference to occur.
             private bool ShouldItemPropagateChildOrdering()
             {
                 if (String.Equals(nameof(ComplexReferenceParentType.Package), this.Type, StringComparison.Ordinal) ||
+                    String.Equals(nameof(ComplexReferenceParentType.PayloadGroup), this.Type, StringComparison.Ordinal) ||
                     String.Equals(nameof(ComplexReferenceParentType.Container), this.Type, StringComparison.Ordinal))
                 {
                     return false;

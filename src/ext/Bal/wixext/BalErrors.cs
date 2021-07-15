@@ -38,6 +38,11 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.MultiplePrereqLicenses, "There may only be one package in the bundle that has either the PrereqLicenseFile attribute or the PrereqLicenseUrl attribute.");
         }
 
+        public static Message NonUpperCaseOverridableVariable(SourceLineNumber sourceLineNumbers, string name, string expectedName)
+        {
+            return Message(sourceLineNumbers, Ids.NonUpperCaseOverridableVariable, "Overridable variable '{0}' must be '{1}' with Bundle/@CommandLineVariables value 'upperCase'.", name, expectedName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -56,6 +61,7 @@ namespace WixToolset.Bal
             MultipleBAFunctions = 6804,
             BAFunctionsPayloadRequiredInUXContainer = 6805,
             MissingDNCPrereq = 6806,
+            NonUpperCaseOverridableVariable = 6807,
         }
     }
 }

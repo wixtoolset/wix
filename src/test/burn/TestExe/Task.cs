@@ -59,6 +59,24 @@ namespace TestExe
         }
     }
 
+    public class GenerateFilesTask : Task
+    {
+        public GenerateFilesTask(string Data) : base(Data) { }
+
+        public override void RunTask()
+        {
+            string[] tokens = this.data.Split(new char[] { '|' }, 2);
+            string folderPath = System.Environment.ExpandEnvironmentVariables(tokens[0]);
+            long size = long.Parse(tokens[1]);
+            Directory.CreateDirectory(folderPath);
+            var bytes = new byte[0];
+            for (long i = 1; i <= size; i++)
+            {
+                File.WriteAllBytes(Path.Combine(folderPath, $"{i}.txt"), bytes);
+            }
+        }
+    }
+
     public class LargeFileTask : Task
     {
         public LargeFileTask(string Data) : base(Data) { }
@@ -161,6 +179,10 @@ namespace TestExe
                                 break;
                             case "/sr":
                                 t = new SleepRandomTask(args[i + 1]);
+                                tasks.Add(t);
+                                break;
+                            case "/gf":
+                                t = new GenerateFilesTask(args[i + 1]);
                                 tasks.Add(t);
                                 break;
                             case "/lf":

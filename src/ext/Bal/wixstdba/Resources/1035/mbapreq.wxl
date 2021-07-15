@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="fi-fi" Language="1035" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="fi-fi" Language="1035" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName] -asennus</String>
   <String Id="Title">Microsoft .NET Framework tarvitaan [WixBundleName] -asennusta varten</String>
   <String Id="ConfirmCancelMessage">Haluatko varmasti peruuttaa?</String>
@@ -22,9 +22,15 @@
   <String Id="ProgressHeader">Asennuksen edistyminen</String>
   <String Id="ProgressLabel">Käsitellään:</String>
   <String Id="ProgressCancelButton">&amp;Peruuta</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Asennus epäonnistui</String>
   <String Id="FailureLogLinkText">Asennus epäonnistui yhdestä tai useammasta syystä. Korjaa ongelmat ja yritä suorittaa asennus sitten uudelleen. Lisätietoja on &lt;a href="#"&gt;lokitiedostossa&lt;/a&gt;.</String>
   <String Id="FailureRestartText">Tietokone täytyy käynnistää uudelleen ohjelmiston palautuksen viimeistelemiseksi.</String>
   <String Id="FailureRestartButton">&amp;Käynnistä uudelleen</String>
   <String Id="FailureCloseButton">&amp;Sulje</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>

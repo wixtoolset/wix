@@ -72,6 +72,14 @@ struct STRINGDICT_STRUCT
 
 const int STRINGDICT_HANDLE_BYTES = sizeof(STRINGDICT_STRUCT);
 
+static HRESULT CreateDict(
+    __out_bcount(STRINGDICT_HANDLE_BYTES) STRINGDICT_HANDLE* psdHandle,
+    __in DICT_TYPE dtType,
+    __in DWORD dwNumExpectedItems,
+    __in_opt void** ppvArray,
+    __in size_t cByteOffset,
+    __in DICT_FLAG dfFlags
+    );
 static HRESULT StringHash(
     __in const STRINGDICT_STRUCT *psd,
     __in DWORD dwNumBuckets,
@@ -135,41 +143,7 @@ extern "C" HRESULT DAPI DictCreateWithEmbeddedKey(
     __in DICT_FLAG dfFlags
     )
 {
-    HRESULT hr = S_OK;
-
-    DictExitOnNull(psdHandle, hr, E_INVALIDARG, "Handle not specified while creating dict");
-
-    // Allocate the handle
-    *psdHandle = static_cast<STRINGDICT_HANDLE>(MemAlloc(sizeof(STRINGDICT_STRUCT), FALSE));
-    DictExitOnNull(*psdHandle, hr, E_OUTOFMEMORY, "Failed to allocate dictionary object");
-
-    STRINGDICT_STRUCT *psd = static_cast<STRINGDICT_STRUCT *>(*psdHandle);
-
-    // Fill out the new handle's values
-    psd->dtType = DICT_EMBEDDED_KEY;
-    psd->dfFlags = dfFlags;
-    psd->cByteOffset = cByteOffset;
-    psd->dwBucketSizeIndex = 0;
-    psd->dwNumItems = 0;
-    psd->ppvItemList = NULL;
-    psd->ppvValueArray = ppvArray;
-
-    // Make psd->dwBucketSizeIndex point to the appropriate spot in the prime
-    // array based on expected number of items and items to buckets ratio
-    // Careful: the "-1" in "countof(MAX_BUCKET_SIZES)-1" ensures we don't end
-    // this loop past the end of the array!
-    while (psd->dwBucketSizeIndex < (countof(MAX_BUCKET_SIZES)-1) &&
-           MAX_BUCKET_SIZES[psd->dwBucketSizeIndex] < dwNumExpectedItems * MAX_BUCKETS_TO_ITEMS_RATIO)
-    {
-        ++psd->dwBucketSizeIndex;
-    }
-
-    // Finally, allocate our initial buckets
-    psd->ppvBuckets = static_cast<void**>(MemAlloc(sizeof(void *) * MAX_BUCKET_SIZES[psd->dwBucketSizeIndex], TRUE));
-    DictExitOnNull(psd->ppvBuckets, hr, E_OUTOFMEMORY, "Failed to allocate buckets for dictionary");
-
-LExit:
-    return hr;
+    return CreateDict(psdHandle, DICT_EMBEDDED_KEY, dwNumExpectedItems, ppvArray, cByteOffset, dfFlags);
 }
 
 // The dict will store a set of keys, with no values associated with them. Use DictAddKey() and DictKeyExists() with this dictionary type.
@@ -179,41 +153,7 @@ extern "C" HRESULT DAPI DictCreateStringList(
     __in DICT_FLAG dfFlags
     )
 {
-    HRESULT hr = S_OK;
-
-    DictExitOnNull(psdHandle, hr, E_INVALIDARG, "Handle not specified while creating dict");
-
-    // Allocate the handle
-    *psdHandle = static_cast<STRINGDICT_HANDLE>(MemAlloc(sizeof(STRINGDICT_STRUCT), FALSE));
-    DictExitOnNull(*psdHandle, hr, E_OUTOFMEMORY, "Failed to allocate dictionary object");
-
-    STRINGDICT_STRUCT *psd = static_cast<STRINGDICT_STRUCT *>(*psdHandle);
-
-    // Fill out the new handle's values
-    psd->dtType = DICT_STRING_LIST;
-    psd->dfFlags = dfFlags;
-    psd->cByteOffset = 0;
-    psd->dwBucketSizeIndex = 0;
-    psd->dwNumItems = 0;
-    psd->ppvItemList = NULL;
-    psd->ppvValueArray = NULL;
-
-    // Make psd->dwBucketSizeIndex point to the appropriate spot in the prime
-    // array based on expected number of items and items to buckets ratio
-    // Careful: the "-1" in "countof(MAX_BUCKET_SIZES)-1" ensures we don't end
-    // this loop past the end of the array!
-    while (psd->dwBucketSizeIndex < (countof(MAX_BUCKET_SIZES)-1) &&
-           MAX_BUCKET_SIZES[psd->dwBucketSizeIndex] < dwNumExpectedItems * MAX_BUCKETS_TO_ITEMS_RATIO)
-    {
-        ++psd->dwBucketSizeIndex;
-    }
-
-    // Finally, allocate our initial buckets
-    psd->ppvBuckets = static_cast<void**>(MemAlloc(sizeof(void *) * MAX_BUCKET_SIZES[psd->dwBucketSizeIndex], TRUE));
-    DictExitOnNull(psd->ppvBuckets, hr, E_OUTOFMEMORY, "Failed to allocate buckets for dictionary");
-
-LExit:
-    return hr;
+    return CreateDict(psdHandle, DICT_STRING_LIST, dwNumExpectedItems, NULL, 0, dfFlags);
 }
 
 extern "C" HRESULT DAPI DictCreateStringListFromArray(
@@ -465,6 +405,54 @@ extern "C" void DAPI DictDestroy(
     ReleaseMem(psd->ppvItemList);
     ReleaseMem(psd->ppvBuckets);
     ReleaseMem(psd);
+}
+
+static HRESULT CreateDict(
+    __out_bcount(STRINGDICT_HANDLE_BYTES) STRINGDICT_HANDLE* psdHandle,
+    __in DICT_TYPE dtType,
+    __in DWORD dwNumExpectedItems,
+    __in_opt void** ppvArray,
+    __in size_t cByteOffset,
+    __in DICT_FLAG dfFlags
+    )
+{
+    HRESULT hr = S_OK;
+
+    DictExitOnNull(psdHandle, hr, E_INVALIDARG, "Handle not specified while creating dict.");
+
+    // Allocate the handle
+    *psdHandle = static_cast<STRINGDICT_HANDLE>(MemAlloc(sizeof(STRINGDICT_STRUCT), TRUE));
+    DictExitOnNull(*psdHandle, hr, E_OUTOFMEMORY, "Failed to allocate dictionary object.");
+
+    STRINGDICT_STRUCT* psd = static_cast<STRINGDICT_STRUCT*>(*psdHandle);
+
+    // Fill out the new handle's values
+    psd->dtType = dtType;
+    psd->dfFlags = dfFlags;
+    psd->cByteOffset = cByteOffset;
+    psd->ppvValueArray = ppvArray;
+
+    // Make psd->dwBucketSizeIndex point to the appropriate spot in the prime
+    // array based on expected number of items and items to buckets ratio
+    // Careful: the "-1" in "countof(MAX_BUCKET_SIZES)-1" ensures we don't end
+    // this loop past the end of the array!
+    while (psd->dwBucketSizeIndex < (countof(MAX_BUCKET_SIZES) - 1) &&
+           MAX_BUCKET_SIZES[psd->dwBucketSizeIndex] < dwNumExpectedItems * MAX_BUCKETS_TO_ITEMS_RATIO)
+    {
+        ++psd->dwBucketSizeIndex;
+    }
+
+    hr = MemAllocArray(reinterpret_cast<LPVOID*>(&psd->ppvBuckets), sizeof(void*), MAX_BUCKET_SIZES[psd->dwBucketSizeIndex]);
+    DictExitOnFailure(hr, "Failed to allocate buckets for dictionary.");
+
+    if (dwNumExpectedItems)
+    {
+        hr = MemAllocArray(reinterpret_cast<LPVOID*>(&psd->ppvItemList), sizeof(void*), dwNumExpectedItems);
+        DictExitOnFailure(hr, "Failed to pre-allocate item list for dictionary.");
+    }
+
+LExit:
+    return hr;
 }
 
 static HRESULT StringHash(

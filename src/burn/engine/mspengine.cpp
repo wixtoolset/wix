@@ -623,7 +623,7 @@ extern "C" HRESULT MspEngineExecutePackage(
 
     if (pExecuteAction->mspTarget.sczLogPath && *pExecuteAction->mspTarget.sczLogPath)
     {
-        hr = WiuEnableLog(dwLogMode, pExecuteAction->mspTarget.sczLogPath, 0);
+        hr = WiuEnableLog(dwLogMode, pExecuteAction->mspTarget.sczLogPath, INSTALLLOGATTRIBUTES_APPEND);
         ExitOnFailure(hr, "Failed to enable logging for package: %ls to: %ls", pExecuteAction->mspTarget.pPackage->sczId, pExecuteAction->mspTarget.sczLogPath);
     }
 

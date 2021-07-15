@@ -793,13 +793,13 @@ LExit:
 
 
 /********************************************************************
- XmlGetAttributeLargeNumber
+ XmlGetAttributeUInt16
 
 *********************************************************************/
-extern "C" HRESULT DAPI XmlGetAttributeLargeNumber(
+extern "C" HRESULT DAPI XmlGetAttributeUInt16(
     __in IXMLDOMNode* pixnNode,
     __in_z LPCWSTR pwzAttribute,
-    __out DWORD64* pdw64Value
+    __out WORD* pwValue
     )
 {
     HRESULT hr = S_OK;
@@ -810,15 +810,120 @@ extern "C" HRESULT DAPI XmlGetAttributeLargeNumber(
 
     if (S_OK == hr)
     {
-        LONGLONG ll = 0;
-        hr = StrStringToInt64(bstrValue, 0, &ll);
-        XmlExitOnFailure(hr, "Failed to treat attribute value as number.");
+        WORD w = 0;
+        hr = StrStringToUInt16(bstrValue, 0, &w);
+        XmlExitOnFailure(hr, "Failed to treat attribute value as UInt16.");
 
-        *pdw64Value = ll;
+        *pwValue = w;
     }
     else
     {
-        *pdw64Value = 0;
+        *pwValue = 0;
+    }
+
+LExit:
+    ReleaseBSTR(bstrValue);
+    return hr;
+}
+
+
+/********************************************************************
+ XmlGetAttributeInt32
+
+*********************************************************************/
+extern "C" HRESULT DAPI XmlGetAttributeInt32(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out int* piValue
+    )
+{
+    HRESULT hr = S_OK;
+    BSTR bstrValue = NULL;
+
+    hr = XmlGetAttribute(pixnNode, pwzAttribute, &bstrValue);
+    XmlExitOnFailure(hr, "failed XmlGetAttribute");
+
+    if (S_OK == hr)
+    {
+        int i = 0;
+        hr = StrStringToInt32(bstrValue, 0, &i);
+        XmlExitOnFailure(hr, "Failed to treat attribute value as Int32.");
+
+        *piValue = i;
+    }
+    else
+    {
+        *piValue = 0;
+    }
+
+LExit:
+    ReleaseBSTR(bstrValue);
+    return hr;
+}
+
+
+/********************************************************************
+ XmlGetAttributeUInt32
+
+*********************************************************************/
+extern "C" HRESULT DAPI XmlGetAttributeUInt32(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out DWORD* pdwValue
+    )
+{
+    HRESULT hr = S_OK;
+    BSTR bstrValue = NULL;
+
+    hr = XmlGetAttribute(pixnNode, pwzAttribute, &bstrValue);
+    XmlExitOnFailure(hr, "failed XmlGetAttribute");
+
+    if (S_OK == hr)
+    {
+        UINT dw = 0;
+        hr = StrStringToUInt32(bstrValue, 0, &dw);
+        XmlExitOnFailure(hr, "Failed to treat attribute value as UInt32.");
+
+        *pdwValue = dw;
+    }
+    else
+    {
+        *pdwValue = 0;
+    }
+
+LExit:
+    ReleaseBSTR(bstrValue);
+    return hr;
+}
+
+
+/********************************************************************
+ XmlGetAttributeUInt64
+
+*********************************************************************/
+extern "C" HRESULT DAPI XmlGetAttributeUInt64(
+    __in IXMLDOMNode* pixnNode,
+    __in_z LPCWSTR pwzAttribute,
+    __out DWORD64* pqwValue
+    )
+{
+    HRESULT hr = S_OK;
+    BSTR bstrValue = NULL;
+
+    hr = XmlGetAttribute(pixnNode, pwzAttribute, &bstrValue);
+    XmlExitOnFailure(hr, "failed XmlGetAttribute");
+
+    if (S_OK == hr)
+    {
+        DWORD64 qw = 0;
+        hr = StrStringToUInt64(bstrValue, 0, &qw);
+        XmlExitOnFailure(hr, "Failed to treat attribute value as UInt64.");
+
+        *pqwValue = qw;
+    }
+    else
+    {
+        *pqwValue = 0;
     }
 
 LExit:

@@ -23,6 +23,9 @@ namespace WixToolset.Mba.Core
         public string LogVariable { get; internal set; }
 
         /// <inheritdoc/>
+        public IOverridableVariables OverridableVariables { get; internal set; }
+
+        /// <inheritdoc/>
         public IDictionary<string, IPackageInfo> Packages { get; internal set; }
 
         internal BundleInfo()
@@ -77,6 +80,8 @@ namespace WixToolset.Mba.Core
             bundle.Name = BootstrapperApplicationData.GetAttribute(bundleNode, "DisplayName");
 
             bundle.LogVariable = BootstrapperApplicationData.GetAttribute(bundleNode, "LogPathVariable");
+
+            bundle.OverridableVariables = OverridableVariablesInfo.ParseFromXml(root);
 
             bundle.Packages = PackageInfo.ParsePackagesFromXml(root);
 

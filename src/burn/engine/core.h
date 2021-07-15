@@ -29,6 +29,7 @@ const LPCWSTR BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES = L"burn.ignoredependen
 const LPCWSTR BURN_COMMANDLINE_SWITCH_ANCESTORS = L"burn.ancestors";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED = L"burn.filehandle.attached";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF = L"burn.filehandle.self";
+const LPCWSTR BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN = L"burn.splash.screen";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PREFIX = L"burn.";
 
 const LPCWSTR BURN_BUNDLE_LAYOUT_DIRECTORY = L"WixBundleLayoutDirectory";
@@ -76,6 +77,12 @@ enum BURN_AU_PAUSE_ACTION
 
 
 // structs
+
+typedef struct _BURN_ENGINE_COMMAND
+{
+    LPWSTR sczSourceProcessPath;
+    LPWSTR sczOriginalSource;
+} BURN_ENGINE_COMMAND;
 
 typedef struct _BURN_ENGINE_STATE
 {
@@ -133,6 +140,10 @@ typedef struct _BURN_ENGINE_STATE
 
     int argc;
     LPWSTR* argv;
+    BOOL fInvalidCommandLine;
+    BURN_ENGINE_COMMAND internalCommand;
+    DWORD cUnknownArgs;
+    int* rgUnknownArgs;
 } BURN_ENGINE_STATE;
 
 typedef struct _BURN_APPLY_CONTEXT
@@ -199,7 +210,6 @@ HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RESTART restart,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
     __in_z_opt LPCWSTR wzActiveParent,
@@ -218,8 +228,35 @@ HRESULT CoreAppendFileHandleSelfToCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
     );
+HRESULT CoreAppendSplashScreenWindowToCommandLine(
+    __in_opt HWND hwndSplashScreen,
+    __deref_inout_z LPWSTR* psczCommandLine
+    );
 void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState
+    );
+HRESULT CoreParseCommandLine(
+    __in int argc,
+    __in LPWSTR* argv,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BURN_PIPE_CONNECTION* pCompanionConnection,
+    __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
+    __inout BURN_MODE* pMode,
+    __inout BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
+    __inout BOOL* pfDisableSystemRestore,
+    __inout_z LPWSTR* psczSourceProcessPath,
+    __inout_z LPWSTR* psczOriginalSource,
+    __inout HANDLE* phSectionFile,
+    __inout HANDLE* phSourceEngineFile,
+    __inout BOOL* pfDisableUnelevate,
+    __inout DWORD* pdwLoggingAttributes,
+    __inout_z LPWSTR* psczLogFile,
+    __inout_z LPWSTR* psczActiveParent,
+    __inout_z LPWSTR* psczIgnoreDependencies,
+    __inout_z LPWSTR* psczAncestors,
+    __inout BOOL* pfInvalidCommandLine,
+    __inout DWORD* pcUnknownArgs,
+    __inout int** prgUnknownArgs
     );
 
 #if defined(__cplusplus)

@@ -3,6 +3,12 @@
 
 
 #include <windows.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458) // declaration of 'xxx' hides class member
+#include <gdiplus.h>
+#pragma warning(pop)
+
 #include <bitsmsg.h>
 #include <msi.h>
 #include <wininet.h>
@@ -10,9 +16,11 @@
 #include <strsafe.h>
 
 #include <dutil.h>
+#include <apputil.h>
 #include <pathutil.h>
 #include <locutil.h>
 #include <memutil.h>
+#include <dictutil.h>
 #include <strutil.h>
 #include <thmutil.h>
 #include <xmlutil.h>

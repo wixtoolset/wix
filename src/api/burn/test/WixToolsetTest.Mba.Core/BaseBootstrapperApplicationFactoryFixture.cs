@@ -3,6 +3,7 @@
 namespace WixToolsetTest.Mba.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using WixToolset.Mba.Core;
     using Xunit;
@@ -17,7 +18,7 @@ namespace WixToolsetTest.Mba.Core
                 action = LaunchAction.Install,
                 cbSize = Marshal.SizeOf(typeof(TestCommand)),
                 display = Display.Full,
-                wzCommandLine = "this \"is a\" test",
+                wzCommandLine = "this \"is a\" test VariableA=AVariable =EmptyName EmptyValue=",
             };
             var pCommand = Marshal.AllocHGlobal(command.cbSize);
             try
@@ -42,7 +43,15 @@ namespace WixToolsetTest.Mba.Core
                         Assert.Equal(baFactory.BA, createResults.pBA);
                         Assert.Equal(baFactory.BA.Command.Action, command.action);
                         Assert.Equal(baFactory.BA.Command.Display, command.display);
-                        Assert.Equal(baFactory.BA.Command.CommandLineArgs, new string[] { "this", "is a", "test" });
+
+                        var mbaCommand = baFactory.BA.Command.ParseCommandLine();
+                        Assert.Equal(mbaCommand.UnknownCommandLineArgs, new string[] { "this", "is a", "test" });
+                        Assert.Equal(mbaCommand.Variables, new KeyValuePair<string, string>[]
+                        {
+                            new KeyValuePair<string, string>("VariableA", "AVariable"),
+                            new KeyValuePair<string, string>("", "EmptyName"),
+                            new KeyValuePair<string, string>("EmptyValue", ""),
+                        });
                     }
                     finally
                     {
@@ -92,7 +101,6 @@ namespace WixToolsetTest.Mba.Core
             public int cbSize;
             public LaunchAction action;
             public Display display;
-            public Restart restart;
             [MarshalAs(UnmanagedType.LPWStr)] public string wzCommandLine;
             public int nCmdShow;
             public ResumeType resume;

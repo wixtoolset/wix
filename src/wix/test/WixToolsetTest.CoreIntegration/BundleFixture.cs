@@ -109,6 +109,10 @@ namespace WixToolsetTest.CoreIntegration
                     var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
                     Assert.Equal(extractedBextManifestData, bextManifestData);
 
+                    var commandLineElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:CommandLine");
+                    var commandLineElement = (XmlNode)Assert.Single(commandLineElements);
+                    Assert.Equal("<CommandLine Variables='upperCase' />", commandLineElement.GetTestXml());
+
                     var logElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Log");
                     var logElement = (XmlNode)Assert.Single(logElements);
                     Assert.Equal("<Log PathVariable='WixBundleLog' Prefix='~TestBundle' Extension='log' />", logElement.GetTestXml());
@@ -166,8 +170,6 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
-                var warning = Assert.Single(result.Messages.Where(m => m.Level == MessageLevel.Warning));
-                Assert.Equal((int)WarningMessages.Ids.ExperimentalBundlePlatform, warning.Id);
 
                 Assert.True(File.Exists(exePath));
                 Assert.True(File.Exists(pdbPath));
@@ -275,6 +277,9 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     var intermediate = Intermediate.Load(wixOutput);
                     var section = intermediate.Sections.Single();
+
+                    var packageSymbol = section.Symbols.OfType<WixBundlePackageSymbol>().Where(x => x.Id.Id == "NetFx462Web").Single();
+                    Assert.Equal(Int64.MaxValue, packageSymbol.InstallSize);
 
                     var payloadSymbol = section.Symbols.OfType<WixBundlePayloadSymbol>().Where(x => x.Id.Id == "NetFx462Web").Single();
                     Assert.Equal(Int64.MaxValue, payloadSymbol.FileSize);

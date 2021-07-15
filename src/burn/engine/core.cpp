@@ -14,25 +14,14 @@ struct BURN_CACHE_THREAD_CONTEXT
 
 // internal function declarations
 
-static HRESULT ParseCommandLine(
+static HRESULT GetSanitizedCommandLine(
     __in int argc,
     __in LPWSTR* argv,
     __in BOOTSTRAPPER_COMMAND* pCommand,
-    __in BURN_PIPE_CONNECTION* pCompanionConnection,
-    __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
     __in BURN_VARIABLES* pVariables,
-    __out BURN_MODE* pMode,
-    __out BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
-    __out BOOL* pfDisableSystemRestore,
-    __out_z LPWSTR* psczSourceProcessPath,
-    __out_z LPWSTR* psczOriginalSource,
-    __out BOOL* pfDisableUnelevate,
-    __out DWORD *pdwLoggingAttributes,
-    __out_z LPWSTR* psczLogFile,
-    __out_z LPWSTR* psczActiveParent,
-    __out_z LPWSTR* psczIgnoreDependencies,
-    __out_z LPWSTR* psczAncestors,
-    __out_z LPWSTR* psczSanitizedCommandLine
+    __in DWORD cUnknownArgs,
+    __in int* rgUnknownArgs,
+    __inout_z LPWSTR* psczSanitizedCommandLine
     );
 static HRESULT ParsePipeConnection(
     __in_ecount(3) LPWSTR* rgArgs,
@@ -77,9 +66,7 @@ extern "C" HRESULT CoreInitialize(
     SIZE_T cbBuffer = 0;
     BURN_CONTAINER_CONTEXT containerContext = { };
     BOOL fElevated = FALSE;
-    LPWSTR sczSourceProcessPath = NULL;
     LPWSTR sczSourceProcessFolder = NULL;
-    LPWSTR sczOriginalSource = NULL;
 
     // Initialize variables.
     hr = VariableInitialize(&pEngineState->variables);
@@ -102,12 +89,19 @@ extern "C" HRESULT CoreInitialize(
     hr = ContainersInitialize(&pEngineState->containers, &pEngineState->section);
     ExitOnFailure(hr, "Failed to initialize containers.");
 
-    // Parse command line.
-    hr = ParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->variables, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &sczSourceProcessPath, &sczOriginalSource, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &sczSanitizedCommandLine);
-    ExitOnFailure(hr, "Failed to parse command line.");
+    hr = GetSanitizedCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->variables, pEngineState->cUnknownArgs, pEngineState->rgUnknownArgs, &sczSanitizedCommandLine);
+    ExitOnFailure(hr, "Fatal error while sanitizing command line.");
 
     LogId(REPORT_STANDARD, MSG_BURN_COMMAND_LINE, sczSanitizedCommandLine ? sczSanitizedCommandLine : L"");
-    
+
+    // The command line wasn't logged immediately so that hidden variables set on the command line can be obscured in the log.
+    // This delay creates issues when troubleshooting parsing errors because the original command line is not in the log.
+    // The code does its best to process the entire command line and keep track if the command line was invalid so that it can log the sanitized command line before erroring out.
+    if (pEngineState->fInvalidCommandLine)
+    {
+        LogExitOnRootFailure(hr = E_INVALIDARG, MSG_FAILED_PARSE_COMMAND_LINE, "Failed to parse command line.");
+    }
+
     hr = CoreInitializeConstants(pEngineState);
     ExitOnFailure(hr, "Failed to initialize contants.");
 
@@ -120,12 +114,12 @@ extern "C" HRESULT CoreInitialize(
     hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_UILEVEL, pEngineState->command.display, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the %ls built-in variable.", BURN_BUNDLE_UILEVEL);
 
-    if (sczSourceProcessPath)
+    if (pEngineState->internalCommand.sczSourceProcessPath)
     {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, sczSourceProcessPath, TRUE, FALSE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, pEngineState->internalCommand.sczSourceProcessPath, TRUE, FALSE);
         ExitOnFailure(hr, "Failed to set source process path variable.");
 
-        hr = PathGetDirectory(sczSourceProcessPath, &sczSourceProcessFolder);
+        hr = PathGetDirectory(pEngineState->internalCommand.sczSourceProcessPath, &sczSourceProcessFolder);
         ExitOnFailure(hr, "Failed to get source process folder from path.");
 
         hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, sczSourceProcessFolder, TRUE, FALSE);
@@ -134,15 +128,15 @@ extern "C" HRESULT CoreInitialize(
 
     // Set BURN_BUNDLE_ORIGINAL_SOURCE, if it was passed in on the command line.
     // Needs to be done after ManifestLoadXmlFromBuffer.
-    if (sczOriginalSource)
+    if (pEngineState->internalCommand.sczOriginalSource)
     {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_ORIGINAL_SOURCE, sczOriginalSource, FALSE, FALSE);
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_ORIGINAL_SOURCE, pEngineState->internalCommand.sczOriginalSource, FALSE, FALSE);
         ExitOnFailure(hr, "Failed to set original source variable.");
     }
 
     if (BURN_MODE_UNTRUSTED == pEngineState->mode || BURN_MODE_NORMAL == pEngineState->mode || BURN_MODE_EMBEDDED == pEngineState->mode)
     {
-        hr = CacheInitialize(&pEngineState->registration, &pEngineState->variables, sczSourceProcessPath);
+        hr = CacheInitialize(&pEngineState->registration, &pEngineState->variables, pEngineState->internalCommand.sczSourceProcessPath);
         ExitOnFailure(hr, "Failed to initialize internal cache functionality.");
     }
 
@@ -165,9 +159,7 @@ extern "C" HRESULT CoreInitialize(
     }
 
 LExit:
-    ReleaseStr(sczOriginalSource);
     ReleaseStr(sczSourceProcessFolder);
-    ReleaseStr(sczSourceProcessPath);
     ContainerClose(&containerContext);
     ReleaseStr(sczStreamName);
     ReleaseStr(sczSanitizedCommandLine);
@@ -646,8 +638,8 @@ extern "C" HRESULT CoreApply(
 
     pEngineState->plan.fAffectedMachineState = pEngineState->plan.fCanAffectMachineState;
 
-    // Abort if this bundle already requires a restart.
-    if (BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
+    // Abort if could affect machine state and this bundle already requires a restart.
+    if (pEngineState->plan.fCanAffectMachineState && BOOTSTRAPPER_RESUME_TYPE_REBOOT_PENDING == pEngineState->command.resumeType)
     {
         restart = BOOTSTRAPPER_APPLY_RESTART_REQUIRED;
 
@@ -932,7 +924,6 @@ extern "C" HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_RESTART restart,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
     __in_z_opt LPCWSTR wzActiveParent,
@@ -972,17 +963,6 @@ extern "C" HRESULT CoreRecreateCommandLine(
         break;
     }
     ExitOnFailure(hr, "Failed to append action state to command-line");
-
-    switch (restart)
-    {
-    case BOOTSTRAPPER_RESTART_ALWAYS:
-        hr = StrAllocConcat(psczCommandLine, L" /forcerestart", 0);
-        break;
-    case BOOTSTRAPPER_RESTART_NEVER:
-        hr = StrAllocConcat(psczCommandLine, L" /norestart", 0);
-        break;
-    }
-    ExitOnFailure(hr, "Failed to append restart state to command-line");
 
     if (wzActiveParent)
     {
@@ -1068,7 +1048,7 @@ extern "C" HRESULT CoreAppendFileHandleAttachedToCommandLine(
         ExitWithLastError(hr, "Failed to duplicate file handle for attached container.");
     }
 
-    hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, reinterpret_cast<size_t>(hExecutableFile));
+    hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, reinterpret_cast<size_t>(hExecutableFile));
     ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
     *phExecutableFile = hExecutableFile;
@@ -1096,12 +1076,12 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
     hExecutableFile = ::CreateFileW(wzExecutablePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, &securityAttributes, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE != hExecutableFile)
     {
-        hr = StrAllocFormattedSecure(psczCommandLine, L"%ls -%ls=%Iu", *psczCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
+        hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
         ExitOnFailure(hr, "Failed to append the file handle to the command line.");
 
         if (psczObfuscatedCommandLine)
         {
-            hr = StrAllocFormatted(psczObfuscatedCommandLine, L"%ls -%ls=%Iu", *psczObfuscatedCommandLine, BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
+            hr = StrAllocConcatFormatted(psczObfuscatedCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, reinterpret_cast<size_t>(hExecutableFile));
             ExitOnFailure(hr, "Failed to append the file handle to the obfuscated command line.");
         }
 
@@ -1112,6 +1092,23 @@ extern "C" HRESULT CoreAppendFileHandleSelfToCommandLine(
 LExit:
     ReleaseFileHandle(hExecutableFile);
 
+    return hr;
+}
+
+extern "C" HRESULT CoreAppendSplashScreenWindowToCommandLine(
+    __in_opt HWND hwndSplashScreen,
+    __deref_inout_z LPWSTR* psczCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (hwndSplashScreen)
+    {
+        hr = StrAllocConcatFormattedSecure(psczCommandLine, L" -%ls=%Iu", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, reinterpret_cast<size_t>(hwndSplashScreen));
+        ExitOnFailure(hr, "Failed to append the splash screen window to the command line.");
+    }
+
+LExit:
     return hr;
 }
 
@@ -1168,41 +1165,38 @@ LExit:
     LogId(REPORT_STANDARD, MSG_CLEANUP_COMPLETE, hr);
 }
 
-// internal helper functions
-
-static HRESULT ParseCommandLine(
+extern "C" HRESULT CoreParseCommandLine(
     __in int argc,
     __in LPWSTR* argv,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PIPE_CONNECTION* pCompanionConnection,
     __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
-    __in BURN_VARIABLES* pVariables,
-    __out BURN_MODE* pMode,
-    __out BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
-    __out BOOL* pfDisableSystemRestore,
-    __out_z LPWSTR* psczSourceProcessPath,
-    __out_z LPWSTR* psczOriginalSource,
-    __out BOOL* pfDisableUnelevate,
-    __out DWORD *pdwLoggingAttributes,
-    __out_z LPWSTR* psczLogFile,
-    __out_z LPWSTR* psczActiveParent,
-    __out_z LPWSTR* psczIgnoreDependencies,
-    __out_z LPWSTR* psczAncestors,
-    __out_z LPWSTR* psczSanitizedCommandLine
+    __inout BURN_MODE* pMode,
+    __inout BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
+    __inout BOOL* pfDisableSystemRestore,
+    __inout_z LPWSTR* psczSourceProcessPath,
+    __inout_z LPWSTR* psczOriginalSource,
+    __inout HANDLE* phSectionFile,
+    __inout HANDLE* phSourceEngineFile,
+    __inout BOOL* pfDisableUnelevate,
+    __inout DWORD* pdwLoggingAttributes,
+    __inout_z LPWSTR* psczLogFile,
+    __inout_z LPWSTR* psczActiveParent,
+    __inout_z LPWSTR* psczIgnoreDependencies,
+    __inout_z LPWSTR* psczAncestors,
+    __inout BOOL* pfInvalidCommandLine,
+    __inout DWORD* pcUnknownArgs,
+    __inout int** prgUnknownArgs
     )
 {
     HRESULT hr = S_OK;
     BOOL fUnknownArg = FALSE;
-    BOOL fHidden = FALSE;
-    LPWSTR sczCommandLine = NULL;
-    LPWSTR sczSanitizedArgument = NULL;
-    LPWSTR sczVariableName = NULL;
+    BOOL fInvalidCommandLine = FALSE;
+    DWORD64 qw = 0;
 
     for (int i = 0; i < argc; ++i)
     {
         fUnknownArg = FALSE;
-        int originalIndex = i;
-        ReleaseNullStr(sczSanitizedArgument);
 
         if (argv[i][0] == L'-' || argv[i][0] == L'/')
         {
@@ -1219,6 +1213,7 @@ static HRESULT ParseCommandLine(
 
                 if (i + 1 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify a path for log.");
                 }
 
@@ -1239,32 +1234,10 @@ static HRESULT ParseCommandLine(
                      CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"silent", -1))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_NONE;
-
-                if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
-                {
-                    pCommand->restart = BOOTSTRAPPER_RESTART_AUTOMATIC;
-                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"passive", -1))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_PASSIVE;
-
-                if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
-                {
-                    pCommand->restart = BOOTSTRAPPER_RESTART_AUTOMATIC;
-                }
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"norestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_NEVER;
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"forcerestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_ALWAYS;
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"promptrestart", -1))
-            {
-                pCommand->restart = BOOTSTRAPPER_RESTART_PROMPT;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"layout", -1))
             {
@@ -1331,6 +1304,7 @@ static HRESULT ParseCommandLine(
             {
                 if (i + 1 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify a path for original source.");
                 }
 
@@ -1342,6 +1316,7 @@ static HRESULT ParseCommandLine(
             {
                 if (i + 1 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify a value for parent.");
                 }
 
@@ -1359,6 +1334,7 @@ static HRESULT ParseCommandLine(
             {
                 if (i + 1 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify a path for append log.");
                 }
 
@@ -1373,12 +1349,14 @@ static HRESULT ParseCommandLine(
             {
                 if (i + 3 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the elevated name, token and parent process id.");
                 }
 
                 if (BURN_MODE_UNTRUSTED != *pMode)
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Multiple mode command-line switches were provided.");
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
                 *pMode = BURN_MODE_ELEVATED;
@@ -1386,33 +1364,43 @@ static HRESULT ParseCommandLine(
                 ++i;
 
                 hr = ParsePipeConnection(argv + i, pCompanionConnection);
-                ExitOnFailure(hr, "Failed to parse elevated connection.");
+                if (FAILED(hr))
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(hr, "Failed to parse elevated connection.");
+                    hr = S_OK;
+                }
 
                 i += 2;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM), BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)))
             {
+                if (BURN_MODE_UNTRUSTED != *pMode)
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
+                }
+
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)];
                 if (L'=' != wzParam[0] || L'\0' == wzParam[1])
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
                 }
-
-                if (BURN_MODE_UNTRUSTED != *pMode)
+                else
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Multiple mode command-line switches were provided.");
+                    *pMode = BURN_MODE_NORMAL;
+
+                    hr = StrAllocString(psczSourceProcessPath, wzParam + 1, 0);
+                    ExitOnFailure(hr, "Failed to copy source process path.");
                 }
-
-                *pMode = BURN_MODE_NORMAL;
-
-                hr = StrAllocString(psczSourceProcessPath, wzParam + 1, 0);
-                ExitOnFailure(hr, "Failed to copy source process path.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_EMBEDDED, -1))
             {
                 if (i + 3 >= argc)
                 {
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the embedded name, token and parent process id.");
                 }
 
@@ -1428,13 +1416,19 @@ static HRESULT ParseCommandLine(
                     *pMode = BURN_MODE_EMBEDDED;
                     break;
                 default:
+                    fInvalidCommandLine = TRUE;
                     ExitOnRootFailure(hr = E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
                 ++i;
 
                 hr = ParsePipeConnection(argv + i, pEmbeddedConnection);
-                ExitOnFailure(hr, "Failed to parse embedded connection.");
+                if (FAILED(hr))
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(hr, "Failed to parse embedded connection.");
+                    hr = S_OK;
+                }
 
                 i += 2;
             }
@@ -1480,7 +1474,8 @@ static HRESULT ParseCommandLine(
             {
                 if (BURN_MODE_UNTRUSTED != *pMode)
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Multiple mode command-line switches were provided.");
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
                 *pMode = BURN_MODE_RUNONCE;
@@ -1491,11 +1486,14 @@ static HRESULT ParseCommandLine(
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES)];
                 if (L'=' != wzParam[0] || L'\0' == wzParam[1])
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES);
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES);
                 }
-
-                hr = StrAllocString(psczIgnoreDependencies, &wzParam[1], 0);
-                ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+                else
+                {
+                    hr = StrAllocString(psczIgnoreDependencies, &wzParam[1], 0);
+                    ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
+                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS), BURN_COMMANDLINE_SWITCH_ANCESTORS, lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS)))
             {
@@ -1503,19 +1501,80 @@ static HRESULT ParseCommandLine(
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS)];
                 if (L'=' != wzParam[0] || L'\0' == wzParam[1])
                 {
-                    ExitOnRootFailure(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_ANCESTORS);
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(hr = E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_ANCESTORS);
                 }
-
-                hr = StrAllocString(psczAncestors, &wzParam[1], 0);
-                ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+                else
+                {
+                    hr = StrAllocString(psczAncestors, &wzParam[1], 0);
+                    ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
+                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)))
             {
-                // Already processed in InitializeEngineState.
+                LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)];
+                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
+                }
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        *phSourceEngineFile = (HANDLE)qw;
+                    }
+                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)))
             {
-                // Already processed in InitializeEngineState.
+                LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)];
+                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
+                }
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse file handle: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        *phSectionFile = (HANDLE)qw;
+                    }
+                }
+            }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN), BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)))
+            {
+                LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)];
+                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
+                }
+                else
+                {
+                    hr = StrStringToUInt64(wzParam, 0, &qw);
+                    if (FAILED(hr))
+                    {
+                        TraceLog(hr, "Failed to parse splash screen window: '%ls'", wzParam);
+                        hr = S_OK;
+                    }
+                    else
+                    {
+                        pCommand->hwndSplashScreen = (HWND)qw;
+                    }
+                }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), BURN_COMMANDLINE_SWITCH_PREFIX, lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX)))
             {
@@ -1531,40 +1590,15 @@ static HRESULT ParseCommandLine(
         else
         {
             fUnknownArg = TRUE;
-
-            const wchar_t* pwc = wcschr(argv[i], L'=');
-            if (pwc)
-            {
-                hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
-                ExitOnFailure(hr, "Failed to copy variable name.");
-
-                hr = VariableIsHidden(pVariables, sczVariableName, &fHidden);
-                ExitOnFailure(hr, "Failed to determine whether variable is hidden.");
-
-                if (fHidden)
-                {
-                    hr = StrAllocFormatted(&sczSanitizedArgument, L"%ls=*****", sczVariableName);
-                    ExitOnFailure(hr, "Failed to copy sanitized argument.");
-                }
-            }
         }
 
-        // Remember command-line switch to pass off to UX.
         if (fUnknownArg)
         {
-            PathCommandLineAppend(&pCommand->wzCommandLine, argv[i]);
-        }
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgUnknownArgs), *pcUnknownArgs, 1, sizeof(int), 5);
+            ExitOnFailure(hr, "Failed to ensure size for unknown args.");
 
-        if (sczSanitizedArgument)
-        {
-            PathCommandLineAppend(psczSanitizedCommandLine, sczSanitizedArgument);
-        }
-        else
-        {
-            for (; originalIndex <= i; ++originalIndex)
-            {
-                PathCommandLineAppend(psczSanitizedCommandLine, argv[originalIndex]);
-            }
+            (*prgUnknownArgs)[*pcUnknownArgs] = i;
+            *pcUnknownArgs += 1;
         }
     }
 
@@ -1585,15 +1619,85 @@ static HRESULT ParseCommandLine(
         pCommand->display = BOOTSTRAPPER_DISPLAY_FULL;
     }
 
-    if (BOOTSTRAPPER_RESTART_UNKNOWN == pCommand->restart)
+LExit:
+    if (fInvalidCommandLine)
     {
-        pCommand->restart = BOOTSTRAPPER_RESTART_PROMPT;
+        hr = S_OK;
+        *pfInvalidCommandLine = TRUE;
+    }
+
+    return hr;
+}
+
+// internal helper functions
+
+static HRESULT GetSanitizedCommandLine(
+    __in int argc,
+    __in LPWSTR* argv,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BURN_VARIABLES* pVariables,
+    __in DWORD cUnknownArgs,
+    __in int* rgUnknownArgs,
+    __inout_z LPWSTR* psczSanitizedCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwUnknownArgIndex = 0;
+    BOOL fHidden = FALSE;
+    LPWSTR sczSanitizedArgument = NULL;
+    LPWSTR sczVariableName = NULL;
+
+    for (int i = 0; i < argc; ++i)
+    {
+        fHidden = FALSE;
+
+        if (dwUnknownArgIndex < cUnknownArgs && rgUnknownArgs[dwUnknownArgIndex] == i)
+        {
+            ++dwUnknownArgIndex;
+
+            if (argv[i][0] != L'-' && argv[i][0] != L'/')
+            {
+                const wchar_t* pwc = wcschr(argv[i], L'=');
+                if (pwc)
+                {
+                    if (BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE == pVariables->commandLineType)
+                    {
+                        hr = StrAllocStringToUpperInvariant(&sczVariableName, argv[i], pwc - argv[i]);
+                    }
+                    else
+                    {
+                        hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
+                    }
+                    ExitOnFailure(hr, "Failed to copy variable name.");
+
+                    hr = VariableIsHidden(pVariables, sczVariableName, &fHidden);
+                    ExitOnFailure(hr, "Failed to determine whether variable is hidden.");
+
+                    if (fHidden)
+                    {
+                        hr = StrAllocFormatted(&sczSanitizedArgument, L"%ls=*****", sczVariableName);
+                        ExitOnFailure(hr, "Failed to copy sanitized argument.");
+                    }
+                }
+            }
+
+            // Remember command-line switch to pass off to BA.
+            PathCommandLineAppend(&pCommand->wzCommandLine, argv[i]);
+        }
+
+        if (fHidden)
+        {
+            PathCommandLineAppend(psczSanitizedCommandLine, sczSanitizedArgument);
+        }
+        else
+        {
+            PathCommandLineAppend(psczSanitizedCommandLine, argv[i]);
+        }
     }
 
 LExit:
     ReleaseStr(sczVariableName);
     ReleaseStr(sczSanitizedArgument);
-    ReleaseStr(sczCommandLine);
 
     return hr;
 }

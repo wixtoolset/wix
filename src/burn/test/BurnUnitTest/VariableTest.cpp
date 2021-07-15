@@ -92,6 +92,7 @@ namespace Bootstrapper
                     L"    <Variable Id='Var5' Type='string' Value='' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Var6' Type='formatted' Value='[Formatted]' Hidden='no' Persisted='no' />"
                     L"    <Variable Id='Formatted' Type='formatted' Value='supersecret' Hidden='yes' Persisted='no' />"
+                    L"    <CommandLine Variables='upperCase' />"
                     L"</Bundle>";
 
                 hr = VariableInitialize(&variables);
@@ -102,6 +103,8 @@ namespace Bootstrapper
 
                 hr = VariablesParseFromXml(&variables, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse variables from XML.");
+
+                Assert::Equal((int)BURN_VARIABLE_COMMAND_LINE_TYPE_UPPER_CASE, (int)variables.commandLineType);
 
                 // get and verify variable values
                 Assert::Equal((int)BURN_VARIANT_TYPE_NUMERIC, VariableGetTypeHelper(&variables, L"Var1"));
@@ -258,6 +261,8 @@ namespace Bootstrapper
                 Assert::True(EvaluateConditionHelper(&variables, L"PROP1 = \"VAL1\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"NONE = \"NOT\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 <> \"VAL1\""));
+                Assert::False(EvaluateConditionHelper(&variables, L"PROP1 <>\n\"VAL1\""));
+                Assert::True(EvaluateConditionHelper(&variables, L"PROP1 <> \"VAL1\nVAL2\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 ~<> \"VAL1\""));
                 Assert::False(EvaluateConditionHelper(&variables, L"PROP1 ~<> \"Val1\""));
                 Assert::True(EvaluateConditionHelper(&variables, L"NONE <> \"NOT\""));

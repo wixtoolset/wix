@@ -256,7 +256,7 @@ namespace WixToolset.WixBA
 
         public bool IsComplete
         {
-            get { return IsSuccessfulCompletion || IsFailedCompletion; }
+            get { return this.IsSuccessfulCompletion || this.IsFailedCompletion; }
         }
 
         public bool IsSuccessfulCompletion
@@ -358,7 +358,7 @@ namespace WixToolset.WixBA
                         {
                             this.root.Canceled = false;
                             WixBA.Plan(WixBA.Model.PlannedAction);
-                        }, param => IsFailedCompletion);
+                        }, param => this.IsFailedCompletion);
                 }
 
                 return this.tryAgainCommand;
@@ -456,7 +456,7 @@ namespace WixToolset.WixBA
 
             // Force all commands to reevaluate CanExecute.
             // InvalidateRequerySuggested must be run on the UI thread.
-            root.Dispatcher.Invoke(new Action(CommandManager.InvalidateRequerySuggested));
+            this.root.Dispatcher.Invoke(new Action(CommandManager.InvalidateRequerySuggested));
         }
 
         private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs e)
@@ -639,7 +639,7 @@ namespace WixToolset.WixBA
                 WixBA.Dispatcher.BeginInvoke(new Action(WixBA.View.Close));
                 return;
             }
-            else if (root.AutoClose)
+            else if (this.root.AutoClose)
             {
                 // Automatically closing since the user clicked the X button.
                 WixBA.Dispatcher.BeginInvoke(new Action(WixBA.View.Close));
@@ -648,13 +648,13 @@ namespace WixToolset.WixBA
 
             // Force all commands to reevaluate CanExecute.
             // InvalidateRequerySuggested must be run on the UI thread.
-            root.Dispatcher.Invoke(new Action(CommandManager.InvalidateRequerySuggested));
+            this.root.Dispatcher.Invoke(new Action(CommandManager.InvalidateRequerySuggested));
         }
 
         private void ParseCommandLine()
         {
             // Get array of arguments based on the system parsing algorithm.
-            string[] args = WixBA.Model.Command.CommandLineArgs;
+            string[] args = BootstrapperCommand.ParseCommandLineToArgs(WixBA.Model.Command.CommandLine);
             for (int i = 0; i < args.Length; ++i)
             {
                 if (args[i].StartsWith("InstallFolder=", StringComparison.InvariantCultureIgnoreCase))

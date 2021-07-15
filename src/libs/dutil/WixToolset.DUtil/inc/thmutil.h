@@ -75,6 +75,13 @@ typedef enum THEME_CONTROL_TYPE
     THEME_CONTROL_TYPE_TAB,
 } THEME_CONTROL_TYPE;
 
+typedef enum THEME_IMAGE_REFERENCE_TYPE
+{
+    THEME_IMAGE_REFERENCE_TYPE_NONE,
+    THEME_IMAGE_REFERENCE_TYPE_PARTIAL,
+    THEME_IMAGE_REFERENCE_TYPE_COMPLETE,
+} THEME_IMAGE_REFERENCE_TYPE;
+
 typedef enum THEME_SHOW_PAGE_REASON
 {
     THEME_SHOW_PAGE_REASON_DEFAULT,
@@ -97,6 +104,32 @@ struct THEME_COLUMN
     int nBaseWidth;
     int nWidth;
     BOOL fExpands;
+};
+
+
+struct THEME_IMAGE_REFERENCE
+{
+    THEME_IMAGE_REFERENCE_TYPE type;
+    DWORD dwImageIndex;
+    DWORD dwImageInstanceIndex;
+    int nX;
+    int nY;
+    int nHeight;
+    int nWidth;
+};
+
+struct THEME_IMAGE_INSTANCE
+{
+    Gdiplus::Bitmap* pBitmap;
+};
+
+struct THEME_IMAGE
+{
+    LPWSTR sczId;
+    DWORD dwIndex;
+
+    DWORD cImageInstances;
+    THEME_IMAGE_INSTANCE* rgImageInstances;
 };
 
 
@@ -159,19 +192,44 @@ struct THEME_CONTROL
     int nY;
     int nHeight;
     int nWidth;
-    int nSourceX;
-    int nSourceY;
     UINT uStringId;
 
     LPWSTR sczEnableCondition;
     LPWSTR sczVisibleCondition;
     BOOL fDisableVariableFunctionality;
 
-    HBITMAP hImage;
-    HICON hIcon;
+    union
+    {
+        struct
+        {
+            THEME_IMAGE_REFERENCE rgImageRef[4];
+        } Button;
+        struct
+        {
+            HBITMAP hImage;
+            HICON hIcon;
 
-    // Don't free these; it's just a handle to the central image lists stored in THEME. The handle is freed once, there.
-    HIMAGELIST rghImageList[4];
+            DWORD cConditionalNotes;
+            THEME_CONDITIONAL_TEXT* rgConditionalNotes;
+        } CommandLink;
+        struct
+        {
+            THEME_IMAGE_REFERENCE imageRef;
+        } Image;
+        struct
+        {
+            // Don't free these; it's just a handle to the central image lists stored in THEME. The handle is freed once, there.
+            HIMAGELIST rghImageList[4];
+
+            THEME_COLUMN* ptcColumns;
+            DWORD cColumns;
+        } ListView;
+        struct
+        {
+            DWORD cImageRef;
+            THEME_IMAGE_REFERENCE* rgImageRef;
+        } ProgressBar;
+    };
 
     DWORD dwStyle;
     DWORD dwExtendedStyle;
@@ -196,10 +254,6 @@ struct THEME_CONTROL
     DWORD dwFontHoverId;
     DWORD dwFontSelectedId;
 
-    // Used by listview controls
-    THEME_COLUMN *ptcColumns;
-    DWORD cColumns;
-
     // Used by radio button controls
     BOOL fLastRadioButton;
     LPWSTR sczValue;
@@ -212,10 +266,6 @@ struct THEME_CONTROL
     // Used by controls that have text
     DWORD cConditionalText;
     THEME_CONDITIONAL_TEXT* rgConditionalText;
-
-    // Used by command link controls
-    DWORD cConditionalNotes;
-    THEME_CONDITIONAL_TEXT* rgConditionalNotes;
 
     // state variables that should be ignored
     HWND hWnd;
@@ -255,6 +305,8 @@ struct THEME_FONT_INSTANCE
 
 struct THEME_FONT
 {
+    LPWSTR sczId;
+    DWORD dwIndex;
     LONG lfHeight;
     LONG lfWeight;
     BYTE lfUnderline;
@@ -292,14 +344,19 @@ struct THEME
     int nMinimumWidth;
     int nWindowHeight;
     int nWindowWidth;
-    int nSourceX;
-    int nSourceY;
     UINT uStringId;
 
-    HBITMAP hImage;
+    DWORD dwSourceImageInstanceIndex;
+    THEME_IMAGE_REFERENCE windowImageRef;
 
     DWORD cFonts;
     THEME_FONT* rgFonts;
+
+    DWORD cImages;
+    THEME_IMAGE* rgImages;
+
+    DWORD cStandaloneImages;
+    THEME_IMAGE_INSTANCE* rgStandaloneImages;
 
     DWORD cPages;
     THEME_PAGE* rgPages;
@@ -311,6 +368,8 @@ struct THEME
     THEME_CONTROL* rgControls;
 
     // internal state variables -- do not use outside ThmUtil.cpp
+    STRINGDICT_HANDLE sdhFontDictionary;
+    STRINGDICT_HANDLE sdhImageDictionary;
     HWND hwndParent; // parent for loaded controls
     HWND hwndHover; // current hwnd hovered over
     DWORD dwCurrentPageId;

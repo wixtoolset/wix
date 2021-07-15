@@ -35,7 +35,6 @@ namespace WixToolset.Mba.Core
         [MarshalAs(UnmanagedType.I4)] internal int cbSize;
         [MarshalAs(UnmanagedType.U4)] private readonly LaunchAction action;
         [MarshalAs(UnmanagedType.U4)] private readonly Display display;
-        [MarshalAs(UnmanagedType.U4)] private readonly Restart restart;
         private readonly IntPtr wzCommandLine;
         [MarshalAs(UnmanagedType.I4)] private readonly int nCmdShow;
         [MarshalAs(UnmanagedType.U4)] private readonly ResumeType resume;
@@ -51,7 +50,6 @@ namespace WixToolset.Mba.Core
             return new BootstrapperCommand(
                 this.action,
                 this.display,
-                this.restart,
                 Marshal.PtrToStringUni(this.wzCommandLine),
                 this.nCmdShow,
                 this.resume,

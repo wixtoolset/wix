@@ -143,7 +143,7 @@ namespace WixToolset.Core
             }
         }
 
-        public WixBundlePayloadSymbol CreatePayloadSymbol(ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType = ComplexReferenceChildType.Unknown, string previousId = null)
+        public WixBundlePayloadSymbol CreatePayloadSymbol(ComplexReferenceParentType parentType, string parentId)
         {
             WixBundlePayloadSymbol symbol = null;
 
@@ -179,7 +179,7 @@ namespace WixToolset.Core
                     Version = this.Version,
                 });
 
-                this.Core.CreateGroupAndOrderingRows(this.SourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Payload, symbol.Id.Id, previousType, previousId);
+                this.Core.CreateGroupAndOrderingRows(this.SourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Payload, symbol.Id.Id, ComplexReferenceChildType.Unknown, null);
             }
 
             return symbol;

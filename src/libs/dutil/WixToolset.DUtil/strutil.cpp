@@ -2580,7 +2580,7 @@ extern "C" HRESULT DAPI StrStringToUInt64(
     while (i < cchIn)
     {
         nDigit = wzIn[i] - L'0';
-        if (9 < nDigit)
+        if (0 > nDigit || 9 < nDigit)
         {
             ExitFunction1(hr = E_INVALIDARG);
         }

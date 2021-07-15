@@ -15,11 +15,10 @@ const DWORD MB_RETRYTRYAGAIN = 0xF;
 
 // structs
 
-typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT BOOTSTRAPPER_ENGINE_CONTEXT;
+typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT BOOTSTRAPPER_ENGINE_CONTEXT; // forward declare
 
 typedef struct _BURN_USER_EXPERIENCE
 {
-    BOOL fSplashScreen;
     BURN_PAYLOADS payloads;
 
     HMODULE hUXModule;

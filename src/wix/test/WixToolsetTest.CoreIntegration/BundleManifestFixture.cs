@@ -211,15 +211,11 @@ namespace WixToolsetTest.CoreIntegration
 
                 var bundleExtensions = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:BundleExtension");
                 Assert.Equal(1, bundleExtensions.Count);
-                Assert.Equal("<BundleExtension Id='ExampleBext' EntryPayloadId='ExampleBext' />", bundleExtensions[0].GetTestXml());
+                Assert.Equal("<BundleExtension Id='ExampleBext' EntryPayloadSourcePath='u1' />", bundleExtensions[0].GetTestXml());
 
                 var bundleExtensionPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:UX/burn:Payload[@Id='ExampleBext']");
                 Assert.Equal(1, bundleExtensionPayloads.Count);
-                var ignored = new Dictionary<string, List<string>>
-                {
-                    { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } },
-                };
-                Assert.Equal("<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='*' />", bundleExtensionPayloads[0].GetTestXml(ignored));
+                Assert.Equal("<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='u1' />", bundleExtensionPayloads[0].GetTestXml());
             }
         }
 
@@ -259,7 +255,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var bundleExtensions = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:BundleExtension");
                 Assert.Equal(1, bundleExtensions.Count);
-                Assert.Equal("<BundleExtension Id='ExampleBundleExtension' EntryPayloadId='ExampleBundleExtension' />", bundleExtensions[0].GetTestXml());
+                Assert.Equal("<BundleExtension Id='ExampleBundleExtension' EntryPayloadSourcePath='u1' />", bundleExtensions[0].GetTestXml());
 
                 var extensionSearches = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:ExtensionSearch");
                 Assert.Equal(2, extensionSearches.Count);

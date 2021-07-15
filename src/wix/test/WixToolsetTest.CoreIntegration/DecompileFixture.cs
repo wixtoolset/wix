@@ -24,9 +24,9 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, msiName),
                     "-intermediateFolder", intermediateFolder,
                     "-o", outputPath
-                });
+                }, out var messages);
 
-                result.AssertSuccess();
+                Assert.Equal(0, result);
 
                 WixAssert.CompareXml(Path.Combine(folder, expectedWxsName), outputPath);
             }

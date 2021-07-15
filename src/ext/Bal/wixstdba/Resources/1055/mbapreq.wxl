@@ -2,7 +2,7 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="tr-tr" Language="1055" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="tr-tr" Language="1055" xmlns="http://wixtoolset.org/schemas/v4/wxl">
   <String Id="Caption">[WixBundleName] Kurulumu</String>
   <String Id="Title">[WixBundleName] kurulumu için Microsoft .NET Framework gerekir</String>
   <String Id="ConfirmCancelMessage">İptal etmek istediğinizden emin misiniz?</String>
@@ -22,9 +22,15 @@
   <String Id="ProgressHeader">Kurulum İlerleme Durumu</String>
   <String Id="ProgressLabel">İşleniyor:</String>
   <String Id="ProgressCancelButton">&amp;İptal</String>
+  <String Id="SuccessHeader">Microsoft .NET Framework Setup Successful</String>
+  <String Id="SuccessRestartText">You must restart your computer before [WixBundleName] setup can continue.</String>
+  <String Id="SuccessRestartButton">&amp;Restart</String>
+  <String Id="SuccessCloseButton">&amp;Close</String>
   <String Id="FailureHeader">Kurulum Başarısız</String>
   <String Id="FailureLogLinkText">Bir veya daha fazla sorun kurulumun başarısız olmasına neden oldu. Lütfen sorunları çözün ve kurulumu yeniden deneyin. Daha fazla bilgi için &lt;a href="#"&gt;günlük dosyasına&lt;/a&gt; bakın.</String>
   <String Id="FailureRestartText">Yazılım geri alma işlemini tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir.</String>
   <String Id="FailureRestartButton">&amp;Yeniden Başlat</String>
   <String Id="FailureCloseButton">&amp;Kapat</String>
+  <String Id="NET452WIN7RTMErrorMessage">[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment.</String>
+  <String Id="ErrorFailNoActionReboot">No action was taken as a system reboot is required.</String>
 </WixLocalization>

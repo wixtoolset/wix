@@ -206,7 +206,7 @@ public: // IBootstrapperApplication
         m_hUiThread = ::CreateThread(NULL, 0, UiThreadProc, this, 0, &dwUIThreadId);
         if (!m_hUiThread)
         {
-            ExitWithLastError(hr, "Failed to create UI thread.");
+            BalExitWithLastError(hr, "Failed to create UI thread.");
         }
 
     LExit:
@@ -230,15 +230,16 @@ public: // IBootstrapperApplication
         // If a restart was required.
         if (m_fRestartRequired)
         {
-            if (m_fAllowRestart)
+            if (m_fShouldRestart && m_fAllowRestart)
             {
                 *pAction = BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART;
             }
 
             if (m_fPrereq)
             {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, m_fAllowRestart ? "The prerequisites scheduled a restart. The bootstrapper application will be reloaded after the computer is restarted."
-                                                                        : "A restart is required by the prerequisites but the user delayed it. The bootstrapper application will be reloaded after the computer is restarted.");
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART == *pAction
+                    ? "The prerequisites scheduled a restart. The bootstrapper application will be reloaded after the computer is restarted."
+                    : "A restart is required by the prerequisites but the user delayed it. The bootstrapper application will be reloaded after the computer is restarted.");
             }
         }
         else if (m_fPrereqInstalled)
@@ -1096,13 +1097,13 @@ public: // IBootstrapperApplication
         __super::OnApplyComplete(hrStatus, restart, recommendation, pAction);
 
         m_restartResult = restart; // remember the restart result so we return the correct error code no matter what the user chooses to do in the UI.
-
-        // If a restart was encountered and we are not suppressing restarts, then restart is required.
-        m_fRestartRequired = (BOOTSTRAPPER_APPLY_RESTART_NONE != restart && BOOTSTRAPPER_RESTART_NEVER < m_command.restart);
+        m_fRestartRequired = BOOTSTRAPPER_APPLY_RESTART_NONE != restart;
         BalSetStringVariable(WIXSTDBA_VARIABLE_RESTART_REQUIRED, m_fRestartRequired ? L"1" : NULL, FALSE);
 
-        // If a restart is required and we're not displaying a UI or we are not supposed to prompt for restart then allow the restart.
-        m_fAllowRestart = m_fRestartRequired && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BOOTSTRAPPER_RESTART_PROMPT < m_command.restart);
+        m_fShouldRestart = m_fRestartRequired && BAL_INFO_RESTART_NEVER < m_BalInfoCommand.restart;
+
+        // Automatically restart if we're not displaying a UI or the command line said to always allow restarts.
+        m_fAllowRestart = m_fShouldRestart && (BOOTSTRAPPER_DISPLAY_FULL > m_command.display || BAL_INFO_RESTART_PROMPT < m_BalInfoCommand.restart);
 
         if (m_fPrereq)
         {
@@ -1985,6 +1986,62 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
+
+public: //CBalBaseBootstrapperApplication
+    virtual STDMETHODIMP Initialize(
+        __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs
+        )
+    {
+        HRESULT hr = S_OK;
+        LONGLONG llInstalled = 0;
+
+        hr = __super::Initialize(pCreateArgs);
+        BalExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
+
+        memcpy_s(&m_command, sizeof(m_command), pCreateArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
+        memcpy_s(&m_createArgs, sizeof(m_createArgs), pCreateArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
+        m_createArgs.pCommand = &m_command;
+
+        if (m_fPrereq)
+        {
+            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
+            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+        else // maybe modify the action state if the bundle is or is not already installed.
+        {
+            hr = BalGetNumericVariable(L"WixBundleInstalled", &llInstalled);
+            if (SUCCEEDED(hr) && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && llInstalled && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
+            }
+            else if (!llInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
+            {
+                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
+            }
+        }
+
+        // When resuming from restart doing some install-like operation, try to find the package that forced the
+        // restart. We'll use this information during planning.
+        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
+        {
+            // Ensure the forced restart package variable is null when it is an empty string.
+            hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
+            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
+            {
+                ReleaseNullStr(m_sczAfterForcedRestartPackage);
+            }
+        }
+
+        hr = S_OK;
+
+    LExit:
+        return hr;
+    }
+
+private:
     //
     // UiThreadProc - entrypoint for UI thread.
     //
@@ -2094,8 +2151,8 @@ private: // privates
         hr = BalManifestLoad(m_hModule, &pixdManifest);
         BalExitOnFailure(hr, "Failed to load bootstrapper application manifest.");
 
-        hr = ParseOverridableVariablesFromXml(pixdManifest);
-        BalExitOnFailure(hr, "Failed to read overridable variables.");
+        hr = BalInfoParseFromXml(&m_Bundle, pixdManifest);
+        BalExitOnFailure(hr, "Failed to load bundle information.");
 
         hr = ProcessCommandLine(&m_sczLanguage);
         ExitOnFailure(hr, "Unknown commandline parameters.");
@@ -2108,9 +2165,6 @@ private: // privates
 
         hr = LoadTheme(sczModulePath, m_sczLanguage);
         ExitOnFailure(hr, "Failed to load theme.");
-
-        hr = BalInfoParseFromXml(&m_Bundle, pixdManifest);
-        BalExitOnFailure(hr, "Failed to load bundle information.");
 
         hr = BalConditionsParseFromXml(&m_Conditions, pixdManifest, m_pWixLoc);
         BalExitOnFailure(hr, "Failed to load conditions from XML.");
@@ -2172,16 +2226,17 @@ private: // privates
         HRESULT hr = S_OK;
         int argc = 0;
         LPWSTR* argv = NULL;
-        LPWSTR sczVariableName = NULL;
-        LPWSTR sczVariableValue = NULL;
+        BOOL fUnknownArg = FALSE;
 
-        if (m_command.wzCommandLine && *m_command.wzCommandLine)
+        argc = m_BalInfoCommand.cUnknownArgs;
+        argv = m_BalInfoCommand.rgUnknownArgs;
+
+        if (argc)
         {
-            hr = AppParseCommandLine(m_command.wzCommandLine, &argc, &argv);
-            ExitOnFailure(hr, "Failed to parse command line.");
-
             for (int i = 0; i < argc; ++i)
             {
+                fUnknownArg = FALSE;
+
                 if (argv[i][0] == L'-' || argv[i][0] == L'/')
                 {
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"lang", -1))
@@ -2197,51 +2252,31 @@ private: // privates
                         hr = StrAllocString(psczLanguage, &argv[i][0], 0);
                         BalExitOnFailure(hr, "Failed to copy language.");
                     }
-                }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
-                {
-                    m_plannedAction = BOOTSTRAPPER_ACTION_CACHE;
-                }
-                else if (m_sdOverridableVariables)
-                {
-                    const wchar_t* pwc = wcschr(argv[i], L'=');
-                    if (pwc)
+                    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
                     {
-                        hr = StrAllocString(&sczVariableName, argv[i], pwc - argv[i]);
-                        BalExitOnFailure(hr, "Failed to copy variable name.");
-
-                        hr = DictKeyExists(m_sdOverridableVariables, sczVariableName);
-                        if (E_NOTFOUND == hr)
-                        {
-                            BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to set non-overridable variable: '%ls'.", sczVariableName);
-                            hr = S_OK;
-                            continue;
-                        }
-                        ExitOnFailure(hr, "Failed to check the dictionary of overridable variables.");
-
-                        hr = StrAllocString(&sczVariableValue, ++pwc, 0);
-                        BalExitOnFailure(hr, "Failed to copy variable value.");
-
-                        hr = m_pEngine->SetVariableString(sczVariableName, sczVariableValue, FALSE);
-                        BalExitOnFailure(hr, "Failed to set variable.");
+                        m_plannedAction = BOOTSTRAPPER_ACTION_CACHE;
                     }
                     else
                     {
-                        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Ignoring unknown argument: %ls", argv[i]);
+                        fUnknownArg = TRUE;
                     }
+                }
+                else
+                {
+                    fUnknownArg = TRUE;
+                }
+
+                if (fUnknownArg)
+                {
+                    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Ignoring unknown argument: %ls", argv[i]);
                 }
             }
         }
 
+        hr = BalSetOverridableVariablesFromEngine(&m_Bundle.overridableVariables, &m_BalInfoCommand, m_pEngine);
+        BalExitOnFailure(hr, "Failed to set overridable variables from the command line.");
+
     LExit:
-        if (argv)
-        {
-            AppFreeCommandLineArgs(argv);
-        }
-
-        ReleaseStr(sczVariableName);
-        ReleaseStr(sczVariableValue);
-
         return hr;
     }
 
@@ -2318,57 +2353,6 @@ private: // privates
     LExit:
         ReleaseStr(sczThemePath);
 
-        return hr;
-    }
-
-
-    HRESULT ParseOverridableVariablesFromXml(
-        __in IXMLDOMDocument* pixdManifest
-        )
-    {
-        HRESULT hr = S_OK;
-        IXMLDOMNode* pNode = NULL;
-        IXMLDOMNodeList* pNodes = NULL;
-        DWORD cNodes = 0;
-        LPWSTR scz = NULL;
-
-        // Get the list of variables users can override on the command line.
-        hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixStdbaOverridableVariable", &pNodes);
-        if (S_FALSE == hr)
-        {
-            ExitFunction1(hr = S_OK);
-        }
-        ExitOnFailure(hr, "Failed to select overridable variable nodes.");
-
-        hr = pNodes->get_length((long*)&cNodes);
-        ExitOnFailure(hr, "Failed to get overridable variable node count.");
-
-        if (cNodes)
-        {
-            hr = DictCreateStringList(&m_sdOverridableVariables, 32, DICT_FLAG_NONE);
-            ExitOnFailure(hr, "Failed to create the string dictionary.");
-
-            for (DWORD i = 0; i < cNodes; ++i)
-            {
-                hr = XmlNextElement(pNodes, &pNode, NULL);
-                ExitOnFailure(hr, "Failed to get next node.");
-
-                // @Name
-                hr = XmlGetAttributeEx(pNode, L"Name", &scz);
-                ExitOnFailure(hr, "Failed to get @Name.");
-
-                hr = DictAddKey(m_sdOverridableVariables, scz);
-                ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", scz);
-
-                // prepare next iteration
-                ReleaseNullObject(pNode);
-            }
-        }
-
-    LExit:
-        ReleaseObject(pNode);
-        ReleaseObject(pNodes);
-        ReleaseStr(scz);
         return hr;
     }
 
@@ -3162,20 +3146,11 @@ private: // privates
         m_state = state;
 
         // If our install is at the end (success or failure) and we're not showing full UI or
-        // we successfully installed the prerequisite then exit (prompt for restart if required).
+        // we successfully installed the prerequisite(s) and either no restart is required or can automatically restart
+        // then exit.
         if ((WIXSTDBA_STATE_APPLIED <= m_state && BOOTSTRAPPER_DISPLAY_FULL > m_command.display) ||
-            (WIXSTDBA_STATE_APPLIED == m_state && m_fPrereq))
+            (WIXSTDBA_STATE_APPLIED == m_state && m_fPrereq && (!m_fRestartRequired || m_fShouldRestart && m_fAllowRestart)))
         {
-            // If a restart was required but we were not automatically allowed to
-            // accept the reboot then do the prompt.
-            if (m_fRestartRequired && !m_fAllowRestart)
-            {
-                StrAllocFromError(&sczUnformattedText, HRESULT_FROM_WIN32(ERROR_SUCCESS_REBOOT_REQUIRED), NULL);
-
-                int nResult = ::MessageBoxW(m_hWnd, sczUnformattedText ? sczUnformattedText : L"The requested operation is successful. Changes will not be effective until the system is rebooted.", m_pTheme->sczCaption, MB_ICONEXCLAMATION | MB_OKCANCEL);
-                m_fAllowRestart = (IDOK == nResult);
-            }
-
             // Quietly exit.
             ::PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
         }
@@ -3213,13 +3188,13 @@ private: // privates
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_SUCCESS] == dwNewPageId) // on the "Success" page, check if the restart or launch button should be enabled.
                 {
-                    BOOL fShowRestartButton = FALSE;
+                    BOOL fEnableRestartButton = FALSE;
                     BOOL fLaunchTargetExists = FALSE;
-                    if (m_fRestartRequired)
+                    if (m_fShouldRestart)
                     {
-                        if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
+                        if (BAL_INFO_RESTART_PROMPT == m_BalInfoCommand.restart)
                         {
-                            fShowRestartButton = TRUE;
+                            fEnableRestartButton = TRUE;
                         }
                     }
                     else if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON))
@@ -3228,13 +3203,13 @@ private: // privates
                     }
 
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON, fLaunchTargetExists && BOOTSTRAPPER_ACTION_UNINSTALL < m_plannedAction);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, fShowRestartButton);
+                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, fEnableRestartButton);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_FAILURE] == dwNewPageId) // on the "Failure" page, show error message and check if the restart button should be enabled.
                 {
                     BOOL fShowLogLink = (m_Bundle.sczLogVariable && *m_Bundle.sczLogVariable); // if there is a log file variable then we'll assume the log file exists.
                     BOOL fShowErrorMessage = FALSE;
-                    BOOL fShowRestartButton = FALSE;
+                    BOOL fEnableRestartButton = FALSE;
 
                     if (FAILED(m_hrFinal))
                     {
@@ -3316,17 +3291,17 @@ private: // privates
                         fShowErrorMessage = TRUE;
                     }
 
-                    if (m_fRestartRequired)
+                    if (m_fShouldRestart)
                     {
-                        if (BOOTSTRAPPER_RESTART_PROMPT == m_command.restart)
+                        if (BAL_INFO_RESTART_PROMPT == m_BalInfoCommand.restart)
                         {
-                            fShowRestartButton = TRUE;
+                            fEnableRestartButton = TRUE;
                         }
                     }
 
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK, fShowLogLink);
                     ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT, fShowErrorMessage);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, fShowRestartButton);
+                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, fEnableRestartButton);
                 }
 
                 HRESULT hr = ThemeShowPage(m_pTheme, dwOldPageId, SW_HIDE);
@@ -3849,9 +3824,6 @@ private: // privates
     {
         HRESULT hr = S_OK;
         IXMLDOMNode* pBAFunctionsNode = NULL;
-        IXMLDOMNode* pPayloadNode = NULL;
-        LPWSTR sczPayloadId = NULL;
-        LPWSTR sczPayloadXPath = NULL;
         LPWSTR sczBafName = NULL;
         LPWSTR sczBafPath = NULL;
         BA_FUNCTIONS_CREATE_ARGS bafCreateArgs = { };
@@ -3865,21 +3837,8 @@ private: // privates
             ExitFunction();
         }
 
-        hr = XmlGetAttributeEx(pBAFunctionsNode, L"PayloadId", &sczPayloadId);
-        BalExitOnFailure(hr, "Failed to get BAFunctions PayloadId.");
-
-        hr = StrAllocFormatted(&sczPayloadXPath, L"/BootstrapperApplicationData/WixPayloadProperties[@Payload='%ls']", sczPayloadId);
-        BalExitOnFailure(hr, "Failed to format BAFunctions payload XPath.");
-
-        hr = XmlSelectSingleNode(pixdManifest, sczPayloadXPath, &pPayloadNode);
-        if (S_FALSE == hr)
-        {
-            hr = E_NOTFOUND;
-        }
-        BalExitOnFailure(hr, "Failed to find WixPayloadProperties node for BAFunctions PayloadId: %ls.", sczPayloadId);
-
-        hr = XmlGetAttributeEx(pPayloadNode, L"Name", &sczBafName);
-        BalExitOnFailure(hr, "Failed to get BAFunctions Name.");
+        hr = XmlGetAttributeEx(pBAFunctionsNode, L"FilePath", &sczBafName);
+        BalExitOnFailure(hr, "Failed to get BAFunctions FilePath.");
 
         hr = PathRelativeToModule(&sczBafPath, sczBafName, m_hModule);
         BalExitOnFailure(hr, "Failed to get path to BAFunctions DLL.");
@@ -3912,10 +3871,7 @@ private: // privates
         }
         ReleaseStr(sczBafPath);
         ReleaseStr(sczBafName);
-        ReleaseStr(sczPayloadXPath);
-        ReleaseStr(sczPayloadId);
         ReleaseObject(pBAFunctionsNode);
-        ReleaseObject(pPayloadNode);
 
         return hr;
     }
@@ -3929,56 +3885,20 @@ public:
         __in HMODULE hModule,
         __in BOOL fPrereq,
         __in HRESULT hrHostInitialization,
-        __in IBootstrapperEngine* pEngine,
-        __in const BOOTSTRAPPER_CREATE_ARGS* pArgs
-        ) : CBalBaseBootstrapperApplication(pEngine, pArgs, 3, 3000)
+        __in IBootstrapperEngine* pEngine
+        ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
     {
         m_hModule = hModule;
-        memcpy_s(&m_command, sizeof(m_command), pArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
-        memcpy_s(&m_createArgs, sizeof(m_createArgs), pArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
-        m_createArgs.pCommand = &m_command;
-
-        if (fPrereq)
-        {
-            // Pre-req BA should only show help or do an install (to launch the Managed BA which can then do the right action).
-            if (BOOTSTRAPPER_ACTION_HELP != m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
-        else // maybe modify the action state if the bundle is or is not already installed.
-        {
-            LONGLONG llInstalled = 0;
-            HRESULT hr = BalGetNumericVariable(L"WixBundleInstalled", &llInstalled);
-            if (SUCCEEDED(hr) && BOOTSTRAPPER_RESUME_TYPE_REBOOT != m_command.resumeType && 0 < llInstalled && BOOTSTRAPPER_ACTION_INSTALL == m_command.action)
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_MODIFY;
-            }
-            else if (0 == llInstalled && (BOOTSTRAPPER_ACTION_MODIFY == m_command.action || BOOTSTRAPPER_ACTION_REPAIR == m_command.action))
-            {
-                m_command.action = BOOTSTRAPPER_ACTION_INSTALL;
-            }
-        }
+        m_command = { };
+        m_createArgs = { };
 
         m_plannedAction = BOOTSTRAPPER_ACTION_UNKNOWN;
 
-        // When resuming from restart doing some install-like operation, try to find the package that forced the
-        // restart. We'll use this information during planning.
         m_sczAfterForcedRestartPackage = NULL;
 
-        if (BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
-        {
-            // Ensure the forced restart package variable is null when it is an empty string.
-            HRESULT hr = BalGetStringVariable(L"WixBundleForcedRestartPackage", &m_sczAfterForcedRestartPackage);
-            if (FAILED(hr) || !m_sczAfterForcedRestartPackage || !*m_sczAfterForcedRestartPackage)
-            {
-                ReleaseNullStr(m_sczAfterForcedRestartPackage);
-            }
-        }
-
         m_pWixLoc = NULL;
-        memset(&m_Bundle, 0, sizeof(m_Bundle));
-        memset(&m_Conditions, 0, sizeof(m_Conditions));
+        m_Bundle = { };
+        m_Conditions = { };
         m_sczConfirmCloseMessage = NULL;
         m_sczFailedMessage = NULL;
 
@@ -3995,6 +3915,7 @@ public:
         m_fDowngrading = FALSE;
         m_restartResult = BOOTSTRAPPER_APPLY_RESTART_NONE;
         m_fRestartRequired = FALSE;
+        m_fShouldRestart = FALSE;
         m_fAllowRestart = FALSE;
 
         m_sczLicenseFile = NULL;
@@ -4003,7 +3924,6 @@ public:
         m_fSuppressRepair = FALSE;
         m_fSupportCacheOnly = FALSE;
 
-        m_sdOverridableVariables = NULL;
         m_pTaskbarList = NULL;
         m_uTaskbarButtonCreatedMessage = UINT_MAX;
         m_fTaskbarButtonOK = FALSE;
@@ -4039,7 +3959,6 @@ public:
         }
 
         ::DeleteCriticalSection(&m_csShowingInternalUiThisPackage);
-        ReleaseDict(m_sdOverridableVariables);
         ReleaseStr(m_sczFailedMessage);
         ReleaseStr(m_sczConfirmCloseMessage);
         BalConditionsUninitialize(&m_Conditions);
@@ -4097,6 +4016,7 @@ private:
     BOOL m_fDowngrading;
     BOOTSTRAPPER_APPLY_RESTART m_restartResult;
     BOOL m_fRestartRequired;
+    BOOL m_fShouldRestart;
     BOOL m_fAllowRestart;
 
     LPWSTR m_sczLicenseFile;
@@ -4104,8 +4024,6 @@ private:
     BOOL m_fSuppressDowngradeFailure;
     BOOL m_fSuppressRepair;
     BOOL m_fSupportCacheOnly;
-
-    STRINGDICT_HANDLE m_sdOverridableVariables;
 
     BOOL m_fPrereq;
     BOOL m_fPrereqInstalled;
@@ -4145,8 +4063,11 @@ HRESULT CreateBootstrapperApplication(
         BalExitOnFailure(hr = E_INVALIDARG, "Engine requested Unknown display type.");
     }
 
-    pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine, pArgs);
-    ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new standard bootstrapper application object.");
+    pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine);
+    BalExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new standard bootstrapper application object.");
+
+    hr = pApplication->Initialize(pArgs);
+    ExitOnFailure(hr, "CWixStandardBootstrapperApplication initialization failed.");
 
     pResults->pfnBootstrapperApplicationProc = BalBaseBootstrapperApplicationProc;
     pResults->pvBootstrapperApplicationProcContext = pApplication;

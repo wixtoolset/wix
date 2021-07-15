@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Theme xmlns="http://wixtoolset.org/schemas/v4/thmutil">
+    <Font Id="Default" Height="-12" Weight="500" Foreground="windowtext" Background="window">Segoe UI</Font>
+    <Image Id="star_transparent.bmp" ImageResource="2" />
+    <Image Id="star_opaque.bmp" ImageResource="3" />
+    <Image Id="star_transparent.png" ImageResource="4" />
+    <Image Id="square_default" ImageResource="5">
+        <AlternateResolution ImageResource="6" />
+        <AlternateResolution ImageResource="7" />
+        <AlternateResolution ImageResource="8" />
+        <AlternateResolution ImageResource="9" />
+    </Image>
+    <Image Id="square_focus" ImageResource="13">
+        <AlternateResolution ImageResource="14" />
+        <AlternateResolution ImageResource="15" />
+    </Image>
+    <Image Id="square_hover" ImageResource="19">
+        <AlternateResolution ImageResource="20" />
+        <AlternateResolution ImageResource="21" />
+    </Image>
+    <Image Id="square_selected" ImageResource="25">
+        <AlternateResolution ImageResource="26" />
+        <AlternateResolution ImageResource="27" />
+    </Image>
+    <Image Id="progressbar" ImageResource="30" />
+    <Image Id="progressbar_reverse" ImageResource="31" />
+
+    <Window Width="600" Height="450" FontId="Default" Caption="BafThmUtilTestingTheme" HexStyle="10cf0000" AutoResize="yes">
+        <ImageList Name="Stars">
+            <ImageListItem ImageResource="2" />
+            <ImageListItem ImageResource="3" />
+            <ImageListItem ImageResource="4" />
+        </ImageList>
+        <Page Name="Transparency">
+            <Label X="6" Y="6" Width="-6" Height="94" FontId="Default">
+                This page has three versions of an image. The top image is a bitmap with a transparent background, the yellow star should be visible but its black background should not (this is currently broken). The middle image is the same bitmap except the black background is fully opaque so the yellow star should be visible on a black background. The bottom image in a PNG version of the top image and should look exactly the same.
+            </Label>
+            <ImageControl X="6" Y="106" Width="64" Height="64" ImageId="star_transparent.bmp" />
+            <ImageControl X="6" Y="176" Width="64" Height="64" ImageId="star_opaque.bmp" />
+            <ImageControl X="6" Y="246" Width="64" Height="64" ImageId="star_transparent.png" />
+            <Button Name="ListViewButton" X="-183" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Next</Text>
+                <ChangePageAction Page="ListView" />
+            </Button>
+        </Page>
+        <Page Name="ListView">
+            <Label X="6" Y="6" Width="-6" Height="18" FontId="Default">
+                This page is for testing ListView.
+            </Label>
+            <ListView Name="ListViewTopLeft" X="6" Y="30" Width="288" Height="176" FontId="Default" HexStyle="00" ImageList="Stars">
+                <Column Width="100">TL One</Column>
+                <Column Width="100">TL Two</Column>
+                <Column Width="88">TL Three</Column>
+            </ListView>
+            <ListView Name="ListViewTopRight" X="300" Y="30" Width="-11" Height="176" FontId="Default" HexStyle="01" ImageListGroupHeader="Stars">
+                <Column Width="100">TR One</Column>
+                <Column Width="100">TR Two</Column>
+                <Column Width="88" Expands="yes">TR Exp</Column>
+            </ListView>
+            <ListView Name="ListViewBottomLeft" X="6" Y="212" Width="288" Height="176" FontId="Default" HexStyle="02" ImageListSmall="Stars">
+                <Column Width="100">BL One</Column>
+                <Column Width="100">BL Two</Column>
+                <Column Width="88">BL Three</Column>
+            </ListView>
+            <ListView Name="ListViewBottomRight" X="300" Y="212" Width="-11" Height="176" FontId="Default" HexStyle="03">
+                <Column Width="100">BR One</Column>
+                <Column Width="100">BR Two</Column>
+                <Column Width="88" Expands="yes">BR Exp</Column>
+            </ListView>
+            <Button Name="ListViewBackButton" X="-269" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Back</Text>
+                <ChangePageAction Page="Transparency" />
+            </Button>
+            <Button Name="ButtonButton" X="-183" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Next</Text>
+                <ChangePageAction Page="Button" />
+            </Button>
+        </Page>
+        <Page Name="Button">
+            <Label X="6" Y="6" Width="-6" Height="132" FontId="Default">
+                This page is for testing graphical buttons. The left image is 16x16 at 100% scaling, the middle image is 32x32 at 100% scaling. The images for the buttons display their dimensions, so the left should be 16x16 at 100% but 32x32 at 200%. The right button starts at 32x32 at 100%, but grows and shrinks with the window and its image should also change.
+
+There are currently four states for a button: default, focus, hover, and selected (in that priority order). There should be a different image for each state, although the left button should have a focus rectangle over the default image since it didn't specify an image for the focused state.
+            </Label>
+            <Button Name="Square16Button" X="6" Y="140" Width="16" Height="16" FontId="Default" TabStop="yes">
+                <ButtonImage ImageId="square_default" />
+                <ButtonHoverImage ImageId="square_hover" />
+                <ButtonSelectedImage ImageId="square_selected" />
+            </Button>
+            <Button Name="Square32Button" X="54" Y="140" Width="32" Height="32" FontId="Default" TabStop="yes">
+                <ButtonImage ImageId="square_default" />
+                <ButtonFocusImage ImageId="square_focus" />
+                <ButtonHoverImage ImageId="square_hover" />
+                <ButtonSelectedImage ImageId="square_selected" />
+            </Button>
+            <Button Name="SquareExpandButton" X="92" Y="140" Width="-476" Height="-278" FontId="Default" TabStop="yes">
+                <ButtonImage ImageId="square_default" />
+                <ButtonFocusImage ImageId="square_focus" />
+                <ButtonHoverImage ImageId="square_hover" />
+                <ButtonSelectedImage ImageId="square_selected" />
+            </Button>
+            <Button Name="ButtonBackButton" X="-269" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Back</Text>
+                <ChangePageAction Page="ListView" />
+            </Button>
+            <Button Name="ProgressbarButton" X="-183" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Next</Text>
+                <ChangePageAction Page="Progressbar" />
+            </Button>
+        </Page>
+        <Page Name="Progressbar">
+            <Label X="6" Y="6" Width="-6" Height="94" FontId="Default">
+                This page has two progress bars. The top progress bar is a standard control, the bottom one is custom drawn from an image. The bottom one should have its left side one pixel wide as black, the right side one pixel wide as grey, the progress as green, and the remaining as blue. The colors should be reversed when the progress goes backward (this is a way to test different colors, not a standard feature of thmutil).
+            </Label>
+            <Progressbar Name="StandardProgressBar" X="6" Y="106" Width="-6" Height="23" />
+            <Progressbar Name="ImageProgressBar" X="6" Y="141" Width="-6" Height="23">
+                <ProgressbarImage ImageId="progressbar" />
+                <ProgressbarImage ImageId="progressbar_reverse" />
+            </Progressbar>
+            <Button Name="ProgressbarBackButton" X="-269" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default">
+                <Text>Back</Text>
+                <ChangePageAction Page="Button" />
+            </Button>
+        </Page>
+        <Button Name="StartButton" X="-97" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default" Visible="yes">
+            <Text>Start</Text>
+            <ChangePageAction Page="Transparency" />
+        </Button>
+        <Button Name="CloseButton" X="-11" Y="-11" Width="75" Height="23" TabStop="yes" FontId="Default" Visible="yes">
+            <Text>ThemeClose</Text>
+            <CloseWindowAction />
+        </Button>
+    </Window>
+</Theme>
