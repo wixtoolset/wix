@@ -57,6 +57,11 @@ static HRESULT OpenBundleKey(
     __in_opt LPCWSTR wzSubKey,
     __inout HKEY* phKey
     );
+static HRESULT CopyStringToBuffer(
+    __in_z LPWSTR wzValue,
+    __in_z_opt LPWSTR wzBuffer,
+    __inout SIZE_T* pcchBuffer
+    );
 
 DAPI_(HRESULT) BundleGetBundleInfo(
     __in_z LPCWSTR wzBundleId,
@@ -111,11 +116,39 @@ LExit:
 }
 
 
+DAPI_(HRESULT) BundleGetBundleInfoFixed(
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzAttribute,
+    __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+    __inout SIZE_T* pcchValue
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczValue = NULL;
+
+    if (!pcchValue)
+    {
+        ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
+    }
+
+    hr = BundleGetBundleInfo(wzBundleId, wzAttribute, &sczValue);
+    if (SUCCEEDED(hr))
+    {
+        hr = CopyStringToBuffer(sczValue, wzValue, pcchValue);
+    }
+
+LExit:
+    ReleaseStr(sczValue);
+
+    return hr;
+}
+
+
 DAPI_(HRESULT) BundleEnumRelatedBundle(
-  __in_z LPCWSTR wzUpgradeCode,
-  __in BUNDLE_INSTALL_CONTEXT context,
-  __inout PDWORD pdwStartIndex,
-  __out_ecount(MAX_GUID_CHARS+1) LPWSTR lpBundleIdBuf
+    __in_z LPCWSTR wzUpgradeCode,
+    __in BUNDLE_INSTALL_CONTEXT context,
+    __inout PDWORD pdwStartIndex,
+    __deref_out_z LPWSTR* psczBundleId
     )
 {
     HRESULT hr = S_OK;
@@ -123,7 +156,6 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
     HKEY hkUninstall = NULL;
     HKEY hkBundle = NULL;
     LPWSTR sczUninstallSubKey = NULL;
-    size_t cchUninstallSubKey = 0;
     LPWSTR sczUninstallSubKeyPath = NULL;
     LPWSTR sczValue = NULL;
     DWORD dwType = 0;
@@ -132,7 +164,7 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
     DWORD cBundleUpgradeCodes = 0;
     BOOL fUpgradeCodeFound = FALSE;
 
-    if (!wzUpgradeCode || !lpBundleIdBuf || !pdwStartIndex)
+    if (!wzUpgradeCode || !pdwStartIndex)
     {
         ButilExitOnFailure(hr = E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
@@ -205,13 +237,10 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
 
         if (fUpgradeCodeFound)
         {
-            if (lpBundleIdBuf)
+            if (psczBundleId)
             {
-                hr = ::StringCchLengthW(sczUninstallSubKey, STRSAFE_MAX_CCH, &cchUninstallSubKey);
-                ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
-
-                hr = ::StringCchCopyNExW(lpBundleIdBuf, MAX_GUID_CHARS + 1, sczUninstallSubKey, cchUninstallSubKey, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-                ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
+                *psczBundleId = sczUninstallSubKey;
+                sczUninstallSubKey = NULL;
             }
 
             break;
@@ -230,6 +259,34 @@ LExit:
     ReleaseRegKey(hkBundle);
     ReleaseRegKey(hkUninstall);
     ReleaseStrArray(rgsczBundleUpgradeCodes, cBundleUpgradeCodes);
+
+    return hr;
+}
+
+
+DAPI_(HRESULT) BundleEnumRelatedBundleFixed(
+    __in_z LPCWSTR wzUpgradeCode,
+    __in BUNDLE_INSTALL_CONTEXT context,
+    __inout PDWORD pdwStartIndex,
+    __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleId
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczValue = NULL;
+    size_t cchValue = 0;
+
+    hr = BundleEnumRelatedBundle(wzUpgradeCode, context, pdwStartIndex, &sczValue);
+    if (SUCCEEDED(hr) && wzBundleId)
+    {
+        hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchValue);
+        ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
+
+        hr = ::StringCchCopyNExW(wzBundleId, MAX_GUID_CHARS + 1, sczValue, cchValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
+        ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
+    }
+
+LExit:
+    ReleaseStr(sczValue);
 
     return hr;
 }
@@ -278,6 +335,34 @@ DAPI_(HRESULT) BundleGetBundleVariable(
 
 LExit:
     ReleaseRegKey(hkBundle);
+
+    return hr;
+}
+
+
+DAPI_(HRESULT) BundleGetBundleVariableFixed(
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzVariable,
+    __out_ecount_opt(*pcchValue) LPWSTR wzValue,
+    __inout SIZE_T* pcchValue
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczValue = NULL;
+
+    if (!pcchValue)
+    {
+        ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
+    }
+
+    hr = BundleGetBundleVariable(wzBundleId, wzVariable, &sczValue);
+    if (SUCCEEDED(hr))
+    {
+        hr = CopyStringToBuffer(sczValue, wzValue, pcchValue);
+    }
+
+LExit:
+    ReleaseStr(sczValue);
 
     return hr;
 }
@@ -353,6 +438,37 @@ static HRESULT OpenBundleKey(
 
 LExit:
     ReleaseStr(sczKeypath);
+
+    return hr;
+}
+
+static HRESULT CopyStringToBuffer(
+    __in_z LPWSTR wzValue,
+    __in_z_opt LPWSTR wzBuffer,
+    __inout SIZE_T* pcchBuffer
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fTooSmall = !wzBuffer;
+
+    if (!fTooSmall)
+    {
+        hr = ::StringCchCopyExW(wzBuffer, *pcchBuffer, wzValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
+        if (STRSAFE_E_INSUFFICIENT_BUFFER == hr)
+        {
+            fTooSmall = TRUE;
+        }
+    }
+
+    if (fTooSmall)
+    {
+        hr = ::StringCchLengthW(wzValue, STRSAFE_MAX_LENGTH, reinterpret_cast<size_t*>(pcchBuffer));
+        if (SUCCEEDED(hr))
+        {
+            hr = E_MOREDATA;
+            *pcchBuffer += 1; // null terminator.
+        }
+    }
 
     return hr;
 }

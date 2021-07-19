@@ -593,9 +593,10 @@ namespace Bootstrapper
                 Assert::Empty((System::Collections::IEnumerable ^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"WixBundleForcedRestartPackage"), nullptr));
 
                 hr = StrAlloc(&sczRelatedBundleId, MAX_GUID_CHARS + 1);
+                NativeAssert::Succeeded(hr, "Failed to allocate buffer for related bundle id.");
 
                 // Verify we can find ourself via the UpgradeCode
-                hr = BundleEnumRelatedBundle(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, &dwRelatedBundleIndex, sczRelatedBundleId);
+                hr = BundleEnumRelatedBundleFixed(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, &dwRelatedBundleIndex, sczRelatedBundleId);
                 TestThrowOnFailure(hr, L"Failed to enumerate related bundle.");
 
                 NativeAssert::StringEqual(TEST_BUNDLE_ID, sczRelatedBundleId);
