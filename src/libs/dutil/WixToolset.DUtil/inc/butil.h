@@ -14,7 +14,8 @@ typedef enum _BUNDLE_INSTALL_CONTEXT
 
 
 /********************************************************************
-BundleGetBundleInfo - Queries the bundle installation metadata for a given property
+BundleGetBundleInfo - Queries the bundle installation metadata for a given property,
+    the caller is expected to free the memory returned vis psczValue
 
 RETURNS:
     E_INVALIDARG
@@ -23,18 +24,15 @@ RETURNS:
         The bundle is not installed
     HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY)
         The property is unrecognized
-    HRESULT_FROM_WIN32(ERROR_MORE_DATA)
-        A buffer is too small to hold the requested data.
     E_NOTIMPL:
         Tried to read a bundle attribute for a type which has not been implemented
 
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
 HRESULT DAPI BundleGetBundleInfo(
-  __in_z LPCWSTR szBundleId,                             // Bundle code
-  __in_z LPCWSTR szAttribute,                            // attribute name
-  __out_ecount_opt(*pcchValueBuf) LPWSTR lpValueBuf,     // returned value, NULL if not desired
-  __inout_opt                     LPDWORD pcchValueBuf   // in/out buffer character count
+    __in_z LPCWSTR szBundleId,
+    __in_z LPCWSTR szAttribute,
+    __deref_out_z LPWSTR* psczValue
     );
 
 /********************************************************************

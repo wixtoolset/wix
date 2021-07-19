@@ -61,21 +61,16 @@ static HRESULT OpenBundleKey(
 DAPI_(HRESULT) BundleGetBundleInfo(
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzAttribute,
-    __out_ecount_opt(*pcchValueBuf) LPWSTR lpValueBuf,
-    __inout_opt LPDWORD pcchValueBuf
+    __deref_out_z LPWSTR* psczValue
     )
 {
-    Assert(wzBundleId && wzAttribute);
-
     HRESULT hr = S_OK;
-    LPWSTR sczValue = NULL;
     HKEY hkBundle = NULL;
     INTERNAL_BUNDLE_STATUS status = INTERNAL_BUNDLE_STATUS_SUCCESS;
-    DWORD cchSource = 0;
     DWORD dwType = 0;
     DWORD dwValue = 0;
 
-    if ((lpValueBuf && !pcchValueBuf) || !wzBundleId || !wzAttribute)
+    if (!wzBundleId || !wzAttribute || !psczValue)
     {
         ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
@@ -95,41 +90,22 @@ DAPI_(HRESULT) BundleGetBundleInfo(
     switch (dwType)
     {
         case REG_SZ:
-            hr = RegReadString(hkBundle, wzAttribute, &sczValue);
+            hr = RegReadString(hkBundle, wzAttribute, psczValue);
             ButilExitOnFailure(hr, "Failed to read string property.");
             break;
         case REG_DWORD:
             hr = RegReadNumber(hkBundle, wzAttribute, &dwValue);
             ButilExitOnFailure(hr, "Failed to read dword property.");
 
-            hr = StrAllocFormatted(&sczValue, L"%d", dwValue);
+            hr = StrAllocFormatted(psczValue, L"%d", dwValue);
             ButilExitOnFailure(hr, "Failed to format dword property as string.");
             break;
         default:
             ButilExitWithRootFailure(hr, E_NOTIMPL, "Reading bundle info of type 0x%x not implemented.", dwType);
     }
 
-    hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchSource));
-    ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
-
-    if (lpValueBuf)
-    {
-        // cchSource is the length of the string not including the terminating null character
-        if (*pcchValueBuf <= cchSource)
-        {
-            *pcchValueBuf = ++cchSource;
-            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA));
-        }
-
-        hr = ::StringCchCatNExW(lpValueBuf, *pcchValueBuf, sczValue, cchSource, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-        ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
-        
-        *pcchValueBuf = cchSource++;        
-    }
-
 LExit:
     ReleaseRegKey(hkBundle);
-    ReleaseStr(sczValue);
 
     return hr;
 }
@@ -147,7 +123,7 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
     HKEY hkUninstall = NULL;
     HKEY hkBundle = NULL;
     LPWSTR sczUninstallSubKey = NULL;
-    DWORD cchUninstallSubKey = 0;
+    size_t cchUninstallSubKey = 0;
     LPWSTR sczUninstallSubKeyPath = NULL;
     LPWSTR sczValue = NULL;
     DWORD dwType = 0;
@@ -231,8 +207,8 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
         {
             if (lpBundleIdBuf)
             {
-                hr = ::StringCchLengthW(sczUninstallSubKey, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchUninstallSubKey));
-                ButilExitOnRootFailure(hr, "Failed to calculate length of string");
+                hr = ::StringCchLengthW(sczUninstallSubKey, STRSAFE_MAX_CCH, &cchUninstallSubKey);
+                ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
 
                 hr = ::StringCchCopyNExW(lpBundleIdBuf, MAX_GUID_CHARS + 1, sczUninstallSubKey, cchUninstallSubKey, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
                 ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
@@ -265,8 +241,6 @@ DAPI_(HRESULT) BundleGetBundleVariable(
     __deref_out_z LPWSTR* psczValue
     )
 {
-    Assert(wzBundleId && wzVariable);
-
     HRESULT hr = S_OK;
     HKEY hkBundle = NULL;
     INTERNAL_BUNDLE_STATUS status = INTERNAL_BUNDLE_STATUS_SUCCESS;
