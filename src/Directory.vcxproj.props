@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CodeAnalysisRuleSet Condition=" Exists('$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset') ">$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CustomizedNativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemDefinitionGroup>

@@ -4,16 +4,16 @@
 
 
 #define ROOT_PATH L"SOFTWARE\\WiX_Burn_UnitTest"
-#define HKLM_PATH L"SOFTWARE\\WiX_Burn_UnitTest\\HKLM"
-#define HKCU_PATH L"SOFTWARE\\WiX_Burn_UnitTest\\HKCU"
+#define HKLM_PATH ROOT_PATH L"\\HKLM"
+#define HKCU_PATH ROOT_PATH L"\\HKCU"
 #define REGISTRY_UNINSTALL_KEY L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
 #define REGISTRY_RUN_KEY L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
-#define TEST_BUNDLE_ID L"{D54F896D-1952-43e6-9C67-B5652240618C}"
+#define TEST_BUNDLE_ID L"{D54F896D-1952-43E6-9C67-B5652240618C}"
 #define TEST_BUNDLE_UPGRADE_CODE L"{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}"
 
-#define TEST_UNINSTALL_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\{D54F896D-1952-43e6-9C67-B5652240618C}"
+#define TEST_UNINSTALL_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\" TEST_BUNDLE_ID
 #define TEST_RUN_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_RUN_KEY
-#define TEST_VARIABLE_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\{D54F896D-1952-43e6-9C67-B5652240618C}\\variables"
+#define TEST_VARIABLE_KEY L"HKEY_CURRENT_USER\\" HKCU_PATH L"\\" REGISTRY_UNINSTALL_KEY L"\\" TEST_BUNDLE_ID L"\\variables"
 
 
 static LSTATUS APIENTRY RegistrationTest_RegCreateKeyExW(
@@ -75,7 +75,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
 
             try
             {
@@ -91,7 +91,7 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -123,7 +123,7 @@ namespace Bootstrapper
                 Assert::True(File::Exists(Path::Combine(cacheDirectory, gcnew String(L"setup.exe"))));
 
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)(Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr)));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)(Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr)));
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -133,7 +133,7 @@ namespace Bootstrapper
                 Assert::False(Directory::Exists(cacheDirectory));
 
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
             }
             finally
             {
@@ -165,7 +165,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
                 // set mock API's
@@ -180,7 +180,7 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' InProgressDisplayName='Product1 Installation' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -214,7 +214,7 @@ namespace Bootstrapper
                 // verify that registration was created
                 Assert::Equal<String^>(gcnew String(L"Product1 Installation"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
@@ -223,7 +223,7 @@ namespace Bootstrapper
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ARP), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 //
                 // uninstall
@@ -236,7 +236,7 @@ namespace Bootstrapper
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -245,7 +245,7 @@ namespace Bootstrapper
                 // verify that registration was removed
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
             }
             finally
             {
@@ -277,7 +277,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
                 // set mock API's
@@ -292,7 +292,7 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -325,7 +325,7 @@ namespace Bootstrapper
 
                 // verify that registration was created
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
@@ -355,7 +355,7 @@ namespace Bootstrapper
                 // verify that registration was removed
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
             }
             finally
             {
@@ -387,7 +387,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
                 // set mock API's
@@ -402,7 +402,7 @@ namespace Bootstrapper
                     L"    <UX UxDllPayloadId='ux.dll'>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' DisplayName='DisplayName1' DisplayVersion='1.2.3.4' Publisher='Publisher1' HelpLink='http://www.microsoft.com/help'"
                     L"             HelpTelephone='555-555-5555' AboutUrl='http://www.microsoft.com/about' UpdateUrl='http://www.microsoft.com/update'"
                     L"             Comments='Comments1' Contact='Contact1' DisableModify='yes' DisableRemove='yes' />"
@@ -437,7 +437,7 @@ namespace Bootstrapper
 
                 // verify that registration was created
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // finish registration
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
@@ -446,7 +446,7 @@ namespace Bootstrapper
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ARP), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 Assert::Equal<String^>(gcnew String(L"DisplayName1"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
                 Assert::Equal<String^>(gcnew String(L"1.2.3.4"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayVersion"), nullptr));
@@ -470,7 +470,7 @@ namespace Bootstrapper
 
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -479,7 +479,7 @@ namespace Bootstrapper
                 // verify that registration was removed
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
             }
             finally
             {
@@ -517,7 +517,7 @@ namespace Bootstrapper
             BYTE* pbBuffer = NULL;
             SIZE_T cbBuffer = 0;
             
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
                 // set mock API's
@@ -532,8 +532,8 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <RelatedBundle Id='" TEST_BUNDLE_UPGRADE_CODE "' Action='Upgrade' />"
-                    L"    <Registration Id='" TEST_BUNDLE_ID "' Tag='foo' ProviderKey='" TEST_BUNDLE_ID "' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <RelatedBundle Id='" TEST_BUNDLE_UPGRADE_CODE L"' Action='Upgrade' />"
+                    L"    <Registration Id='" TEST_BUNDLE_ID L"' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
@@ -585,6 +585,7 @@ namespace Bootstrapper
 
                 ReleaseNullBuffer(pbBuffer);
                 cbBuffer = 0;
+
                 // Verify the variables exist
                 Assert::Equal<String^>(gcnew String(L"42"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable1"), nullptr));
                 Assert::Equal<String^>(gcnew String(L"bar"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable2"), nullptr));
@@ -596,12 +597,14 @@ namespace Bootstrapper
                 // Verify we can find ourself via the UpgradeCode
                 hr = BundleEnumRelatedBundle(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, &dwRelatedBundleIndex, sczRelatedBundleId);
                 TestThrowOnFailure(hr, L"Failed to enumerate related bundle.");
-                Assert::Equal<String^>(gcnew String(TEST_BUNDLE_ID), gcnew String(sczRelatedBundleId));
+
+                NativeAssert::StringEqual(TEST_BUNDLE_ID, sczRelatedBundleId);
 
                 // Verify we can read the bundle variables via the API
                 hr = BundleGetBundleVariable(TEST_BUNDLE_ID, L"MyBurnVariable1", &sczValue);
                 TestThrowOnFailure(hr, L"Failed to read MyBurnVariable1.");
-                Assert::Equal<String^>(gcnew String(L"42"), gcnew String(sczValue));
+
+                NativeAssert::StringEqual(L"42", sczValue);
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -626,7 +629,7 @@ namespace Bootstrapper
             }
         }
 
-        [Fact]//(Skip = "Currently fails")]
+        [Fact]
         void ResumeTest()
         {
             HRESULT hr = S_OK;
@@ -643,7 +646,7 @@ namespace Bootstrapper
             BYTE* pbBuffer = NULL;
             SIZE_T cbBuffer = 0;
             SIZE_T piBuffer = 0;
-            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"));
+            String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
                 // set mock API's
@@ -658,7 +661,7 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43e6-9C67-B5652240618C}' UpgradeCode='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
@@ -715,6 +718,7 @@ namespace Bootstrapper
 
                 ReleaseNullBuffer(pbBuffer);
                 cbBuffer = 0;
+
                 // Verify the variables exist
                 Assert::Equal<String^>(gcnew String(L"42"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable1"), nullptr));
                 Assert::Equal<String^>(gcnew String(L"bar"), (String^)Registry::GetValue(gcnew String(TEST_VARIABLE_KEY), gcnew String(L"MyBurnVariable2"), nullptr));
@@ -723,7 +727,8 @@ namespace Bootstrapper
 
                 hr = BundleGetBundleVariable(TEST_BUNDLE_ID, L"MyBurnVariable1", &sczValue);
                 TestThrowOnFailure(hr, L"Failed to read MyBurnVariable1.");
-                Assert::Equal<String^>(gcnew String(L"42"), gcnew String(sczValue));
+
+                NativeAssert::StringEqual(L"42", sczValue);
 
                 // read interrupted resume type
                 hr = RegistrationDetectResumeType(&registration, &resumeType);
@@ -736,7 +741,7 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to suspend session.");
 
                 // verify that run key was removed
-                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::Equal((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // read suspend resume type
                 hr = RegistrationDetectResumeType(&registration, &resumeType);
@@ -751,15 +756,12 @@ namespace Bootstrapper
                 hr = VariableDeserialize(&variables, TRUE, pbBuffer, cbBuffer, &piBuffer);
                 TestThrowOnFailure(hr, L"Failed to deserialize variables.");
 
-                //Assert::Equal((SIZE_T)sizeof(rgbData), cbBuffer);
-                //Assert::True(0 == memcmp(pbBuffer, rgbData, sizeof(rgbData)));
-
                 // write active resume mode
                 hr = RegistrationSessionResume(&registration, &variables, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
                 TestThrowOnFailure(hr, L"Failed to write active resume mode.");
 
                 // verify that run key was put back
-                Assert::NotEqual((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(L"{D54F896D-1952-43e6-9C67-B5652240618C}"), nullptr));
+                Assert::NotEqual((Object^)nullptr, Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);

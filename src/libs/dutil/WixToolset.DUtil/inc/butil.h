@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-typedef enum BUNDLE_INSTALL_CONTEXT
+typedef enum _BUNDLE_INSTALL_CONTEXT
 {
     BUNDLE_INSTALL_CONTEXT_MACHINE,
     BUNDLE_INSTALL_CONTEXT_USER,
@@ -55,11 +55,29 @@ HRESULT DAPI BundleEnumRelatedBundle(
   __out_ecount(MAX_GUID_CHARS+1)  LPWSTR lpBundleIdBuf
     );
 
+/********************************************************************
+BundleGetBundleVariable - Queries the bundle installation metadata for a given variable,
+    the caller is expected to free the memory returned vis psczValue
+
+RETURNS:
+    S_OK
+        Success, if the variable had a value, it's returned in psczValue
+    E_INVALIDARG
+        An invalid parameter was passed to the function.
+    HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT)
+        The bundle is not installed
+    HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY)
+        The variable is unrecognized
+    E_NOTIMPL:
+        Tried to read a bundle variable for a type which has not been implemented
+
+    All other returns are unexpected returns from other dutil methods.
+********************************************************************/
 HRESULT DAPI BundleGetBundleVariable(
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzVariable,
     __deref_out_z LPWSTR* psczValue
-);
+    );
 
 
 #ifdef __cplusplus

@@ -910,7 +910,6 @@ extern "C" HRESULT RegistrationSessionEnd(
 {
     HRESULT hr = S_OK;
     LPWSTR sczRebootRequiredKey = NULL;
-    LPWSTR sczVariableKey = NULL;
     HKEY hkRebootRequired = NULL;
     HKEY hkRegistration = NULL;
 
@@ -958,19 +957,8 @@ extern "C" HRESULT RegistrationSessionEnd(
 
         RemoveSoftwareTags(pVariables, &pRegistration->softwareTags);
 
-        // build variable registry key path
-        hr = StrAllocFormatted(&sczVariableKey, L"%s\\%s", pRegistration->sczRegistrationKey, REGISTRY_BUNDLE_VARIABLE_KEY);
-        ExitOnFailure(hr, "Failed to build variable registry key path.");
-
-        // Delete registration variable key.
-        hr = RegDelete(pRegistration->hkRoot, sczVariableKey, REG_KEY_DEFAULT, FALSE);
-        if (E_FILENOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to delete registration variable key: %ls", sczVariableKey);
-        }
-
         // Delete registration key.
-        hr = RegDelete(pRegistration->hkRoot, pRegistration->sczRegistrationKey, REG_KEY_DEFAULT, FALSE);
+        hr = RegDelete(pRegistration->hkRoot, pRegistration->sczRegistrationKey, REG_KEY_DEFAULT, TRUE);
         if (E_FILENOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to delete registration key: %ls", pRegistration->sczRegistrationKey);
@@ -998,7 +986,6 @@ extern "C" HRESULT RegistrationSessionEnd(
 LExit:
     ReleaseRegKey(hkRegistration);
     ReleaseRegKey(hkRebootRequired);
-    ReleaseStr(sczVariableKey);
     ReleaseStr(sczRebootRequiredKey);
 
     return hr;

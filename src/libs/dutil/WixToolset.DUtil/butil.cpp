@@ -8,6 +8,7 @@
 #define ButilExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_BUTIL, x, s, __VA_ARGS__)
 #define ButilExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_BUTIL, x, s, __VA_ARGS__)
 #define ButilExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_BUTIL, x, s, __VA_ARGS__)
+#define ButilExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_BUTIL, x, e, s, __VA_ARGS__)
 #define ButilExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_BUTIL, x, s, __VA_ARGS__)
 #define ButilExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_BUTIL, p, x, e, s, __VA_ARGS__)
 #define ButilExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_BUTIL, p, x, s, __VA_ARGS__)
@@ -22,7 +23,29 @@ const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE = L"BundleUpgrade
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PROVIDER_KEY = L"BundleProviderKey";
 const LPCWSTR BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY = L"variables";
 
+enum INTERNAL_BUNDLE_STATUS
+{
+    INTERNAL_BUNDLE_STATUS_SUCCESS,
+    INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE,
+    INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY,
+};
+
 // Forward declarations.
+/********************************************************************
+LocateAndQueryBundleValue - Locates the requested key for the bundle,
+    then queries the registry type for requested value.
+
+NOTE: caller is responsible for closing key
+********************************************************************/
+static HRESULT LocateAndQueryBundleValue(
+    __in_z LPCWSTR wzBundleId,
+    __in_opt LPCWSTR wzSubKey,
+    __in LPCWSTR wzValueName,
+    __inout HKEY* phKey,
+    __inout DWORD* pdwType,
+    __out INTERNAL_BUNDLE_STATUS* pStatus
+    );
+
 /********************************************************************
 OpenBundleKey - Opens the bundle uninstallation key for a given bundle
 
@@ -31,42 +54,43 @@ NOTE: caller is responsible for closing key
 static HRESULT OpenBundleKey(
     __in_z LPCWSTR wzBundleId,
     __in BUNDLE_INSTALL_CONTEXT context,
-    __in_opt LPCWSTR szSubKey,
-    __inout HKEY* key);
+    __in_opt LPCWSTR wzSubKey,
+    __inout HKEY* phKey
+    );
 
-/********************************************************************
-BundleGetBundleInfo - Read the registration data for a gven bundle
-********************************************************************/
-extern "C" HRESULT DAPI BundleGetBundleInfo(
-  __in_z LPCWSTR wzBundleId,
-  __in_z LPCWSTR wzAttribute,
-  __out_ecount_opt(*pcchValueBuf) LPWSTR lpValueBuf,
-  __inout_opt LPDWORD pcchValueBuf
-  )
+DAPI_(HRESULT) BundleGetBundleInfo(
+    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzAttribute,
+    __out_ecount_opt(*pcchValueBuf) LPWSTR lpValueBuf,
+    __inout_opt LPDWORD pcchValueBuf
+    )
 {
     Assert(wzBundleId && wzAttribute);
 
     HRESULT hr = S_OK;
     LPWSTR sczValue = NULL;
     HKEY hkBundle = NULL;
+    INTERNAL_BUNDLE_STATUS status = INTERNAL_BUNDLE_STATUS_SUCCESS;
     DWORD cchSource = 0;
     DWORD dwType = 0;
     DWORD dwValue = 0;
 
     if ((lpValueBuf && !pcchValueBuf) || !wzBundleId || !wzAttribute)
     {
-        ButilExitOnFailure(hr = E_INVALIDARG, "An invalid parameter was passed to the function.");
+        ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    if (FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_MACHINE, NULL, &hkBundle)) &&
-        FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_USER, NULL, &hkBundle)))
+    hr = LocateAndQueryBundleValue(wzBundleId, NULL, wzAttribute, &hkBundle, &dwType, &status);
+    ButilExitOnFailure(hr, "Failed to locate and query bundle attribute.");
+
+    switch (status)
     {
-        ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) : hr, "Failed to locate bundle uninstall key path.");
+    case INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE:
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT));
+    case INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY:
+        // If the bundle doesn't have the property defined, return ERROR_UNKNOWN_PROPERTY
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY));
     }
-
-    // If the bundle doesn't have the property defined, return ERROR_UNKNOWN_PROPERTY
-    hr = RegGetType(hkBundle, wzAttribute, &dwType);
-    ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) : hr, "Failed to locate bundle property.");
 
     switch (dwType)
     {
@@ -82,12 +106,11 @@ extern "C" HRESULT DAPI BundleGetBundleInfo(
             ButilExitOnFailure(hr, "Failed to format dword property as string.");
             break;
         default:
-            ButilExitOnFailure(hr = E_NOTIMPL, "Reading bundle info of type 0x%x not implemented.", dwType);
-
+            ButilExitWithRootFailure(hr, E_NOTIMPL, "Reading bundle info of type 0x%x not implemented.", dwType);
     }
 
     hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchSource));
-    ButilExitOnFailure(hr, "Failed to calculate length of string");
+    ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
 
     if (lpValueBuf)
     {
@@ -95,11 +118,11 @@ extern "C" HRESULT DAPI BundleGetBundleInfo(
         if (*pcchValueBuf <= cchSource)
         {
             *pcchValueBuf = ++cchSource;
-            ButilExitOnFailure(hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA), "A buffer is too small to hold the requested data.");
+            ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_MORE_DATA));
         }
 
         hr = ::StringCchCatNExW(lpValueBuf, *pcchValueBuf, sczValue, cchSource, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-        ButilExitOnFailure(hr, "Failed to copy the property value to the output buffer.");
+        ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
         
         *pcchValueBuf = cchSource++;        
     }
@@ -111,10 +134,8 @@ LExit:
     return hr;
 }
 
-/********************************************************************
-********************************************************************/
 
-extern "C" HRESULT DAPI BundleEnumRelatedBundle(
+DAPI_(HRESULT) BundleEnumRelatedBundle(
   __in_z LPCWSTR wzUpgradeCode,
   __in BUNDLE_INSTALL_CONTEXT context,
   __inout PDWORD pdwStartIndex,
@@ -170,6 +191,7 @@ extern "C" HRESULT DAPI BundleEnumRelatedBundle(
             case REG_SZ:
                 hr = RegReadString(hkBundle, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &sczValue);
                 ButilExitOnFailure(hr, "Failed to read BundleUpgradeCode string property.");
+
                 if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, sczValue, -1, wzUpgradeCode, -1))
                 {
                     *pdwStartIndex = dwIndex;
@@ -202,8 +224,7 @@ extern "C" HRESULT DAPI BundleEnumRelatedBundle(
                 break;
 
             default:
-                ButilExitOnFailure(hr = E_NOTIMPL, "BundleUpgradeCode of type 0x%x not implemented.", dwType);
-
+                ButilExitWithRootFailure(hr, E_NOTIMPL, "BundleUpgradeCode of type 0x%x not implemented.", dwType);
         }
 
         if (fUpgradeCodeFound)
@@ -211,10 +232,10 @@ extern "C" HRESULT DAPI BundleEnumRelatedBundle(
             if (lpBundleIdBuf)
             {
                 hr = ::StringCchLengthW(sczUninstallSubKey, STRSAFE_MAX_CCH, reinterpret_cast<UINT_PTR*>(&cchUninstallSubKey));
-                ButilExitOnFailure(hr, "Failed to calculate length of string");
+                ButilExitOnRootFailure(hr, "Failed to calculate length of string");
 
                 hr = ::StringCchCopyNExW(lpBundleIdBuf, MAX_GUID_CHARS + 1, sczUninstallSubKey, cchUninstallSubKey, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
-                ButilExitOnFailure(hr, "Failed to copy the property value to the output buffer.");
+                ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
             }
 
             break;
@@ -237,51 +258,36 @@ LExit:
     return hr;
 }
 
-/********************************************************************
-BundleGetBundleVariable - Queries the bundle installation metadata for a given variable,
-the caller is expected to free the memory returned vis psczValue
-RETURNS:
-S_OK
- Success, if the variable had a value, it's returned in psczValue
-E_INVALIDARG
- An invalid parameter was passed to the function.
-HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT)
- The bundle is not installed
-HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY)
- The variable is unrecognized
-E_NOTIMPL:
- Tried to read a bundle variable for a type which has not been implemented
 
-All other returns are unexpected returns from other dutil methods.
-********************************************************************/
-
-extern "C" HRESULT DAPI BundleGetBundleVariable(
+DAPI_(HRESULT) BundleGetBundleVariable(
     __in_z LPCWSTR wzBundleId,
     __in_z LPCWSTR wzVariable,
-    __deref_out_z LPWSTR * psczValue
-)
+    __deref_out_z LPWSTR* psczValue
+    )
 {
     Assert(wzBundleId && wzVariable);
 
     HRESULT hr = S_OK;
-    BUNDLE_INSTALL_CONTEXT context = BUNDLE_INSTALL_CONTEXT_MACHINE;
     HKEY hkBundle = NULL;
+    INTERNAL_BUNDLE_STATUS status = INTERNAL_BUNDLE_STATUS_SUCCESS;
     DWORD dwType = 0;
 
     if (!wzBundleId || !wzVariable || !psczValue)
     {
-        ButilExitOnFailure(hr = E_INVALIDARG, "An invalid parameter was passed to the function.");
+        ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    if (FAILED(hr = OpenBundleKey(wzBundleId, context = BUNDLE_INSTALL_CONTEXT_MACHINE, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, &hkBundle)) &&
-        FAILED(hr = OpenBundleKey(wzBundleId, context = BUNDLE_INSTALL_CONTEXT_USER, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, &hkBundle)))
+    hr = LocateAndQueryBundleValue(wzBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, wzVariable, &hkBundle, &dwType, &status);
+    ButilExitOnFailure(hr, "Failed to locate and query bundle variable.");
+
+    switch (status)
     {
-        ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) : hr, "Failed to locate bundle uninstall key variable path.");
+    case INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE:
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT));
+    case INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY:
+        // If the bundle doesn't have the shared variable defined, return ERROR_UNKNOWN_PROPERTY
+        ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY));
     }
-
-    // If the bundle doesn't have the shared variable defined, return ERROR_UNKNOWN_PROPERTY
-    hr = RegGetType(hkBundle, wzVariable, &dwType);
-    ButilExitOnFailure(E_FILENOTFOUND == hr ? HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) : hr, "Failed to locate bundle variable.");
 
     switch (dwType)
     {
@@ -293,35 +299,74 @@ extern "C" HRESULT DAPI BundleGetBundleVariable(
         hr = S_OK;
         break;
     default:
-        ButilExitOnFailure(hr = E_NOTIMPL, "Reading bundle variable of type 0x%x not implemented.", dwType);
-
+        ButilExitWithRootFailure(hr, E_NOTIMPL, "Reading bundle variable of type 0x%x not implemented.", dwType);
     }
 
 LExit:
     ReleaseRegKey(hkBundle);
 
     return hr;
-
 }
-/********************************************************************
-*
-********************************************************************/
-HRESULT OpenBundleKey(
+
+static HRESULT LocateAndQueryBundleValue(
+    __in_z LPCWSTR wzBundleId,
+    __in_opt LPCWSTR wzSubKey,
+    __in LPCWSTR wzValueName,
+    __inout HKEY* phKey,
+    __inout DWORD* pdwType,
+    __out INTERNAL_BUNDLE_STATUS* pStatus
+    )
+{
+    HRESULT hr = S_OK;
+
+    *pStatus = INTERNAL_BUNDLE_STATUS_SUCCESS;
+
+    if (FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_MACHINE, wzSubKey, phKey)) &&
+        FAILED(hr = OpenBundleKey(wzBundleId, BUNDLE_INSTALL_CONTEXT_USER, wzSubKey, phKey)))
+    {
+        if (E_FILENOTFOUND == hr)
+        {
+            *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_BUNDLE;
+            ExitFunction1(hr = S_OK);
+        }
+
+        ButilExitOnFailure(hr, "Failed to open bundle key.");
+    }
+
+    // If the bundle doesn't have the value defined, return ERROR_UNKNOWN_PROPERTY
+    hr = RegGetType(*phKey, wzValueName, pdwType);
+    if (FAILED(hr))
+    {
+        if (E_FILENOTFOUND == hr)
+        {
+            *pStatus = INTERNAL_BUNDLE_STATUS_UNKNOWN_PROPERTY;
+            ExitFunction1(hr = S_OK);
+        }
+
+        ButilExitOnFailure(hr, "Failed to read bundle value.");
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT OpenBundleKey(
     __in_z LPCWSTR wzBundleId,
     __in BUNDLE_INSTALL_CONTEXT context,
-    __in_opt LPCWSTR szSubKey,
-    __inout HKEY* key)
+    __in_opt LPCWSTR wzSubKey,
+    __inout HKEY* phKey
+    )
 {
-    Assert(key && wzBundleId);
-    AssertSz(NULL == *key, "*key should be null");
+    Assert(phKey && wzBundleId);
+    AssertSz(NULL == *phKey, "*key should be null");
 
     HRESULT hr = S_OK;
     HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == context ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
     LPWSTR sczKeypath = NULL;
 
-    if (szSubKey)
+    if (wzSubKey)
     {
-        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleId, szSubKey);
+        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleId, wzSubKey);
     }
     else
     {
@@ -329,7 +374,7 @@ HRESULT OpenBundleKey(
     }
     ButilExitOnFailure(hr, "Failed to allocate bundle uninstall key path.");
 
-    hr = RegOpen(hkRoot, sczKeypath, KEY_READ, key);
+    hr = RegOpen(hkRoot, sczKeypath, KEY_READ, phKey);
     ButilExitOnFailure(hr, "Failed to open bundle uninstall key path.");
 
 LExit:
@@ -337,4 +382,3 @@ LExit:
 
     return hr;
 }
-

@@ -37,14 +37,9 @@ static HRESULT WriteStringToRegistry(
     __in_z_opt LPCWSTR wzName,
     __in_z_opt LPCWSTR wzValue,
     __in DWORD dwType
-);
+    );
 
-/********************************************************************
- RegInitialize - initializes regutil
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegInitialize(
-    )
+DAPI_(HRESULT) RegInitialize()
 {
     HRESULT hr = S_OK;
 
@@ -66,12 +61,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegUninitialize - uninitializes regutil
-
-*********************************************************************/
-extern "C" void DAPI RegUninitialize(
-    )
+DAPI_(void) RegUninitialize()
 {
     if (vhAdvApi32Dll)
     {
@@ -85,12 +75,7 @@ extern "C" void DAPI RegUninitialize(
 }
 
 
-/********************************************************************
- RegFunctionOverride - overrides the registry functions. Typically used
-                       for unit testing.
-
-*********************************************************************/
-extern "C" void DAPI RegFunctionOverride(
+DAPI_(void) RegFunctionOverride(
     __in_opt PFN_REGCREATEKEYEXW pfnRegCreateKeyExW,
     __in_opt PFN_REGOPENKEYEXW pfnRegOpenKeyExW,
     __in_opt PFN_REGDELETEKEYEXW pfnRegDeleteKeyExW,
@@ -114,11 +99,7 @@ extern "C" void DAPI RegFunctionOverride(
 }
 
 
-/********************************************************************
- RegCreate - creates a registry key.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegCreate(
+DAPI_(HRESULT) RegCreate(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
@@ -136,11 +117,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegCreate - creates a registry key with extra options.
-
-*********************************************************************/
-HRESULT DAPI RegCreateEx(
+DAPI_(HRESULT) RegCreateEx(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
@@ -167,11 +144,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegOpen - opens a registry key.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegOpen(
+DAPI_(HRESULT) RegOpen(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in DWORD dwAccess,
@@ -193,11 +166,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegDelete - deletes a registry key (and optionally it's whole tree).
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegDelete(
+DAPI_(HRESULT) RegDelete(
     __in HKEY hkRoot,
     __in_z LPCWSTR wzSubKey,
     __in REG_KEY_BITNESS kbKeyBitness,
@@ -282,11 +251,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegKeyEnum - enumerates child registry keys.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegKeyEnum(
+DAPI_(HRESULT) RegKeyEnum(
     __in HKEY hk,
     __in DWORD dwIndex,
     __deref_out_z LPWSTR* psczKey
@@ -342,11 +307,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegValueEnum - enumerates registry values.
-
-*********************************************************************/
-HRESULT DAPI RegValueEnum(
+DAPI_(HRESULT) RegValueEnum(
     __in HKEY hk,
     __in DWORD dwIndex,
     __deref_out_z LPWSTR* psczName,
@@ -377,10 +338,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegGetType - reads a registry key value type.
- *********************************************************************/
-HRESULT DAPI RegGetType(
+DAPI_(HRESULT) RegGetType(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __out DWORD *pdwType
@@ -400,11 +358,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegReadBinary - reads a registry key binary value.
- NOTE: caller is responsible for freeing *ppbBuffer
-*********************************************************************/
-HRESULT DAPI RegReadBinary(
+DAPI_(HRESULT) RegReadBinary(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __deref_out_bcount_opt(*pcbBuffer) BYTE** ppbBuffer,
@@ -453,11 +407,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegReadString - reads a registry key value as a string.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegReadString(
+DAPI_(HRESULT) RegReadString(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __deref_out_z LPWSTR* psczValue
@@ -530,11 +480,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegReadStringArray - reads a registry key value REG_MULTI_SZ value as a string array.
-
-*********************************************************************/
-HRESULT DAPI RegReadStringArray(
+DAPI_(HRESULT) RegReadStringArray(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __deref_out_ecount_opt(*pcStrings) LPWSTR** prgsczStrings,
@@ -626,11 +572,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegReadVersion - reads a registry key value as a version.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegReadVersion(
+DAPI_(HRESULT) RegReadVersion(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __out DWORD64* pdw64Version
@@ -672,13 +614,10 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegReadNone - reads a NONE registry key value.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegReadNone(
+DAPI_(HRESULT) RegReadNone(
     __in HKEY hk,
-    __in_z_opt LPCWSTR wzName)
+    __in_z_opt LPCWSTR wzName
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
@@ -694,18 +633,14 @@ extern "C" HRESULT DAPI RegReadNone(
     if (REG_NONE != dwType)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE);
-        RegExitOnRootFailure(hr, "Error reading version registry value due to unexpected data type: %u", dwType);
+        RegExitOnRootFailure(hr, "Error reading none registry value due to unexpected data type: %u", dwType);
     }
 
 LExit:
     return hr;
 }
 
-/********************************************************************
- RegReadNumber - reads a DWORD registry key value as a number.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegReadNumber(
+DAPI_(HRESULT) RegReadNumber(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __out DWORD* pdwValue
@@ -734,11 +669,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegReadQword - reads a QWORD registry key value as a number.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegReadQword(
+DAPI_(HRESULT) RegReadQword(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __out DWORD64* pqwValue
@@ -767,11 +698,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegWriteBinary - writes a registry key value as a binary.
-
-*********************************************************************/
-HRESULT DAPI RegWriteBinary(
+DAPI_(HRESULT) RegWriteBinary(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in_bcount(cbBuffer) const BYTE *pbBuffer,
@@ -789,27 +716,17 @@ LExit:
 }
 
 
-/********************************************************************
-RegWriteExpandString - writes a registry key value as an expand string.
-
-Note: if wzValue is NULL the value will be removed.
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteExpandString(
+DAPI_(HRESULT) RegWriteExpandString(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in_z_opt LPCWSTR wzValue
-)
+    )
 {
     return WriteStringToRegistry(hk, wzName, wzValue, REG_EXPAND_SZ);
 }
 
 
-/********************************************************************
- RegWriteString - writes a registry key value as a string.
-
- Note: if wzValue is NULL the value will be removed.
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteString(
+DAPI_(HRESULT) RegWriteString(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in_z_opt LPCWSTR wzValue
@@ -819,11 +736,7 @@ extern "C" HRESULT DAPI RegWriteString(
 }
 
 
-/********************************************************************
- RegWriteStringFormatted - writes a registry key value as a formatted string.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteStringFormatted(
+DAPIV_(HRESULT) RegWriteStringFormatted(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in __format_string LPCWSTR szFormat,
@@ -848,11 +761,7 @@ LExit:
 }
 
 
-/********************************************************************
- RegWriteStringArray - writes an array of strings as a REG_MULTI_SZ value
-
-*********************************************************************/
-HRESULT DAPI RegWriteStringArray(
+DAPI_(HRESULT) RegWriteStringArray(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in_ecount(cValues) LPWSTR *rgwzValues,
@@ -913,14 +822,10 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegWriteNone - writes a registry key value as none.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteNone(
+DAPI_(HRESULT) RegWriteNone(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
@@ -932,11 +837,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegWriteNumber - writes a registry key value as a number.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteNumber(
+DAPI_(HRESULT) RegWriteNumber(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in DWORD dwValue
@@ -952,11 +853,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegWriteQword - writes a registry key value as a Qword.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegWriteQword(
+DAPI_(HRESULT) RegWriteQword(
     __in HKEY hk,
     __in_z_opt LPCWSTR wzName,
     __in DWORD64 qwValue
@@ -972,11 +869,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
- RegQueryKey - queries the key for the number of subkeys and values.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegQueryKey(
+DAPI_(HRESULT) RegQueryKey(
     __in HKEY hk,
     __out_opt DWORD* pcSubKeys,
     __out_opt DWORD* pcValues
@@ -992,12 +885,7 @@ LExit:
     return hr;
 }
 
-/********************************************************************
-RegKeyReadNumber - reads a DWORD registry key value as a number from
-a specified subkey.
-
-*********************************************************************/
-extern "C" HRESULT DAPI RegKeyReadNumber(
+DAPI_(HRESULT) RegKeyReadNumber(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
@@ -1025,7 +913,7 @@ RegValueExists - determines whether a named value exists in a
 specified subkey.
 
 *********************************************************************/
-extern "C" BOOL DAPI RegValueExists(
+DAPI_(BOOL) RegValueExists(
     __in HKEY hk,
     __in_z LPCWSTR wzSubKey,
     __in_z_opt LPCWSTR wzName,
