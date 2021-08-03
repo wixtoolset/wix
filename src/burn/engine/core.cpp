@@ -1521,7 +1521,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the elevated name, token and parent process id.");
                 }
 
-                if (BURN_MODE_UNTRUSTED != pInternalCommand->mode)
+                if (BURN_MODE_UNKNOWN != pInternalCommand->mode)
                 {
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
@@ -1543,7 +1543,13 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM), BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)))
             {
-                if (BURN_MODE_UNTRUSTED == pInternalCommand->mode)
+                if (0 != i)
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Clean room command-line switch must be first argument on command-line.");
+                }
+
+                if (BURN_MODE_UNKNOWN == pInternalCommand->mode)
                 {
                     pInternalCommand->mode = BURN_MODE_NORMAL;
                 }
@@ -1579,8 +1585,9 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 switch (pInternalCommand->mode)
                 {
-                case BURN_MODE_UNTRUSTED:
-                    // Leave mode as UNTRUSTED to launch the clean room process.
+                case BURN_MODE_UNKNOWN:
+                    // Set mode to UNTRUSTED to ensure multiple modes weren't specified.
+                    pInternalCommand->mode = BURN_MODE_UNTRUSTED;
                     break;
                 case BURN_MODE_NORMAL:
                     // The initialization code already assumes that the
@@ -1647,7 +1654,7 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
             {
-                if (BURN_MODE_UNTRUSTED != pInternalCommand->mode)
+                if (BURN_MODE_UNKNOWN != pInternalCommand->mode)
                 {
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
@@ -1795,6 +1802,11 @@ extern "C" HRESULT CoreParseCommandLine(
     if (BOOTSTRAPPER_DISPLAY_UNKNOWN == pCommand->display)
     {
         pCommand->display = BOOTSTRAPPER_DISPLAY_FULL;
+    }
+
+    if (BURN_MODE_UNKNOWN == pInternalCommand->mode)
+    {
+        pInternalCommand->mode = BURN_MODE_UNTRUSTED;
     }
 
 LExit:
