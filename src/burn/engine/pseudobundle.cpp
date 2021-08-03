@@ -165,7 +165,6 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     __in BURN_PACKAGE* pPassthroughPackage,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
-    __in_z_opt LPCWSTR wzAppendLogPath,
     __in BURN_PACKAGE* pPackage
     )
 {
@@ -202,10 +201,8 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
 
     pPassthroughPackage->Exe.protocol = pPackage->Exe.protocol;
 
-    // No matter the operation, we're passing the same command-line. That's what makes
-    // this a passthrough bundle.
-    hr = CoreRecreateCommandLine(&sczArguments, pCommand->action, pInternalCommand, pCommand, pCommand->relationType, TRUE, wzAppendLogPath);
-    ExitOnFailure(hr, "Failed to recreate command-line arguments.");
+    hr = CoreCreatePassthroughBundleCommandLine(&sczArguments, pInternalCommand, pCommand);
+    ExitOnFailure(hr, "Failed to create command-line arguments.");
 
     hr = StrAllocString(&pPassthroughPackage->Exe.sczInstallArguments, sczArguments, 0);
     ExitOnFailure(hr, "Failed to copy install arguments for passthrough bundle package");

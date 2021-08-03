@@ -14,6 +14,19 @@ struct BURN_CACHE_THREAD_CONTEXT
 
 // internal function declarations
 
+static HRESULT CoreRecreateCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BOOTSTRAPPER_ACTION action,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
+    __in BOOTSTRAPPER_RELATION_TYPE relationType,
+    __in BOOL fPassthrough
+    );
+static HRESULT AppendLayoutToCommandLine(
+    __in BOOTSTRAPPER_ACTION action,
+    __in_z LPCWSTR wzLayoutDirectory,
+    __deref_inout_z LPWSTR* psczCommandLine
+    );
 static HRESULT GetSanitizedCommandLine(
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
@@ -924,22 +937,18 @@ extern "C" LPCWSTR CoreRelationTypeToCommandLineString(
     return wzRelationTypeCommandLine;
 }
 
-extern "C" HRESULT CoreRecreateCommandLine(
+static HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzAppendLogPath
+    __in BOOL fPassthrough
     )
 {
     HRESULT hr = S_OK;
     LPWSTR scz = NULL;
     LPCWSTR wzRelationTypeCommandLine = CoreRelationTypeToCommandLineString(relationType);
-
-    hr = StrAllocString(psczCommandLine, L"", 0);
-    ExitOnFailure(hr, "Failed to empty command line.");
 
     switch (pCommand->display)
     {
@@ -954,6 +963,9 @@ extern "C" HRESULT CoreRecreateCommandLine(
 
     switch (action)
     {
+    case BOOTSTRAPPER_ACTION_HELP:
+        hr = StrAllocConcat(psczCommandLine, L" /help", 0);
+        break;
     case BOOTSTRAPPER_ACTION_MODIFY:
         hr = StrAllocConcat(psczCommandLine, L" /modify", 0);
         break;
@@ -985,52 +997,190 @@ extern "C" HRESULT CoreRecreateCommandLine(
 
     if (pInternalCommand->sczAncestors)
     {
-        hr = StrAllocFormatted(&scz, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pInternalCommand->sczAncestors);
-        ExitOnFailure(hr, "Failed to format ancestors for command-line.");
-
-        hr = StrAllocConcat(psczCommandLine, scz, 0);
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pInternalCommand->sczAncestors);
         ExitOnFailure(hr, "Failed to append ancestors to command-line.");
     }
 
     if (wzRelationTypeCommandLine)
     {
-        hr = StrAllocFormatted(&scz, L" /%ls", wzRelationTypeCommandLine);
-        ExitOnFailure(hr, "Failed to format relation type for command-line.");
-
-        hr = StrAllocConcat(psczCommandLine, scz, 0);
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", wzRelationTypeCommandLine);
         ExitOnFailure(hr, "Failed to append relation type to command-line.");
     }
 
     if (fPassthrough)
     {
-        hr = StrAllocFormatted(&scz, L" /%ls", BURN_COMMANDLINE_SWITCH_PASSTHROUGH);
-        ExitOnFailure(hr, "Failed to format passthrough for command-line.");
-
-        hr = StrAllocConcat(psczCommandLine, scz, 0);
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_PASSTHROUGH);
         ExitOnFailure(hr, "Failed to append passthrough to command-line.");
-    }
-
-    if (wzAppendLogPath && *wzAppendLogPath)
-    {
-        hr = StrAllocFormatted(&scz, L" /%ls \"%ls\"", BURN_COMMANDLINE_SWITCH_LOG_APPEND, wzAppendLogPath);
-        ExitOnFailure(hr, "Failed to format append log command-line for command-line.");
-
-        hr = StrAllocConcat(psczCommandLine, scz, 0);
-        ExitOnFailure(hr, "Failed to append log command-line to command-line");
     }
 
     if (pCommand->wzCommandLine && *pCommand->wzCommandLine)
     {
-        hr = StrAllocConcat(psczCommandLine, L" ", 0);
-        ExitOnFailure(hr, "Failed to append space to command-line.");
-
-        hr = StrAllocConcat(psczCommandLine, pCommand->wzCommandLine, 0);
+        hr = StrAllocConcatFormattedSecure(psczCommandLine, L" %ls", pCommand->wzCommandLine);
         ExitOnFailure(hr, "Failed to append command-line to command-line.");
     }
 
 LExit:
     ReleaseStr(scz);
 
+    return hr;
+}
+
+extern "C" HRESULT CoreCreateCleanRoomCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_z LPCWSTR wzCleanRoomBundlePath,
+    __in_z LPCWSTR wzCurrentProcessPath,
+    __inout HANDLE* phFileAttached,
+    __inout HANDLE* phFileSelf
+    )
+{
+    HRESULT hr = S_OK;
+    BOOTSTRAPPER_COMMAND* pCommand = &pEngineState->command;
+    BURN_ENGINE_COMMAND* pInternalCommand = &pEngineState->internalCommand;
+
+    // The clean room switch must always be at the front of the command line so
+    // the EngineInCleanRoom function will operate correctly.
+    hr = StrAllocFormatted(psczCommandLine, L"-%ls=\"%ls\"", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, wzCurrentProcessPath);
+    ExitOnFailure(hr, "Failed to allocate parameters for unelevated process.");
+
+    // Send a file handle for the child Burn process to access the attached container.
+    hr = CoreAppendFileHandleAttachedToCommandLine(pEngineState->section.hEngineFile, phFileAttached, psczCommandLine);
+    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
+
+    // Grab a file handle for the child Burn process.
+    hr = CoreAppendFileHandleSelfToCommandLine(wzCleanRoomBundlePath, phFileSelf, psczCommandLine, NULL);
+    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
+
+    hr = CoreAppendSplashScreenWindowToCommandLine(pCommand->hwndSplashScreen, psczCommandLine);
+    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
+
+    if (pInternalCommand->sczLogFile)
+    {
+        LPCWSTR wzLogParameter = (BURN_LOGGING_ATTRIBUTE_EXTRADEBUG & pInternalCommand->dwLoggingAttributes) ? L"xlog" : L"log";
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", wzLogParameter);
+        ExitOnFailure(hr, "Failed to append logging switch.");
+
+        hr = PathCommandLineAppend(psczCommandLine, pInternalCommand->sczLogFile);
+        ExitOnFailure(hr, "Failed to append custom log path.");
+    }
+
+    hr = AppendLayoutToCommandLine(pCommand->action, pCommand->wzLayoutDirectory, psczCommandLine);
+    ExitOnFailure(hr, "Failed to append layout.");
+
+    switch (pInternalCommand->automaticUpdates)
+    {
+    case BURN_AU_PAUSE_ACTION_NONE:
+        hr = StrAllocConcat(psczCommandLine, L" /noaupause", 0);
+        ExitOnFailure(hr, "Failed to append /noaupause.");
+        break;
+    case BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME:
+        hr = StrAllocConcat(psczCommandLine, L" /keepaupaused", 0);
+        ExitOnFailure(hr, "Failed to append /keepaupaused.");
+        break;
+    }
+
+    // TODO: This should only be added if it was enabled from the command line.
+    if (pInternalCommand->fDisableSystemRestore)
+    {
+        hr = StrAllocConcat(psczCommandLine, L" /disablesystemrestore", 0);
+        ExitOnFailure(hr, "Failed to append /disablesystemrestore.");
+    }
+
+#ifdef ENABLE_UNELEVATE
+    if (pInternalCommand->fDisableUnelevate)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE);
+        ExitOnFailure(hr, "Failed to append switch: %ls.", BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE);
+    }
+#endif
+
+    if (pInternalCommand->sczOriginalSource)
+    {
+        hr = StrAllocConcat(psczCommandLine, L" /originalsource", 0);
+        ExitOnFailure(hr, "Failed to append /originalsource.");
+
+        hr = PathCommandLineAppend(psczCommandLine, pInternalCommand->sczOriginalSource);
+        ExitOnFailure(hr, "Failed to append original source.");
+    }
+
+    if (pEngineState->embeddedConnection.sczName)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" -%ls %ls %ls %u", BURN_COMMANDLINE_SWITCH_EMBEDDED, pEngineState->embeddedConnection.sczName, pEngineState->embeddedConnection.sczSecret, pEngineState->embeddedConnection.dwProcessId);
+        ExitOnFailure(hr, "Failed to allocate embedded command.");
+    }
+
+    if (pInternalCommand->sczIgnoreDependencies)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pInternalCommand->sczIgnoreDependencies);
+        ExitOnFailure(hr, "Failed to append ignored dependencies to command-line.");
+    }
+
+    hr = CoreRecreateCommandLine(psczCommandLine, pCommand->action, pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough);
+    ExitOnFailure(hr, "Failed to recreate clean room command-line.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT CoreCreatePassthroughBundleCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand
+    )
+{
+    HRESULT hr = S_OK;
+
+    // No matter the operation, we're passing the same command-line.
+    // That's what makes this a passthrough bundle.
+    hr = CoreRecreateCommandLine(psczCommandLine, pCommand->action, pInternalCommand, pCommand, pCommand->relationType, TRUE);
+    ExitOnFailure(hr, "Failed to recreate passthrough bundle command-line.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT CoreCreateResumeCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = StrAllocFormatted(psczCommandLine, L"/%ls", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
+    ExitOnFailure(hr, "Failed to alloc resume command-line.");
+
+    if (BURN_LOGGING_ATTRIBUTE_EXTRADEBUG & pPlan->pInternalCommand->dwLoggingAttributes)
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_LOG_MODE, L"x");
+        ExitOnFailure(hr, "Failed to set log mode in resume command-line.");
+    }
+
+    if (pLog->sczPath && *(pLog->sczPath))
+    {
+        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls \"%ls\"", BURN_COMMANDLINE_SWITCH_LOG_APPEND, pLog->sczPath);
+        ExitOnFailure(hr, "Failed to set log path in resume command-line.");
+    }
+
+    hr = CoreRecreateCommandLine(psczCommandLine, pPlan->action, pPlan->pInternalCommand, pPlan->pCommand, pPlan->pCommand->relationType, pPlan->pCommand->fPassthrough);
+    ExitOnFailure(hr, "Failed to recreate resume command-line.");
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT CoreCreateUpdateBundleCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = CoreRecreateCommandLine(psczCommandLine, BOOTSTRAPPER_ACTION_INSTALL, pInternalCommand, pCommand, BOOTSTRAPPER_RELATION_NONE, FALSE);
+    ExitOnFailure(hr, "Failed to recreate update bundle command-line.");
+
+LExit:
     return hr;
 }
 
@@ -1334,6 +1484,35 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE), BURN_COMMANDLINE_SWITCH_LOG_MODE, -1))
+            {
+                // Get a pointer to the next character after the switch.
+                LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE)];
+                if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_LOG_MODE);
+                }
+                else
+                {
+                    while (L'\0' != wzParam[0])
+                    {
+                        switch (wzParam[0])
+                        {
+                        case L'x':
+                            pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_EXTRADEBUG | BURN_LOGGING_ATTRIBUTE_VERBOSE;
+                            break;
+                        default:
+                            // Skip (but log) any other modifiers we don't recognize,
+                            // so that adding future modifiers doesn't break old bundles.
+                            LogId(REPORT_STANDARD, MSG_BURN_UNKNOWN_PRIVATE_SWITCH_MODIFIER, BURN_COMMANDLINE_SWITCH_LOG_MODE, wzParam[0]);
+                            break;
+                        }
+
+                        ++wzParam;
+                    }
+                }
+            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_ELEVATED, -1))
             {
                 if (i + 3 >= argc)
@@ -1462,7 +1641,9 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE, -1))
             {
+#ifdef ENABLE_UNELEVATE
                 pInternalCommand->fDisableUnelevate = TRUE;
+#endif
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
             {
@@ -1627,6 +1808,30 @@ LExit:
 }
 
 // internal helper functions
+
+static HRESULT AppendLayoutToCommandLine(
+    __in BOOTSTRAPPER_ACTION action,
+    __in_z LPCWSTR wzLayoutDirectory,
+    __deref_inout_z LPWSTR* psczCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (BOOTSTRAPPER_ACTION_LAYOUT == action || wzLayoutDirectory)
+    {
+        hr = StrAllocConcat(psczCommandLine, L" /layout", 0);
+        ExitOnFailure(hr, "Failed to append layout switch.");
+
+        if (wzLayoutDirectory)
+        {
+            hr = PathCommandLineAppend(psczCommandLine, wzLayoutDirectory);
+            ExitOnFailure(hr, "Failed to append layout directory.");
+        }
+    }
+
+LExit:
+    return hr;
+}
 
 static HRESULT GetSanitizedCommandLine(
     __in BURN_ENGINE_COMMAND* pInternalCommand,

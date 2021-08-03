@@ -1322,7 +1322,7 @@ static HRESULT UpdateResumeMode(
     DWORD er = ERROR_SUCCESS;
     HKEY hkRebootRequired = NULL;
     HKEY hkRun = NULL;
-    LPWSTR sczResumeCommandLine = NULL;
+    LPWSTR sczRunOnceCommandLine = NULL;
     LPCWSTR sczResumeKey = REGISTRY_RUN_ONCE_KEY;
 
     LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume));
@@ -1354,14 +1354,14 @@ static HRESULT UpdateResumeMode(
     if ((BURN_RESUME_MODE_ACTIVE == resumeMode || fRestartInitiated) && !pRegistration->fDisableResume)
     {
         // append RunOnce switch
-        hr = StrAllocFormatted(&sczResumeCommandLine, L"\"%ls\" /%ls", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_RUNONCE);
+        hr = StrAllocFormatted(&sczRunOnceCommandLine, L"\"%ls\" /%ls /%ls", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, BURN_COMMANDLINE_SWITCH_RUNONCE);
         ExitOnFailure(hr, "Failed to format resume command line for RunOnce.");
 
         // write run key
         hr = RegCreate(pRegistration->hkRoot, sczResumeKey, KEY_WRITE, &hkRun);
         ExitOnFailure(hr, "Failed to create run key.");
 
-        hr = RegWriteString(hkRun, pRegistration->sczId, sczResumeCommandLine);
+        hr = RegWriteString(hkRun, pRegistration->sczId, sczRunOnceCommandLine);
         ExitOnFailure(hr, "Failed to write run key value.");
 
         hr = RegWriteString(hkRegistration, REGISTRY_BUNDLE_RESUME_COMMAND_LINE, pRegistration->sczResumeCommandLine);
@@ -1398,7 +1398,7 @@ static HRESULT UpdateResumeMode(
     }
 
 LExit:
-    ReleaseStr(sczResumeCommandLine);
+    ReleaseStr(sczRunOnceCommandLine);
     ReleaseRegKey(hkRebootRequired);
     ReleaseRegKey(hkRun);
 

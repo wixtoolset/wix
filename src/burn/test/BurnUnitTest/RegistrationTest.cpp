@@ -133,7 +133,7 @@ namespace Bootstrapper
                 Assert::True(File::Exists(Path::Combine(cacheDirectory, gcnew String(L"setup.exe"))));
 
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)(Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr)));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)(Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr)));
 
                 // end session
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -234,7 +234,7 @@ namespace Bootstrapper
                 // verify that registration was created
                 Assert::Equal<String^>(gcnew String(L"Product1 Installation"), (String^)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"DisplayName"), nullptr));
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS);
@@ -256,7 +256,7 @@ namespace Bootstrapper
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
                 Assert::Equal(1, (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Installed"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);
@@ -355,7 +355,7 @@ namespace Bootstrapper
 
                 // verify that registration was created
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // complete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_REQUIRED, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
@@ -477,7 +477,7 @@ namespace Bootstrapper
 
                 // verify that registration was created
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // finish registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_ARP, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_REGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_FULL);
@@ -510,7 +510,7 @@ namespace Bootstrapper
 
                 // verify that registration was updated
                 Assert::Equal(Int32(BURN_RESUME_MODE_ACTIVE), (Int32)Registry::GetValue(gcnew String(TEST_UNINSTALL_KEY), gcnew String(L"Resume"), nullptr));
-                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
+                Assert::Equal<String^>(String::Concat(L"\"", Path::Combine(cacheDirectory, gcnew String(L"setup.exe")), L"\" /burn.clean.room /burn.runonce"), (String^)Registry::GetValue(gcnew String(TEST_RUN_KEY), gcnew String(TEST_BUNDLE_ID), nullptr));
 
                 // delete registration
                 hr = RegistrationSessionEnd(&registration, &cache, &variables, &packages, BURN_RESUME_MODE_NONE, BOOTSTRAPPER_APPLY_RESTART_NONE, BURN_DEPENDENCY_REGISTRATION_ACTION_UNREGISTER, BOOTSTRAPPER_REGISTRATION_TYPE_NONE);

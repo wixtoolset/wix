@@ -135,6 +135,13 @@ Language=English
 Failed to parse command line.
 .
 
+MessageId=16
+Severity=Warning
+SymbolicName=MSG_BURN_UNKNOWN_PRIVATE_SWITCH_MODIFIER
+Language=English
+Unknown burn internal command-line switch modifier encountered, switch: '%1!ls!', modifier: '%2!c!'.
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION

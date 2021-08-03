@@ -18,6 +18,7 @@ const LPCWSTR BURN_COMMANDLINE_SWITCH_ELEVATED = L"burn.elevated";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_EMBEDDED = L"burn.embedded";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_RUNONCE = L"burn.runonce";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_LOG_APPEND = L"burn.log.append";
+const LPCWSTR BURN_COMMANDLINE_SWITCH_LOG_MODE = L"burn.log.mode";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_RELATED_DETECT = L"burn.related.detect";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_RELATED_UPGRADE = L"burn.related.upgrade";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_RELATED_ADDON = L"burn.related.addon";
@@ -89,7 +90,9 @@ typedef struct _BURN_ENGINE_COMMAND
     BURN_MODE mode;
     BURN_AU_PAUSE_ACTION automaticUpdates;
     BOOL fDisableSystemRestore;
+#ifdef ENABLE_UNELEVATE
     BOOL fDisableUnelevate;
+#endif
     BOOL fInitiallyElevated;
 
     LPWSTR sczActiveParent;
@@ -215,14 +218,28 @@ HRESULT CoreSaveEngineState(
 LPCWSTR CoreRelationTypeToCommandLineString(
     __in BOOTSTRAPPER_RELATION_TYPE relationType
     );
-HRESULT CoreRecreateCommandLine(
+HRESULT CoreCreateCleanRoomCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
-    __in BOOTSTRAPPER_ACTION action,
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_z LPCWSTR wzCleanRoomBundlePath,
+    __in_z LPCWSTR wzCurrentProcessPath,
+    __inout HANDLE* phFileAttached,
+    __inout HANDLE* phFileSelf
+    );
+HRESULT CoreCreatePassthroughBundleCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
-    __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzAppendLogPath
+    __in BOOTSTRAPPER_COMMAND* pCommand
+    );
+HRESULT CoreCreateResumeCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_PLAN* pPlan,
+    __in BURN_LOGGING* pLog
+    );
+HRESULT CoreCreateUpdateBundleCommandLine(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand
     );
 HRESULT CoreAppendFileHandleAttachedToCommandLine(
     __in HANDLE hFileWithAttachedContainer,
