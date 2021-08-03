@@ -40,6 +40,9 @@ namespace Bootstrapper
                     "    <CommandLine Variables='upperCase' />"
                     "</Bundle>";
 
+                hr = CacheInitialize(&engineState.cache, &engineState.internalCommand);
+                TestThrowOnFailure(hr, L"Failed initialize cache.");
+
                 hr = VariableInitialize(&engineState.variables);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 

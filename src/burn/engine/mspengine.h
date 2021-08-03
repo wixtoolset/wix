@@ -62,6 +62,7 @@ HRESULT MspEnginePlanAddPackage(
 HRESULT MspEngineExecutePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,

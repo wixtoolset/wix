@@ -133,7 +133,7 @@ static HRESULT ParseFromXml(
     ExitOnFailure(hr, "Failed to parse searches.");
 
     // parse registration
-    hr = RegistrationParseFromXml(&pEngineState->registration, pixeBundle);
+    hr = RegistrationParseFromXml(&pEngineState->registration, &pEngineState->cache, pixeBundle);
     ExitOnFailure(hr, "Failed to parse registration.");
 
     // parse update

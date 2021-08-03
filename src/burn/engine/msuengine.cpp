@@ -233,6 +233,7 @@ LExit:
 
 extern "C" HRESULT MsuEngineExecutePackage(
     __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in BOOL fStopWusaService,
@@ -289,7 +290,7 @@ extern "C" HRESULT MsuEngineExecutePackage(
     {
     case BOOTSTRAPPER_ACTION_STATE_INSTALL:
         // get cached MSU path
-        hr = CacheGetCompletedPath(TRUE, pPackage->sczCacheId, &sczCachedDirectory);
+        hr = CacheGetCompletedPath(pCache, TRUE, pPackage->sczCacheId, &sczCachedDirectory);
         ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
         // Best effort to set the execute package cache folder variable.

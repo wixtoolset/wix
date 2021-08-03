@@ -151,6 +151,7 @@ HRESULT ElevationChildPumpMessages(
     __in HANDLE hPipe,
     __in HANDLE hCachePipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
+    __in BURN_CACHE* pCache,
     __in BURN_CONTAINERS* pContainers,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,

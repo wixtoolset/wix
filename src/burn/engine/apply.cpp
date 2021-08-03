@@ -26,6 +26,7 @@ enum BURN_CACHE_PROGRESS_TYPE
 
 typedef struct _BURN_CACHE_CONTEXT
 {
+    BURN_CACHE* pCache;
     BURN_USER_EXPERIENCE* pUX;
     BURN_VARIABLES* pVariables;
     BURN_PAYLOADS* pPayloads;
@@ -55,6 +56,7 @@ typedef struct _BURN_CACHE_PROGRESS_CONTEXT
 
 typedef struct _BURN_EXECUTE_CONTEXT
 {
+    BURN_CACHE* pCache;
     BURN_USER_EXPERIENCE* pUX;
     BURN_APPLY_CONTEXT* pApplyContext;
     BOOL fRollback;
@@ -269,6 +271,7 @@ static void ResetTransactionRegistrationState(
     __in BOOL fCommit
     );
 static HRESULT CleanPackage(
+    __in BURN_CACHE* pCache,
     __in HANDLE hElevatedPipe,
     __in BURN_PACKAGE* pPackage
     );
@@ -401,7 +404,7 @@ extern "C" HRESULT ApplyRegister(
     }
     else // need to complete registration on the machine.
     {
-        hr = CacheCalculateBundleWorkingPath(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &sczEngineWorkingPath);
+        hr = CacheCalculateBundleWorkingPath(pEngineState->plan.pCache, pEngineState->registration.sczExecutableName, &sczEngineWorkingPath);
         ExitOnFailure(hr, "Failed to calculate working path for engine.");
 
         // begin new session
@@ -412,7 +415,7 @@ extern "C" HRESULT ApplyRegister(
         }
         else
         {
-            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
+            hr = RegistrationSessionBegin(sczEngineWorkingPath, &pEngineState->registration, &pEngineState->cache, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->plan.dependencyRegistrationAction, pEngineState->plan.qwEstimatedSize, registrationType);
             ExitOnFailure(hr, "Failed to begin registration session.");
         }
     }
@@ -501,7 +504,7 @@ extern "C" HRESULT ApplyUnregister(
     }
     else
     {
-        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
+        hr = RegistrationSessionEnd(&pEngineState->registration, &pEngineState->cache, &pEngineState->variables, &pEngineState->packages, resumeMode, restart, pEngineState->plan.dependencyRegistrationAction, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-user process.");
     }
 
@@ -531,6 +534,7 @@ extern "C" HRESULT ApplyCache(
     ExitOnRootFailure(hr, "BA aborted cache.");
 
     cacheContext.hSourceEngineFile = hSourceEngineFile;
+    cacheContext.pCache = pPlan->pCache;
     cacheContext.pPayloads = pPlan->pPayloads;
     cacheContext.pUX = pUX;
     cacheContext.pVariables = pVariables;
@@ -568,7 +572,7 @@ extern "C" HRESULT ApplyCache(
             {
                 if (!pPackage->fPerMachine || INVALID_HANDLE_VALUE == cacheContext.hPipe)
                 {
-                    hr = CachePreparePackage(pPackage);
+                    hr = CachePreparePackage(pPlan->pCache, pPackage);
 
                     cacheContext.hPipe = INVALID_HANDLE_VALUE;
                 }
@@ -616,7 +620,7 @@ LExit:
         ElevationCacheCleanup(hPipe);
     }
 
-    CacheCleanup(FALSE, pPlan->wzBundleId);
+    CacheCleanup(FALSE, pPlan->pCache);
 
     for (DWORD i = 0; i < cacheContext.cSearchPathsMax; ++i)
     {
@@ -653,6 +657,7 @@ extern "C" HRESULT ApplyExecute(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
     BOOL fSeekNextRollbackBoundary = FALSE;
 
+    context.pCache = pEngineState->plan.pCache;
     context.pUX = &pEngineState->userExperience;
     context.pApplyContext = pApplyContext;
     context.cExecutePackagesTotal = pEngineState->plan.cExecutePackagesTotal;
@@ -762,7 +767,7 @@ extern "C" void ApplyClean(
         BURN_CLEAN_ACTION* pCleanAction = pPlan->rgCleanActions + i;
         BURN_PACKAGE* pPackage = pCleanAction->pPackage;
 
-        hr = CleanPackage(hPipe, pPackage);
+        hr = CleanPackage(pPlan->pCache, hPipe, pPackage);
     }
 }
 
@@ -1479,7 +1484,7 @@ static HRESULT AcquireContainerOrPayload(
             dwChosenSearchPath = 0;
             dwDestinationSearchPath = 0;
 
-            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath, &dwDestinationSearchPath);
+            hr = CacheGetLocalSourcePaths(wzRelativePath, *pwzSourcePath, wzDestinationPath, pContext->wzLayoutDirectory, pContext->pCache, pContext->pVariables, &pContext->rgSearchPaths, &pContext->cSearchPaths, &dwChosenSearchPath, &dwDestinationSearchPath);
             ExitOnFailure(hr, "Failed to search local source.");
 
             if (wzPayloadContainerId)
@@ -1710,7 +1715,7 @@ static HRESULT LayoutOrCacheContainerOrPayload(
             }
             else // complete the payload.
             {
-                hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove, CacheMessageHandler, CacheProgressRoutine, &progress);
+                hr = CacheCompletePayload(pContext->pCache, pPackage->fPerMachine, pPayload, pPackage->sczCacheId, wzUnverifiedPath, fMove, CacheMessageHandler, CacheProgressRoutine, &progress);
             }
         }
 
@@ -2174,7 +2179,7 @@ static void DoRollbackCache(
                 {
                     if (dwLastCheckpoint <= dwCheckpoint) // only rollback when it was attempted to be cached.
                     {
-                        hr = CleanPackage(hPipe, pPackage);
+                        hr = CleanPackage(pPlan->pCache, hPipe, pPackage);
                     }
                 }
                 else if (pPackage->fCanAffectRegistration)
@@ -2401,7 +2406,7 @@ static HRESULT DoRollbackActions(
             case BURN_EXECUTE_ACTION_TYPE_UNCACHE_PACKAGE:
                 if (!pRollbackAction->uncachePackage.pPackage->fCached) // only rollback when it wasn't already cached.
                 {
-                    hr = CleanPackage(pEngineState->companionConnection.hPipe, pRollbackAction->uncachePackage.pPackage);
+                    hr = CleanPackage(pEngineState->plan.pCache, pEngineState->companionConnection.hPipe, pRollbackAction->uncachePackage.pPackage);
                     IgnoreRollbackError(hr, "Failed to uncache package for rollback.");
                 }
                 else if (pRollbackAction->uncachePackage.pPackage->fCanAffectRegistration)
@@ -2477,7 +2482,7 @@ static HRESULT ExecuteExePackage(
     }
     else
     {
-        hrExecute = ExeEngineExecutePackage(pExecuteAction, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
+        hrExecute = ExeEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user EXE package.");
     }
 
@@ -2548,7 +2553,7 @@ static HRESULT ExecuteMsiPackage(
     }
     else
     {
-        hrExecute = MsiEngineExecutePackage(pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
+        hrExecute = MsiEngineExecutePackage(pEngineState->userExperience.hwndApply, pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user MSI package.");
     }
 
@@ -2621,7 +2626,7 @@ static HRESULT ExecuteMspPackage(
     }
     else
     {
-        hrExecute = MspEngineExecutePackage(pEngineState->userExperience.hwndApply, pExecuteAction, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
+        hrExecute = MspEngineExecutePackage(pEngineState->userExperience.hwndApply, pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, MsiExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user MSP package.");
     }
 
@@ -2983,6 +2988,7 @@ static void ResetTransactionRegistrationState(
 }
 
 static HRESULT CleanPackage(
+    __in BURN_CACHE* pCache,
     __in HANDLE hElevatedPipe,
     __in BURN_PACKAGE* pPackage
     )
@@ -2995,7 +3001,7 @@ static HRESULT CleanPackage(
     }
     else
     {
-        hr = CacheRemovePackage(FALSE, pPackage->sczId, pPackage->sczCacheId);
+        hr = CacheRemovePackage(pCache, FALSE, pPackage->sczId, pPackage->sczCacheId);
     }
 
     if (pPackage->fCanAffectRegistration)

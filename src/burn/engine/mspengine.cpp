@@ -544,6 +544,7 @@ LExit:
 extern "C" HRESULT MspEngineExecutePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
@@ -574,7 +575,7 @@ extern "C" HRESULT MspEngineExecutePackage(
 
         if (BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->mspTarget.action)
         {
-            hr = CacheGetCompletedPath(pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
+            hr = CacheGetCompletedPath(pCache, pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
             ExitOnFailure(hr, "Failed to get cached path for MSP package: %ls", pMspPackage->sczId);
 
             // TODO: Figure out if this makes sense -- the variable is set to the last patch's path only

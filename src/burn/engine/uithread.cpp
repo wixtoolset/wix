@@ -16,7 +16,7 @@ struct UITHREAD_CONTEXT
 
 struct UITHREAD_INFO
 {
-    BOOL fElevated;
+    BOOL fElevatedEngine;
     BURN_USER_EXPERIENCE* pUserExperience;
 };
 
@@ -105,10 +105,10 @@ static DWORD WINAPI ThreadProc(
     MSG msg = { };
 
     BURN_ENGINE_STATE* pEngineState = pContext->pEngineState;
-    BOOL fElevated = BURN_MODE_ELEVATED == pContext->pEngineState->mode;
+    BOOL fElevatedEngine = BURN_MODE_ELEVATED == pContext->pEngineState->mode;
 
     // If elevated, set up the thread local storage to store the correct pipe to communicate logging.
-    if (fElevated)
+    if (fElevatedEngine)
     {
         Assert(TLS_OUT_OF_INDEXES != pEngineState->dwElevatedLoggingTlsId);
 
@@ -130,7 +130,7 @@ static DWORD WINAPI ThreadProc(
 
     fRegistered = TRUE;
 
-    info.fElevated = fElevated;
+    info.fElevatedEngine = fElevatedEngine;
     info.pUserExperience = &pEngineState->userExperience;
 
     // Create the window to handle reboots without activating it.
@@ -199,7 +199,7 @@ static LRESULT CALLBACK WndProc(
 
         // Always block shutdown in the elevated process, but ask the BA in the non-elevated.
         UITHREAD_INFO* pInfo = reinterpret_cast<UITHREAD_INFO*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-        if (!pInfo->fElevated)
+        if (!pInfo->fElevatedEngine)
         {
             // TODO: instead of recommending canceling all non-critical shutdowns, maybe we should only recommend cancel
             //       when the engine is doing work?
@@ -209,7 +209,7 @@ static LRESULT CALLBACK WndProc(
         }
 
         fRet = !fCancel;
-        LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN, LoggingBoolToString(fCritical), LoggingBoolToString(pInfo->fElevated), LoggingBoolToString(fRet));
+        LogId(REPORT_STANDARD, MSG_SYSTEM_SHUTDOWN, LoggingBoolToString(fCritical), LoggingBoolToString(pInfo->fElevatedEngine), LoggingBoolToString(fRet));
         return fRet;
         }
 

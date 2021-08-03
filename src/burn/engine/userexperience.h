@@ -15,8 +15,6 @@ const DWORD MB_RETRYTRYAGAIN = 0xF;
 
 // structs
 
-typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT BOOTSTRAPPER_ENGINE_CONTEXT; // forward declare
-
 typedef struct _BURN_USER_EXPERIENCE
 {
     BURN_PAYLOADS payloads;
@@ -66,7 +64,7 @@ HRESULT UserExperienceUnload(
     __in BURN_USER_EXPERIENCE* pUserExperience
     );
 HRESULT UserExperienceEnsureWorkingFolder(
-    __in LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __deref_out_z LPWSTR* psczUserExperienceWorkingFolder
     );
 HRESULT UserExperienceRemove(

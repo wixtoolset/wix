@@ -166,6 +166,7 @@ typedef struct _BURN_REGISTRATION
 
 HRESULT RegistrationParseFromXml(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in IXMLDOMNode* pixnBundle
     );
 void RegistrationUninitialize(
@@ -188,6 +189,7 @@ HRESULT RegistrationDetectRelatedBundles(
 HRESULT RegistrationSessionBegin(
     __in_z LPCWSTR wzEngineWorkingPath,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
@@ -201,6 +203,7 @@ HRESULT RegistrationSessionResume(
     );
 HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,

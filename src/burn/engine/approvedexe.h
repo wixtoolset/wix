@@ -6,6 +6,11 @@
 extern "C" {
 #endif
 
+// forward declare
+
+typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT BOOTSTRAPPER_ENGINE_CONTEXT;
+typedef struct _BURN_CACHE BURN_CACHE;
+typedef struct _BURN_ENGINE_COMMAND BURN_ENGINE_COMMAND;
 
 // structs
 
@@ -57,6 +62,7 @@ HRESULT ApprovedExesLaunch(
     __out DWORD* pdwProcessId
     );
 HRESULT ApprovedExesVerifySecureLocation(
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe
     );

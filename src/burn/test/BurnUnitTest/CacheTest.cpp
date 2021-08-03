@@ -48,6 +48,8 @@ namespace Bootstrapper
         void CacheSignatureTest()
         {
             HRESULT hr = S_OK;
+            BURN_CACHE cache = { };
+            BURN_ENGINE_COMMAND internalCommand = { };
             BURN_PACKAGE package = { };
             BURN_PAYLOAD payload = { };
             LPWSTR sczPayloadPath = NULL;
@@ -74,7 +76,10 @@ namespace Bootstrapper
                 payload.qwFileSize = 27;
                 payload.verification = BURN_PAYLOAD_VERIFICATION_HASH;
 
-                hr = CacheCompletePayload(package.fPerMachine, &payload, package.sczCacheId, sczPayloadPath, FALSE, CacheTestEventRoutine, CacheTestProgressRoutine, &context);
+                hr = CacheInitialize(&cache, &internalCommand);
+                TestThrowOnFailure(hr, L"Failed initialize cache.");
+
+                hr = CacheCompletePayload(&cache, package.fPerMachine, &payload, package.sczCacheId, sczPayloadPath, FALSE, CacheTestEventRoutine, CacheTestProgressRoutine, &context);
                 Assert::Equal(S_OK, hr);
             }
             finally

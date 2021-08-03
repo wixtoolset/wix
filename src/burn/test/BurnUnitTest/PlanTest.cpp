@@ -925,6 +925,9 @@ namespace Bootstrapper
 
             ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
 
+            hr = CacheInitialize(&pEngineState->cache, &pEngineState->internalCommand);
+            NativeAssert::Succeeded(hr, "Failed to initialize cache.");
+
             hr = VariableInitialize(&pEngineState->variables);
             NativeAssert::Succeeded(hr, "Failed to initialize variables.");
 
@@ -947,6 +950,9 @@ namespace Bootstrapper
 
             hr = CoreInitializeConstants(pEngineState);
             NativeAssert::Succeeded(hr, "Failed to initialize core constants");
+
+            hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
+            NativeAssert::Succeeded(hr, "Failed to initialize cache sources.");
 
             pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
         }

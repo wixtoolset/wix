@@ -244,8 +244,8 @@ LExit:
 
     UserExperienceRemove(&engineState.userExperience);
 
-    CacheRemoveWorkingFolder(engineState.registration.sczId);
-    CacheUninitialize();
+    CacheRemoveWorkingFolder(&engineState.cache);
+    CacheUninitialize(&engineState.cache);
 
     // If this is a related bundle (but not an update) suppress restart and return the standard restart error code.
     if (fRestart && BOOTSTRAPPER_RELATION_NONE != engineState.command.relationType && BOOTSTRAPPER_RELATION_UPDATE != engineState.command.relationType)
@@ -334,12 +334,18 @@ static HRESULT InitializeEngineState(
     PipeConnectionInitialize(&pEngineState->companionConnection);
     PipeConnectionInitialize(&pEngineState->embeddedConnection);
 
+    // Retain whether bundle was initially run elevated.
+    ProcElevated(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
+
     // Parse command line.
     hr = CoreParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &pEngineState->internalCommand.sczSourceProcessPath, &pEngineState->internalCommand.sczOriginalSource, &hSectionFile, &hSourceEngineFile, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &pEngineState->fInvalidCommandLine, &pEngineState->cUnknownArgs, &pEngineState->rgUnknownArgs);
     ExitOnFailure(hr, "Fatal error while parsing command line.");
 
     hr = SectionInitialize(&pEngineState->section, hSectionFile, hSourceEngineFile);
     ExitOnFailure(hr, "Failed to initialize engine section.");
+
+    hr = CacheInitialize(&pEngineState->cache, &pEngineState->internalCommand);
+    ExitOnFailure(hr, "Failed to initialize internal cache functionality.");
 
 LExit:
     return hr;
@@ -421,8 +427,6 @@ static HRESULT RunUntrusted(
     hr = PathForCurrentProcess(&sczCurrentProcessPath, NULL);
     ExitOnFailure(hr, "Failed to get path for current process.");
 
-    BOOL fRunningFromCache = CacheBundleRunningFromCache();
-
     // If we're running from the package cache, we're in a secure
     // folder (DLLs cannot be inserted here for hijacking purposes)
     // so just launch the current process's path as the clean room
@@ -431,13 +435,13 @@ static HRESULT RunUntrusted(
     // a secure folder) but it makes the code that only wants to run
     // in clean room more complicated if we don't launch an explicit
     // clean room process.
-    if (fRunningFromCache)
+    if (CacheBundleRunningFromCache(&pEngineState->cache))
     {
         wzCleanRoomBundlePath = sczCurrentProcessPath;
     }
     else
     {
-        hr = CacheBundleToCleanRoom(&pEngineState->section, &sczCachedCleanRoomBundlePath);
+        hr = CacheBundleToCleanRoom(&pEngineState->cache, &pEngineState->section, &sczCachedCleanRoomBundlePath);
         ExitOnFailure(hr, "Failed to cache to clean room.");
 
         wzCleanRoomBundlePath = sczCachedCleanRoomBundlePath;
@@ -658,7 +662,7 @@ static HRESULT RunElevated(
     SrpInitialize(TRUE);
 
     // Pump messages from parent process.
-    hr = ElevationChildPumpMessages(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &fDisabledAutomaticUpdates, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart);
+    hr = ElevationChildPumpMessages(pEngineState->dwElevatedLoggingTlsId, pEngineState->companionConnection.hPipe, pEngineState->companionConnection.hCachePipe, &pEngineState->approvedExes, &pEngineState->cache, &pEngineState->containers, &pEngineState->packages, &pEngineState->payloads, &pEngineState->variables, &pEngineState->registration, &pEngineState->userExperience, &hLock, &fDisabledAutomaticUpdates, &pEngineState->userExperience.dwExitCode, &pEngineState->fRestart);
     LogRedirect(NULL, NULL); // reset logging so the next failure gets written to "log buffer" for the failure log.
     ExitOnFailure(hr, "Failed to pump messages from parent process.");
 

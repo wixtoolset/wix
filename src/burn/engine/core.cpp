@@ -32,6 +32,7 @@ static HRESULT DetectPackage(
     __in BURN_PACKAGE* pPackage
     );
 static HRESULT DetectPackagePayloadsCached(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage
     );
 static DWORD WINAPI CacheThreadProc(
@@ -65,7 +66,6 @@ extern "C" HRESULT CoreInitialize(
     BYTE* pbBuffer = NULL;
     SIZE_T cbBuffer = 0;
     BURN_CONTAINER_CONTEXT containerContext = { };
-    BOOL fElevated = FALSE;
     LPWSTR sczSourceProcessFolder = NULL;
 
     // Initialize variables.
@@ -105,10 +105,7 @@ extern "C" HRESULT CoreInitialize(
     hr = CoreInitializeConstants(pEngineState);
     ExitOnFailure(hr, "Failed to initialize contants.");
 
-    // Retain whether bundle was initially run elevated.
-    ProcElevated(::GetCurrentProcess(), &fElevated);
-
-    hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_ELEVATED, fElevated, TRUE);
+    hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_ELEVATED, pEngineState->internalCommand.fInitiallyElevated, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the %ls built-in variable.", BURN_BUNDLE_ELEVATED);
 
     hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_UILEVEL, pEngineState->command.display, TRUE);
@@ -136,8 +133,8 @@ extern "C" HRESULT CoreInitialize(
 
     if (BURN_MODE_UNTRUSTED == pEngineState->mode || BURN_MODE_NORMAL == pEngineState->mode || BURN_MODE_EMBEDDED == pEngineState->mode)
     {
-        hr = CacheInitialize(&pEngineState->registration, &pEngineState->variables, pEngineState->internalCommand.sczSourceProcessPath);
-        ExitOnFailure(hr, "Failed to initialize internal cache functionality.");
+        hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
+        ExitOnFailure(hr, "Failed to initialize internal cache source functionality.");
     }
 
     // If we're not elevated then we'll be loading the bootstrapper application, so extract
@@ -145,7 +142,7 @@ extern "C" HRESULT CoreInitialize(
     if (BURN_MODE_NORMAL == pEngineState->mode || BURN_MODE_EMBEDDED == pEngineState->mode)
     {
         // Extract all UX payloads to working folder.
-        hr = UserExperienceEnsureWorkingFolder(pEngineState->registration.sczId, &pEngineState->userExperience.sczTempDirectory);
+        hr = UserExperienceEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to get unique temporary folder for bootstrapper application.");
 
         hr = PayloadExtractUXContainer(&pEngineState->userExperience.payloads, &containerContext, pEngineState->userExperience.sczTempDirectory);
@@ -455,6 +452,7 @@ extern "C" HRESULT CorePlan(
     // Remember the overall action state in the plan since it shapes the changes
     // we make everywhere.
     pEngineState->plan.action = action;
+    pEngineState->plan.pCache = &pEngineState->cache;
     pEngineState->plan.pPayloads = &pEngineState->payloads;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
@@ -571,7 +569,7 @@ extern "C" HRESULT CoreElevate(
         // If the elevated companion pipe isn't created yet, let's make that happen.
         if (!pEngineState->sczBundleEngineWorkingPath)
         {
-            hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+            hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
             ExitOnFailure(hr, "Failed to cache engine to working directory.");
         }
 
@@ -673,7 +671,7 @@ extern "C" HRESULT CoreApply(
     // Ensure the engine is cached to the working path.
     if (!pEngineState->sczBundleEngineWorkingPath)
     {
-        hr = CacheBundleToWorkingDirectory(pEngineState->registration.sczId, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+        hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
         ExitOnFailure(hr, "Failed to cache engine to working directory.");
     }
 
@@ -1740,7 +1738,7 @@ static HRESULT DetectPackage(
     ExitOnRootFailure(hr, "BA aborted detect package begin.");
 
     // Detect the cache state of the package.
-    hr = DetectPackagePayloadsCached(pPackage);
+    hr = DetectPackagePayloadsCached(&pEngineState->cache, pPackage);
     ExitOnFailure(hr, "Failed to detect if payloads are all cached for package: %ls", pPackage->sczId);
 
     // Use the correct engine to detect the package.
@@ -1782,6 +1780,7 @@ LExit:
 }
 
 static HRESULT DetectPackagePayloadsCached(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage
     )
 {
@@ -1792,7 +1791,7 @@ static HRESULT DetectPackagePayloadsCached(
 
     if (pPackage->sczCacheId && *pPackage->sczCacheId)
     {
-        hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachePath);
+        hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachePath);
         ExitOnFailure(hr, "Failed to get completed cache path.");
 
         // If the cached directory exists, we have something.

@@ -409,7 +409,7 @@ extern "C" HRESULT PlanLayoutBundle(
     hr = StrAllocString(&pCacheAction->bundleLayout.sczExecutableName, wzExecutableName, 0);
     ExitOnFailure(hr, "Failed to to copy executable name for bundle.");
 
-    hr = CacheCalculateBundleLayoutWorkingPath(pPlan->wzBundleId, &pCacheAction->bundleLayout.sczUnverifiedPath);
+    hr = CacheCalculateBundleLayoutWorkingPath(pPlan->pCache, pPlan->wzBundleId, &pCacheAction->bundleLayout.sczUnverifiedPath);
     ExitOnFailure(hr, "Failed to calculate bundle layout working path.");
 
     pCacheAction->bundleLayout.qwBundleSize = qwBundleSize;
@@ -526,7 +526,7 @@ extern "C" HRESULT PlanRegistration(
     pPlan->fIgnoreAllDependents = pRegistration->fIgnoreAllDependents;
 
     // Ensure the bundle is cached if not running from the cache.
-    if (!CacheBundleRunningFromCache())
+    if (!CacheBundleRunningFromCache(pPlan->pCache))
     {
         pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE;
     }
@@ -1021,7 +1021,7 @@ extern "C" HRESULT PlanLayoutContainer(
         }
         else
         {
-            hr = CacheCalculateContainerWorkingPath(pPlan->wzBundleId, pContainer, &pContainer->sczUnverifiedPath);
+            hr = CacheCalculateContainerWorkingPath(pPlan->pCache, pContainer, &pContainer->sczUnverifiedPath);
             ExitOnFailure(hr, "Failed to calculate unverified path for container.");
         }
     }
@@ -2235,7 +2235,7 @@ static HRESULT ProcessPayloadGroup(
 
         if (!pPayload->sczUnverifiedPath)
         {
-            hr = CacheCalculatePayloadWorkingPath(pPlan->wzBundleId, pPayload, &pPayload->sczUnverifiedPath);
+            hr = CacheCalculatePayloadWorkingPath(pPlan->pCache, pPayload, &pPayload->sczUnverifiedPath);
             ExitOnFailure(hr, "Failed to calculate unverified path for payload.");
         }
     }

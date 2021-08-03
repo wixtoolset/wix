@@ -161,14 +161,14 @@ extern "C" HRESULT UserExperienceUnload(
 }
 
 extern "C" HRESULT UserExperienceEnsureWorkingFolder(
-    __in LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __deref_out_z LPWSTR* psczUserExperienceWorkingFolder
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
 
-    hr = CacheEnsureWorkingFolder(wzBundleId, &sczWorkingFolder);
+    hr = CacheEnsureWorkingFolder(pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working folder.");
 
     hr = StrAllocFormatted(psczUserExperienceWorkingFolder, L"%ls%ls\\", sczWorkingFolder, L".ba");
