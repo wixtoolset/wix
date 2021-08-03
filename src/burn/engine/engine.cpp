@@ -246,7 +246,7 @@ LExit:
 
     UserExperienceRemove(&engineState.userExperience);
 
-    CacheRemoveWorkingFolder(&engineState.cache);
+    CacheRemoveBaseWorkingFolder(&engineState.cache);
     CacheUninitialize(&engineState.cache);
 
     // If this is a related bundle (but not an update) suppress restart and return the standard restart error code.
@@ -401,7 +401,7 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->internalCommand.sczLogFile);
     ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
     ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
-    ReleaseStr(pEngineState->internalCommand.sczWorkingDirectory);
+    ReleaseStr(pEngineState->internalCommand.sczEngineWorkingDirectory);
 
     ReleaseStr(pEngineState->log.sczExtension);
     ReleaseStr(pEngineState->log.sczPrefix);

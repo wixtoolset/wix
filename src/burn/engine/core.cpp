@@ -229,7 +229,7 @@ extern "C" HRESULT CoreInitializeConstants(
         {
             // Pass along any ancestors and ourself to prevent infinite loops.
             pPackage->Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
-            pPackage->Exe.wzEngineWorkingDirectory = pInternalCommand->sczWorkingDirectory;
+            pPackage->Exe.wzEngineWorkingDirectory = pInternalCommand->sczEngineWorkingDirectory;
         }
     }
 
@@ -1019,7 +1019,7 @@ static HRESULT CoreRecreateCommandLine(
         ExitOnFailure(hr, "Failed to append ancestors to command-line.");
     }
 
-    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pInternalCommand->sczWorkingDirectory, psczCommandLine, NULL);
+    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pInternalCommand->sczEngineWorkingDirectory, psczCommandLine, NULL);
     ExitOnFailure(hr, "Failed to append the custom working directory to command-line.");
 
     if (wzRelationTypeCommandLine)
@@ -1733,12 +1733,12 @@ extern "C" HRESULT CoreParseCommandLine(
                 else if (L'\0' == wzParam[1])
                 {
                     // Need to grab the current directory here since this is passed on to other processes.
-                    hr = DirGetCurrent(&pInternalCommand->sczWorkingDirectory);
+                    hr = DirGetCurrent(&pInternalCommand->sczEngineWorkingDirectory);
                     ExitOnFailure(hr, "Failed to get current directory for custom working directory.");
                 }
                 else
                 {
-                    hr = StrAllocString(&pInternalCommand->sczWorkingDirectory, wzParam + 1, 0);
+                    hr = StrAllocString(&pInternalCommand->sczEngineWorkingDirectory, wzParam + 1, 0);
                     ExitOnFailure(hr, "Failed to allocate the custom working directory.");
                 }
             }

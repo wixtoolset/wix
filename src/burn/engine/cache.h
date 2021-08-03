@@ -39,7 +39,8 @@ typedef struct _BURN_CACHE
     BOOL fInitializedCacheSources;
     BOOL fRunningFromCache;
     LPWSTR sczSourceProcessFolder;
-    LPWSTR sczWorkingFolder;
+    LPWSTR sczAcquisitionFolder;
+    LPWSTR sczBaseWorkingFolder;
 } BURN_CACHE;
 
 typedef struct _BURN_CACHE_MESSAGE
@@ -80,9 +81,12 @@ HRESULT CacheInitializeSources(
     __in BURN_VARIABLES* pVariables,
     __in BURN_ENGINE_COMMAND* pInternalCommand
     );
-HRESULT CacheEnsureWorkingFolder(
+HRESULT CacheEnsureAcquisitionFolder(
+    __in BURN_CACHE* pCache
+    );
+HRESULT CacheEnsureBaseWorkingFolder(
     __in BURN_CACHE* pCache,
-    __deref_out_z_opt LPWSTR* psczWorkingFolder
+    __deref_out_z_opt LPWSTR* psczBaseWorkingFolder
     );
 HRESULT CacheCalculateBundleWorkingPath(
     __in BURN_CACHE* pCache,
@@ -228,7 +232,7 @@ HRESULT CacheVerifyPayload(
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
     );
-HRESULT CacheRemoveWorkingFolder(
+HRESULT CacheRemoveBaseWorkingFolder(
     __in BURN_CACHE* pCache
     );
 HRESULT CacheRemoveBundle(
