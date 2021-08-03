@@ -115,9 +115,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -213,9 +214,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -334,9 +336,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -455,9 +458,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -601,9 +605,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -738,9 +743,10 @@ namespace Bootstrapper
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pCommand = &command;
                 plan.pInternalCommand = &internalCommand;
 
-                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
+                hr = PlanSetResumeCommand(&plan, &registration, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);

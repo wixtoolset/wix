@@ -80,13 +80,27 @@ enum BURN_AU_PAUSE_ACTION
 
 typedef struct _BURN_ENGINE_COMMAND
 {
+    int argc;
+    LPWSTR* argv;
+    DWORD cUnknownArgs;
+    int* rgUnknownArgs;
+    BOOL fInvalidCommandLine;
+
+    BURN_MODE mode;
+    BURN_AU_PAUSE_ACTION automaticUpdates;
+    BOOL fDisableSystemRestore;
+    BOOL fDisableUnelevate;
     BOOL fInitiallyElevated;
 
     LPWSTR sczActiveParent;
+    LPWSTR sczAncestors;
     LPWSTR sczIgnoreDependencies;
 
     LPWSTR sczSourceProcessPath;
     LPWSTR sczOriginalSource;
+
+    DWORD dwLoggingAttributes;
+    LPWSTR sczLogFile;
 } BURN_ENGINE_COMMAND;
 
 typedef struct _BURN_ENGINE_STATE
@@ -122,7 +136,6 @@ typedef struct _BURN_ENGINE_STATE
     HANDLE hMessageWindowThread;
 
     BOOL fDisableRollback;
-    BOOL fDisableSystemRestore;
     BOOL fParallelCacheAndExecute;
 
     BURN_LOGGING log;
@@ -131,9 +144,6 @@ typedef struct _BURN_ENGINE_STATE
 
     BURN_PLAN plan;
 
-    BURN_MODE mode;
-    BURN_AU_PAUSE_ACTION automaticUpdates;
-
     DWORD dwElevatedLoggingTlsId;
 
     LPWSTR sczBundleEngineWorkingPath;
@@ -141,14 +151,8 @@ typedef struct _BURN_ENGINE_STATE
     BURN_PIPE_CONNECTION embeddedConnection;
 
     BURN_RESUME_MODE resumeMode;
-    BOOL fDisableUnelevate;
 
-    int argc;
-    LPWSTR* argv;
-    BOOL fInvalidCommandLine;
     BURN_ENGINE_COMMAND internalCommand;
-    DWORD cUnknownArgs;
-    int* rgUnknownArgs;
 } BURN_ENGINE_STATE;
 
 typedef struct _BURN_APPLY_CONTEXT
@@ -218,9 +222,7 @@ HRESULT CoreRecreateCommandLine(
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzAncestors,
-    __in_z_opt LPCWSTR wzAppendLogPath,
-    __in_z_opt LPCWSTR wzAdditionalCommandLineArguments
+    __in_z_opt LPCWSTR wzAppendLogPath
     );
 HRESULT CoreAppendFileHandleAttachedToCommandLine(
     __in HANDLE hFileWithAttachedContainer,
@@ -241,27 +243,12 @@ void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState
     );
 HRESULT CoreParseCommandLine(
-    __in int argc,
-    __in LPWSTR* argv,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PIPE_CONNECTION* pCompanionConnection,
     __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
-    __inout BURN_MODE* pMode,
-    __inout BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
-    __inout BOOL* pfDisableSystemRestore,
-    __inout_z LPWSTR* psczSourceProcessPath,
-    __inout_z LPWSTR* psczOriginalSource,
     __inout HANDLE* phSectionFile,
-    __inout HANDLE* phSourceEngineFile,
-    __inout BOOL* pfDisableUnelevate,
-    __inout DWORD* pdwLoggingAttributes,
-    __inout_z LPWSTR* psczLogFile,
-    __inout_z LPWSTR* psczActiveParent,
-    __inout_z LPWSTR* psczIgnoreDependencies,
-    __inout_z LPWSTR* psczAncestors,
-    __inout BOOL* pfInvalidCommandLine,
-    __inout DWORD* pcUnknownArgs,
-    __inout int** prgUnknownArgs
+    __inout HANDLE* phSourceEngineFile
     );
 
 #if defined(__cplusplus)

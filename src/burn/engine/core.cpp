@@ -15,12 +15,9 @@ struct BURN_CACHE_THREAD_CONTEXT
 // internal function declarations
 
 static HRESULT GetSanitizedCommandLine(
-    __in int argc,
-    __in LPWSTR* argv,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_VARIABLES* pVariables,
-    __in DWORD cUnknownArgs,
-    __in int* rgUnknownArgs,
     __inout_z LPWSTR* psczSanitizedCommandLine
     );
 static HRESULT ParsePipeConnection(
@@ -89,7 +86,7 @@ extern "C" HRESULT CoreInitialize(
     hr = ContainersInitialize(&pEngineState->containers, &pEngineState->section);
     ExitOnFailure(hr, "Failed to initialize containers.");
 
-    hr = GetSanitizedCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->variables, pEngineState->cUnknownArgs, pEngineState->rgUnknownArgs, &sczSanitizedCommandLine);
+    hr = GetSanitizedCommandLine(&pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, &sczSanitizedCommandLine);
     ExitOnFailure(hr, "Fatal error while sanitizing command line.");
 
     LogId(REPORT_STANDARD, MSG_BURN_COMMAND_LINE, sczSanitizedCommandLine ? sczSanitizedCommandLine : L"");
@@ -97,7 +94,7 @@ extern "C" HRESULT CoreInitialize(
     // The command line wasn't logged immediately so that hidden variables set on the command line can be obscured in the log.
     // This delay creates issues when troubleshooting parsing errors because the original command line is not in the log.
     // The code does its best to process the entire command line and keep track if the command line was invalid so that it can log the sanitized command line before erroring out.
-    if (pEngineState->fInvalidCommandLine)
+    if (pEngineState->internalCommand.fInvalidCommandLine)
     {
         LogExitOnRootFailure(hr = E_INVALIDARG, MSG_FAILED_PARSE_COMMAND_LINE, "Failed to parse command line.");
     }
@@ -137,7 +134,7 @@ extern "C" HRESULT CoreInitialize(
         ExitOnFailure(hr, "Failed to set original source variable.");
     }
 
-    if (BURN_MODE_UNTRUSTED == pEngineState->mode || BURN_MODE_NORMAL == pEngineState->mode || BURN_MODE_EMBEDDED == pEngineState->mode)
+    if (BURN_MODE_UNTRUSTED == pEngineState->internalCommand.mode || BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
         hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
         ExitOnFailure(hr, "Failed to initialize internal cache source functionality.");
@@ -145,7 +142,7 @@ extern "C" HRESULT CoreInitialize(
 
     // If we're not elevated then we'll be loading the bootstrapper application, so extract
     // the payloads from the BA container.
-    if (BURN_MODE_NORMAL == pEngineState->mode || BURN_MODE_EMBEDDED == pEngineState->mode)
+    if (BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
         // Extract all UX payloads to working folder.
         hr = UserExperienceEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
@@ -176,15 +173,16 @@ extern "C" HRESULT CoreInitializeConstants(
     )
 {
     HRESULT hr = S_OK;
+    BURN_ENGINE_COMMAND* pInternalCommand = &pEngineState->internalCommand;
     BURN_REGISTRATION* pRegistration = &pEngineState->registration;
 
-    hr = DependencyInitialize(&pEngineState->internalCommand, &pEngineState->dependencies, pRegistration);
+    hr = DependencyInitialize(pInternalCommand, &pEngineState->dependencies, pRegistration);
     ExitOnFailure(hr, "Failed to initialize dependency data.");
 
     // Support passing Ancestors to embedded burn bundles.
-    if (pRegistration->sczAncestors && *pRegistration->sczAncestors)
+    if (pInternalCommand->sczAncestors && *pInternalCommand->sczAncestors)
     {
-        hr = StrAllocFormatted(&pRegistration->sczBundlePackageAncestors, L"%ls;%ls", pRegistration->sczAncestors, pRegistration->sczId);
+        hr = StrAllocFormatted(&pRegistration->sczBundlePackageAncestors, L"%ls;%ls", pInternalCommand->sczAncestors, pRegistration->sczId);
         ExitOnFailure(hr, "Failed to copy ancestors and self to bundle package ancestors.");
     }
     else
@@ -459,6 +457,7 @@ extern "C" HRESULT CorePlan(
     // we make everywhere.
     pEngineState->plan.action = action;
     pEngineState->plan.pCache = &pEngineState->cache;
+    pEngineState->plan.pCommand = &pEngineState->command;
     pEngineState->plan.pInternalCommand = &pEngineState->internalCommand;
     pEngineState->plan.pPayloads = &pEngineState->payloads;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
@@ -470,7 +469,7 @@ extern "C" HRESULT CorePlan(
     ExitOnFailure(hr, "Failed to update action.");
 
     // Set resume commandline
-    hr = PlanSetResumeCommand(&pEngineState->plan, &pEngineState->registration, &pEngineState->command, &pEngineState->log);
+    hr = PlanSetResumeCommand(&pEngineState->plan, &pEngineState->registration, &pEngineState->log);
     ExitOnFailure(hr, "Failed to set resume command");
 
     hr = DependencyPlanInitialize(&pEngineState->dependencies, &pEngineState->plan);
@@ -499,7 +498,7 @@ extern "C" HRESULT CorePlan(
     }
     else
     {
-        hr = PlanForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->command, &pEngineState->plan, &pEngineState->registration, action);
+        hr = PlanForwardCompatibleBundles(&pEngineState->userExperience, &pEngineState->plan, &pEngineState->registration);
         ExitOnFailure(hr, "Failed to plan forward compatible bundles.");
 
         if (pEngineState->plan.fEnabledForwardCompatibleBundle)
@@ -688,7 +687,7 @@ extern "C" HRESULT CoreApply(
         hr = CoreElevate(pEngineState, pEngineState->userExperience.hwndApply);
         ExitOnFailure(hr, "Failed to elevate.");
 
-        hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->userExperience, &pEngineState->variables, pEngineState->plan.action, pEngineState->automaticUpdates, !pEngineState->fDisableSystemRestore);
+        hr = ElevationApplyInitialize(pEngineState->companionConnection.hPipe, &pEngineState->userExperience, &pEngineState->variables, &pEngineState->plan);
         ExitOnFailure(hr, "Failed to initialize apply in elevated process.");
 
         fElevated = TRUE;
@@ -932,9 +931,7 @@ extern "C" HRESULT CoreRecreateCommandLine(
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzAncestors,
-    __in_z_opt LPCWSTR wzAppendLogPath,
-    __in_z_opt LPCWSTR wzAdditionalCommandLineArguments
+    __in_z_opt LPCWSTR wzAppendLogPath
     )
 {
     HRESULT hr = S_OK;
@@ -986,9 +983,9 @@ extern "C" HRESULT CoreRecreateCommandLine(
         ExitOnFailure(hr, "Failed to append active parent command-line to command-line.");
     }
 
-    if (wzAncestors)
+    if (pInternalCommand->sczAncestors)
     {
-        hr = StrAllocFormatted(&scz, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, wzAncestors);
+        hr = StrAllocFormatted(&scz, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_ANCESTORS, pInternalCommand->sczAncestors);
         ExitOnFailure(hr, "Failed to format ancestors for command-line.");
 
         hr = StrAllocConcat(psczCommandLine, scz, 0);
@@ -1022,12 +1019,12 @@ extern "C" HRESULT CoreRecreateCommandLine(
         ExitOnFailure(hr, "Failed to append log command-line to command-line");
     }
 
-    if (wzAdditionalCommandLineArguments && *wzAdditionalCommandLineArguments)
+    if (pCommand->wzCommandLine && *pCommand->wzCommandLine)
     {
         hr = StrAllocConcat(psczCommandLine, L" ", 0);
         ExitOnFailure(hr, "Failed to append space to command-line.");
 
-        hr = StrAllocConcat(psczCommandLine, wzAdditionalCommandLineArguments, 0);
+        hr = StrAllocConcat(psczCommandLine, pCommand->wzCommandLine, 0);
         ExitOnFailure(hr, "Failed to append command-line to command-line.");
     }
 
@@ -1171,33 +1168,20 @@ LExit:
 }
 
 extern "C" HRESULT CoreParseCommandLine(
-    __in int argc,
-    __in LPWSTR* argv,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PIPE_CONNECTION* pCompanionConnection,
     __in BURN_PIPE_CONNECTION* pEmbeddedConnection,
-    __inout BURN_MODE* pMode,
-    __inout BURN_AU_PAUSE_ACTION* pAutomaticUpdates,
-    __inout BOOL* pfDisableSystemRestore,
-    __inout_z LPWSTR* psczSourceProcessPath,
-    __inout_z LPWSTR* psczOriginalSource,
     __inout HANDLE* phSectionFile,
-    __inout HANDLE* phSourceEngineFile,
-    __inout BOOL* pfDisableUnelevate,
-    __inout DWORD* pdwLoggingAttributes,
-    __inout_z LPWSTR* psczLogFile,
-    __inout_z LPWSTR* psczActiveParent,
-    __inout_z LPWSTR* psczIgnoreDependencies,
-    __inout_z LPWSTR* psczAncestors,
-    __inout BOOL* pfInvalidCommandLine,
-    __inout DWORD* pcUnknownArgs,
-    __inout int** prgUnknownArgs
+    __inout HANDLE* phSourceEngineFile
     )
 {
     HRESULT hr = S_OK;
     BOOL fUnknownArg = FALSE;
     BOOL fInvalidCommandLine = FALSE;
     DWORD64 qw = 0;
+    int argc = pInternalCommand->argc;
+    LPWSTR* argv = pInternalCommand->argv;
 
     for (int i = 0; i < argc; ++i)
     {
@@ -1209,11 +1193,11 @@ extern "C" HRESULT CoreParseCommandLine(
                 CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"log", -1) ||
                 CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"xlog", -1))
             {
-                *pdwLoggingAttributes &= ~BURN_LOGGING_ATTRIBUTE_APPEND;
+                pInternalCommand->dwLoggingAttributes &= ~BURN_LOGGING_ATTRIBUTE_APPEND;
 
                 if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], 1, L"x", 1))
                 {
-                    *pdwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_VERBOSE | BURN_LOGGING_ATTRIBUTE_EXTRADEBUG;
+                    pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_VERBOSE | BURN_LOGGING_ATTRIBUTE_EXTRADEBUG;
                 }
 
                 if (i + 1 >= argc)
@@ -1224,7 +1208,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
-                hr = StrAllocString(psczLogFile, argv[i], 0);
+                hr = StrAllocString(&pInternalCommand->sczLogFile, argv[i], 0);
                 ExitOnFailure(hr, "Failed to copy log file path.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"?", -1) ||
@@ -1291,19 +1275,19 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"noaupause", -1))
             {
-                *pAutomaticUpdates = BURN_AU_PAUSE_ACTION_NONE;
+                pInternalCommand->automaticUpdates = BURN_AU_PAUSE_ACTION_NONE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"keepaupaused", -1))
             {
                 // Switch /noaupause takes precedence.
-                if (BURN_AU_PAUSE_ACTION_NONE != *pAutomaticUpdates)
+                if (BURN_AU_PAUSE_ACTION_NONE != pInternalCommand->automaticUpdates)
                 {
-                    *pAutomaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME;
+                    pInternalCommand->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME;
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"disablesystemrestore", -1))
             {
-                *pfDisableSystemRestore = TRUE;
+                pInternalCommand->fDisableSystemRestore = TRUE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"originalsource", -1))
             {
@@ -1314,7 +1298,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 }
 
                 ++i;
-                hr = StrAllocString(psczOriginalSource, argv[i], 0);
+                hr = StrAllocString(&pInternalCommand->sczOriginalSource, argv[i], 0);
                 ExitOnFailure(hr, "Failed to copy last used source.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT, -1))
@@ -1327,12 +1311,12 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
-                hr = StrAllocString(psczActiveParent, argv[i], 0);
+                hr = StrAllocString(&pInternalCommand->sczActiveParent, argv[i], 0);
                 ExitOnFailure(hr, "Failed to copy parent.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT_NONE, -1))
             {
-                hr = StrAllocString(psczActiveParent, L"", 0);
+                hr = StrAllocString(&pInternalCommand->sczActiveParent, L"", 0);
                 ExitOnFailure(hr, "Failed to initialize parent to none.");
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_LOG_APPEND, -1))
@@ -1345,10 +1329,10 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 ++i;
 
-                hr = StrAllocString(psczLogFile, argv[i], 0);
+                hr = StrAllocString(&pInternalCommand->sczLogFile, argv[i], 0);
                 ExitOnFailure(hr, "Failed to copy append log file path.");
 
-                *pdwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
+                pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_ELEVATED, -1))
             {
@@ -1358,13 +1342,13 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the elevated name, token and parent process id.");
                 }
 
-                if (BURN_MODE_UNTRUSTED != *pMode)
+                if (BURN_MODE_UNTRUSTED != pInternalCommand->mode)
                 {
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
-                *pMode = BURN_MODE_ELEVATED;
+                pInternalCommand->mode = BURN_MODE_ELEVATED;
 
                 ++i;
 
@@ -1380,9 +1364,9 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM), BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)))
             {
-                if (BURN_MODE_UNTRUSTED == *pMode)
+                if (BURN_MODE_UNTRUSTED == pInternalCommand->mode)
                 {
-                    *pMode = BURN_MODE_NORMAL;
+                    pInternalCommand->mode = BURN_MODE_NORMAL;
                 }
                 else
                 {
@@ -1401,7 +1385,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                     else if (L'\0' != wzParam[1])
                     {
-                        hr = StrAllocString(psczSourceProcessPath, wzParam + 1, 0);
+                        hr = StrAllocString(&pInternalCommand->sczSourceProcessPath, wzParam + 1, 0);
                         ExitOnFailure(hr, "Failed to copy source process path.");
                     }
                 }
@@ -1414,7 +1398,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnRootFailure(hr = E_INVALIDARG, "Must specify the embedded name, token and parent process id.");
                 }
 
-                switch (*pMode)
+                switch (pInternalCommand->mode)
                 {
                 case BURN_MODE_UNTRUSTED:
                     // Leave mode as UNTRUSTED to launch the clean room process.
@@ -1423,7 +1407,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     // The initialization code already assumes that the
                     // clean room switch is at the beginning of the command line,
                     // so it's safe to assume that the mode is NORMAL in the clean room.
-                    *pMode = BURN_MODE_EMBEDDED;
+                    pInternalCommand->mode = BURN_MODE_EMBEDDED;
                     break;
                 default:
                     fInvalidCommandLine = TRUE;
@@ -1478,17 +1462,17 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE, -1))
             {
-                *pfDisableUnelevate = TRUE;
+                pInternalCommand->fDisableUnelevate = TRUE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
             {
-                if (BURN_MODE_UNTRUSTED != *pMode)
+                if (BURN_MODE_UNTRUSTED != pInternalCommand->mode)
                 {
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
 
-                *pMode = BURN_MODE_RUNONCE;
+                pInternalCommand->mode = BURN_MODE_RUNONCE;
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES), BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES)))
             {
@@ -1501,7 +1485,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 }
                 else
                 {
-                    hr = StrAllocString(psczIgnoreDependencies, &wzParam[1], 0);
+                    hr = StrAllocString(&pInternalCommand->sczIgnoreDependencies, &wzParam[1], 0);
                     ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
                 }
             }
@@ -1516,7 +1500,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 }
                 else
                 {
-                    hr = StrAllocString(psczAncestors, &wzParam[1], 0);
+                    hr = StrAllocString(&pInternalCommand->sczAncestors, &wzParam[1], 0);
                     ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
                 }
             }
@@ -1604,18 +1588,21 @@ extern "C" HRESULT CoreParseCommandLine(
 
         if (fUnknownArg)
         {
-            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgUnknownArgs), *pcUnknownArgs, 1, sizeof(int), 5);
+            hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(&pInternalCommand->rgUnknownArgs), pInternalCommand->cUnknownArgs, 1, sizeof(int), 5);
             ExitOnFailure(hr, "Failed to ensure size for unknown args.");
 
-            (*prgUnknownArgs)[*pcUnknownArgs] = i;
-            *pcUnknownArgs += 1;
+            pInternalCommand->rgUnknownArgs[pInternalCommand->cUnknownArgs] = i;
+            pInternalCommand->cUnknownArgs += 1;
         }
     }
 
-    // If embedded, ensure the display goes embedded as well.
-    if (BURN_MODE_EMBEDDED == *pMode)
+    if (BURN_MODE_EMBEDDED == pInternalCommand->mode)
     {
+        // Ensure the display goes embedded as well.
         pCommand->display = BOOTSTRAPPER_DISPLAY_EMBEDDED;
+
+        // Disable system restore since the parent bundle may have done it.
+        pInternalCommand->fDisableSystemRestore = TRUE;
     }
 
     // Set the defaults if nothing was set above.
@@ -1633,7 +1620,7 @@ LExit:
     if (fInvalidCommandLine)
     {
         hr = S_OK;
-        *pfInvalidCommandLine = TRUE;
+        pInternalCommand->fInvalidCommandLine = TRUE;
     }
 
     return hr;
@@ -1642,12 +1629,9 @@ LExit:
 // internal helper functions
 
 static HRESULT GetSanitizedCommandLine(
-    __in int argc,
-    __in LPWSTR* argv,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_VARIABLES* pVariables,
-    __in DWORD cUnknownArgs,
-    __in int* rgUnknownArgs,
     __inout_z LPWSTR* psczSanitizedCommandLine
     )
 {
@@ -1656,6 +1640,10 @@ static HRESULT GetSanitizedCommandLine(
     BOOL fHidden = FALSE;
     LPWSTR sczSanitizedArgument = NULL;
     LPWSTR sczVariableName = NULL;
+    int argc = pInternalCommand->argc;
+    LPWSTR* argv = pInternalCommand->argv;
+    DWORD cUnknownArgs = pInternalCommand->cUnknownArgs;
+    int* rgUnknownArgs = pInternalCommand->rgUnknownArgs;
 
     for (int i = 0; i < argc; ++i)
     {
