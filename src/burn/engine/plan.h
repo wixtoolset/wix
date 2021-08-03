@@ -229,7 +229,8 @@ typedef struct _BURN_CLEAN_ACTION
 typedef struct _BURN_PLAN
 {
     BOOTSTRAPPER_ACTION action;
-    BURN_PAYLOADS* pPayloads;   // points directly into parent the ENGINE_STATE.
+    BURN_CACHE* pCache;
+    BURN_PAYLOADS* pPayloads;
     LPWSTR wzBundleId;          // points directly into parent the ENGINE_STATE.
     LPWSTR wzBundleProviderKey; // points directly into parent the ENGINE_STATE.
     BOOL fPerMachine;

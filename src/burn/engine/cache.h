@@ -24,6 +24,24 @@ enum BURN_CACHE_STEP
     BURN_CACHE_STEP_FINALIZE,
 };
 
+typedef struct _BURN_CACHE
+{
+    BOOL fInitializedCache;
+    BOOL fPerMachineCacheRootVerified;
+    BOOL fOriginalPerMachineCacheRootVerified;
+    BOOL fUnverifiedCacheFolderCreated;
+    BOOL fCustomMachinePackageCache;
+    LPWSTR sczDefaultUserPackageCache;
+    LPWSTR sczDefaultMachinePackageCache;
+    LPWSTR sczCurrentMachinePackageCache;
+
+    // Only valid after CacheInitializeSources
+    BOOL fInitializedCacheSources;
+    BOOL fRunningFromCache;
+    LPWSTR sczSourceProcessFolder;
+    LPWSTR sczWorkingFolder;
+} BURN_CACHE;
+
 typedef struct _BURN_CACHE_MESSAGE
 {
     BURN_CACHE_MESSAGE_TYPE type;
@@ -53,38 +71,46 @@ typedef HRESULT(CALLBACK* PFN_BURNCACHEMESSAGEHANDLER)(
 // functions
 
 HRESULT CacheInitialize(
+    __in BURN_CACHE* pCache,
+    __in BURN_ENGINE_COMMAND* pInternalCommand
+    );
+HRESULT CacheInitializeSources(
+    __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
-    __in_z_opt LPCWSTR wzSourceProcessPath
+    __in BURN_ENGINE_COMMAND* pInternalCommand
     );
 HRESULT CacheEnsureWorkingFolder(
-    __in_z_opt LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __deref_out_z_opt LPWSTR* psczWorkingFolder
     );
 HRESULT CacheCalculateBundleWorkingPath(
-    __in_z LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __in LPCWSTR wzExecutableName,
     __deref_out_z LPWSTR* psczWorkingPath
     );
 HRESULT CacheCalculateBundleLayoutWorkingPath(
+    __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzBundleId,
     __deref_out_z LPWSTR* psczWorkingPath
     );
 HRESULT CacheCalculatePayloadWorkingPath(
-    __in_z LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __in BURN_PAYLOAD* pPayload,
     __deref_out_z LPWSTR* psczWorkingPath
     );
 HRESULT CacheCalculateContainerWorkingPath(
-    __in_z LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __in BURN_CONTAINER* pContainer,
     __deref_out_z LPWSTR* psczWorkingPath
     );
 HRESULT CacheGetPerMachineRootCompletedPath(
+    __in BURN_CACHE* pCache,
     __out_z LPWSTR* psczCurrentRootCompletedPath,
     __out_z LPWSTR* psczDefaultRootCompletedPath
     );
 HRESULT CacheGetCompletedPath(
+    __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzCacheId,
     __deref_out_z LPWSTR* psczCompletedPath
@@ -98,6 +124,7 @@ HRESULT CacheGetLocalSourcePaths(
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath,
     __in_z_opt LPCWSTR wzLayoutDirectory,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __inout LPWSTR** prgSearchPaths,
     __out DWORD* pcSearchPaths,
@@ -121,16 +148,20 @@ void CacheSendErrorCallback(
     __in_z_opt LPCWSTR wzError,
     __out_opt BOOL* pfRetry
     );
-BOOL CacheBundleRunningFromCache();
+BOOL CacheBundleRunningFromCache(
+    __in BURN_CACHE* pCache
+    );
 HRESULT CachePreparePackage(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage
     );
 HRESULT CacheBundleToCleanRoom(
+    __in BURN_CACHE* pCache,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
     );
 HRESULT CacheBundleToWorkingDirectory(
-    __in_z LPCWSTR wzBundleId,
+    __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
@@ -145,6 +176,7 @@ HRESULT CacheLayoutBundle(
     __in LPVOID pContext
     );
 HRESULT CacheCompleteBundle(
+    __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzExecutableName,
     __in_z LPCWSTR wzBundleId,
@@ -172,6 +204,7 @@ HRESULT CacheLayoutPayload(
     __in LPVOID pContext
     );
 HRESULT CacheCompletePayload(
+    __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCacheId,
@@ -196,22 +229,26 @@ HRESULT CacheVerifyPayload(
     __in LPVOID pContext
     );
 HRESULT CacheRemoveWorkingFolder(
-    __in_z_opt LPCWSTR wzBundleId
+    __in BURN_CACHE* pCache
     );
 HRESULT CacheRemoveBundle(
+    __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPackageId
     );
 HRESULT CacheRemovePackage(
+    __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCacheId
     );
 void CacheCleanup(
     __in BOOL fPerMachine,
-    __in_z LPCWSTR wzBundleId
+    __in BURN_CACHE* pCache
     );
-void CacheUninitialize();
+void CacheUninitialize(
+    __in BURN_CACHE* pCache
+    );
 
 #ifdef __cplusplus
 }

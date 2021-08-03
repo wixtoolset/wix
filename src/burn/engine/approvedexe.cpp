@@ -211,6 +211,7 @@ LExit:
 }
 
 extern "C" HRESULT ApprovedExesVerifySecureLocation(
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe
     )
@@ -245,7 +246,7 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
 
     // The problem with using a Variable for the root package cache folder is that it might not have been secured yet.
     // Getting it through CacheGetPerMachineRootCompletedPath makes sure it has been secured.
-    hr = CacheGetPerMachineRootCompletedPath(&scz, &sczSecondary);
+    hr = CacheGetPerMachineRootCompletedPath(pCache, &scz, &sczSecondary);
     ExitOnFailure(hr, "Failed to get the root package cache folder.");
 
     // If the package cache is redirected, hr is S_FALSE.

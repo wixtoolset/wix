@@ -342,6 +342,7 @@ LExit:
 
 extern "C" HRESULT ExeEngineExecutePackage(
     __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
@@ -368,7 +369,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
     BURN_PAYLOAD* pPackagePayload = pPackage->payloads.rgItems[0].pPayload;
 
     // get cached executable path
-    hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+    hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
     ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
     // Best effort to set the execute package cache folder and action variables.

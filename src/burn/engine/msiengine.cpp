@@ -41,6 +41,7 @@ static HRESULT ConcatFeatureActionProperties(
     __inout_z LPWSTR* psczArguments
     );
 static HRESULT ConcatPatchProperty(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage,
     __in BOOL fRollback,
     __inout_z LPWSTR* psczArguments
@@ -1059,6 +1060,7 @@ LExit:
 extern "C" HRESULT MsiEngineExecutePackage(
     __in_opt HWND hwndParent,
     __in BURN_EXECUTE_ACTION* pExecuteAction,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
@@ -1119,7 +1121,7 @@ extern "C" HRESULT MsiEngineExecutePackage(
     if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL != pExecuteAction->msiPackage.action)
     {
         // get cached MSI path
-        hr = CacheGetCompletedPath(pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
+        hr = CacheGetCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, &sczCachedDirectory);
         ExitOnFailure(hr, "Failed to get cached path for package: %ls", pPackage->sczId);
 
         // Best effort to set the execute package cache folder variable.
@@ -1165,10 +1167,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     ExitOnFailure(hr, "Failed to add feature action properties to obfuscated argument string.");
 
     // add slipstream patch properties
-    hr = ConcatPatchProperty(pPackage, fRollback, &sczProperties);
+    hr = ConcatPatchProperty(pCache, pPackage, fRollback, &sczProperties);
     ExitOnFailure(hr, "Failed to add patch properties to argument string.");
 
-    hr = ConcatPatchProperty(pPackage, fRollback, &sczObfuscatedProperties);
+    hr = ConcatPatchProperty(pCache, pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
     hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczProperties);
@@ -1940,6 +1942,7 @@ LExit:
 }
 
 static HRESULT ConcatPatchProperty(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage,
     __in BOOL fRollback,
     __inout_z LPWSTR* psczArguments
@@ -1962,7 +1965,7 @@ static HRESULT ConcatPatchProperty(
 
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL < patchExecuteAction)
             {
-                hr = CacheGetCompletedPath(pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
+                hr = CacheGetCompletedPath(pCache, pMspPackage->fPerMachine, pMspPackage->sczCacheId, &sczCachedDirectory);
                 ExitOnFailure(hr, "Failed to get cached path for MSP package: %ls", pMspPackage->sczId);
 
                 hr = PathConcat(sczCachedDirectory, pMspPackagePayload->sczFilePath, &sczMspPath);

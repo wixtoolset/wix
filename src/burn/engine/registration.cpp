@@ -42,7 +42,8 @@ static HRESULT ParseSoftwareTagsFromXml(
     __out DWORD* pcSoftwareTags
     );
 static HRESULT SetPaths(
-    __in BURN_REGISTRATION* pRegistration
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
     );
 static HRESULT GetBundleManufacturer(
     __in BURN_REGISTRATION* pRegistration,
@@ -120,6 +121,7 @@ static BOOL IsRegistryRebootPending();
 *******************************************************************/
 extern "C" HRESULT RegistrationParseFromXml(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in IXMLDOMNode* pixnBundle
     )
 {
@@ -335,7 +337,7 @@ extern "C" HRESULT RegistrationParseFromXml(
         ExitOnFailure(hr, "Failed to get @Classification.");
     }
 
-    hr = SetPaths(pRegistration);
+    hr = SetPaths(pRegistration, pCache);
     ExitOnFailure(hr, "Failed to set registration paths.");
 
 LExit:
@@ -614,6 +616,7 @@ LExit:
 extern "C" HRESULT RegistrationSessionBegin(
     __in_z LPCWSTR wzEngineWorkingPath,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOptions,
     __in BURN_DEPENDENCY_REGISTRATION_ACTION dependencyRegistrationAction,
@@ -633,7 +636,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     // Cache bundle executable.
     if (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE)
     {
-        hr = CacheCompleteBundle(pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, wzEngineWorkingPath
+        hr = CacheCompleteBundle(pCache, pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, wzEngineWorkingPath
 #ifdef DEBUG
                         , pRegistration->sczCacheExecutablePath
 #endif
@@ -900,6 +903,7 @@ LExit:
  *******************************************************************/
 extern "C" HRESULT RegistrationSessionEnd(
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BURN_PACKAGES* pPackages,
     __in BURN_RESUME_MODE resumeMode,
@@ -964,7 +968,7 @@ extern "C" HRESULT RegistrationSessionEnd(
             ExitOnFailure(hr, "Failed to delete registration key: %ls", pRegistration->sczRegistrationKey);
         }
 
-        CacheRemoveBundle(pRegistration->fPerMachine, pRegistration->sczId);
+        CacheRemoveBundle(pCache, pRegistration->fPerMachine, pRegistration->sczId);
     }
     else // the mode needs to be updated so open the registration key.
     {
@@ -1213,7 +1217,8 @@ LExit:
 }
 
 static HRESULT SetPaths(
-    __in BURN_REGISTRATION* pRegistration
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
     )
 {
     HRESULT hr = S_OK;
@@ -1227,7 +1232,7 @@ static HRESULT SetPaths(
     ExitOnFailure(hr, "Failed to build uninstall registry key path.");
 
     // build cache directory
-    hr = CacheGetCompletedPath(pRegistration->fPerMachine, pRegistration->sczId, &sczCacheDirectory);
+    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczId, &sczCacheDirectory);
     ExitOnFailure(hr, "Failed to build cache directory.");
 
     // build cached executable path

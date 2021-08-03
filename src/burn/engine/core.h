@@ -80,6 +80,7 @@ enum BURN_AU_PAUSE_ACTION
 
 typedef struct _BURN_ENGINE_COMMAND
 {
+    BOOL fInitiallyElevated;
     LPWSTR sczSourceProcessPath;
     LPWSTR sczOriginalSource;
 } BURN_ENGINE_COMMAND;
@@ -109,6 +110,7 @@ typedef struct _BURN_ENGINE_STATE
     BURN_PACKAGES packages;
     BURN_UPDATE update;
     BURN_APPROVED_EXES approvedExes;
+    BURN_CACHE cache;
     BURN_EXTENSIONS extensions;
 
     HWND hMessageWindow;

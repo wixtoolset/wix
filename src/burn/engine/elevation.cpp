@@ -88,6 +88,7 @@ typedef struct _BURN_ELEVATION_CHILD_MESSAGE_CONTEXT
     HANDLE* phLock;
     BOOL* pfDisabledAutomaticUpdates;
     BURN_APPROVED_EXES* pApprovedExes;
+    BURN_CACHE* pCache;
     BURN_CONTAINERS* pContainers;
     BURN_PACKAGES* pPackages;
     BURN_PAYLOADS* pPayloads;
@@ -164,6 +165,7 @@ static HRESULT OnApplyUninitialize(
     __in HANDLE* phLock
     );
 static HRESULT OnSessionBegin(
+    __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -176,6 +178,7 @@ static HRESULT OnSessionResume(
     __in SIZE_T cbData
     );
 static HRESULT OnSessionEnd(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
@@ -188,12 +191,14 @@ static HRESULT OnSaveState(
     __in SIZE_T cbData
     );
 static HRESULT OnCachePreparePackage(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
     __in SIZE_T cbData
     );
 static HRESULT OnCacheCompletePayload(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
@@ -207,7 +212,7 @@ static HRESULT OnCacheVerifyPayload(
     __in SIZE_T cbData
     );
 static void OnCacheCleanup(
-    __in_z LPCWSTR wzBundleId
+    __in BURN_CACHE* pCache
     );
 static HRESULT OnProcessDependentRegistration(
     __in const BURN_REGISTRATION* pRegistration,
@@ -216,6 +221,7 @@ static HRESULT OnProcessDependentRegistration(
     );
 static HRESULT OnExecuteExePackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
@@ -224,6 +230,7 @@ static HRESULT OnExecuteExePackage(
     );
 static HRESULT OnExecuteMsiPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -231,6 +238,7 @@ static HRESULT OnExecuteMsiPackage(
     );
 static HRESULT OnExecuteMspPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -238,6 +246,7 @@ static HRESULT OnExecuteMspPackage(
     );
 static HRESULT OnExecuteMsuPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -279,6 +288,7 @@ static int MsiExecuteMessageHandler(
     __in_opt LPVOID pvContext
     );
 static HRESULT OnCleanPackage(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -286,6 +296,7 @@ static HRESULT OnCleanPackage(
 static HRESULT OnLaunchApprovedExe(
     __in HANDLE hPipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -1284,6 +1295,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     __in HANDLE hPipe,
     __in HANDLE hCachePipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
+    __in BURN_CACHE* pCache,
     __in BURN_CONTAINERS* pContainers,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
@@ -1304,6 +1316,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
 
     cacheContext.dwLoggingTlsId = dwLoggingTlsId;
     cacheContext.hPipe = hCachePipe;
+    cacheContext.pCache = pCache;
     cacheContext.pContainers = pContainers;
     cacheContext.pPackages = pPackages;
     cacheContext.pPayloads = pPayloads;
@@ -1316,6 +1329,7 @@ extern "C" HRESULT ElevationChildPumpMessages(
     context.phLock = phLock;
     context.pfDisabledAutomaticUpdates = pfDisabledAutomaticUpdates;
     context.pApprovedExes = pApprovedExes;
+    context.pCache = pCache;
     context.pContainers = pContainers;
     context.pPackages = pPackages;
     context.pPayloads = pPayloads;
@@ -1826,7 +1840,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_BEGIN:
-        hrResult = OnSessionBegin(pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnSessionBegin(pContext->pCache, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_RESUME:
@@ -1834,7 +1848,7 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SESSION_END:
-        hrResult = OnSessionEnd(pContext->pPackages, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnSessionEnd(pContext->pCache, pContext->pPackages, pContext->pRegistration, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_SAVE_STATE:
@@ -1846,19 +1860,19 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_EXE_PACKAGE:
-        hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pPackages, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteExePackage(pContext->hPipe, pContext->pCache, pContext->pPackages, &pContext->pRegistration->relatedBundles, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSI_PACKAGE:
-        hrResult = OnExecuteMsiPackage(pContext->hPipe, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMsiPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSP_PACKAGE:
-        hrResult = OnExecuteMspPackage(pContext->hPipe, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMspPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_MSU_PACKAGE:
-        hrResult = OnExecuteMsuPackage(pContext->hPipe, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnExecuteMsuPackage(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER:
@@ -1870,11 +1884,11 @@ static HRESULT ProcessElevatedChildMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE:
-        hrResult = OnCleanPackage(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCleanPackage(pContext->pCache, pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE:
-        hrResult = OnLaunchApprovedExe(pContext->hPipe, pContext->pApprovedExes, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnLaunchApprovedExe(pContext->hPipe, pContext->pApprovedExes, pContext->pCache, pContext->pVariables, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     default:
@@ -1901,11 +1915,11 @@ static HRESULT ProcessElevatedChildCacheMessage(
     switch (pMsg->dwMessage)
     {
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_PREPARE_PACKAGE:
-        hrResult = OnCachePreparePackage(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCachePreparePackage(pContext->pCache, pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_COMPLETE_PAYLOAD:
-        hrResult = OnCacheCompletePayload(pContext->hPipe, pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCacheCompletePayload(pContext->hPipe, pContext->pCache, pContext->pPackages, pContext->pPayloads, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_VERIFY_PAYLOAD:
@@ -1913,12 +1927,12 @@ static HRESULT ProcessElevatedChildCacheMessage(
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CACHE_CLEANUP:
-        OnCacheCleanup(pContext->pRegistration->sczId);
+        OnCacheCleanup(pContext->pCache);
         hrResult = S_OK;
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_CLEAN_PACKAGE:
-        hrResult = OnCleanPackage(pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
+        hrResult = OnCleanPackage(pContext->pCache, pContext->pPackages, (BYTE*)pMsg->pvData, pMsg->cbData);
         break;
 
     default:
@@ -2080,6 +2094,7 @@ static HRESULT OnApplyUninitialize(
 }
 
 static HRESULT OnSessionBegin(
+    __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -2120,7 +2135,7 @@ static HRESULT OnSessionBegin(
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Begin session in per-machine process.
-    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
+    hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pCache, pVariables, dwRegistrationOperations, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to begin registration session.");
 
 LExit:
@@ -2162,6 +2177,7 @@ LExit:
 }
 
 static HRESULT OnSessionEnd(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
@@ -2190,7 +2206,7 @@ static HRESULT OnSessionEnd(
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     // suspend session in per-machine process
-    hr = RegistrationSessionEnd(pRegistration, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
+    hr = RegistrationSessionEnd(pRegistration, pCache, pVariables, pPackages, (BURN_RESUME_MODE)dwResumeMode, (BOOTSTRAPPER_APPLY_RESTART)dwRestart, (BURN_DEPENDENCY_REGISTRATION_ACTION)dwDependencyRegistrationAction, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to suspend registration session.");
 
 LExit:
@@ -2214,6 +2230,7 @@ LExit:
 }
 
 static HRESULT OnCachePreparePackage(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -2239,7 +2256,7 @@ static HRESULT OnCachePreparePackage(
         ExitOnRootFailure(hr, "Invalid data passed to cache prepare package.");
     }
 
-    hr = CachePreparePackage(pPackage);
+    hr = CachePreparePackage(pCache, pPackage);
     ExitOnFailure(hr, "Failed to prepare cache package.");
 
 LExit:
@@ -2250,6 +2267,7 @@ LExit:
 
 static HRESULT OnCacheCompletePayload(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_PAYLOADS* pPayloads,
     __in BYTE* pbData,
@@ -2291,7 +2309,7 @@ static HRESULT OnCacheCompletePayload(
 
     if (pPackage && pPayload) // complete payload.
     {
-        hr = CacheCompletePayload(pPackage->fPerMachine, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
+        hr = CacheCompletePayload(pCache, pPackage->fPerMachine, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
         ExitOnFailure(hr, "Failed to cache payload: %ls", pPayload->sczKey);
     }
     else
@@ -2364,10 +2382,10 @@ LExit:
 }
 
 static void OnCacheCleanup(
-    __in_z LPCWSTR wzBundleId
+    __in BURN_CACHE* pCache
     )
 {
-    CacheCleanup(TRUE, wzBundleId);
+    CacheCleanup(TRUE, pCache);
 }
 
 static HRESULT OnProcessDependentRegistration(
@@ -2405,6 +2423,7 @@ LExit:
 
 static HRESULT OnExecuteExePackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BURN_VARIABLES* pVariables,
@@ -2464,7 +2483,7 @@ static HRESULT OnExecuteExePackage(
     }
 
     // Execute EXE package.
-    hr = ExeEngineExecutePackage(&executeAction, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
+    hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
     ExitOnFailure(hr, "Failed to execute EXE package.");
 
 LExit:
@@ -2490,6 +2509,7 @@ LExit:
 
 static HRESULT OnExecuteMsiPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -2563,7 +2583,7 @@ static HRESULT OnExecuteMsiPackage(
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Execute MSI package.
-    hr = MsiEngineExecutePackage(hwndParent, &executeAction, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
+    hr = MsiEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &msiRestart);
     ExitOnFailure(hr, "Failed to execute MSI package.");
 
 LExit:
@@ -2587,6 +2607,7 @@ LExit:
 
 static HRESULT OnExecuteMspPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -2658,7 +2679,7 @@ static HRESULT OnExecuteMspPackage(
     ExitOnFailure(hr, "Failed to read rollback flag.");
 
     // Execute MSP package.
-    hr = MspEngineExecutePackage(hwndParent, &executeAction, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &restart);
+    hr = MspEngineExecutePackage(hwndParent, &executeAction, pCache, pVariables, fRollback, MsiExecuteMessageHandler, hPipe, &restart);
     ExitOnFailure(hr, "Failed to execute MSP package.");
 
 LExit:
@@ -2682,6 +2703,7 @@ LExit:
 
 static HRESULT OnExecuteMsuPackage(
     __in HANDLE hPipe,
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
@@ -2718,7 +2740,7 @@ static HRESULT OnExecuteMsuPackage(
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
     // execute MSU package
-    hr = MsuEngineExecutePackage(&executeAction, pVariables, static_cast<BOOL>(dwRollback), static_cast<BOOL>(dwStopWusaService), GenericExecuteMessageHandler, hPipe, &restart);
+    hr = MsuEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), static_cast<BOOL>(dwStopWusaService), GenericExecuteMessageHandler, hPipe, &restart);
     ExitOnFailure(hr, "Failed to execute MSU package.");
 
 LExit:
@@ -3051,6 +3073,7 @@ LExit:
 }
 
 static HRESULT OnCleanPackage(
+    __in BURN_CACHE* pCache,
     __in BURN_PACKAGES* pPackages,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -3069,7 +3092,7 @@ static HRESULT OnCleanPackage(
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
     // Remove the package from the cache.
-    hr = CacheRemovePackage(TRUE, pPackage->sczId, pPackage->sczCacheId);
+    hr = CacheRemovePackage(pCache, TRUE, pPackage->sczId, pPackage->sczCacheId);
     ExitOnFailure(hr, "Failed to remove from cache package: %ls", pPackage->sczId);
 
 LExit:
@@ -3080,6 +3103,7 @@ LExit:
 static HRESULT OnLaunchApprovedExe(
     __in HANDLE hPipe,
     __in BURN_APPROVED_EXES* pApprovedExes,
+    __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BYTE* pbData,
     __in SIZE_T cbData
@@ -3124,7 +3148,7 @@ static HRESULT OnLaunchApprovedExe(
     hr = RegReadString(hKey, pApprovedExe->sczValueName, &pLaunchApprovedExe->sczExecutablePath);
     ExitOnFailure(hr, "Failed to read the value for the approved exe path.");
 
-    hr = ApprovedExesVerifySecureLocation(pVariables, pLaunchApprovedExe);
+    hr = ApprovedExesVerifySecureLocation(pCache, pVariables, pLaunchApprovedExe);
     ExitOnFailure(hr, "Failed to verify the executable path is in a secure location: %ls", pLaunchApprovedExe->sczExecutablePath);
     if (S_FALSE == hr)
     {
