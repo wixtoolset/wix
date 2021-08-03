@@ -80,19 +80,6 @@ HRESULT PipeCreatePipes(
     __in BOOL fCreateCachePipe,
     __out HANDLE* phEvent
     );
-HRESULT PipeLaunchParentProcess(
-    __in LPCWSTR wzCommandLine,
-    __in int nCmdShow,
-    __in_z LPWSTR sczConnectionName,
-    __in_z LPWSTR sczSecret,
-    __in BOOL fDisableUnelevate
-    );
-HRESULT PipeLaunchChildProcess(
-    __in_z LPCWSTR wzExecutablePath,
-    __in BURN_PIPE_CONNECTION* pConnection,
-    __in BOOL fElevate,
-    __in_opt HWND hwndParent
-    );
 HRESULT PipeWaitForChildConnect(
     __in BURN_PIPE_CONNECTION* pConnection
     );
