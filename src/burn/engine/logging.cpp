@@ -15,7 +15,11 @@ static CONST LPWSTR LOG_FAILED_EVENT_LOG_MESSAGE = L"Burn Engine Fatal Error: fa
 // internal function declarations
 
 static void CheckLoggingPolicy(
-    __out DWORD *pdwAttributes
+    __inout DWORD* pdwAttributes
+    );
+static HRESULT InitializeLogging(
+    __in BURN_LOGGING* pLog,
+    __in BURN_ENGINE_COMMAND* pInternalCommand
     );
 static HRESULT GetNonSessionSpecificTempFolder(
     __deref_out_z LPWSTR* psczNonSessionTempFolder
@@ -26,8 +30,9 @@ static HRESULT GetNonSessionSpecificTempFolder(
 
 extern "C" HRESULT LoggingOpen(
     __in BURN_LOGGING* pLog,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in_z LPCWSTR wzBundleName
     )
 {
@@ -35,8 +40,8 @@ extern "C" HRESULT LoggingOpen(
     LPWSTR sczLoggingBaseFolder = NULL;
     LPWSTR sczPrefixFormatted = NULL;
 
-    // Check if the logging policy is set and configure the logging appropriately.
-    CheckLoggingPolicy(&pLog->dwAttributes);
+    hr = InitializeLogging(pLog, pInternalCommand);
+    ExitOnFailure(hr, "Failed to initialize logging.");
 
     if (pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_VERBOSE || pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_EXTRADEBUG)
     {
@@ -94,7 +99,7 @@ extern "C" HRESULT LoggingOpen(
                 HRESULT hrOriginal = hr;
 
                 hr = HRESULT_FROM_WIN32(ERROR_INSTALL_LOG_FAILURE);
-                SplashScreenDisplayError(display, wzBundleName, hr);
+                SplashScreenDisplayError(pCommand->display, wzBundleName, hr);
 
                 ExitOnFailure(hrOriginal, "Failed to open log: %ls", pLog->sczPath);
             }
@@ -709,7 +714,7 @@ extern "C" LPWSTR LoggingStringOrUnknownIfNull(
 // internal function declarations
 
 static void CheckLoggingPolicy(
-    __out DWORD *pdwAttributes
+    __inout DWORD *pdwAttributes
     )
 {
     HRESULT hr = S_OK;
@@ -741,6 +746,28 @@ static void CheckLoggingPolicy(
 
     ReleaseStr(sczLoggingPolicy);
     ReleaseRegKey(hk);
+}
+
+static HRESULT InitializeLogging(
+    __in BURN_LOGGING* pLog,
+    __in BURN_ENGINE_COMMAND* pInternalCommand
+    )
+{
+    HRESULT hr = S_OK;
+
+    // Check if the logging policy is set and configure the logging appropriately.
+    CheckLoggingPolicy(&pLog->dwAttributes);
+
+    pLog->dwAttributes |= pInternalCommand->dwLoggingAttributes;
+
+    if (pInternalCommand->sczLogFile)
+    {
+        hr = StrAllocString(&pLog->sczPath, pInternalCommand->sczLogFile, 0);
+        ExitOnFailure(hr, "Failed to copy log file path from command line.");
+    }
+
+LExit:
+    return hr;
 }
 
 static HRESULT GetNonSessionSpecificTempFolder(

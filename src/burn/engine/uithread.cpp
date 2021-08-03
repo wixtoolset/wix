@@ -105,7 +105,7 @@ static DWORD WINAPI ThreadProc(
     MSG msg = { };
 
     BURN_ENGINE_STATE* pEngineState = pContext->pEngineState;
-    BOOL fElevatedEngine = BURN_MODE_ELEVATED == pContext->pEngineState->mode;
+    BOOL fElevatedEngine = BURN_MODE_ELEVATED == pContext->pEngineState->internalCommand.mode;
 
     // If elevated, set up the thread local storage to store the correct pipe to communicate logging.
     if (fElevatedEngine)

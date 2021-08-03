@@ -197,7 +197,7 @@ HRESULT ExternalEngineSendEmbeddedError(
     SIZE_T cbData = 0;
     DWORD dwResult = *pnResult = 0;
 
-    if (BURN_MODE_EMBEDDED != pEngineState->mode)
+    if (BURN_MODE_EMBEDDED != pEngineState->internalCommand.mode)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_STATE);
         ExitOnRootFailure(hr, "BA requested to send embedded message when not in embedded mode.");
@@ -235,7 +235,7 @@ HRESULT ExternalEngineSendEmbeddedProgress(
     SIZE_T cbData = 0;
     DWORD dwResult = *pnResult = 0;
 
-    if (BURN_MODE_EMBEDDED != pEngineState->mode)
+    if (BURN_MODE_EMBEDDED != pEngineState->internalCommand.mode)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_STATE);
         ExitOnRootFailure(hr, "BA requested to send embedded progress message when not in embedded mode.");
@@ -295,7 +295,7 @@ HRESULT ExternalEngineSetUpdate(
     {
         UpdateUninitialize(&pEngineState->update);
 
-        hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, &pEngineState->internalCommand, &pEngineState->command, BOOTSTRAPPER_RELATION_NONE, FALSE, pEngineState->registration.sczAncestors, NULL, pEngineState->command.wzCommandLine);
+        hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, &pEngineState->internalCommand, &pEngineState->command, BOOTSTRAPPER_RELATION_NONE, FALSE, NULL);
         ExitOnFailure(hr, "Failed to recreate command-line for update bundle.");
 
         // Bundles would fail to use the downloaded update bundle, as the running bundle would be one of the search paths.

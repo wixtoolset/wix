@@ -152,7 +152,6 @@ typedef struct _BURN_REGISTRATION
     BOOL fEligibleForCleanup;            // Only valid after detect.
 
     LPWSTR sczDetectedProviderKeyBundleId;
-    LPWSTR sczAncestors;
     LPWSTR sczBundlePackageAncestors;
 } BURN_REGISTRATION;
 

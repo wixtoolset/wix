@@ -339,7 +339,7 @@ extern "C" HRESULT ElevationElevate(
     __in_opt HWND hwndParent
     )
 {
-    Assert(BURN_MODE_ELEVATED != pEngineState->mode);
+    Assert(BURN_MODE_ELEVATED != pEngineState->internalCommand.mode);
     Assert(!pEngineState->companionConnection.sczName);
     Assert(!pEngineState->companionConnection.sczSecret);
     Assert(!pEngineState->companionConnection.hProcess);
@@ -407,9 +407,7 @@ extern "C" HRESULT ElevationApplyInitialize(
     __in HANDLE hPipe,
     __in BURN_USER_EXPERIENCE* pBA,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_ACTION action,
-    __in BURN_AU_PAUSE_ACTION auAction,
-    __in BOOL fTakeSystemRestorePoint
+    __in BURN_PLAN* pPlan
     )
 {
     HRESULT hr = S_OK;
@@ -421,13 +419,13 @@ extern "C" HRESULT ElevationApplyInitialize(
     context.pBA = pBA;
 
     // serialize message data
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)action);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pPlan->action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)auAction);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pPlan->pInternalCommand->automaticUpdates);
     ExitOnFailure(hr, "Failed to write update action to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fTakeSystemRestorePoint);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)!pPlan->pInternalCommand->fDisableSystemRestore);
     ExitOnFailure(hr, "Failed to write system restore point action to message buffer.");
     
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);

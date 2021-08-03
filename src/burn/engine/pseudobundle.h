@@ -31,7 +31,6 @@ HRESULT PseudoBundleInitializePassthrough(
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in_z_opt LPCWSTR wzAppendLogPath,
-    __in_z_opt LPCWSTR wzAncestors,
     __in BURN_PACKAGE* pPackage
     );
 

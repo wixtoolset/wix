@@ -113,7 +113,7 @@ extern "C" HRESULT EngineRun(
     LogSetLevel(REPORT_VERBOSE, FALSE); // FALSE means don't write an additional text line to the log saying the level changed
 #endif
 
-    hr = AppParseCommandLine(wzCommandLine, &engineState.argc, &engineState.argv);
+    hr = AppParseCommandLine(wzCommandLine, &engineState.internalCommand.argc, &engineState.internalCommand.argv);
     ExitOnFailure(hr, "Failed to parse command line.");
 
     hr = InitializeEngineState(&engineState, hEngineFile);
@@ -121,7 +121,7 @@ extern "C" HRESULT EngineRun(
 
     engineState.command.nCmdShow = nCmdShow;
 
-    if (BURN_MODE_ELEVATED != engineState.mode && BOOTSTRAPPER_DISPLAY_NONE < engineState.command.display && !engineState.command.hwndSplashScreen)
+    if (BURN_MODE_ELEVATED != engineState.internalCommand.mode && BOOTSTRAPPER_DISPLAY_NONE < engineState.command.display && !engineState.command.hwndSplashScreen)
     {
         SplashScreenCreate(hInstance, NULL, &engineState.command.hwndSplashScreen);
     }
@@ -192,7 +192,7 @@ extern "C" HRESULT EngineRun(
     ExitOnFailure(hr, "Failed to initialize core.");
 
     // Select run mode.
-    switch (engineState.mode)
+    switch (engineState.internalCommand.mode)
     {
     case BURN_MODE_UNTRUSTED:
         hr = RunUntrusted(wzCommandLine, &engineState);
@@ -328,7 +328,7 @@ static HRESULT InitializeEngineState(
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
 
-    pEngineState->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
+    pEngineState->internalCommand.automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED;
     pEngineState->dwElevatedLoggingTlsId = TLS_OUT_OF_INDEXES;
     ::InitializeCriticalSection(&pEngineState->userExperience.csEngineActive);
     PipeConnectionInitialize(&pEngineState->companionConnection);
@@ -338,7 +338,7 @@ static HRESULT InitializeEngineState(
     ProcElevated(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
 
     // Parse command line.
-    hr = CoreParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &pEngineState->internalCommand.sczSourceProcessPath, &pEngineState->internalCommand.sczOriginalSource, &hSectionFile, &hSourceEngineFile, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->internalCommand.sczActiveParent, &pEngineState->internalCommand.sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &pEngineState->fInvalidCommandLine, &pEngineState->cUnknownArgs, &pEngineState->rgUnknownArgs);
+    hr = CoreParseCommandLine(&pEngineState->internalCommand, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &hSectionFile, &hSourceEngineFile);
     ExitOnFailure(hr, "Fatal error while parsing command line.");
 
     hr = SectionInitialize(&pEngineState->section, hSectionFile, hSourceEngineFile);
@@ -355,12 +355,12 @@ static void UninitializeEngineState(
     __in BURN_ENGINE_STATE* pEngineState
     )
 {
-    if (pEngineState->argv)
+    if (pEngineState->internalCommand.argv)
     {
-        AppFreeCommandLineArgs(pEngineState->argv);
+        AppFreeCommandLineArgs(pEngineState->internalCommand.argv);
     }
 
-    ReleaseMem(pEngineState->rgUnknownArgs);
+    ReleaseMem(pEngineState->internalCommand.rgUnknownArgs);
 
     PipeConnectionUninitialize(&pEngineState->embeddedConnection);
     PipeConnectionUninitialize(&pEngineState->companionConnection);
@@ -390,7 +390,9 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->command.wzCommandLine);
 
     ReleaseStr(pEngineState->internalCommand.sczActiveParent);
+    ReleaseStr(pEngineState->internalCommand.sczAncestors);
     ReleaseStr(pEngineState->internalCommand.sczIgnoreDependencies);
+    ReleaseStr(pEngineState->internalCommand.sczLogFile);
     ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
     ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
 
@@ -469,7 +471,7 @@ static HRESULT RunUntrusted(
 
 #ifdef ENABLE_UNELEVATE
     // TODO: Pass file handle to unelevated process if this ever gets reenabled.
-    if (!pEngineState->fDisableUnelevate)
+    if (!pEngineState->internalCommand.fDisableUnelevate)
     {
         // Try to launch unelevated and if that fails for any reason, we'll launch our process normally (even though that may make it elevated).
         hr = ProcExecuteAsInteractiveUser(wzCleanRoomBundlePath, sczParameters, &hProcess);
@@ -522,7 +524,7 @@ static HRESULT RunNormal(
     BURN_EXTENSION_ENGINE_CONTEXT extensionEngineContext = { };
 
     // Initialize logging.
-    hr = LoggingOpen(&pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->registration.sczDisplayName);
+    hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
     ExitOnFailure(hr, "Failed to open log.");
 
     // Ensure we're on a supported operating system.
@@ -693,9 +695,6 @@ static HRESULT RunEmbedded(
     )
 {
     HRESULT hr = S_OK;
-
-    // Disable system restore since the parent bundle may have done it.
-    pEngineState->fDisableSystemRestore = TRUE;
 
     // Connect to parent process.
     hr = PipeChildConnect(&pEngineState->embeddedConnection, FALSE);

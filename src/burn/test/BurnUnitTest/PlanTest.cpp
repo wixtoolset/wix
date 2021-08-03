@@ -1144,8 +1144,11 @@ namespace Bootstrapper
             __in LPCWSTR wzVersion
             )
         {
-            HRESULT hr = StrAllocString(&pEngineState->registration.sczAncestors, wzId, 0);
+            HRESULT hr = StrAllocString(&pEngineState->internalCommand.sczAncestors, wzId, 0);
             NativeAssert::Succeeded(hr, "Failed to set registration's ancestors");
+
+            hr = StrAllocFormatted(&pEngineState->registration.sczBundlePackageAncestors, L"%ls;%ls", wzId, pEngineState->registration.sczId);
+            NativeAssert::Succeeded(hr, "Failed to set registration's package ancestors");
 
             pEngineState->command.relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 

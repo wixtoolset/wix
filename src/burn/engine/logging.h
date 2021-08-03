@@ -43,8 +43,9 @@ typedef struct _BURN_LOGGING
 
 HRESULT LoggingOpen(
     __in BURN_LOGGING* pLog,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in_z LPCWSTR wzBundleName
     );
 

@@ -230,6 +230,7 @@ typedef struct _BURN_PLAN
 {
     BOOTSTRAPPER_ACTION action;
     BURN_CACHE* pCache;
+    BOOTSTRAPPER_COMMAND* pCommand;
     BURN_ENGINE_COMMAND* pInternalCommand;
     BURN_PAYLOADS* pPayloads;
     LPWSTR wzBundleId;          // points directly into parent the ENGINE_STATE.
@@ -326,10 +327,8 @@ HRESULT PlanLayoutBundle(
     );
 HRESULT PlanForwardCompatibleBundles(
     __in BURN_USER_EXPERIENCE* pUX,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PLAN* pPlan,
-    __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_ACTION action
+    __in BURN_REGISTRATION* pRegistration
     );
 HRESULT PlanPackages(
     __in BURN_USER_EXPERIENCE* pUX,
@@ -446,7 +445,6 @@ HRESULT PlanRollbackBoundaryComplete(
 HRESULT PlanSetResumeCommand(
     __in BURN_PLAN* pPlan,
     __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_LOGGING* pLog
     );
 void PlanDump(

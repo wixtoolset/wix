@@ -428,15 +428,14 @@ LExit:
 
 extern "C" HRESULT PlanForwardCompatibleBundles(
     __in BURN_USER_EXPERIENCE* pUX,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_PLAN* pPlan,
-    __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_ACTION action
+    __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
     BOOL fRecommendIgnore = TRUE;
     BOOL fIgnoreBundle = FALSE;
+    BOOTSTRAPPER_ACTION action = pPlan->action;
 
     if (!pRegistration->fForwardCompatibleBundleExists)
     {
@@ -480,7 +479,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
 
         if (!fIgnoreBundle)
         {
-            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pPlan->pInternalCommand, pCommand, NULL, pRegistration->sczAncestors, &pRelatedBundle->package);
+            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pPlan->pInternalCommand, pPlan->pCommand, NULL, &pRelatedBundle->package);
             ExitOnFailure(hr, "Failed to initialize pass through bundle.");
 
             pPlan->fEnabledForwardCompatibleBundle = TRUE;
@@ -1239,9 +1238,9 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
     UINT cAncestors = 0;
     STRINGDICT_HANDLE sdAncestors = NULL;
 
-    if (pRegistration->sczAncestors)
+    if (pPlan->pInternalCommand->sczAncestors)
     {
-        hr = StrSplitAllocArray(&rgsczAncestors, &cAncestors, pRegistration->sczAncestors, L";");
+        hr = StrSplitAllocArray(&rgsczAncestors, &cAncestors, pPlan->pInternalCommand->sczAncestors, L";");
         ExitOnFailure(hr, "Failed to create string array from ancestors.");
 
         hr = DictCreateStringListFromArray(&sdAncestors, rgsczAncestors, cAncestors, DICT_FLAG_CASEINSENSITIVE);
@@ -1777,14 +1776,14 @@ LExit:
 extern "C" HRESULT PlanSetResumeCommand(
     __in BURN_PLAN* pPlan,
     __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_LOGGING* pLog
     )
 {
     HRESULT hr = S_OK;
+    BOOTSTRAPPER_COMMAND* pCommand = pPlan->pCommand;
 
     // build the resume command-line.
-    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, pPlan->action, pPlan->pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough, pRegistration->sczAncestors, pLog->sczPath, pCommand->wzCommandLine);
+    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, pPlan->action, pPlan->pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough, pLog->sczPath);
     ExitOnFailure(hr, "Failed to recreate resume command-line.");
 
 LExit:

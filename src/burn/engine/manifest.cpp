@@ -98,7 +98,7 @@ static HRESULT ParseFromXml(
         }
 
         // parse disable system restore
-        hr = XmlGetYesNoAttribute(pixnChain, L"DisableSystemRestore", &pEngineState->fDisableSystemRestore);
+        hr = XmlGetYesNoAttribute(pixnChain, L"DisableSystemRestore", &pEngineState->internalCommand.fDisableSystemRestore);
         if (E_NOTFOUND != hr)
         {
             ExitOnFailure(hr, "Failed to get Chain/@DisableSystemRestore");

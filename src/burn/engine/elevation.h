@@ -16,9 +16,7 @@ HRESULT ElevationApplyInitialize(
     __in HANDLE hPipe,
     __in BURN_USER_EXPERIENCE* pBA,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_ACTION action,
-    __in BURN_AU_PAUSE_ACTION auAction,
-    __in BOOL fTakeSystemRestorePoint
+    __in BURN_PLAN* pPlan
     );
 HRESULT ElevationApplyUninitialize(
     __in HANDLE hPipe
