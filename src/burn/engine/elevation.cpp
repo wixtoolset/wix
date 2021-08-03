@@ -100,6 +100,16 @@ typedef struct _BURN_ELEVATION_CHILD_MESSAGE_CONTEXT
 
 // internal function declarations
 
+/*******************************************************************
+ LaunchElevatedProcess - Called from the per-user process to create
+                          the per-machine process and set up the
+                          communication pipe.
+
+*******************************************************************/
+static HRESULT LaunchElevatedProcess(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_opt HWND hwndParent
+    );
 static DWORD WINAPI ElevatedChildCacheThreadProc(
     __in LPVOID lpThreadParameter
     );
@@ -367,7 +377,7 @@ extern "C" HRESULT ElevationElevate(
         nResult = IDOK;
 
         // Create the elevated process and if successful, wait for it to connect.
-        hr = PipeLaunchChildProcess(pEngineState->sczBundleEngineWorkingPath, &pEngineState->companionConnection, TRUE, hwndParent);
+        hr = LaunchElevatedProcess(pEngineState, hwndParent);
         if (SUCCEEDED(hr))
         {
             LogId(REPORT_STANDARD, MSG_LAUNCH_ELEVATED_ENGINE_SUCCESS);
@@ -1370,6 +1380,36 @@ LExit:
 }
 
 // internal function definitions
+
+static HRESULT LaunchElevatedProcess(
+    __in BURN_ENGINE_STATE* pEngineState,
+    __in_opt HWND hwndParent
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwCurrentProcessId = ::GetCurrentProcessId();
+    LPWSTR sczParameters = NULL;
+    HANDLE hProcess = NULL;
+    BURN_PIPE_CONNECTION* pConnection = &pEngineState->companionConnection;
+
+    hr = StrAllocFormatted(&sczParameters, L"-q -%ls %ls %ls %u", BURN_COMMANDLINE_SWITCH_ELEVATED, pConnection->sczName, pConnection->sczSecret, dwCurrentProcessId);
+    ExitOnFailure(hr, "Failed to allocate parameters for elevated process.");
+
+    // Since ShellExecuteEx doesn't support passing inherited handles, don't bother with CoreAppendFileHandleSelfToCommandLine.
+    // We could fallback to using ::DuplicateHandle to inject the file handle later if necessary.
+    hr = ShelExec(pEngineState->sczBundleEngineWorkingPath, sczParameters, L"runas", NULL, SW_SHOWNA, hwndParent, &hProcess);
+    ExitOnFailure(hr, "Failed to launch elevated child process: %ls", pEngineState->sczBundleEngineWorkingPath);
+
+    pConnection->dwProcessId = ::GetProcessId(hProcess);
+    pConnection->hProcess = hProcess;
+    hProcess = NULL;
+
+LExit:
+    ReleaseHandle(hProcess);
+    ReleaseStr(sczParameters);
+
+    return hr;
+}
 
 static DWORD WINAPI ElevatedChildCacheThreadProc(
     __in LPVOID lpThreadParameter

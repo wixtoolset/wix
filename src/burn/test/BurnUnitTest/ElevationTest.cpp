@@ -52,38 +52,33 @@ namespace Bootstrapper
         void ElevateTest()
         {
             HRESULT hr = S_OK;
-            BURN_PIPE_CONNECTION connection = { };
+            BURN_ENGINE_STATE engineState = { };
+            BURN_PIPE_CONNECTION* pConnection = &engineState.companionConnection;
             HANDLE hEvent = NULL;
             DWORD dwResult = S_OK;
+
+            engineState.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
+
             try
             {
                 ShelFunctionOverride(ElevateTest_ShellExecuteExW);
 
-                PipeConnectionInitialize(&connection);
+                PipeConnectionInitialize(pConnection);
 
                 //
                 // per-user side setup
                 //
-                hr = PipeCreateNameAndSecret(&connection.sczName, &connection.sczSecret);
-                TestThrowOnFailure(hr, L"Failed to create connection name and secret.");
-
-                hr = PipeCreatePipes(&connection, TRUE, &hEvent);
-                TestThrowOnFailure(hr, L"Failed to create pipes.");
-
-                hr = PipeLaunchChildProcess(L"tests\\ignore\\this\\path\\to\\burn.exe", &connection, TRUE, NULL);
-                TestThrowOnFailure(hr, L"Failed to create elevated process.");
-
-                hr = PipeWaitForChildConnect(&connection);
-                TestThrowOnFailure(hr, L"Failed to wait for child process to connect.");
+                hr = ElevationElevate(&engineState, NULL);
+                TestThrowOnFailure(hr, L"Failed to elevate.");
 
                 // post execute message
-                hr = PipeSendMessage(connection.hPipe, TEST_PARENT_SENT_MESSAGE_ID, NULL, 0, ProcessParentMessages, NULL, &dwResult);
+                hr = PipeSendMessage(pConnection->hPipe, TEST_PARENT_SENT_MESSAGE_ID, NULL, 0, ProcessParentMessages, NULL, &dwResult);
                 TestThrowOnFailure(hr, "Failed to post execute message to per-machine process.");
 
                 //
                 // initiate termination
                 //
-                hr = PipeTerminateChildProcess(&connection, 666, FALSE);
+                hr = PipeTerminateChildProcess(pConnection, 666, FALSE);
                 TestThrowOnFailure(hr, L"Failed to terminate elevated process.");
 
                 // check flags
@@ -91,7 +86,7 @@ namespace Bootstrapper
             }
             finally
             {
-                PipeConnectionUninitialize(&connection);
+                PipeConnectionUninitialize(pConnection);
                 ReleaseHandle(hEvent);
             }
         }

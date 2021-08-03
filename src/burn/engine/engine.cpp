@@ -462,30 +462,18 @@ static HRESULT RunUntrusted(
     hr = CoreCreateCleanRoomCommandLine(&sczParameters, pEngineState, wzCleanRoomBundlePath, sczCurrentProcessPath, &hFileAttached, &hFileSelf);
     ExitOnFailure(hr, "Failed to create clean room command-line.");
 
-#ifdef ENABLE_UNELEVATE
-    // TODO: Pass file handle to unelevated process if this ever gets reenabled.
-    if (!pEngineState->internalCommand.fDisableUnelevate)
+    hr = StrAllocFormattedSecure(&sczFullCommandLine, L"\"%ls\" %ls", wzCleanRoomBundlePath, sczParameters);
+    ExitOnFailure(hr, "Failed to allocate full command-line.");
+
+    si.cb = sizeof(si);
+    si.wShowWindow = static_cast<WORD>(pEngineState->command.nCmdShow);
+    if (!::CreateProcessW(wzCleanRoomBundlePath, sczFullCommandLine, NULL, NULL, TRUE, 0, 0, NULL, &si, &pi))
     {
-        // Try to launch unelevated and if that fails for any reason, we'll launch our process normally (even though that may make it elevated).
-        hr = ProcExecuteAsInteractiveUser(wzCleanRoomBundlePath, sczParameters, &hProcess);
+        ExitWithLastError(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
     }
-#endif
 
-    if (!hProcess)
-    {
-        hr = StrAllocFormattedSecure(&sczFullCommandLine, L"\"%ls\" %ls", wzCleanRoomBundlePath, sczParameters);
-        ExitOnFailure(hr, "Failed to allocate full command-line.");
-
-        si.cb = sizeof(si);
-        si.wShowWindow = static_cast<WORD>(pEngineState->command.nCmdShow);
-        if (!::CreateProcessW(wzCleanRoomBundlePath, sczFullCommandLine, NULL, NULL, TRUE, 0, 0, NULL, &si, &pi))
-        {
-            ExitWithLastError(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
-        }
-
-        hProcess = pi.hProcess;
-        pi.hProcess = NULL;
-    }
+    hProcess = pi.hProcess;
+    pi.hProcess = NULL;
 
     hr = ProcWaitForCompletion(hProcess, INFINITE, &pEngineState->userExperience.dwExitCode);
     ExitOnFailure(hr, "Failed to wait for clean room process: %ls", wzCleanRoomBundlePath);

@@ -1086,14 +1086,6 @@ extern "C" HRESULT CoreCreateCleanRoomCommandLine(
         ExitOnFailure(hr, "Failed to append /disablesystemrestore.");
     }
 
-#ifdef ENABLE_UNELEVATE
-    if (pInternalCommand->fDisableUnelevate)
-    {
-        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE);
-        ExitOnFailure(hr, "Failed to append switch: %ls.", BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE);
-    }
-#endif
-
     if (pInternalCommand->sczOriginalSource)
     {
         hr = StrAllocConcat(psczCommandLine, L" /originalsource", 0);
@@ -1645,12 +1637,6 @@ extern "C" HRESULT CoreParseCommandLine(
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PASSTHROUGH, -1))
             {
                 pCommand->fPassthrough = TRUE;
-            }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_DISABLE_UNELEVATE, -1))
-            {
-#ifdef ENABLE_UNELEVATE
-                pInternalCommand->fDisableUnelevate = TRUE;
-#endif
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
             {

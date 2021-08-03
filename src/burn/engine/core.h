@@ -91,9 +91,6 @@ typedef struct _BURN_ENGINE_COMMAND
     BURN_MODE mode;
     BURN_AU_PAUSE_ACTION automaticUpdates;
     BOOL fDisableSystemRestore;
-#ifdef ENABLE_UNELEVATE
-    BOOL fDisableUnelevate;
-#endif
     BOOL fInitiallyElevated;
 
     LPWSTR sczActiveParent;
