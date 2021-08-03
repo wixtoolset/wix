@@ -39,11 +39,12 @@ extern "C" HRESULT LoggingOpen(
     HRESULT hr = S_OK;
     LPWSTR sczLoggingBaseFolder = NULL;
     LPWSTR sczPrefixFormatted = NULL;
+    LPCWSTR wzPostfix = BURN_MODE_UNTRUSTED == pInternalCommand->mode ? L".cleanroom" : NULL;
 
     hr = InitializeLogging(pLog, pInternalCommand);
     ExitOnFailure(hr, "Failed to initialize logging.");
 
-    if (pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_VERBOSE || pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_EXTRADEBUG)
+    if ((pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_VERBOSE) || (pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_EXTRADEBUG))
     {
         if (pLog->dwAttributes & BURN_LOGGING_ATTRIBUTE_EXTRADEBUG)
         {
@@ -54,9 +55,17 @@ extern "C" HRESULT LoggingOpen(
             LogSetLevel(REPORT_VERBOSE, FALSE);
         }
 
+        // In these modes, make sure a log will be created even if the bundle wasn't configured to create one.
         if ((!pLog->sczPath || !*pLog->sczPath) && (!pLog->sczPrefix || !*pLog->sczPrefix))
         {
-            PathCreateTimeBasedTempFile(NULL, L"Setup", NULL, L"log", &pLog->sczPath, NULL);
+            hr = StrAllocString(&pLog->sczPrefix, L"Setup", 0);
+            ExitOnFailure(hr, "Failed to copy default log prefix.");
+
+            if (!pLog->sczExtension || !*pLog->sczExtension)
+            {
+                hr = StrAllocString(&pLog->sczExtension, L"log", 0);
+                ExitOnFailure(hr, "Failed to copy default log extension.");
+            }
         }
     }
 
@@ -134,7 +143,7 @@ extern "C" HRESULT LoggingOpen(
                 ExitOnFailure(hr, "Failed to get non-session specific TEMP folder.");
             }
 
-            hr = LogOpen(sczLoggingBaseFolder, wzPrefix, NULL, pLog->sczExtension, FALSE, FALSE, &pLog->sczPath);
+            hr = LogOpen(sczLoggingBaseFolder, wzPrefix, wzPostfix, pLog->sczExtension, FALSE, FALSE, &pLog->sczPath);
             if (FAILED(hr))
             {
                 LogDisable();
@@ -760,7 +769,9 @@ static HRESULT InitializeLogging(
 
     pLog->dwAttributes |= pInternalCommand->dwLoggingAttributes;
 
-    if (pInternalCommand->sczLogFile)
+    // The untrusted process needs a separate log file.
+    // TODO: Burn crashes if they do try to use the same log file.
+    if (pInternalCommand->sczLogFile && BURN_MODE_UNTRUSTED != pInternalCommand->mode)
     {
         hr = StrAllocString(&pLog->sczPath, pInternalCommand->sczLogFile, 0);
         ExitOnFailure(hr, "Failed to copy log file path from command line.");

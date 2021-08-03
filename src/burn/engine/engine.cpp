@@ -95,6 +95,7 @@ extern "C" HRESULT EngineRun(
     SYSTEM_INFO si = { };
     RTL_OSVERSIONINFOEXW ovix = { };
     LPWSTR sczExePath = NULL;
+    BOOL fRunUntrusted = FALSE;
     BOOL fRunNormal = FALSE;
     BOOL fRestart = FALSE;
 
@@ -194,6 +195,8 @@ extern "C" HRESULT EngineRun(
     switch (engineState.internalCommand.mode)
     {
     case BURN_MODE_UNTRUSTED:
+        fRunUntrusted = TRUE;
+
         hr = RunUntrusted(&engineState);
         ExitOnFailure(hr, "Failed to run untrusted mode.");
         break;
@@ -295,6 +298,10 @@ LExit:
         {
             LogId(REPORT_STANDARD, MSG_RESTARTING);
         }
+    }
+    else if (fRunUntrusted)
+    {
+        LogId(REPORT_STANDARD, MSG_EXITING_CLEAN_ROOM, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
 
     if (fLogInitialized)
@@ -425,6 +432,10 @@ static HRESULT RunUntrusted(
     HANDLE hFileSelf = NULL;
     HANDLE hProcess = NULL;
 
+    // Initialize logging.
+    hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
+    ExitOnFailure(hr, "Failed to open clean room log.");
+
     hr = PathForCurrentProcess(&sczCurrentProcessPath, NULL);
     ExitOnFailure(hr, "Failed to get path for current process.");
 
@@ -480,6 +491,12 @@ static HRESULT RunUntrusted(
     ExitOnFailure(hr, "Failed to wait for clean room process: %ls", wzCleanRoomBundlePath);
 
 LExit:
+    // If the splash screen is still around, close it.
+    if (::IsWindow(pEngineState->command.hwndSplashScreen))
+    {
+        ::PostMessageW(pEngineState->command.hwndSplashScreen, WM_CLOSE, 0, 0);
+    }
+
     ReleaseHandle(pi.hThread);
     ReleaseFileHandle(hFileSelf);
     ReleaseFileHandle(hFileAttached);
