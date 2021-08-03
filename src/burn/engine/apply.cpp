@@ -533,6 +533,9 @@ extern "C" HRESULT ApplyCache(
     hr = UserExperienceOnCacheBegin(pUX);
     ExitOnRootFailure(hr, "BA aborted cache.");
 
+    hr = CacheEnsureAcquisitionFolder(pPlan->pCache);
+    ExitOnFailure(hr, "Failed to ensure acquisition folder.");
+
     cacheContext.hSourceEngineFile = hSourceEngineFile;
     cacheContext.pCache = pPlan->pCache;
     cacheContext.pPayloads = pPlan->pPayloads;

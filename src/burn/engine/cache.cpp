@@ -16,9 +16,10 @@ static HRESULT CacheVerifyPayloadSignature(
     );
 static HRESULT CalculateBaseWorkingFolder(
     __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in LPCWSTR wzAcquisitionFolder,
     __inout_z LPWSTR* psczBaseWorkingFolder
     );
-static HRESULT CalculateWorkingFolder(
+static HRESULT CalculateWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
     );
@@ -214,7 +215,7 @@ extern "C" HRESULT CacheInitialize(
     ExitOnFailure(hr, "Failed to backslash terminate default %hs package cache directory name.", "per-user");
 
 
-    hr = CalculateWorkingFolder(pCache, pInternalCommand);
+    hr = CalculateWorkingFolders(pCache, pInternalCommand);
 
     pCache->fInitializedCache = TRUE;
 
@@ -309,24 +310,42 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CacheEnsureWorkingFolder(
-    __in BURN_CACHE* pCache,
-    __deref_out_z_opt LPWSTR* psczWorkingFolder
+extern "C" HRESULT CacheEnsureAcquisitionFolder(
+    __in BURN_CACHE* pCache
     )
 {
     Assert(pCache->fInitializedCache);
 
     HRESULT hr = S_OK;
 
-    hr = DirEnsureExists(pCache->sczWorkingFolder, NULL);
+    hr = DirEnsureExists(pCache->sczAcquisitionFolder, NULL);
+    ExitOnFailure(hr, "Failed create acquisition folder.");
+
+    // Best effort to ensure our working folder is not encrypted.
+    ::DecryptFileW(pCache->sczBaseWorkingFolder, 0);
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT CacheEnsureBaseWorkingFolder(
+    __in BURN_CACHE* pCache,
+    __deref_out_z_opt LPWSTR* psczBaseWorkingFolder
+    )
+{
+    Assert(pCache->fInitializedCache);
+
+    HRESULT hr = S_OK;
+
+    hr = DirEnsureExists(pCache->sczBaseWorkingFolder, NULL);
     ExitOnFailure(hr, "Failed create working folder.");
 
     // Best effort to ensure our working folder is not encrypted.
-    ::DecryptFileW(pCache->sczWorkingFolder, 0);
+    ::DecryptFileW(pCache->sczBaseWorkingFolder, 0);
 
-    if (psczWorkingFolder)
+    if (psczBaseWorkingFolder)
     {
-        hr = StrAllocString(psczWorkingFolder, pCache->sczWorkingFolder, 0);
+        hr = StrAllocString(psczBaseWorkingFolder, pCache->sczBaseWorkingFolder, 0);
         ExitOnFailure(hr, "Failed to copy working folder.");
     }
 
@@ -353,7 +372,7 @@ extern "C" HRESULT CacheCalculateBundleWorkingPath(
     }
     else // Otherwise, use the real working folder.
     {
-        hr = StrAllocFormatted(psczWorkingPath, L"%ls%ls\\%ls", pCache->sczWorkingFolder, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName);
+        hr = StrAllocFormatted(psczWorkingPath, L"%ls%ls\\%ls", pCache->sczBaseWorkingFolder, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName);
         ExitOnFailure(hr, "Failed to calculate the bundle working path.");
     }
 
@@ -371,7 +390,7 @@ extern "C" HRESULT CacheCalculateBundleLayoutWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcat(pCache->sczWorkingFolder, wzBundleId, psczWorkingPath);
+    hr = PathConcat(pCache->sczAcquisitionFolder, wzBundleId, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append bundle id for bundle layout working path.");
 
 LExit:
@@ -388,7 +407,7 @@ extern "C" HRESULT CacheCalculatePayloadWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcat(pCache->sczWorkingFolder, pPayload->sczKey, psczWorkingPath);
+    hr = PathConcat(pCache->sczAcquisitionFolder, pPayload->sczKey, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append Id as payload unverified path.");
 
 LExit:
@@ -405,7 +424,7 @@ extern "C" HRESULT CacheCalculateContainerWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcat(pCache->sczWorkingFolder, pContainer->sczHash, psczWorkingPath);
+    hr = PathConcat(pCache->sczAcquisitionFolder, pContainer->sczHash, psczWorkingPath);
     ExitOnFailure(hr, "Failed to append hash as container unverified path.");
 
 LExit:
@@ -1155,7 +1174,7 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CacheRemoveWorkingFolder(
+extern "C" HRESULT CacheRemoveBaseWorkingFolder(
     __in BURN_CACHE* pCache
     )
 {
@@ -1164,7 +1183,7 @@ extern "C" HRESULT CacheRemoveWorkingFolder(
     if (pCache->fInitializedCacheSources)
     {
         // Try to clean out everything in the working folder.
-        hr = DirEnsureDeleteEx(pCache->sczWorkingFolder, DIR_DELETE_FILES | DIR_DELETE_RECURSE | DIR_DELETE_SCHEDULE);
+        hr = DirEnsureDeleteEx(pCache->sczBaseWorkingFolder, DIR_DELETE_FILES | DIR_DELETE_RECURSE | DIR_DELETE_SCHEDULE);
         TraceError(hr, "Could not delete bundle engine working folder.");
     }
 
@@ -1275,9 +1294,9 @@ extern "C" void CacheCleanup(
 
     if (!fPerMachine)
     {
-        if (pCache->sczWorkingFolder)
+        if (pCache->sczAcquisitionFolder)
         {
-            hr = PathConcat(pCache->sczWorkingFolder, L"*.*", &sczFiles);
+            hr = PathConcat(pCache->sczAcquisitionFolder, L"*.*", &sczFiles);
             if (SUCCEEDED(hr))
             {
                 hFind = ::FindFirstFileW(sczFiles, &wfd);
@@ -1299,7 +1318,7 @@ extern "C" void CacheCleanup(
                             continue;
                         }
 
-                        hr = PathConcatCch(pCache->sczWorkingFolder, 0, wfd.cFileName, cchFileName, &sczDelete);
+                        hr = PathConcatCch(pCache->sczAcquisitionFolder, 0, wfd.cFileName, cchFileName, &sczDelete);
                         if (SUCCEEDED(hr))
                         {
                             hr = FileEnsureDelete(sczDelete);
@@ -1327,7 +1346,8 @@ extern "C" void CacheUninitialize(
     ReleaseNullStr(pCache->sczCurrentMachinePackageCache);
     ReleaseNullStr(pCache->sczDefaultMachinePackageCache);
     ReleaseNullStr(pCache->sczDefaultUserPackageCache);
-    ReleaseNullStr(pCache->sczWorkingFolder);
+    ReleaseNullStr(pCache->sczBaseWorkingFolder);
+    ReleaseNullStr(pCache->sczAcquisitionFolder);
     ReleaseNullStr(pCache->sczSourceProcessFolder);
 
     pCache->fRunningFromCache = FALSE;
@@ -1343,6 +1363,7 @@ extern "C" void CacheUninitialize(
 
 static HRESULT CalculateBaseWorkingFolder(
     __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in LPCWSTR wzAcquisitionFolder,
     __inout_z LPWSTR* psczBaseWorkingFolder
     )
 {
@@ -1351,10 +1372,10 @@ static HRESULT CalculateBaseWorkingFolder(
     ReleaseNullStr(*psczBaseWorkingFolder);
 
     // The value from the command line takes precedence.
-    if (pInternalCommand->sczWorkingDirectory)
+    if (pInternalCommand->sczEngineWorkingDirectory)
     {
-        hr = PathExpand(psczBaseWorkingFolder, pInternalCommand->sczWorkingDirectory, PATH_EXPAND_FULLPATH);
-        ExitOnFailure(hr, "Failed to expand engine working directory from command-line: '%ls'", pInternalCommand->sczWorkingDirectory);
+        hr = PathExpand(psczBaseWorkingFolder, pInternalCommand->sczEngineWorkingDirectory, PATH_EXPAND_FULLPATH);
+        ExitOnFailure(hr, "Failed to expand engine working directory from command-line: '%ls'", pInternalCommand->sczEngineWorkingDirectory);
 
         ExitFunction();
     }
@@ -1373,34 +1394,41 @@ static HRESULT CalculateBaseWorkingFolder(
         }
     }
 
-    // Default to the temp path specified in environment variables, but need to use system temp path for security reasons if running elevated.
+    // Default to the acquisition folder, but need to use system temp path for security reasons if running elevated.
     if (pInternalCommand->fInitiallyElevated)
     {
         hr = PathGetSystemTempPath(psczBaseWorkingFolder);
-        ExitOnFailure(hr, "Failed to get system temp folder path for working folder.");
+        ExitOnFailure(hr, "Failed to get system temp folder path for base working folder.");
     }
     else
     {
-        hr = PathGetTempPath(psczBaseWorkingFolder);
-        ExitOnFailure(hr, "Failed to get temp folder path for working folder.");
+        hr = StrAllocString(psczBaseWorkingFolder, wzAcquisitionFolder, 0);
+        ExitOnFailure(hr, "Failed to copy acquisition folder path for base working folder.");
     }
 
 LExit:
     return hr;
 }
 
-static HRESULT CalculateWorkingFolder(
+static HRESULT CalculateWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
     )
 {
     HRESULT hr = S_OK;
     RPC_STATUS rs = RPC_S_OK;
+    LPWSTR sczBaseAcquisitionPath = NULL;
     LPWSTR sczTempPath = NULL;
     UUID guid = {};
     WCHAR wzGuid[39];
 
-    hr = CalculateBaseWorkingFolder(pInternalCommand, &sczTempPath);
+    hr = PathGetTempPath(&sczBaseAcquisitionPath);
+    ExitOnFailure(hr, "Failed to get temp folder path for acquisition folder base.");
+
+    hr = PathBackslashTerminate(&sczBaseAcquisitionPath);
+    ExitOnFailure(hr, "Failed to backslashify base engine working directory.");
+
+    hr = CalculateBaseWorkingFolder(pInternalCommand, sczBaseAcquisitionPath, &sczTempPath);
     ExitOnFailure(hr, "Failed to get base engine working directory.");
 
     hr = PathBackslashTerminate(&sczTempPath);
@@ -1416,10 +1444,14 @@ static HRESULT CalculateWorkingFolder(
         ExitOnRootFailure(hr, "Failed to convert working folder guid into string.");
     }
 
-    hr = StrAllocFormatted(&pCache->sczWorkingFolder, L"%ls%ls\\", sczTempPath, wzGuid);
+    hr = StrAllocFormatted(&pCache->sczAcquisitionFolder, L"%ls%ls\\", sczBaseAcquisitionPath, wzGuid);
+    ExitOnFailure(hr, "Failed to append random guid on to temp path for acquisition folder.");
+
+    hr = StrAllocFormatted(&pCache->sczBaseWorkingFolder, L"%ls%ls\\", sczTempPath, wzGuid);
     ExitOnFailure(hr, "Failed to append random guid on to temp path for working folder.");
 
 LExit:
+    ReleaseStr(sczBaseAcquisitionPath);
     ReleaseStr(sczTempPath);
 
     return hr;
@@ -2020,7 +2052,7 @@ static HRESULT CopyEngineToWorkingFolder(
     LPWSTR sczPayloadSourcePath = NULL;
     LPWSTR sczPayloadTargetPath = NULL;
 
-    hr = CacheEnsureWorkingFolder(pCache, &sczWorkingFolder);
+    hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working path to copy engine.");
 
     hr = PathConcat(sczWorkingFolder, wzWorkingFolderName, &sczTargetDirectory);

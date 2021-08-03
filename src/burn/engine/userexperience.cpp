@@ -168,7 +168,7 @@ extern "C" HRESULT UserExperienceEnsureWorkingFolder(
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
 
-    hr = CacheEnsureWorkingFolder(pCache, &sczWorkingFolder);
+    hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working folder.");
 
     hr = StrAllocFormatted(psczUserExperienceWorkingFolder, L"%ls%ls\\", sczWorkingFolder, L".ba");
