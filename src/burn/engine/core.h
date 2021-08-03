@@ -81,6 +81,10 @@ enum BURN_AU_PAUSE_ACTION
 typedef struct _BURN_ENGINE_COMMAND
 {
     BOOL fInitiallyElevated;
+
+    LPWSTR sczActiveParent;
+    LPWSTR sczIgnoreDependencies;
+
     LPWSTR sczSourceProcessPath;
     LPWSTR sczOriginalSource;
 } BURN_ENGINE_COMMAND;
@@ -111,6 +115,7 @@ typedef struct _BURN_ENGINE_STATE
     BURN_UPDATE update;
     BURN_APPROVED_EXES approvedExes;
     BURN_CACHE cache;
+    BURN_DEPENDENCIES dependencies;
     BURN_EXTENSIONS extensions;
 
     HWND hMessageWindow;
@@ -137,8 +142,6 @@ typedef struct _BURN_ENGINE_STATE
 
     BURN_RESUME_MODE resumeMode;
     BOOL fDisableUnelevate;
-
-    LPWSTR sczIgnoreDependencies;
 
     int argc;
     LPWSTR* argv;
@@ -211,10 +214,10 @@ LPCWSTR CoreRelationTypeToCommandLineString(
 HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzActiveParent,
     __in_z_opt LPCWSTR wzAncestors,
     __in_z_opt LPCWSTR wzAppendLogPath,
     __in_z_opt LPCWSTR wzAdditionalCommandLineArguments

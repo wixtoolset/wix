@@ -11,6 +11,18 @@ extern "C" {
 const LPCWSTR DEPENDENCY_IGNOREDEPENDENCIES = L"IGNOREDEPENDENCIES";
 
 
+typedef struct _BURN_DEPENDENCIES
+{
+    DEPENDENCY* rgIgnoredDependencies;
+    UINT cIgnoredDependencies;
+    LPCWSTR wzActiveParent;
+    LPCWSTR wzSelfDependent;
+    BOOL fIgnoreAllDependents;
+    BOOL fSelfDependent;
+    BOOL fActiveParent;
+} BURN_DEPENDENCIES;
+
+
 // function declarations
 
 /********************************************************************
@@ -33,8 +45,13 @@ HRESULT DependencyParseProvidersFromXml(
     );
 
 HRESULT DependencyInitialize(
-    __in BURN_REGISTRATION* pRegistration,
-    __in_z_opt LPCWSTR wzIgnoreDependencies
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BURN_DEPENDENCIES* pDependencies,
+    __in BURN_REGISTRATION* pRegistration
+    );
+
+void DependencyUninitialize(
+    __in BURN_DEPENDENCIES* pDependencies
     );
 
 /********************************************************************
@@ -52,7 +69,9 @@ HRESULT DependencyDetectProviderKeyBundleId(
 
 *********************************************************************/
 HRESULT DependencyDetect(
-    __in BURN_ENGINE_STATE* pEngineState
+    __in BURN_DEPENDENCIES* pDependencies,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_REGISTRATION* pRegistration
     );
 
 /********************************************************************
@@ -60,7 +79,7 @@ HRESULT DependencyDetect(
 
 *********************************************************************/
 HRESULT DependencyPlanInitialize(
-    __in const BURN_REGISTRATION* pRegistration,
+    __in BURN_DEPENDENCIES* pDependencies,
     __in BURN_PLAN* pPlan
     );
 

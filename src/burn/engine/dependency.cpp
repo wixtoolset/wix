@@ -171,36 +171,56 @@ LExit:
 }
 
 extern "C" HRESULT DependencyInitialize(
-    __in BURN_REGISTRATION* pRegistration,
-    __in_z_opt LPCWSTR wzIgnoreDependencies
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BURN_DEPENDENCIES* pDependencies,
+    __in BURN_REGISTRATION* pRegistration
     )
 {
+    AssertSz(!pDependencies->cIgnoredDependencies, "Dependencies already initalized.");
+
     HRESULT hr = S_OK;
 
     // If no parent was specified at all, use the bundle id as the self dependent.
-    if (!pRegistration->sczActiveParent)
+    if (!pInternalCommand->sczActiveParent)
     {
-        pRegistration->wzSelfDependent = pRegistration->sczId;
+        pDependencies->wzSelfDependent = pRegistration->sczId;
     }
-    else if (*pRegistration->sczActiveParent) // if parent was specified use that as the self dependent.
+    else if (*pInternalCommand->sczActiveParent) // if parent was specified use that as the self dependent.
     {
-        pRegistration->wzSelfDependent = pRegistration->sczActiveParent;
+        pDependencies->wzSelfDependent = pInternalCommand->sczActiveParent;
     }
     // else parent:none was used which means we should not register a dependency on ourself.
 
+    pDependencies->wzActiveParent = pInternalCommand->sczActiveParent;
+
     // The current bundle provider key should always be ignored for dependency checks.
-    hr = DepDependencyArrayAlloc(&pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
+    hr = DepDependencyArrayAlloc(&pDependencies->rgIgnoredDependencies, &pDependencies->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
     ExitOnFailure(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
 
     // Add the list of dependencies to ignore.
-    if (wzIgnoreDependencies)
+    if (pInternalCommand->sczIgnoreDependencies)
     {
-        hr = SplitIgnoreDependencies(wzIgnoreDependencies, &pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, &pRegistration->fIgnoreAllDependents);
+        hr = SplitIgnoreDependencies(pInternalCommand->sczIgnoreDependencies, &pDependencies->rgIgnoredDependencies, &pDependencies->cIgnoredDependencies, &pDependencies->fIgnoreAllDependents);
         ExitOnFailure(hr, "Failed to split the list of dependencies to ignore.");
     }
 
+    pDependencies->fSelfDependent = NULL != pDependencies->wzSelfDependent;
+    pDependencies->fActiveParent = NULL != pInternalCommand->sczActiveParent && NULL != *pInternalCommand->sczActiveParent;
+
 LExit:
     return hr;
+}
+
+extern "C" void DependencyUninitialize(
+    __in BURN_DEPENDENCIES* pDependencies
+    )
+{
+    if (pDependencies->rgIgnoredDependencies)
+    {
+        ReleaseDependencyArray(pDependencies->rgIgnoredDependencies, pDependencies->cIgnoredDependencies);
+    }
+
+    memset(pDependencies, 0, sizeof(BURN_DEPENDENCIES));
 }
 
 extern "C" HRESULT DependencyDetectProviderKeyBundleId(
@@ -228,15 +248,14 @@ LExit:
 }
 
 extern "C" HRESULT DependencyDetect(
-    __in BURN_ENGINE_STATE* pEngineState
+    __in BURN_DEPENDENCIES* pDependencies,
+    __in BURN_PACKAGES* pPackages,
+    __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
-    BURN_REGISTRATION* pRegistration = &pEngineState->registration;
     STRINGDICT_HANDLE sdIgnoredDependents = NULL;
     BURN_PACKAGE* pPackage = NULL;
-    BOOL fSelfDependent = NULL != pRegistration->wzSelfDependent;
-    BOOL fActiveParent = NULL != pRegistration->sczActiveParent && NULL != *pRegistration->sczActiveParent;
 
     // Always leave this empty so that all dependents get detected. Plan will ignore dependents based on its own logic.
     hr = DictCreateStringList(&sdIgnoredDependents, INITIAL_STRINGDICT_SIZE, DICT_FLAG_CASEINSENSITIVE);
@@ -252,16 +271,16 @@ extern "C" HRESULT DependencyDetect(
         hr = S_OK;
     }
 
-    for (DWORD iPackage = 0; iPackage < pEngineState->packages.cPackages; ++iPackage)
+    for (DWORD iPackage = 0; iPackage < pPackages->cPackages; ++iPackage)
     {
-        pPackage = pEngineState->packages.rgPackages + iPackage;
+        pPackage = pPackages->rgPackages + iPackage;
         hr = DetectPackageDependents(pPackage, sdIgnoredDependents, pRegistration);
         ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
     }
 
-    for (DWORD iRelatedBundle = 0; iRelatedBundle < pEngineState->registration.relatedBundles.cRelatedBundles; ++iRelatedBundle)
+    for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
     {
-        BURN_RELATED_BUNDLE* pRelatedBundle = pEngineState->registration.relatedBundles.rgRelatedBundles + iRelatedBundle;
+        BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
         if (!pRelatedBundle->fPlannable)
         {
             continue;
@@ -272,18 +291,18 @@ extern "C" HRESULT DependencyDetect(
         ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
     }
 
-    if (fSelfDependent || fActiveParent)
+    if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
     {
         for (DWORD i = 0; i < pRegistration->cDependents; ++i)
         {
             DEPENDENCY* pDependent = pRegistration->rgDependents + i;
 
-            if (fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczActiveParent, -1, pDependent->sczKey, -1))
+            if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzActiveParent, -1, pDependent->sczKey, -1))
             {
                 pRegistration->fParentRegisteredAsDependent = TRUE;
             }
 
-            if (fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->wzSelfDependent, -1, pDependent->sczKey, -1))
+            if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzSelfDependent, -1, pDependent->sczKey, -1))
             {
                 pRegistration->fSelfRegisteredAsDependent = TRUE;
             }
@@ -297,16 +316,16 @@ LExit:
 }
 
 extern "C" HRESULT DependencyPlanInitialize(
-    __in const BURN_REGISTRATION* pRegistration,
+    __in BURN_DEPENDENCIES* pDependencies,
     __in BURN_PLAN* pPlan
     )
 {
     HRESULT hr = S_OK;
 
     // TODO: After adding enumeration to STRINGDICT, a single STRINGDICT_HANDLE can be used everywhere.
-    for (DWORD i = 0; i < pRegistration->cIgnoredDependencies; ++i)
+    for (DWORD i = 0; i < pDependencies->cIgnoredDependencies; ++i)
     {
-        DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + i;
+        DEPENDENCY* pDependency = pDependencies->rgIgnoredDependencies + i;
 
         hr = DepDependencyArrayAlloc(&pPlan->rgPlannedProviders, &pPlan->cPlannedProviders, pDependency->sczKey, pDependency->sczName);
         ExitOnFailure(hr, "Failed to add the detected provider to the list of dependencies to ignore.");
@@ -952,6 +971,7 @@ static HRESULT GetIgnoredDependents(
     {
         ExitOnFailure(hr, "Failed to get the package property: %ls", DEPENDENCY_IGNOREDEPENDENCIES);
 
+        // TODO: this is the raw value of the property, all property values are currently formatted in a different part of planning.
         hr = DependencyAddIgnoreDependencies(*psdIgnoredDependents, sczIgnoreDependencies);
         ExitOnFailure(hr, "Failed to add the authored ignored dependencies to the cumulative list of ignored dependencies.");
     }

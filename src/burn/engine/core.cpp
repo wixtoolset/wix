@@ -111,6 +111,12 @@ extern "C" HRESULT CoreInitialize(
     hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_UILEVEL, pEngineState->command.display, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the %ls built-in variable.", BURN_BUNDLE_UILEVEL);
 
+    if (pEngineState->internalCommand.sczActiveParent && *pEngineState->internalCommand.sczActiveParent)
+    {
+        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_ACTIVE_PARENT, pEngineState->internalCommand.sczActiveParent, TRUE, FALSE);
+        ExitOnFailure(hr, "Failed to overwrite the bundle active parent built-in variable.");
+    }
+
     if (pEngineState->internalCommand.sczSourceProcessPath)
     {
         hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, pEngineState->internalCommand.sczSourceProcessPath, TRUE, FALSE);
@@ -172,7 +178,7 @@ extern "C" HRESULT CoreInitializeConstants(
     HRESULT hr = S_OK;
     BURN_REGISTRATION* pRegistration = &pEngineState->registration;
 
-    hr = DependencyInitialize(pRegistration, pEngineState->sczIgnoreDependencies);
+    hr = DependencyInitialize(&pEngineState->internalCommand, &pEngineState->dependencies, pRegistration);
     ExitOnFailure(hr, "Failed to initialize dependency data.");
 
     // Support passing Ancestors to embedded burn bundles.
@@ -360,7 +366,7 @@ extern "C" HRESULT CoreDetect(
         }
     }
 
-    hr = DependencyDetect(pEngineState);
+    hr = DependencyDetect(&pEngineState->dependencies, &pEngineState->packages, &pEngineState->registration);
     ExitOnFailure(hr, "Failed to detect the dependencies.");
 
     // Log the detected states.
@@ -453,6 +459,7 @@ extern "C" HRESULT CorePlan(
     // we make everywhere.
     pEngineState->plan.action = action;
     pEngineState->plan.pCache = &pEngineState->cache;
+    pEngineState->plan.pInternalCommand = &pEngineState->internalCommand;
     pEngineState->plan.pPayloads = &pEngineState->payloads;
     pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
     pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
@@ -463,10 +470,10 @@ extern "C" HRESULT CorePlan(
     ExitOnFailure(hr, "Failed to update action.");
 
     // Set resume commandline
-    hr = PlanSetResumeCommand(&pEngineState->registration, action, &pEngineState->command, &pEngineState->log);
+    hr = PlanSetResumeCommand(&pEngineState->plan, &pEngineState->registration, &pEngineState->command, &pEngineState->log);
     ExitOnFailure(hr, "Failed to set resume command");
 
-    hr = DependencyPlanInitialize(&pEngineState->registration, &pEngineState->plan);
+    hr = DependencyPlanInitialize(&pEngineState->dependencies, &pEngineState->plan);
     ExitOnFailure(hr, "Failed to initialize the dependencies for the plan.");
 
     if (BOOTSTRAPPER_ACTION_LAYOUT == action)
@@ -508,7 +515,7 @@ extern "C" HRESULT CorePlan(
         {
             pEngineState->plan.fPerMachine = pEngineState->registration.fPerMachine; // default the scope of the plan to the per-machine state of the bundle.
 
-            hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
+            hr = PlanRegistration(&pEngineState->plan, &pEngineState->registration, &pEngineState->dependencies, pEngineState->command.resumeType, pEngineState->command.relationType, &fContinuePlanning);
             ExitOnFailure(hr, "Failed to plan registration.");
 
             if (fContinuePlanning)
@@ -921,10 +928,10 @@ extern "C" LPCWSTR CoreRelationTypeToCommandLineString(
 extern "C" HRESULT CoreRecreateCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough,
-    __in_z_opt LPCWSTR wzActiveParent,
     __in_z_opt LPCWSTR wzAncestors,
     __in_z_opt LPCWSTR wzAppendLogPath,
     __in_z_opt LPCWSTR wzAdditionalCommandLineArguments
@@ -937,7 +944,7 @@ extern "C" HRESULT CoreRecreateCommandLine(
     hr = StrAllocString(psczCommandLine, L"", 0);
     ExitOnFailure(hr, "Failed to empty command line.");
 
-    switch (display)
+    switch (pCommand->display)
     {
     case BOOTSTRAPPER_DISPLAY_NONE:
         hr = StrAllocConcat(psczCommandLine, L" /quiet", 0);
@@ -962,11 +969,11 @@ extern "C" HRESULT CoreRecreateCommandLine(
     }
     ExitOnFailure(hr, "Failed to append action state to command-line");
 
-    if (wzActiveParent)
+    if (pInternalCommand->sczActiveParent)
     {
-        if (*wzActiveParent)
+        if (*pInternalCommand->sczActiveParent)
         {
-            hr = StrAllocFormatted(&scz, L" /%ls \"%ls\"", BURN_COMMANDLINE_SWITCH_PARENT, wzActiveParent);
+            hr = StrAllocFormatted(&scz, L" /%ls \"%ls\"", BURN_COMMANDLINE_SWITCH_PARENT, pInternalCommand->sczActiveParent);
             ExitOnFailure(hr, "Failed to format active parent command-line for command-line.");
         }
         else

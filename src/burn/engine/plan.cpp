@@ -444,7 +444,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
     }
 
     // Only change the recommendation if an active parent was provided.
-    if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
+    if (pPlan->pInternalCommand->sczActiveParent && *pPlan->pInternalCommand->sczActiveParent)
     {
         // On install, recommend running the forward compatible bundle because there is an active parent. This
         // will essentially register the parent with the forward compatible bundle.
@@ -480,7 +480,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
 
         if (!fIgnoreBundle)
         {
-            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pCommand, NULL, pRegistration->sczActiveParent, pRegistration->sczAncestors, &pRelatedBundle->package);
+            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pPlan->pInternalCommand, pCommand, NULL, pRegistration->sczAncestors, &pRelatedBundle->package);
             ExitOnFailure(hr, "Failed to initialize pass through bundle.");
 
             pPlan->fEnabledForwardCompatibleBundle = TRUE;
@@ -512,6 +512,7 @@ extern "C" HRESULT PlanPackages(
 extern "C" HRESULT PlanRegistration(
     __in BURN_PLAN* pPlan,
     __in BURN_REGISTRATION* pRegistration,
+    __in BURN_DEPENDENCIES* pDependencies,
     __in BOOTSTRAPPER_RESUME_TYPE /*resumeType*/,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout BOOL* pfContinuePlanning
@@ -523,7 +524,7 @@ extern "C" HRESULT PlanRegistration(
 
     pPlan->fCanAffectMachineState = TRUE; // register the bundle since we're modifying machine state.
     pPlan->fDisallowRemoval = FALSE; // by default the bundle can be planned to be removed
-    pPlan->fIgnoreAllDependents = pRegistration->fIgnoreAllDependents;
+    pPlan->fIgnoreAllDependents = pDependencies->fIgnoreAllDependents;
 
     // Ensure the bundle is cached if not running from the cache.
     if (!CacheBundleRunningFromCache(pPlan->pCache))
@@ -560,10 +561,10 @@ extern "C" HRESULT PlanRegistration(
         // would prevent self-removal.
         if (pRegistration->fSelfRegisteredAsDependent)
         {
-            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pRegistration->wzSelfDependent, pRegistration->sczId);
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pDependencies->wzSelfDependent, pRegistration->sczId);
             ExitOnFailure(hr, "Failed to allocate registration action.");
 
-            hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pRegistration->wzSelfDependent);
+            hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pDependencies->wzSelfDependent);
             ExitOnFailure(hr, "Failed to add self-dependent to ignore dependents.");
         }
 
@@ -575,9 +576,9 @@ extern "C" HRESULT PlanRegistration(
             if (BOOTSTRAPPER_RELATION_UPGRADE != relationType)
             {
                 // If there were other dependencies to ignore, add them.
-                for (DWORD iDependency = 0; iDependency < pRegistration->cIgnoredDependencies; ++iDependency)
+                for (DWORD iDependency = 0; iDependency < pDependencies->cIgnoredDependencies; ++iDependency)
                 {
-                    DEPENDENCY* pDependency = pRegistration->rgIgnoredDependencies + iDependency;
+                    DEPENDENCY* pDependency = pDependencies->rgIgnoredDependencies + iDependency;
 
                     hr = DictKeyExists(sdIgnoreDependents, pDependency->sczKey);
                     if (E_NOTFOUND != hr)
@@ -689,9 +690,9 @@ extern "C" HRESULT PlanRegistration(
         // Only do the following if we decided there was a dependent self to register. If so and and an explicit parent was
         // provided, register dependent self. Otherwise, if this bundle is not an addon or patch bundle then self-regisiter
         // as our own dependent.
-        if (pRegistration->wzSelfDependent && !pRegistration->fSelfRegisteredAsDependent && (pRegistration->sczActiveParent || !fAddonOrPatchBundle))
+        if (pDependencies->wzSelfDependent && !pRegistration->fSelfRegisteredAsDependent && (pDependencies->wzActiveParent || !fAddonOrPatchBundle))
         {
-            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pRegistration->wzSelfDependent, pRegistration->sczId);
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pDependencies->wzSelfDependent, pRegistration->sczId);
             ExitOnFailure(hr, "Failed to add registration action for self dependent.");
         }
     }
@@ -1774,8 +1775,8 @@ LExit:
 
 *******************************************************************/
 extern "C" HRESULT PlanSetResumeCommand(
+    __in BURN_PLAN* pPlan,
     __in BURN_REGISTRATION* pRegistration,
-    __in BOOTSTRAPPER_ACTION action,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in BURN_LOGGING* pLog
     )
@@ -1783,7 +1784,7 @@ extern "C" HRESULT PlanSetResumeCommand(
     HRESULT hr = S_OK;
 
     // build the resume command-line.
-    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, action, pCommand->display, pCommand->relationType, pCommand->fPassthrough, pRegistration->sczActiveParent, pRegistration->sczAncestors, pLog->sczPath, pCommand->wzCommandLine);
+    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, pPlan->action, pPlan->pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough, pRegistration->sczAncestors, pLog->sczPath, pCommand->wzCommandLine);
     ExitOnFailure(hr, "Failed to recreate resume command-line.");
 
 LExit:

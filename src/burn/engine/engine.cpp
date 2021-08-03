@@ -338,7 +338,7 @@ static HRESULT InitializeEngineState(
     ProcElevated(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
 
     // Parse command line.
-    hr = CoreParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &pEngineState->internalCommand.sczSourceProcessPath, &pEngineState->internalCommand.sczOriginalSource, &hSectionFile, &hSourceEngineFile, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->registration.sczActiveParent, &pEngineState->sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &pEngineState->fInvalidCommandLine, &pEngineState->cUnknownArgs, &pEngineState->rgUnknownArgs);
+    hr = CoreParseCommandLine(pEngineState->argc, pEngineState->argv, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &pEngineState->mode, &pEngineState->automaticUpdates, &pEngineState->fDisableSystemRestore, &pEngineState->internalCommand.sczSourceProcessPath, &pEngineState->internalCommand.sczOriginalSource, &hSectionFile, &hSourceEngineFile, &pEngineState->fDisableUnelevate, &pEngineState->log.dwAttributes, &pEngineState->log.sczPath, &pEngineState->internalCommand.sczActiveParent, &pEngineState->internalCommand.sczIgnoreDependencies, &pEngineState->registration.sczAncestors, &pEngineState->fInvalidCommandLine, &pEngineState->cUnknownArgs, &pEngineState->rgUnknownArgs);
     ExitOnFailure(hr, "Fatal error while parsing command line.");
 
     hr = SectionInitialize(&pEngineState->section, hSectionFile, hSourceEngineFile);
@@ -362,8 +362,6 @@ static void UninitializeEngineState(
 
     ReleaseMem(pEngineState->rgUnknownArgs);
 
-    ReleaseStr(pEngineState->sczIgnoreDependencies);
-
     PipeConnectionUninitialize(&pEngineState->embeddedConnection);
     PipeConnectionUninitialize(&pEngineState->companionConnection);
     ReleaseStr(pEngineState->sczBundleEngineWorkingPath)
@@ -376,6 +374,7 @@ static void UninitializeEngineState(
     UserExperienceUninitialize(&pEngineState->userExperience);
 
     ApprovedExesUninitialize(&pEngineState->approvedExes);
+    DependencyUninitialize(&pEngineState->dependencies);
     UpdateUninitialize(&pEngineState->update);
     VariablesUninitialize(&pEngineState->variables);
     SearchesUninitialize(&pEngineState->searches);
@@ -390,6 +389,8 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->command.wzLayoutDirectory);
     ReleaseStr(pEngineState->command.wzCommandLine);
 
+    ReleaseStr(pEngineState->internalCommand.sczActiveParent);
+    ReleaseStr(pEngineState->internalCommand.sczIgnoreDependencies);
     ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
     ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
 

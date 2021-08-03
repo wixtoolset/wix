@@ -385,7 +385,6 @@ extern "C" void RegistrationUninitialize(
     ReleaseMem(pRegistration->rgsczPatchCodes);
 
     ReleaseStr(pRegistration->sczProviderKey);
-    ReleaseStr(pRegistration->sczActiveParent);
     ReleaseStr(pRegistration->sczExecutableName);
 
     ReleaseStr(pRegistration->sczRegistrationKey);
@@ -461,12 +460,6 @@ extern "C" HRESULT RegistrationSetVariables(
 
     hr = GetBundleManufacturer(pRegistration, pVariables, &scz);
     ExitOnFailure(hr, "Failed to initialize bundle manufacturer.");
-
-    if (pRegistration->sczActiveParent && *pRegistration->sczActiveParent)
-    {
-        hr = VariableSetString(pVariables, BURN_BUNDLE_ACTIVE_PARENT, pRegistration->sczActiveParent, TRUE, FALSE);
-        ExitOnFailure(hr, "Failed to overwrite the bundle active parent built-in variable.");
-    }
 
     hr = VariableSetString(pVariables, BURN_BUNDLE_PROVIDER_KEY, pRegistration->sczProviderKey, TRUE, FALSE);
     ExitOnFailure(hr, "Failed to overwrite the bundle provider key built-in variable.");
