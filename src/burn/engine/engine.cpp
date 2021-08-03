@@ -71,8 +71,7 @@ extern "C" BOOL EngineInCleanRoom(
     // that should be setting this command line option, that is in our control.
     BOOL fInCleanRoom = (wzCommandLine &&
         (wzCommandLine[0] == L'-' || wzCommandLine[0] == L'/') &&
-        CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzCommandLine + 1, cchCleanRoomSwitch, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, cchCleanRoomSwitch) &&
-        wzCommandLine[1 + cchCleanRoomSwitch] == L'='
+        CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzCommandLine + 1, cchCleanRoomSwitch, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, cchCleanRoomSwitch)
     );
 
     return fInCleanRoom;

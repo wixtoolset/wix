@@ -773,7 +773,7 @@ extern "C" HRESULT RegistrationSessionBegin(
         else if (BURN_REGISTRATION_MODIFY_DISABLE_BUTTON != pRegistration->modify) // if support modify (aka: did not disable anything)
         {
             // ModifyPath: [path to exe] /modify
-            hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_MODIFY_PATH, L"\"%ls\" /modify", pRegistration->sczCacheExecutablePath);
+            hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_MODIFY_PATH, L"\"%ls\" /%ls /modify", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
             ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_MODIFY_PATH);
 
             // NoElevateOnModify: 1
@@ -796,14 +796,14 @@ extern "C" HRESULT RegistrationSessionBegin(
         }
 
         // QuietUninstallString: [path to exe] /uninstall /quiet
-        hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_QUIET_UNINSTALL_STRING, L"\"%ls\" /uninstall /quiet", pRegistration->sczCacheExecutablePath);
+        hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_QUIET_UNINSTALL_STRING, L"\"%ls\" /%ls /uninstall /quiet", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_QUIET_UNINSTALL_STRING);
 
         // UninstallString, [path to exe]
         // If the modify button is to be disabled, we'll add "/modify" to the uninstall string because the button is "Uninstall/Change". Otherwise,
         // it's just the "Uninstall" button so we add "/uninstall" to make the program just go away.
         LPCWSTR wzUninstallParameters = (BURN_REGISTRATION_MODIFY_DISABLE_BUTTON == pRegistration->modify) ? L"/modify" : L" /uninstall";
-        hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_UNINSTALL_STRING, L"\"%ls\" %ls", pRegistration->sczCacheExecutablePath, wzUninstallParameters);
+        hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_UNINSTALL_STRING, L"\"%ls\" /%ls %ls", pRegistration->sczCacheExecutablePath, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, wzUninstallParameters);
         ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_UNINSTALL_STRING);
 
         if (pRegistration->softwareTags.cSoftwareTags)
