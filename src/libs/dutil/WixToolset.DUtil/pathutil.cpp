@@ -9,6 +9,7 @@
 #define PathExitWithLastError(x, s, ...) ExitWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
 #define PathExitOnFailure(x, s, ...) ExitOnFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
 #define PathExitOnRootFailure(x, s, ...) ExitOnRootFailureSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
+#define PathExitWithRootFailure(x, e, s, ...) ExitWithRootFailureSource(DUTIL_SOURCE_PATHUTIL, x, e, s, __VA_ARGS__)
 #define PathExitOnFailureDebugTrace(x, s, ...) ExitOnFailureDebugTraceSource(DUTIL_SOURCE_PATHUTIL, x, s, __VA_ARGS__)
 #define PathExitOnNull(p, x, e, s, ...) ExitOnNullSource(DUTIL_SOURCE_PATHUTIL, p, x, e, s, __VA_ARGS__)
 #define PathExitOnNullWithLastError(p, x, s, ...) ExitOnNullWithLastErrorSource(DUTIL_SOURCE_PATHUTIL, p, x, s, __VA_ARGS__)
@@ -809,6 +810,92 @@ DAPI_(HRESULT) PathCreateTempDirectory(
 LExit:
     ReleaseStr(scz);
     ReleaseStr(sczTempPath);
+
+    return hr;
+}
+
+
+DAPI_(HRESULT) PathGetTempPath(
+    __out_z LPWSTR* psczTempPath
+    )
+{
+    HRESULT hr = S_OK;
+    WCHAR wzTempPath[MAX_PATH + 1] = { };
+    DWORD cch = 0;
+
+    cch = ::GetTempPathW(countof(wzTempPath), wzTempPath);
+    if (!cch)
+    {
+        PathExitWithLastError(hr, "Failed to GetTempPath.");
+    }
+    else if (cch >= countof(wzTempPath))
+    {
+        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "TEMP directory path too long.");
+    }
+
+    hr = StrAllocString(psczTempPath, wzTempPath, cch);
+    PathExitOnFailure(hr, "Failed to copy TEMP directory path.");
+
+LExit:
+    return hr;
+}
+
+
+DAPI_(HRESULT) PathGetSystemTempPath(
+    __out_z LPWSTR* psczSystemTempPath
+    )
+{
+    HRESULT hr = S_OK;
+    HKEY hKey = NULL;
+    WCHAR wzTempPath[MAX_PATH + 1] = { };
+    DWORD cch = 0;
+
+    // There is no documented API to get system environment variables, so read them from the registry.
+    hr = RegOpen(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\Environment", KEY_READ, &hKey);
+    if (E_FILENOTFOUND != hr)
+    {
+        PathExitOnFailure(hr, "Failed to open system environment registry key.");
+
+        // Follow documented precedence rules for TMP/TEMP from ::GetTempPath.
+        // TODO: values will be expanded with the current environment variables instead of the system environment variables.
+        hr = RegReadString(hKey, L"TMP", psczSystemTempPath);
+        if (E_FILENOTFOUND != hr)
+        {
+            PathExitOnFailure(hr, "Failed to get system TMP value.");
+
+            hr = PathBackslashTerminate(psczSystemTempPath);
+            PathExitOnFailure(hr, "Failed to backslash terminate system TMP value.");
+
+            ExitFunction();
+        }
+
+        hr = RegReadString(hKey, L"TEMP", psczSystemTempPath);
+        if (E_FILENOTFOUND != hr)
+        {
+            PathExitOnFailure(hr, "Failed to get system TEMP value.");
+
+            hr = PathBackslashTerminate(psczSystemTempPath);
+            PathExitOnFailure(hr, "Failed to backslash terminate system TEMP value.");
+
+            ExitFunction();
+        }
+    }
+
+    cch = ::GetSystemWindowsDirectoryW(wzTempPath, countof(wzTempPath));
+    if (!cch)
+    {
+        PathExitWithLastError(hr, "Failed to get Windows directory path.");
+    }
+    else if (cch >= countof(wzTempPath))
+    {
+        PathExitWithRootFailure(hr, E_INSUFFICIENT_BUFFER, "Windows directory path too long.");
+    }
+
+    hr = PathConcat(wzTempPath, L"TEMP\\", psczSystemTempPath);
+    PathExitOnFailure(hr, "Failed to concat Temp directory on Windows directory path.");
+
+LExit:
+    ReleaseRegKey(hKey);
 
     return hr;
 }
