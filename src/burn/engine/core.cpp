@@ -1375,7 +1375,11 @@ extern "C" HRESULT CoreParseCommandLine(
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM), BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)))
             {
-                if (BURN_MODE_UNTRUSTED != *pMode)
+                if (BURN_MODE_UNTRUSTED == *pMode)
+                {
+                    *pMode = BURN_MODE_NORMAL;
+                }
+                else
                 {
                     fInvalidCommandLine = TRUE;
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
@@ -1383,17 +1387,18 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)];
-                if (L'=' != wzParam[0] || L'\0' == wzParam[1])
+                if (L'\0' != wzParam[0])
                 {
-                    fInvalidCommandLine = TRUE;
-                    TraceLog(E_INVALIDARG, "Missing required parameter for switch: %ls", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
-                }
-                else
-                {
-                    *pMode = BURN_MODE_NORMAL;
-
-                    hr = StrAllocString(psczSourceProcessPath, wzParam + 1, 0);
-                    ExitOnFailure(hr, "Failed to copy source process path.");
+                    if (L'=' != wzParam[0])
+                    {
+                        fInvalidCommandLine = TRUE;
+                        TraceLog(E_INVALIDARG, "Invalid switch: %ls", argv[i]);
+                    }
+                    else if (L'\0' != wzParam[1])
+                    {
+                        hr = StrAllocString(psczSourceProcessPath, wzParam + 1, 0);
+                        ExitOnFailure(hr, "Failed to copy source process path.");
+                    }
                 }
             }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_EMBEDDED, -1))
