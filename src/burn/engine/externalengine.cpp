@@ -295,8 +295,8 @@ HRESULT ExternalEngineSetUpdate(
     {
         UpdateUninitialize(&pEngineState->update);
 
-        hr = CoreRecreateCommandLine(&sczCommandline, BOOTSTRAPPER_ACTION_INSTALL, &pEngineState->internalCommand, &pEngineState->command, BOOTSTRAPPER_RELATION_NONE, FALSE, NULL);
-        ExitOnFailure(hr, "Failed to recreate command-line for update bundle.");
+        hr = CoreCreateUpdateBundleCommandLine(&sczCommandline, &pEngineState->internalCommand, &pEngineState->command);
+        ExitOnFailure(hr, "Failed to create command-line for update bundle.");
 
         // Bundles would fail to use the downloaded update bundle, as the running bundle would be one of the search paths.
         // Here I am generating a random guid, but in the future it would be nice if the feed would provide the ID of the update.

@@ -17,7 +17,6 @@ static void UninitializeEngineState(
     __in BURN_ENGINE_STATE* pEngineState
     );
 static HRESULT RunUntrusted(
-    __in LPCWSTR wzCommandLine,
     __in BURN_ENGINE_STATE* pEngineState
     );
 static HRESULT RunNormal(
@@ -195,7 +194,7 @@ extern "C" HRESULT EngineRun(
     switch (engineState.internalCommand.mode)
     {
     case BURN_MODE_UNTRUSTED:
-        hr = RunUntrusted(wzCommandLine, &engineState);
+        hr = RunUntrusted(&engineState);
         ExitOnFailure(hr, "Failed to run untrusted mode.");
         break;
 
@@ -411,7 +410,6 @@ static void UninitializeEngineState(
 }
 
 static HRESULT RunUntrusted(
-    __in LPCWSTR wzCommandLine,
     __in BURN_ENGINE_STATE* pEngineState
     )
 {
@@ -450,24 +448,8 @@ static HRESULT RunUntrusted(
         wzCleanRoomBundlePath = sczCachedCleanRoomBundlePath;
     }
 
-    // The clean room switch must always be at the front of the command line so
-    // the EngineInCleanRoom function will operate correctly.
-    hr = StrAllocFormatted(&sczParameters, L"-%ls=\"%ls\"", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, sczCurrentProcessPath);
-    ExitOnFailure(hr, "Failed to allocate parameters for unelevated process.");
-
-    // Send a file handle for the child Burn process to access the attached container.
-    hr = CoreAppendFileHandleAttachedToCommandLine(pEngineState->section.hEngineFile, &hFileAttached, &sczParameters);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
-
-    // Grab a file handle for the child Burn process.
-    hr = CoreAppendFileHandleSelfToCommandLine(wzCleanRoomBundlePath, &hFileSelf, &sczParameters, NULL);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
-
-    hr = CoreAppendSplashScreenWindowToCommandLine(pEngineState->command.hwndSplashScreen, &sczParameters);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
-
-    hr = StrAllocConcatFormattedSecure(&sczParameters, L" %ls", wzCommandLine);
-    ExitOnFailure(hr, "Failed to append original command line.");
+    hr = CoreCreateCleanRoomCommandLine(&sczParameters, pEngineState, wzCleanRoomBundlePath, sczCurrentProcessPath, &hFileAttached, &hFileSelf);
+    ExitOnFailure(hr, "Failed to create clean room command-line.");
 
 #ifdef ENABLE_UNELEVATE
     // TODO: Pass file handle to unelevated process if this ever gets reenabled.

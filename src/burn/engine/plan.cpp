@@ -479,7 +479,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
 
         if (!fIgnoreBundle)
         {
-            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pPlan->pInternalCommand, pPlan->pCommand, NULL, &pRelatedBundle->package);
+            hr = PseudoBundleInitializePassthrough(&pPlan->forwardCompatibleBundle, pPlan->pInternalCommand, pPlan->pCommand, &pRelatedBundle->package);
             ExitOnFailure(hr, "Failed to initialize pass through bundle.");
 
             pPlan->fEnabledForwardCompatibleBundle = TRUE;
@@ -1780,11 +1780,10 @@ extern "C" HRESULT PlanSetResumeCommand(
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_COMMAND* pCommand = pPlan->pCommand;
 
     // build the resume command-line.
-    hr = CoreRecreateCommandLine(&pRegistration->sczResumeCommandLine, pPlan->action, pPlan->pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough, pLog->sczPath);
-    ExitOnFailure(hr, "Failed to recreate resume command-line.");
+    hr = CoreCreateResumeCommandLine(&pRegistration->sczResumeCommandLine, pPlan, pLog);
+    ExitOnFailure(hr, "Failed to create resume command-line.");
 
 LExit:
     return hr;
