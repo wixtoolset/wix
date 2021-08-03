@@ -142,6 +142,13 @@ Language=English
 Unknown burn internal command-line switch modifier encountered, switch: '%1!ls!', modifier: '%2!c!'.
 .
 
+MessageId=17
+Severity=Success
+SymbolicName=MSG_EXITING_CLEAN_ROOM
+Language=English
+Exit code: 0x%1!x!
+.
+
 MessageId=51
 Severity=Error
 SymbolicName=MSG_FAILED_PARSE_CONDITION
