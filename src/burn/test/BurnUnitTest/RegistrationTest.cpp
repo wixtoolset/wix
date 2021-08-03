@@ -75,6 +75,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
@@ -113,7 +114,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -170,6 +174,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
@@ -207,7 +212,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -287,6 +295,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
@@ -324,7 +333,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -402,6 +414,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
@@ -441,7 +454,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -534,6 +550,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             BYTE* pbBuffer = NULL;
@@ -583,7 +600,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);
@@ -668,6 +688,7 @@ namespace Bootstrapper
             BURN_REGISTRATION registration = { };
             BURN_LOGGING logging = { };
             BURN_PACKAGES packages = { };
+            BURN_PLAN plan = { };
             BURN_CACHE cache = { };
             BURN_ENGINE_COMMAND internalCommand = { };
             BOOTSTRAPPER_RESUME_TYPE resumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
@@ -716,7 +737,10 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                hr = PlanSetResumeCommand(&registration, BOOTSTRAPPER_ACTION_INSTALL, &command, &logging);
+                plan.action = BOOTSTRAPPER_ACTION_INSTALL;
+                plan.pInternalCommand = &internalCommand;
+
+                hr = PlanSetResumeCommand(&plan, &registration, &command, &logging);
                 TestThrowOnFailure(hr, L"Failed to set registration resume command.");
 
                 hr = PathForCurrentProcess(&sczCurrentProcess, NULL);

@@ -163,9 +163,9 @@ LExit:
 
 extern "C" HRESULT PseudoBundleInitializePassthrough(
     __in BURN_PACKAGE* pPassthroughPackage,
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
     __in_z_opt LPCWSTR wzAppendLogPath,
-    __in_z_opt LPCWSTR wzActiveParent,
     __in_z_opt LPCWSTR wzAncestors,
     __in BURN_PACKAGE* pPackage
     )
@@ -205,7 +205,7 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
 
     // No matter the operation, we're passing the same command-line. That's what makes
     // this a passthrough bundle.
-    hr = CoreRecreateCommandLine(&sczArguments, pCommand->action, pCommand->display, pCommand->relationType, TRUE, wzActiveParent, wzAncestors, wzAppendLogPath, pCommand->wzCommandLine);
+    hr = CoreRecreateCommandLine(&sczArguments, pCommand->action, pInternalCommand, pCommand, pCommand->relationType, TRUE, wzAncestors, wzAppendLogPath, pCommand->wzCommandLine);
     ExitOnFailure(hr, "Failed to recreate command-line arguments.");
 
     hr = StrAllocString(&pPassthroughPackage->Exe.sczInstallArguments, sczArguments, 0);

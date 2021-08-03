@@ -959,14 +959,8 @@ namespace Bootstrapper
 
         void PlanTestDetect(BURN_ENGINE_STATE* pEngineState)
         {
-            HRESULT hr = S_OK;
-            BURN_REGISTRATION* pRegistration = &pEngineState->registration;
-
-            DetectReset(pRegistration, &pEngineState->packages);
+            DetectReset(&pEngineState->registration, &pEngineState->packages);
             PlanReset(&pEngineState->plan, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
-
-            hr = DepDependencyArrayAlloc(&pRegistration->rgIgnoredDependencies, &pRegistration->cIgnoredDependencies, pRegistration->sczProviderKey, NULL);
-            NativeAssert::Succeeded(hr, "Failed to add the bundle provider key to the list of dependencies to ignore.");
 
             pEngineState->userExperience.fEngineActive = TRUE;
             pEngineState->fDetected = TRUE;

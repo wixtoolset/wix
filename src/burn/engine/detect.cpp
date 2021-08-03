@@ -44,13 +44,6 @@ extern "C" void DetectReset(
     pRegistration->fForwardCompatibleBundleExists = FALSE;
     pRegistration->fEligibleForCleanup = FALSE;
 
-    if (pRegistration->rgIgnoredDependencies)
-    {
-        ReleaseDependencyArray(pRegistration->rgIgnoredDependencies, pRegistration->cIgnoredDependencies);
-    }
-    pRegistration->rgIgnoredDependencies = NULL;
-    pRegistration->cIgnoredDependencies = 0;
-
     if (pRegistration->rgDependents)
     {
         ReleaseDependencyArray(pRegistration->rgDependents, pRegistration->cDependents);

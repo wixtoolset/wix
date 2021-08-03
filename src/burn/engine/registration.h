@@ -110,7 +110,6 @@ typedef struct _BURN_REGISTRATION
     DWORD cPatchCodes;
 
     VERUTIL_VERSION* pVersion;
-    LPWSTR sczActiveParent;
     LPWSTR sczProviderKey;
     LPWSTR sczExecutableName;
 
@@ -145,12 +144,8 @@ typedef struct _BURN_REGISTRATION
     BURN_UPDATE_REGISTRATION update;
 
     BURN_RELATED_BUNDLES relatedBundles; // Only valid after detect.
-    DEPENDENCY* rgIgnoredDependencies;   // Only valid after detect.
-    UINT cIgnoredDependencies;           // Only valid after detect.
     DEPENDENCY* rgDependents;            // Only valid after detect.
     UINT cDependents;                    // Only valid after detect.
-    BOOL fIgnoreAllDependents;           // Only valid after detect.
-    LPCWSTR wzSelfDependent;             // Only valid after detect.
     BOOL fSelfRegisteredAsDependent;     // Only valid after detect.
     BOOL fParentRegisteredAsDependent;   // Only valid after detect.
     BOOL fForwardCompatibleBundleExists; // Only valid after detect.
