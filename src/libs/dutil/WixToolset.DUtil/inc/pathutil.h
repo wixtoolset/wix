@@ -151,6 +151,22 @@ DAPI_(HRESULT) PathCreateTempDirectory(
     );
 
 /*******************************************************************
+ PathGetTempPath - returns the path to the temp folder
+    that is backslash terminated.
+*******************************************************************/
+DAPI_(HRESULT) PathGetTempPath(
+    __out_z LPWSTR* psczTempPath
+    );
+
+/*******************************************************************
+ PathGetSystemTempPath - returns the path to the system temp folder
+    that is backslash terminated.
+*******************************************************************/
+DAPI_(HRESULT) PathGetSystemTempPath(
+    __out_z LPWSTR* psczSystemTempPath
+    );
+
+/*******************************************************************
  PathGetKnownFolder - returns the path to a well-known shell folder
 
 *******************************************************************/

@@ -1916,7 +1916,6 @@ static HRESULT InitializeVariableTempFolder(
     HRESULT hr = S_OK;
     WCHAR wzPath[MAX_PATH] = { };
 
-    // get volume path name
     if (!::GetTempPathW(MAX_PATH, wzPath))
     {
         ExitWithLastError(hr, "Failed to get temp path.");

@@ -1281,7 +1281,7 @@ static HRESULT CalculateWorkingFolder(
     HRESULT hr = S_OK;
     RPC_STATUS rs = RPC_S_OK;
     BOOL fElevated = FALSE;
-    WCHAR wzTempPath[MAX_PATH] = { };
+    LPWSTR sczTempPath = NULL;
     UUID guid = {};
     WCHAR wzGuid[39];
 
@@ -1291,20 +1291,13 @@ static HRESULT CalculateWorkingFolder(
 
         if (fElevated)
         {
-            if (!::GetWindowsDirectoryW(wzTempPath, countof(wzTempPath)))
-            {
-                ExitWithLastError(hr, "Failed to get windows path for working folder.");
-            }
-
-            hr = PathFixedBackslashTerminate(wzTempPath, countof(wzTempPath));
-            ExitOnFailure(hr, "Failed to ensure windows path for working folder ended in backslash.");
-
-            hr = ::StringCchCatW(wzTempPath, countof(wzTempPath), L"Temp\\");
-            ExitOnFailure(hr, "Failed to concat Temp directory on windows path for working folder.");
+            hr = PathGetSystemTempPath(&sczTempPath);
+            ExitOnFailure(hr, "Failed to get system temp folder path for working folder.");
         }
-        else if (0 == ::GetTempPathW(countof(wzTempPath), wzTempPath))
+        else
         {
-            ExitWithLastError(hr, "Failed to get temp path for working folder.");
+            hr = PathGetTempPath(&sczTempPath);
+            ExitOnFailure(hr, "Failed to get temp folder path for working folder.");
         }
 
         rs = ::UuidCreate(&guid);
@@ -1317,7 +1310,7 @@ static HRESULT CalculateWorkingFolder(
             ExitOnRootFailure(hr, "Failed to convert working folder guid into string.");
         }
 
-        hr = StrAllocFormatted(&vsczWorkingFolder, L"%ls%ls\\", wzTempPath, wzGuid);
+        hr = StrAllocFormatted(&vsczWorkingFolder, L"%ls%ls\\", sczTempPath, wzGuid);
         ExitOnFailure(hr, "Failed to append bundle id on to temp path for working folder.");
     }
 
@@ -1325,6 +1318,8 @@ static HRESULT CalculateWorkingFolder(
     ExitOnFailure(hr, "Failed to copy working folder path.");
 
 LExit:
+    ReleaseStr(sczTempPath);
+
     return hr;
 }
 
