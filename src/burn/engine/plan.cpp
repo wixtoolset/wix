@@ -266,6 +266,7 @@ extern "C" void PlanUninitializeExecuteAction(
     case BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE:
         ReleaseStr(pExecuteAction->exePackage.sczIgnoreDependencies);
         ReleaseStr(pExecuteAction->exePackage.sczAncestors);
+        ReleaseStr(pExecuteAction->exePackage.sczEngineWorkingDirectory);
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
@@ -1282,6 +1283,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
 
         // Pass along any ancestors and ourself to prevent infinite loops.
         pRelatedBundle->package.Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
+        pRelatedBundle->package.Exe.wzEngineWorkingDirectory = pPlan->pInternalCommand->sczWorkingDirectory;
 
         hr = PlanDefaultRelatedBundleRequestState(relationType, pRelatedBundle->relationType, pPlan->action, pRegistration->pVersion, pRelatedBundle->pVersion, &pRelatedBundle->package.requested);
         ExitOnFailure(hr, "Failed to get default request state for related bundle.");

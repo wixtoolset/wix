@@ -14,6 +14,7 @@ const LPCWSTR BURN_POLICY_REGISTRY_PATH = L"WiX\\Burn";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PARENT = L"parent";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PARENT_NONE = L"parent:none";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_CLEAN_ROOM = L"burn.clean.room";
+const LPCWSTR BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY = L"burn.working.directory";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_ELEVATED = L"burn.elevated";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_EMBEDDED = L"burn.embedded";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_RUNONCE = L"burn.runonce";
@@ -99,6 +100,7 @@ typedef struct _BURN_ENGINE_COMMAND
 
     LPWSTR sczSourceProcessPath;
     LPWSTR sczOriginalSource;
+    LPWSTR sczWorkingDirectory;
 
     DWORD dwLoggingAttributes;
     LPWSTR sczLogFile;
@@ -253,6 +255,11 @@ HRESULT CoreAppendFileHandleSelfToCommandLine(
 HRESULT CoreAppendSplashScreenWindowToCommandLine(
     __in_opt HWND hwndSplashScreen,
     __deref_inout_z LPWSTR* psczCommandLine
+    );
+HRESULT CoreAppendEngineWorkingDirectoryToCommandLine(
+    __in_z_opt LPCWSTR wzEngineWorkingDirectory,
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
     );
 void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState

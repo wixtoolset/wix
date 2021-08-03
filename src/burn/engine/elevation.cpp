@@ -852,6 +852,9 @@ extern "C" HRESULT ElevationExecuteExePackage(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczAncestors);
     ExitOnFailure(hr, "Failed to write the list of ancestors to the message buffer.");
 
+    hr = BuffWriteString(&pbData, &cbData, pExecuteAction->exePackage.sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to write the custom working directory to the message buffer.");
+
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
 
@@ -2476,6 +2479,7 @@ static HRESULT OnExecuteExePackage(
     BURN_EXECUTE_ACTION executeAction = { };
     LPWSTR sczIgnoreDependencies = NULL;
     LPWSTR sczAncestors = NULL;
+    LPWSTR sczEngineWorkingDirectory = NULL;
     BOOTSTRAPPER_APPLY_RESTART exeRestart = BOOTSTRAPPER_APPLY_RESTART_NONE;
 
     executeAction.type = BURN_EXECUTE_ACTION_TYPE_EXE_PACKAGE;
@@ -2495,6 +2499,9 @@ static HRESULT OnExecuteExePackage(
 
     hr = BuffReadString(pbData, cbData, &iData, &sczAncestors);
     ExitOnFailure(hr, "Failed to read the list of ancestors.");
+
+    hr = BuffReadString(pbData, cbData, &iData, &sczEngineWorkingDirectory);
+    ExitOnFailure(hr, "Failed to read the custom working directory.");
 
     hr = VariableDeserialize(pVariables, FALSE, pbData, cbData, &iData);
     ExitOnFailure(hr, "Failed to read variables.");
@@ -2520,11 +2527,18 @@ static HRESULT OnExecuteExePackage(
         ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
     }
 
+    if (sczEngineWorkingDirectory && *sczEngineWorkingDirectory)
+    {
+        hr = StrAllocString(&executeAction.exePackage.sczEngineWorkingDirectory, sczEngineWorkingDirectory, 0);
+        ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+    }
+
     // Execute EXE package.
     hr = ExeEngineExecutePackage(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, &exeRestart);
     ExitOnFailure(hr, "Failed to execute EXE package.");
 
 LExit:
+    ReleaseStr(sczEngineWorkingDirectory);
     ReleaseStr(sczAncestors);
     ReleaseStr(sczIgnoreDependencies);
     ReleaseStr(sczPackage);

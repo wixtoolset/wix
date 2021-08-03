@@ -45,6 +45,7 @@
 #include "dutil.h"
 #include "verutil.h"
 #include "aclutil.h"
+#include "apputil.h"
 #include "atomutil.h"
 #include "buffutil.h"
 #include "butil.h"

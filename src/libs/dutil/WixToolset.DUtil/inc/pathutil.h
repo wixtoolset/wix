@@ -14,16 +14,6 @@ typedef enum PATH_EXPAND
 
 
 /*******************************************************************
- PathCommandLineAppend - appends a command line argument on to a
-    string such that ::CommandLineToArgv() will shred them correctly
-    (i.e. quote arguments with spaces in them).
-********************************************************************/
-DAPI_(HRESULT) PathCommandLineAppend(
-    __deref_inout_z LPWSTR* psczCommandLine,
-    __in_z LPCWSTR wzArgument
-    );
-
-/*******************************************************************
  PathFile -  returns a pointer to the file part of the path.
 ********************************************************************/
 DAPI_(LPWSTR) PathFile(

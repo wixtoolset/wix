@@ -14,6 +14,10 @@ static HRESULT CacheVerifyPayloadSignature(
     __in_z LPCWSTR wzUnverifiedPayloadPath,
     __in HANDLE hFile
     );
+static HRESULT CalculateBaseWorkingFolder(
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __inout_z LPWSTR* psczBaseWorkingFolder
+    );
 static HRESULT CalculateWorkingFolder(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
@@ -1337,6 +1341,54 @@ extern "C" void CacheUninitialize(
 
 // Internal functions.
 
+static HRESULT CalculateBaseWorkingFolder(
+    __in BURN_ENGINE_COMMAND* pInternalCommand,
+    __inout_z LPWSTR* psczBaseWorkingFolder
+    )
+{
+    HRESULT hr = S_OK;
+
+    ReleaseNullStr(*psczBaseWorkingFolder);
+
+    // The value from the command line takes precedence.
+    if (pInternalCommand->sczWorkingDirectory)
+    {
+        hr = PathExpand(psczBaseWorkingFolder, pInternalCommand->sczWorkingDirectory, PATH_EXPAND_FULLPATH);
+        ExitOnFailure(hr, "Failed to expand engine working directory from command-line: '%ls'", pInternalCommand->sczWorkingDirectory);
+
+        ExitFunction();
+    }
+
+    // The base working folder can be specified through policy,
+    // but only use it if elevated because it should be secured against non-admin users.
+    if (pInternalCommand->fInitiallyElevated)
+    {
+        hr = PolcReadString(POLICY_BURN_REGISTRY_PATH, L"EngineWorkingDirectory", NULL, psczBaseWorkingFolder);
+        ExitOnFailure(hr, "Failed to read EngineWorkingDirectory policy directory.");
+
+        if (*psczBaseWorkingFolder)
+        {
+            // PolcReadString is supposed to automatically expand REG_EXPAND_SZ values.
+            ExitFunction();
+        }
+    }
+
+    // Default to the temp path specified in environment variables, but need to use system temp path for security reasons if running elevated.
+    if (pInternalCommand->fInitiallyElevated)
+    {
+        hr = PathGetSystemTempPath(psczBaseWorkingFolder);
+        ExitOnFailure(hr, "Failed to get system temp folder path for working folder.");
+    }
+    else
+    {
+        hr = PathGetTempPath(psczBaseWorkingFolder);
+        ExitOnFailure(hr, "Failed to get temp folder path for working folder.");
+    }
+
+LExit:
+    return hr;
+}
+
 static HRESULT CalculateWorkingFolder(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
@@ -1348,16 +1400,11 @@ static HRESULT CalculateWorkingFolder(
     UUID guid = {};
     WCHAR wzGuid[39];
 
-    if (pInternalCommand->fInitiallyElevated)
-    {
-        hr = PathGetSystemTempPath(&sczTempPath);
-        ExitOnFailure(hr, "Failed to get system temp folder path for working folder.");
-    }
-    else
-    {
-        hr = PathGetTempPath(&sczTempPath);
-        ExitOnFailure(hr, "Failed to get temp folder path for working folder.");
-    }
+    hr = CalculateBaseWorkingFolder(pInternalCommand, &sczTempPath);
+    ExitOnFailure(hr, "Failed to get base engine working directory.");
+
+    hr = PathBackslashTerminate(&sczTempPath);
+    ExitOnFailure(hr, "Failed to backslashify base engine working directory.");
 
     rs = ::UuidCreate(&guid);
     hr = HRESULT_FROM_RPC(rs);

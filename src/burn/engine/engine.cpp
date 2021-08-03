@@ -401,6 +401,7 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->internalCommand.sczLogFile);
     ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
     ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
+    ReleaseStr(pEngineState->internalCommand.sczWorkingDirectory);
 
     ReleaseStr(pEngineState->log.sczExtension);
     ReleaseStr(pEngineState->log.sczPrefix);
