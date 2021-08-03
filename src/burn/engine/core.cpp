@@ -22,6 +22,23 @@ static HRESULT CoreRecreateCommandLine(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPassthrough
     );
+static HRESULT AppendEscapedArgumentToCommandLine(
+    __in_z LPCWSTR wzEscapedArgument,
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
+    );
+static HRESULT EscapeAndAppendArgumentToCommandLineFormatted(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    ...
+    );
+static HRESULT EscapeAndAppendArgumentToCommandLineFormattedArgs(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    __in va_list args
+    );
 static HRESULT AppendLayoutToCommandLine(
     __in BOOTSTRAPPER_ACTION action,
     __in_z LPCWSTR wzLayoutDirectory,
@@ -207,11 +224,12 @@ extern "C" HRESULT CoreInitializeConstants(
     for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
     {
         BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
-        
+
         if (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol) // TODO: Don't assume exePackages with burn protocol are bundles.
         {
             // Pass along any ancestors and ourself to prevent infinite loops.
             pPackage->Exe.wzAncestors = pRegistration->sczBundlePackageAncestors;
+            pPackage->Exe.wzEngineWorkingDirectory = pInternalCommand->sczWorkingDirectory;
         }
     }
 
@@ -1001,6 +1019,9 @@ static HRESULT CoreRecreateCommandLine(
         ExitOnFailure(hr, "Failed to append ancestors to command-line.");
     }
 
+    hr = CoreAppendEngineWorkingDirectoryToCommandLine(pInternalCommand->sczWorkingDirectory, psczCommandLine, NULL);
+    ExitOnFailure(hr, "Failed to append the custom working directory to command-line.");
+
     if (wzRelationTypeCommandLine)
     {
         hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", wzRelationTypeCommandLine);
@@ -1060,7 +1081,7 @@ extern "C" HRESULT CoreCreateCleanRoomCommandLine(
         hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", wzLogParameter);
         ExitOnFailure(hr, "Failed to append logging switch.");
 
-        hr = PathCommandLineAppend(psczCommandLine, pInternalCommand->sczLogFile);
+        hr = AppAppendCommandLineArgument(psczCommandLine, pInternalCommand->sczLogFile);
         ExitOnFailure(hr, "Failed to append custom log path.");
     }
 
@@ -1091,7 +1112,7 @@ extern "C" HRESULT CoreCreateCleanRoomCommandLine(
         hr = StrAllocConcat(psczCommandLine, L" /originalsource", 0);
         ExitOnFailure(hr, "Failed to append /originalsource.");
 
-        hr = PathCommandLineAppend(psczCommandLine, pInternalCommand->sczOriginalSource);
+        hr = AppAppendCommandLineArgument(psczCommandLine, pInternalCommand->sczOriginalSource);
         ExitOnFailure(hr, "Failed to append original source.");
     }
 
@@ -1255,6 +1276,28 @@ extern "C" HRESULT CoreAppendSplashScreenWindowToCommandLine(
 LExit:
     return hr;
 }
+
+extern "C" HRESULT CoreAppendEngineWorkingDirectoryToCommandLine(
+    __in_z_opt LPCWSTR wzEngineWorkingDirectory,
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczArgument = NULL;
+
+    if (wzEngineWorkingDirectory)
+    {
+        hr = EscapeAndAppendArgumentToCommandLineFormatted(psczCommandLine, psczObfuscatedCommandLine, L"-%ls=%ls", BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY, wzEngineWorkingDirectory);
+        ExitOnFailure(hr, "Failed to append the custom working directory to the command line.");
+    }
+
+LExit:
+    ReleaseStr(sczArgument);
+
+    return hr;
+}
+
 
 extern "C" void CoreCleanup(
     __in BURN_ENGINE_STATE* pEngineState
@@ -1678,6 +1721,27 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
                 }
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY), BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY, lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY)))
+            {
+                // Get a pointer to the next character after the switch.
+                LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY)];
+                if (L'=' != wzParam[0])
+                {
+                    fInvalidCommandLine = TRUE;
+                    TraceLog(E_INVALIDARG, "Invalid switch: %ls", argv[i]);
+                }
+                else if (L'\0' == wzParam[1])
+                {
+                    // Need to grab the current directory here since this is passed on to other processes.
+                    hr = DirGetCurrent(&pInternalCommand->sczWorkingDirectory);
+                    ExitOnFailure(hr, "Failed to get current directory for custom working directory.");
+                }
+                else
+                {
+                    hr = StrAllocString(&pInternalCommand->sczWorkingDirectory, wzParam + 1, 0);
+                    ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+                }
+            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)))
             {
                 LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)];
@@ -1807,6 +1871,79 @@ LExit:
 
 // internal helper functions
 
+static HRESULT AppendEscapedArgumentToCommandLine(
+    __in_z LPCWSTR wzEscapedArgument,
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine
+    )
+{
+    HRESULT hr = S_OK;
+
+    // If there is already data in the command line,
+    // append a space before appending the argument.
+    if (*psczCommandLine && **psczCommandLine)
+    {
+        hr = StrAllocConcatSecure(psczCommandLine, L" ", 0);
+        ExitOnFailure(hr, "Failed to append space to command line with existing data.");
+    }
+
+    hr = StrAllocConcatSecure(psczCommandLine, wzEscapedArgument, 0);
+    ExitOnFailure(hr, "Failed to append escaped command line argument.");
+
+    if (psczObfuscatedCommandLine)
+    {
+        if (*psczObfuscatedCommandLine && **psczObfuscatedCommandLine)
+        {
+            hr = StrAllocConcat(psczObfuscatedCommandLine, L" ", 0);
+            ExitOnFailure(hr, "Failed to append space to obfuscated command line with existing data.");
+        }
+
+        hr = StrAllocConcat(psczObfuscatedCommandLine, wzEscapedArgument, 0);
+        ExitOnFailure(hr, "Failed to append escaped argument to obfuscated command line.");
+    }
+
+LExit:
+    return hr;
+}
+
+static HRESULT EscapeAndAppendArgumentToCommandLineFormatted(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    ...
+    )
+{
+    HRESULT hr = S_OK;
+    va_list args;
+
+    va_start(args, wzFormat);
+    hr = EscapeAndAppendArgumentToCommandLineFormattedArgs(psczCommandLine, psczObfuscatedCommandLine, wzFormat, args);
+    va_end(args);
+
+    return hr;
+}
+
+static HRESULT EscapeAndAppendArgumentToCommandLineFormattedArgs(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __deref_inout_z_opt LPWSTR* psczObfuscatedCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczArgument = NULL;
+
+    hr = AppEscapeCommandLineArgumentFormattedArgs(&sczArgument, wzFormat, args);
+    ExitOnFailure(hr, "Failed to escape the argument for the command line.");
+
+    hr = AppendEscapedArgumentToCommandLine(sczArgument, psczCommandLine, psczObfuscatedCommandLine);
+
+LExit:
+    ReleaseStr(sczArgument);
+
+    return hr;
+}
+
 static HRESULT AppendLayoutToCommandLine(
     __in BOOTSTRAPPER_ACTION action,
     __in_z LPCWSTR wzLayoutDirectory,
@@ -1822,7 +1959,7 @@ static HRESULT AppendLayoutToCommandLine(
 
         if (wzLayoutDirectory)
         {
-            hr = PathCommandLineAppend(psczCommandLine, wzLayoutDirectory);
+            hr = AppAppendCommandLineArgument(psczCommandLine, wzLayoutDirectory);
             ExitOnFailure(hr, "Failed to append layout directory.");
         }
     }
@@ -1883,16 +2020,16 @@ static HRESULT GetSanitizedCommandLine(
             }
 
             // Remember command-line switch to pass off to BA.
-            PathCommandLineAppend(&pCommand->wzCommandLine, argv[i]);
+            AppAppendCommandLineArgument(&pCommand->wzCommandLine, argv[i]);
         }
 
         if (fHidden)
         {
-            PathCommandLineAppend(psczSanitizedCommandLine, sczSanitizedArgument);
+            AppAppendCommandLineArgument(psczSanitizedCommandLine, sczSanitizedArgument);
         }
         else
         {
-            PathCommandLineAppend(psczSanitizedCommandLine, argv[i]);
+            AppAppendCommandLineArgument(psczSanitizedCommandLine, argv[i]);
         }
     }
 

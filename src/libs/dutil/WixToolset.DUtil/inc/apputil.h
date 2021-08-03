@@ -34,10 +34,49 @@ AppParseCommandLine - parses the command line using CommandLineToArgvW.
                       by calling AppFreeCommandLineArgs.
 
 ********************************************************************/
-DAPI_(HRESULT) AppParseCommandLine(
+HRESULT DAPI AppParseCommandLine(
     __in LPCWSTR wzCommandLine,
     __in int* argc,
     __in LPWSTR** pArgv
+    );
+
+/*******************************************************************
+ AppAppendCommandLineArgument - appends a command line argument on to a
+    string such that ::CommandLineToArgv() will shred them correctly
+    (i.e. quote arguments with spaces in them).
+********************************************************************/
+HRESULT DAPI AppAppendCommandLineArgument(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in_z LPCWSTR wzArgument
+    );
+
+HRESULT DAPIV AppAppendCommandLineArgumentFormatted(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    ...
+    );
+
+HRESULT DAPI AppAppendCommandLineArgumentFormattedArgs(
+    __deref_inout_z LPWSTR* psczCommandLine,
+    __in __format_string LPCWSTR wzFormat,
+    __in va_list args
+    );
+
+/********************************************************************
+AppEscapeCommandLineArgumentFormatted - formats a string and then
+    escapes it such that ::CommandLineToArgv() will parse it back unaltered.
+
+********************************************************************/
+HRESULT DAPIV AppEscapeCommandLineArgumentFormatted(
+    __deref_inout_z LPWSTR* psczEscapedArgument,
+    __in __format_string LPCWSTR wzFormat,
+    ...
+    );
+
+HRESULT DAPI AppEscapeCommandLineArgumentFormattedArgs(
+    __deref_inout_z LPWSTR* psczEscapedArgument,
+    __in __format_string LPCWSTR wzFormat,
+    __in va_list args
     );
 
 #ifdef __cplusplus

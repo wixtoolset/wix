@@ -308,6 +308,12 @@ extern "C" HRESULT ExeEnginePlanAddPackage(
             ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
         }
 
+        if (pPackage->Exe.wzEngineWorkingDirectory)
+        {
+            hr = StrAllocString(&pAction->exePackage.sczEngineWorkingDirectory, pPackage->Exe.wzEngineWorkingDirectory, 0);
+            ExitOnFailure(hr, "Failed to allocate the custom working directory.");
+        }
+
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, NULL); // ignore errors.
     }
 
@@ -488,6 +494,9 @@ extern "C" HRESULT ExeEngineExecutePackage(
 
     if (BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol)
     {
+        hr = CoreAppendEngineWorkingDirectoryToCommandLine(pExecuteAction->exePackage.sczEngineWorkingDirectory, &sczCommand, &sczCommandObfuscated);
+        ExitOnFailure(hr, "Failed to append the custom working directory to the exepackage command line.");
+
         hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczCommand, &sczCommandObfuscated);
         ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
     }

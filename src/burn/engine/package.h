@@ -267,6 +267,7 @@ typedef struct _BURN_PACKAGE
             LPWSTR sczUninstallArguments;
             LPWSTR sczIgnoreDependencies;
             LPCWSTR wzAncestors; // points directly into engine state.
+            LPCWSTR wzEngineWorkingDirectory; // points directly into engine state.
 
             BOOL fPseudoBundle;
 

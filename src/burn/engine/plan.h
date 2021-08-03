@@ -164,6 +164,7 @@ typedef struct _BURN_EXECUTE_ACTION
             BOOTSTRAPPER_ACTION_STATE action;
             LPWSTR sczIgnoreDependencies;
             LPWSTR sczAncestors;
+            LPWSTR sczEngineWorkingDirectory;
         } exePackage;
         struct
         {
