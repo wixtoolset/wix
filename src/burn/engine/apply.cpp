@@ -725,6 +725,7 @@ extern "C" HRESULT ApplyExecute(
                 break;
             }
 
+            // The action failed, roll back to previous rollback boundary.
             if (pCheckpoint)
             {
                 // If inside a MSI transaction, roll it back.
@@ -734,7 +735,6 @@ extern "C" HRESULT ApplyExecute(
                     IgnoreRollbackError(hrRollback, "Failed rolling back transaction");
                 }
 
-                // The action failed, roll back to previous rollback boundary.
                 hrRollback = DoRollbackActions(pEngineState, &context, pCheckpoint->dwId, pRestart);
                 IgnoreRollbackError(hrRollback, "Failed rollback actions");
             }
@@ -744,6 +744,9 @@ extern "C" HRESULT ApplyExecute(
             {
                 break;
             }
+
+            // Ignore failure inside of a non-vital rollback boundary.
+            hr = S_OK;
 
             // Move forward to next rollback boundary.
             fSeekNextRollbackBoundary = TRUE;
