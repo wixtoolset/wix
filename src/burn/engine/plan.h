@@ -438,6 +438,9 @@ HRESULT PlanAppendRollbackAction(
     );
 HRESULT PlanRollbackBoundaryBegin(
     __in BURN_PLAN* pPlan,
+    __in BURN_USER_EXPERIENCE* pUX,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     );
 HRESULT PlanRollbackBoundaryComplete(

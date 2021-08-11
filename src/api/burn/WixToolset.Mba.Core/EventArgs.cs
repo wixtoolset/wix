@@ -782,6 +782,39 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanRollbackBoundary"/>
+    /// </summary>
+    [Serializable]
+    public class PlanRollbackBoundaryEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary />
+        public PlanRollbackBoundaryEventArgs(string rollbackBoundaryId, bool recommendedTransaction, bool transaction, bool cancelRecommendation)
+            : base(cancelRecommendation)
+        {
+            this.RollbackBoundaryId = rollbackBoundaryId;
+            this.RecommendedTransaction = recommendedTransaction;
+            this.Transaction = transaction;
+        }
+
+        /// <summary>
+        /// Gets the identity of the rollback boundary to plan for.
+        /// </summary>
+        public string RollbackBoundaryId { get; private set; }
+
+        /// <summary>
+        /// Whether or not the rollback boundary was authored to use an MSI transaction.
+        /// </summary>
+        public bool RecommendedTransaction { get; private set; }
+
+        /// <summary>
+        /// Whether or not an MSI transaction will be used in the rollback boundary.
+        /// If <see cref="RecommendedTransaction"/> is false, setting the value to true has no effect.
+        /// If <see cref="RecommendedTransaction"/> is true, setting the value to false will cause the packages inside this rollback boundary to be executed without a wrapping MSI transaction.
+        /// </summary>
+        public bool Transaction { get; set; }
+    }
+
+    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.PlanPatchTarget"/>
     /// </summary>
     [Serializable]

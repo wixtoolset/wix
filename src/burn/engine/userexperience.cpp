@@ -104,7 +104,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 4, 27, 0);
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 8, 10, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -2051,6 +2051,36 @@ EXTERN_C BAAPI UserExperienceOnPlanRelatedBundle(
         hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
     }
     *pRequestedState = results.requestedState;
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlanRollbackBoundary(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzRollbackBoundaryId,
+    __inout BOOL* pfTransaction
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANROLLBACKBOUNDARY_ARGS args = { };
+    BA_ONPLANROLLBACKBOUNDARY_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzRollbackBoundaryId = wzRollbackBoundaryId;
+    args.fRecommendedTransaction = *pfTransaction;
+
+    results.cbSize = sizeof(results);
+    results.fTransaction = *pfTransaction;
+
+    hr = SendBAMessage(pUserExperience, BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANROLLBACKBOUNDARY, &args, &results);
+    ExitOnFailure(hr, "BA OnPlanRollbackBoundary failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pfTransaction = results.fTransaction;
 
 LExit:
     return hr;

@@ -71,3 +71,10 @@ Language=English
 WIXSTDBA: Planned MSI package: %1!ls!, wixstdba requested: actionMsiProperty=%2!d!;uiLevel=%3!d!;disableExternalUiHandler=%4!hs!, bafunctions requested: actionMsiProperty=%5!d!;uiLevel=%6!d!;disableExternalUiHandler=%7!hs!
 .
 
+MessageId=8
+Severity=Success
+SymbolicName=MSG_WIXSTDBA_PLANNED_ROLLBACK_BOUNDARY
+Language=English
+WIXSTDBA: Planned rollback boundary: %1!ls!, wixstdba requested transaction: %2!hs!, bafunctions requested transaction: %3!hs!
+.
+

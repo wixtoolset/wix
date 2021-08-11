@@ -79,6 +79,9 @@ static void LogRelatedBundles(
     __in const BURN_RELATED_BUNDLES* pRelatedBundles,
     __in BOOL fReverse
     );
+static void LogRollbackBoundary(
+    __in const BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    );
 
 
 // function definitions
@@ -2222,6 +2225,8 @@ static void LogPackages(
     __in const BOOTSTRAPPER_ACTION action
     )
 {
+    BOOL fUninstalling = BOOTSTRAPPER_ACTION_UNINSTALL == action;
+
     if (pUpgradeBundlePackage)
     {
         LogId(REPORT_STANDARD, MSG_PLANNED_UPGRADE_BUNDLE, pUpgradeBundlePackage->sczId, LoggingRequestStateToString(pUpgradeBundlePackage->defaultRequested), LoggingRequestStateToString(pUpgradeBundlePackage->requested), LoggingActionStateToString(pUpgradeBundlePackage->execute), LoggingActionStateToString(pUpgradeBundlePackage->rollback), LoggingDependencyActionToString(pUpgradeBundlePackage->dependencyExecute));
@@ -2233,7 +2238,7 @@ static void LogPackages(
     else
     {
         // Display related bundles first if uninstalling.
-        if (BOOTSTRAPPER_ACTION_UNINSTALL == action)
+        if (fUninstalling)
         {
             LogRelatedBundles(pRelatedBundles, TRUE);
         }
@@ -2241,8 +2246,17 @@ static void LogPackages(
         // Display all the packages in the log.
         for (DWORD i = 0; i < pPackages->cPackages; ++i)
         {
-            const DWORD iPackage = (BOOTSTRAPPER_ACTION_UNINSTALL == action) ? pPackages->cPackages - 1 - i : i;
+            const DWORD iPackage = fUninstalling ? pPackages->cPackages - 1 - i : i;
             const BURN_PACKAGE* pPackage = &pPackages->rgPackages[iPackage];
+
+            if (!fUninstalling && pPackage->pRollbackBoundaryForward)
+            {
+                LogRollbackBoundary(pPackage->pRollbackBoundaryForward);
+            }
+            else if (fUninstalling && pPackage->pRollbackBoundaryBackward)
+            {
+                LogRollbackBoundary(pPackage->pRollbackBoundaryBackward);
+            }
 
             LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingCacheTypeToString(pPackage->authoredCacheType), LoggingCacheTypeToString(pPackage->cacheType), LoggingBoolToString(pPackage->fPlannedCache), LoggingBoolToString(pPackage->fPlannedUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
             
@@ -2312,4 +2326,11 @@ static void LogRelatedBundles(
             }
         }
     }
+}
+
+static void LogRollbackBoundary(
+    __in const BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
+    )
+{
+    LogId(REPORT_STANDARD, MSG_PLANNED_ROLLBACK_BOUNDARY, pRollbackBoundary->sczId, LoggingBoolToString(pRollbackBoundary->fVital), LoggingBoolToString(pRollbackBoundary->fTransaction), LoggingBoolToString(pRollbackBoundary->fTransactionAuthored));
 }

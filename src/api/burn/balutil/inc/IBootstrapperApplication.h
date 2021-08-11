@@ -160,6 +160,14 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
+    // OnPlanRollbackBoundary - called when the engine is planning a rollback boundary.
+    STDMETHOD(OnPlanRollbackBoundary)(
+        __in_z LPCWSTR wzRollbackBoundaryId,
+        __in BOOL fRecommendedTransaction,
+        __inout BOOL* pfTransaction,
+        __inout BOOL* pfCancel
+        ) = 0;
+
     // OnPlanPackageBegin - called when the engine has begun getting the BA's input
     //                      for planning a package.
     STDMETHOD(OnPlanPackageBegin)(

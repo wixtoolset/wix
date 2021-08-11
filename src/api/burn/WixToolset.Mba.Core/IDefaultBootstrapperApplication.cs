@@ -314,6 +314,11 @@ namespace WixToolset.Mba.Core
         event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
         /// <summary>
+        /// Fired when the engine is planning a rollback boundary.
+        /// </summary>
+        event EventHandler<PlanRollbackBoundaryEventArgs> PlanRollbackBoundary;
+
+        /// <summary>
         /// Fired when the engine has changed progress for the bundle installation.
         /// </summary>
         event EventHandler<ProgressEventArgs> Progress;

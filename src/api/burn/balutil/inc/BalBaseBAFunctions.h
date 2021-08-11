@@ -255,6 +255,16 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnPlanRollbackBoundary(
+        __in_z LPCWSTR /*wzRollbackBoundaryId*/,
+        __in BOOL /*fRecommendedTransaction*/,
+        __inout BOOL* /*pfTransaction*/,
+        __inout BOOL* /*pfCancel*/
+        )
+    {
+        return S_OK;
+    }
+
     virtual STDMETHODIMP OnPlanPackageBegin(
         __in_z LPCWSTR /*wzPackageId*/,
         __in BOOTSTRAPPER_PACKAGE_STATE /*state*/,

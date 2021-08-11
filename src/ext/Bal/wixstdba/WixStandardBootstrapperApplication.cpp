@@ -186,6 +186,9 @@ static HRESULT DAPI SetVariableStringCallback(
     __in BOOL fFormatted,
     __in_opt LPVOID pvContext
     );
+static LPCSTR LoggingBoolToString(
+    __in BOOL f
+    );
 static LPCSTR LoggingRequestStateToString(
     __in BOOTSTRAPPER_REQUEST_STATE requestState
     );
@@ -1393,6 +1396,9 @@ public: // IBootstrapperApplication
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS:
             OnCachePayloadExtractProgressFallback(reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTPROGRESS_RESULTS*>(pvResults));
             break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANROLLBACKBOUNDARY:
+            OnPlanRollbackBoundaryFallback(reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_RESULTS*>(pvResults));
+            break;
         default:
 #ifdef DEBUG
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
@@ -1984,6 +1990,16 @@ private: // privates
         )
     {
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONCACHEPAYLOADEXTRACTPROGRESS, pArgs, pResults, m_pvBAFunctionsProcContext);
+    }
+
+    void OnPlanRollbackBoundaryFallback(
+        __in BA_ONPLANROLLBACKBOUNDARY_ARGS* pArgs,
+        __inout BA_ONPLANROLLBACKBOUNDARY_RESULTS* pResults
+        )
+    {
+        BOOL fTransaction = pResults->fTransaction;
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANROLLBACKBOUNDARY, pArgs, pResults, m_pvBAFunctionsProcContext);
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_ROLLBACK_BOUNDARY, m_hModule, pArgs->wzRollbackBoundaryId, LoggingBoolToString(fTransaction), LoggingBoolToString(pResults->fTransaction));
     }
 
 
@@ -4138,6 +4154,18 @@ static HRESULT DAPI SetVariableStringCallback(
     )
 {
     return BalSetStringVariable(wzVariable, wzValue, fFormatted);
+}
+
+static LPCSTR LoggingBoolToString(
+    __in BOOL f
+    )
+{
+    if (f)
+    {
+        return "Yes";
+    }
+
+    return "No";
 }
 
 static LPCSTR LoggingRequestStateToString(
