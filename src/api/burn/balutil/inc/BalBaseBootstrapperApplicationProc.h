@@ -171,6 +171,15 @@ static HRESULT BalBaseBAProcOnPlanRelatedBundle(
     return pBA->OnPlanRelatedBundle(pArgs->wzBundleId, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
 }
 
+static HRESULT BalBaseBAProcOnPlanRollbackBoundary(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANROLLBACKBOUNDARY_ARGS* pArgs,
+    __inout BA_ONPLANROLLBACKBOUNDARY_RESULTS* pResults
+    )
+{
+    return pBA->OnPlanRollbackBoundary(pArgs->wzRollbackBoundaryId, pArgs->fRecommendedTransaction, &pResults->fTransaction, &pResults->fCancel);
+}
+
 static HRESULT BalBaseBAProcOnPlanPackageBegin(
     __in IBootstrapperApplication* pBA,
     __in BA_ONPLANPACKAGEBEGIN_ARGS* pArgs,
@@ -891,6 +900,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONCACHEPAYLOADEXTRACTCOMPLETE:
             hr = BalBaseBAProcOnCachePayloadExtractComplete(pBA, reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONCACHEPAYLOADEXTRACTCOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANROLLBACKBOUNDARY:
+            hr = BalBaseBAProcOnPlanRollbackBoundary(pBA, reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANROLLBACKBOUNDARY_RESULTS*>(pvResults));
             break;
         }
     }

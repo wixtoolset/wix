@@ -471,6 +471,13 @@ Language=English
       Planned slipstreamed patch: %1!ls!, execute: %2!hs!, rollback: %3!hs!
 .
 
+MessageId=222
+Severity=Success
+SymbolicName=MSG_PLANNED_ROLLBACK_BOUNDARY
+Language=English
+Planned rollback boundary: '%1!ls!', vital: %2!hs!, transaction: %3!hs! (default: %4!hs!)
+.
+
 MessageId=299
 Severity=Success
 SymbolicName=MSG_PLAN_COMPLETE

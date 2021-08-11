@@ -304,6 +304,18 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.PlanRollbackBoundary"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanRollbackBoundary(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzRollbackBoundaryId,
+            [MarshalAs(UnmanagedType.Bool)] bool fRecommendedTransaction,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fTransaction,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
+            );
+
+        /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.PlanPackageBegin"/>.
         /// </summary>
         [PreserveSig]

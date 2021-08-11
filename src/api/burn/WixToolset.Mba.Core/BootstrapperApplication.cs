@@ -86,6 +86,9 @@ namespace WixToolset.Mba.Core
         public event EventHandler<PlanRelatedBundleEventArgs> PlanRelatedBundle;
 
         /// <inheritdoc/>
+        public event EventHandler<PlanRollbackBoundaryEventArgs> PlanRollbackBoundary;
+
+        /// <inheritdoc/>
         public event EventHandler<PlanPackageBeginEventArgs> PlanPackageBegin;
 
         /// <inheritdoc/>
@@ -490,6 +493,18 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanRelatedBundle(PlanRelatedBundleEventArgs args)
         {
             EventHandler<PlanRelatedBundleEventArgs> handler = this.PlanRelatedBundle;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="PlanRollbackBoundary"/> event.
+        /// </summary>
+        protected virtual void OnPlanRollbackBoundary(PlanRollbackBoundaryEventArgs args)
+        {
+            EventHandler<PlanRollbackBoundaryEventArgs> handler = this.PlanRollbackBoundary;
             if (null != handler)
             {
                 handler(this, args);
@@ -1374,6 +1389,16 @@ namespace WixToolset.Mba.Core
             this.OnPlanRelatedBundle(args);
 
             pRequestedState = args.State;
+            fCancel = args.Cancel;
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnPlanRollbackBoundary(string wzRollbackBoundaryId, bool fRecommendedTransaction, ref bool fTransaction, ref bool fCancel)
+        {
+            PlanRollbackBoundaryEventArgs args = new PlanRollbackBoundaryEventArgs(wzRollbackBoundaryId, fRecommendedTransaction, fTransaction, fCancel);
+            this.OnPlanRollbackBoundary(args);
+
+            fTransaction = args.Transaction;
             fCancel = args.Cancel;
             return args.HResult;
         }
