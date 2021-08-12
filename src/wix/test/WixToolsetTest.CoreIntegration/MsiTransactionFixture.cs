@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System.Collections.Generic;
     using System.IO;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
@@ -50,6 +51,8 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var binFolder = Path.Combine(baseFolder, "bin");
                 var exePath = Path.Combine(binFolder, "test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
 
                 BuildMsiPackages(folder, intermediateFolder, binFolder);
 
@@ -68,6 +71,14 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(exePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var rollbackBoundaries = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:RollbackBoundary");
+                Assert.Equal(2, rollbackBoundaries.Count);
+                Assert.Equal("<RollbackBoundary Id='WixDefaultBoundary' Vital='yes' Transaction='no' />", rollbackBoundaries[0].GetTestXml());
+                Assert.Equal("<RollbackBoundary Id='rba31DvS6_ninGllmavuS.cp4RYckk' Vital='yes' Transaction='yes' LogPathVariable='WixBundleLog_rba31DvS6_ninGllmavuS.cp4RYckk' />", rollbackBoundaries[1].GetTestXml());
             }
         }
 

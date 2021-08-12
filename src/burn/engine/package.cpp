@@ -36,6 +36,7 @@ extern "C" HRESULT PackagesParseFromXml(
     BSTR bstrNodeName = NULL;
     DWORD cMspPackages = 0;
     LPWSTR scz = NULL;
+    BOOL fFoundXml = FALSE;
 
     // select rollback boundary nodes
     hr = XmlSelectNodes(pixnBundle, L"RollbackBoundary", &pixnNodes);
@@ -63,15 +64,19 @@ extern "C" HRESULT PackagesParseFromXml(
 
             // @Id
             hr = XmlGetAttributeEx(pixnNode, L"Id", &pRollbackBoundary->sczId);
-            ExitOnFailure(hr, "Failed to get @Id.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
             // @Vital
             hr = XmlGetYesNoAttribute(pixnNode, L"Vital", &pRollbackBoundary->fVital);
-            ExitOnFailure(hr, "Failed to get @Vital.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Vital.");
 
             // @Transaction
             hr = XmlGetYesNoAttribute(pixnNode, L"Transaction", &pRollbackBoundary->fTransactionAuthored);
-            ExitOnFailure(hr, "Failed to get @Transaction.");
+            ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Transaction.");
+
+            // @LogPathVariable
+            hr = XmlGetAttributeEx(pixnNode, L"LogPathVariable", &pRollbackBoundary->sczLogPathVariable);
+            ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @LogPathVariable.");
 
             // prepare next iteration
             ReleaseNullObject(pixnNode);
@@ -110,11 +115,13 @@ extern "C" HRESULT PackagesParseFromXml(
 
         // @Id
         hr = XmlGetAttributeEx(pixnNode, L"Id", &pPackage->sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
         // @Cache
         hr = XmlGetAttributeEx(pixnNode, L"Cache", &scz);
-        if (SUCCEEDED(hr))
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Cache.");
+
+        if (fFoundXml)
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"remove", -1))
             {
@@ -134,72 +141,62 @@ extern "C" HRESULT PackagesParseFromXml(
                 ExitOnRootFailure(hr, "Invalid cache type: %ls", scz);
             }
         }
-        ExitOnFailure(hr, "Failed to get @Cache.");
 
         // @CacheId
         hr = XmlGetAttributeEx(pixnNode, L"CacheId", &pPackage->sczCacheId);
-        ExitOnFailure(hr, "Failed to get @CacheId.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @CacheId.");
 
         // @Size
         hr = XmlGetAttributeUInt64(pixnNode, L"Size", &pPackage->qwSize);
-        ExitOnFailure(hr, "Failed to get @Size.");
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Size.");
 
         // @InstallSize
         hr = XmlGetAttributeUInt64(pixnNode, L"InstallSize", &pPackage->qwInstallSize);
-        ExitOnFailure(hr, "Failed to get @InstallSize.");
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallSize.");
 
         // @PerMachine
         hr = XmlGetYesNoAttribute(pixnNode, L"PerMachine", &pPackage->fPerMachine);
-        ExitOnFailure(hr, "Failed to get @PerMachine.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @PerMachine.");
 
         // @Permanent
         hr = XmlGetYesNoAttribute(pixnNode, L"Permanent", &pPackage->fUninstallable);
-        ExitOnFailure(hr, "Failed to get @Permanent.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Permanent.");
         pPackage->fUninstallable = !pPackage->fUninstallable; // TODO: change "Uninstallable" variable name to permanent, until then Uninstallable is the opposite of Permanent so fix the variable.
         pPackage->fCanAffectRegistration = pPackage->fUninstallable;
 
         // @Vital
         hr = XmlGetYesNoAttribute(pixnNode, L"Vital", &pPackage->fVital);
-        ExitOnFailure(hr, "Failed to get @Vital.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Vital.");
 
         // @LogPathVariable
         hr = XmlGetAttributeEx(pixnNode, L"LogPathVariable", &pPackage->sczLogPathVariable);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @LogPathVariable.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @LogPathVariable.");
 
         // @RollbackLogPathVariable
         hr = XmlGetAttributeEx(pixnNode, L"RollbackLogPathVariable", &pPackage->sczRollbackLogPathVariable);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @RollbackLogPathVariable.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RollbackLogPathVariable.");
 
         // @InstallCondition
         hr = XmlGetAttributeEx(pixnNode, L"InstallCondition", &pPackage->sczInstallCondition);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @InstallCondition.");
-        }
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallCondition.");
 
         // @RollbackBoundaryForward
         hr = XmlGetAttributeEx(pixnNode, L"RollbackBoundaryForward", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @RollbackBoundaryForward.");
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RollbackBoundaryForward.");
 
-            hr =  FindRollbackBoundaryById(pPackages, scz, &pPackage->pRollbackBoundaryForward);
+        if (fFoundXml)
+        {
+            hr = FindRollbackBoundaryById(pPackages, scz, &pPackage->pRollbackBoundaryForward);
             ExitOnFailure(hr, "Failed to find forward transaction boundary: %ls", scz);
         }
 
         // @RollbackBoundaryBackward
         hr = XmlGetAttributeEx(pixnNode, L"RollbackBoundaryBackward", &scz);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get @RollbackBoundaryBackward.");
+        ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @RollbackBoundaryBackward.");
 
-            hr =  FindRollbackBoundaryById(pPackages, scz, &pPackage->pRollbackBoundaryBackward);
+        if (fFoundXml)
+        {
+            hr = FindRollbackBoundaryById(pPackages, scz, &pPackage->pRollbackBoundaryBackward);
             ExitOnFailure(hr, "Failed to find backward transaction boundary: %ls", scz);
         }
 
@@ -378,6 +375,7 @@ extern "C" void PackagesUninitialize(
         {
             ReleaseStr(pPackages->rgRollbackBoundaries[i].sczId);
             ReleaseStr(pPackages->rgRollbackBoundaries[i].sczLogPath);
+            ReleaseStr(pPackages->rgRollbackBoundaries[i].sczLogPathVariable);
         }
         MemFree(pPackages->rgRollbackBoundaries);
     }

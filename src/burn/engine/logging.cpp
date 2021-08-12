@@ -242,11 +242,6 @@ extern "C" HRESULT LoggingSetPackageVariable(
     // Make sure that no package log files are created when logging has been disabled via Log element.
     if (BURN_LOGGING_STATE_DISABLED == pLog->state)
     {
-        if (psczLogPath)
-        {
-            *psczLogPath = NULL;
-        }
-
         ExitFunction();
     }
 
@@ -268,6 +263,36 @@ extern "C" HRESULT LoggingSetPackageVariable(
 
 LExit:
     ReleaseStr(sczLogPath);
+
+    return hr;
+}
+
+extern "C" HRESULT LoggingSetTransactionVariable(
+    __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary,
+    __in_z_opt LPCWSTR wzSuffix,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables
+    )
+{
+    HRESULT hr = S_OK;
+
+    // Make sure that no log files are created when logging has been disabled via Log element.
+    if (BURN_LOGGING_STATE_DISABLED == pLog->state)
+    {
+        ExitFunction();
+    }
+
+    if (pRollbackBoundary && pRollbackBoundary->sczLogPathVariable && *pRollbackBoundary->sczLogPathVariable)
+    {
+        hr = StrAllocFormatted(&pRollbackBoundary->sczLogPath, L"%ls%hs%ls_%03u_%ls.%ls", pLog->sczPrefix, wzSuffix && *wzSuffix ? "_" : "", wzSuffix && *wzSuffix ? wzSuffix : L"", vdwPackageSequence, pRollbackBoundary->sczId, pLog->sczExtension);
+        ExitOnFailure(hr, "Failed to allocate path for transaction log.");
+
+        hr = VariableSetString(pVariables, pRollbackBoundary->sczLogPathVariable, pRollbackBoundary->sczLogPath, FALSE, FALSE);
+        ExitOnFailure(hr, "Failed to set log path into variable.");
+    }
+
+LExit:
+    ++vdwPackageSequence;
 
     return hr;
 }

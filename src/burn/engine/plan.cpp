@@ -1709,8 +1709,8 @@ LExit:
 extern "C" HRESULT PlanRollbackBoundaryBegin(
     __in BURN_PLAN* pPlan,
     __in BURN_USER_EXPERIENCE* pUX,
-    __in BURN_LOGGING* /*pLog*/,
-    __in BURN_VARIABLES* /*pVariables*/,
+    __in BURN_LOGGING* pLog,
+    __in BURN_VARIABLES* pVariables,
     __in BURN_ROLLBACK_BOUNDARY* pRollbackBoundary
     )
 {
@@ -1744,6 +1744,8 @@ extern "C" HRESULT PlanRollbackBoundaryBegin(
     }
     else
     {
+        LoggingSetTransactionVariable(pRollbackBoundary, NULL, pLog, pVariables); // ignore errors.
+
         // Add begin MSI transaction to execute plan.
         hr = PlanExecuteCheckpoint(pPlan);
         ExitOnFailure(hr, "Failed to append checkpoint before MSI transaction begin action.");

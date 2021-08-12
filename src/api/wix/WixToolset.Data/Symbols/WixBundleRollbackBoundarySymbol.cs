@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundarySymbolFields.Vital), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundarySymbolFields.Transaction), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.LogPathVariable), IntermediateFieldType.String),
             },
             typeof(WixBundleRollbackBoundarySymbol));
     }
@@ -23,6 +24,7 @@ namespace WixToolset.Data.Symbols
     {
         Vital,
         Transaction,
+        LogPathVariable,
     }
 
     public class WixBundleRollbackBoundarySymbol : IntermediateSymbol
@@ -47,6 +49,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (bool?)this.Fields[(int)WixBundleRollbackBoundarySymbolFields.Transaction];
             set => this.Set((int)WixBundleRollbackBoundarySymbolFields.Transaction, value);
+        }
+
+        public string LogPathVariable
+        {
+            get => (string)this.Fields[(int)WixBundleRollbackBoundarySymbolFields.LogPathVariable];
+            set => this.Set((int)WixBundleRollbackBoundarySymbolFields.LogPathVariable, value);
         }
     }
 }

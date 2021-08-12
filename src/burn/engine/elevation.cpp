@@ -3246,7 +3246,10 @@ static HRESULT OnMsiBeginTransaction(
     hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
-    pRollbackBoundary->sczLogPath = sczLogPath;
+    if (sczLogPath && *sczLogPath)
+    {
+        pRollbackBoundary->sczLogPath = sczLogPath;
+    }
 
     hr = MsiEngineBeginTransaction(pRollbackBoundary);
 
@@ -3284,7 +3287,10 @@ static HRESULT OnMsiCommitTransaction(
     hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
-    pRollbackBoundary->sczLogPath = sczLogPath;
+    if (sczLogPath && *sczLogPath)
+    {
+        pRollbackBoundary->sczLogPath = sczLogPath;
+    }
 
     hr = MsiEngineCommitTransaction(pRollbackBoundary);
 
@@ -3322,7 +3328,10 @@ static HRESULT OnMsiRollbackTransaction(
     hr = PackageFindRollbackBoundaryById(pPackages, sczId, &pRollbackBoundary);
     ExitOnFailure(hr, "Failed to find rollback boundary: %ls", sczId);
 
-    pRollbackBoundary->sczLogPath = sczLogPath;
+    if (sczLogPath && *sczLogPath)
+    {
+        pRollbackBoundary->sczLogPath = sczLogPath;
+    }
 
     hr = MsiEngineRollbackTransaction(pRollbackBoundary);
 

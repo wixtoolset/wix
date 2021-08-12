@@ -188,6 +188,12 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("Id", rollbackBoundary.Id.Id);
                     writer.WriteAttributeString("Vital", rollbackBoundary.Vital == false ? "no" : "yes");
                     writer.WriteAttributeString("Transaction", rollbackBoundary.Transaction == true ? "yes" : "no");
+
+                    if (!String.IsNullOrEmpty(rollbackBoundary.LogPathVariable))
+                    {
+                        writer.WriteAttributeString("LogPathVariable", rollbackBoundary.LogPathVariable);
+                    }
+
                     writer.WriteEndElement();
                 }
 
