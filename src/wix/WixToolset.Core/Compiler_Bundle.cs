@@ -1860,6 +1860,7 @@ namespace WixToolset.Core
             Identifier id = null;
             var vital = YesNoType.Yes;
             var transaction = YesNoType.No;
+            string logPathVariable = null;
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -1884,6 +1885,9 @@ namespace WixToolset.Core
                         break;
                     case "Transaction":
                         transaction = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "LogPathVariable":
+                        logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         break;
                     default:
                         allowed = false;
@@ -1932,9 +1936,21 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
+            if (transaction == YesNoType.Yes)
+            {
+                if (logPathVariable == null)
+                {
+                    logPathVariable = String.Concat("WixBundleLog_", id.Id);
+                }
+            }
+             else if (logPathVariable != null)
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "LogPathVariable", logPathVariable, "Transaction"));
+            }
+
             if (!this.Core.EncounteredError)
             {
-                this.CreateRollbackBoundary(sourceLineNumbers, id, vital, transaction, parentType, parentId, previousType, previousId);
+                this.CreateRollbackBoundary(sourceLineNumbers, id, vital, transaction, logPathVariable, parentType, parentId, previousType, previousId);
             }
 
             return id.Id;
@@ -2759,11 +2775,12 @@ namespace WixToolset.Core
         /// <param name="id">Identifier for the rollback boundary.</param>
         /// <param name="vital">Indicates whether the rollback boundary is vital or not.</param>
         /// <param name="transaction">Indicates whether the rollback boundary will use an MSI transaction.</param>
+        /// <param name="logPathVariable">The variable for the path of the MSI transaction log.</param>
         /// <param name="parentType">Type of parent group.</param>
         /// <param name="parentId">Identifier of parent group.</param>
         /// <param name="previousType">Type of previous item, if any.</param>
         /// <param name="previousId">Identifier of previous item, if any.</param>
-        private void CreateRollbackBoundary(SourceLineNumber sourceLineNumbers, Identifier id, YesNoType vital, YesNoType transaction, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        private void CreateRollbackBoundary(SourceLineNumber sourceLineNumbers, Identifier id, YesNoType vital, YesNoType transaction, string logPathVariable, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
         {
             this.Core.AddSymbol(new WixChainItemSymbol(sourceLineNumbers, id));
 
@@ -2777,6 +2794,11 @@ namespace WixToolset.Core
             if (YesNoType.NotSet != transaction)
             {
                 rollbackBoundary.Transaction = (transaction == YesNoType.Yes);
+
+                if (logPathVariable != null)
+                {
+                    rollbackBoundary.LogPathVariable = logPathVariable;
+                }
             }
 
             this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, null);

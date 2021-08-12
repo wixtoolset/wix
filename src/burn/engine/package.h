@@ -195,6 +195,7 @@ typedef struct _BURN_ROLLBACK_BOUNDARY
     BOOL fTransactionAuthored;
     BOOL fTransaction;
     BOOL fActiveTransaction; // only valid during Apply.
+    LPWSTR sczLogPathVariable;
     LPWSTR sczLogPath;
 } BURN_ROLLBACK_BOUNDARY;
 
