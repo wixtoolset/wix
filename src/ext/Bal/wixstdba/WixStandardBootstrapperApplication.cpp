@@ -286,6 +286,7 @@ public: // IBootstrapperApplication
             // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
             if (!m_fPrereq && BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE == operation)
             {
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "A newer version (v%ls) of this product is installed.", wzVersion);
                 m_fDowngrading = TRUE;
             }
         }
@@ -321,12 +322,14 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
+
         // If we're not interacting with the user or we're doing a layout or we're resuming just after a force restart
         // then automatically start planning.
         BOOL fSkipToPlan = SUCCEEDED(hrStatus) &&
                            (BOOTSTRAPPER_DISPLAY_FULL > m_command.display ||
                             BOOTSTRAPPER_ACTION_LAYOUT == m_command.action ||
                             BOOTSTRAPPER_RESUME_TYPE_REBOOT == m_command.resumeType);
+
         // If we're requiring user input (which currently means Install, Repair, or Uninstall)
         // or if we're skipping to an action that modifies machine state
         // then evaluate conditions.
@@ -360,6 +363,23 @@ public: // IBootstrapperApplication
                     }
                 }
             }
+            else if (m_fDowngrading && BOOTSTRAPPER_ACTION_UNINSTALL < m_command.action)
+            {
+                if (m_fSuppressDowngradeFailure)
+                {
+                    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Downgrade failure has been suppressed; exiting bundle.");
+
+                    hr = S_OK;
+                    SetState(WIXSTDBA_STATE_APPLIED, hr);
+                    ExitFunction();
+                }
+                else
+                {
+                    // If we are going to apply a downgrade, bail.
+                    hr = HRESULT_FROM_WIN32(ERROR_PRODUCT_VERSION);
+                    BalExitOnFailure(hr, "Cannot install a product when a newer version is installed.");
+                }
+            }
         }
 
         SetState(WIXSTDBA_STATE_DETECTED, hrStatus);
@@ -369,6 +389,7 @@ public: // IBootstrapperApplication
             ::PostMessageW(m_hWnd, WM_WIXSTDBA_PLAN_PACKAGES, 0, m_command.action);
         }
 
+    LExit:
         return hr;
     }
 
@@ -2162,7 +2183,7 @@ private:
     {
         HRESULT hr = S_OK;
         LPWSTR sczModulePath = NULL;
-        IXMLDOMDocument *pixdManifest = NULL;
+        IXMLDOMDocument* pixdManifest = NULL;
 
         hr = BalManifestLoad(m_hModule, &pixdManifest);
         BalExitOnFailure(hr, "Failed to load bootstrapper application manifest.");
@@ -2789,21 +2810,21 @@ private:
         switch (uMsg)
         {
         case WM_NCCREATE:
-            {
+        {
             LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
             pBA = reinterpret_cast<CWixStandardBootstrapperApplication*>(lpcs->lpCreateParams);
 #pragma warning(suppress:4244)
             ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pBA));
-            }
-            break;
+        }
+        break;
 
         case WM_NCDESTROY:
-            {
+        {
             LRESULT lres = CallDefaultWndProc(pBA, hWnd, uMsg, wParam, lParam);
             ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
             ::PostQuitMessage(0);
             return lres;
-            }
+        }
 
         case WM_CREATE:
             if (!pBA->OnCreate(hWnd))
@@ -3023,8 +3044,6 @@ private:
         }
 
         m_pEngine->CloseSplashScreen();
-
-        return;
     }
 
 
@@ -3042,8 +3061,6 @@ private:
         }
 
         m_pEngine->CloseSplashScreen();
-
-        return;
     }
 
 
@@ -3073,8 +3090,6 @@ private:
         {
             SetState(WIXSTDBA_STATE_DETECTING, hr);
         }
-
-        return;
     }
 
 
@@ -3089,20 +3104,6 @@ private:
 
         m_plannedAction = action;
 
-        // If we are going to apply a downgrade, bail.
-        if (m_fDowngrading && BOOTSTRAPPER_ACTION_UNINSTALL < action)
-        {
-            if (m_fSuppressDowngradeFailure)
-            {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "A newer version of this product is installed but downgrade failure has been suppressed; continuing...");
-            }
-            else
-            {
-                hr = HRESULT_FROM_WIN32(ERROR_PRODUCT_VERSION);
-                BalExitOnFailure(hr, "Cannot install a product when a newer version is installed.");
-            }
-        }
-
         SetState(WIXSTDBA_STATE_PLANNING, hr);
 
         hr = m_pEngine->Plan(action);
@@ -3113,8 +3114,6 @@ private:
         {
             SetState(WIXSTDBA_STATE_PLANNING, hr);
         }
-
-        return;
     }
 
 
@@ -3139,8 +3138,6 @@ private:
         {
             SetState(WIXSTDBA_STATE_APPLYING, hr);
         }
-
-        return;
     }
 
 
@@ -3490,8 +3487,6 @@ private:
         ReleaseStr(sczLicenseUrl);
         ReleaseStr(sczLicenseDirectory);
         ReleaseStr(sczLicenseFilename);
-
-        return;
     }
 
 
@@ -3579,8 +3574,6 @@ private:
         ReleaseStr(sczLaunchTargetElevatedId);
         StrSecureZeroFreeString(sczLaunchTarget);
         ReleaseStr(sczUnformattedLaunchTarget);
-
-        return;
     }
 
 
@@ -3593,8 +3586,6 @@ private:
 
         m_fAllowRestart = TRUE;
         ::SendMessageW(m_hWnd, WM_CLOSE, 0, 0);
-
-        return;
     }
 
 
@@ -3614,8 +3605,6 @@ private:
 
     LExit:
         ReleaseStr(sczLogFile);
-
-        return;
     }
 
 
@@ -3902,7 +3891,7 @@ public:
         __in BOOL fPrereq,
         __in HRESULT hrHostInitialization,
         __in IBootstrapperEngine* pEngine
-        ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
+    ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
     {
         m_hModule = hModule;
         m_command = { };

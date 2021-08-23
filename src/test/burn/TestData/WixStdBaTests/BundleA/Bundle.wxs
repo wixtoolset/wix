@@ -1,0 +1,17 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="~$(var.TestGroupName) - $(var.BundleName)" Version="$(var.Version)" UpgradeCode="$(var.UpgradeCode)" Compressed="yes" CommandLineVariables="caseSensitive">
+    <Log Prefix="~$(var.TestGroupName)_$(var.BundleName)" />
+
+    <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
+
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" SuppressDowngradeFailure="yes" />
+    </BootstrapperApplication>
+
+    <Chain>
+      <PackageGroupRef Id="BundlePackages" />
+    </Chain>
+  </Bundle>
+</Wix>

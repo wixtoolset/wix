@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Bal.wixext", "wi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Dnc.Host", "WixToolset.Dnc.Host\WixToolset.Dnc.Host.csproj", "{0D780900-C2FF-4FA2-8CB5-8A19768724C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixToolset.Mba.Host", "WixToolset.Mba.Host\WixToolset.Mba.Host.csproj", "{F2BA1935-70FA-4156-B161-FD03850B4FAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Mba.Host", "WixToolset.Mba.Host\WixToolset.Mba.Host.csproj", "{F2BA1935-70FA-4156-B161-FD03850B4FAA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.FullFramework2MBA", "test\examples\FullFramework2MBA\Example.FullFramework2MBA.csproj", "{CC4236FC-226E-4232-AB50-24CBEC4D314D}"
 EndProject
