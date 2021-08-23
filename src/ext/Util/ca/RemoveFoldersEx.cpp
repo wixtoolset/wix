@@ -28,11 +28,15 @@ static HRESULT RecursePath(
     WIN32_FIND_DATAW wfd;
     LPWSTR sczNext = NULL;
 
+#ifdef _WIN64
+    UNREFERENCED_PARAMETER(fDisableWow64Redirection);
+#else
     if (fDisableWow64Redirection)
     {
         hr = WcaDisableWow64FSRedirection();
         ExitOnFailure(hr, "Custom action was told to act on a 64-bit component, but was unable to disable filesystem redirection through the Wow64 API.");
     }
+#endif
 
     // First recurse down to all the child directories.
     hr = StrAllocFormatted(&sczSearch, L"%s*", wzPath);
@@ -103,10 +107,12 @@ LExit:
         ::FindClose(hFind);
     }
 
+#ifndef _WIN64
     if (fDisableWow64Redirection)
     {
         WcaRevertWow64FSRedirection();
     }
+#endif
 
     ReleaseStr(sczNext);
     ReleaseStr(sczProperty);
@@ -140,7 +146,9 @@ extern "C" UINT WINAPI WixRemoveFoldersEx(
     hr = WcaInitialize(hInstall, "WixRemoveFoldersEx");
     ExitOnFailure(hr, "Failed to initialize WixRemoveFoldersEx.");
 
+#ifndef _WIN64
     WcaInitializeWow64();
+#endif
 
     // anything to do?
     if (S_OK != WcaTableExists(L"Wix4RemoveFolderEx"))
@@ -219,7 +227,9 @@ extern "C" UINT WINAPI WixRemoveFoldersEx(
     ExitOnFailure(hr, "Failure occured while processing Wix4RemoveFolderEx table");
 
 LExit:
+#ifndef _WIN64
     WcaFinalizeWow64();
+#endif
 
     if (hColumns)
     {
