@@ -13,6 +13,7 @@ namespace WixToolset.Tools.Heat
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Harvesters;
+    using WixToolset.Harvesters.Extensibility;
     using WixToolset.Tools.Core;
 
     /// <summary>
@@ -70,7 +71,14 @@ namespace WixToolset.Tools.Heat
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(args);
 
-            var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider);
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+            foreach (var extension in arguments.Extensions)
+            {
+                extensionManager.Load(extension);
+            }
+            var heatExtensions = extensionManager.GetServices<IHeatExtension>();
+
+            var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, heatExtensions);
             var command = commandLine.ParseStandardCommandLine(arguments);
             return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
         }
