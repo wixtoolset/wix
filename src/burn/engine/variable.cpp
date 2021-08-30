@@ -97,6 +97,10 @@ static HRESULT InitializeVariableVersionNT(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
     );
+static HRESULT InitializeVariableNativeMachine(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+    );
 static HRESULT InitializeVariableOsInfo(
     __in DWORD_PTR dwpData,
     __inout BURN_VARIANT* pValue
@@ -223,6 +227,7 @@ extern "C" HRESULT VariableInitialize(
         {L"LocalAppDataFolder", InitializeVariableCsidlFolder, CSIDL_LOCAL_APPDATA},
         {VARIABLE_LOGONUSER, InitializeVariableLogonUser, 0},
         {L"MyPicturesFolder", InitializeVariableCsidlFolder, CSIDL_MYPICTURES},
+        {L"NativeMachine", InitializeVariableNativeMachine, 0},
         {L"NTProductType", InitializeVariableOsInfo, OS_INFO_VARIABLE_NTProductType},
         {L"NTSuiteBackOffice", InitializeVariableOsInfo, OS_INFO_VARIABLE_NTSuiteBackOffice},
         {L"NTSuiteDataCenter", InitializeVariableOsInfo, OS_INFO_VARIABLE_NTSuiteDataCenter},
@@ -1821,6 +1826,26 @@ static HRESULT InitializeVariableSystemInfo(
     }
 
     hr = BVariantCopy(&value, pValue);
+    ExitOnFailure(hr, "Failed to set variant value.");
+
+LExit:
+    return hr;
+}
+
+static HRESULT InitializeVariableNativeMachine(
+    __in DWORD_PTR dwpData,
+    __inout BURN_VARIANT* pValue
+    )
+{
+    UNREFERENCED_PARAMETER(dwpData);
+    
+    HRESULT hr = S_OK;
+    USHORT usNativeMachine = IMAGE_FILE_MACHINE_UNKNOWN;
+
+    hr = ProcNativeMachine(::GetCurrentProcess(), &usNativeMachine);
+    ExitOnFailure(hr, "Failed to get native machine value.");
+    
+    hr = BVariantSetNumeric(pValue, usNativeMachine);
     ExitOnFailure(hr, "Failed to set variant value.");
 
 LExit:

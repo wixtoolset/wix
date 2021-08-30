@@ -61,6 +61,7 @@ namespace WixToolset.Core
                 "LocalAppDataFolder",
                 "LogonUser",
                 "MyPicturesFolder",
+                "NativeMachine",
                 "NTProductType",
                 "NTSuiteBackOffice",
                 "NTSuiteDataCenter",
