@@ -18,6 +18,7 @@
 #include "dutil.h"
 #include "apputil.h"
 #include "memutil.h"
+#include "dictutil.h"
 #include "dirutil.h"
 #include "fileutil.h"
 #include "locutil.h"

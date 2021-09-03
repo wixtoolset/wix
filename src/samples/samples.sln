@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thmviewer", "thmviewer\thmviewer.vcxproj", "{95228C13-97F5-484A-B4A2-ECF4618B0881}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Debug|Any CPU.Build.0 = Debug|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Debug|x86.ActiveCfg = Debug|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Debug|x86.Build.0 = Debug|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Release|Any CPU.ActiveCfg = Release|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Release|x86.ActiveCfg = Release|Win32
+		{95228C13-97F5-484A-B4A2-ECF4618B0881}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {537F1116-39FE-4AED-A9A2-35030E5750D5}
+	EndGlobalSection
+EndGlobal
