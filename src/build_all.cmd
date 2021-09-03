@@ -51,7 +51,7 @@ call ext\ext.cmd %_C% || exit /b
 
 :: samples
 
-:: call samples\samples.cmd %_C% || exit /b
+call samples\samples.cmd %_C% || exit /b
 
 
 :: integration tests
