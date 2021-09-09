@@ -9,7 +9,7 @@ namespace WixToolset.Harvesters
     using WixToolset.Harvesters.Data;
     using WixToolset.Harvesters.Extensibility;
 
-    internal class UtilTransformMutator : BaseMutatorExtension
+    public class UtilTransformMutator : BaseMutatorExtension
     {
         private string transform;
         private int transformSequence;

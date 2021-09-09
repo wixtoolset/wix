@@ -11,7 +11,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Defines generated element types.
     /// </summary>
-    internal enum GenerateType
+    public enum GenerateType
     {
         /// <summary>Generate Components.</summary>
         Components,
@@ -29,7 +29,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// VS-related extensions for the WiX Toolset Harvester application.
     /// </summary>
-    internal class VSHeatExtension : BaseHeatExtension
+    public class VSHeatExtension : BaseHeatExtension
     {
         /// <summary>
         /// Gets the supported command line types for this extension.
@@ -45,7 +45,7 @@ namespace WixToolset.Harvesters
                     new HeatCommandLineOption("-configuration", "configuration to set when harvesting the project"),
                     new HeatCommandLineOption("-directoryid", "overridden directory id for generated directory elements"),
                     new HeatCommandLineOption("-generate", Environment.NewLine +
-                        "            specify what elements to generate, one of:" + Environment.NewLine + 
+                        "            specify what elements to generate, one of:" + Environment.NewLine +
                         "                components, container, payloadgroup, packagegroup" + Environment.NewLine +
                         "                (default is components)"),
                     new HeatCommandLineOption("-msbuildbinpath", "msbuild bin directory path"),
@@ -94,7 +94,7 @@ namespace WixToolset.Harvesters
                         {
                             throw new WixException(HarvesterErrors.InvalidDirectoryId(args[i]));
                         }
-                        
+
                         directoryIds = args[i];
                     }
                     else if ("-generate" == args[i])
@@ -187,7 +187,7 @@ namespace WixToolset.Harvesters
                         {
                             throw new WixException(HarvesterErrors.InvalidProjectName(args[i]));
                         }
-                        
+
                         projectName = args[i];
                     }
                     else if ("-suid" == args[i])

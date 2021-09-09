@@ -11,7 +11,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring from a native DLL file.
     /// </summary>
-    internal class DllHarvester
+    public class DllHarvester
     {
         /// <summary>
         /// Harvest the registry values written by calling DllRegisterServer on the specified file.

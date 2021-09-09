@@ -12,7 +12,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a directory from the file system.
     /// </summary>
-    internal class DirectoryHarvester : BaseHarvesterExtension
+    public class DirectoryHarvester : BaseHarvesterExtension
     {
         private FileHarvester fileHarvester;
 

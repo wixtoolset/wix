@@ -14,7 +14,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a reg file.
     /// </summary>
-    internal class RegFileHarvester : BaseHarvesterExtension
+    public class RegFileHarvester : BaseHarvesterExtension
     {
         private static readonly string ComponentPrefix = "cmp";
 
@@ -295,25 +295,25 @@ namespace WixToolset.Harvesters
                 value = parts[1].Substring(4);
                 type = Wix.RegistryValue.TypeType.binary;
             }
-            else if (parts[1].StartsWith("dword:")) 
+            else if (parts[1].StartsWith("dword:"))
             {
                 // dword
                 value = parts[1].Substring(6);
                 type = Wix.RegistryValue.TypeType.integer;
             }
-            else if (parts[1].StartsWith("hex(2):")) 
+            else if (parts[1].StartsWith("hex(2):"))
             {
                 // expandable string
                 value = parts[1].Substring(7);
                 type = Wix.RegistryValue.TypeType.expandable;
             }
-            else if (parts[1].StartsWith("hex(7):")) 
+            else if (parts[1].StartsWith("hex(7):"))
             {
                 // multi-string
                 value = parts[1].Substring(7);
                 type = Wix.RegistryValue.TypeType.multiString;
             }
-            else if (parts[1].StartsWith("hex(")) 
+            else if (parts[1].StartsWith("hex("))
             {
                 // Give a better error when we find something that isn't supported
                 // by specifying the type that isn't supported.
@@ -332,7 +332,7 @@ namespace WixToolset.Harvesters
                 type = 0;
                 return false;
             }
-            else if (parts[1].StartsWith("\"")) 
+            else if (parts[1].StartsWith("\""))
             {
                 // string
                 value = parts[1].Substring(1, parts[1].Length - 2);

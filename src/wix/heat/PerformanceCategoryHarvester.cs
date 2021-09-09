@@ -14,7 +14,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a file from the file system.
     /// </summary>
-    internal class PerformanceCategoryHarvester : BaseHarvesterExtension
+    public class PerformanceCategoryHarvester : BaseHarvesterExtension
     {
         /// <summary>
         /// Harvest a performance category.
@@ -71,8 +71,8 @@ namespace WixToolset.Harvesters
                 {
                     perfCategory.MultiInstance = Util.YesNoType.yes;
                 }
-                
-                // If it's multi-instance, check if there are any instances and get counters from there; else we get 
+
+                // If it's multi-instance, check if there are any instances and get counters from there; else we get
                 // the counters straight up. For multi-instance, GetCounters() fails if there are any instances. If there
                 // are no instances, then GetCounters(instance) can't be called since there is no instance. Instances
                 // will exist for each counter even if only one of the counters was "intialized."
@@ -81,7 +81,7 @@ namespace WixToolset.Harvesters
                 PerformanceCounter[] counters = hasInstances
                     ? pcc.GetCounters(instances.First())
                     : pcc.GetCounters();
-                    
+
                 foreach (PerformanceCounter counter in counters)
                 {
                     Util.PerformanceCounter perfCounter = new Util.PerformanceCounter();
