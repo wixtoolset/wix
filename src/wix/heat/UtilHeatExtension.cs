@@ -15,7 +15,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// A utility heat extension for the WiX Toolset Harvester application.
     /// </summary>
-    internal class UtilHeatExtension : BaseHeatExtension
+    public class UtilHeatExtension : BaseHeatExtension
     {
         public UtilHeatExtension(IServiceProvider serviceProvider)
         {
@@ -44,7 +44,7 @@ namespace WixToolset.Harvesters
                     new HeatCommandLineOption("-cg <ComponentGroupName>", "component group name (cannot contain spaces e.g -cg MyComponentGroup)"),
                     new HeatCommandLineOption("-dr <DirectoryName>", "directory reference to root directories (cannot contain spaces e.g. -dr MyAppDirRef)"),
                     new HeatCommandLineOption("-var <VariableName>", "substitute File/@Source=\"SourceDir\" with a preprocessor or a wix variable" + Environment.NewLine +
-                                                      "(e.g. -var var.MySource will become File/@Source=\"$(var.MySource)\\myfile.txt\" and " + Environment.NewLine + 
+                                                      "(e.g. -var var.MySource will become File/@Source=\"$(var.MySource)\\myfile.txt\" and " + Environment.NewLine +
                                                       "-var wix.MySource will become File/@Source=\"!(wix.MySource)\\myfile.txt\""),
                     new HeatCommandLineOption("-gg", "generate guids now"),
                     new HeatCommandLineOption("-g1", "generated guids are not in brackets"),
@@ -379,7 +379,7 @@ namespace WixToolset.Harvesters
         {
             string truncatedCommandSwitch = args[index];
             string commandSwitchValue = args[index + 1];
-            
+
             //increment the index to the switch value
             index++;
 

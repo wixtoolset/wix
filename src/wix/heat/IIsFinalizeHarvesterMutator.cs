@@ -13,7 +13,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The finalize harvester mutator for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    internal class IIsFinalizeHarvesterMutator : BaseMutatorExtension
+    public class IIsFinalizeHarvesterMutator : BaseMutatorExtension
     {
         private Hashtable directoryPaths;
         private Hashtable filePaths;

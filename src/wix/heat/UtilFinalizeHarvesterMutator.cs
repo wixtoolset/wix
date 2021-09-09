@@ -17,7 +17,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The finalize harvester mutator for the WiX Toolset Utility Extension.
     /// </summary>
-    internal class UtilFinalizeHarvesterMutator : BaseMutatorExtension
+    public class UtilFinalizeHarvesterMutator : BaseMutatorExtension
     {
         private ArrayList components;
         private ArrayList directories;
@@ -996,7 +996,7 @@ namespace WixToolset.Harvesters
 
                     // escape literal $ characters
                     file.Source = file.Source.Replace("$", "$$");
-                    
+
                     if (null != sourceDirSubstitution && file.Source.StartsWith("SourceDir\\", StringComparison.Ordinal))
                     {
                         file.Source = file.Source.Substring(9).Insert(0, sourceDirSubstitution);
@@ -1059,7 +1059,7 @@ namespace WixToolset.Harvesters
                 }
             }
 
-        
+
             ArrayList reversedDirectoryPaths = new ArrayList();
 
             // reverse the indexed directory paths to ensure the longest paths are found first
@@ -1090,7 +1090,7 @@ namespace WixToolset.Harvesters
                 }
             }
         }
-        
+
         private static bool IsVb6RegistryValue(Wix.RegistryValue registryValue)
         {
             if (Wix.RegistryValue.ActionType.write == registryValue.Action && Wix.RegistryRootType.HKCR == registryValue.Root)

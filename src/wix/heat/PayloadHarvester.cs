@@ -14,7 +14,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a payload from the file system.
     /// </summary>
-    internal class PayloadHarvester : BaseHarvesterExtension
+    public class PayloadHarvester : BaseHarvesterExtension
     {
         private bool setUniqueIdentifiers;
         private WixBundlePackageType packageType;

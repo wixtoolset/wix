@@ -16,7 +16,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring from the registry.
     /// </summary>
-    internal class RegistryHarvester : IDisposable
+    public class RegistryHarvester : IDisposable
     {
         private const string HKCRPathInHKLM = @"Software\Classes";
         private string remappedPath;
@@ -69,7 +69,7 @@ namespace WixToolset.Harvesters
                     this.RemapRegistryKey(NativeMethods.HkeyUsers, String.Concat(this.remappedPath, @"\\HKEY_USERS"));
                     this.RemapRegistryKey(NativeMethods.HkeyCurrentUser, String.Concat(this.remappedPath, @"\\HKEY_CURRENT_USER"));
 
-                    // Typelib registration on Windows Vista requires that the key 
+                    // Typelib registration on Windows Vista requires that the key
                     // HKLM\Software\Classes exist, so add it to the remapped root
                     Registry.LocalMachine.CreateSubKey(HKCRPathInHKLM);
                 }

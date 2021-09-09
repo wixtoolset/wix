@@ -13,7 +13,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The template type.
     /// </summary>
-    internal enum TemplateType
+    public enum TemplateType
     {
         /// <summary>
         /// A fragment template.
@@ -34,7 +34,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The mutator for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    internal class UtilMutator : BaseMutatorExtension
+    public class UtilMutator : BaseMutatorExtension
     {
         private ArrayList components;
         private ArrayList componentGroups;
@@ -108,10 +108,10 @@ namespace WixToolset.Harvesters
 
         /// <summary>
         /// Gets or sets the option to set the format of guids.
-        /// D - 32 digits separated by hyphens: 
-        ///     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
-        /// B - 32 digits separated by hyphens, enclosed in brackets: 
-        ///     {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} 
+        /// D - 32 digits separated by hyphens:
+        ///     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        /// B - 32 digits separated by hyphens, enclosed in brackets:
+        ///     {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
         /// </summary>
         /// <value>Guid format either B or D.</value>
         public string GuidFormat
