@@ -1374,6 +1374,9 @@ namespace WixToolset.Converters
                 case "WIX_ACCOUNT_PERFLOGUSERS_NODOMAIN":
                     newElementName = "QueryWindowsWellKnownSIDs";
                     break;
+                case "WIX_NATIVE_MACHINE":
+                    newElementName = "QueryNativeMachine";
+                    break;
             }
 
             if (!String.IsNullOrEmpty(newElementName)

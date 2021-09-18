@@ -353,6 +353,18 @@
             <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
+    
+    <Fragment>
+        <CustomAction Id="$(var.Prefix)QueryNativeMachine$(var.Suffix)" DllEntry="WixQueryNativeMachine" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+
+        <InstallExecuteSequence>
+            <Custom Action="$(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallExecuteSequence>
+
+        <InstallUISequence>
+            <Custom Action="$(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+        </InstallUISequence>
+    </Fragment>
 
     <Fragment>
         <Binary Id="$(var.Prefix)UtilCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))utilca.dll" />
