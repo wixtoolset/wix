@@ -4,7 +4,7 @@
 
 // sql queries
 static LPCWSTR vcsWebDirQuery7 = L"SELECT `Web_`, `WebDir`, `Component_`, `Path`, `DirProperties_`, `Application_`"
-                                       L"FROM `IIsWebDir`";
+                                 L"FROM `Wix4IIsWebDir`";
 
 enum eWebDirQuery { wdqWeb = 1, wdqWebDir, wdqComponent , wdqPath, wdqProperties, wdqApplication, wdqInstalled, wdqAction };
 

@@ -7,7 +7,7 @@ namespace WixToolset.Iis
     public static class IisTableDefinitions
     {
         public static readonly TableDefinition Certificate = new TableDefinition(
-            "Certificate",
+            "Wix4Certificate",
             IisSymbolDefinitions.Certificate,
             new[]
             {
@@ -25,7 +25,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition CertificateHash = new TableDefinition(
-            "CertificateHash",
+            "Wix4CertificateHash",
             IisSymbolDefinitions.CertificateHash,
             new[]
             {
@@ -36,7 +36,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebSiteCertificates = new TableDefinition(
-            "IIsWebSiteCertificates",
+            "Wix4IIsWebSiteCertificates",
             IisSymbolDefinitions.IIsWebSiteCertificates,
             new[]
             {
@@ -47,7 +47,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsAppPool = new TableDefinition(
-            "IIsAppPool",
+            "Wix4IIsAppPool",
             IisSymbolDefinitions.IIsAppPool,
             new[]
             {
@@ -72,7 +72,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsMimeMap = new TableDefinition(
-            "IIsMimeMap",
+            "Wix4IIsMimeMap",
             IisSymbolDefinitions.IIsMimeMap,
             new[]
             {
@@ -86,7 +86,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsProperty = new TableDefinition(
-            "IIsProperty",
+            "Wix4IIsProperty",
             IisSymbolDefinitions.IIsProperty,
             new[]
             {
@@ -99,7 +99,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebDirProperties = new TableDefinition(
-            "IIsWebDirProperties",
+            "Wix4IIsWebDirProperties",
             IisSymbolDefinitions.IIsWebDirProperties,
             new[]
             {
@@ -123,7 +123,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebAddress = new TableDefinition(
-            "IIsWebAddress",
+            "Wix4IIsWebAddress",
             IisSymbolDefinitions.IIsWebAddress,
             new[]
             {
@@ -138,7 +138,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebSite = new TableDefinition(
-            "IIsWebSite",
+            "Wix4IIsWebSite",
             IisSymbolDefinitions.IIsWebSite,
             new[]
             {
@@ -160,7 +160,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebApplication = new TableDefinition(
-            "IIsWebApplication",
+            "Wix4IIsWebApplication",
             IisSymbolDefinitions.IIsWebApplication,
             new[]
             {
@@ -181,7 +181,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebApplicationExtension = new TableDefinition(
-            "IIsWebApplicationExtension",
+            "Wix4IIsWebApplicationExtension",
             IisSymbolDefinitions.IIsWebApplicationExtension,
             new[]
             {
@@ -195,7 +195,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsFilter = new TableDefinition(
-            "IIsFilter",
+            "Wix4IIsFilter",
             IisSymbolDefinitions.IIsFilter,
             new[]
             {
@@ -212,7 +212,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebDir = new TableDefinition(
-            "IIsWebDir",
+            "Wix4IIsWebDir",
             IisSymbolDefinitions.IIsWebDir,
             new[]
             {
@@ -227,7 +227,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebError = new TableDefinition(
-            "IIsWebError",
+            "Wix4IIsWebError",
             IisSymbolDefinitions.IIsWebError,
             new[]
             {
@@ -242,7 +242,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsHttpHeader = new TableDefinition(
-            "IIsHttpHeader",
+            "Wix4IIsHttpHeader",
             IisSymbolDefinitions.IIsHttpHeader,
             new[]
             {
@@ -258,7 +258,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebServiceExtension = new TableDefinition(
-            "IIsWebServiceExtension",
+            "Wix4IIsWebServiceExtension",
             IisSymbolDefinitions.IIsWebServiceExtension,
             new[]
             {
@@ -273,7 +273,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebVirtualDir = new TableDefinition(
-            "IIsWebVirtualDir",
+            "Wix4IIsWebVirtualDir",
             IisSymbolDefinitions.IIsWebVirtualDir,
             new[]
             {
@@ -289,7 +289,7 @@ namespace WixToolset.Iis
         );
 
         public static readonly TableDefinition IIsWebLog = new TableDefinition(
-            "IIsWebLog",
+            "Wix4IIsWebLog",
             IisSymbolDefinitions.IIsWebLog,
             new[]
             {

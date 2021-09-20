@@ -85,7 +85,7 @@ VOID ParseCertificateAuthority(__in LPCWSTR wzCertificateAuthorityOrig, __out LP
 */
 
 
-LPCWSTR vcsCertQuery = L"SELECT `Certificate`, `Name`, `Component_`, `StoreLocation`, `StoreName`, `Attributes`, `Binary_`, `CertificatePath`, `PFXPassword` FROM `Certificate`";
+LPCWSTR vcsCertQuery = L"SELECT `Certificate`, `Name`, `Component_`, `StoreLocation`, `StoreName`, `Attributes`, `Binary_`, `CertificatePath`, `PFXPassword` FROM `Wix4Certificate`";
 enum eCertQuery { cqCertificate = 1, cqName, cqComponent, cqStoreLocation, cqStoreName, cqAttributes, cqCertificateBinary, cqCertificatePath, cqPFXPassword };
 
 

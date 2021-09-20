@@ -3,7 +3,7 @@
 #include "precomp.h"
 // sql queries
 LPCWSTR vcsWebLogQuery7 = L"SELECT `Log`, `Format` "
-                         L"FROM `IIsWebLog`  WHERE `Log`=?";
+                         L"FROM `Wix4IIsWebLog`  WHERE `Log`=?";
 
 enum eWebLogQuery { wlqLog = 1, wlqFormat };
 
@@ -50,7 +50,7 @@ HRESULT ScaGetWebLog7(
     ExitOnFailure(hr, "failed to copy log name: %ls", pwzData);
 
     hr = WcaGetRecordString(hRec, wlqFormat, &pwzData);
-    ExitOnFailure(hr, "failed to get IIsWebLog.Format for Log:", wzLog);
+    ExitOnFailure(hr, "failed to get IIsWebLog.Format for Log: %ls", wzLog);
 
     //translate WIX log format name strings to IIS7
     if (0 == lstrcmpW(pwzData, L"Microsoft IIS Log File Format"))
