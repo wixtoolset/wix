@@ -2,16 +2,16 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `User` WHERE `User`=?";
+LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User` WHERE `User`=?";
 enum eUserQuery { vuqUser = 1, vuqComponent, vuqName, vuqDomain, vuqPassword };
 
-LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Group` WHERE `Group`=?";
+LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Group`=?";
 enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
 
-LPCWSTR vcsUserGroupQuery = L"SELECT `User_`, `Group_` FROM `UserGroup` WHERE `User_`=?";
+LPCWSTR vcsUserGroupQuery = L"SELECT `User_`, `Group_` FROM `Wix4UserGroup` WHERE `User_`=?";
 enum eUserGroupQuery { vugqUser = 1, vugqGroup };
 
-LPCWSTR vActionableQuery = L"SELECT `User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `User` WHERE `Component_` IS NOT NULL";
+LPCWSTR vActionableQuery = L"SELECT `User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `Wix4User` WHERE `Component_` IS NOT NULL";
 enum eActionableQuery { vaqUser = 1, vaqComponent, vaqName, vaqDomain, vaqPassword, vaqAttributes };
 
 HRESULT __stdcall ScaGetUserDeferred(

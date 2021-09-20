@@ -7,58 +7,58 @@ const int WriteMetabaseChangesCost = 20;
 const int WriteIIS7ConfigChangesCost = 20;
 
 // sql queries
-LPCWSTR vcsUserDeferredQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `User`";
+LPCWSTR vcsUserDeferredQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User`";
 
-LPCWSTR vcsWebSvcExtQuery = L"SELECT `Component_`, `File`, `Description`, `Group`, `Attributes` FROM `IIsWebServiceExtension`";
+LPCWSTR vcsWebSvcExtQuery = L"SELECT `Component_`, `File`, `Description`, `Group`, `Attributes` FROM `Wix4IIsWebServiceExtension`";
 
-LPCWSTR vcsAppPoolQuery = L"SELECT `AppPool`, `Name`, `Component_`, `Attributes`, `User_`, `RecycleMinutes`, `RecycleRequests`, `RecycleTimes`, `VirtualMemory`, `PrivateMemory`, `IdleTimeout`, `QueueLimit`, `CPUMon`, `MaxProc`, `ManagedRuntimeVersion`, `ManagedPipelineMode` FROM `IIsAppPool`";
+LPCWSTR vcsAppPoolQuery = L"SELECT `AppPool`, `Name`, `Component_`, `Attributes`, `User_`, `RecycleMinutes`, `RecycleRequests`, `RecycleTimes`, `VirtualMemory`, `PrivateMemory`, `IdleTimeout`, `QueueLimit`, `CPUMon`, `MaxProc`, `ManagedRuntimeVersion`, `ManagedPipelineMode` FROM `Wix4IIsAppPool`";
 
 LPCWSTR vcsComponentAttrQuery = L"SELECT `Component`,`Attributes` FROM `Component`";
 
-LPCWSTR vcsMimeMapQuery = L"SELECT `MimeMap`, `ParentType`, `ParentValue`, `MimeType`, `Extension` FROM `IIsMimeMap`";
+LPCWSTR vcsMimeMapQuery = L"SELECT `MimeMap`, `ParentType`, `ParentValue`, `MimeType`, `Extension` FROM `Wix4IIsMimeMap`";
 
-LPCWSTR vcsHttpHeaderQuery = L"SELECT `Name`, `ParentType`, `ParentValue`, `Value`, `Attributes` FROM `IIsHttpHeader` ORDER BY `Sequence`";
+LPCWSTR vcsHttpHeaderQuery = L"SELECT `Name`, `ParentType`, `ParentValue`, `Value`, `Attributes` FROM `Wix4IIsHttpHeader` ORDER BY `Sequence`";
 
 LPCWSTR vcsWebErrorQuery =
     L"SELECT `ErrorCode`, `SubCode`, `ParentType`, `ParentValue`, `File`, `URL` "
-    L"FROM `IIsWebError` ORDER BY `ErrorCode`, `SubCode`";
+    L"FROM `Wix4IIsWebError` ORDER BY `ErrorCode`, `SubCode`";
 
 LPCWSTR vcsWebDirPropertiesQuery = L"SELECT `DirProperties`, `Access`, `Authorization`, `AnonymousUser_`, `IIsControlledPassword`, `LogVisits`, `Index`, `DefaultDoc`, `AspDetailedError`, `HttpExpires`, `CacheControlMaxAge`, `CacheControlCustom`, `NoCustomError`, `AccessSSLFlags`, `AuthenticationProviders` "
-    L"FROM `IIsWebDirProperties`";
+    L"FROM `Wix4IIsWebDirProperties`";
 
-LPCWSTR vcsSslCertificateQuery = L"SELECT `Certificate`.`StoreName`, `CertificateHash`.`Hash`, `IIsWebSiteCertificates`.`Web_` FROM `Certificate`, `CertificateHash`, `IIsWebSiteCertificates` WHERE `Certificate`.`Certificate`=`CertificateHash`.`Certificate_` AND `CertificateHash`.`Certificate_`=`IIsWebSiteCertificates`.`Certificate_`";
+LPCWSTR vcsSslCertificateQuery = L"SELECT `Wix4Certificate`.`StoreName`, `Wix4CertificateHash`.`Hash`, `Wix4IIsWebSiteCertificates`.`Web_` FROM `Wix4Certificate`, `Wix4CertificateHash`, `Wix4IIsWebSiteCertificates` WHERE `Wix4Certificate`.`Certificate`=`Wix4CertificateHash`.`Certificate_` AND `Wix4CertificateHash`.`Certificate_`=`Wix4IIsWebSiteCertificates`.`Certificate_`";
 
 LPCWSTR vcsWebLogQuery = L"SELECT `Log`, `Format` "
-    L"FROM `IIsWebLog`";
+    L"FROM `Wix4IIsWebLog`";
 
 LPCWSTR vcsWebApplicationQuery = L"SELECT `Name`, `Isolation`, `AllowSessions`, `SessionTimeout`, "
     L"`Buffer`, `ParentPaths`, `DefaultScript`, `ScriptTimeout`, "
     L"`ServerDebugging`, `ClientDebugging`, `AppPool_`, `Application` "
-    L"FROM `IIsWebApplication`";
+    L"FROM `Wix4IIsWebApplication`";
 
-LPCWSTR vcsWebAppExtensionQuery = L"SELECT `Extension`, `Verbs`, `Executable`, `Attributes`, `Application_` FROM `IIsWebApplicationExtension`";
+LPCWSTR vcsWebAppExtensionQuery = L"SELECT `Extension`, `Verbs`, `Executable`, `Attributes`, `Application_` FROM `Wix4IIsWebApplicationExtension`";
 
 LPCWSTR vcsWebQuery = L"SELECT `Web`, `Component_`, `Id`, `Description`, `ConnectionTimeout`, `Directory_`, `State`, `Attributes`, `DirProperties_`, `Application_`, "
-    L"`Address`, `IP`, `Port`, `Header`, `Secure`, `Log_` FROM `IIsWebSite`, `IIsWebAddress` "
+    L"`Address`, `IP`, `Port`, `Header`, `Secure`, `Log_` FROM `Wix4IIsWebSite`, `Wix4IIsWebAddress` "
     L"WHERE `KeyAddress_`=`Address` ORDER BY `Sequence`";
 
 LPCWSTR vcsWebAddressQuery = L"SELECT `Address`, `Web_`, `IP`, `Port`, `Header`, `Secure` "
-    L"FROM `IIsWebAddress`";
+    L"FROM `Wix4IIsWebAddress`";
 
 LPCWSTR vcsWebBaseQuery = L"SELECT `Web`, `Id`, `IP`, `Port`, `Header`, `Secure`, `Description` "
-    L"FROM `IIsWebSite`, `IIsWebAddress` "
+    L"FROM `Wix4IIsWebSite`, `Wix4IIsWebAddress` "
     L"WHERE `KeyAddress_`=`Address`";
 
 LPCWSTR vcsWebDirQuery = L"SELECT `Web_`, `WebDir`, `Component_`, `Path`, `DirProperties_`, `Application_` "
-    L"FROM `IIsWebDir`";
+    L"FROM `Wix4IIsWebDir`";
 
 LPCWSTR vcsVDirQuery = L"SELECT `Web_`, `VirtualDir`, `Component_`, `Alias`, `Directory_`, `DirProperties_`, `Application_` "
     L"FROM `IIsWebVirtualDir`";
 
-LPCWSTR vcsFilterQuery = L"SELECT `Web_`, `Name`, `Component_`, `Path`, `Description`, `Flags`, `LoadOrder` FROM `IIsFilter` ORDER BY `Web_`";
+LPCWSTR vcsFilterQuery = L"SELECT `Web_`, `Name`, `Component_`, `Path`, `Description`, `Flags`, `LoadOrder` FROM `Wix4IIsFilter` ORDER BY `Web_`";
 
 LPCWSTR vcsPropertyQuery = L"SELECT `Property`, `Component_`, `Attributes`, `Value` "
-    L"FROM `IIsProperty`";
+    L"FROM `Wix4IIsProperty`";
 
 #define IIS7CONDITION L"VersionNT >= 600"
 #define USEIIS7CONDITION IIS7CONDITION L"AND NOT UseIis6Compatibility"
