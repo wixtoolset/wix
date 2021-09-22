@@ -14,7 +14,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a reg file.
     /// </summary>
-    public class RegFileHarvester : BaseHarvesterExtension
+    public sealed class RegFileHarvester : BaseHarvesterExtension
     {
         private static readonly string ComponentPrefix = "cmp";
 

@@ -13,7 +13,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The harvester mutator for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public class IIsHarvesterMutator : BaseMutatorExtension
+    public sealed class IIsHarvesterMutator : BaseMutatorExtension
     {
         private ArrayList components;
         private DirectoryHarvester directoryHarvester;

@@ -19,7 +19,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for the outputs of a VS project.
     /// </summary>
-    public class VSProjectHarvester : BaseHarvesterExtension
+    public sealed class VSProjectHarvester : BaseHarvesterExtension
     {
         // These format strings are used for generated element identifiers.
         //   {0} = project name

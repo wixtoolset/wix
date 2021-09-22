@@ -10,7 +10,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring from an assembly file.
     /// </summary>
-    public class AssemblyHarvester
+    public sealed class AssemblyHarvester
     {
         /// <summary>
         /// Harvest the registry values written by RegisterAssembly.

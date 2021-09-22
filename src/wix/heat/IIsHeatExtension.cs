@@ -8,7 +8,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// An IIS harvesting extension for the WiX Toolset Harvester application.
     /// </summary>
-    public class IIsHeatExtension : BaseHeatExtension
+    public sealed class IIsHeatExtension : BaseHeatExtension
     {
         /// <summary>
         /// Gets the supported command line types for this extension.

@@ -34,7 +34,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The mutator for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public class UtilMutator : BaseMutatorExtension
+    public sealed class UtilMutator : BaseMutatorExtension
     {
         private ArrayList components;
         private ArrayList componentGroups;

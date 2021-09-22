@@ -10,7 +10,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring from a type library file.
     /// </summary>
-    public class TypeLibraryHarvester
+    public sealed class TypeLibraryHarvester
     {
         /// <summary>
         /// Harvest the registry values written by RegisterTypeLib.

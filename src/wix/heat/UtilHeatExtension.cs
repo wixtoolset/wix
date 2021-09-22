@@ -15,7 +15,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// A utility heat extension for the WiX Toolset Harvester application.
     /// </summary>
-    public class UtilHeatExtension : BaseHeatExtension
+    public sealed class UtilHeatExtension : BaseHeatExtension
     {
         public UtilHeatExtension(IServiceProvider serviceProvider)
         {

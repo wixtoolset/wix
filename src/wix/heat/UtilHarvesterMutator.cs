@@ -15,7 +15,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The WiX Toolset harvester mutator.
     /// </summary>
-    public class UtilHarvesterMutator : BaseMutatorExtension
+    public sealed class UtilHarvesterMutator : BaseMutatorExtension
     {
         // Flags for SetErrorMode() native method.
         private const UInt32 SEM_FAILCRITICALERRORS = 0x0001;
