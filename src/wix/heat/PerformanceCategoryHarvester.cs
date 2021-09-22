@@ -14,7 +14,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring for a file from the file system.
     /// </summary>
-    public class PerformanceCategoryHarvester : BaseHarvesterExtension
+    public sealed class PerformanceCategoryHarvester : BaseHarvesterExtension
     {
         /// <summary>
         /// Harvest a performance category.

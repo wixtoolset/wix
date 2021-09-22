@@ -15,7 +15,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The web site harvester for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public class IIsWebSiteHarvester : BaseHarvesterExtension
+    public sealed class IIsWebSiteHarvester : BaseHarvesterExtension
     {
         /// <summary>
         /// Harvest a WiX document.

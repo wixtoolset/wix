@@ -29,7 +29,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// VS-related extensions for the WiX Toolset Harvester application.
     /// </summary>
-    public class VSHeatExtension : BaseHeatExtension
+    public sealed class VSHeatExtension : BaseHeatExtension
     {
         /// <summary>
         /// Gets the supported command line types for this extension.

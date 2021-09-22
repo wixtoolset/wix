@@ -17,7 +17,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// The finalize harvester mutator for the WiX Toolset Utility Extension.
     /// </summary>
-    public class UtilFinalizeHarvesterMutator : BaseMutatorExtension
+    public sealed class UtilFinalizeHarvesterMutator : BaseMutatorExtension
     {
         private ArrayList components;
         private ArrayList directories;

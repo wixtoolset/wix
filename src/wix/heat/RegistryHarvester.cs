@@ -16,7 +16,7 @@ namespace WixToolset.Harvesters
     /// <summary>
     /// Harvest WiX authoring from the registry.
     /// </summary>
-    public class RegistryHarvester : IDisposable
+    public sealed class RegistryHarvester : IDisposable
     {
         private const string HKCRPathInHKLM = @"Software\Classes";
         private string remappedPath;
