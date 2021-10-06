@@ -125,8 +125,8 @@ namespace WixToolsetTest.CoreIntegration
 
                     var msiPayloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='test.msi']");
                     var msiPayload = (XmlNode)Assert.Single(msiPayloads);
-                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
-                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } }));
+                    Assert.Equal("<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='WixAttachedContainer' />",
+                        msiPayload.GetTestXml(new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } }));
                 }
 
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);

@@ -62,13 +62,12 @@ namespace WixToolset.Core.Burn
         public Intermediate Unbind(IUnbindContext context)
         {
             var uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
-            var acExtractPath = Path.Combine(context.ExportBasePath, "AttachedContainer");
             var messaging = context.ServiceProvider.GetService<IMessaging>();
 
             using (var reader = BurnReader.Open(messaging, context.InputFilePath))
             {
                 reader.ExtractUXContainer(uxExtractPath, context.IntermediateFolder);
-                reader.ExtractAttachedContainer(acExtractPath, context.IntermediateFolder);
+                reader.ExtractAttachedContainers(context.ExportBasePath);
             }
 
             return null;

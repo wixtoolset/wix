@@ -7,7 +7,7 @@
 // If these defaults ever change, be sure to update constants in burn\engine\section.cpp as well.
 #pragma data_seg(push, ".wixburn")
 static DWORD dwMagic = 0x00f14300;
-static DWORD dwVersion = 0x00000002;
+static DWORD dwVersion = 0x00000003;
 
 static GUID guidBundleId = { };
 
@@ -18,6 +18,5 @@ static DWORD dwOriginalSignatureSize = 0;
 
 static DWORD dwContainerFormat = 1;
 static DWORD dwContainerCount = 0;
-static DWORD qwBootstrapperApplicationContainerSize = 0;
-static DWORD qwAttachedContainerSize = 0;
+static DWORD qwAttachedContainerSizes[116]; // Including UX container
 #pragma data_seg(pop)

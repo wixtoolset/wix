@@ -2,14 +2,12 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Xml;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
-    using WixToolset.Core.Burn;
+    using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.TestPackage;
     using Xunit;
 
@@ -51,11 +49,11 @@ namespace WixToolsetTest.CoreIntegration
 
                 var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload");
                 Assert.Equal(4, payloads.Count);
-                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                Assert.Equal(@"<Payload Id='FirstX64' FilePath='FirstX64\FirstX64.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX64/FirstX64/FirstX64.msi' Packaging='embedded' SourcePath='a0' Container='BundlePackages' />", payloads[0].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86\FirstX86.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX86.msi/FirstX86/FirstX86.msi' Packaging='embedded' SourcePath='a1' Container='BundlePackages' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86.msi/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a2' Container='BundlePackages' />", payloads[2].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='ff2L_N_DLQ.nSUi.l8LxG14gd2V4' FilePath='FirstX64\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX64/ff2L_N_DLQ.nSUi.l8LxG14gd2V4/FirstX64/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='a3' Container='BundlePackages' />", payloads[3].GetTestXml(ignoreAttributes));
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } };
+                Assert.Equal(@"<Payload Id='FirstX64' FilePath='FirstX64\FirstX64.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX64/FirstX64/FirstX64.msi' Packaging='embedded' SourcePath='*' Container='BundlePackages' />", payloads[0].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86\FirstX86.msi' FileSize='*' Hash='*' DownloadUrl='http://example.com//FirstX86.msi/FirstX86/FirstX86.msi' Packaging='embedded' SourcePath='*' Container='BundlePackages' />", payloads[1].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='FirstX86\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX86.msi/fk1m38Cf9RZ2Bx_ipinRY6BftelU/FirstX86/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='*' Container='BundlePackages' />", payloads[2].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='ff2L_N_DLQ.nSUi.l8LxG14gd2V4' FilePath='FirstX64\PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' DownloadUrl='http://example.com/FirstX64/ff2L_N_DLQ.nSUi.l8LxG14gd2V4/FirstX64/PFiles/MsiPackage/test.txt' Packaging='embedded' SourcePath='*' Container='BundlePackages' />", payloads[3].GetTestXml(ignoreAttributes));
             }
         }
 
@@ -95,11 +93,11 @@ namespace WixToolsetTest.CoreIntegration
 
                 var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload");
                 Assert.Equal(4, payloads.Count);
-                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
-                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />", payloads[0].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='FirstX64.msi' FilePath='FirstX64.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a1' Container='FirstX64' />", payloads[1].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='WixAttachedContainer' />", payloads[2].GetTestXml(ignoreAttributes));
-                Assert.Equal(@"<Payload Id='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a3' Container='FirstX64' />", payloads[3].GetTestXml(ignoreAttributes));
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } };
+                Assert.Equal(@"<Payload Id='FirstX86.msi' FilePath='FirstX86.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='WixAttachedContainer' />", payloads[0].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='FirstX64.msi' FilePath='FirstX64.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='FirstX64' />", payloads[1].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='WixAttachedContainer' />", payloads[2].GetTestXml(ignoreAttributes));
+                Assert.Equal(@"<Payload Id='fC0n41rZK8oW3JK8LzHu6AT3CjdQ' FilePath='PFiles\MsiPackage\test.txt' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='FirstX64' />", payloads[3].GetTestXml(ignoreAttributes));
             }
         }
 
@@ -205,20 +203,20 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } };
                 var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
                                             .Cast<XmlElement>()
                                             .Select(e => e.GetTestXml(ignoreAttributes))
                                             .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<Payload Id='SharedPayload' FilePath='LayoutPayloadInContainer.wxs' FileSize='*' Hash='*' LayoutOnly='yes' Packaging='embedded' SourcePath='a1' Container='FirstX64' />",
+                    "<Payload Id='SharedPayload' FilePath='LayoutPayloadInContainer.wxs' FileSize='*' Hash='*' LayoutOnly='yes' Packaging='embedded' SourcePath='*' Container='FirstX64' />",
                 }, payloads);
             }
         }
 
         [Fact]
-        public void MultipleAttachedContainersAreNotCurrentlySupported()
+        public void MultipleAttachedContainers()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -230,6 +228,7 @@ namespace WixToolsetTest.CoreIntegration
                 var bundlePath = Path.Combine(binFolder, "test.exe");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
+                var tempFolderPath = Path.Combine(baseFolder, "temp");
 
                 this.BuildMsis(folder, intermediateFolder, binFolder);
 
@@ -244,7 +243,19 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath
                 });
 
-                Assert.Equal((int)BurnBackendErrors.Ids.MultipleAttachedContainersUnsupported, result.ExitCode);
+                Assert.Equal(0, result.ExitCode);
+                Assert.True(File.Exists(bundlePath));
+
+                Directory.CreateDirectory(tempFolderPath);
+                using (var burnReader = BurnReader.Open(null, bundlePath))
+                {
+                    // Extract the BA because that loads the payload target paths from the manifest 
+                    Assert.True(burnReader.ExtractUXContainer(baFolderPath, tempFolderPath));
+                    Assert.True(burnReader.ExtractAttachedContainers(extractFolderPath));
+                }
+
+                Assert.True(File.Exists(Path.Combine(extractFolderPath, "FirstX64", "FirstX64.msi")), "Expected extracted container to contain FirstX64.msi");
+                Assert.True(File.Exists(Path.Combine(extractFolderPath, "WixAttachedContainer", "FirstX86.msi")), "Expected extracted container to contain FirstX86.msi");
             }
         }
 
@@ -286,14 +297,14 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                var ignoreAttributes = new Dictionary<string, List<string>> { { "Payload", new List<string> { "FileSize", "Hash", "SourcePath" } } };
                 var payloads = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Payload[@Id='SharedPayload']")
                                             .Cast<XmlElement>()
                                             .Select(e => e.GetTestXml(ignoreAttributes))
                                             .ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<Payload Id='SharedPayload' FilePath='PayloadInMultipleContainers.wxs' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a2' Container='FirstX86' />",
+                    "<Payload Id='SharedPayload' FilePath='PayloadInMultipleContainers.wxs' FileSize='*' Hash='*' Packaging='embedded' SourcePath='*' Container='FirstX86' />",
                 }, payloads);
             }
         }

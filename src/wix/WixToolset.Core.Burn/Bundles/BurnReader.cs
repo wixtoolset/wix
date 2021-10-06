@@ -126,16 +126,19 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (XmlNode payload in payloads)
             {
-                XmlNode sourcePathNode = payload.Attributes.GetNamedItem("SourcePath");
-                XmlNode filePathNode = payload.Attributes.GetNamedItem("FilePath");
                 XmlNode packagingNode = payload.Attributes.GetNamedItem("Packaging");
 
-                string sourcePath = sourcePathNode.Value;
-                string destinationPath = filePathNode.Value;
                 string packaging = packagingNode.Value;
 
                 if (packaging.Equals("embedded", StringComparison.OrdinalIgnoreCase))
                 {
+                    XmlNode sourcePathNode = payload.Attributes.GetNamedItem("SourcePath");
+                    XmlNode filePathNode = payload.Attributes.GetNamedItem("FilePath");
+                    XmlNode containerNode = payload.Attributes.GetNamedItem("Container");
+
+                    string sourcePath = sourcePathNode.Value;
+                    string destinationPath = Path.Combine(containerNode.Value, filePathNode.Value);
+
                     this.attachedContainerPayloadNames.Add(new DictionaryEntry(sourcePath, destinationPath));
                 }
             }
@@ -152,12 +155,11 @@ namespace WixToolset.Core.Burn.Bundles
         /// Gets the attached container from the exe and extracts its contents to the output directory.
         /// </summary>
         /// <param name="outputDirectory">Directory to write extracted files to.</param>
-        /// <param name="tempDirectory">Scratch directory.</param>
         /// <returns>True if successful, false otherwise</returns>
-        public bool ExtractAttachedContainer(string outputDirectory, string tempDirectory)
+        public bool ExtractAttachedContainers(string outputDirectory)
         {
             // No attached container to extract
-            if (this.AttachedContainerAddress == 0 || this.AttachedContainerSize == 0)
+            if (this.AttachedContainers.Count == 0)
             {
                 return false;
             }
@@ -168,16 +170,19 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             Directory.CreateDirectory(outputDirectory);
-            string tempCabPath = Path.Combine(tempDirectory, "attached.cab");
-
-            this.binaryReader.BaseStream.Seek(this.AttachedContainerAddress, SeekOrigin.Begin);
-            using (Stream tempCab = File.Open(tempCabPath, FileMode.Create, FileAccess.Write))
+            foreach (ContainerSlot cntnr in this.AttachedContainers)
             {
-                BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)this.AttachedContainerSize);
-            }
+                string tempCabPath = Path.GetTempFileName();
 
-            var cabinet = new Cabinet(tempCabPath);
-            cabinet.Extract(outputDirectory);
+                this.binaryReader.BaseStream.Seek(cntnr.Address, SeekOrigin.Begin);
+                using (Stream tempCab = File.Open(tempCabPath, FileMode.Create, FileAccess.Write))
+                {
+                    BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)cntnr.Size);
+                }
+
+                var cabinet = new Cabinet(tempCabPath);
+                cabinet.Extract(outputDirectory);
+            }
 
             foreach (DictionaryEntry entry in this.attachedContainerPayloadNames)
             {

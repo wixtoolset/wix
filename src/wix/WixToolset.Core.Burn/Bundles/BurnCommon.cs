@@ -3,6 +3,7 @@
 namespace WixToolset.Core.Burn.Bundles
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using WixToolset.Data;
@@ -19,7 +20,6 @@ namespace WixToolset.Core.Burn.Bundles
     {
         public const string BurnNamespace = "http://wixtoolset.org/schemas/v4/2008/Burn";
         public const string BurnUXContainerEmbeddedIdFormat = "u{0}";
-        public const string BurnAuthoredContainerEmbeddedIdFormat = "a{0}";
 
         public const string BADataFileName = "BootstrapperApplicationData.xml";
         public const string BADataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
@@ -67,7 +67,7 @@ namespace WixToolset.Core.Burn.Bundles
         //   40-43:  container type (1 = CAB)
         //   44-47:  container count
         //   48-51:  byte count of manifest + UX container
-        //   52-55:  byte count of attached container
+        //   52-512:  byte count of attached containers (4 bytes for each container)
         protected const UInt32 BURN_SECTION_OFFSET_MAGIC = 0;
         protected const UInt32 BURN_SECTION_OFFSET_VERSION = 4;
         protected const UInt32 BURN_SECTION_OFFSET_BUNDLEGUID = 8;
@@ -78,11 +78,14 @@ namespace WixToolset.Core.Burn.Bundles
         protected const UInt32 BURN_SECTION_OFFSET_FORMAT = 40;
         protected const UInt32 BURN_SECTION_OFFSET_COUNT = 44;
         protected const UInt32 BURN_SECTION_OFFSET_UXSIZE = 48;
-        protected const UInt32 BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE = 52;
-        protected const UInt32 BURN_SECTION_SIZE = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE + 4; // last field + sizeof(DWORD)
+        protected const UInt32 BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0 = 52;
 
         protected const UInt32 BURN_SECTION_MAGIC = 0x00f14300;
-        protected const UInt32 BURN_SECTION_VERSION = 0x00000002;
+        protected const UInt32 BURN_SECTION_VERSION = 0x00000003;
+        protected const UInt32 BURN_SECTION_COMPATIBLE_VERSION = 0x00000002;
+        protected const UInt32 BURN_SECTION_SIZE = 512;
+        protected const UInt32 BURN_SECTION_MAX_ATTACHEDCONTAINER_COUNT = (BURN_SECTION_SIZE - BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0) / sizeof(UInt32);
+
         protected string fileExe;
         protected UInt32 peOffset = UInt32.MaxValue;
         protected UInt16 sections = UInt16.MaxValue;
@@ -112,6 +115,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             this.Messaging = messaging;
             this.fileExe = fileExe;
+            this.AttachedContainers = new List<ContainerSlot>();
         }
 
         public UInt32 Checksum { get; protected set; }
@@ -126,8 +130,7 @@ namespace WixToolset.Core.Burn.Bundles
         public UInt32 ContainerCount { get; protected set; }
         public UInt32 UXAddress { get; protected set; }
         public UInt32 UXSize { get; protected set; }
-        public UInt32 AttachedContainerAddress { get; protected set; }
-        public UInt32 AttachedContainerSize { get; protected set; }
+        public List<ContainerSlot> AttachedContainers { get; protected set; }
 
         protected IMessaging Messaging { get; }
 
@@ -177,7 +180,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             reader.BaseStream.Seek(this.wixburnDataOffset, SeekOrigin.Begin);
-            byte[] bytes = reader.ReadBytes((int)BURN_SECTION_SIZE);
+            List<byte> manifest = new List<byte>();
+            manifest.AddRange(reader.ReadBytes((int)BURN_SECTION_SIZE));
+            byte[] bytes = manifest.ToArray();
             UInt32 uint32 = 0;
 
             uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_MAGIC);
@@ -188,9 +193,9 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             this.Version = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_VERSION);
-            if (BURN_SECTION_VERSION != this.Version)
+            if ((BURN_SECTION_VERSION != this.Version) && (BURN_SECTION_COMPATIBLE_VERSION != this.Version))
             {
-                this.Messaging.Write(ErrorMessages.BundleTooNew(this.fileExe, this.Version));
+                this.Messaging.Write(BurnBackendErrors.IncompatibleWixBurnSection(this.fileExe, this.Version));
                 return false;
             }
 
@@ -207,6 +212,11 @@ namespace WixToolset.Core.Burn.Bundles
             this.OriginalSignatureSize = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALSIGNATURESIZE);
 
             this.ContainerCount = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_COUNT);
+            if (BURN_SECTION_MAX_ATTACHEDCONTAINER_COUNT < this.ContainerCount)
+            {
+                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                return false;
+            }
             this.UXAddress = this.StubSize;
             this.UXSize = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_UXSIZE);
 
@@ -224,8 +234,18 @@ namespace WixToolset.Core.Burn.Bundles
                 this.EngineSize = this.StubSize + this.UXSize;
             }
 
-            this.AttachedContainerAddress = this.ContainerCount > 1 ? this.EngineSize : 0;
-            this.AttachedContainerSize = this.ContainerCount > 1 ? BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE) : 0;
+            this.AttachedContainers.Clear();
+            uint nextAddress = this.EngineSize;
+            if (this.ContainerCount > 1)
+            {
+                for (uint i = 0; i < (this.ContainerCount - 1 /* Excluding UX */); ++i)
+                {
+                    uint sizeOffset = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0 + (i * 4);
+                    uint size = BurnCommon.ReadUInt32(bytes, sizeOffset);
+                    this.AttachedContainers.Add(new ContainerSlot(nextAddress, size));
+                    nextAddress += size;
+                }
+            }
 
             return true;
         }
@@ -268,8 +288,7 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
                 }
 
-                // we need 56 bytes for the manifest header, which is always going to fit in 
-                // the smallest alignment (512 bytes), but just to be paranoid...
+                // We need 512 bytes for the manifest header
                 if (BURN_SECTION_SIZE > BurnCommon.ReadUInt32(bytes, IMAGE_SECTION_HEADER_OFFSET_SIZEOFRAWDATA))
                 {
                     this.Messaging.Write(ErrorMessages.StubWixburnSectionTooSmall(this.fileExe));
@@ -381,5 +400,17 @@ namespace WixToolset.Core.Burn.Bundles
             Debug.Assert(offset + 8 <= bytes.Length);
             return BurnCommon.ReadUInt32(bytes, offset) + ((UInt64)BurnCommon.ReadUInt32(bytes, offset + 4) << 32);
         }
+    }
+
+    internal struct ContainerSlot
+    {
+        public ContainerSlot(uint address, uint size) : this()
+        {
+            this.Address = address;
+            this.Size = size;
+        }
+
+        public uint Address { get; set; }
+        public uint Size { get; set; }
     }
 }

@@ -36,11 +36,6 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.ExternalPayloadCollision2, "The location of the symbol related to the previous error.");
         }
 
-        public static Message MultipleAttachedContainersUnsupported(SourceLineNumber sourceLineNumbers, string containerId)
-        {
-            return Message(sourceLineNumbers, Ids.MultipleAttachedContainersUnsupported, "Bundles don't currently support having more than one attached container. Either remove all authored attached containers to use the default attached container, or make sure all compressed payloads are included in this Container '{0}'.", containerId);
-        }
-
         public static Message PackageCachePayloadCollision(SourceLineNumber sourceLineNumbers, string payloadId, string payloadName, string packageId)
         {
             return Message(sourceLineNumbers, Ids.PackageCachePayloadCollision, "The Payload '{0}' has a duplicate Name '{1}' in package '{2}'. When caching the package, the file will get overwritten.", payloadId, payloadName, packageId);
@@ -49,6 +44,16 @@ namespace WixToolset.Core.Burn
         public static Message PackageCachePayloadCollision2(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.PackageCachePayloadCollision2, "The location of the payload related to the previous error.");
+        }
+
+        public static Message TooManyAttachedContainers(uint maxAllowed)
+        {
+            return Message(null, Ids.TooManyAttachedContainers, "The bundle has too many attached containers. The maximal attached container count is {0}", maxAllowed);
+        }
+
+        public static Message IncompatibleWixBurnSection(string bundleExecutable, long bundleVersion)
+        {
+            return Message(null, Ids.IncompatibleWixBurnSection, "Unable to read bundle executable '{0}', because this bundle was created with a different version of WiX burn (.wixburn section version '{1}'). You must use the same version of Windows Installer XML in order to read this bundle.", bundleExecutable, bundleVersion);
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
@@ -66,7 +71,8 @@ namespace WixToolset.Core.Burn
             ExternalPayloadCollision2 = 8005,
             PackageCachePayloadCollision = 8006,
             PackageCachePayloadCollision2 = 8007,
-            MultipleAttachedContainersUnsupported = 8008,
+            TooManyAttachedContainers = 8008,
+            IncompatibleWixBurnSection = 8009,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }

@@ -26,7 +26,7 @@ namespace WixToolsetTest.CoreIntegration
                 var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
                 var baFolderPath = Path.Combine(extractFolderPath, "UX");
-                var attachedContainerFolderPath = Path.Combine(extractFolderPath, "AttachedContainer");
+                var attachedContainerFolderPath = Path.Combine(extractFolderPath, "WixAttachedContainer");
 
                 // TODO: use WixRunner.Execute(string[]) to always go through the command line.
                 var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
