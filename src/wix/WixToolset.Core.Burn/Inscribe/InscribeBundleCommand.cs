@@ -29,17 +29,23 @@ namespace WixToolset.Core.Burn.Inscribe
             using (var reader = BurnReader.Open(this.Context.InputFilePath))
             {
                 FileSystem.CopyFile(this.Context.SignedEngineFile, tempFile, allowHardlink: false);
-
-                // If there was an attached container on the original (unsigned) bundle, put it back.
-                if (reader.AttachedContainerSize > 0)
+                using (BurnWriter writer = BurnWriter.Open(this.Messaging, tempFile))
                 {
-                    reader.Stream.Seek(reader.AttachedContainerAddress, SeekOrigin.Begin);
-
-                    using (var writer = BurnWriter.Open(this.Messaging, tempFile))
+                    if (reader.Version != writer.Version)
                     {
-                        writer.RememberThenResetSignature();
-                        writer.AppendContainer(reader.Stream, reader.AttachedContainerSize, BurnCommon.Container.Attached);
-                        inscribed = true;
+                        this.Messaging.Write(BurnBackendErrors.IncompatibleWixBurnSection(this.Context.InputFilePath, reader.Version));
+                    }
+
+                    writer.AttachedContainers.Clear();
+                    writer.RememberThenResetSignature();
+                    foreach (ContainerSlot cntnr in reader.AttachedContainers)
+                    {
+                        if (cntnr.Size > 0)
+                        {
+                            reader.Stream.Seek(cntnr.Address, SeekOrigin.Begin);
+                            writer.AppendContainer(reader.Stream, cntnr.Size, BurnCommon.Container.Attached);
+                            inscribed = true;
+                        }
                     }
                 }
             }

@@ -117,14 +117,6 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
 
-            foreach (var container in this.Containers.Where(c => !String.IsNullOrEmpty(c.WorkingPath) && c.Id.Id != BurnConstants.BurnUXContainerName))
-            {
-                if (container.Type == ContainerType.Attached && attachedContainerIndex > 2 && container.Id.Id != BurnConstants.BurnDefaultAttachedContainerName)
-                {
-                    this.Messaging.Write(BurnBackendErrors.MultipleAttachedContainersUnsupported(container.SourceLineNumbers, container.Id.Id));
-                }
-            }
-
             if (!this.Messaging.EncounteredError)
             {
                 foreach (var container in this.Containers.Where(c => !String.IsNullOrEmpty(c.WorkingPath) && c.Id.Id != BurnConstants.BurnUXContainerName))

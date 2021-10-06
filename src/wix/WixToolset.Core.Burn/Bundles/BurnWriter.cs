@@ -93,7 +93,10 @@ namespace WixToolset.Core.Burn.Bundles
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_FORMAT, 1); // Hard-coded to CAB for now.
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_COUNT, 0);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_UXSIZE, 0);
-            this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE, 0);
+            for (uint i = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE0; i < BURN_SECTION_SIZE; i += sizeof(UInt32))
+            {
+                this.WriteToBurnSectionOffset(i, 0);
+            }
             this.binaryWriter.BaseStream.Flush();
 
             this.EngineSize = this.StubSize;
@@ -127,6 +130,11 @@ namespace WixToolset.Core.Burn.Bundles
             UInt32 burnSectionCount = 0;
             UInt32 burnSectionOffsetSize = 0;
 
+            if (containerSize == 0)
+            {
+                return false;
+            }
+
             switch (container)
             {
                 case Container.UX:
@@ -138,10 +146,19 @@ namespace WixToolset.Core.Burn.Bundles
                     break;
 
                 case Container.Attached:
-                    burnSectionCount = 2;
-                    burnSectionOffsetSize = BURN_SECTION_OFFSET_ATTACHEDCONTAINERSIZE;
                     // TODO: verify that the size in the section data is 0 or the same size.
-                    this.AttachedContainerSize = (uint)containerSize;
+                    uint nextAddress = this.EngineSize;
+                    foreach (ContainerSlot cntnr in this.AttachedContainers)
+                    {
+                        if (cntnr.Address >= nextAddress)
+                        {
+                            nextAddress = cntnr.Address + cntnr.Size;
+                        }
+                    }
+
+                    this.AttachedContainers.Add(new ContainerSlot(nextAddress, (uint)containerSize));
+                    burnSectionCount = 1 + (uint)this.AttachedContainers.Count;
+                    burnSectionOffsetSize = BURN_SECTION_OFFSET_UXSIZE + ((uint)this.AttachedContainers.Count * 4);
                     break;
 
                 default:
@@ -206,6 +223,12 @@ namespace WixToolset.Core.Burn.Bundles
         {
             if (this.invalidBundle)
             {
+                return false;
+            }
+            if (burnSectionOffsetSize > (BURN_SECTION_SIZE - sizeof(UInt32)))
+            {
+                this.invalidBundle = true;
+                this.Messaging.Write(BurnBackendErrors.TooManyAttachedContainers(BURN_SECTION_MAX_ATTACHEDCONTAINER_COUNT));
                 return false;
             }
 

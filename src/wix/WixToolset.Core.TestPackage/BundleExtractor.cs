@@ -50,14 +50,12 @@ namespace WixToolset.Core.TestPackage
         /// <param name="messaging"></param>
         /// <param name="bundleFilePath">Path to the bundle.</param>
         /// <param name="destinationFolderPath">Path to extract to.</param>
-        /// <param name="tempFolderPath">Temp path for extraction.</param>
         /// <returns>True if there was an attached container.</returns>
-        public static bool ExtractAttachedContainer(IMessaging messaging, string bundleFilePath, string destinationFolderPath, string tempFolderPath)
+        public static bool ExtractAttachedContainers(IMessaging messaging, string bundleFilePath, string destinationFolderPath)
         {
-            Directory.CreateDirectory(tempFolderPath);
             using (var burnReader = BurnReader.Open(messaging, bundleFilePath))
             {
-                return burnReader.ExtractAttachedContainer(destinationFolderPath, tempFolderPath);
+                return burnReader.ExtractAttachedContainers(destinationFolderPath);
             }
         }
 
