@@ -37,8 +37,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // to be equal to or longer than the "fileVersion" in length when its present;
                     // the workaround is to prepend zeroes to the last version number in the assembly
                     // version.
-                    var targetNetfx1 = (headers.CorHeader.MajorRuntimeVersion == 2) && (headers.CorHeader.MinorRuntimeVersion == 0);
-                    if (targetNetfx1 && !String.IsNullOrEmpty(fileVersion) && fileVersion.Length > version.Length)
+                    if (IsNetFx1xAssembly(headers) && !String.IsNullOrEmpty(fileVersion) && fileVersion.Length > version.Length)
                     {
                         var versionParts = version.Split('.');
 
@@ -154,6 +153,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 return "x86";
             }
+            else if (IsNetFx1xAssembly(headers))
+            {
+                // .NET Framework 1.x didn't support 64-bit, so if the assembly isn't explicitly 32-bit-required,
+                // the architecture wasn't specified, unlike .NET 2.0 and later, which identify it as MSIL.
+                return null;
+            }
             else if ((headers.CorHeader.Flags & CorFlags.ILOnly) == CorFlags.ILOnly)
             {
                 return "MSIL";
@@ -164,6 +169,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // GetAssemblyIdentityFromFile() method of acquiring the assembly identity.
                 return "x86";
             }
+        }
+
+        private static bool IsNetFx1xAssembly(PEHeaders headers)
+        {
+            return headers.CorHeader.MajorRuntimeVersion == 2 && headers.CorHeader.MinorRuntimeVersion == 0;
         }
 
         private static string ReadString(MetadataReader reader, StringHandle handle)
