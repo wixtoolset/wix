@@ -596,6 +596,61 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWithNet1xAssembly()
+        {
+            var folder = TestData.Get(@"TestData\Assembly1x");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\PFiles\AssemblyMsiPackage\candle.exe")));
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var fileSymbol = section.Symbols.OfType<FileSymbol>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), fileSymbol[FileSymbolFields.Source].AsPath().Path);
+                Assert.Equal(@"candle.exe", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
+
+                var msiAssemblyNameSymbols = section.Symbols.OfType<MsiAssemblyNameSymbol>();
+                Assert.Equal(new[]
+                {
+                    "culture",
+                    "fileVersion",
+                    "name",
+                    "publicKeyToken",
+                    "version"
+                }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
+
+                Assert.Equal(new[]
+                {
+                    "neutral",
+                    "2.0.5805.0",
+                    "candle",
+                    "CE35F76FCDA82BAD",
+                    "2.0.5805.0",
+                }, msiAssemblyNameSymbols.OrderBy(a => a.Name).Select(a => a.Value).ToArray());
+            }
+        }
+
+        [Fact]
         public void CanBuild64bit()
         {
             var folder = TestData.Get(@"TestData\SingleFile");
