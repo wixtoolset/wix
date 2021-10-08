@@ -5,7 +5,7 @@ branches:
     - master
     - develop
 
-image: Previous Visual Studio 2019
+image: Visual Studio 2019
 
 version: 0.0.0.{build}
 configuration: Release
@@ -14,6 +14,11 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   NUGET_XMLDOC_MODE: skip
+
+install:
+  - mkdir C:\LinkRepro_Win32_v141
+  - mkdir C:\LinkRepro_x64_v141
+  - mkdir C:\LinkRepro_ARM64_v141
 
 build_script:
   - src\build_official.cmd
@@ -28,6 +33,12 @@ nuget:
 
 skip_branch_with_pr: true
 skip_tags: true
+
+on_finish:
+  - ps: 7z a ('linkrepro_Win32_v141_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') C:\LinkRepro_Win32_v141\
+  - ps: 7z a ('linkrepro_x64_v141_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') C:\LinkRepro_x64_v141\
+  - ps: 7z a ('linkrepro_ARM64_v141_' + (Get-Date).tostring("yyyyMMddHHmmss") + '.zip') C:\LinkRepro_ARM64_v141\
+  - ps: Push-AppveyorArtifact linkrepro_*.zip
 
 artifacts:
   - path: build\artifacts

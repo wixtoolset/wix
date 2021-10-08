@@ -39,6 +39,12 @@
     <EnableSourceLink Condition=" '$(PlatformToolset)'=='v140' ">false</EnableSourceLink>
   </PropertyGroup>
 
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalOptions Condition=" '$(PlatformToolset)'=='v141' ">/LINKREPRO:C:\LinkRepro_$(Platform)_$(PlatformToolset) %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
