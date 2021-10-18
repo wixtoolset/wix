@@ -15,9 +15,9 @@ nuget restore || exit /b
 :: dotnet pack -c %_C% WixBuildTools.MsgGen\WixBuildTools.MsgGen.csproj || exit /b
 :: dotnet pack -c %_C% WixBuildTools.XsdGen\WixBuildTools.XsdGen.csproj || exit /b
 
-msbuild -t:Pack -p:Configuration=%_C% WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj -v:m || exit /b
 
-msbuild -t:Build -p:Configuration=%_C% WixBuildTools.TestSupport.Native\WixBuildTools.TestSupport.Native.vcxproj || exit /b
+msbuild -t:Build -p:Configuration=%_C% WixBuildTools.TestSupport.Native\WixBuildTools.TestSupport.Native.vcxproj -v:m || exit /b
 
 @popd
 @endlocal
