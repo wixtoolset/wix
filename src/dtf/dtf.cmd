@@ -12,15 +12,15 @@
 
 nuget restore || exit /b
 
-msbuild -t:Build -p:Configuration=%_C% || exit /b
+msbuild -t:Build -p:Configuration=%_C% -m -v:m -nr:false || exit /b
 
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression.Cab || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression.Zip || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Resources || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller.Linq || exit /b
-msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller.Package || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression.Cab -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Compression.Zip -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.Resources -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller.Linq -v:m || exit /b
+msbuild -t:Pack -p:Configuration=%_C% WixToolset.Dtf.WindowsInstaller.Package -v:m || exit /b
 
 @popd
 @endlocal
