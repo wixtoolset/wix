@@ -1,0 +1,41 @@
+name: Build WiX Toolset v4
+
+on:
+  push:
+    branches:
+      master
+  pull_request:
+    branches:
+      - master
+      - develop
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_XMLDOC_MODE: skip
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.3
+
+      - name: Build wix4
+        run: build.cmd
+
+      - name: Save build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: build/artifacts/
