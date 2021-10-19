@@ -3,7 +3,8 @@ name: Build WiX Toolset v4
 on:
   push:
     branches:
-      master
+      - master
+      - develop
   pull_request:
     branches:
       - master
@@ -32,10 +33,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.3
 
       - name: Build wix4
-        run: build.cmd
+        shell: cmd
+        run: ./build.cmd
 
       - name: Save build
-      - uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: artifacts
           path: build/artifacts/
