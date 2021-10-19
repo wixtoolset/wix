@@ -3,7 +3,8 @@ name: Build WiX Toolset v4
 on:
   push:
     branches:
-      master
+      - master
+      - develop
   pull_request:
     branches:
       - master
