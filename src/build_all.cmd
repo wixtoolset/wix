@@ -6,6 +6,8 @@
 @if /i "%1"=="release" set _C=Release
 @if not "%1"=="" shift & goto parse_args
 
+@if "%VCToolsVersion%"=="" call :StartDeveloperCommandPrompt
+
 @echo build %_C%
 
 :: Initialize required files/folders
@@ -56,5 +58,19 @@ call ext\ext.cmd %_C% || exit /b
 
 call test\test.cmd %_C% || exit /b
 
+goto LExit
+
+:StartDeveloperCommandPrompt
+echo Initializing developer command prompt
+for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath`) do (
+  if exist "%%i\Common7\Tools\vsdevcmd.bat" (
+    call "%%i\Common7\Tools\vsdevcmd.bat" -no_logo
+    exit /b
+  )
+)
+
+exit /b 2
+
+:LExit
 @popd
 @endlocal

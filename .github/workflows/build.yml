@@ -24,17 +24,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '5.0.x'
-
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.3
-
       - name: Build wix4
         shell: cmd
-        run: ./build.cmd
+        run: ./src/build_official.cmd
+        env:
+          RuntimeTestsEnabled: ${{ github.ref == 'refs/heads/master' }}
+          SigningUser:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_USER || '' }}
+          SigningSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
 
       - name: Save build
         uses: actions/upload-artifact@v2
