@@ -850,6 +850,30 @@ public: // IBAFunctions
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnThemeControlWmCommand(
+        __in WPARAM /*wParam*/,
+        __in LPCWSTR /*wzName*/,
+        __in WORD /*wId*/,
+        __in HWND /*hWnd*/,
+        __inout BOOL* /*pfProcessed*/,
+        __inout LRESULT* /*plResult*/
+        )
+    {
+        return S_OK;
+    }
+
+    virtual STDMETHODIMP OnThemeControlWmNotify(
+        __in LPNMHDR /*lParam*/,
+        __in LPCWSTR /*wzName*/,
+        __in WORD /*wId*/,
+        __in HWND /*hWnd*/,
+        __inout BOOL* /*pfProcessed*/,
+        __inout LRESULT* /*plResult*/
+        )
+    {
+        return S_OK;
+    }
+
 protected:
     CBalBaseBAFunctions(
         __in HMODULE hModule,

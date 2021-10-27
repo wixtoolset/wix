@@ -33,6 +33,24 @@ static HRESULT BalBaseBAFunctionsProcOnThemeControlLoading(
     return pBAFunctions->OnThemeControlLoading(pArgs->wzName, &pResults->fProcessed, &pResults->wId);
 }
 
+static HRESULT BalBaseBAFunctionsProcOnThemeControlWmCommand(
+    __in IBAFunctions* pBAFunctions,
+    __in BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_ARGS* pArgs,
+    __inout BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_RESULTS* pResults
+    )
+{
+    return pBAFunctions->OnThemeControlWmCommand(pArgs->wParam, pArgs->wzName, pArgs->wId, pArgs->hWnd, &pResults->fProcessed, &pResults->lResult);
+}
+
+static HRESULT BalBaseBAFunctionsProcOnThemeControlWmNotify(
+    __in IBAFunctions* pBAFunctions,
+    __in BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_ARGS* pArgs,
+    __inout BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_RESULTS* pResults
+    )
+{
+    return pBAFunctions->OnThemeControlWmNotify(pArgs->lParam, pArgs->wzName, pArgs->wId, pArgs->hWnd, &pResults->fProcessed, &pResults->lResult);
+}
+
 /*******************************************************************
 BalBaseBAFunctionsProc - requires pvContext to be of type IBAFunctions.
 Provides a default mapping between the message based BAFunctions interface and
@@ -136,6 +154,12 @@ static HRESULT WINAPI BalBaseBAFunctionsProc(
             break;
         case BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLLOADING:
             hr = BalBaseBAFunctionsProcOnThemeControlLoading(pBAFunctions, reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLLOADING_ARGS*>(pvArgs), reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS*>(pvResults));
+            break;
+        case BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLWMCOMMAND:
+            hr = BalBaseBAFunctionsProcOnThemeControlWmCommand(pBAFunctions, reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_ARGS*>(pvArgs), reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_RESULTS*>(pvResults));
+            break;
+        case BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLWMNOTIFY:
+            hr = BalBaseBAFunctionsProcOnThemeControlWmNotify(pBAFunctions, reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_ARGS*>(pvArgs), reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_RESULTS*>(pvResults));
             break;
         }
     }

@@ -421,12 +421,10 @@ static void CALLBACK OnBillboardTimer(
     );
 static void OnBrowseDirectory(
     __in THEME* pTheme,
-    __in HWND hWnd,
     __in const THEME_ACTION* pAction
     );
 static BOOL OnButtonClicked(
     __in THEME* pTheme,
-    __in HWND hWnd,
     __in const THEME_CONTROL* pControl
     );
 static BOOL OnDpiChanged(
@@ -434,20 +432,37 @@ static BOOL OnDpiChanged(
     __in WPARAM wParam,
     __in LPARAM lParam
     );
+static BOOL OnHypertextClicked(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pThemeControl,
+    __in PNMLINK pnmlink
+    );
 static void OnNcCreate(
     __in THEME* pTheme,
     __in HWND hWnd,
     __in LPARAM lParam
     );
-static HRESULT OnRichEditEnLink(
-    __in LPARAM lParam,
-    __in HWND hWndRichEdit,
-    __in HWND hWnd
+static BOOL OnNotifyEnLink(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pThemeControl,
+    __in ENLINK* link
     );
-static BOOL ControlIsType(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
-    __in THEME_CONTROL_TYPE type
+static BOOL OnNotifyEnMsgFilter(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pThemeControl,
+    __in MSGFILTER* msgFilter
+    );
+static BOOL OnWmCommand(
+    __in THEME* pTheme,
+    __in WPARAM wParam,
+    __in const THEME_CONTROL* pThemeControl,
+    __inout LRESULT* plResult
+    );
+static BOOL OnWmNotify(
+    __in THEME* pTheme,
+    __in LPNMHDR lParam,
+    __in const THEME_CONTROL* pThemeControl,
+    __inout LRESULT* plResult
     );
 static const THEME_CONTROL* FindControlFromHWnd(
     __in const THEME* pTheme,
@@ -5089,7 +5104,6 @@ static void CALLBACK OnBillboardTimer(
 
 static void OnBrowseDirectory(
     __in THEME* pTheme,
-    __in HWND hWnd,
     __in const THEME_ACTION* pAction
     )
 {
@@ -5098,7 +5112,7 @@ static void OnBrowseDirectory(
     BROWSEINFOW browseInfo = { };
     PIDLIST_ABSOLUTE pidl = NULL;
 
-    browseInfo.hwndOwner = hWnd;
+    browseInfo.hwndOwner = pTheme->hwndParent;
     browseInfo.pszDisplayName = wzPath;
     browseInfo.lpszTitle = pTheme->sczCaption;
     browseInfo.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
@@ -5148,7 +5162,6 @@ LExit:
 
 static BOOL OnButtonClicked(
     __in THEME* pTheme,
-    __in HWND hWnd,
     __in const THEME_CONTROL* pControl
     )
 {
@@ -5191,11 +5204,11 @@ static BOOL OnButtonClicked(
                 switch (pChosenAction->type)
                 {
                 case THEME_ACTION_TYPE_BROWSE_DIRECTORY:
-                    OnBrowseDirectory(pTheme, hWnd, pChosenAction);
+                    OnBrowseDirectory(pTheme, pChosenAction);
                     break;
 
                 case THEME_ACTION_TYPE_CLOSE_WINDOW:
-                    ::SendMessageW(hWnd, WM_CLOSE, 0, 0);
+                    ::SendMessageW(pTheme->hwndParent, WM_CLOSE, 0, 0);
                     break;
 
                 case THEME_ACTION_TYPE_CHANGE_PAGE:
@@ -5272,6 +5285,25 @@ LExit:
     return !fIgnored;
 }
 
+static BOOL OnHypertextClicked(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* /*pThemeControl*/,
+    __in PNMLINK pnmlink
+    )
+{
+    BOOL fProcessed = FALSE;
+    HRESULT hr = S_OK;
+    LITEM litem = pnmlink->item;
+
+    hr = ShelExec(litem.szUrl, NULL, L"open", NULL, SW_SHOWDEFAULT, pTheme->hwndParent, NULL);
+    ThmExitOnFailure(hr, "Failed to launch hypertext link: %ls", litem.szUrl);
+
+    fProcessed = TRUE;
+
+LExit:
+    return fProcessed;
+}
+
 static void OnNcCreate(
     __in THEME* pTheme,
     __in HWND hWnd,
@@ -5291,63 +5323,185 @@ static void OnNcCreate(
     }
 }
 
-static HRESULT OnRichEditEnLink(
-    __in LPARAM lParam,
-    __in HWND hWndRichEdit,
-    __in HWND hWnd
+static BOOL OnNotifyEnLink(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pThemeControl,
+    __in ENLINK* link
     )
 {
+    BOOL fProcessed = FALSE;
     HRESULT hr = S_OK;
     LPWSTR sczLink = NULL;
-    ENLINK* link = reinterpret_cast<ENLINK*>(lParam);
+    TEXTRANGEW tr = { };
 
-    switch (link->msg)
+    // Hyperlink clicks from rich-edit control.
+    if (THEME_CONTROL_TYPE_RICHEDIT == pThemeControl->type)
     {
-    case WM_LBUTTONDOWN:
+        switch (link->msg)
         {
-        hr = StrAlloc(&sczLink, link->chrg.cpMax - link->chrg.cpMin + 2);
-        ThmExitOnFailure(hr, "Failed to allocate string for link.");
+        case WM_LBUTTONDOWN:
+            hr = StrAlloc(&sczLink, (SIZE_T)2 + link->chrg.cpMax - link->chrg.cpMin);
+            ThmExitOnFailure(hr, "Failed to allocate string for link.");
 
-        TEXTRANGEW tr;
-        tr.chrg.cpMin = link->chrg.cpMin;
-        tr.chrg.cpMax = link->chrg.cpMax;
-        tr.lpstrText = sczLink;
+            tr.chrg.cpMin = link->chrg.cpMin;
+            tr.chrg.cpMax = link->chrg.cpMax;
+            tr.lpstrText = sczLink;
 
-        if (0 < ::SendMessageW(hWndRichEdit, EM_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr)))
-        {
-            hr = ShelExec(sczLink, NULL, L"open", NULL, SW_SHOWDEFAULT, hWnd, NULL);
-            ThmExitOnFailure(hr, "Failed to launch link: %ls", sczLink);
+            if (0 < ::SendMessageW(pThemeControl->hWnd, EM_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr)))
+            {
+                hr = ShelExec(sczLink, NULL, L"open", NULL, SW_SHOWDEFAULT, pTheme->hwndParent, NULL);
+                ThmExitOnFailure(hr, "Failed to launch link: %ls", sczLink);
+
+                fProcessed = TRUE;
+            }
+
+            break;
+
+        case WM_SETCURSOR:
+            ::SetCursor(vhCursorHand);
+            fProcessed = TRUE;
+
+            break;
         }
-        
-        break;
-        }
-
-    case WM_SETCURSOR:
-        ::SetCursor(vhCursorHand);
-        break;
     }
 
 LExit:
     ReleaseStr(sczLink);
 
-    return hr;
+    return fProcessed;
 }
 
-static BOOL ControlIsType(
-    __in const THEME* pTheme,
-    __in DWORD dwControl,
-    __in const THEME_CONTROL_TYPE type
+static BOOL OnNotifyEnMsgFilter(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pThemeControl,
+    __in MSGFILTER* msgFilter
     )
 {
-    BOOL fIsType = FALSE;
-    HWND hWnd = ::GetDlgItem(pTheme->hwndParent, dwControl);
-    if (hWnd)
+    BOOL fProcessed = FALSE;
+
+    // Tab/Shift+Tab support for rich-edit control.
+    if (THEME_CONTROL_TYPE_RICHEDIT == pThemeControl->type)
     {
-        const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, hWnd);
-        fIsType = (pControl && type == pControl->type);
+        switch (msgFilter->msg)
+        {
+        case WM_KEYDOWN:
+            if (VK_TAB == msgFilter->wParam)
+            {
+                BOOL fShift = 0x8000 & ::GetKeyState(VK_SHIFT);
+                HWND hwndFocus = ::GetNextDlgTabItem(pTheme->hwndParent, pThemeControl->hWnd, fShift);
+                ::SetFocus(hwndFocus);
+
+                fProcessed = TRUE;
+            }
+            break;
+        }
     }
 
-    return fIsType;
+    return fProcessed;
+}
+
+static BOOL OnWmCommand(
+    __in THEME* pTheme,
+    __in WPARAM wParam,
+    __in const THEME_CONTROL* pThemeControl,
+    __inout LRESULT* plResult
+    )
+{
+    BOOL fProcessed = FALSE;
+    THEME_CONTROLWMCOMMAND_ARGS args = { };
+    THEME_CONTROLWMCOMMAND_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wParam = wParam;
+    args.pThemeControl = pThemeControl;
+
+    results.cbSize = sizeof(results);
+    results.lResult = *plResult;
+
+    if (::SendMessageW(pTheme->hwndParent, WM_THMUTIL_CONTROL_WM_COMMAND, reinterpret_cast<WPARAM>(&args), reinterpret_cast<LPARAM>(&results)))
+    {
+        fProcessed = TRUE;
+        *plResult = results.lResult;
+        ExitFunction();
+    }
+
+    switch (HIWORD(wParam))
+    {
+    case BN_CLICKED:
+        if (OnButtonClicked(pTheme, pThemeControl))
+        {
+            fProcessed = TRUE;
+            *plResult = 0;
+            ExitFunction();
+        }
+        break;
+    }
+
+LExit:
+    return fProcessed;
+}
+
+static BOOL OnWmNotify(
+    __in THEME* pTheme,
+    __in LPNMHDR lParam,
+    __in const THEME_CONTROL* pThemeControl,
+    __inout LRESULT* plResult
+    )
+{
+    BOOL fProcessed = FALSE;
+    THEME_CONTROLWMNOTIFY_ARGS args = { };
+    THEME_CONTROLWMNOTIFY_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.lParam = lParam;
+    args.pThemeControl = pThemeControl;
+
+    results.cbSize = sizeof(results);
+    results.lResult = *plResult;
+
+    if (::SendMessageW(pTheme->hwndParent, WM_THMUTIL_CONTROL_WM_NOTIFY, reinterpret_cast<WPARAM>(&args), reinterpret_cast<LPARAM>(&results)))
+    {
+        fProcessed = TRUE;
+        *plResult = results.lResult;
+        ExitFunction();
+    }
+
+    switch (lParam->code)
+    {
+    case EN_MSGFILTER:
+        if (OnNotifyEnMsgFilter(pTheme, pThemeControl, reinterpret_cast<MSGFILTER*>(lParam)))
+        {
+            fProcessed = TRUE;
+            *plResult = 1;
+            ExitFunction();
+        }
+        break;
+
+    case EN_LINK:
+        if (OnNotifyEnLink(pTheme, pThemeControl, reinterpret_cast<ENLINK*>(lParam)))
+        {
+            fProcessed = TRUE;
+            *plResult = 1;
+            ExitFunction();
+        }
+
+    case NM_CLICK: __fallthrough;
+    case NM_RETURN:
+        switch (pThemeControl->type)
+        {
+        case THEME_CONTROL_TYPE_HYPERTEXT:
+            // Clicks on a hypertext/syslink control.
+            if (OnHypertextClicked(pTheme, pThemeControl, reinterpret_cast<PNMLINK>(lParam)))
+            {
+                fProcessed = TRUE;
+                *plResult = 1;
+                ExitFunction();
+            }
+        }
+    }
+
+LExit:
+    return fProcessed;
 }
 
 static const THEME_CONTROL* FindControlFromHWnd(
@@ -5780,6 +5934,9 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
     __in LPARAM lParam
     )
 {
+    LRESULT lres = 0;
+    const THEME_CONTROL* pThemeControl = NULL;
+
     if (pTheme)
     {
         switch (uMsg)
@@ -5827,55 +5984,22 @@ static LRESULT CALLBACK ControlGroupDefWindowProc(
             if (lParam)
             {
                 LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
-                switch (pnmhdr->code)
+                pThemeControl = FindControlFromHWnd(pTheme, pnmhdr->hwndFrom);
+                if (pThemeControl && OnWmNotify(pTheme, pnmhdr, pThemeControl, &lres))
                 {
-                    // Tab/Shift+Tab support for rich-edit control.
-                case EN_MSGFILTER:
-                {
-                    MSGFILTER* msgFilter = reinterpret_cast<MSGFILTER*>(lParam);
-                    if (WM_KEYDOWN == msgFilter->msg && VK_TAB == msgFilter->wParam)
-                    {
-                        BOOL fShift = 0x8000 & ::GetKeyState(VK_SHIFT);
-                        HWND hwndFocus = ::GetNextDlgTabItem(hWnd, msgFilter->nmhdr.hwndFrom, fShift);
-                        ::SetFocus(hwndFocus);
-                        return 1;
-                    }
-                    break;
-                }
-
-                // Hyperlink clicks from rich-edit control.
-                case EN_LINK:
-                    return SUCCEEDED(OnRichEditEnLink(lParam, pnmhdr->hwndFrom, hWnd));
-
-                    // Clicks on a hypertext/syslink control.
-                case NM_CLICK: __fallthrough;
-                case NM_RETURN:
-                    if (ControlIsType(pTheme, static_cast<DWORD>(pnmhdr->idFrom), THEME_CONTROL_TYPE_HYPERTEXT))
-                    {
-                        PNMLINK pnmlink = reinterpret_cast<PNMLINK>(lParam);
-                        LITEM litem = pnmlink->item;
-                        ShelExec(litem.szUrl, NULL, L"open", NULL, SW_SHOWDEFAULT, hWnd, NULL);
-                        return 1;
-                    }
-
-                    return 0;
+                    return lres;
                 }
             }
             break;
 
         case WM_COMMAND:
-            switch (HIWORD(wParam))
+            if (lParam)
             {
-            case BN_CLICKED:
-                if (lParam)
+                pThemeControl = FindControlFromHWnd(pTheme, (HWND)lParam);
+                if (pThemeControl && OnWmCommand(pTheme, wParam, pThemeControl, &lres))
                 {
-                    const THEME_CONTROL* pControl = FindControlFromHWnd(pTheme, (HWND)lParam);
-                    if (pControl && OnButtonClicked(pTheme, hWnd, pControl))
-                    {
-                        return 0;
-                    }
+                    return lres;
                 }
-                break;
             }
             break;
         }

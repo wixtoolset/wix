@@ -103,6 +103,14 @@ typedef enum _WM_THMUTIL
     // wparam is THEME_LOADINGCONTROL_ARGS* and lparam is THEME_LOADINGCONTROL_RESULTS*.
     // Return code is TRUE if it was processed.
     WM_THMUTIL_LOADING_CONTROL = WM_APP - 1,
+    // Sent when WM_COMMAND is received for a control.
+    // wparam is THEME_CONTROLWMCOMMAND_ARGS* and lparam is THEME_CONTROLWMCOMMAND_RESULTS*.
+    // Return code is TRUE if it was processed.
+    WM_THMUTIL_CONTROL_WM_COMMAND = WM_APP - 2,
+    // Sent when WM_NOTIFY is received for a control.
+    // wparam is THEME_CONTROLWMNOTIFY_ARGS* and lparam is THEME_CONTROLWMNOTIFY_RESULTS*.
+    // Return code is TRUE to prevent further processing of the message.
+    WM_THMUTIL_CONTROL_WM_NOTIFY = WM_APP - 3,
 } WM_THMUTIL;
 
 struct THEME_COLUMN
@@ -396,6 +404,32 @@ struct THEME
 
     LPVOID pvVariableContext;
 };
+
+typedef struct _THEME_CONTROLWMCOMMAND_ARGS
+{
+    DWORD cbSize;
+    WPARAM wParam;
+    const THEME_CONTROL* pThemeControl;
+} THEME_CONTROLWMCOMMAND_ARGS;
+
+typedef struct _THEME_CONTROLWMCOMMAND_RESULTS
+{
+    DWORD cbSize;
+    LRESULT lResult;
+} THEME_CONTROLWMCOMMAND_RESULTS;
+
+typedef struct _THEME_CONTROLWMNOTIFY_ARGS
+{
+    DWORD cbSize;
+    LPNMHDR lParam;
+    const THEME_CONTROL* pThemeControl;
+} THEME_CONTROLWMNOTIFY_ARGS;
+
+typedef struct _THEME_CONTROLWMNOTIFY_RESULTS
+{
+    DWORD cbSize;
+    LRESULT lResult;
+} THEME_CONTROLWMNOTIFY_RESULTS;
 
 typedef struct _THEME_LOADINGCONTROL_ARGS
 {
