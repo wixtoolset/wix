@@ -312,13 +312,8 @@ static HRESULT CreateMainWindowClass(
     ATOM atom = 0;
     WNDCLASSW wc = { };
 
-    wc.lpfnWndProc = MainWndProc;
-    wc.hInstance = hInstance;
-    wc.hIcon = reinterpret_cast<HICON>(pTheme->hIcon);
-    wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-    wc.hbrBackground = pTheme->rgFonts[pTheme->dwFontId].hBackground;
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = THMVWR_WINDOW_CLASS_MAIN;
+    ThemeInitializeWindowClass(pTheme, &wc, MainWndProc, hInstance, THMVWR_WINDOW_CLASS_MAIN);
+
     atom = ::RegisterClassW(&wc);
     if (!atom)
     {

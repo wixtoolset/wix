@@ -824,6 +824,26 @@ LExit:
 }
 
 
+DAPI_(void) ThemeInitializeWindowClass(
+    __in THEME* pTheme,
+    __in WNDCLASSW* pWndClass,
+    __in WNDPROC pfnWndProc,
+    __in HINSTANCE hInstance,
+    __in LPCWSTR wzClassName
+    )
+{
+    pWndClass->style = CS_HREDRAW | CS_VREDRAW;
+    pWndClass->hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+
+    pWndClass->lpfnWndProc = pfnWndProc;
+    pWndClass->hInstance = hInstance;
+    pWndClass->lpszClassName = wzClassName;
+
+    pWndClass->hIcon = reinterpret_cast<HICON>(pTheme->hIcon);
+    pWndClass->hbrBackground = pTheme->rgFonts[pTheme->dwFontId].hBackground;
+}
+
+
 DAPI_(HRESULT) ThemeCreateParentWindow(
     __in THEME* pTheme,
     __in DWORD dwExStyle,

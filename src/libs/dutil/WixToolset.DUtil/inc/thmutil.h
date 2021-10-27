@@ -530,6 +530,19 @@ HRESULT DAPI ThemeRegisterVariableCallbacks(
     );
 
 /********************************************************************
+ ThemeInitializeWindowClass - sets defaults for the window class
+                              from the given theme.
+
+*******************************************************************/
+void DAPI ThemeInitializeWindowClass(
+    __in THEME* pTheme,
+    __in WNDCLASSW* pWndClass,
+    __in WNDPROC pfnWndProc,
+    __in HINSTANCE hInstance,
+    __in LPCWSTR wzClassName
+    );
+
+/********************************************************************
  ThemeCreateParentWindow - creates a parent window for the theme.
 
 *******************************************************************/

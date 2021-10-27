@@ -130,30 +130,24 @@ private:
     HRESULT CreateTestingWindow()
     {
         HRESULT hr = S_OK;
-        HICON hIcon = reinterpret_cast<HICON>(m_pBafTheme->hIcon);
         WNDCLASSW wc = { };
         int x = CW_USEDEFAULT;
         int y = CW_USEDEFAULT;
         POINT ptCursor = { };
 
+        ThemeInitializeWindowClass(m_pBafTheme, &wc, CBafThmUtilTesting::TestingWndProc, m_hModule, BAFTHMUTILTESTING_WINDOW_CLASS);
+
         // If the theme did not provide an icon, try using the icon from the bundle engine.
-        if (!hIcon)
+        if (!wc.hIcon)
         {
             HMODULE hBootstrapperEngine = ::GetModuleHandleW(NULL);
             if (hBootstrapperEngine)
             {
-                hIcon = ::LoadIconW(hBootstrapperEngine, MAKEINTRESOURCEW(1));
+                wc.hIcon = ::LoadIconW(hBootstrapperEngine, MAKEINTRESOURCEW(1));
             }
         }
 
         // Register the window class and create the window.
-        wc.lpfnWndProc = CBafThmUtilTesting::TestingWndProc;
-        wc.hInstance = m_hModule;
-        wc.hIcon = hIcon;
-        wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-        wc.hbrBackground = m_pBafTheme->rgFonts[m_pBafTheme->dwFontId].hBackground;
-        wc.lpszMenuName = NULL;
-        wc.lpszClassName = BAFTHMUTILTESTING_WINDOW_CLASS;
         if (!::RegisterClassW(&wc))
         {
             ExitWithLastError(hr, "Failed to register window.");
