@@ -52,6 +52,10 @@ static BOOL OnThemeLoadingControl(
     __in const THEME_LOADINGCONTROL_ARGS* pArgs,
     __in THEME_LOADINGCONTROL_RESULTS* pResults
     );
+static BOOL OnThemeControlWmNotify(
+    __in const THEME_CONTROLWMNOTIFY_ARGS* pArgs,
+    __in THEME_CONTROLWMNOTIFY_RESULTS* pResults
+    );
 static void CALLBACK ThmviewerTraceError(
     __in_z LPCSTR szFile,
     __in int iLine,
@@ -377,32 +381,11 @@ static LRESULT CALLBACK MainWndProc(
         ::PostQuitMessage(0);
         break;
 
-    case WM_NOTIFY:
-        {
-        NMHDR* pnmhdr = reinterpret_cast<NMHDR*>(lParam);
-        switch (pnmhdr->code)
-        {
-        case TVN_SELCHANGEDW:
-            {
-            NMTREEVIEWW* ptv = reinterpret_cast<NMTREEVIEWW*>(lParam);
-            ::PostThreadMessageW(vdwDisplayThreadId, WM_THMVWR_SHOWPAGE, SW_HIDE, ptv->itemOld.lParam);
-            ::PostThreadMessageW(vdwDisplayThreadId, WM_THMVWR_SHOWPAGE, SW_SHOW, ptv->itemNew.lParam);
-            }
-            break;
-
-        //case NM_DBLCLK:
-        //    TVITEM item = { };
-        //    item.mask = TVIF_PARAM;
-        //    item.hItem = TreeView_GetSelection(pnmhdr->hwndFrom);
-        //    TreeView_GetItem(pnmhdr->hwndFrom, &item);
-        //    ::PostThreadMessageW(vdwDisplayThreadId, WM_THMVWR_SHOWPAGE, SW_SHOW, item.lParam);
-        //    return 1;
-        }
-        }
-        break;
-
     case WM_THMUTIL_LOADING_CONTROL:
         return OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
+
+    case WM_THMUTIL_CONTROL_WM_NOTIFY:
+        return OnThemeControlWmNotify(reinterpret_cast<THEME_CONTROLWMNOTIFY_ARGS*>(wParam), reinterpret_cast<THEME_CONTROLWMNOTIFY_RESULTS*>(lParam));
     }
 
     return ThemeDefWindowProc(vpTheme, hWnd, uMsg, wParam, lParam);
@@ -557,4 +540,30 @@ static BOOL OnThemeLoadingControl(
 
     pResults->hr = S_OK;
     return TRUE;
+}
+
+static BOOL OnThemeControlWmNotify(
+    __in const THEME_CONTROLWMNOTIFY_ARGS* pArgs,
+    __in THEME_CONTROLWMNOTIFY_RESULTS* /*pResults*/
+    )
+{
+    BOOL fProcessed = FALSE;
+
+    switch (pArgs->lParam->code)
+    {
+    case TVN_SELCHANGEDW:
+        switch (pArgs->pThemeControl->wId)
+        {
+        case THMVWR_CONTROL_TREE:
+            NMTREEVIEWW* ptv = reinterpret_cast<NMTREEVIEWW*>(pArgs->lParam);
+            ::PostThreadMessageW(vdwDisplayThreadId, WM_THMVWR_SHOWPAGE, SW_HIDE, ptv->itemOld.lParam);
+            ::PostThreadMessageW(vdwDisplayThreadId, WM_THMVWR_SHOWPAGE, SW_SHOW, ptv->itemNew.lParam);
+
+            fProcessed = TRUE;
+            break;
+        }
+        break;
+    }
+
+    return fProcessed;
 }

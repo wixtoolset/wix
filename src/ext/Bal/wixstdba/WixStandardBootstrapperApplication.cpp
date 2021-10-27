@@ -2878,65 +2878,11 @@ private:
             pBA->OnShowFailure();
             return 0;
 
-        case WM_COMMAND:
-            switch (HIWORD(wParam))
-            {
-            case BN_CLICKED:
-                switch (LOWORD(wParam))
-                {
-                case WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX:
-                    pBA->OnClickAcceptCheckbox();
-                    return 0;
+        case WM_THMUTIL_CONTROL_WM_COMMAND:
+            return pBA->OnThemeControlWmCommand(reinterpret_cast<THEME_CONTROLWMCOMMAND_ARGS*>(wParam), reinterpret_cast<THEME_CONTROLWMCOMMAND_RESULTS*>(lParam));
 
-                case WIXSTDBA_CONTROL_INSTALL_BUTTON:
-                    pBA->OnClickInstallButton();
-                    return 0;
-
-                case WIXSTDBA_CONTROL_REPAIR_BUTTON:
-                    pBA->OnClickRepairButton();
-                    return 0;
-
-                case WIXSTDBA_CONTROL_UNINSTALL_BUTTON:
-                    pBA->OnClickUninstallButton();
-                    return 0;
-
-                case WIXSTDBA_CONTROL_LAUNCH_BUTTON:
-                    pBA->OnClickLaunchButton();
-                    return 0;
-
-                case WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON: __fallthrough;
-                case WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON:
-                    pBA->OnClickRestartButton();
-                    return 0;
-
-                case WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON:
-                    pBA->OnClickCloseButton();
-                    return 0;
-                }
-                break;
-            }
-            break;
-
-        case WM_NOTIFY:
-            if (lParam)
-            {
-                LPNMHDR pnmhdr = reinterpret_cast<LPNMHDR>(lParam);
-                switch (pnmhdr->code)
-                {
-                case NM_CLICK: __fallthrough;
-                case NM_RETURN:
-                    switch (static_cast<DWORD>(pnmhdr->idFrom))
-                    {
-                    case WIXSTDBA_CONTROL_EULA_LINK:
-                        pBA->OnClickEulaLink();
-                        return 1;
-                    case WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK:
-                        pBA->OnClickLogFileLink();
-                        return 1;
-                    }
-                }
-            }
-            break;
+        case WM_THMUTIL_CONTROL_WM_NOTIFY:
+            return pBA->OnThemeControlWmNotify(reinterpret_cast<THEME_CONTROLWMNOTIFY_ARGS*>(wParam), reinterpret_cast<THEME_CONTROLWMNOTIFY_RESULTS*>(lParam));
         }
 
         if (pBA && pBA->m_pTaskbarList && uMsg == pBA->m_uTaskbarButtonCreatedMessage)
@@ -3664,6 +3610,154 @@ private:
 
     LExit:
         ReleaseStr(sczLogFile);
+    }
+
+    BOOL OnThemeControlWmCommand(
+        __in const THEME_CONTROLWMCOMMAND_ARGS* pArgs,
+        __in THEME_CONTROLWMCOMMAND_RESULTS* pResults
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+        BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_ARGS themeControlWmCommandArgs = { };
+        BA_FUNCTIONS_ONTHEMECONTROLWMCOMMAND_RESULTS themeControlWmCommandResults = { };
+
+        switch (HIWORD(pArgs->wParam))
+        {
+        case BN_CLICKED:
+            switch (pArgs->pThemeControl->wId)
+            {
+            case WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX:
+                OnClickAcceptCheckbox();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_INSTALL_BUTTON:
+                OnClickInstallButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_REPAIR_BUTTON:
+                OnClickRepairButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_UNINSTALL_BUTTON:
+                OnClickUninstallButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_LAUNCH_BUTTON:
+                OnClickLaunchButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON: __fallthrough;
+            case WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON:
+                OnClickRestartButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+
+            case WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON:
+                OnClickCloseButton();
+                fProcessed = TRUE;
+                pResults->lResult = 0;
+                ExitFunction();
+            }
+            break;
+        }
+
+        if (m_pfnBAFunctionsProc)
+        {
+            themeControlWmCommandArgs.cbSize = sizeof(themeControlWmCommandArgs);
+            themeControlWmCommandArgs.wParam = pArgs->wParam;
+            themeControlWmCommandArgs.wzName = pArgs->pThemeControl->sczName;
+            themeControlWmCommandArgs.wId = pArgs->pThemeControl->wId;
+            themeControlWmCommandArgs.hWnd = pArgs->pThemeControl->hWnd;
+
+            themeControlWmCommandResults.cbSize = sizeof(themeControlWmCommandResults);
+            themeControlWmCommandResults.lResult = pResults->lResult;
+
+            hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLWMCOMMAND, &themeControlWmCommandArgs, &themeControlWmCommandResults, m_pvBAFunctionsProcContext);
+            if (E_NOTIMPL != hr)
+            {
+                BalExitOnFailure(hr, "BAFunctions OnThemeControlWmCommand failed.");
+
+                if (themeControlWmCommandResults.fProcessed)
+                {
+                    fProcessed = TRUE;
+                    pResults->lResult = themeControlWmCommandResults.lResult;
+                    ExitFunction();
+                }
+            }
+        }
+
+LExit:
+        return fProcessed;
+    }
+
+    BOOL OnThemeControlWmNotify(
+        __in const THEME_CONTROLWMNOTIFY_ARGS* pArgs,
+        __in THEME_CONTROLWMNOTIFY_RESULTS* pResults
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+        BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_ARGS themeControlWmNotifyArgs = { };
+        BA_FUNCTIONS_ONTHEMECONTROLWMNOTIFY_RESULTS themeControlWmNotifyResults = { };
+
+        switch (pArgs->lParam->code)
+        {
+        case NM_CLICK: __fallthrough;
+        case NM_RETURN:
+            switch (pArgs->pThemeControl->wId)
+            {
+            case WIXSTDBA_CONTROL_EULA_LINK:
+                OnClickEulaLink();
+                fProcessed = TRUE;
+                pResults->lResult = 1;
+                ExitFunction();
+            case WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK:
+                OnClickLogFileLink();
+                fProcessed = TRUE;
+                pResults->lResult = 1;
+                ExitFunction();
+            }
+        }
+
+        if (m_pfnBAFunctionsProc)
+        {
+            themeControlWmNotifyArgs.cbSize = sizeof(themeControlWmNotifyArgs);
+            themeControlWmNotifyArgs.lParam = pArgs->lParam;
+            themeControlWmNotifyArgs.wzName = pArgs->pThemeControl->sczName;
+            themeControlWmNotifyArgs.wId = pArgs->pThemeControl->wId;
+            themeControlWmNotifyArgs.hWnd = pArgs->pThemeControl->hWnd;
+
+            themeControlWmNotifyResults.cbSize = sizeof(themeControlWmNotifyResults);
+            themeControlWmNotifyResults.lResult = pResults->lResult;
+
+            hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLWMCOMMAND, &themeControlWmNotifyArgs, &themeControlWmNotifyResults, m_pvBAFunctionsProcContext);
+            if (E_NOTIMPL != hr)
+            {
+                BalExitOnFailure(hr, "BAFunctions OnThemeControlWmNotify failed.");
+
+                if (themeControlWmNotifyResults.fProcessed)
+                {
+                    fProcessed = TRUE;
+                    pResults->lResult = themeControlWmNotifyResults.lResult;
+                    ExitFunction();
+                }
+            }
+        }
+
+LExit:
+        return fProcessed;
     }
 
 

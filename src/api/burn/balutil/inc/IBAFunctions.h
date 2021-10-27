@@ -39,4 +39,26 @@ DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49
         __inout BOOL* pfProcessed,
         __inout WORD* pwId
         ) = 0;
+
+    // OnThemeControlWmCommand - Called when WM_COMMAND is received for a control.
+    //
+    STDMETHOD(OnThemeControlWmCommand)(
+        __in WPARAM wParam,
+        __in LPCWSTR wzName,
+        __in WORD wId,
+        __in HWND hWnd,
+        __inout BOOL* pfProcessed,
+        __inout LRESULT* plResult
+        ) = 0;
+
+    // OnThemeControlWmNotify - Called when WM_NOTIFY is received for a control.
+    //
+    STDMETHOD(OnThemeControlWmNotify)(
+        __in LPNMHDR lParam,
+        __in LPCWSTR wzName,
+        __in WORD wId,
+        __in HWND hWnd,
+        __inout BOOL* pfProcessed,
+        __inout LRESULT* plResult
+        ) = 0;
 };

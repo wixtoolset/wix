@@ -43,49 +43,6 @@ static void CALLBACK BafThmUtilTestingTraceError(
 class CBafThmUtilTesting : public CBalBaseBAFunctions
 {
 public: // IBAFunctions
-    /*virtual STDMETHODIMP OnThemeLoaded(
-        THEME* pTheme,
-        WIX_LOCALIZATION* pWixLoc
-        )
-    {
-        HRESULT hr = S_OK;
-
-        hr = __super::OnThemeLoaded(pTheme, pWixLoc);
-
-        return hr;
-    }*/
-
-    virtual STDMETHODIMP WndProc(
-        __in THEME* pTheme,
-        __in HWND hWnd,
-        __in UINT uMsg,
-        __in WPARAM wParam,
-        __in LPARAM lParam,
-        __inout LRESULT* plRes
-        )
-    {
-        switch (uMsg)
-        {
-        case WM_COMMAND:
-            switch (HIWORD(wParam))
-            {
-            case BN_CLICKED:
-                switch (LOWORD(wParam))
-                {
-                case BAF_CONTROL_INSTALL_TEST_BUTTON:
-                    OnShowTheme();
-                    *plRes = 0;
-                    return S_OK;
-                }
-
-                break;
-            }
-            break;
-        }
-
-        return __super::WndProc(pTheme, hWnd, uMsg, wParam, lParam, plRes);
-    }
-
     virtual STDMETHODIMP OnThemeControlLoading(
         __in LPCWSTR wzName,
         __inout BOOL* pfProcessed,
@@ -99,6 +56,35 @@ public: // IBAFunctions
         }
 
         return S_OK;
+    }
+
+    virtual STDMETHODIMP OnThemeControlWmCommand(
+        __in WPARAM wParam,
+        __in LPCWSTR /*wzName*/,
+        __in WORD wId,
+        __in HWND /*hWnd*/,
+        __inout BOOL* pfProcessed,
+        __inout LRESULT* plResult
+        )
+    {
+        HRESULT hr = S_OK;
+
+        switch (HIWORD(wParam))
+        {
+        case BN_CLICKED:
+            switch (wId)
+            {
+            case BAF_CONTROL_INSTALL_TEST_BUTTON:
+                OnShowTheme();
+                *pfProcessed = TRUE;
+                *plResult = 0;
+                break;
+            }
+
+            break;
+        }
+
+        return hr;
     }
 
 private:
