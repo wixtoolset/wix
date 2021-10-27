@@ -14,8 +14,6 @@
 
 #include <dutil.h>
 #include <dictutil.h>
-#include <locutil.h>
-#include <thmutil.h>
 
 #include <BootstrapperEngine.h>
 #include <BootstrapperApplication.h>

@@ -2762,7 +2762,6 @@ private:
             if (pBA->m_pfnBAFunctionsProc)
             {
                 wndProcArgs.cbSize = sizeof(wndProcArgs);
-                wndProcArgs.pTheme = pTheme;
                 wndProcArgs.hWnd = hWnd;
                 wndProcArgs.uMsg = uMsg;
                 wndProcArgs.wParam = wParam;
@@ -2770,10 +2769,20 @@ private:
                 wndProcResults.cbSize = sizeof(wndProcResults);
 
                 hr = pBA->m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_WNDPROC, &wndProcArgs, &wndProcResults, pBA->m_pvBAFunctionsProcContext);
-                if (E_NOTIMPL != hr)
+
+                if (E_NOTIMPL == hr)
                 {
-                    lres = wndProcResults.lres;
-                    ExitFunction();
+                    hr = S_OK;
+                }
+                else
+                {
+                    BalExitOnFailure(hr, "BAFunctions WndProc failed.");
+
+                    if (wndProcResults.fProcessed)
+                    {
+                        lres = wndProcResults.lResult;
+                        ExitFunction();
+                    }
                 }
             }
         }
@@ -2889,8 +2898,7 @@ private:
         if (m_pfnBAFunctionsProc)
         {
             themeLoadedArgs.cbSize = sizeof(themeLoadedArgs);
-            themeLoadedArgs.pTheme = m_pTheme;
-            themeLoadedArgs.pWixLoc = m_pWixLoc;
+            themeLoadedArgs.hWnd = m_pTheme->hwndParent;
             themeLoadedResults.cbSize = sizeof(themeLoadedResults);
             hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMELOADED, &themeLoadedArgs, &themeLoadedResults, m_pvBAFunctionsProcContext);
             BalExitOnFailure(hr, "BAFunctions OnThemeLoaded failed.");

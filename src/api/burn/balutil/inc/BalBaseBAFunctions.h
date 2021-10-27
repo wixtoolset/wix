@@ -5,9 +5,6 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#include "dutil.h"
-#include "locutil.h"
-#include "thmutil.h"
 #include "BAFunctions.h"
 #include "IBAFunctions.h"
 #include "BootstrapperEngine.h"
@@ -803,32 +800,26 @@ public: // IBAFunctions
     }
 
     virtual STDMETHODIMP OnThemeLoaded(
-        THEME* pTheme,
-        WIX_LOCALIZATION* pWixLoc
+        __in HWND hWnd
         )
     {
         HRESULT hr = S_OK;
 
-        m_pTheme = pTheme;
-        m_pWixLoc = pWixLoc;
+        m_hwndParent = hWnd;
 
         return hr;
     }
 
     virtual STDMETHODIMP WndProc(
-        __in THEME* pTheme,
-        __in HWND hWnd,
-        __in UINT uMsg,
-        __in WPARAM wParam,
-        __in LPARAM lParam,
-        __inout LRESULT* plRes
+        __in HWND /*hWnd*/,
+        __in UINT /*uMsg*/,
+        __in WPARAM /*wParam*/,
+        __in LPARAM /*lParam*/,
+        __inout BOOL* /*pfProcessed*/,
+        __inout LRESULT* /*plResult*/
         )
     {
-        HRESULT hr = S_OK;
-
-        *plRes = ThemeDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
-
-        return hr;
+        return S_OK;
     }
 
     virtual STDMETHODIMP BAFunctionsProc(
@@ -917,6 +908,5 @@ protected:
     BA_FUNCTIONS_CREATE_ARGS m_bafCreateArgs;
     BOOTSTRAPPER_CREATE_ARGS m_baCreateArgs;
     BOOTSTRAPPER_COMMAND m_command;
-    THEME* m_pTheme;
-    WIX_LOCALIZATION* m_pWixLoc;
+    HWND m_hwndParent;
 };
