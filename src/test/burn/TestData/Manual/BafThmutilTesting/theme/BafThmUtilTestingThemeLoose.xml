@@ -4,35 +4,35 @@
 
 <Theme xmlns="http://wixtoolset.org/schemas/v4/thmutil">
     <Font Id="Default" Height="-12" Weight="500" Foreground="windowtext" Background="window">Segoe UI</Font>
-    <Image Id="star_transparent.bmp" ImageResource="2" />
-    <Image Id="star_opaque.bmp" ImageResource="3" />
-    <Image Id="star_transparent.png" ImageResource="4" />
-    <Image Id="square_default" ImageResource="5">
-        <AlternateResolution ImageResource="6" />
-        <AlternateResolution ImageResource="7" />
-        <AlternateResolution ImageResource="8" />
-        <AlternateResolution ImageResource="9" />
+    <Image Id="star_transparent.bmp" ImageFile="star_transparent.bmp" />
+    <Image Id="star_opaque.bmp" ImageFile="star_opaque.bmp" />
+    <Image Id="star_transparent.png" ImageFile="star_transparent.png" />
+    <Image Id="square_default" ImageFile="16x16.png">
+        <AlternateResolution ImageFile="32x32.png" />
+        <AlternateResolution ImageFile="64x64.png" />
+        <AlternateResolution ImageFile="128x128.png" />
+        <AlternateResolution ImageFile="256x256.png" />
     </Image>
-    <Image Id="square_focus" ImageResource="13">
-        <AlternateResolution ImageResource="14" />
-        <AlternateResolution ImageResource="15" />
+    <Image Id="square_focus" ImageFile="64x64_focus.png">
+        <AlternateResolution ImageFile="128x128_focus.png" />
+        <AlternateResolution ImageFile="256x256_focus.png" />
     </Image>
-    <Image Id="square_hover" ImageResource="19">
-        <AlternateResolution ImageResource="20" />
-        <AlternateResolution ImageResource="21" />
+    <Image Id="square_hover" ImageFile="64x64_hover.png">
+        <AlternateResolution ImageFile="128x128_hover.png" />
+        <AlternateResolution ImageFile="256x256_hover.png" />
     </Image>
-    <Image Id="square_selected" ImageResource="25">
-        <AlternateResolution ImageResource="26" />
-        <AlternateResolution ImageResource="27" />
+    <Image Id="square_selected" ImageFile="64x64_selected.png">
+        <AlternateResolution ImageFile="128x128_selected.png" />
+        <AlternateResolution ImageFile="256x256_selected.png" />
     </Image>
-    <Image Id="progressbar" ImageResource="30" />
-    <Image Id="progressbar_reverse" ImageResource="31" />
+    <Image Id="progressbar" ImageFile="progressbar.bmp" />
+    <Image Id="progressbar_reverse" ImageFile="progressbar_reverse.bmp" />
 
     <Window Width="600" Height="450" FontId="Default" Caption="BafThmUtilTestingTheme" HexStyle="10cf0000" AutoResize="yes">
         <ImageList Name="Stars">
-            <ImageListItem ImageResource="2" />
-            <ImageListItem ImageResource="3" />
-            <ImageListItem ImageResource="4" />
+            <ImageListItem ImageFile="star_transparent.bmp" />
+            <ImageListItem ImageFile="star_opaque.bmp" />
+            <ImageListItem ImageFile="star_transparent.png" />
         </ImageList>
         <Page Name="Transparency">
             <Label X="6" Y="6" Width="-6" Height="94" FontId="Default">

@@ -230,18 +230,14 @@ private:
             return lres;
         }
 
-        case WM_CREATE:
-            if (!pBaf->OnCreate(hWnd))
-            {
-                return -1;
-            }
-            break;
-
         case WM_THMUTIL_LOADING_CONTROL:
             return pBaf->OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
 
+        case WM_THMUTIL_LOADED_CONTROL:
+            return pBaf->OnThemeLoadedControl(hWnd, reinterpret_cast<THEME_LOADEDCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADEDCONTROL_RESULTS*>(lParam));
+
         case WM_TIMER:
-            if (!lParam && pBaf)
+            if (!lParam && BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE == wParam && pBaf)
             {
                 pBaf->UpdateProgressBarProgress();
 
@@ -253,33 +249,14 @@ private:
         return ThemeDefWindowProc(pBaf ? pBaf->m_pBafTheme : NULL, hWnd, uMsg, wParam, lParam);
     }
 
-    BOOL OnCreate(
-        __in HWND hWnd
+    HRESULT OnCreatedListView(
+        __in HWND hWndListView
         )
     {
         HRESULT hr = S_OK;
         LVITEMW lvitem = { };
         LVGROUP lvgroup = { };
         static UINT puColumns[] = { 0, 1, 2 };
-        HWND hwndTopLeft = NULL;
-        HWND hwndTopRight = NULL;
-        HWND hwndBottomLeft = NULL;
-        HWND hwndBottomRight = NULL;
-
-        hr = ThemeLoadControls(m_pBafTheme);
-        BalExitOnFailure(hr, "Failed to load theme controls.");
-
-        hwndTopLeft = ::GetDlgItem(m_pBafTheme->hwndParent, BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_LEFT);
-        BalExitOnNull(hwndTopLeft, hr, E_INVALIDSTATE, "Failed to get top left list view hWnd.");
-
-        hwndTopRight = ::GetDlgItem(m_pBafTheme->hwndParent, BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_RIGHT);
-        BalExitOnNull(hwndTopRight, hr, E_INVALIDSTATE, "Failed to get top right list view hWnd.");
-
-        hwndBottomLeft = ::GetDlgItem(m_pBafTheme->hwndParent, BAFTHMUTILTESTING_CONTROL_LISTVIEW_BOTTOM_LEFT);
-        BalExitOnNull(hwndBottomLeft, hr, E_INVALIDSTATE, "Failed to get bottom left list view hWnd.");
-
-        hwndBottomRight = ::GetDlgItem(m_pBafTheme->hwndParent, BAFTHMUTILTESTING_CONTROL_LISTVIEW_BOTTOM_RIGHT);
-        BalExitOnNull(hwndBottomRight, hr, E_INVALIDSTATE, "Failed to get bottom right list view hWnd.");
 
         lvgroup.cbSize = sizeof(LVGROUP);
         lvgroup.mask = LVGF_GROUPID | LVGF_TITLEIMAGE | LVGF_DESCRIPTIONTOP | LVGF_HEADER;
@@ -295,10 +272,7 @@ private:
             hr = StrAllocFormatted(&lvgroup.pszHeader, L"Header_%d", i);
             BalExitOnFailure(hr, "Failed to alloc list view group header.");
 
-            ListView_InsertGroup(hwndTopLeft, -1, &lvgroup);
-            ListView_InsertGroup(hwndTopRight, -1, &lvgroup);
-            ListView_InsertGroup(hwndBottomLeft, -1, &lvgroup);
-            ListView_InsertGroup(hwndBottomRight, -1, &lvgroup);
+            ListView_InsertGroup(hWndListView, -1, &lvgroup);
 
             lvitem.mask = LVIF_COLUMNS | LVIF_GROUPID | LVIF_IMAGE | LVIF_TEXT;
             lvitem.iItem = i;
@@ -312,10 +286,7 @@ private:
             lvitem.cColumns = countof(puColumns);
             lvitem.puColumns = puColumns;
 
-            ListView_InsertItem(hwndTopLeft, &lvitem);
-            ListView_InsertItem(hwndTopRight, &lvitem);
-            ListView_InsertItem(hwndBottomLeft, &lvitem);
-            ListView_InsertItem(hwndBottomRight, &lvitem);
+            ListView_InsertItem(hWndListView, &lvitem);
 
             for (int j = 0; j < 3; ++j)
             {
@@ -325,23 +296,16 @@ private:
                 hr = StrAllocFormatted(&lvitem.pszText, L"%d_%d", j, i);
                 BalExitOnFailure(hr, "Failed to alloc list view subitem text.");
 
-                ListView_InsertItem(hwndTopLeft, &lvitem);
-                ListView_InsertItem(hwndTopRight, &lvitem);
-                ListView_InsertItem(hwndBottomLeft, &lvitem);
-                ListView_InsertItem(hwndBottomRight, &lvitem);
+                ListView_InsertItem(hWndListView, &lvitem);
             }
         }
-
-        ListView_EnableGroupView(hwndTopRight, TRUE);
-
-        ::SetTimer(hWnd, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE, 500, NULL);
 
     LExit:
         ReleaseStr(lvgroup.pszDescriptionTop);
         ReleaseStr(lvgroup.pszHeader);
         ReleaseStr(lvitem.pszText);
 
-        return SUCCEEDED(hr);
+        return hr;
     }
 
     BOOL OnThemeLoadingControl(
@@ -349,17 +313,60 @@ private:
         __in THEME_LOADINGCONTROL_RESULTS* pResults
         )
     {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+        
         for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
             {
+                fProcessed = TRUE;
                 pResults->wId = vrgInitControls[iAssignControl].wId;
                 break;
             }
         }
 
-        pResults->hr = S_OK;
-        return TRUE;
+        pResults->hr = hr;
+        return fProcessed || FAILED(hr);
+    }
+
+    BOOL OnThemeLoadedControl(
+        __in HWND hWndParent,
+        __in const THEME_LOADEDCONTROL_ARGS* pArgs,
+        __in THEME_LOADEDCONTROL_RESULTS* pResults
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+
+        switch (pArgs->pThemeControl->wId)
+        {
+        case BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_LEFT:
+        case BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_RIGHT:
+        case BAFTHMUTILTESTING_CONTROL_LISTVIEW_BOTTOM_LEFT:
+        case BAFTHMUTILTESTING_CONTROL_LISTVIEW_BOTTOM_RIGHT:
+            fProcessed = TRUE;
+
+            hr = OnCreatedListView(pArgs->pThemeControl->hWnd);
+            ExitOnFailure(hr, "Failed to populate list view.");
+
+            if (BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_RIGHT == pArgs->pThemeControl->wId)
+            {
+                ListView_EnableGroupView(pArgs->pThemeControl->hWnd, TRUE);
+            }
+
+            break;
+            
+        case BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_STANDARD:
+            fProcessed = TRUE;
+
+            ::SetTimer(hWndParent, BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_IMAGE, 500, NULL);
+            break;
+        }
+
+    LExit:
+        pResults->hr = hr;
+        return fProcessed || FAILED(hr);
     }
 
     void UpdateProgressBarProgress()

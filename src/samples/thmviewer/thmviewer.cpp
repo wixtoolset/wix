@@ -353,16 +353,7 @@ static LRESULT CALLBACK MainWndProc(
     case WM_NCDESTROY:
         DecrementHandleTheme(pHandleTheme);
         ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
-        break;
-
-    case WM_CREATE:
-        {
-            HRESULT hr = ThemeLoadControls(vpTheme);
-            if (FAILED(hr))
-            {
-                return -1;
-            }
-        }
+        ::PostQuitMessage(0);
         break;
 
     case WM_THMVWR_THEME_LOAD_BEGIN:
@@ -376,10 +367,6 @@ static LRESULT CALLBACK MainWndProc(
     case WM_THMVWR_NEW_THEME:
         OnNewTheme(vpTheme, hWnd, reinterpret_cast<HANDLE_THEME*>(lParam));
         return 0;
-
-    case WM_DESTROY:
-        ::PostQuitMessage(0);
-        break;
 
     case WM_THMUTIL_LOADING_CONTROL:
         return OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));

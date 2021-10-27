@@ -61,4 +61,13 @@ DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49
         __inout BOOL* pfProcessed,
         __inout LRESULT* plResult
         ) = 0;
+
+    // OnThemeControlLoaded - Called after a control was created for the theme.
+    //
+    STDMETHOD(OnThemeControlLoaded)(
+        __in LPCWSTR wzName,
+        __in WORD wId,
+        __in HWND hWnd,
+        __inout BOOL* pfProcessed
+        ) = 0;
 };
