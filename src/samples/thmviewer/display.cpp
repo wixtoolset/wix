@@ -329,7 +329,7 @@ static BOOL DisplayOnCreate(
 {
     HRESULT hr = S_OK;
 
-    hr = ThemeLoadControls(pTheme, NULL, 0);
+    hr = ThemeLoadControls(pTheme);
     ExitOnFailure(hr, "Failed to load theme controls");
 
     // Pre-populate some control types with data.

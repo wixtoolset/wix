@@ -6,6 +6,11 @@
 
 static const LPCWSTR BAFTHMUTILTESTING_WINDOW_CLASS = L"BafThmUtilTesting";
 
+enum BAF_CONTROL
+{
+    BAF_CONTROL_INSTALL_TEST_BUTTON = BAFUNCTIONS_FIRST_ASSIGN_CONTROL_ID,
+};
+
 enum BAFTHMUTILTESTING_CONTROL
 {
     BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_LEFT = THEME_FIRST_ASSIGN_CONTROL_ID,
@@ -59,24 +64,41 @@ public: // IBAFunctions
         __inout LRESULT* plRes
         )
     {
-        HRESULT hr = S_OK;
-
-        __super::WndProc(pTheme, hWnd, uMsg, wParam, lParam, plRes);
-
-        // Show our window when any button is clicked.
         switch (uMsg)
         {
         case WM_COMMAND:
             switch (HIWORD(wParam))
             {
             case BN_CLICKED:
-                OnShowTheme();
+                switch (LOWORD(wParam))
+                {
+                case BAF_CONTROL_INSTALL_TEST_BUTTON:
+                    OnShowTheme();
+                    *plRes = 0;
+                    return S_OK;
+                }
+
                 break;
             }
             break;
         }
 
-        return hr;
+        return __super::WndProc(pTheme, hWnd, uMsg, wParam, lParam, plRes);
+    }
+
+    virtual STDMETHODIMP OnThemeControlLoading(
+        __in LPCWSTR wzName,
+        __inout BOOL* pfProcessed,
+        __inout WORD* pwId
+        )
+    {
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzName, -1, L"InstallTestButton", -1))
+        {
+            *pfProcessed = TRUE;
+            *pwId = BAF_CONTROL_INSTALL_TEST_BUTTON;
+        }
+
+        return S_OK;
     }
 
 private:
@@ -229,6 +251,9 @@ private:
             }
             break;
 
+        case WM_THMUTIL_LOADING_CONTROL:
+            return pBaf->OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
+
         case WM_TIMER:
             if (!lParam && pBaf)
             {
@@ -255,7 +280,7 @@ private:
         HWND hwndBottomLeft = NULL;
         HWND hwndBottomRight = NULL;
 
-        hr = ThemeLoadControls(m_pBafTheme, vrgInitControls, countof(vrgInitControls));
+        hr = ThemeLoadControls(m_pBafTheme);
         BalExitOnFailure(hr, "Failed to load theme controls.");
 
         hwndTopLeft = ::GetDlgItem(m_pBafTheme->hwndParent, BAFTHMUTILTESTING_CONTROL_LISTVIEW_TOP_LEFT);
@@ -331,6 +356,24 @@ private:
         ReleaseStr(lvitem.pszText);
 
         return SUCCEEDED(hr);
+    }
+
+    BOOL OnThemeLoadingControl(
+        __in const THEME_LOADINGCONTROL_ARGS* pArgs,
+        __in THEME_LOADINGCONTROL_RESULTS* pResults
+        )
+    {
+        for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
+        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
+            {
+                pResults->wId = vrgInitControls[iAssignControl].wId;
+                break;
+            }
+        }
+
+        pResults->hr = S_OK;
+        return TRUE;
     }
 
     void UpdateProgressBarProgress()

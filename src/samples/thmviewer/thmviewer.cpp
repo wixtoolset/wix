@@ -14,10 +14,6 @@ enum THMVWR_CONTROL
     THMVWR_CONTROL_TREE = THEME_FIRST_ASSIGN_CONTROL_ID,
 };
 
-static THEME_ASSIGN_CONTROL_ID vrgInitControls[] = {
-    { THMVWR_CONTROL_TREE, L"Tree" },
-};
-
 // Internal functions
 
 static HRESULT ProcessCommandLine(
@@ -51,6 +47,10 @@ static void OnNewTheme(
     __in THEME* pTheme,
     __in HWND hWnd,
     __in HANDLE_THEME* pHandle
+    );
+static BOOL OnThemeLoadingControl(
+    __in const THEME_LOADINGCONTROL_ARGS* pArgs,
+    __in THEME_LOADINGCONTROL_RESULTS* pResults
     );
 static void CALLBACK ThmviewerTraceError(
     __in_z LPCSTR szFile,
@@ -353,7 +353,7 @@ static LRESULT CALLBACK MainWndProc(
 
     case WM_CREATE:
         {
-            HRESULT hr = ThemeLoadControls(vpTheme, vrgInitControls, countof(vrgInitControls));
+            HRESULT hr = ThemeLoadControls(vpTheme);
             if (FAILED(hr))
             {
                 return -1;
@@ -400,6 +400,9 @@ static LRESULT CALLBACK MainWndProc(
         }
         }
         break;
+
+    case WM_THMUTIL_LOADING_CONTROL:
+        return OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
     }
 
     return ThemeDefWindowProc(vpTheme, hWnd, uMsg, wParam, lParam);
@@ -540,4 +543,18 @@ static void OnNewTheme(
     {
         ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_SELECTITEM, TVGN_CARET, reinterpret_cast<LPARAM>(htiSelected));
     }
+}
+
+static BOOL OnThemeLoadingControl(
+    __in const THEME_LOADINGCONTROL_ARGS* pArgs,
+    __in THEME_LOADINGCONTROL_RESULTS* pResults
+    )
+{
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, L"Tree", -1))
+    {
+        pResults->wId = THMVWR_CONTROL_TREE;
+    }
+
+    pResults->hr = S_OK;
+    return TRUE;
 }

@@ -39,6 +39,7 @@
 #define LWS_NOPREFIX        0x0004
 #endif
 
+const WORD THEME_FIRST_AUTO_ASSIGN_CONTROL_ID = 100;
 const DWORD THEME_INVALID_ID = 0xFFFFFFFF;
 const COLORREF THEME_INVISIBLE_COLORREF = 0xFFFFFFFF;
 const DWORD GROW_FONT_INSTANCES = 3;
@@ -272,11 +273,14 @@ static HRESULT FindImageList(
     __in_z LPCWSTR wzImageListName,
     __out HIMAGELIST *phImageList
     );
+static HRESULT OnLoadingControl(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pControl,
+    __inout WORD* pwId
+    );
 static HRESULT LoadControls(
     __in THEME* pTheme,
-    __in_opt THEME_CONTROL* pParentControl,
-    __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
-    __in DWORD cAssignControlIds
+    __in_opt THEME_CONTROL* pParentControl
     );
 static HRESULT ShowControl(
     __in THEME* pTheme,
@@ -871,9 +875,7 @@ LExit:
 
 
 DAPI_(HRESULT) ThemeLoadControls(
-    __in THEME* pTheme,
-    __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
-    __in DWORD cAssignControlIds
+    __in THEME* pTheme
     )
 {
     HRESULT hr = S_OK;
@@ -883,7 +885,7 @@ DAPI_(HRESULT) ThemeLoadControls(
         ThmExitOnFailure(hr = E_INVALIDSTATE, "ThemeLoadControls called before theme parent window created.");
     }
 
-    hr = LoadControls(pTheme, NULL, rgAssignControlIds, cAssignControlIds);
+    hr = LoadControls(pTheme, NULL);
 
 LExit:
     return hr;
@@ -1844,8 +1846,6 @@ static HRESULT ParseTheme(
     __out THEME** ppTheme
     )
 {
-    static WORD wThemeId = 0;
-
     HRESULT hr = S_OK;
     THEME* pTheme = NULL;
     IXMLDOMElement *pThemeElement = NULL;
@@ -1858,8 +1858,8 @@ static HRESULT ParseTheme(
     pTheme = static_cast<THEME*>(MemAlloc(sizeof(THEME), TRUE));
     ThmExitOnNull(pTheme, hr, E_OUTOFMEMORY, "Failed to allocate memory for theme.");
 
-    pTheme->wId = ++wThemeId;
     pTheme->nDpi = USER_DEFAULT_SCREEN_DPI;
+    pTheme->wNextControlId = THEME_FIRST_AUTO_ASSIGN_CONTROL_ID;
 
     // Parse the optional background resource image.
     hr = GetAttributeImageFileOrResource(hModule, wzRelativePath, pThemeElement, &pBitmap);
@@ -5248,7 +5248,7 @@ static BOOL OnButtonClicked(
 LExit:
     return fHandled;
 }
-    
+
 static BOOL OnDpiChanged(
     __in THEME* pTheme,
     __in WPARAM wParam,
@@ -5934,11 +5934,38 @@ static LRESULT CALLBACK StaticOwnerDrawWndProc(
     }
 }
 
+static HRESULT OnLoadingControl(
+    __in THEME* pTheme,
+    __in const THEME_CONTROL* pControl,
+    __inout WORD* pwId
+    )
+{
+    HRESULT hr = S_OK;
+    THEME_LOADINGCONTROL_ARGS loadingControlArgs = { };
+    THEME_LOADINGCONTROL_RESULTS loadingControlResults = { };
+
+    loadingControlArgs.cbSize = sizeof(loadingControlArgs);
+    loadingControlArgs.pThemeControl = pControl;
+
+    loadingControlResults.cbSize = sizeof(loadingControlResults);
+    loadingControlResults.hr = E_NOTIMPL;
+    loadingControlResults.wId = *pwId;
+
+    if (::SendMessageW(pTheme->hwndParent, WM_THMUTIL_LOADING_CONTROL, reinterpret_cast<WPARAM>(&loadingControlArgs), reinterpret_cast<LPARAM>(&loadingControlResults)))
+    {
+        hr = loadingControlResults.hr;
+        if (SUCCEEDED(hr))
+        {
+            *pwId = loadingControlResults.wId;
+        }
+    }
+
+    return hr;
+}
+
 static HRESULT LoadControls(
     __in THEME* pTheme,
-    __in_opt THEME_CONTROL* pParentControl,
-    __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
-    __in DWORD cAssignControlIds
+    __in_opt THEME_CONTROL* pParentControl
     )
 {
     HRESULT hr = S_OK;
@@ -6101,16 +6128,16 @@ static HRESULT LoadControls(
         }
         ThmExitOnNull(wzWindowClass, hr, E_INVALIDDATA, "Failed to configure control %u because of unknown type: %u", i, pControl->type);
 
-        // Default control ids to the theme id and its index in the control array, unless there
-        // is a specific id to assign to a named control.
-        WORD wControlId = MAKEWORD(i, pTheme->wId);
-        for (DWORD iAssignControl = 0; pControl->sczName && iAssignControl < cAssignControlIds; ++iAssignControl)
+        // Default control ids to the next id, unless there is a specific id to assign to a control.
+        WORD wControlId = THEME_FIRST_AUTO_ASSIGN_CONTROL_ID;
+        hr = OnLoadingControl(pTheme, pControl, &wControlId);
+        ThmExitOnFailure(hr, "ThmLoadingControl failed.");
+
+        // This range is reserved for thmutil. The process will run out of available window handles before reaching the end of the range.
+        if (THEME_FIRST_AUTO_ASSIGN_CONTROL_ID <= wControlId && THEME_FIRST_ASSIGN_CONTROL_ID > wControlId)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pControl->sczName, -1, rgAssignControlIds[iAssignControl].wzName, -1))
-            {
-                wControlId = rgAssignControlIds[iAssignControl].wId;
-                break;
-            }
+            wControlId = pTheme->wNextControlId;
+            pTheme->wNextControlId += 1;
         }
 
         pControl->wId = wControlId;
@@ -6296,7 +6323,7 @@ static HRESULT LoadControls(
 
         if (pControl->cControls)
         {
-            hr = LoadControls(pTheme, pControl, rgAssignControlIds, cAssignControlIds);
+            hr = LoadControls(pTheme, pControl);
             ThmExitOnFailure(hr, "Failed to load child controls.");
         }
     }

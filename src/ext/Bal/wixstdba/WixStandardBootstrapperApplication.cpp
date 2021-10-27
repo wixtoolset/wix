@@ -77,10 +77,15 @@ static LPCWSTR vrgwzPageNames[] = {
     L"Failure",
 };
 
+// The range [0, 100) is unused to avoid collisions with system ids,
+// the range [100, 0x4000) is unused to avoid collisions with thmutil,
+// the range [0x4000, 0x8000) is unused to avoid collisions with BAFunctions.
+const WORD WIXSTDBA_FIRST_ASSIGN_CONTROL_ID = 0x8000; 
+
 enum WIXSTDBA_CONTROL
 {
     // Welcome page
-    WIXSTDBA_CONTROL_INSTALL_BUTTON = THEME_FIRST_ASSIGN_CONTROL_ID,
+    WIXSTDBA_CONTROL_INSTALL_BUTTON = WIXSTDBA_FIRST_ASSIGN_CONTROL_ID,
     WIXSTDBA_CONTROL_EULA_RICHEDIT,
     WIXSTDBA_CONTROL_EULA_LINK,
     WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX,
@@ -2812,6 +2817,9 @@ private:
             }
             break;
 
+        case WM_THMUTIL_LOADING_CONTROL:
+            return pBA->OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
+
         case WM_QUERYENDSESSION:
             fCancel = true;
             pBA->OnSystemShutdown(static_cast<DWORD>(lParam), &fCancel);
@@ -2935,7 +2943,7 @@ private:
         BA_FUNCTIONS_ONTHEMELOADED_ARGS themeLoadedArgs = { };
         BA_FUNCTIONS_ONTHEMELOADED_RESULTS themeLoadedResults = { };
 
-        hr = ThemeLoadControls(m_pTheme, vrgInitControls, countof(vrgInitControls));
+        hr = ThemeLoadControls(m_pTheme);
         BalExitOnFailure(hr, "Failed to load theme controls.");
 
         C_ASSERT(COUNT_WIXSTDBA_PAGE == countof(vrgwzPageNames));
@@ -3006,6 +3014,57 @@ private:
         ReleaseStr(sczLicenseFormatted);
 
         return SUCCEEDED(hr);
+    }
+
+    BOOL OnThemeLoadingControl(
+        __in const THEME_LOADINGCONTROL_ARGS* pArgs,
+        __in THEME_LOADINGCONTROL_RESULTS* pResults
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+        BA_FUNCTIONS_ONTHEMECONTROLLOADING_ARGS themeControlLoadingArgs = { };
+        BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS themeControlLoadingResults = { };
+
+        for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
+        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
+            {
+                fProcessed = TRUE;
+                pResults->wId = vrgInitControls[iAssignControl].wId;
+                ExitFunction();
+            }
+        }
+
+        if (m_pfnBAFunctionsProc)
+        {
+            themeControlLoadingArgs.cbSize = sizeof(themeControlLoadingArgs);
+            themeControlLoadingArgs.wzName = pArgs->pThemeControl->sczName;
+
+            themeControlLoadingResults.cbSize = sizeof(themeControlLoadingResults);
+            themeControlLoadingResults.wId = pResults->wId;
+
+            hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLLOADING, &themeControlLoadingArgs, &themeControlLoadingResults, m_pvBAFunctionsProcContext);
+
+            if (E_NOTIMPL == hr)
+            {
+                hr = S_OK;
+            }
+            else
+            {
+                BalExitOnFailure(hr, "BAFunctions OnThemeControlLoading failed.");
+
+                if (themeControlLoadingResults.fProcessed)
+                {
+                    fProcessed = TRUE;
+                    pResults->wId = themeControlLoadingResults.wId;
+                }
+            }
+        }
+
+    LExit:
+        pResults->hr = hr;
+        return fProcessed || FAILED(hr);
     }
 
 
@@ -3868,7 +3927,7 @@ private:
         BalExitOnNullWithLastError(pfnBAFunctionsCreate, hr, "Failed to get BAFunctionsCreate entry-point from: %ls", sczBafPath);
 
         bafCreateArgs.cbSize = sizeof(bafCreateArgs);
-        bafCreateArgs.qwBAFunctionsAPIVersion = MAKEQWORDVERSION(0, 0, 0, 2); // TODO: need to decide whether to keep this, and if so when to update it.
+        bafCreateArgs.qwBAFunctionsAPIVersion = MAKEQWORDVERSION(2021, 9, 20, 0);
         bafCreateArgs.pBootstrapperCreateArgs = &m_createArgs;
 
         bafCreateResults.cbSize = sizeof(bafCreateResults);

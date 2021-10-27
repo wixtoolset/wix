@@ -31,4 +31,12 @@ DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49
         __inout LPVOID pvResults,
         __in_opt LPVOID pvContext
         ) = 0;
+
+    // OnThemeControlLoading - Called while creating a control for the theme.
+    //
+    STDMETHOD(OnThemeControlLoading)(
+        __in LPCWSTR wzName,
+        __inout BOOL* pfProcessed,
+        __inout WORD* pwId
+        ) = 0;
 };

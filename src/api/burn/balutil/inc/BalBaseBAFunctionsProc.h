@@ -24,6 +24,15 @@ static HRESULT BalBaseBAFunctionsProcWndProc(
     return pBAFunctions->WndProc(pArgs->pTheme, pArgs->hWnd, pArgs->uMsg, pArgs->wParam, pArgs->lParam, &pResults->lres);
 }
 
+static HRESULT BalBaseBAFunctionsProcOnThemeControlLoading(
+    __in IBAFunctions* pBAFunctions,
+    __in BA_FUNCTIONS_ONTHEMECONTROLLOADING_ARGS* pArgs,
+    __inout BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS* pResults
+    )
+{
+    return pBAFunctions->OnThemeControlLoading(pArgs->wzName, &pResults->fProcessed, &pResults->wId);
+}
+
 /*******************************************************************
 BalBaseBAFunctionsProc - requires pvContext to be of type IBAFunctions.
 Provides a default mapping between the message based BAFunctions interface and
@@ -124,6 +133,9 @@ static HRESULT WINAPI BalBaseBAFunctionsProc(
             break;
         case BA_FUNCTIONS_MESSAGE_WNDPROC:
             hr = BalBaseBAFunctionsProcWndProc(pBAFunctions, reinterpret_cast<BA_FUNCTIONS_WNDPROC_ARGS*>(pvArgs), reinterpret_cast<BA_FUNCTIONS_WNDPROC_RESULTS*>(pvResults));
+            break;
+        case BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLLOADING:
+            hr = BalBaseBAFunctionsProcOnThemeControlLoading(pBAFunctions, reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLLOADING_ARGS*>(pvArgs), reinterpret_cast<BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS*>(pvResults));
             break;
         }
     }
