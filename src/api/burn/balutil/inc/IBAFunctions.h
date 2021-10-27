@@ -7,20 +7,18 @@ DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49
     // OnThemeLoaded - Called after the BA finished loading all the controls for the theme.
     //
     STDMETHOD(OnThemeLoaded)(
-        THEME* pTheme,
-        WIX_LOCALIZATION* pWixLoc
+        __in HWND hWnd
         ) = 0;
 
     // WndProc - Called if the BA hasn't handled the message.
-    //           The implementation must either return E_NOTIMPL or call ThemeDefWindowProc for unhandled messages.
     //
     STDMETHOD(WndProc)(
-        __in THEME* pTheme,
         __in HWND hWnd,
         __in UINT uMsg,
         __in WPARAM wParam,
         __in LPARAM lParam,
-        __inout LRESULT* plRes
+        __inout BOOL* pfProcessed,
+        __inout LRESULT* plResult
         ) = 0;
 
     // BAFunctionsProc - The PFN_BA_FUNCTIONS_PROC can call this method to give the BAFunctions raw access to the callback from WixStdBA.

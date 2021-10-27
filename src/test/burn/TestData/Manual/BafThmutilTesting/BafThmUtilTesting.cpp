@@ -100,7 +100,7 @@ private:
         hr = CreateTestingWindow();
         BalExitOnFailure(hr, "Failed to create BafThmUtilTesting window.");
 
-        ::EnableWindow(m_pTheme->hwndParent, FALSE);
+        ::EnableWindow(m_hwndParent, FALSE);
 
         // message pump
         while (0 != (fRet = ::GetMessageW(&msg, NULL, 0, 0)))
@@ -118,7 +118,7 @@ private:
         }
 
     LExit:
-        ::EnableWindow(m_pTheme->hwndParent, TRUE);
+        ::EnableWindow(m_hwndParent, TRUE);
 
         DestroyTestingWindow();
 
@@ -130,7 +130,7 @@ private:
     HRESULT CreateTestingWindow()
     {
         HRESULT hr = S_OK;
-        HICON hIcon = reinterpret_cast<HICON>(m_pTheme->hIcon);
+        HICON hIcon = reinterpret_cast<HICON>(m_pBafTheme->hIcon);
         WNDCLASSW wc = { };
         int x = CW_USEDEFAULT;
         int y = CW_USEDEFAULT;
@@ -151,7 +151,7 @@ private:
         wc.hInstance = m_hModule;
         wc.hIcon = hIcon;
         wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-        wc.hbrBackground = m_pTheme->rgFonts[m_pBafTheme->dwFontId].hBackground;
+        wc.hbrBackground = m_pBafTheme->rgFonts[m_pBafTheme->dwFontId].hBackground;
         wc.lpszMenuName = NULL;
         wc.lpszClassName = BAFTHMUTILTESTING_WINDOW_CLASS;
         if (!::RegisterClassW(&wc))
@@ -168,7 +168,7 @@ private:
             y = ptCursor.y;
         }
 
-        hr = ThemeCreateParentWindow(m_pBafTheme, 0, wc.lpszClassName, m_pBafTheme->sczCaption, m_pBafTheme->dwStyle, x, y, m_pTheme->hwndParent, m_hModule, this, THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES, &m_hWndBaf);
+        hr = ThemeCreateParentWindow(m_pBafTheme, 0, wc.lpszClassName, m_pBafTheme->sczCaption, m_pBafTheme->dwStyle, x, y, m_hwndParent, m_hModule, this, THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES, &m_hWndBaf);
         ExitOnFailure(hr, "Failed to create window.");
 
         hr = S_OK;
@@ -216,7 +216,7 @@ private:
         case WM_CLOSE:
             if (pBaf)
             {
-                ::EnableWindow(pBaf->m_pTheme->hwndParent, TRUE);
+                ::EnableWindow(pBaf->m_hwndParent, TRUE);
             }
 
             break;

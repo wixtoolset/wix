@@ -12,7 +12,7 @@ static HRESULT BalBaseBAFunctionsProcOnThemeLoaded(
     __inout BA_FUNCTIONS_ONTHEMELOADED_RESULTS* /*pResults*/
     )
 {
-    return pBAFunctions->OnThemeLoaded(pArgs->pTheme, pArgs->pWixLoc);
+    return pBAFunctions->OnThemeLoaded(pArgs->hWnd);
 }
 
 static HRESULT BalBaseBAFunctionsProcWndProc(
@@ -21,7 +21,7 @@ static HRESULT BalBaseBAFunctionsProcWndProc(
     __inout BA_FUNCTIONS_WNDPROC_RESULTS* pResults
     )
 {
-    return pBAFunctions->WndProc(pArgs->pTheme, pArgs->hWnd, pArgs->uMsg, pArgs->wParam, pArgs->lParam, &pResults->lres);
+    return pBAFunctions->WndProc(pArgs->hWnd, pArgs->uMsg, pArgs->wParam, pArgs->lParam, &pResults->fProcessed, &pResults->lResult);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnThemeControlLoading(
