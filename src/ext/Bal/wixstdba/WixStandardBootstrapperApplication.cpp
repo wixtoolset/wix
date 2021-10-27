@@ -2647,31 +2647,25 @@ private:
     HRESULT CreateMainWindow()
     {
         HRESULT hr = S_OK;
-        HICON hIcon = reinterpret_cast<HICON>(m_pTheme->hIcon);
         WNDCLASSW wc = { };
         DWORD dwWindowStyle = 0;
         int x = CW_USEDEFAULT;
         int y = CW_USEDEFAULT;
         POINT ptCursor = { };
 
+        ThemeInitializeWindowClass(m_pTheme, &wc, CWixStandardBootstrapperApplication::WndProc, m_hModule, WIXSTDBA_WINDOW_CLASS);
+
         // If the theme did not provide an icon, try using the icon from the bundle engine.
-        if (!hIcon)
+        if (!wc.hIcon)
         {
             HMODULE hBootstrapperEngine = ::GetModuleHandleW(NULL);
             if (hBootstrapperEngine)
             {
-                hIcon = ::LoadIconW(hBootstrapperEngine, MAKEINTRESOURCEW(1));
+                wc.hIcon = ::LoadIconW(hBootstrapperEngine, MAKEINTRESOURCEW(1));
             }
         }
 
         // Register the window class and create the window.
-        wc.lpfnWndProc = CWixStandardBootstrapperApplication::WndProc;
-        wc.hInstance = m_hModule;
-        wc.hIcon = hIcon;
-        wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-        wc.hbrBackground = m_pTheme->rgFonts[m_pTheme->dwFontId].hBackground;
-        wc.lpszMenuName = NULL;
-        wc.lpszClassName = WIXSTDBA_WINDOW_CLASS;
         if (!::RegisterClassW(&wc))
         {
             ExitWithLastError(hr, "Failed to register window.");

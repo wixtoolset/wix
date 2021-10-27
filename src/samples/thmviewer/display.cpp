@@ -78,11 +78,7 @@ static DWORD WINAPI DisplayThreadProc(
 
     HANDLE_THEME* pCurrentHandle = NULL;
     ATOM atomWc = 0;
-    WNDCLASSW wc = { }; // the following are constant for the display window class.
-    wc.lpfnWndProc = DisplayWndProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = THMVWR_WINDOW_CLASS_DISPLAY;
-
+    WNDCLASSW wc = { };
     HWND hWnd = NULL;
     RECT rc = { };
     int x = CW_USEDEFAULT;
@@ -170,12 +166,8 @@ static DWORD WINAPI DisplayThreadProc(
                     pCurrentHandle = reinterpret_cast<HANDLE_THEME*>(msg.lParam);
                     if (pCurrentHandle)
                     {
-                        wc.hIcon = reinterpret_cast<HICON>(pCurrentHandle->pTheme->hIcon);
-                        wc.hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-                        if (0 < pCurrentHandle->pTheme->cFonts)
-                        {
-                            wc.hbrBackground = pCurrentHandle->pTheme->rgFonts[pCurrentHandle->pTheme->dwFontId].hBackground;
-                        }
+                        ThemeInitializeWindowClass(pCurrentHandle->pTheme, &wc, DisplayWndProc, hInstance, THMVWR_WINDOW_CLASS_DISPLAY);
+
                         atomWc = ::RegisterClassW(&wc);
                         if (!atomWc)
                         {
