@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
-    <BA>hyperlinkLicense</BA>
+    <BA>customHyperlinkLicense</BA>
     <UpgradeCode>{98ACBCF6-B54A-46AF-8990-DFB8795B965B}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

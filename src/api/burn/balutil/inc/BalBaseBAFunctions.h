@@ -841,6 +841,15 @@ public: // IBAFunctions
         return E_NOTIMPL;
     }
 
+    virtual STDMETHODIMP OnThemeControlLoading(
+        __in LPCWSTR /*wzName*/,
+        __inout BOOL* /*pfProcessed*/,
+        __inout WORD* /*pwId*/
+        )
+    {
+        return S_OK;
+    }
+
 protected:
     CBalBaseBAFunctions(
         __in HMODULE hModule,

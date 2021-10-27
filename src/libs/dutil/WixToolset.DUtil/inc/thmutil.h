@@ -95,6 +95,15 @@ typedef enum THEME_WINDOW_INITIAL_POSITION
     THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES,
 } THEME_WINDOW_INITIAL_POSITION;
 
+// These messages are sent by thmutil to the parent window created in ThemeCreateParentWindow.
+// thmutil reserves the last values of WM_USER's range.
+typedef enum _WM_THMUTIL
+{
+    // Sent while creating a control.
+    // wparam is THEME_LOADINGCONTROL_ARGS* and lparam is THEME_LOADINGCONTROL_RESULTS*.
+    // Return code is TRUE if it was processed.
+    WM_THMUTIL_LOADING_CONTROL = WM_APP - 1,
+} WM_THMUTIL;
 
 struct THEME_COLUMN
 {
@@ -171,7 +180,7 @@ struct THEME_ASSIGN_CONTROL_ID
     LPCWSTR wzName; // name of control to match
 };
 
-const DWORD THEME_FIRST_ASSIGN_CONTROL_ID = 1024; // Recommended first control id to be assigned.
+const WORD THEME_FIRST_ASSIGN_CONTROL_ID = 0x4000; // Recommended first control id to be assigned.
 
 struct THEME_CONTROL
 {
@@ -325,7 +334,7 @@ struct THEME_FONT
 
 struct THEME
 {
-    WORD wId;
+    WORD wNextControlId;
 
     BOOL fAutoResize;
     BOOL fForceResize;
@@ -387,6 +396,24 @@ struct THEME
 
     LPVOID pvVariableContext;
 };
+
+typedef struct _THEME_LOADINGCONTROL_ARGS
+{
+    DWORD cbSize;
+    const THEME_CONTROL* pThemeControl;
+} THEME_LOADINGCONTROL_ARGS;
+
+typedef struct _THEME_LOADINGCONTROL_RESULTS
+{
+    DWORD cbSize;
+    HRESULT hr;
+
+    // Used to apply a specific id to the control (usually used for WM_COMMAND).
+    // If assigning an id, it is recommended to start with THEME_FIRST_ASSIGN_CONTROL_ID to avoid collisions with well known ids such as IDOK and IDCANCEL.
+    // The values [100, THEME_FIRST_ASSIGN_CONTROL_ID) are reserved for thmutil.
+    // Due to this value being packed into 16 bits for many system window messages, this is restricted to a WORD.
+    WORD wId;
+} THEME_LOADINGCONTROL_RESULTS;
 
 
 /********************************************************************
@@ -472,9 +499,7 @@ HRESULT DAPI ThemeCreateParentWindow(
 
 *******************************************************************/
 HRESULT DAPI ThemeLoadControls(
-    __in THEME* pTheme,
-    __in_ecount_opt(cAssignControlIds) const THEME_ASSIGN_CONTROL_ID* rgAssignControlIds,
-    __in DWORD cAssignControlIds
+    __in THEME* pTheme
     );
 
 /********************************************************************
