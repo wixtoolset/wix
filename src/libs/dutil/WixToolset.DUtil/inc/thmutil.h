@@ -6,6 +6,10 @@
 extern "C" {
 #endif
 
+// forward declare
+
+typedef struct _THEME THEME;
+
 #define ReleaseTheme(p) if (p) { ThemeFree(p); p = NULL; }
 
 typedef HRESULT(CALLBACK *PFNTHM_EVALUATE_VARIABLE_CONDITION)(
@@ -111,6 +115,10 @@ typedef enum _WM_THMUTIL
     // wparam is THEME_CONTROLWMNOTIFY_ARGS* and lparam is THEME_CONTROLWMNOTIFY_RESULTS*.
     // Return code is TRUE to prevent further processing of the message.
     WM_THMUTIL_CONTROL_WM_NOTIFY = WM_APP - 3,
+    // Sent after created a control.
+    // wparam is THEME_LOADEDCONTROL_ARGS* and lparam is THEME_LOADEDCONTROL_RESULTS*.
+    // Return code is TRUE if it was processed.
+    WM_THMUTIL_LOADED_CONTROL = WM_APP - 4,
 } WM_THMUTIL;
 
 struct THEME_COLUMN
@@ -287,6 +295,7 @@ struct THEME_CONTROL
     // state variables that should be ignored
     HWND hWnd;
     DWORD dwData; // type specific data
+    THEME* pTheme;
 };
 
 
@@ -340,7 +349,7 @@ struct THEME_FONT
 };
 
 
-struct THEME
+typedef struct _THEME
 {
     WORD wNextControlId;
 
@@ -403,7 +412,7 @@ struct THEME
     PFNTHM_SET_VARIABLE_STRING pfnSetStringVariable;
 
     LPVOID pvVariableContext;
-};
+} THEME;
 
 typedef struct _THEME_CONTROLWMCOMMAND_ARGS
 {
@@ -430,6 +439,18 @@ typedef struct _THEME_CONTROLWMNOTIFY_RESULTS
     DWORD cbSize;
     LRESULT lResult;
 } THEME_CONTROLWMNOTIFY_RESULTS;
+
+typedef struct _THEME_LOADEDCONTROL_ARGS
+{
+    DWORD cbSize;
+    const THEME_CONTROL* pThemeControl;
+} THEME_LOADEDCONTROL_ARGS;
+
+typedef struct _THEME_LOADEDCONTROL_RESULTS
+{
+    DWORD cbSize;
+    HRESULT hr;
+} THEME_LOADEDCONTROL_RESULTS;
 
 typedef struct _THEME_LOADINGCONTROL_ARGS
 {
@@ -525,24 +546,6 @@ HRESULT DAPI ThemeCreateParentWindow(
     __in_opt LPVOID lpParam,
     __in THEME_WINDOW_INITIAL_POSITION initialPosition,
     __out_opt HWND* phWnd
-    );
-
-/********************************************************************
- ThemeLoadControls - creates the windows for all the theme controls
-                     using the window created in ThemeCreateParentWindow.
-
-*******************************************************************/
-HRESULT DAPI ThemeLoadControls(
-    __in THEME* pTheme
-    );
-
-/********************************************************************
- ThemeUnloadControls - resets all the theme control windows so the theme
-                       controls can be reloaded.
-
-*******************************************************************/
-void DAPI ThemeUnloadControls(
-    __in THEME* pTheme
     );
 
 /********************************************************************

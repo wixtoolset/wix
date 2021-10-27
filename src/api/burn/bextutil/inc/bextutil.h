@@ -11,6 +11,7 @@ extern "C" {
 
 #define BextExitOnFailureSource(d, x, f, ...) if (FAILED(x)) { BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitOnRootFailureSource(d, x, f, ...) if (FAILED(x)) { BextLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BextExitWithRootFailureSource(d, x, e, f, ...) { x = FAILED(e) ? e : E_FAIL; BextLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitOnLastErrorSource(d, x, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; } }
 #define BextExitOnNullSource(d, p, x, e, f, ...) if (NULL == p) { x = e; BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 #define BextExitOnNullWithLastErrorSource(d, p, x, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BextLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
@@ -18,6 +19,7 @@ extern "C" {
 
 #define BextExitOnFailure(x, f, ...) BextExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 #define BextExitOnRootFailure(x, f, ...) BextExitOnRootFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BextExitWithRootFailure(x, e, f, ...) BextExitWithRootFailureSource(DUTIL_SOURCE_DEFAULT, x, e, f, __VA_ARGS__)
 #define BextExitOnLastError(x, f, ...) BextExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 #define BextExitOnNull(p, x, e, f, ...) BextExitOnNullSource(DUTIL_SOURCE_DEFAULT, p, x, e, f, __VA_ARGS__)
 #define BextExitOnNullWithLastError(p, x, f, ...) BextExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, f, __VA_ARGS__)

@@ -21,9 +21,10 @@ static LRESULT CALLBACK DisplayWndProc(
     __in WPARAM wParam,
     __in LPARAM lParam
     );
-static BOOL DisplayOnCreate(
+static BOOL DisplayOnThmLoadedControl(
     __in THEME* pTheme,
-    __in HWND hWnd
+    __in const THEME_LOADEDCONTROL_ARGS* args,
+    __in THEME_LOADEDCONTROL_RESULTS* results
     );
 
 
@@ -270,13 +271,6 @@ static LRESULT CALLBACK DisplayWndProc(
         }
         break;
 
-    case WM_CREATE:
-        if (!DisplayOnCreate(pHandleTheme->pTheme, hWnd))
-        {
-            return -1;
-        }
-        break;
-
     case WM_TIMER:
         if (!lParam && SUCCEEDED(ThemeSetProgressControl(pHandleTheme->pTheme, wParam, dwProgress)))
         {
@@ -308,47 +302,45 @@ static LRESULT CALLBACK DisplayWndProc(
         }
         break;
 
-    case WM_DESTROY:
-        ThemeUnloadControls(pHandleTheme->pTheme);
-        ::PostQuitMessage(0);
-        break;
-
     case WM_NCDESTROY:
         DecrementHandleTheme(pHandleTheme);
         ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
+        ::PostQuitMessage(0);
         break;
+
+    case WM_THMUTIL_LOADED_CONTROL:
+        if (pHandleTheme)
+        {
+            return DisplayOnThmLoadedControl(pHandleTheme->pTheme, reinterpret_cast<THEME_LOADEDCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADEDCONTROL_RESULTS*>(lParam));
+        }
     }
 
     return ThemeDefWindowProc(pHandleTheme ? pHandleTheme->pTheme : NULL, hWnd, uMsg, wParam, lParam);
 }
 
-static BOOL DisplayOnCreate(
+static BOOL DisplayOnThmLoadedControl(
     __in THEME* pTheme,
-    __in HWND hWnd
+    __in const THEME_LOADEDCONTROL_ARGS* args,
+    __in THEME_LOADEDCONTROL_RESULTS* results
     )
 {
     HRESULT hr = S_OK;
-
-    hr = ThemeLoadControls(pTheme);
-    ExitOnFailure(hr, "Failed to load theme controls");
+    const THEME_CONTROL* pControl = args->pThemeControl;
 
     // Pre-populate some control types with data.
-    for (DWORD i = 0; i < pTheme->cControls; ++i)
+    if (THEME_CONTROL_TYPE_RICHEDIT == pControl->type)
     {
-        THEME_CONTROL* pControl = pTheme->rgControls + i;
-        if (THEME_CONTROL_TYPE_RICHEDIT == pControl->type)
-        {
-            hr = ThemeLoadRichEditFromResource(pTheme, pControl->wId, MAKEINTRESOURCEA(THMVWR_RES_RICHEDIT_FILE), ::GetModuleHandleW(NULL));
-            ExitOnFailure(hr, "Failed to load richedit text.");
-        }
-        else if (THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
-        {
-            DWORD dwId = ::SetTimer(hWnd, pControl->wId, 500, NULL);
-            dwId = dwId; // prevents warning in "ship" build.
-            Assert(dwId == pControl->wId);
-        }
+        hr = ThemeLoadRichEditFromResource(pTheme, pControl->wId, MAKEINTRESOURCEA(THMVWR_RES_RICHEDIT_FILE), ::GetModuleHandleW(NULL));
+        ExitOnFailure(hr, "Failed to load richedit text.");
+    }
+    else if (THEME_CONTROL_TYPE_PROGRESSBAR == pControl->type)
+    {
+        DWORD dwId = ::SetTimer(pTheme->hwndParent, pControl->wId, 500, NULL);
+        dwId = dwId; // prevents warning in "ship" build.
+        Assert(dwId == pControl->wId);
     }
 
 LExit:
-    return SUCCEEDED(hr);
+    results->hr = hr;
+    return TRUE;
 }

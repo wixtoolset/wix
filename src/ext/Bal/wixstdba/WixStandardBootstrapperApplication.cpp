@@ -2368,6 +2368,11 @@ private:
         hr = ThemeRegisterVariableCallbacks(m_pTheme, EvaluateVariableConditionCallback, FormatVariableStringCallback, GetVariableNumericCallback, SetVariableNumericCallback, GetVariableStringCallback, SetVariableStringCallback, NULL);
         BalExitOnFailure(hr, "Failed to register variable theme callbacks.");
 
+        C_ASSERT(COUNT_WIXSTDBA_PAGE == countof(vrgwzPageNames));
+        C_ASSERT(countof(m_rgdwPageIds) == countof(vrgwzPageNames));
+
+        ThemeGetPageIds(m_pTheme, vrgwzPageNames, m_rgdwPageIds, countof(m_rgdwPageIds));
+
         hr = ThemeLocalize(m_pTheme, m_pWixLoc);
         BalExitOnFailure(hr, "Failed to localize theme: %ls", sczThemePath);
 
@@ -2676,6 +2681,8 @@ private:
         hr = ThemeCreateParentWindow(m_pTheme, 0, wc.lpszClassName, m_pTheme->sczCaption, dwWindowStyle, x, y, HWND_DESKTOP, m_hModule, this, THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES, &m_hWnd);
         ExitOnFailure(hr, "Failed to create window.");
 
+        OnThemeLoaded();
+
         hr = S_OK;
 
     LExit:
@@ -2810,15 +2817,11 @@ private:
             return lres;
             }
 
-        case WM_CREATE:
-            if (!pBA->OnCreate(hWnd))
-            {
-                return -1;
-            }
-            break;
-
         case WM_THMUTIL_LOADING_CONTROL:
             return pBA->OnThemeLoadingControl(reinterpret_cast<THEME_LOADINGCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADINGCONTROL_RESULTS*>(lParam));
+
+        case WM_THMUTIL_LOADED_CONTROL:
+            return pBA->OnThemeLoadedControl(reinterpret_cast<THEME_LOADEDCONTROL_ARGS*>(wParam), reinterpret_cast<THEME_LOADEDCONTROL_RESULTS*>(lParam));
 
         case WM_QUERYENDSESSION:
             fCancel = true;
@@ -2875,73 +2878,13 @@ private:
 
 
     //
-    // OnCreate - finishes loading the theme.
+    // OnThemeLoaded - finishes loading the theme.
     //
-    BOOL OnCreate(
-        __in HWND /*hWnd*/
-        )
+    BOOL OnThemeLoaded()
     {
         HRESULT hr = S_OK;
-        LPWSTR sczLicenseFormatted = NULL;
-        LPWSTR sczLicensePath = NULL;
-        LPWSTR sczLicenseDirectory = NULL;
-        LPWSTR sczLicenseFilename = NULL;
         BA_FUNCTIONS_ONTHEMELOADED_ARGS themeLoadedArgs = { };
         BA_FUNCTIONS_ONTHEMELOADED_RESULTS themeLoadedResults = { };
-
-        hr = ThemeLoadControls(m_pTheme);
-        BalExitOnFailure(hr, "Failed to load theme controls.");
-
-        C_ASSERT(COUNT_WIXSTDBA_PAGE == countof(vrgwzPageNames));
-        C_ASSERT(countof(m_rgdwPageIds) == countof(vrgwzPageNames));
-
-        ThemeGetPageIds(m_pTheme, vrgwzPageNames, m_rgdwPageIds, countof(m_rgdwPageIds));
-
-        // Load the RTF EULA control with text if the control exists.
-        if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_EULA_RICHEDIT))
-        {
-            hr = (m_sczLicenseFile && *m_sczLicenseFile) ? S_OK : E_INVALIDDATA;
-            if (SUCCEEDED(hr))
-            {
-                hr = StrAllocString(&sczLicenseFormatted, m_sczLicenseFile, 0);
-                if (SUCCEEDED(hr))
-                {
-                    hr = LocLocalizeString(m_pWixLoc, &sczLicenseFormatted);
-                    if (SUCCEEDED(hr))
-                    {
-                        // Assume there is no hidden variables to be formatted
-                        // so don't worry about securely freeing it.
-                        hr = BalFormatString(sczLicenseFormatted, &sczLicenseFormatted);
-                        if (SUCCEEDED(hr))
-                        {
-                            hr = PathRelativeToModule(&sczLicensePath, sczLicenseFormatted, m_hModule);
-                            if (SUCCEEDED(hr))
-                            {
-                                hr = PathGetDirectory(sczLicensePath, &sczLicenseDirectory);
-                                if (SUCCEEDED(hr))
-                                {
-                                    hr = StrAllocString(&sczLicenseFilename, PathFile(sczLicenseFormatted), 0);
-                                    if (SUCCEEDED(hr))
-                                    {
-                                        hr = LocProbeForFile(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath);
-                                        if (SUCCEEDED(hr))
-                                        {
-                                            hr = ThemeLoadRichEditFromFile(m_pTheme, WIXSTDBA_CONTROL_EULA_RICHEDIT, sczLicensePath, m_hModule);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (FAILED(hr))
-            {
-                BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Failed to load file into license richedit control from path '%ls' manifest value: %ls", sczLicensePath, m_sczLicenseFile);
-                hr = S_OK;
-            }
-        }
 
         if (m_pfnBAFunctionsProc)
         {
@@ -2954,11 +2897,6 @@ private:
         }
 
     LExit:
-        ReleaseStr(sczLicenseFilename);
-        ReleaseStr(sczLicenseDirectory);
-        ReleaseStr(sczLicensePath);
-        ReleaseStr(sczLicenseFormatted);
-
         return SUCCEEDED(hr);
     }
 
@@ -3011,6 +2949,108 @@ private:
     LExit:
         pResults->hr = hr;
         return fProcessed || FAILED(hr);
+    }
+
+    BOOL OnThemeLoadedControl(
+        __in const THEME_LOADEDCONTROL_ARGS* pArgs,
+        __in THEME_LOADEDCONTROL_RESULTS* pResults
+        )
+    {
+        HRESULT hr = S_OK;
+        BOOL fProcessed = FALSE;
+        BA_FUNCTIONS_ONTHEMECONTROLLOADED_ARGS themeControlLoadedArgs = { };
+        BA_FUNCTIONS_ONTHEMECONTROLLOADED_RESULTS themeControlLoadedResults = { };
+
+        if (WIXSTDBA_CONTROL_EULA_RICHEDIT == pArgs->pThemeControl->wId)
+        {
+            // Best effort to load the RTF EULA control with text.
+            OnLoadedEulaRtfControl(pArgs->pThemeControl);
+            fProcessed = TRUE;
+            ExitFunction();
+        }
+
+        if (m_pfnBAFunctionsProc)
+        {
+            themeControlLoadedArgs.cbSize = sizeof(themeControlLoadedArgs);
+            themeControlLoadedArgs.wzName = pArgs->pThemeControl->sczName;
+            themeControlLoadedArgs.wId = pArgs->pThemeControl->wId;
+            themeControlLoadedArgs.hWnd = pArgs->pThemeControl->hWnd;
+
+            themeControlLoadedResults.cbSize = sizeof(themeControlLoadedResults);
+
+            hr = m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONTHEMECONTROLLOADED, &themeControlLoadedArgs, &themeControlLoadedResults, m_pvBAFunctionsProcContext);
+
+            if (E_NOTIMPL == hr)
+            {
+                hr = S_OK;
+            }
+            else
+            {
+                BalExitOnFailure(hr, "BAFunctions OnThemeControlLoaded failed.");
+
+                if (themeControlLoadedResults.fProcessed)
+                {
+                    fProcessed = TRUE;
+                }
+            }
+        }
+
+    LExit:
+        pResults->hr = hr;
+        return fProcessed || FAILED(hr);
+    }
+
+    HRESULT OnLoadedEulaRtfControl(
+        const THEME_CONTROL* pThemeControl
+        )
+    {
+        HRESULT hr = S_OK;
+        LPWSTR sczLicenseFormatted = NULL;
+        LPWSTR sczLicensePath = NULL;
+        LPWSTR sczLicenseDirectory = NULL;
+        LPWSTR sczLicenseFilename = NULL;
+
+        if (!m_sczLicenseFile || !*m_sczLicenseFile)
+        {
+            ExitWithRootFailure(hr, E_INVALIDDATA, "No license file in manifest.");
+        }
+
+        hr = StrAllocString(&sczLicenseFormatted, m_sczLicenseFile, 0);
+        ExitOnFailure(hr, "Failed to copy manifest license file.");
+
+        hr = LocLocalizeString(m_pWixLoc, &sczLicenseFormatted);
+        ExitOnFailure(hr, "Failed to localize manifest license file.");
+
+        hr = BalFormatString(sczLicenseFormatted, &sczLicenseFormatted);
+        ExitOnFailure(hr, "Failed to expand localized manifest license file.");
+
+        hr = PathRelativeToModule(&sczLicensePath, sczLicenseFormatted, m_hModule);
+        ExitOnFailure(hr, "Failed to get relative path for license file.");
+
+        hr = PathGetDirectory(sczLicensePath, &sczLicenseDirectory);
+        ExitOnFailure(hr, "Failed to get license file directory.");
+
+        hr = StrAllocString(&sczLicenseFilename, PathFile(sczLicenseFormatted), 0);
+        ExitOnFailure(hr, "Failed to copy license file name.");
+
+        hr = LocProbeForFile(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath);
+        ExitOnFailure(hr, "Failed to probe for localized license file.");
+
+        hr = ThemeLoadRichEditFromFile(m_pTheme, pThemeControl->wId, sczLicensePath, m_hModule);
+        ExitOnFailure(hr, "Failed to load license file into richedit control.");
+
+    LExit:
+        if (FAILED(hr))
+        {
+            BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Failed to load file into license richedit control from path '%ls' manifest value: %ls", sczLicensePath, m_sczLicenseFile);
+        }
+
+        ReleaseStr(sczLicenseFilename);
+        ReleaseStr(sczLicenseDirectory);
+        ReleaseStr(sczLicensePath);
+        ReleaseStr(sczLicenseFormatted);
+
+        return hr;
     }
 
 

@@ -874,6 +874,16 @@ public: // IBAFunctions
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnThemeControlLoaded(
+        __in LPCWSTR /*wzName*/,
+        __in WORD /*wId*/,
+        __in HWND /*hWnd*/,
+        __inout BOOL* /*pfProcessed*/
+        )
+    {
+        return S_OK;
+    }
+
 protected:
     CBalBaseBAFunctions(
         __in HMODULE hModule,

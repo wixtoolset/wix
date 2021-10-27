@@ -205,6 +205,7 @@ static HRESULT ParseControl(
     __in_opt THEME_PAGE* pPage
     );
 static void InitializeThemeControl(
+    THEME* pTheme,
     THEME_CONTROL* pControl
     );
 static HRESULT ParseActions(
@@ -272,6 +273,12 @@ static HRESULT FindImageList(
     __in THEME* pTheme,
     __in_z LPCWSTR wzImageListName,
     __out HIMAGELIST *phImageList
+    );
+static HRESULT LoadThemeControls(
+    __in THEME* pTheme
+    );
+static void UnloadThemeControls(
+    __in THEME* pTheme
     );
 static HRESULT OnLoadingControl(
     __in THEME* pTheme,
@@ -451,6 +458,10 @@ static BOOL OnNotifyEnMsgFilter(
     __in THEME* pTheme,
     __in const THEME_CONTROL* pThemeControl,
     __in MSGFILTER* msgFilter
+    );
+static BOOL OnPanelCreate(
+    __in THEME_CONTROL* pControl,
+    __in HWND hWnd
     );
 static BOOL OnWmCommand(
     __in THEME* pTheme,
@@ -888,35 +899,6 @@ LExit:
     return hr;
 }
 
-
-DAPI_(HRESULT) ThemeLoadControls(
-    __in THEME* pTheme
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (!pTheme->hwndParent)
-    {
-        ThmExitOnFailure(hr = E_INVALIDSTATE, "ThemeLoadControls called before theme parent window created.");
-    }
-
-    hr = LoadControls(pTheme, NULL);
-
-LExit:
-    return hr;
-}
-
-
-DAPI_(void) ThemeUnloadControls(
-    __in THEME* pTheme
-    )
-{
-    UnloadControls(pTheme->cControls, pTheme->rgControls);
-
-    pTheme->hwndHover = NULL;
-    pTheme->hwndParent = NULL;
-}
-
 DAPI_(HRESULT) ThemeLocalize(
     __in THEME *pTheme,
     __in const WIX_LOCALIZATION *pWixLoc
@@ -1087,6 +1069,17 @@ extern "C" LRESULT CALLBACK ThemeDefWindowProc(
             {
                 OnNcCreate(pTheme, hWnd, lParam);
             }
+            break;
+
+        case WM_CREATE:
+            if (FAILED(LoadThemeControls(pTheme)))
+            {
+                return -1;
+            }
+            break;
+
+        case WM_DESTROY:
+            UnloadThemeControls(pTheme);
             break;
 
         case WM_NCHITTEST:
@@ -3406,7 +3399,7 @@ static HRESULT ParseControl(
     BOOL fAnyTextChildren = FALSE;
     BOOL fAnyNoteChildren = FALSE;
 
-    InitializeThemeControl(pControl);
+    InitializeThemeControl(pTheme, pControl);
 
     hr = XmlGetAttributeEx(pixn, L"Name", &pControl->sczName);
     ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control Name attribute.");
@@ -3715,6 +3708,7 @@ LExit:
 }
 
 static void InitializeThemeControl(
+    THEME* pTheme,
     THEME_CONTROL* pControl
     )
 {
@@ -3722,6 +3716,7 @@ static void InitializeThemeControl(
     pControl->dwFontId = THEME_INVALID_ID;
     pControl->dwFontSelectedId = THEME_INVALID_ID;
     pControl->uStringId = UINT_MAX;
+    pControl->pTheme = pTheme;
 }
 
 
@@ -3854,7 +3849,7 @@ static HRESULT ParseBillboardPanels(
         pControl = pParentControl->rgControls + pParentControl->cControls;
         pParentControl->cControls += 1;
         pControl->type = THEME_CONTROL_TYPE_PANEL;
-        InitializeThemeControl(pControl);
+        InitializeThemeControl(pTheme, pControl);
 
         if (pPage)
         {
@@ -5400,6 +5395,24 @@ static BOOL OnNotifyEnMsgFilter(
     return fProcessed;
 }
 
+static BOOL OnPanelCreate(
+    __in THEME_CONTROL* pControl,
+    __in HWND hWnd
+    )
+{
+    HRESULT hr = S_OK;
+
+    ThmExitOnNull(pControl, hr, E_INVALIDSTATE, "Null control for OnPanelCreate");
+
+    pControl->hWnd = hWnd;
+
+    hr = LoadControls(pControl->pTheme, pControl);
+    ThmExitOnFailure(hr, "Failed to load panel controls.");
+
+LExit:
+    return SUCCEEDED(hr);
+}
+
 static BOOL OnWmCommand(
     __in THEME* pTheme,
     __in WPARAM wParam,
@@ -6017,17 +6030,24 @@ static LRESULT CALLBACK PanelWndProc(
     )
 {
     LRESULT lres = 0;
-    THEME* pTheme = reinterpret_cast<THEME*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+    THEME_CONTROL* pControl = reinterpret_cast<THEME_CONTROL*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
     switch (uMsg)
     {
     case WM_NCCREATE:
     {
         LPCREATESTRUCTW lpcs = reinterpret_cast<LPCREATESTRUCTW>(lParam);
-        pTheme = reinterpret_cast<THEME*>(lpcs->lpCreateParams);
-        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pTheme));
+        pControl = reinterpret_cast<THEME_CONTROL*>(lpcs->lpCreateParams);
+        ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pControl));
+        break;
     }
-    break;
+
+    case WM_CREATE:
+        if (!OnPanelCreate(pControl, hWnd))
+        {
+            return -1;
+        }
+        break;
 
     case WM_NCDESTROY:
         lres = ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -6039,7 +6059,7 @@ static LRESULT CALLBACK PanelWndProc(
         break;
     }
 
-    return ControlGroupDefWindowProc(pTheme, hWnd, uMsg, wParam, lParam);
+    return ControlGroupDefWindowProc(pControl ? pControl->pTheme : NULL, hWnd, uMsg, wParam, lParam);
 }
 
 static LRESULT CALLBACK StaticOwnerDrawWndProc(
@@ -6087,6 +6107,30 @@ static HRESULT OnLoadingControl(
     return hr;
 }
 
+static HRESULT LoadThemeControls(
+    __in THEME* pTheme
+    )
+{
+    HRESULT hr = S_OK;
+
+    ThmExitOnNull(pTheme->hwndParent, hr, E_INVALIDSTATE, "LoadThemeControls called before theme parent window created.");
+
+    hr = LoadControls(pTheme, NULL);
+
+LExit:
+    return hr;
+}
+
+static void UnloadThemeControls(
+    __in THEME* pTheme
+    )
+{
+    UnloadControls(pTheme->cControls, pTheme->rgControls);
+
+    pTheme->hwndHover = NULL;
+    pTheme->hwndParent = NULL;
+}
+
 static HRESULT LoadControls(
     __in THEME* pTheme,
     __in_opt THEME_CONTROL* pParentControl
@@ -6103,9 +6147,14 @@ static HRESULT LoadControls(
     int h = 0;
     int x = 0;
     int y = 0;
+    THEME_LOADEDCONTROL_ARGS loadedControlArgs = { };
+    THEME_LOADEDCONTROL_RESULTS loadedControlResults = { };
 
     GetControls(pTheme, pParentControl, cControls, rgControls);
     ::GetClientRect(hwndParent, &rcParent);
+
+    loadedControlArgs.cbSize = sizeof(loadedControlArgs);
+    loadedControlResults.cbSize = sizeof(loadedControlResults);
 
     for (DWORD i = 0; i < cControls; ++i)
     {
@@ -6124,8 +6173,7 @@ static HRESULT LoadControls(
 
         switch (pControl->type)
         {
-        case THEME_CONTROL_TYPE_BILLBOARD: 
-            __fallthrough;
+        case THEME_CONTROL_TYPE_BILLBOARD: __fallthrough;
         case THEME_CONTROL_TYPE_PANEL:
             wzWindowClass = vsczPanelClass;
             dwWindowExBits |= WS_EX_CONTROLPARENT;
@@ -6309,7 +6357,7 @@ static HRESULT LoadControls(
             pControl->dwStyle &= ~WS_VISIBLE;
         }
 
-        pControl->hWnd = ::CreateWindowExW(dwWindowExBits, wzWindowClass, pControl->sczText, pControl->dwStyle | dwWindowBits, x, y, w, h, hwndParent, reinterpret_cast<HMENU>(wControlId), NULL, pTheme);
+        pControl->hWnd = ::CreateWindowExW(dwWindowExBits, wzWindowClass, pControl->sczText, pControl->dwStyle | dwWindowBits, x, y, w, h, hwndParent, reinterpret_cast<HMENU>(wControlId), NULL, pControl);
         ThmExitOnNullWithLastError(pControl->hWnd, hr, "Failed to create window.");
 
         if (pControl->sczTooltip)
@@ -6445,10 +6493,15 @@ static HRESULT LoadControls(
             }
         }
 
-        if (pControl->cControls)
+        loadedControlArgs.pThemeControl = pControl;
+        loadedControlResults.hr = E_NOTIMPL;
+        if (::SendMessageW(pTheme->hwndParent, WM_THMUTIL_LOADED_CONTROL, reinterpret_cast<WPARAM>(&loadedControlArgs), reinterpret_cast<LPARAM>(&loadedControlResults)))
         {
-            hr = LoadControls(pTheme, pControl);
-            ThmExitOnFailure(hr, "Failed to load child controls.");
+            if (E_NOTIMPL != loadedControlResults.hr)
+            {
+                hr = loadedControlResults.hr;
+                ThmExitOnFailure(hr, "ThmLoadedControl failed");
+            }
         }
     }
 
