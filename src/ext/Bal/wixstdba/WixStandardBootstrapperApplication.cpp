@@ -80,7 +80,7 @@ static LPCWSTR vrgwzPageNames[] = {
 // The range [0, 100) is unused to avoid collisions with system ids,
 // the range [100, 0x4000) is unused to avoid collisions with thmutil,
 // the range [0x4000, 0x8000) is unused to avoid collisions with BAFunctions.
-const WORD WIXSTDBA_FIRST_ASSIGN_CONTROL_ID = 0x8000; 
+const WORD WIXSTDBA_FIRST_ASSIGN_CONTROL_ID = 0x8000;
 
 enum WIXSTDBA_CONTROL
 {
@@ -119,36 +119,8 @@ enum WIXSTDBA_CONTROL
     WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK,
     WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT,
     WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON,
-};
 
-static THEME_ASSIGN_CONTROL_ID vrgInitControls[] = {
-    { WIXSTDBA_CONTROL_INSTALL_BUTTON, L"InstallButton" },
-    { WIXSTDBA_CONTROL_EULA_RICHEDIT, L"EulaRichedit" },
-    { WIXSTDBA_CONTROL_EULA_LINK, L"EulaHyperlink" },
-    { WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX, L"EulaAcceptCheckbox" },
-
-    { WIXSTDBA_CONTROL_REPAIR_BUTTON, L"RepairButton" },
-    { WIXSTDBA_CONTROL_UNINSTALL_BUTTON, L"UninstallButton" },
-
-    { WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT, L"CacheProgressPackageText" },
-    { WIXSTDBA_CONTROL_CACHE_PROGRESS_BAR, L"CacheProgressbar" },
-    { WIXSTDBA_CONTROL_CACHE_PROGRESS_TEXT, L"CacheProgressText" },
-    { WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT, L"ExecuteProgressPackageText" },
-    { WIXSTDBA_CONTROL_EXECUTE_PROGRESS_BAR, L"ExecuteProgressbar" },
-    { WIXSTDBA_CONTROL_EXECUTE_PROGRESS_TEXT, L"ExecuteProgressText" },
-    { WIXSTDBA_CONTROL_EXECUTE_PROGRESS_ACTIONDATA_TEXT, L"ExecuteProgressActionDataText"},
-    { WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, L"OverallProgressPackageText" },
-    { WIXSTDBA_CONTROL_OVERALL_PROGRESS_BAR, L"OverallProgressbar" },
-    { WIXSTDBA_CONTROL_OVERALL_CALCULATED_PROGRESS_BAR, L"OverallCalculatedProgressbar" },
-    { WIXSTDBA_CONTROL_OVERALL_PROGRESS_TEXT, L"OverallProgressText" },
-    { WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON, L"ProgressCancelButton" },
-
-    { WIXSTDBA_CONTROL_LAUNCH_BUTTON, L"LaunchButton" },
-    { WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, L"SuccessRestartButton" },
-
-    { WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK, L"FailureLogFileLink" },
-    { WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT, L"FailureMessageText" },
-    { WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, L"FailureRestartButton" },
+    LAST_WIXSTDBA_CONTROL,
 };
 
 typedef struct _WIXSTDBA_PACKAGE_INFO
@@ -568,7 +540,7 @@ public: // IBootstrapperApplication
 
         wz = sczFormattedString ? sczFormattedString : L"Pausing Windows automatic updates";
 
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+        ThemeSetTextControl(m_pControlOverallProgressPackageText, wz);
 
         ReleaseStr(sczFormattedString);
         return hr;
@@ -594,7 +566,7 @@ public: // IBootstrapperApplication
 
         wz = sczFormattedString ? sczFormattedString : L"Creating system restore point";
 
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+        ThemeSetTextControl(m_pControlOverallProgressPackageText, wz);
 
         ReleaseStr(sczFormattedString);
         return hr;
@@ -614,12 +586,12 @@ public: // IBootstrapperApplication
             HRESULT hr = BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
             LPCWSTR wz = (SUCCEEDED(hr) && pPackage->sczDisplayName) ? pPackage->sczDisplayName : wzPackageId;
 
-            ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT, wz);
+            ThemeSetTextControl(m_pControlCacheProgressPackageText, wz);
 
             // If something started executing, leave it in the overall progress text.
             if (!m_fStartedExecution)
             {
-                ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+                ThemeSetTextControl(m_pControlOverallProgressPackageText, wz);
             }
         }
 
@@ -757,7 +729,7 @@ public: // IBootstrapperApplication
         )
     {
         UpdateCacheProgress(SUCCEEDED(hrStatus) ? 100 : 0);
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT, L"");
+        ThemeSetTextControl(m_pControlCacheProgressPackageText, L"");
         SetState(WIXSTDBA_STATE_CACHED, S_OK); // we always return success here and let OnApplyComplete() deal with the error.
         return __super::OnCacheComplete(hrStatus);
     }
@@ -870,7 +842,7 @@ public: // IBootstrapperApplication
 
         if (INSTALLMESSAGE_ACTIONSTART == messageType)
         {
-            ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_ACTIONDATA_TEXT, wzMessage);
+            ThemeSetTextControl(m_pControlExecuteProgressActionDataText, wzMessage);
         }
 
         return __super::OnExecuteMsiMessage(wzPackageId, messageType, dwUIHint, wzMessage, cData, rgwzData, nRecommendation, pResult);
@@ -890,9 +862,9 @@ public: // IBootstrapperApplication
 #endif
 
         ::StringCchPrintfW(wzProgress, countof(wzProgress), L"%u%%", dwOverallProgressPercentage);
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_TEXT, wzProgress);
+        ThemeSetTextControl(m_pControlOverallProgressText, wzProgress);
 
-        ThemeSetProgressControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_BAR, dwOverallProgressPercentage);
+        ThemeSetProgressControl(m_pControlOverallProgressbar, dwOverallProgressPercentage);
         SetTaskbarButtonProgress(dwOverallProgressPercentage);
 
         return __super::OnProgress(dwProgressPercentage, dwOverallProgressPercentage, pfCancel);
@@ -951,8 +923,8 @@ public: // IBootstrapperApplication
 
             fShowingInternalUiThisPackage = INSTALLUILEVEL_NONE != (INSTALLUILEVEL_NONE & uiLevel);
 
-            ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT, wz);
-            ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
+            ThemeSetTextControl(m_pControlExecuteProgressPackageText, wz);
+            ThemeSetTextControl(m_pControlOverallProgressPackageText, wz);
         }
 
         ::EnterCriticalSection(&m_csShowingInternalUiThisPackage);
@@ -979,12 +951,12 @@ public: // IBootstrapperApplication
 #endif
 
         ::StringCchPrintfW(wzProgress, countof(wzProgress), L"%u%%", dwOverallProgressPercentage);
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_TEXT, wzProgress);
+        ThemeSetTextControl(m_pControlExecuteProgressText, wzProgress);
 
-        ThemeSetProgressControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_BAR, dwOverallProgressPercentage);
+        ThemeSetProgressControl(m_pControlExecuteProgressbar, dwOverallProgressPercentage);
 
         m_dwCalculatedExecuteProgress = dwOverallProgressPercentage * (100 - WIXSTDBA_ACQUIRE_PERCENTAGE) / 100;
-        ThemeSetProgressControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_CALCULATED_PROGRESS_BAR, m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
+        ThemeSetProgressControl(m_pControlOverallCalculatedProgressbar, m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
 
         SetTaskbarButtonProgress(m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
 
@@ -1030,10 +1002,10 @@ public: // IBootstrapperApplication
     {
         HRESULT hr = S_OK;
 
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT, L"");
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_ACTIONDATA_TEXT, L"");
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, L"");
-        ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON, FALSE); // no more cancel.
+        ThemeSetTextControl(m_pControlExecuteProgressPackageText, L"");
+        ThemeSetTextControl(m_pControlExecuteProgressActionDataText, L"");
+        ThemeSetTextControl(m_pControlOverallProgressPackageText, L"");
+        ThemeControlEnable(m_pControlProgressCancelButton, FALSE); // no more cancel.
         m_fShowingInternalUiThisPackage = FALSE;
 
         SetState(WIXSTDBA_STATE_EXECUTED, S_OK); // we always return success here and let OnApplyComplete() deal with the error.
@@ -2912,12 +2884,27 @@ private:
         BA_FUNCTIONS_ONTHEMECONTROLLOADING_ARGS themeControlLoadingArgs = { };
         BA_FUNCTIONS_ONTHEMECONTROLLOADING_RESULTS themeControlLoadingResults = { };
 
-        for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
+        for (DWORD iAssignControl = 0; iAssignControl < countof(m_rgInitControls); ++iAssignControl)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
+            THEME_ASSIGN_CONTROL_ID* pAssignControl = m_rgInitControls + iAssignControl;
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, pAssignControl->wzName, -1))
             {
+                if (!pAssignControl->ppControl)
+                {
+                    BalExitWithRootFailure(hr, E_INVALIDSTATE, "Control '%ls' has no member variable", pAssignControl->wzName);
+                }
+
+                if (*pAssignControl->ppControl)
+                {
+                    BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Duplicate control name: %ls", pAssignControl->wzName);
+                }
+                else
+                {
+                    *pAssignControl->ppControl = pArgs->pThemeControl;
+                }
+
                 fProcessed = TRUE;
-                pResults->wId = vrgInitControls[iAssignControl].wId;
+                pResults->wId = pAssignControl->wId;
                 ExitFunction();
             }
         }
@@ -3038,7 +3025,7 @@ private:
         hr = LocProbeForFile(sczLicenseDirectory, sczLicenseFilename, m_sczLanguage, &sczLicensePath);
         ExitOnFailure(hr, "Failed to probe for localized license file.");
 
-        hr = ThemeLoadRichEditFromFile(m_pTheme, pThemeControl->wId, sczLicensePath, m_hModule);
+        hr = ThemeLoadRichEditFromFile(pThemeControl, sczLicensePath, m_hModule);
         ExitOnFailure(hr, "Failed to load license file into richedit control.");
 
     LExit:
@@ -3179,7 +3166,7 @@ private:
         hr = m_pEngine->Apply(m_hWnd);
         BalExitOnFailure(hr, "Failed to start applying packages.");
 
-        ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON, TRUE); // ensure the cancel button is enabled before starting.
+        ThemeControlEnable(m_pControlProgressCancelButton, TRUE); // ensure the cancel button is enabled before starting.
 
     LExit:
         if (FAILED(hr))
@@ -3232,22 +3219,22 @@ private:
                     {
                         BalGetNumericVariable(WIXBUNDLE_VARIABLE_ELEVATED, &llElevated);
                     }
-                    ThemeControlElevates(m_pTheme, WIXSTDBA_CONTROL_INSTALL_BUTTON, (m_Bundle.fPerMachine && !llElevated));
+                    ThemeControlElevates(m_pControlInstallButton, (m_Bundle.fPerMachine && !llElevated));
 
                     // If the EULA control exists, show it only if a license URL is provided as well.
-                    if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_EULA_LINK))
+                    if (m_pControlEulaHyperlink)
                     {
                         BOOL fEulaLink = (m_sczLicenseUrl && *m_sczLicenseUrl);
-                        ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_EULA_LINK, fEulaLink);
-                        ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX, fEulaLink);
+                        ThemeControlEnable(m_pControlEulaHyperlink, fEulaLink);
+                        ThemeControlEnable(m_pControlEulaAcceptCheckbox, fEulaLink);
                     }
 
-                    BOOL fAcceptedLicense = !ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX) || !ThemeControlEnabled(m_pTheme, WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX) || ThemeIsControlChecked(m_pTheme, WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_INSTALL_BUTTON, fAcceptedLicense);
+                    BOOL fAcceptedLicense = !m_pControlEulaAcceptCheckbox || !ThemeControlEnabled(m_pControlEulaAcceptCheckbox) || ThemeIsControlChecked(m_pControlEulaAcceptCheckbox);
+                    ThemeControlEnable(m_pControlInstallButton, fAcceptedLicense);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_MODIFY] == dwNewPageId)
                 {
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_REPAIR_BUTTON, !m_fSuppressRepair);
+                    ThemeControlEnable(m_pControlRepairButton, !m_fSuppressRepair);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_SUCCESS] == dwNewPageId) // on the "Success" page, check if the restart or launch button should be enabled.
                 {
@@ -3260,13 +3247,13 @@ private:
                             fEnableRestartButton = TRUE;
                         }
                     }
-                    else if (ThemeControlExists(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON))
+                    else if (m_pControlLaunchButton)
                     {
                         fLaunchTargetExists = BalVariableExists(WIXSTDBA_VARIABLE_LAUNCH_TARGET_PATH);
                     }
 
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_LAUNCH_BUTTON, fLaunchTargetExists && BOOTSTRAPPER_ACTION_UNINSTALL < m_plannedAction);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON, fEnableRestartButton);
+                    ThemeControlEnable(m_pControlLaunchButton, fLaunchTargetExists && BOOTSTRAPPER_ACTION_UNINSTALL < m_plannedAction);
+                    ThemeControlEnable(m_pControlSuccessRestartButton, fEnableRestartButton);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_FAILURE] == dwNewPageId) // on the "Failure" page, show error message and check if the restart button should be enabled.
                 {
@@ -3350,7 +3337,7 @@ private:
                             StrAllocFormatted(&sczText, L"0x%08x - %ls", m_hrFinal, sczUnformattedText);
                         }
 
-                        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT, sczText);
+                        ThemeSetTextControl(m_pControlFailureMessageText, sczText);
                         fShowErrorMessage = TRUE;
                     }
 
@@ -3362,9 +3349,9 @@ private:
                         }
                     }
 
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK, fShowLogLink);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT, fShowErrorMessage);
-                    ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, fEnableRestartButton);
+                    ThemeControlEnable(m_pControlFailureLogFileLink, fShowLogLink);
+                    ThemeControlEnable(m_pControlFailureMessageText, fShowErrorMessage);
+                    ThemeControlEnable(m_pControlFailureRestartButton, fEnableRestartButton);
                 }
 
                 HRESULT hr = ThemeShowPage(m_pTheme, dwOldPageId, SW_HIDE);
@@ -3382,7 +3369,7 @@ private:
                 // On the install page set the focus to the install button or the next enabled control if install is disabled.
                 if (m_rgdwPageIds[WIXSTDBA_PAGE_INSTALL] == dwNewPageId)
                 {
-                    ThemeSetFocus(m_pTheme, WIXSTDBA_CONTROL_INSTALL_BUTTON);
+                    ThemeSetFocus(m_pControlInstallButton);
                 }
             }
         }
@@ -3426,7 +3413,7 @@ private:
             // If we canceled, disable cancel button since clicking it again is silly.
             if (fClose)
             {
-                ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON, FALSE);
+                ThemeControlEnable(m_pControlProgressCancelButton, FALSE);
             }
 
             fClose = FALSE;
@@ -3450,8 +3437,8 @@ private:
     //
     void OnClickAcceptCheckbox()
     {
-        BOOL fAcceptedLicense = ThemeIsControlChecked(m_pTheme, WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX);
-        ThemeControlEnable(m_pTheme, WIXSTDBA_CONTROL_INSTALL_BUTTON, fAcceptedLicense);
+        BOOL fAcceptedLicense = ThemeIsControlChecked(m_pControlEulaAcceptCheckbox);
+        ThemeControlEnable(m_pControlInstallButton, fAcceptedLicense);
     }
 
 
@@ -3965,12 +3952,12 @@ LExit:
         WCHAR wzProgress[5] = { };
 
         ::StringCchPrintfW(wzProgress, countof(wzProgress), L"%u%%", dwOverallPercentage);
-        ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_CACHE_PROGRESS_TEXT, wzProgress);
+        ThemeSetTextControl(m_pControlCacheProgressText, wzProgress);
 
-        ThemeSetProgressControl(m_pTheme, WIXSTDBA_CONTROL_CACHE_PROGRESS_BAR, dwOverallPercentage);
+        ThemeSetProgressControl(m_pControlCacheProgressbar, dwOverallPercentage);
 
         m_dwCalculatedCacheProgress = dwOverallPercentage * WIXSTDBA_ACQUIRE_PERCENTAGE / 100;
-        ThemeSetProgressControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_CALCULATED_PROGRESS_BAR, m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
+        ThemeSetProgressControl(m_pControlOverallCalculatedProgressbar, m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
 
         SetTaskbarButtonProgress(m_dwCalculatedCacheProgress + m_dwCalculatedExecuteProgress);
     }
@@ -4099,6 +4086,8 @@ public:
         __in IBootstrapperEngine* pEngine
         ) : CBalBaseBootstrapperApplication(pEngine, 3, 3000)
     {
+        THEME_ASSIGN_CONTROL_ID* pAssignControl = NULL;
+
         m_hModule = hModule;
         m_command = { };
         m_createArgs = { };
@@ -4152,6 +4141,148 @@ public:
         m_hBAFModule = NULL;
         m_pfnBAFunctionsProc = NULL;
         m_pvBAFunctionsProcContext = NULL;
+
+        C_ASSERT(0 == WIXSTDBA_CONTROL_INSTALL_BUTTON - WIXSTDBA_FIRST_ASSIGN_CONTROL_ID);
+        pAssignControl = m_rgInitControls;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_INSTALL_BUTTON;
+        pAssignControl->wzName = L"InstallButton";
+        pAssignControl->ppControl = &m_pControlInstallButton;
+        m_pControlInstallButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EULA_RICHEDIT;
+        pAssignControl->wzName = L"EulaRichedit";
+        pAssignControl->ppControl = &m_pControlEulaRichedit;
+        m_pControlEulaRichedit = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EULA_LINK;
+        pAssignControl->wzName = L"EulaHyperlink";
+        pAssignControl->ppControl = &m_pControlEulaHyperlink;
+        m_pControlEulaHyperlink = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EULA_ACCEPT_CHECKBOX;
+        pAssignControl->wzName = L"EulaAcceptCheckbox";
+        pAssignControl->ppControl = &m_pControlEulaAcceptCheckbox;
+        m_pControlEulaAcceptCheckbox = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_REPAIR_BUTTON;
+        pAssignControl->wzName = L"RepairButton";
+        pAssignControl->ppControl = &m_pControlRepairButton;
+        m_pControlRepairButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_UNINSTALL_BUTTON;
+        pAssignControl->wzName = L"UninstallButton";
+        pAssignControl->ppControl = &m_pControlUninstallButton;
+        m_pControlUninstallButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_PACKAGE_TEXT;
+        pAssignControl->wzName = L"CacheProgressPackageText";
+        pAssignControl->ppControl = &m_pControlCacheProgressPackageText;
+        m_pControlCacheProgressPackageText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_BAR;
+        pAssignControl->wzName = L"CacheProgressbar";
+        pAssignControl->ppControl = &m_pControlCacheProgressbar;
+        m_pControlCacheProgressbar = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_CACHE_PROGRESS_TEXT;
+        pAssignControl->wzName = L"CacheProgressText";
+        pAssignControl->ppControl = &m_pControlCacheProgressText;
+        m_pControlCacheProgressText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT;
+        pAssignControl->wzName = L"ExecuteProgressPackageText";
+        pAssignControl->ppControl = &m_pControlExecuteProgressPackageText;
+        m_pControlExecuteProgressPackageText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_BAR;
+        pAssignControl->wzName = L"ExecuteProgressbar";
+        pAssignControl->ppControl = &m_pControlExecuteProgressbar;
+        m_pControlExecuteProgressbar = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_TEXT;
+        pAssignControl->wzName = L"ExecuteProgressText";
+        pAssignControl->ppControl = &m_pControlExecuteProgressText;
+        m_pControlExecuteProgressText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_EXECUTE_PROGRESS_ACTIONDATA_TEXT;
+        pAssignControl->wzName = L"ExecuteProgressActionDataText";
+        pAssignControl->ppControl = &m_pControlExecuteProgressActionDataText;
+        m_pControlExecuteProgressActionDataText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT;
+        pAssignControl->wzName = L"OverallProgressPackageText";
+        pAssignControl->ppControl = &m_pControlOverallProgressPackageText;
+        m_pControlOverallProgressPackageText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_BAR;
+        pAssignControl->wzName = L"OverallProgressbar";
+        pAssignControl->ppControl = &m_pControlOverallProgressbar;
+        m_pControlOverallProgressbar = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_CALCULATED_PROGRESS_BAR;
+        pAssignControl->wzName = L"OverallCalculatedProgressbar";
+        pAssignControl->ppControl = &m_pControlOverallCalculatedProgressbar;
+        m_pControlOverallCalculatedProgressbar = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_OVERALL_PROGRESS_TEXT;
+        pAssignControl->wzName = L"OverallProgressText";
+        pAssignControl->ppControl = &m_pControlOverallProgressText;
+        m_pControlOverallProgressText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_PROGRESS_CANCEL_BUTTON;
+        pAssignControl->wzName = L"ProgressCancelButton";
+        pAssignControl->ppControl = &m_pControlProgressCancelButton;
+        m_pControlProgressCancelButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_LAUNCH_BUTTON;
+        pAssignControl->wzName = L"LaunchButton";
+        pAssignControl->ppControl = &m_pControlLaunchButton;
+        m_pControlLaunchButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_SUCCESS_RESTART_BUTTON;
+        pAssignControl->wzName = L"SuccessRestartButton";
+        pAssignControl->ppControl = &m_pControlSuccessRestartButton;
+        m_pControlSuccessRestartButton = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_LOGFILE_LINK;
+        pAssignControl->wzName = L"FailureLogFileLink";
+        pAssignControl->ppControl = &m_pControlFailureLogFileLink;
+        m_pControlFailureLogFileLink = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_MESSAGE_TEXT;
+        pAssignControl->wzName = L"FailureMessageText";
+        pAssignControl->ppControl = &m_pControlFailureMessageText;
+        m_pControlFailureMessageText = NULL;
+        ++pAssignControl;
+
+        pAssignControl->wId = WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON;
+        pAssignControl->wzName = L"FailureRestartButton";
+        pAssignControl->ppControl = &m_pControlFailureRestartButton;
+        m_pControlFailureRestartButton = NULL;
+
+        C_ASSERT(LAST_WIXSTDBA_CONTROL == WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON + 1);
     }
 
 
@@ -4212,10 +4343,47 @@ private:
 
     LPWSTR m_sczLanguage;
     THEME* m_pTheme;
+    THEME_ASSIGN_CONTROL_ID m_rgInitControls[LAST_WIXSTDBA_CONTROL - WIXSTDBA_FIRST_ASSIGN_CONTROL_ID];
     DWORD m_rgdwPageIds[countof(vrgwzPageNames)];
     HANDLE m_hUiThread;
     BOOL m_fRegistered;
     HWND m_hWnd;
+
+    // Welcome page
+    const THEME_CONTROL* m_pControlInstallButton;
+    const THEME_CONTROL* m_pControlEulaRichedit;
+    const THEME_CONTROL* m_pControlEulaHyperlink;
+    const THEME_CONTROL* m_pControlEulaAcceptCheckbox;
+
+    // Modify page
+    const THEME_CONTROL* m_pControlRepairButton;
+    const THEME_CONTROL* m_pControlUninstallButton;
+
+    // Progress page
+    const THEME_CONTROL* m_pControlCacheProgressPackageText;
+    const THEME_CONTROL* m_pControlCacheProgressbar;
+    const THEME_CONTROL* m_pControlCacheProgressText;
+
+    const THEME_CONTROL* m_pControlExecuteProgressPackageText;
+    const THEME_CONTROL* m_pControlExecuteProgressbar;
+    const THEME_CONTROL* m_pControlExecuteProgressText;
+    const THEME_CONTROL* m_pControlExecuteProgressActionDataText;
+
+    const THEME_CONTROL* m_pControlOverallProgressPackageText;
+    const THEME_CONTROL* m_pControlOverallProgressbar;
+    const THEME_CONTROL* m_pControlOverallCalculatedProgressbar;
+    const THEME_CONTROL* m_pControlOverallProgressText;
+
+    const THEME_CONTROL* m_pControlProgressCancelButton;
+
+    // Success page
+    const THEME_CONTROL* m_pControlLaunchButton;
+    const THEME_CONTROL* m_pControlSuccessRestartButton;
+
+    // Failure page
+    const THEME_CONTROL* m_pControlFailureLogFileLink;
+    const THEME_CONTROL* m_pControlFailureMessageText;
+    const THEME_CONTROL* m_pControlFailureRestartButton;
 
     WIXSTDBA_STATE m_state;
     HRESULT m_hrFinal;

@@ -87,6 +87,7 @@
 #include "strutil.h"
 #include "timeutil.h"
 #include "timeutil.h"
+#include "wndutil.h"
 #include "thmutil.h"
 #include "uncutil.h"
 #include "uriutil.h"

@@ -107,6 +107,7 @@
     <ClCompile Include="userutil.cpp" />
     <ClCompile Include="verutil.cpp" />
     <ClCompile Include="wiutil.cpp" />
+    <ClCompile Include="wndutil.cpp" />
     <ClCompile Include="wuautil.cpp" />
     <ClCompile Include="xmlutil.cpp" />
   </ItemGroup>
@@ -164,6 +165,7 @@
     <ClInclude Include="inc\userutil.h" />
     <ClInclude Include="inc\verutil.h" />
     <ClInclude Include="inc\wiutil.h" />
+    <ClInclude Include="inc\wndutil.h" />
     <ClInclude Include="inc\wuautil.h" />
     <ClInclude Include="inc\xmlutil.h" />
     <ClInclude Include="precomp.h" />

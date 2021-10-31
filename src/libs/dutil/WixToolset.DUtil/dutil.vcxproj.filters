@@ -165,6 +165,9 @@
     <ClCompile Include="wiutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="wndutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="xmlutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -336,6 +339,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\wiutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\wndutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\xmlutil.h">

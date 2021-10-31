@@ -390,6 +390,12 @@ static void OnThemeLoadError(
     LPWSTR* psczErrors = NULL;
     UINT cErrors = 0;
     TVINSERTSTRUCTW tvi = { };
+    const THEME_CONTROL* pTreeControl = NULL;
+
+    if (!ThemeControlExistsById(pTheme, THMVWR_CONTROL_TREE, &pTreeControl))
+    {
+        ExitWithRootFailure(hr, E_INVALIDSTATE, "THMVWR_CONTROL_TREE control doesn't exist.");
+    }
 
     // Add the application node.
     tvi.hParent = NULL;
@@ -397,7 +403,7 @@ static void OnThemeLoadError(
     tvi.item.mask = TVIF_TEXT | TVIF_PARAM;
     tvi.item.lParam = 0;
     tvi.item.pszText = L"Failed to load theme.";
-    tvi.hParent = reinterpret_cast<HTREEITEM>(ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
+    tvi.hParent = reinterpret_cast<HTREEITEM>(::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
 
     if (!vsczThemeLoadErrors)
     {
@@ -405,13 +411,13 @@ static void OnThemeLoadError(
         ExitOnFailure(hr, "Failed to format error message.");
 
         tvi.item.pszText = sczMessage;
-        ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+        ::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
 
         hr = StrAllocFromError(&sczMessage, hrFailure, NULL);
         ExitOnFailure(hr, "Failed to format error message text.");
 
         tvi.item.pszText = sczMessage;
-        ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+        ::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
     }
     else
     {
@@ -421,11 +427,11 @@ static void OnThemeLoadError(
         for (DWORD i = 0; i < cErrors; ++i)
         {
             tvi.item.pszText = psczErrors[i];
-            ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+            ::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
         }
     }
 
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(tvi.hParent));
+    ::SendMessage(pTreeControl->hWnd, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(tvi.hParent));
 
 LExit:
     ReleaseStr(sczMessage);
@@ -439,6 +445,7 @@ static void OnNewTheme(
     __in HANDLE_THEME* pHandle
     )
 {
+    const THEME_CONTROL* pTreeControl = NULL;
     HANDLE_THEME* pOldHandle = reinterpret_cast<HANDLE_THEME*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
     THEME* pNewTheme = pHandle->pTheme;
 
@@ -460,17 +467,23 @@ static void OnNewTheme(
 
     ::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pHandle));
 
+    if (!ThemeControlExistsById(pTheme, THMVWR_CONTROL_TREE, &pTreeControl))
+    {
+        TraceError(E_INVALIDSTATE, "Tree control doesn't exist.");
+        return;
+    }
+
     // Remember the currently selected item by name so we can try to automatically select it later.
     // Otherwise, the user would see their window destroyed after every save of their theme file and
     // have to click to get the window back.
     item.mask = TVIF_TEXT;
     item.pszText = wzSelectedPage;
     item.cchTextMax = countof(wzSelectedPage);
-    item.hItem = reinterpret_cast<HTREEITEM>(ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_GETNEXTITEM, TVGN_CARET, NULL));
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_GETITEM, 0, reinterpret_cast<LPARAM>(&item));
+    item.hItem = reinterpret_cast<HTREEITEM>(::SendMessage(pTreeControl->hWnd, TVM_GETNEXTITEM, TVGN_CARET, NULL));
+    ::SendMessage(pTreeControl->hWnd, TVM_GETITEM, 0, reinterpret_cast<LPARAM>(&item));
 
     // Remove the previous items in the tree.
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_DELETEITEM, 0, reinterpret_cast<LPARAM>(TVI_ROOT));
+    ::SendMessage(pTreeControl->hWnd, TVM_DELETEITEM, 0, reinterpret_cast<LPARAM>(TVI_ROOT));
 
     // Add the application node.
     tvi.hParent = NULL;
@@ -480,7 +493,7 @@ static void OnNewTheme(
     tvi.item.pszText = pHandle && pHandle->pTheme && pHandle->pTheme->sczCaption ? pHandle->pTheme->sczCaption : L"Window";
 
     // Add the pages.
-    tvi.hParent = reinterpret_cast<HTREEITEM>(ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
+    tvi.hParent = reinterpret_cast<HTREEITEM>(::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
     tvi.hInsertAfter = TVI_SORT;
     for (DWORD i = 0; i < pNewTheme->cPages; ++i)
     {
@@ -490,7 +503,7 @@ static void OnNewTheme(
             tvi.item.pszText = pPage->sczName;
             tvi.item.lParam = i + 1; //prgdwPageIds[i]; - TODO: do the right thing here by calling ThemeGetPageIds(), should not assume we know how the page ids will be calculated.
 
-            HTREEITEM hti = reinterpret_cast<HTREEITEM>(ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
+            HTREEITEM hti = reinterpret_cast<HTREEITEM>(::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
             if (*wzSelectedPage && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pPage->sczName, -1, wzSelectedPage, -1))
             {
                 htiSelected = hti;
@@ -503,10 +516,10 @@ static void OnNewTheme(
         htiSelected = tvi.hParent;
     }
 
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(tvi.hParent));
+    ::SendMessage(pTreeControl->hWnd, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(tvi.hParent));
     if (htiSelected)
     {
-        ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_SELECTITEM, TVGN_CARET, reinterpret_cast<LPARAM>(htiSelected));
+        ::SendMessage(pTreeControl->hWnd, TVM_SELECTITEM, TVGN_CARET, reinterpret_cast<LPARAM>(htiSelected));
     }
 }
 
